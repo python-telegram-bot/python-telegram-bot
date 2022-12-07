@@ -36,7 +36,7 @@ class ChatPhoto(TelegramObject):
     equal.
 
     Args:
-        small_file_id (:obj:`str`): Unique file identifier of small
+        small_file_id (:obj:`str`): File identifier of small
             (:tg-const:`telegram.ChatPhoto.SIZE_SMALL` x :tg-const:`telegram.ChatPhoto.SIZE_SMALL`)
             chat photo. This file_id can be used only for photo download and only for as long
             as the photo is not changed.
@@ -44,7 +44,7 @@ class ChatPhoto(TelegramObject):
             (:tg-const:`telegram.ChatPhoto.SIZE_SMALL` x :tg-const:`telegram.ChatPhoto.SIZE_SMALL`)
             chat photo, which is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        big_file_id (:obj:`str`): Unique file identifier of big
+        big_file_id (:obj:`str`): File identifier of big
             (:tg-const:`telegram.ChatPhoto.SIZE_BIG` x :tg-const:`telegram.ChatPhoto.SIZE_BIG`)
             chat photo. This file_id can be used only for photo download and only for as long as
             the photo is not changed.
