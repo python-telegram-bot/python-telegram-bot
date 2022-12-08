@@ -453,7 +453,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         message_thread_id: int = None,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -688,7 +688,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         chat_id: Union[int, str],
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        entities: Sequence["MessageEntity"] = None,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -715,8 +715,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`): |parse_mode|
-            entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
-                that appear in message text, which can be specified instead of
+            entities (Sequence[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
                 :paramref:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
@@ -895,7 +895,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         reply_markup: ReplyMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -928,7 +928,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -996,7 +996,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1037,7 +1037,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
             duration (:obj:`int`, optional): Duration of sent audio in seconds.
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
@@ -1120,7 +1120,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         thumb: FileInput = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1163,7 +1163,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_content_type_detection (:obj:`bool`, optional): Disables automatic server-side
                 content type detection for files uploaded using multipart/form-data.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1318,7 +1318,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         supports_streaming: bool = None,
         thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1365,7 +1365,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
             supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
                 suitable for streaming.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -1566,7 +1566,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1619,7 +1619,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1689,7 +1689,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         reply_markup: ReplyMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1734,7 +1734,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
             duration (:obj:`int`, optional): Duration of the voice message in seconds.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
@@ -1810,7 +1810,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         api_kwargs: JSONDict = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
     ) -> Tuple[Message, ...]:
         """Use this method to send a group of photos or videos as an album.
 
@@ -1828,7 +1828,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            media (List[:class:`telegram.InputMediaAudio`, :class:`telegram.InputMediaDocument`, \
+            media (Sequence[:class:`telegram.InputMediaAudio`, :class:`telegram.InputMediaDocument`, \
                 :class:`telegram.InputMediaPhoto`, :class:`telegram.InputMediaVideo`]): An array
                 describing messages to be sent, must include 2–10 items.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -1855,7 +1855,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 available modes.
 
                 .. versionadded:: 20.0
-            caption_entities (List[:class:`telegram.MessageEntity`], optional):
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
                 List of special entities for :paramref:`caption`,
                 which can be specified instead of :paramref:`parse_mode`.
                 Defaults to :obj:`None`.
@@ -3143,7 +3143,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: InlineKeyboardMarkup = None,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        entities: Sequence["MessageEntity"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3172,7 +3172,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
+            entities (Sequence[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of
                 :paramref:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
@@ -3218,7 +3218,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3246,7 +3246,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
 
@@ -3408,7 +3408,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         offset: int = None,
         limit: int = None,
         timeout: float = None,
-        allowed_updates: List[str] = None,
+        allowed_updates: Sequence[str] = None,
         *,
         read_timeout: float = 2,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3445,7 +3445,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             timeout (:obj:`int`, optional): Timeout in seconds for long polling. Defaults to ``0``,
                 i.e. usual short polling. Should be positive, short polling should be used for
                 testing purposes only.
-            allowed_updates (List[:obj:`str`]), optional): A list the types of
+            allowed_updates (Sequence[:obj:`str`]), optional): A list the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
@@ -3500,7 +3500,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         url: str,
         certificate: FileInput = None,
         max_connections: int = None,
-        allowed_updates: List[str] = None,
+        allowed_updates: Sequence[str] = None,
         ip_address: str = None,
         drop_pending_updates: bool = None,
         secret_token: str = None,
@@ -3567,7 +3567,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.WebhookLimit.MAX_CONNECTIONS_LIMIT`.
                 Defaults to ``40``. Use lower values to limit the load on your bot's server,
                 and higher values to increase your bot's throughput.
-            allowed_updates (List[:obj:`str`], optional): A list the types of
+            allowed_updates (Sequence[:obj:`str`], optional): A list the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
@@ -4095,7 +4095,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         payload: str,
         provider_token: str,
         currency: str,
-        prices: List["LabeledPrice"],
+        prices: Sequence["LabeledPrice"],
         start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
@@ -4114,7 +4114,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         send_email_to_provider: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         max_tip_amount: int = None,
-        suggested_tip_amounts: List[int] = None,
+        suggested_tip_amounts: Sequence[int] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -4152,7 +4152,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 `@BotFather <https://t.me/BotFather>`_.
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_.
-            prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
+            prices (Sequence[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
@@ -4163,7 +4163,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 majority of currencies). Defaults to ``0``.
 
                 .. versionadded:: 13.5
-            suggested_tip_amounts (List[:obj:`int`], optional): An array of
+            suggested_tip_amounts (Sequence[:obj:`int`], optional): An array of
                 suggested amounts of tips in the *smallest* units of the currency (integer, **not**
                 float/double). At most 4 suggested tip amounts can be specified. The suggested tip
                 amounts must be positive, passed in a strictly increased order and must not exceed
@@ -4270,7 +4270,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         shipping_query_id: str,
         ok: bool,
-        shipping_options: List[ShippingOption] = None,
+        shipping_options: Sequence[ShippingOption] = None,
         error_message: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4292,7 +4292,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             ok (:obj:`bool`): Specify :obj:`True` if delivery to the specified address is possible
                 and :obj:`False` if there are any problems (for example, if delivery to the
                 specified address is not possible).
-            shipping_options (List[:class:`telegram.ShippingOption`]), optional]: Required if
+            shipping_options (Sequence[:class:`telegram.ShippingOption`]), optional]: Required if
                 :paramref:`ok` is :obj:`True`. A list of available shipping options.
             error_message (:obj:`str`, optional): Required if :paramref:`ok` is :obj:`False`.
                 Error message in human readable form that explains why it is impossible to complete
@@ -5396,7 +5396,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     @_log
     async def get_custom_emoji_stickers(
         self,
-        custom_emoji_ids: List[str],
+        custom_emoji_ids: Sequence[str],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5412,7 +5412,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             Returns a tuple instead of a list.
 
         Args:
-            custom_emoji_ids (List[:obj:`str`]): List of custom emoji identifiers.
+            custom_emoji_ids (Sequence[:obj:`str`]): List of custom emoji identifiers.
                 At most :tg-const:`telegram.constants.CustomEmojiStickerLimit.\
 CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
@@ -5839,7 +5839,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def set_passport_data_errors(
         self,
         user_id: Union[str, int],
-        errors: List[PassportElementError],
+        errors: Sequence[PassportElementError],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5859,7 +5859,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             user_id (:obj:`int`): User identifier
-            errors (List[:class:`PassportElementError`]): A list describing the errors.
+            errors (Sequence[:class:`PassportElementError`]): A list describing the errors.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5885,7 +5885,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[int, str],
         question: str,
-        options: List[str],
+        options: Sequence[str],
         is_anonymous: bool = None,
         type: str = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool = None,
@@ -5899,7 +5899,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         open_period: int = None,
         close_date: Union[int, datetime] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        explanation_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -5919,7 +5919,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
                 :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
-            options (List[:obj:`str`]): List of answer options,
+            options (Sequence[:obj:`str`]): List of answer options,
                 :tg-const:`telegram.Poll.MIN_OPTION_NUMBER`-
                 :tg-const:`telegram.Poll.MAX_OPTION_NUMBER` strings
                 :tg-const:`telegram.Poll.MIN_OPTION_LENGTH`-
@@ -5940,7 +5940,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             explanation_parse_mode (:obj:`str`, optional): Mode for parsing entities in the
                 explanation. See the constants in :class:`telegram.constants.ParseMode` for the
                 available modes.
-            explanation_entities (List[:class:`telegram.MessageEntity`], optional): List of special
+            explanation_entities (Sequence[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :paramref:`explanation_parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
@@ -6286,7 +6286,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     @_log
     async def set_my_commands(
         self,
-        commands: List[Union[BotCommand, Tuple[str, str]]],
+        commands: Sequence[Union[BotCommand, Tuple[str, str]]],
         scope: BotCommandScope = None,
         language_code: str = None,
         *,
@@ -6304,7 +6304,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. seealso:: :meth:`get_my_commands`, :meth:`delete_my_commands`
 
         Args:
-            commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A list
+            commands (Sequence[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A list
                 of bot commands to be set as the list of the bot's commands. At most
                 :tg-const:`telegram.constants.BotCommandLimit.MAX_COMMAND_NUMBER` commands can be
                 specified.
@@ -6465,7 +6465,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
@@ -6498,7 +6498,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 entities parsing. If not specified, the original caption is kept.
             parse_mode (:obj:`str`, optional): Mode for parsing entities in the new caption. See
                 the constants in :class:`telegram.constants.ParseMode` for the available modes.
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -6639,9 +6639,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         payload: str,
         provider_token: str,
         currency: str,
-        prices: List["LabeledPrice"],
+        prices: Sequence["LabeledPrice"],
         max_tip_amount: int = None,
-        suggested_tip_amounts: List[int] = None,
+        suggested_tip_amounts: Sequence[int] = None,
         provider_data: Union[str, object] = None,
         photo_url: str = None,
         photo_size: int = None,
@@ -6679,7 +6679,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 `@BotFather <https://t.me/BotFather>`_.
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_.
-            prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
+            prices (Sequence[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
@@ -6688,7 +6688,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
                 shows the number of digits past the decimal point for each currency (2 for the
                 majority of currencies). Defaults to ``0``.
-            suggested_tip_amounts (List[:obj:`int`], optional): An array of
+            suggested_tip_amounts (Sequence[:obj:`int`], optional): An array of
                 suggested amounts of tips in the *smallest* units of the currency (integer, **not**
                 float/double). At most 4 suggested tip amounts can be specified. The suggested tip
                 amounts must be positive, passed in a strictly increased order and must not exceed
