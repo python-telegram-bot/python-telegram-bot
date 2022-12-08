@@ -161,8 +161,8 @@ class InlineKeyboardButton(TelegramObject):
             offers a quick way for the user to open your bot in inline mode in the same chat - good
             for selecting something from multiple options.
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
-            be launched when the user presses the button. This type of button must always be
-            the ``first`` button in the first row.
+            be launched when the user presses the button. This type of button **must** always be
+            the **first** button in the first row.
         pay (:obj:`bool`): Optional. Specify :obj:`True`, to send a Pay button. This type of button
             **must** always be the **first** button in the first row and can only be used in
             invoice messages.
