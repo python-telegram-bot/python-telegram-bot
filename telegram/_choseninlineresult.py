@@ -56,8 +56,11 @@ class ChosenInlineResult(TelegramObject):
     Attributes:
         result_id (:obj:`str`): The unique identifier for the result that was chosen.
         from_user (:class:`telegram.User`): The user that chose the result.
-        location (:class:`telegram.Location`): Optional. Sender location.
-        inline_message_id (:obj:`str`): Optional. Identifier of the sent inline message.
+        location (:class:`telegram.Location`): Optional. Sender location, only for bots that
+            require user location.
+        inline_message_id (:obj:`str`): Optional. Identifier of the sent inline message. Available
+            only if there is an inline keyboard attached to the message. Will be also received in
+            callback queries and can be used to edit the message.
         query (:obj:`str`): The query that was used to obtain the result.
 
     """
