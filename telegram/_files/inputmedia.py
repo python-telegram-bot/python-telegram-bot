@@ -133,11 +133,12 @@ class InputMediaAnimation(InputMedia):
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATION`.
         media (:obj:`str` | :class:`telegram.InputFile`): Animation to send.
-        caption (:obj:`str`): Optional. Caption of the document to be sent.
-        parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
-        thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
+        thumb (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
+        caption (:obj:`str`): Optional. Caption of the animation to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
+            after entities parsing.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
         width (:obj:`int`): Optional. Animation width.
         height (:obj:`int`): Optional. Animation height.
         duration (:obj:`int`): Optional. Animation duration in seconds.
@@ -208,10 +209,11 @@ class InputMediaPhoto(InputMedia):
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
-        caption (:obj:`str`): Optional. Caption of the document to be sent.
-        parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
+        caption (:obj:`str`): Optional. Caption of the photo to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
+            after entities parsing.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
     """
 
@@ -282,16 +284,17 @@ class InputMediaVideo(InputMedia):
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.VIDEO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Video file to send.
-        caption (:obj:`str`): Optional. Caption of the document to be sent.
-        parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
+        caption (:obj:`str`): Optional. Caption of the video to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
+            after entities parsing.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int`): Optional. Video duration in seconds.
-        supports_streaming (:obj:`bool`): Optional. Pass :obj:`True`, if the uploaded video is
+        supports_streaming (:obj:`bool`): Optional. :obj:`True`, if the uploaded video is
             suitable for streaming.
-        thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
+        thumb (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
     """
 
@@ -363,7 +366,7 @@ class InputMediaAudio(InputMedia):
             entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
-        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
+        duration (:obj:`int`, optional): Duration of the audio in seconds as defined by sender.
         performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
@@ -376,15 +379,16 @@ class InputMediaAudio(InputMedia):
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.AUDIO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
-        caption (:obj:`str`): Optional. Caption of the document to be sent.
-        parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
-        duration (:obj:`int`): Duration of the audio in seconds.
+        caption (:obj:`str`): Optional. Caption of the audio to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
+            after entities parsing.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        duration (:obj:`int`): Optional. Duration of the audio in seconds.
         performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
-        thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
+        thumb (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
     """
 
@@ -460,14 +464,15 @@ class InputMediaDocument(InputMedia):
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.DOCUMENT`.
         media (:obj:`str` | :class:`telegram.InputFile`): File to send.
-        caption (:obj:`str`): Optional. Caption of the document to be sent.
-        parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
-        thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
+        caption (:obj:`str`): Optional. Caption of the document to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
+            after entities parsing.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        thumb (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
         disable_content_type_detection (:obj:`bool`): Optional. Disables automatic server-side
-            content type detection for files uploaded using multipart/form-data. Always true, if
-            the document is sent as part of an album.
+            content type detection for files uploaded using multipart/form-data. Always
+            :obj:`True`, if the document is sent as part of an album.
 
     """
 
