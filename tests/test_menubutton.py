@@ -31,7 +31,7 @@ from telegram import (
 
 
 @pytest.fixture(
-    scope="class",
+    scope="module",
     params=[
         MenuButton.DEFAULT,
         MenuButton.WEB_APP,
@@ -43,7 +43,7 @@ def scope_type(request):
 
 
 @pytest.fixture(
-    scope="class",
+    scope="module",
     params=[
         MenuButtonDefault,
         MenuButtonCommands,
@@ -60,7 +60,7 @@ def scope_class(request):
 
 
 @pytest.fixture(
-    scope="class",
+    scope="module",
     params=[
         (MenuButtonDefault, MenuButton.DEFAULT),
         (MenuButtonCommands, MenuButton.COMMANDS),
@@ -76,24 +76,26 @@ def scope_class_and_type(request):
     return request.param
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def menu_button(scope_class_and_type):
     # We use de_json here so that we don't have to worry about which class gets which arguments
     return scope_class_and_type[0].de_json(
         dict(
             type=scope_class_and_type[1],
-            text=TestMenuButton.text,
-            web_app=TestMenuButton.web_app.to_dict(),
+            text=Space.text,
+            web_app=Space.web_app.to_dict(),
         ),
         bot=None,
     )
 
 
-# All the scope types are very similar, so we test everything via parametrization
-class TestMenuButton:
+class Space:
     text = "button_text"
     web_app = WebAppInfo(url="https://python-telegram-bot.org/web_app")
 
+
+# All the scope types are very similar, so we test everything via parametrization
+class TestMenuButtonNoReq:
     def test_slot_behaviour(self, menu_button, mro_slots):
         for attr in menu_button.__slots__:
             assert getattr(menu_button, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -103,7 +105,7 @@ class TestMenuButton:
         cls = scope_class_and_type[0]
         type_ = scope_class_and_type[1]
 
-        json_dict = {"type": type_, "text": self.text, "web_app": self.web_app.to_dict()}
+        json_dict = {"type": type_, "text": Space.text, "web_app": Space.web_app.to_dict()}
         menu_button = MenuButton.de_json(json_dict, bot)
         assert set(menu_button.api_kwargs.keys()) == {"text", "web_app"} - set(cls.__slots__)
 
@@ -111,17 +113,17 @@ class TestMenuButton:
         assert type(menu_button) is cls
         assert menu_button.type == type_
         if "web_app" in cls.__slots__:
-            assert menu_button.web_app == self.web_app
+            assert menu_button.web_app == Space.web_app
         if "text" in cls.__slots__:
-            assert menu_button.text == self.text
+            assert menu_button.text == Space.text
 
         assert cls.de_json(None, bot) is None
         assert MenuButton.de_json({}, bot) is None
 
     def test_de_json_invalid_type(self, bot):
-        json_dict = {"type": "invalid", "text": self.text, "web_app": self.web_app.to_dict()}
+        json_dict = {"type": "invalid", "text": Space.text, "web_app": Space.web_app.to_dict()}
         menu_button = MenuButton.de_json(json_dict, bot)
-        assert menu_button.api_kwargs == {"text": self.text, "web_app": self.web_app.to_dict()}
+        assert menu_button.api_kwargs == {"text": Space.text, "web_app": Space.web_app.to_dict()}
 
         assert type(menu_button) is MenuButton
         assert menu_button.type == "invalid"
@@ -129,7 +131,7 @@ class TestMenuButton:
     def test_de_json_subclass(self, scope_class, bot):
         """This makes sure that e.g. MenuButtonDefault(data) never returns a
         MenuButtonChat instance."""
-        json_dict = {"type": "invalid", "text": self.text, "web_app": self.web_app.to_dict()}
+        json_dict = {"type": "invalid", "text": Space.text, "web_app": Space.web_app.to_dict()}
         assert type(scope_class.de_json(json_dict, bot)) is scope_class
 
     def test_to_dict(self, menu_button):

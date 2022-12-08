@@ -21,20 +21,22 @@ import pytest
 from telegram import BotCommand, ProximityAlertTriggered, User
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def proximity_alert_triggered():
     return ProximityAlertTriggered(
-        traveler=TestProximityAlertTriggered.traveler,
-        watcher=TestProximityAlertTriggered.watcher,
-        distance=TestProximityAlertTriggered.distance,
+        Space.traveler,
+        Space.watcher,
+        Space.distance,
     )
 
 
-class TestProximityAlertTriggered:
+class Space:
     traveler = User(1, "foo", False)
     watcher = User(2, "bar", False)
     distance = 42
 
+
+class TestProximityAlertTriggeredNoReq:
     def test_slot_behaviour(self, proximity_alert_triggered, mro_slots):
         inst = proximity_alert_triggered
         for attr in inst.__slots__:
@@ -43,18 +45,18 @@ class TestProximityAlertTriggered:
 
     def test_de_json(self, bot):
         json_dict = {
-            "traveler": self.traveler.to_dict(),
-            "watcher": self.watcher.to_dict(),
-            "distance": self.distance,
+            "traveler": Space.traveler.to_dict(),
+            "watcher": Space.watcher.to_dict(),
+            "distance": Space.distance,
         }
         proximity_alert_triggered = ProximityAlertTriggered.de_json(json_dict, bot)
         assert proximity_alert_triggered.api_kwargs == {}
 
-        assert proximity_alert_triggered.traveler == self.traveler
-        assert proximity_alert_triggered.traveler.first_name == self.traveler.first_name
-        assert proximity_alert_triggered.watcher == self.watcher
-        assert proximity_alert_triggered.watcher.first_name == self.watcher.first_name
-        assert proximity_alert_triggered.distance == self.distance
+        assert proximity_alert_triggered.traveler == Space.traveler
+        assert proximity_alert_triggered.traveler.first_name == Space.traveler.first_name
+        assert proximity_alert_triggered.watcher == Space.watcher
+        assert proximity_alert_triggered.watcher.first_name == Space.watcher.first_name
+        assert proximity_alert_triggered.distance == Space.distance
 
     def test_to_dict(self, proximity_alert_triggered):
         proximity_alert_triggered_dict = proximity_alert_triggered.to_dict()

@@ -21,15 +21,17 @@ import pytest
 from telegram import LabeledPrice, Location
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def labeled_price():
-    return LabeledPrice(TestLabeledPrice.label, TestLabeledPrice.amount)
+    return LabeledPrice(Space.label, Space.amount)
 
 
-class TestLabeledPrice:
+class Space:
     label = "label"
     amount = 100
 
+
+class TestLabeledPriceNoReq:
     def test_slot_behaviour(self, labeled_price, mro_slots):
         inst = labeled_price
         for attr in inst.__slots__:
@@ -37,8 +39,8 @@ class TestLabeledPrice:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, labeled_price):
-        assert labeled_price.label == self.label
-        assert labeled_price.amount == self.amount
+        assert labeled_price.label == Space.label
+        assert labeled_price.amount == Space.amount
 
     def test_to_dict(self, labeled_price):
         labeled_price_dict = labeled_price.to_dict()

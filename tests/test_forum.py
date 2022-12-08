@@ -32,7 +32,7 @@ async def emoji_id(bot):
     return first_sticker.custom_emoji_id
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 async def forum_topic_object(forum_group_id, emoji_id):
     return ForumTopic(
         message_thread_id=forum_group_id,
@@ -42,7 +42,7 @@ async def forum_topic_object(forum_group_id, emoji_id):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 async def real_topic(bot, emoji_id, forum_group_id):
     result = await bot.create_forum_topic(
         chat_id=forum_group_id,
@@ -59,7 +59,7 @@ async def real_topic(bot, emoji_id, forum_group_id):
     assert result is True, "Topic was not deleted"
 
 
-class TestForumTopic:
+class TestForumTopicNoReq:
     def test_slot_behaviour(self, mro_slots, forum_topic_object):
         for attr in forum_topic_object.__slots__:
             assert getattr(forum_topic_object, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -139,7 +139,8 @@ class TestForumTopic:
         assert a != e
         assert hash(a) != hash(e)
 
-    @pytest.mark.flaky(3, 1)
+
+class TestForumTopicReq:
     async def test_create_forum_topic(self, real_topic):
         result = real_topic
         assert isinstance(result, ForumTopic)
@@ -161,7 +162,6 @@ class TestForumTopic:
         )
         assert result is True, "Failed to delete forum topic"
 
-    @pytest.mark.flaky(3, 1)
     async def test_get_forum_topic_icon_stickers(self, bot):
         emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
         first_sticker = emoji_sticker_list[0]
@@ -194,7 +194,6 @@ class TestForumTopic:
         assert result is True, "Failed to edit forum topic"
         # no way of checking the edited name, just the boolean result
 
-    @pytest.mark.flaky(3, 1)
     async def test_send_message_to_topic(self, bot, forum_group_id, real_topic):
         message_thread_id = real_topic.message_thread_id
 
@@ -245,12 +244,12 @@ class TestForumTopic:
         assert result is True, "Failed to unpin all the messages in forum topic"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def topic_created():
     return ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
 
 
-class TestForumTopicCreated:
+class TestForumTopicCreatedNoReq:
     def test_slot_behaviour(self, topic_created, mro_slots):
         for attr in topic_created.__slots__:
             assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -299,7 +298,7 @@ class TestForumTopicCreated:
         assert hash(a) != hash(d)
 
 
-class TestForumTopicClosed:
+class TestForumTopicClosedNoReq:
     def test_slot_behaviour(self, mro_slots):
         action = ForumTopicClosed()
         for attr in action.__slots__:
@@ -317,7 +316,7 @@ class TestForumTopicClosed:
         assert action_dict == {}
 
 
-class TestForumTopicReopened:
+class TestForumTopicReopenedNoReq:
     def test_slot_behaviour(self, mro_slots):
         action = ForumTopicReopened()
         for attr in action.__slots__:

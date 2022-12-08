@@ -22,18 +22,17 @@ import pytest
 from telegram import WebAppData
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def web_app_data():
-    return WebAppData(
-        data=TestWebAppData.data,
-        button_text=TestWebAppData.button_text,
-    )
+    return WebAppData(data=Space.data, button_text=Space.button_text)
 
 
-class TestWebAppData:
+class Space:
     data = "data"
     button_text = "button_text"
 
+
+class TestWebAppDataNoReq:
     def test_slot_behaviour(self, web_app_data, mro_slots):
         for attr in web_app_data.__slots__:
             assert getattr(web_app_data, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -43,20 +42,20 @@ class TestWebAppData:
         web_app_data_dict = web_app_data.to_dict()
 
         assert isinstance(web_app_data_dict, dict)
-        assert web_app_data_dict["data"] == self.data
-        assert web_app_data_dict["button_text"] == self.button_text
+        assert web_app_data_dict["data"] == Space.data
+        assert web_app_data_dict["button_text"] == Space.button_text
 
     def test_de_json(self, bot):
-        json_dict = {"data": self.data, "button_text": self.button_text}
+        json_dict = {"data": Space.data, "button_text": Space.button_text}
         web_app_data = WebAppData.de_json(json_dict, bot)
         assert web_app_data.api_kwargs == {}
 
-        assert web_app_data.data == self.data
-        assert web_app_data.button_text == self.button_text
+        assert web_app_data.data == Space.data
+        assert web_app_data.button_text == Space.button_text
 
     def test_equality(self):
-        a = WebAppData(self.data, self.button_text)
-        b = WebAppData(self.data, self.button_text)
+        a = WebAppData(Space.data, Space.button_text)
+        b = WebAppData(Space.data, Space.button_text)
         c = WebAppData("", "")
         d = WebAppData("not_data", "not_button_text")
 

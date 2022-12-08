@@ -21,19 +21,19 @@ import pytest
 from telegram import InputLocationMessageContent, Location
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_location_message_content():
     return InputLocationMessageContent(
-        TestInputLocationMessageContent.latitude,
-        TestInputLocationMessageContent.longitude,
-        live_period=TestInputLocationMessageContent.live_period,
-        horizontal_accuracy=TestInputLocationMessageContent.horizontal_accuracy,
-        heading=TestInputLocationMessageContent.heading,
-        proximity_alert_radius=TestInputLocationMessageContent.proximity_alert_radius,
+        Space.latitude,
+        Space.longitude,
+        live_period=Space.live_period,
+        horizontal_accuracy=Space.horizontal_accuracy,
+        heading=Space.heading,
+        proximity_alert_radius=Space.proximity_alert_radius,
     )
 
 
-class TestInputLocationMessageContent:
+class Space:
     latitude = -23.691288
     longitude = -46.788279
     live_period = 80
@@ -41,6 +41,8 @@ class TestInputLocationMessageContent:
     heading = 90
     proximity_alert_radius = 999
 
+
+class TestInputLocationMessageContentNoReq:
     def test_slot_behaviour(self, input_location_message_content, mro_slots):
         inst = input_location_message_content
         for attr in inst.__slots__:
@@ -48,12 +50,14 @@ class TestInputLocationMessageContent:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_location_message_content):
-        assert input_location_message_content.longitude == self.longitude
-        assert input_location_message_content.latitude == self.latitude
-        assert input_location_message_content.live_period == self.live_period
-        assert input_location_message_content.horizontal_accuracy == self.horizontal_accuracy
-        assert input_location_message_content.heading == self.heading
-        assert input_location_message_content.proximity_alert_radius == self.proximity_alert_radius
+        assert input_location_message_content.longitude == Space.longitude
+        assert input_location_message_content.latitude == Space.latitude
+        assert input_location_message_content.live_period == Space.live_period
+        assert input_location_message_content.horizontal_accuracy == Space.horizontal_accuracy
+        assert input_location_message_content.heading == Space.heading
+        assert (
+            input_location_message_content.proximity_alert_radius == Space.proximity_alert_radius
+        )
 
     def test_to_dict(self, input_location_message_content):
         input_location_message_content_dict = input_location_message_content.to_dict()

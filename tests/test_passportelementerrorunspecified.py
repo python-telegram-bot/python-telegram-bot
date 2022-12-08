@@ -21,21 +21,19 @@ import pytest
 from telegram import PassportElementErrorDataField, PassportElementErrorUnspecified
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def passport_element_error_unspecified():
-    return PassportElementErrorUnspecified(
-        TestPassportElementErrorUnspecified.type_,
-        TestPassportElementErrorUnspecified.element_hash,
-        TestPassportElementErrorUnspecified.message,
-    )
+    return PassportElementErrorUnspecified(Space.type_, Space.element_hash, Space.message)
 
 
-class TestPassportElementErrorUnspecified:
+class Space:
     source = "unspecified"
     type_ = "test_type"
     element_hash = "element_hash"
     message = "Error message"
 
+
+class TestPassportElementErrorUnspecifiedNoReq:
     def test_slot_behaviour(self, passport_element_error_unspecified, mro_slots):
         inst = passport_element_error_unspecified
         for attr in inst.__slots__:
@@ -43,10 +41,10 @@ class TestPassportElementErrorUnspecified:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, passport_element_error_unspecified):
-        assert passport_element_error_unspecified.source == self.source
-        assert passport_element_error_unspecified.type == self.type_
-        assert passport_element_error_unspecified.element_hash == self.element_hash
-        assert passport_element_error_unspecified.message == self.message
+        assert passport_element_error_unspecified.source == Space.source
+        assert passport_element_error_unspecified.type == Space.type_
+        assert passport_element_error_unspecified.element_hash == Space.element_hash
+        assert passport_element_error_unspecified.message == Space.message
 
     def test_to_dict(self, passport_element_error_unspecified):
         passport_element_error_unspecified_dict = passport_element_error_unspecified.to_dict()
@@ -70,12 +68,12 @@ class TestPassportElementErrorUnspecified:
         )
 
     def test_equality(self):
-        a = PassportElementErrorUnspecified(self.type_, self.element_hash, self.message)
-        b = PassportElementErrorUnspecified(self.type_, self.element_hash, self.message)
-        c = PassportElementErrorUnspecified(self.type_, "", "")
-        d = PassportElementErrorUnspecified("", self.element_hash, "")
-        e = PassportElementErrorUnspecified("", "", self.message)
-        f = PassportElementErrorDataField(self.type_, "", "", self.message)
+        a = PassportElementErrorUnspecified(Space.type_, Space.element_hash, Space.message)
+        b = PassportElementErrorUnspecified(Space.type_, Space.element_hash, Space.message)
+        c = PassportElementErrorUnspecified(Space.type_, "", "")
+        d = PassportElementErrorUnspecified("", Space.element_hash, "")
+        e = PassportElementErrorUnspecified("", "", Space.message)
+        f = PassportElementErrorDataField(Space.type_, "", "", Space.message)
 
         assert a == b
         assert hash(a) == hash(b)

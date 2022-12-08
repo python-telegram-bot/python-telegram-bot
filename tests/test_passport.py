@@ -128,7 +128,7 @@ RAW_PASSPORT_DATA = {
 }
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 def all_passport_data():
     return [
         {
@@ -214,12 +214,12 @@ def all_passport_data():
     ]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 def passport_data(bot):
     return PassportData.de_json(RAW_PASSPORT_DATA, bot=bot)
 
 
-class TestPassport:
+class Space:
     driver_license_selfie_file_id = "DgADBAADEQQAAkopgFNr6oi-wISRtAI"
     driver_license_selfie_file_unique_id = "d4e390cca57b4da5a65322b304762a12"
     driver_license_front_side_file_id = "DgADBAADxwMAApnQgVPK2-ckL2eXVAI"
@@ -241,6 +241,8 @@ class TestPassport:
     driver_license_selfie_credentials_file_hash = "Cila/qLXSBH7DpZFbb5bRZIRxeFW2uv/ulL0u0JNsYI="
     driver_license_selfie_credentials_secret = "tivdId6RNYNsvXYPppdzrbxOBuBOr9wXRPDcCvnXU7E="
 
+
+class TestPassportNoReq:
     def test_slot_behaviour(self, passport_data, mro_slots):
         inst = passport_data
         for attr in inst.__slots__:
@@ -259,58 +261,58 @@ class TestPassport:
         assert driver_license.type == "driver_license"
         assert driver_license.data == RAW_PASSPORT_DATA["data"][1]["data"]
         assert isinstance(driver_license.selfie, PassportFile)
-        assert driver_license.selfie.file_id == self.driver_license_selfie_file_id
-        assert driver_license.selfie.file_unique_id == self.driver_license_selfie_file_unique_id
+        assert driver_license.selfie.file_id == Space.driver_license_selfie_file_id
+        assert driver_license.selfie.file_unique_id == Space.driver_license_selfie_file_unique_id
 
         assert isinstance(driver_license.front_side, PassportFile)
-        assert driver_license.front_side.file_id == self.driver_license_front_side_file_id
+        assert driver_license.front_side.file_id == Space.driver_license_front_side_file_id
         assert (
             driver_license.front_side.file_unique_id
-            == self.driver_license_front_side_file_unique_id
+            == Space.driver_license_front_side_file_unique_id
         )
 
         assert isinstance(driver_license.reverse_side, PassportFile)
-        assert driver_license.reverse_side.file_id == self.driver_license_reverse_side_file_id
+        assert driver_license.reverse_side.file_id == Space.driver_license_reverse_side_file_id
         assert (
             driver_license.reverse_side.file_unique_id
-            == self.driver_license_reverse_side_file_unique_id
+            == Space.driver_license_reverse_side_file_unique_id
         )
 
         assert isinstance(driver_license.translation[0], PassportFile)
-        assert driver_license.translation[0].file_id == self.driver_license_translation_1_file_id
+        assert driver_license.translation[0].file_id == Space.driver_license_translation_1_file_id
         assert (
             driver_license.translation[0].file_unique_id
-            == self.driver_license_translation_1_file_unique_id
+            == Space.driver_license_translation_1_file_unique_id
         )
 
         assert isinstance(driver_license.translation[1], PassportFile)
-        assert driver_license.translation[1].file_id == self.driver_license_translation_2_file_id
+        assert driver_license.translation[1].file_id == Space.driver_license_translation_2_file_id
         assert (
             driver_license.translation[1].file_unique_id
-            == self.driver_license_translation_2_file_unique_id
+            == Space.driver_license_translation_2_file_unique_id
         )
 
         assert utility_bill.type == "utility_bill"
         assert isinstance(utility_bill.files[0], PassportFile)
-        assert utility_bill.files[0].file_id == self.utility_bill_1_file_id
-        assert utility_bill.files[0].file_unique_id == self.utility_bill_1_file_unique_id
+        assert utility_bill.files[0].file_id == Space.utility_bill_1_file_id
+        assert utility_bill.files[0].file_unique_id == Space.utility_bill_1_file_unique_id
 
         assert isinstance(utility_bill.files[1], PassportFile)
-        assert utility_bill.files[1].file_id == self.utility_bill_2_file_id
-        assert utility_bill.files[1].file_unique_id == self.utility_bill_2_file_unique_id
+        assert utility_bill.files[1].file_id == Space.utility_bill_2_file_id
+        assert utility_bill.files[1].file_unique_id == Space.utility_bill_2_file_unique_id
 
         assert isinstance(utility_bill.translation[0], PassportFile)
-        assert utility_bill.translation[0].file_id == self.utility_bill_translation_1_file_id
+        assert utility_bill.translation[0].file_id == Space.utility_bill_translation_1_file_id
         assert (
             utility_bill.translation[0].file_unique_id
-            == self.utility_bill_translation_1_file_unique_id
+            == Space.utility_bill_translation_1_file_unique_id
         )
 
         assert isinstance(utility_bill.translation[1], PassportFile)
-        assert utility_bill.translation[1].file_id == self.utility_bill_translation_2_file_id
+        assert utility_bill.translation[1].file_id == Space.utility_bill_translation_2_file_id
         assert (
             utility_bill.translation[1].file_unique_id
-            == self.utility_bill_translation_2_file_unique_id
+            == Space.utility_bill_translation_2_file_unique_id
         )
 
         assert address.type == "address"
@@ -348,21 +350,21 @@ class TestPassport:
             "document_no": "DOCUMENT_NO",
         }
         assert isinstance(driver_license.selfie, PassportFile)
-        assert driver_license.selfie.file_id == self.driver_license_selfie_file_id
-        assert driver_license.selfie.file_unique_id == self.driver_license_selfie_file_unique_id
+        assert driver_license.selfie.file_id == Space.driver_license_selfie_file_id
+        assert driver_license.selfie.file_unique_id == Space.driver_license_selfie_file_unique_id
 
         assert isinstance(driver_license.front_side, PassportFile)
-        assert driver_license.front_side.file_id == self.driver_license_front_side_file_id
+        assert driver_license.front_side.file_id == Space.driver_license_front_side_file_id
         assert (
             driver_license.front_side.file_unique_id
-            == self.driver_license_front_side_file_unique_id
+            == Space.driver_license_front_side_file_unique_id
         )
 
         assert isinstance(driver_license.reverse_side, PassportFile)
-        assert driver_license.reverse_side.file_id == self.driver_license_reverse_side_file_id
+        assert driver_license.reverse_side.file_id == Space.driver_license_reverse_side_file_id
         assert (
             driver_license.reverse_side.file_unique_id
-            == self.driver_license_reverse_side_file_unique_id
+            == Space.driver_license_reverse_side_file_unique_id
         )
 
         assert address.type == "address"
@@ -377,12 +379,12 @@ class TestPassport:
 
         assert utility_bill.type == "utility_bill"
         assert isinstance(utility_bill.files[0], PassportFile)
-        assert utility_bill.files[0].file_id == self.utility_bill_1_file_id
-        assert utility_bill.files[0].file_unique_id == self.utility_bill_1_file_unique_id
+        assert utility_bill.files[0].file_id == Space.utility_bill_1_file_id
+        assert utility_bill.files[0].file_unique_id == Space.utility_bill_1_file_unique_id
 
         assert isinstance(utility_bill.files[1], PassportFile)
-        assert utility_bill.files[1].file_id == self.utility_bill_2_file_id
-        assert utility_bill.files[1].file_unique_id == self.utility_bill_2_file_unique_id
+        assert utility_bill.files[1].file_id == Space.utility_bill_2_file_id
+        assert utility_bill.files[1].file_unique_id == Space.utility_bill_2_file_unique_id
 
         assert email.type == "email"
         assert email.email == "fb3e3i47zt@dispostable.com"
@@ -468,8 +470,8 @@ class TestPassport:
         file = await selfie.get_file()
         assert file.file_id == selfie.file_id
         assert file.file_unique_id == selfie.file_unique_id
-        assert file._credentials.file_hash == self.driver_license_selfie_credentials_file_hash
-        assert file._credentials.secret == self.driver_license_selfie_credentials_secret
+        assert file._credentials.file_hash == Space.driver_license_selfie_credentials_file_hash
+        assert file._credentials.secret == Space.driver_license_selfie_credentials_secret
 
     async def test_mocked_set_passport_data_errors(self, monkeypatch, bot, chat_id, passport_data):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):

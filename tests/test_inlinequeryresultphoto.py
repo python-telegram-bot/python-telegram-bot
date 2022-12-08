@@ -28,25 +28,25 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_photo():
     return InlineQueryResultPhoto(
-        TestInlineQueryResultPhoto.id_,
-        TestInlineQueryResultPhoto.photo_url,
-        TestInlineQueryResultPhoto.thumb_url,
-        photo_width=TestInlineQueryResultPhoto.photo_width,
-        photo_height=TestInlineQueryResultPhoto.photo_height,
-        title=TestInlineQueryResultPhoto.title,
-        description=TestInlineQueryResultPhoto.description,
-        caption=TestInlineQueryResultPhoto.caption,
-        parse_mode=TestInlineQueryResultPhoto.parse_mode,
-        caption_entities=TestInlineQueryResultPhoto.caption_entities,
-        input_message_content=TestInlineQueryResultPhoto.input_message_content,
-        reply_markup=TestInlineQueryResultPhoto.reply_markup,
+        Space.id_,
+        Space.photo_url,
+        Space.thumb_url,
+        photo_width=Space.photo_width,
+        photo_height=Space.photo_height,
+        title=Space.title,
+        description=Space.description,
+        caption=Space.caption,
+        parse_mode=Space.parse_mode,
+        caption_entities=Space.caption_entities,
+        input_message_content=Space.input_message_content,
+        reply_markup=Space.reply_markup,
     )
 
 
-class TestInlineQueryResultPhoto:
+class Space:
     id_ = "id"
     type_ = "photo"
     photo_url = "photo url"
@@ -62,6 +62,8 @@ class TestInlineQueryResultPhoto:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultPhotoNoReq:
     def test_slot_behaviour(self, inline_query_result_photo, mro_slots):
         inst = inline_query_result_photo
         for attr in inst.__slots__:
@@ -69,25 +71,25 @@ class TestInlineQueryResultPhoto:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_photo):
-        assert inline_query_result_photo.type == self.type_
-        assert inline_query_result_photo.id == self.id_
-        assert inline_query_result_photo.photo_url == self.photo_url
-        assert inline_query_result_photo.photo_width == self.photo_width
-        assert inline_query_result_photo.photo_height == self.photo_height
-        assert inline_query_result_photo.thumb_url == self.thumb_url
-        assert inline_query_result_photo.title == self.title
-        assert inline_query_result_photo.description == self.description
-        assert inline_query_result_photo.caption == self.caption
-        assert inline_query_result_photo.parse_mode == self.parse_mode
-        assert inline_query_result_photo.caption_entities == tuple(self.caption_entities)
+        assert inline_query_result_photo.type == Space.type_
+        assert inline_query_result_photo.id == Space.id_
+        assert inline_query_result_photo.photo_url == Space.photo_url
+        assert inline_query_result_photo.photo_width == Space.photo_width
+        assert inline_query_result_photo.photo_height == Space.photo_height
+        assert inline_query_result_photo.thumb_url == Space.thumb_url
+        assert inline_query_result_photo.title == Space.title
+        assert inline_query_result_photo.description == Space.description
+        assert inline_query_result_photo.caption == Space.caption
+        assert inline_query_result_photo.parse_mode == Space.parse_mode
+        assert inline_query_result_photo.caption_entities == tuple(Space.caption_entities)
         assert (
             inline_query_result_photo.input_message_content.to_dict()
-            == self.input_message_content.to_dict()
+            == Space.input_message_content.to_dict()
         )
-        assert inline_query_result_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_photo.reply_markup.to_dict() == Space.reply_markup.to_dict()
 
     def test_caption_entities_always_tuple(self):
-        result = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
+        result = InlineQueryResultPhoto(Space.id_, Space.photo_url, Space.thumb_url)
         assert result.caption_entities == ()
 
     def test_to_dict(self, inline_query_result_photo):
@@ -124,11 +126,11 @@ class TestInlineQueryResultPhoto:
         )
 
     def test_equality(self):
-        a = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
-        b = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
-        c = InlineQueryResultPhoto(self.id_, "", self.thumb_url)
-        d = InlineQueryResultPhoto("", self.photo_url, self.thumb_url)
-        e = InlineQueryResultVoice(self.id_, "", "")
+        a = InlineQueryResultPhoto(Space.id_, Space.photo_url, Space.thumb_url)
+        b = InlineQueryResultPhoto(Space.id_, Space.photo_url, Space.thumb_url)
+        c = InlineQueryResultPhoto(Space.id_, "", Space.thumb_url)
+        d = InlineQueryResultPhoto("", Space.photo_url, Space.thumb_url)
+        e = InlineQueryResultVoice(Space.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

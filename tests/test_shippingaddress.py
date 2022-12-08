@@ -21,19 +21,19 @@ import pytest
 from telegram import ShippingAddress
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def shipping_address():
     return ShippingAddress(
-        TestShippingAddress.country_code,
-        TestShippingAddress.state,
-        TestShippingAddress.city,
-        TestShippingAddress.street_line1,
-        TestShippingAddress.street_line2,
-        TestShippingAddress.post_code,
+        Space.country_code,
+        Space.state,
+        Space.city,
+        Space.street_line1,
+        Space.street_line2,
+        Space.post_code,
     )
 
 
-class TestShippingAddress:
+class Space:
     country_code = "GB"
     state = "state"
     city = "London"
@@ -41,6 +41,8 @@ class TestShippingAddress:
     street_line2 = "street_line2"
     post_code = "WC1"
 
+
+class TestShippingAddressNoReq:
     def test_slot_behaviour(self, shipping_address, mro_slots):
         inst = shipping_address
         for attr in inst.__slots__:
@@ -49,22 +51,22 @@ class TestShippingAddress:
 
     def test_de_json(self, bot):
         json_dict = {
-            "country_code": self.country_code,
-            "state": self.state,
-            "city": self.city,
-            "street_line1": self.street_line1,
-            "street_line2": self.street_line2,
-            "post_code": self.post_code,
+            "country_code": Space.country_code,
+            "state": Space.state,
+            "city": Space.city,
+            "street_line1": Space.street_line1,
+            "street_line2": Space.street_line2,
+            "post_code": Space.post_code,
         }
         shipping_address = ShippingAddress.de_json(json_dict, bot)
         assert shipping_address.api_kwargs == {}
 
-        assert shipping_address.country_code == self.country_code
-        assert shipping_address.state == self.state
-        assert shipping_address.city == self.city
-        assert shipping_address.street_line1 == self.street_line1
-        assert shipping_address.street_line2 == self.street_line2
-        assert shipping_address.post_code == self.post_code
+        assert shipping_address.country_code == Space.country_code
+        assert shipping_address.state == Space.state
+        assert shipping_address.city == Space.city
+        assert shipping_address.street_line1 == Space.street_line1
+        assert shipping_address.street_line2 == Space.street_line2
+        assert shipping_address.post_code == Space.post_code
 
     def test_to_dict(self, shipping_address):
         shipping_address_dict = shipping_address.to_dict()
@@ -79,38 +81,48 @@ class TestShippingAddress:
 
     def test_equality(self):
         a = ShippingAddress(
-            self.country_code,
-            self.state,
-            self.city,
-            self.street_line1,
-            self.street_line2,
-            self.post_code,
+            Space.country_code,
+            Space.state,
+            Space.city,
+            Space.street_line1,
+            Space.street_line2,
+            Space.post_code,
         )
         b = ShippingAddress(
-            self.country_code,
-            self.state,
-            self.city,
-            self.street_line1,
-            self.street_line2,
-            self.post_code,
+            Space.country_code,
+            Space.state,
+            Space.city,
+            Space.street_line1,
+            Space.street_line2,
+            Space.post_code,
         )
         d = ShippingAddress(
-            "", self.state, self.city, self.street_line1, self.street_line2, self.post_code
+            "", Space.state, Space.city, Space.street_line1, Space.street_line2, Space.post_code
         )
         d2 = ShippingAddress(
-            self.country_code, "", self.city, self.street_line1, self.street_line2, self.post_code
+            Space.country_code,
+            "",
+            Space.city,
+            Space.street_line1,
+            Space.street_line2,
+            Space.post_code,
         )
         d3 = ShippingAddress(
-            self.country_code, self.state, "", self.street_line1, self.street_line2, self.post_code
+            Space.country_code,
+            Space.state,
+            "",
+            Space.street_line1,
+            Space.street_line2,
+            Space.post_code,
         )
         d4 = ShippingAddress(
-            self.country_code, self.state, self.city, "", self.street_line2, self.post_code
+            Space.country_code, Space.state, Space.city, "", Space.street_line2, Space.post_code
         )
         d5 = ShippingAddress(
-            self.country_code, self.state, self.city, self.street_line1, "", self.post_code
+            Space.country_code, Space.state, Space.city, Space.street_line1, "", Space.post_code
         )
         d6 = ShippingAddress(
-            self.country_code, self.state, self.city, self.street_line1, self.street_line2, ""
+            Space.country_code, Space.state, Space.city, Space.street_line1, Space.street_line2, ""
         )
 
         assert a == b

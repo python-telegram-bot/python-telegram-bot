@@ -26,7 +26,7 @@ from telegram.request._requestparameter import RequestParameter
 from tests.conftest import data_file
 
 
-class TestRequestParameter:
+class TestRequestParameterNoReq:
     def test_init(self):
         request_parameter = RequestParameter("name", "value", [1, 2])
         assert request_parameter.name == "name"

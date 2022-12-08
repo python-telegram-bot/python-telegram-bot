@@ -28,27 +28,27 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_video():
     return InlineQueryResultVideo(
-        TestInlineQueryResultVideo.id_,
-        TestInlineQueryResultVideo.video_url,
-        TestInlineQueryResultVideo.mime_type,
-        TestInlineQueryResultVideo.thumb_url,
-        TestInlineQueryResultVideo.title,
-        video_width=TestInlineQueryResultVideo.video_width,
-        video_height=TestInlineQueryResultVideo.video_height,
-        video_duration=TestInlineQueryResultVideo.video_duration,
-        caption=TestInlineQueryResultVideo.caption,
-        parse_mode=TestInlineQueryResultVideo.parse_mode,
-        caption_entities=TestInlineQueryResultVideo.caption_entities,
-        description=TestInlineQueryResultVideo.description,
-        input_message_content=TestInlineQueryResultVideo.input_message_content,
-        reply_markup=TestInlineQueryResultVideo.reply_markup,
+        Space.id_,
+        Space.video_url,
+        Space.mime_type,
+        Space.thumb_url,
+        Space.title,
+        video_width=Space.video_width,
+        video_height=Space.video_height,
+        video_duration=Space.video_duration,
+        caption=Space.caption,
+        parse_mode=Space.parse_mode,
+        caption_entities=Space.caption_entities,
+        description=Space.description,
+        input_message_content=Space.input_message_content,
+        reply_markup=Space.reply_markup,
     )
 
 
-class TestInlineQueryResultVideo:
+class Space:
     id_ = "id"
     type_ = "video"
     video_url = "video url"
@@ -65,6 +65,8 @@ class TestInlineQueryResultVideo:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultVideoNoReq:
     def test_slot_behaviour(self, inline_query_result_video, mro_slots):
         inst = inline_query_result_video
         for attr in inst.__slots__:
@@ -72,28 +74,28 @@ class TestInlineQueryResultVideo:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_video):
-        assert inline_query_result_video.type == self.type_
-        assert inline_query_result_video.id == self.id_
-        assert inline_query_result_video.video_url == self.video_url
-        assert inline_query_result_video.mime_type == self.mime_type
-        assert inline_query_result_video.video_width == self.video_width
-        assert inline_query_result_video.video_height == self.video_height
-        assert inline_query_result_video.video_duration == self.video_duration
-        assert inline_query_result_video.thumb_url == self.thumb_url
-        assert inline_query_result_video.title == self.title
-        assert inline_query_result_video.description == self.description
-        assert inline_query_result_video.caption == self.caption
-        assert inline_query_result_video.parse_mode == self.parse_mode
-        assert inline_query_result_video.caption_entities == tuple(self.caption_entities)
+        assert inline_query_result_video.type == Space.type_
+        assert inline_query_result_video.id == Space.id_
+        assert inline_query_result_video.video_url == Space.video_url
+        assert inline_query_result_video.mime_type == Space.mime_type
+        assert inline_query_result_video.video_width == Space.video_width
+        assert inline_query_result_video.video_height == Space.video_height
+        assert inline_query_result_video.video_duration == Space.video_duration
+        assert inline_query_result_video.thumb_url == Space.thumb_url
+        assert inline_query_result_video.title == Space.title
+        assert inline_query_result_video.description == Space.description
+        assert inline_query_result_video.caption == Space.caption
+        assert inline_query_result_video.parse_mode == Space.parse_mode
+        assert inline_query_result_video.caption_entities == tuple(Space.caption_entities)
         assert (
             inline_query_result_video.input_message_content.to_dict()
-            == self.input_message_content.to_dict()
+            == Space.input_message_content.to_dict()
         )
-        assert inline_query_result_video.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_video.reply_markup.to_dict() == Space.reply_markup.to_dict()
 
     def test_caption_entities_always_tuple(self):
         video = InlineQueryResultVideo(
-            self.id_, self.video_url, self.mime_type, self.thumb_url, self.title
+            Space.id_, Space.video_url, Space.mime_type, Space.thumb_url, Space.title
         )
         assert video.caption_entities == ()
 
@@ -137,14 +139,16 @@ class TestInlineQueryResultVideo:
 
     def test_equality(self):
         a = InlineQueryResultVideo(
-            self.id_, self.video_url, self.mime_type, self.thumb_url, self.title
+            Space.id_, Space.video_url, Space.mime_type, Space.thumb_url, Space.title
         )
         b = InlineQueryResultVideo(
-            self.id_, self.video_url, self.mime_type, self.thumb_url, self.title
+            Space.id_, Space.video_url, Space.mime_type, Space.thumb_url, Space.title
         )
-        c = InlineQueryResultVideo(self.id_, "", self.mime_type, self.thumb_url, self.title)
-        d = InlineQueryResultVideo("", self.video_url, self.mime_type, self.thumb_url, self.title)
-        e = InlineQueryResultVoice(self.id_, "", "")
+        c = InlineQueryResultVideo(Space.id_, "", Space.mime_type, Space.thumb_url, Space.title)
+        d = InlineQueryResultVideo(
+            "", Space.video_url, Space.mime_type, Space.thumb_url, Space.title
+        )
+        e = InlineQueryResultVoice(Space.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

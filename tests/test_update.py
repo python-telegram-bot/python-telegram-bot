@@ -96,14 +96,16 @@ all_types = (
 ids = all_types + ("callback_query_without_message",)
 
 
-@pytest.fixture(params=params, ids=ids)
+@pytest.fixture(scope="module", params=params, ids=ids)
 def update(request):
-    return Update(update_id=TestUpdate.update_id, **request.param)
+    return Update(update_id=Space.update_id, **request.param)
 
 
-class TestUpdate:
+class Space:
     update_id = 868573637
 
+
+class TestUpdateNoReq:
     def test_slot_behaviour(self, update, mro_slots):
         for attr in update.__slots__:
             assert getattr(update, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -111,13 +113,13 @@ class TestUpdate:
 
     @pytest.mark.parametrize("paramdict", argvalues=params, ids=ids)
     def test_de_json(self, bot, paramdict):
-        json_dict = {"update_id": TestUpdate.update_id}
+        json_dict = {"update_id": Space.update_id}
         # Convert the single update 'item' to a dict of that item and apply it to the json_dict
         json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
         update = Update.de_json(json_dict, bot)
         assert update.api_kwargs == {}
 
-        assert update.update_id == self.update_id
+        assert update.update_id == Space.update_id
 
         # Make sure only one thing in the update (other than update_id) is not None
         i = 0
@@ -189,11 +191,11 @@ class TestUpdate:
             assert eff_message is None
 
     def test_equality(self):
-        a = Update(self.update_id, message=message)
-        b = Update(self.update_id, message=message)
-        c = Update(self.update_id)
+        a = Update(Space.update_id, message=message)
+        b = Update(Space.update_id, message=message)
+        c = Update(Space.update_id)
         d = Update(0, message=message)
-        e = User(self.update_id, "", False)
+        e = User(Space.update_id, "", False)
 
         assert a == b
         assert hash(a) == hash(b)

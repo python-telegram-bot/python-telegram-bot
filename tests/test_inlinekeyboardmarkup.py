@@ -28,12 +28,12 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_keyboard_markup():
-    return InlineKeyboardMarkup(TestInlineKeyboardMarkup.inline_keyboard)
+    return InlineKeyboardMarkup(Space.inline_keyboard)
 
 
-class TestInlineKeyboardMarkup:
+class Space:
     inline_keyboard = [
         [
             InlineKeyboardButton(text="button1", callback_data="data1"),
@@ -41,21 +41,13 @@ class TestInlineKeyboardMarkup:
         ]
     ]
 
+
+class TestInlineKeyboardMarkupNoReq:
     def test_slot_behaviour(self, inline_keyboard_markup, mro_slots):
         inst = inline_keyboard_markup
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_message_with_inline_keyboard_markup(
-        self, bot, chat_id, inline_keyboard_markup
-    ):
-        message = await bot.send_message(
-            chat_id, "Testing InlineKeyboardMarkup", reply_markup=inline_keyboard_markup
-        )
-
-        assert message.text == "Testing InlineKeyboardMarkup"
 
     def test_from_button(self):
         inline_keyboard_markup = InlineKeyboardMarkup.from_button(
@@ -87,7 +79,7 @@ class TestInlineKeyboardMarkup:
 
     def test_expected_values(self, inline_keyboard_markup):
         assert inline_keyboard_markup.inline_keyboard == tuple(
-            tuple(row) for row in self.inline_keyboard
+            tuple(row) for row in Space.inline_keyboard
         )
 
     def test_wrong_keyboard_inputs(self):
@@ -142,7 +134,7 @@ class TestInlineKeyboardMarkup:
 
         assert isinstance(inline_keyboard_markup_dict, dict)
         assert inline_keyboard_markup_dict["inline_keyboard"] == [
-            [self.inline_keyboard[0][0].to_dict(), self.inline_keyboard[0][1].to_dict()]
+            [Space.inline_keyboard[0][0].to_dict(), Space.inline_keyboard[0][1].to_dict()]
         ]
 
     def test_de_json(self):
@@ -231,3 +223,14 @@ class TestInlineKeyboardMarkup:
 
         assert a != g
         assert hash(a) != hash(g)
+
+
+class TestInlineKeyborardMarkupReq:
+    async def test_send_message_with_inline_keyboard_markup(
+        self, bot, chat_id, inline_keyboard_markup
+    ):
+        message = await bot.send_message(
+            chat_id, "Testing InlineKeyboardMarkup", reply_markup=inline_keyboard_markup
+        )
+
+        assert message.text == "Testing InlineKeyboardMarkup"

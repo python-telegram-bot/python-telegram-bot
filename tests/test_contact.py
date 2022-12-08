@@ -24,49 +24,51 @@ from telegram.error import BadRequest
 from telegram.request import RequestData
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def contact():
     return Contact(
-        TestContact.phone_number,
-        TestContact.first_name,
-        TestContact.last_name,
-        TestContact.user_id,
+        Space.phone_number,
+        Space.first_name,
+        Space.last_name,
+        Space.user_id,
     )
 
 
-class TestContact:
+class Space:
     phone_number = "+11234567890"
     first_name = "Leandro"
     last_name = "Toledo"
     user_id = 23
 
+
+class TestContactNoReq:
     def test_slot_behaviour(self, contact, mro_slots):
         for attr in contact.__slots__:
             assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(contact)) == len(set(mro_slots(contact))), "duplicate slot"
 
     def test_de_json_required(self, bot):
-        json_dict = {"phone_number": self.phone_number, "first_name": self.first_name}
+        json_dict = {"phone_number": Space.phone_number, "first_name": Space.first_name}
         contact = Contact.de_json(json_dict, bot)
         assert contact.api_kwargs == {}
 
-        assert contact.phone_number == self.phone_number
-        assert contact.first_name == self.first_name
+        assert contact.phone_number == Space.phone_number
+        assert contact.first_name == Space.first_name
 
     def test_de_json_all(self, bot):
         json_dict = {
-            "phone_number": self.phone_number,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "user_id": self.user_id,
+            "phone_number": Space.phone_number,
+            "first_name": Space.first_name,
+            "last_name": Space.last_name,
+            "user_id": Space.user_id,
         }
         contact = Contact.de_json(json_dict, bot)
         assert contact.api_kwargs == {}
 
-        assert contact.phone_number == self.phone_number
-        assert contact.first_name == self.first_name
-        assert contact.last_name == self.last_name
-        assert contact.user_id == self.user_id
+        assert contact.phone_number == Space.phone_number
+        assert contact.first_name == Space.first_name
+        assert contact.last_name == Space.last_name
+        assert contact.user_id == Space.user_id
 
     async def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -80,7 +82,50 @@ class TestContact:
         message = await bot.send_contact(contact=contact, chat_id=chat_id)
         assert message
 
-    @pytest.mark.flaky(3, 1)
+    async def test_send_contact_without_required(self, bot, chat_id):
+        with pytest.raises(ValueError, match="Either contact or phone_number and first_name"):
+            await bot.send_contact(chat_id=chat_id)
+
+    async def test_send_mutually_exclusive(self, bot, chat_id, contact):
+        with pytest.raises(ValueError, match="Not both"):
+            await bot.send_contact(
+                chat_id=chat_id,
+                contact=contact,
+                phone_number=contact.phone_number,
+                first_name=contact.first_name,
+            )
+
+    def test_to_dict(self, contact):
+        contact_dict = contact.to_dict()
+
+        assert isinstance(contact_dict, dict)
+        assert contact_dict["phone_number"] == contact.phone_number
+        assert contact_dict["first_name"] == contact.first_name
+        assert contact_dict["last_name"] == contact.last_name
+        assert contact_dict["user_id"] == contact.user_id
+
+    def test_equality(self):
+        a = Contact(Space.phone_number, Space.first_name)
+        b = Contact(Space.phone_number, Space.first_name)
+        c = Contact(Space.phone_number, "")
+        d = Contact("", Space.first_name)
+        e = Voice("", "unique_id", 0)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+class TestContactReq:
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -114,7 +159,6 @@ class TestContact:
                     chat_id, contact=contact, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_contact_default_protect_content(self, chat_id, default_bot, contact):
         protected = await default_bot.send_contact(chat_id, contact=contact)
@@ -123,45 +167,3 @@ class TestContact:
             chat_id, contact=contact, protect_content=False
         )
         assert not unprotected.has_protected_content
-
-    async def test_send_contact_without_required(self, bot, chat_id):
-        with pytest.raises(ValueError, match="Either contact or phone_number and first_name"):
-            await bot.send_contact(chat_id=chat_id)
-
-    async def test_send_mutually_exclusive(self, bot, chat_id, contact):
-        with pytest.raises(ValueError, match="Not both"):
-            await bot.send_contact(
-                chat_id=chat_id,
-                contact=contact,
-                phone_number=contact.phone_number,
-                first_name=contact.first_name,
-            )
-
-    def test_to_dict(self, contact):
-        contact_dict = contact.to_dict()
-
-        assert isinstance(contact_dict, dict)
-        assert contact_dict["phone_number"] == contact.phone_number
-        assert contact_dict["first_name"] == contact.first_name
-        assert contact_dict["last_name"] == contact.last_name
-        assert contact_dict["user_id"] == contact.user_id
-
-    def test_equality(self):
-        a = Contact(self.phone_number, self.first_name)
-        b = Contact(self.phone_number, self.first_name)
-        c = Contact(self.phone_number, "")
-        d = Contact("", self.first_name)
-        e = Voice("", "unique_id", 0)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

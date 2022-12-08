@@ -27,26 +27,26 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_location():
     return InlineQueryResultLocation(
-        TestInlineQueryResultLocation.id_,
-        TestInlineQueryResultLocation.latitude,
-        TestInlineQueryResultLocation.longitude,
-        TestInlineQueryResultLocation.title,
-        live_period=TestInlineQueryResultLocation.live_period,
-        thumb_url=TestInlineQueryResultLocation.thumb_url,
-        thumb_width=TestInlineQueryResultLocation.thumb_width,
-        thumb_height=TestInlineQueryResultLocation.thumb_height,
-        input_message_content=TestInlineQueryResultLocation.input_message_content,
-        reply_markup=TestInlineQueryResultLocation.reply_markup,
-        horizontal_accuracy=TestInlineQueryResultLocation.horizontal_accuracy,
-        heading=TestInlineQueryResultLocation.heading,
-        proximity_alert_radius=TestInlineQueryResultLocation.proximity_alert_radius,
+        Space.id_,
+        Space.latitude,
+        Space.longitude,
+        Space.title,
+        live_period=Space.live_period,
+        thumb_url=Space.thumb_url,
+        thumb_width=Space.thumb_width,
+        thumb_height=Space.thumb_height,
+        input_message_content=Space.input_message_content,
+        reply_markup=Space.reply_markup,
+        horizontal_accuracy=Space.horizontal_accuracy,
+        heading=Space.heading,
+        proximity_alert_radius=Space.proximity_alert_radius,
     )
 
 
-class TestInlineQueryResultLocation:
+class Space:
     id_ = "id"
     type_ = "location"
     latitude = 0.0
@@ -62,6 +62,8 @@ class TestInlineQueryResultLocation:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultLocationNoReq:
     def test_slot_behaviour(self, inline_query_result_location, mro_slots):
         inst = inline_query_result_location
         for attr in inst.__slots__:
@@ -69,23 +71,23 @@ class TestInlineQueryResultLocation:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_location):
-        assert inline_query_result_location.id == self.id_
-        assert inline_query_result_location.type == self.type_
-        assert inline_query_result_location.latitude == self.latitude
-        assert inline_query_result_location.longitude == self.longitude
-        assert inline_query_result_location.title == self.title
-        assert inline_query_result_location.live_period == self.live_period
-        assert inline_query_result_location.thumb_url == self.thumb_url
-        assert inline_query_result_location.thumb_width == self.thumb_width
-        assert inline_query_result_location.thumb_height == self.thumb_height
+        assert inline_query_result_location.id == Space.id_
+        assert inline_query_result_location.type == Space.type_
+        assert inline_query_result_location.latitude == Space.latitude
+        assert inline_query_result_location.longitude == Space.longitude
+        assert inline_query_result_location.title == Space.title
+        assert inline_query_result_location.live_period == Space.live_period
+        assert inline_query_result_location.thumb_url == Space.thumb_url
+        assert inline_query_result_location.thumb_width == Space.thumb_width
+        assert inline_query_result_location.thumb_height == Space.thumb_height
         assert (
             inline_query_result_location.input_message_content.to_dict()
-            == self.input_message_content.to_dict()
+            == Space.input_message_content.to_dict()
         )
-        assert inline_query_result_location.reply_markup.to_dict() == self.reply_markup.to_dict()
-        assert inline_query_result_location.heading == self.heading
-        assert inline_query_result_location.horizontal_accuracy == self.horizontal_accuracy
-        assert inline_query_result_location.proximity_alert_radius == self.proximity_alert_radius
+        assert inline_query_result_location.reply_markup.to_dict() == Space.reply_markup.to_dict()
+        assert inline_query_result_location.heading == Space.heading
+        assert inline_query_result_location.horizontal_accuracy == Space.horizontal_accuracy
+        assert inline_query_result_location.proximity_alert_radius == Space.proximity_alert_radius
 
     def test_to_dict(self, inline_query_result_location):
         inline_query_result_location_dict = inline_query_result_location.to_dict()
@@ -136,11 +138,11 @@ class TestInlineQueryResultLocation:
         )
 
     def test_equality(self):
-        a = InlineQueryResultLocation(self.id_, self.longitude, self.latitude, self.title)
-        b = InlineQueryResultLocation(self.id_, self.longitude, self.latitude, self.title)
-        c = InlineQueryResultLocation(self.id_, 0, self.latitude, self.title)
-        d = InlineQueryResultLocation("", self.longitude, self.latitude, self.title)
-        e = InlineQueryResultVoice(self.id_, "", "")
+        a = InlineQueryResultLocation(Space.id_, Space.longitude, Space.latitude, Space.title)
+        b = InlineQueryResultLocation(Space.id_, Space.longitude, Space.latitude, Space.title)
+        c = InlineQueryResultLocation(Space.id_, 0, Space.latitude, Space.title)
+        d = InlineQueryResultLocation("", Space.longitude, Space.latitude, Space.title)
+        e = InlineQueryResultVoice(Space.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

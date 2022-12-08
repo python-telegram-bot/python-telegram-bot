@@ -29,21 +29,23 @@ from tests.auxil.bot_method_checks import (
 @pytest.fixture(scope="class")
 def passport_file(bot):
     pf = PassportFile(
-        file_id=TestPassportFile.file_id,
-        file_unique_id=TestPassportFile.file_unique_id,
-        file_size=TestPassportFile.file_size,
-        file_date=TestPassportFile.file_date,
+        file_id=Space.file_id,
+        file_unique_id=Space.file_unique_id,
+        file_size=Space.file_size,
+        file_date=Space.file_date,
     )
     pf.set_bot(bot)
     return pf
 
 
-class TestPassportFile:
+class Space:
     file_id = "data"
     file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     file_size = 50
     file_date = 1532879128
 
+
+class TestPassportFileNoReq:
     def test_slot_behaviour(self, passport_file, mro_slots):
         inst = passport_file
         for attr in inst.__slots__:
@@ -51,10 +53,10 @@ class TestPassportFile:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, passport_file):
-        assert passport_file.file_id == self.file_id
-        assert passport_file.file_unique_id == self.file_unique_id
-        assert passport_file.file_size == self.file_size
-        assert passport_file.file_date == self.file_date
+        assert passport_file.file_id == Space.file_id
+        assert passport_file.file_unique_id == Space.file_unique_id
+        assert passport_file.file_size == Space.file_size
+        assert passport_file.file_date == Space.file_date
 
     def test_to_dict(self, passport_file):
         passport_file_dict = passport_file.to_dict()
@@ -81,10 +83,10 @@ class TestPassportFile:
         assert (await passport_file.get_file()).file_id == "True"
 
     def test_equality(self):
-        a = PassportFile(self.file_id, self.file_unique_id, self.file_size, self.file_date)
-        b = PassportFile("", self.file_unique_id, self.file_size, self.file_date)
-        c = PassportFile(self.file_id, self.file_unique_id, "", "")
-        d = PassportFile("", "", self.file_size, self.file_date)
+        a = PassportFile(Space.file_id, Space.file_unique_id, Space.file_size, Space.file_date)
+        b = PassportFile("", Space.file_unique_id, Space.file_size, Space.file_date)
+        c = PassportFile(Space.file_id, Space.file_unique_id, "", "")
+        d = PassportFile("", "", Space.file_size, Space.file_date)
         e = PassportElementError("source", "type", "message")
 
         assert a == b

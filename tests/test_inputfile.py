@@ -26,12 +26,12 @@ from telegram import InputFile
 from tests.conftest import data_file
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def png_file():
     return data_file("game.png")
 
 
-class TestInputFile:
+class TestInputFileNoReq:
     def test_slot_behaviour(self, mro_slots):
         inst = InputFile(BytesIO(b"blah"), filename="tg.jpg")
         for attr in inst.__slots__:
@@ -139,6 +139,8 @@ class TestInputFile:
             == "blah.jpg"
         )
 
+
+class TestInputFileReq:
     async def test_send_bytes(self, bot, chat_id):
         # We test this here and not at the respective test modules because it's not worth
         # duplicating the test for the different methods

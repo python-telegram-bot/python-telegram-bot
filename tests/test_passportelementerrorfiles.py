@@ -21,21 +21,19 @@ import pytest
 from telegram import PassportElementErrorFiles, PassportElementErrorSelfie
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def passport_element_error_files():
-    return PassportElementErrorFiles(
-        TestPassportElementErrorFiles.type_,
-        TestPassportElementErrorFiles.file_hashes,
-        TestPassportElementErrorFiles.message,
-    )
+    return PassportElementErrorFiles(Space.type_, Space.file_hashes, Space.message)
 
 
-class TestPassportElementErrorFiles:
+class Space:
     source = "files"
     type_ = "test_type"
     file_hashes = ["hash1", "hash2"]
     message = "Error message"
 
+
+class TestPassportElementErrorFilesNoReq:
     def test_slot_behaviour(self, passport_element_error_files, mro_slots):
         inst = passport_element_error_files
         for attr in inst.__slots__:
@@ -43,11 +41,11 @@ class TestPassportElementErrorFiles:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, passport_element_error_files):
-        assert passport_element_error_files.source == self.source
-        assert passport_element_error_files.type == self.type_
+        assert passport_element_error_files.source == Space.source
+        assert passport_element_error_files.type == Space.type_
         assert isinstance(passport_element_error_files.file_hashes, list)
-        assert passport_element_error_files.file_hashes == self.file_hashes
-        assert passport_element_error_files.message == self.message
+        assert passport_element_error_files.file_hashes == Space.file_hashes
+        assert passport_element_error_files.message == Space.message
 
     def test_to_dict(self, passport_element_error_files):
         passport_element_error_files_dict = passport_element_error_files.to_dict()
@@ -62,12 +60,12 @@ class TestPassportElementErrorFiles:
         assert passport_element_error_files_dict["message"] == passport_element_error_files.message
 
     def test_equality(self):
-        a = PassportElementErrorFiles(self.type_, self.file_hashes, self.message)
-        b = PassportElementErrorFiles(self.type_, self.file_hashes, self.message)
-        c = PassportElementErrorFiles(self.type_, "", "")
-        d = PassportElementErrorFiles("", self.file_hashes, "")
-        e = PassportElementErrorFiles("", "", self.message)
-        f = PassportElementErrorSelfie(self.type_, "", self.message)
+        a = PassportElementErrorFiles(Space.type_, Space.file_hashes, Space.message)
+        b = PassportElementErrorFiles(Space.type_, Space.file_hashes, Space.message)
+        c = PassportElementErrorFiles(Space.type_, "", "")
+        d = PassportElementErrorFiles("", Space.file_hashes, "")
+        e = PassportElementErrorFiles("", "", Space.message)
+        f = PassportElementErrorSelfie(Space.type_, "", Space.message)
 
         assert a == b
         assert hash(a) == hash(b)

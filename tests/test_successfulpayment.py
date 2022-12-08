@@ -21,20 +21,20 @@ import pytest
 from telegram import OrderInfo, SuccessfulPayment
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def successful_payment():
     return SuccessfulPayment(
-        TestSuccessfulPayment.currency,
-        TestSuccessfulPayment.total_amount,
-        TestSuccessfulPayment.invoice_payload,
-        TestSuccessfulPayment.telegram_payment_charge_id,
-        TestSuccessfulPayment.provider_payment_charge_id,
-        shipping_option_id=TestSuccessfulPayment.shipping_option_id,
-        order_info=TestSuccessfulPayment.order_info,
+        Space.currency,
+        Space.total_amount,
+        Space.invoice_payload,
+        Space.telegram_payment_charge_id,
+        Space.provider_payment_charge_id,
+        shipping_option_id=Space.shipping_option_id,
+        order_info=Space.order_info,
     )
 
 
-class TestSuccessfulPayment:
+class Space:
     invoice_payload = "invoice_payload"
     shipping_option_id = "shipping_option_id"
     currency = "EUR"
@@ -43,6 +43,8 @@ class TestSuccessfulPayment:
     telegram_payment_charge_id = "telegram_payment_charge_id"
     provider_payment_charge_id = "provider_payment_charge_id"
 
+
+class TestSuccessfulPaymentNoReq:
     def test_slot_behaviour(self, successful_payment, mro_slots):
         inst = successful_payment
         for attr in inst.__slots__:
@@ -51,23 +53,23 @@ class TestSuccessfulPayment:
 
     def test_de_json(self, bot):
         json_dict = {
-            "invoice_payload": self.invoice_payload,
-            "shipping_option_id": self.shipping_option_id,
-            "currency": self.currency,
-            "total_amount": self.total_amount,
-            "order_info": self.order_info.to_dict(),
-            "telegram_payment_charge_id": self.telegram_payment_charge_id,
-            "provider_payment_charge_id": self.provider_payment_charge_id,
+            "invoice_payload": Space.invoice_payload,
+            "shipping_option_id": Space.shipping_option_id,
+            "currency": Space.currency,
+            "total_amount": Space.total_amount,
+            "order_info": Space.order_info.to_dict(),
+            "telegram_payment_charge_id": Space.telegram_payment_charge_id,
+            "provider_payment_charge_id": Space.provider_payment_charge_id,
         }
         successful_payment = SuccessfulPayment.de_json(json_dict, bot)
         assert successful_payment.api_kwargs == {}
 
-        assert successful_payment.invoice_payload == self.invoice_payload
-        assert successful_payment.shipping_option_id == self.shipping_option_id
-        assert successful_payment.currency == self.currency
-        assert successful_payment.order_info == self.order_info
-        assert successful_payment.telegram_payment_charge_id == self.telegram_payment_charge_id
-        assert successful_payment.provider_payment_charge_id == self.provider_payment_charge_id
+        assert successful_payment.invoice_payload == Space.invoice_payload
+        assert successful_payment.shipping_option_id == Space.shipping_option_id
+        assert successful_payment.currency == Space.currency
+        assert successful_payment.order_info == Space.order_info
+        assert successful_payment.telegram_payment_charge_id == Space.telegram_payment_charge_id
+        assert successful_payment.provider_payment_charge_id == Space.provider_payment_charge_id
 
     def test_to_dict(self, successful_payment):
         successful_payment_dict = successful_payment.to_dict()
@@ -90,27 +92,27 @@ class TestSuccessfulPayment:
 
     def test_equality(self):
         a = SuccessfulPayment(
-            self.currency,
-            self.total_amount,
-            self.invoice_payload,
-            self.telegram_payment_charge_id,
-            self.provider_payment_charge_id,
+            Space.currency,
+            Space.total_amount,
+            Space.invoice_payload,
+            Space.telegram_payment_charge_id,
+            Space.provider_payment_charge_id,
         )
         b = SuccessfulPayment(
-            self.currency,
-            self.total_amount,
-            self.invoice_payload,
-            self.telegram_payment_charge_id,
-            self.provider_payment_charge_id,
+            Space.currency,
+            Space.total_amount,
+            Space.invoice_payload,
+            Space.telegram_payment_charge_id,
+            Space.provider_payment_charge_id,
         )
         c = SuccessfulPayment(
-            "", 0, "", self.telegram_payment_charge_id, self.provider_payment_charge_id
+            "", 0, "", Space.telegram_payment_charge_id, Space.provider_payment_charge_id
         )
         d = SuccessfulPayment(
-            self.currency,
-            self.total_amount,
-            self.invoice_payload,
-            self.telegram_payment_charge_id,
+            Space.currency,
+            Space.total_amount,
+            Space.invoice_payload,
+            Space.telegram_payment_charge_id,
             "",
         )
 

@@ -84,7 +84,7 @@ class TestNoSocks:
             HTTPXRequest(proxy_url="socks5://foo")
 
 
-class TestRequest:
+class TestRequestNoReq:
     test_flag = None
 
     @pytest.fixture(autouse=True)
@@ -325,7 +325,7 @@ class TestRequest:
         assert self.test_flag == (1, 2, 3, 4)
 
 
-class TestHTTPXRequest:
+class TestHTTPXRequestNoReq:
     test_flag = None
 
     @pytest.fixture(autouse=True)
@@ -567,7 +567,8 @@ class TestHTTPXRequest:
                     httpx_request.do_request(method="GET", url="URL"),
                 )
 
-    @pytest.mark.flaky(3, 1)
+
+class TestHTTPXRequestReq:
     async def test_do_request_wait_for_pool(self, monkeypatch, httpx_request):
         """The pool logic is buried rather deeply in httpxcore, so we make actual requests here
         instead of mocking"""

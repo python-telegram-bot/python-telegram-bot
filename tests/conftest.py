@@ -22,7 +22,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import pytest
 from httpx import AsyncClient, Response
@@ -52,10 +52,26 @@ from tests.bots import get_bot
 
 
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
-def pytest_runtestloop(session):
+def pytest_runtestloop(session: pytest.Session):
     session.add_marker(
         pytest.mark.filterwarnings("ignore::telegram.warnings.PTBDeprecationWarning")
     )
+
+
+def pytest_collection_modifyitems(items: List[pytest.Item]):
+    """Here we add a flaky marker to all request making tests and the no_req marker to the rest."""
+    for item in items:
+        parent = item.parent
+        if parent is None:
+            return
+        if (
+            "NoReq" not in parent.name
+            and parent.name.endswith("Req")
+            and not parent.get_closest_marker(name="flaky")
+        ):
+            parent.add_marker(pytest.mark.flaky(3, 1))
+        elif parent.name.endswith("NoReq") and not parent.get_closest_marker(name="no_req"):
+            parent.add_marker(pytest.mark.no_req)
 
 
 GITHUB_ACTION = os.getenv("GITHUB_ACTION", False)
@@ -148,6 +164,7 @@ class DictApplication(Application):
 async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
     async with make_bot(bot_info) as _bot:
+        print("making new bot")
         yield _bot
 
 
@@ -170,20 +187,35 @@ async def raw_bot(bot_info):
         yield _bot
 
 
-@pytest.fixture(scope="function")
+default_bots = {}
+
+
+@pytest.fixture(scope="session")
 async def default_bot(request, bot_info):
     param = request.param if hasattr(request, "param") else {}
+    defaults = Defaults(**param)
 
-    default_bot = make_bot(bot_info, defaults=Defaults(**param))
-    async with default_bot:
-        yield default_bot
+    # If the bot is already created, return it. Else make a new one.
+    default_bot = default_bots.get(defaults, None)
+    if default_bot is None:
+        default_bot = make_bot(bot_info, defaults=defaults)
+        await default_bot.initialize()
+        default_bots[defaults] = default_bot  # Defaults object is hashable
+    return default_bot
 
 
-@pytest.fixture(scope="function")
+tz_bots = {}
+
+
+@pytest.fixture(scope="session")
 async def tz_bot(timezone, bot_info):
-    default_bot = make_bot(bot_info, defaults=Defaults(tzinfo=timezone))
-    async with default_bot:
-        yield default_bot
+    try:  # If the bot is already created, return it. Saves time since get_me is not called again.
+        return tz_bots[timezone]
+    except KeyError:
+        default_bot = make_bot(bot_info, defaults=Defaults(tzinfo=timezone))
+        await default_bot.initialize()
+        tz_bots[timezone] = default_bot
+        return default_bot
 
 
 @pytest.fixture(scope="session")
@@ -248,7 +280,7 @@ def thumb_file():
     f.close()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def class_thumb_file():
     f = data_file("thumb.jpg").open("rb")
     yield f
@@ -401,7 +433,7 @@ class BasicTimezone(datetime.tzinfo):
         return datetime.timedelta(0)
 
 
-@pytest.fixture(params=["Europe/Berlin", "Asia/Singapore", "UTC"])
+@pytest.fixture(scope="session", params=["Europe/Berlin", "Asia/Singapore", "UTC"])
 def tzinfo(request):
     if TEST_WITH_OPT_DEPS:
         return pytz.timezone(request.param)
@@ -410,7 +442,7 @@ def tzinfo(request):
         return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def timezone(tzinfo):
     return tzinfo
 

@@ -19,7 +19,7 @@
 from telegram import PhotoSize, UserProfilePhotos
 
 
-class TestUserProfilePhotos:
+class Space:
     total_count = 2
     photos = [
         [
@@ -32,21 +32,23 @@ class TestUserProfilePhotos:
         ],
     ]
 
+
+class TestUserProfilePhotosNoReq:
     def test_slot_behaviour(self, mro_slots):
-        inst = UserProfilePhotos(self.total_count, self.photos)
+        inst = UserProfilePhotos(Space.total_count, Space.photos)
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, bot):
-        json_dict = {"total_count": 2, "photos": [[y.to_dict() for y in x] for x in self.photos]}
+        json_dict = {"total_count": 2, "photos": [[y.to_dict() for y in x] for x in Space.photos]}
         user_profile_photos = UserProfilePhotos.de_json(json_dict, bot)
         assert user_profile_photos.api_kwargs == {}
-        assert user_profile_photos.total_count == self.total_count
-        assert user_profile_photos.photos == tuple(tuple(p) for p in self.photos)
+        assert user_profile_photos.total_count == Space.total_count
+        assert user_profile_photos.photos == tuple(tuple(p) for p in Space.photos)
 
     def test_to_dict(self):
-        user_profile_photos = UserProfilePhotos(self.total_count, self.photos)
+        user_profile_photos = UserProfilePhotos(Space.total_count, Space.photos)
         user_profile_photos_dict = user_profile_photos.to_dict()
         assert user_profile_photos_dict["total_count"] == user_profile_photos.total_count
         for ix, x in enumerate(user_profile_photos_dict["photos"]):
@@ -54,9 +56,9 @@ class TestUserProfilePhotos:
                 assert y == user_profile_photos.photos[ix][iy].to_dict()
 
     def test_equality(self):
-        a = UserProfilePhotos(2, self.photos)
-        b = UserProfilePhotos(2, self.photos)
-        c = UserProfilePhotos(1, [self.photos[0]])
+        a = UserProfilePhotos(2, Space.photos)
+        b = UserProfilePhotos(2, Space.photos)
+        c = UserProfilePhotos(1, [Space.photos[0]])
         d = PhotoSize("file_id1", "unique_id", 512, 512)
 
         assert a == b

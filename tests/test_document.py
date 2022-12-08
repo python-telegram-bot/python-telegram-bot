@@ -40,13 +40,13 @@ def document_file():
     f.close()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 async def document(bot, chat_id):
     with data_file("telegram.png").open("rb") as f:
         return (await bot.send_document(chat_id, document=f, read_timeout=50)).document
 
 
-class TestDocument:
+class Space:
     caption = "DocumentTest - *Caption*"
     document_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.gif"
     file_size = 12948
@@ -58,6 +58,8 @@ class TestDocument:
     document_file_id = "5a3128a4d2a04750b5b58397f3b5e812"
     document_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
+
+class TestDocumentNoReq:
     def test_slot_behaviour(self, document, mro_slots):
         for attr in document.__slots__:
             assert getattr(document, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -71,78 +73,12 @@ class TestDocument:
         assert document.file_unique_id != ""
 
     def test_expected_values(self, document):
-        assert document.file_size == self.file_size
-        assert document.mime_type == self.mime_type
-        assert document.file_name == self.file_name
-        assert document.thumb.file_size == self.thumb_file_size
-        assert document.thumb.width == self.thumb_width
-        assert document.thumb.height == self.thumb_height
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_all_args(self, bot, chat_id, document_file, document, thumb_file):
-        message = await bot.send_document(
-            chat_id,
-            document=document_file,
-            caption=self.caption,
-            disable_notification=False,
-            protect_content=True,
-            filename="telegram_custom.png",
-            parse_mode="Markdown",
-            thumb=thumb_file,
-        )
-
-        assert isinstance(message.document, Document)
-        assert isinstance(message.document.file_id, str)
-        assert message.document.file_id != ""
-        assert isinstance(message.document.file_unique_id, str)
-        assert message.document.file_unique_id != ""
-        assert isinstance(message.document.thumb, PhotoSize)
-        assert message.document.file_name == "telegram_custom.png"
-        assert message.document.mime_type == document.mime_type
-        assert message.document.file_size == document.file_size
-        assert message.caption == self.caption.replace("*", "")
-        assert message.document.thumb.width == self.thumb_width
-        assert message.document.thumb.height == self.thumb_height
-        assert message.has_protected_content
-
-    @pytest.mark.flaky(3, 1)
-    async def test_get_and_download(self, bot, document):
-        path = Path("telegram.png")
-        if path.is_file():
-            path.unlink()
-
-        new_file = await bot.get_file(document.file_id)
-
-        assert new_file.file_size == document.file_size
-        assert new_file.file_id == document.file_id
-        assert new_file.file_unique_id == document.file_unique_id
-        assert new_file.file_path.startswith("https://")
-
-        await new_file.download_to_drive("telegram.png")
-
-        assert path.is_file()
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_url_gif_file(self, bot, chat_id):
-        message = await bot.send_document(chat_id, self.document_file_url)
-
-        document = message.document
-
-        assert isinstance(document, Document)
-        assert isinstance(document.file_id, str)
-        assert document.file_id != ""
-        assert isinstance(message.document.file_unique_id, str)
-        assert message.document.file_unique_id != ""
-        assert isinstance(document.thumb, PhotoSize)
-        assert document.file_name == "telegram.gif"
-        assert document.mime_type == "image/gif"
-        assert document.file_size == 3878
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_resend(self, bot, chat_id, document):
-        message = await bot.send_document(chat_id=chat_id, document=document.file_id)
-
-        assert message.document == document
+        assert document.file_size == Space.file_size
+        assert document.mime_type == Space.mime_type
+        assert document.file_name == Space.file_name
+        assert document.thumb.file_size == Space.thumb_file_size
+        assert document.thumb.width == Space.thumb_width
+        assert document.thumb.height == Space.thumb_height
 
     @pytest.mark.parametrize("disable_content_type_detection", [True, False, None])
     async def test_send_with_document(
@@ -165,7 +101,169 @@ class TestDocument:
 
         assert message
 
-    @pytest.mark.flaky(3, 1)
+    @pytest.mark.parametrize("local_mode", [True, False])
+    async def test_send_document_local_files(self, monkeypatch, bot, chat_id, local_mode):
+        try:
+            bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local bot API set up
+            test_flag = False
+            file = data_file("telegram.jpg")
+            expected = file.as_uri()
+
+            async def make_assertion(_, data, *args, **kwargs):
+                nonlocal test_flag
+                if local_mode:
+                    test_flag = data.get("document") == expected and data.get("thumb") == expected
+                else:
+                    test_flag = isinstance(data.get("document"), InputFile) and isinstance(
+                        data.get("thumb"), InputFile
+                    )
+
+            monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.send_document(chat_id, file, thumb=file)
+            assert test_flag
+        finally:
+            bot._local_mode = False
+
+    def test_de_json(self, bot, document):
+        json_dict = {
+            "file_id": Space.document_file_id,
+            "file_unique_id": Space.document_file_unique_id,
+            "thumb": document.thumb.to_dict(),
+            "file_name": Space.file_name,
+            "mime_type": Space.mime_type,
+            "file_size": Space.file_size,
+        }
+        test_document = Document.de_json(json_dict, bot)
+        assert test_document.api_kwargs == {}
+
+        assert test_document.file_id == Space.document_file_id
+        assert test_document.file_unique_id == Space.document_file_unique_id
+        assert test_document.thumb == document.thumb
+        assert test_document.file_name == Space.file_name
+        assert test_document.mime_type == Space.mime_type
+        assert test_document.file_size == Space.file_size
+
+    def test_to_dict(self, document):
+        document_dict = document.to_dict()
+
+        assert isinstance(document_dict, dict)
+        assert document_dict["file_id"] == document.file_id
+        assert document_dict["file_unique_id"] == document.file_unique_id
+        assert document_dict["file_name"] == document.file_name
+        assert document_dict["mime_type"] == document.mime_type
+        assert document_dict["file_size"] == document.file_size
+
+    async def test_error_send_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            await bot.send_document(chat_id=chat_id)
+
+    async def test_get_file_instance_method(self, monkeypatch, document):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["file_id"] == document.file_id
+
+        assert check_shortcut_signature(Document.get_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(document.get_file, document.get_bot(), "get_file")
+        assert await check_defaults_handling(document.get_file, document.get_bot())
+
+        monkeypatch.setattr(document.get_bot(), "get_file", make_assertion)
+        assert await document.get_file()
+
+    def test_equality(self, document):
+        a = Document(document.file_id, document.file_unique_id)
+        b = Document("", document.file_unique_id)
+        d = Document("", "")
+        e = Voice(document.file_id, document.file_unique_id, 0)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+class TestDocumentReq:
+    async def test_error_send_empty_file(self, bot, chat_id):
+        with open(os.devnull, "rb") as f:
+            with pytest.raises(TelegramError):
+                await bot.send_document(chat_id=chat_id, document=f)
+
+    async def test_error_send_empty_file_id(self, bot, chat_id):
+        with pytest.raises(TelegramError):
+            await bot.send_document(chat_id=chat_id, document="")
+
+    async def test_get_and_download(self, bot, document):
+        path = Path("telegram.png")
+        if path.is_file():
+            path.unlink()
+
+        new_file = await bot.get_file(document.file_id)
+
+        assert new_file.file_size == document.file_size
+        assert new_file.file_id == document.file_id
+        assert new_file.file_unique_id == document.file_unique_id
+        assert new_file.file_path.startswith("https://")
+
+        await new_file.download_to_drive("telegram.png")
+
+        assert path.is_file()
+
+    async def test_send_resend(self, bot, chat_id, document):
+        message = await bot.send_document(chat_id=chat_id, document=document.file_id)
+        assert message.document == document
+
+    async def test_send_all_args(self, bot, chat_id, document_file, document, thumb_file):
+        message = await bot.send_document(
+            chat_id,
+            document=document_file,
+            caption=Space.caption,
+            disable_notification=False,
+            protect_content=True,
+            filename="telegram_custom.png",
+            parse_mode="Markdown",
+            thumb=thumb_file,
+        )
+
+        assert isinstance(message.document, Document)
+        assert isinstance(message.document.file_id, str)
+        assert message.document.file_id != ""
+        assert isinstance(message.document.file_unique_id, str)
+        assert message.document.file_unique_id != ""
+        assert isinstance(message.document.thumb, PhotoSize)
+        assert message.document.file_name == "telegram_custom.png"
+        assert message.document.mime_type == document.mime_type
+        assert message.document.file_size == document.file_size
+        assert message.caption == Space.caption.replace("*", "")
+        assert message.document.thumb.width == Space.thumb_width
+        assert message.document.thumb.height == Space.thumb_height
+        assert message.has_protected_content
+
+    async def test_send_url_gif_file(self, bot, chat_id):
+        message = await bot.send_document(chat_id, Space.document_file_url)
+
+        document = message.document
+
+        assert isinstance(document, Document)
+        assert isinstance(document.file_id, str)
+        assert document.file_id != ""
+        assert isinstance(message.document.file_unique_id, str)
+        assert message.document.file_unique_id != ""
+        assert isinstance(document.thumb, PhotoSize)
+        assert document.file_name == "telegram.gif"
+        assert document.mime_type == "image/gif"
+        assert document.file_size == 3878
+
+    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
+    async def test_send_document_default_protect_content(self, chat_id, default_bot, document):
+        protected = await default_bot.send_document(chat_id, document)
+        assert protected.has_protected_content
+        unprotected = await default_bot.send_document(chat_id, document, protect_content=False)
+        assert not unprotected.has_protected_content
+
     async def test_send_document_caption_entities(self, bot, chat_id, document):
         test_string = "Italic Bold Code"
         entities = [
@@ -180,7 +278,6 @@ class TestDocument:
         assert message.caption == test_string
         assert message.caption_entities == tuple(entities)
 
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_document_default_parse_mode_1(self, default_bot, chat_id, document):
         test_string = "Italic Bold Code"
@@ -190,7 +287,6 @@ class TestDocument:
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_document_default_parse_mode_2(self, default_bot, chat_id, document):
         test_markdown_string = "_Italic_ *Bold* `Code`"
@@ -201,7 +297,6 @@ class TestDocument:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_document_default_parse_mode_3(self, default_bot, chat_id, document):
         test_markdown_string = "_Italic_ *Bold* `Code`"
@@ -212,7 +307,6 @@ class TestDocument:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -245,106 +339,3 @@ class TestDocument:
                 await default_bot.send_document(
                     chat_id, document, reply_to_message_id=reply_to_message.message_id
                 )
-
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
-    async def test_send_document_default_protect_content(self, chat_id, default_bot, document):
-        protected = await default_bot.send_document(chat_id, document)
-        assert protected.has_protected_content
-        unprotected = await default_bot.send_document(chat_id, document, protect_content=False)
-        assert not unprotected.has_protected_content
-
-    @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_document_local_files(self, monkeypatch, bot, chat_id, local_mode):
-        try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
-            test_flag = False
-            file = data_file("telegram.jpg")
-            expected = file.as_uri()
-
-            async def make_assertion(_, data, *args, **kwargs):
-                nonlocal test_flag
-                if local_mode:
-                    test_flag = data.get("document") == expected and data.get("thumb") == expected
-                else:
-                    test_flag = isinstance(data.get("document"), InputFile) and isinstance(
-                        data.get("thumb"), InputFile
-                    )
-
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_document(chat_id, file, thumb=file)
-            assert test_flag
-        finally:
-            bot._local_mode = False
-
-    def test_de_json(self, bot, document):
-        json_dict = {
-            "file_id": self.document_file_id,
-            "file_unique_id": self.document_file_unique_id,
-            "thumb": document.thumb.to_dict(),
-            "file_name": self.file_name,
-            "mime_type": self.mime_type,
-            "file_size": self.file_size,
-        }
-        test_document = Document.de_json(json_dict, bot)
-        assert test_document.api_kwargs == {}
-
-        assert test_document.file_id == self.document_file_id
-        assert test_document.file_unique_id == self.document_file_unique_id
-        assert test_document.thumb == document.thumb
-        assert test_document.file_name == self.file_name
-        assert test_document.mime_type == self.mime_type
-        assert test_document.file_size == self.file_size
-
-    def test_to_dict(self, document):
-        document_dict = document.to_dict()
-
-        assert isinstance(document_dict, dict)
-        assert document_dict["file_id"] == document.file_id
-        assert document_dict["file_unique_id"] == document.file_unique_id
-        assert document_dict["file_name"] == document.file_name
-        assert document_dict["mime_type"] == document.mime_type
-        assert document_dict["file_size"] == document.file_size
-
-    @pytest.mark.flaky(3, 1)
-    async def test_error_send_empty_file(self, bot, chat_id):
-        with open(os.devnull, "rb") as f:
-            with pytest.raises(TelegramError):
-                await bot.send_document(chat_id=chat_id, document=f)
-
-    @pytest.mark.flaky(3, 1)
-    async def test_error_send_empty_file_id(self, bot, chat_id):
-        with pytest.raises(TelegramError):
-            await bot.send_document(chat_id=chat_id, document="")
-
-    async def test_error_send_without_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError):
-            await bot.send_document(chat_id=chat_id)
-
-    async def test_get_file_instance_method(self, monkeypatch, document):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == document.file_id
-
-        assert check_shortcut_signature(Document.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(document.get_file, document.get_bot(), "get_file")
-        assert await check_defaults_handling(document.get_file, document.get_bot())
-
-        monkeypatch.setattr(document.get_bot(), "get_file", make_assertion)
-        assert await document.get_file()
-
-    def test_equality(self, document):
-        a = Document(document.file_id, document.file_unique_id)
-        b = Document("", document.file_unique_id)
-        d = Document("", "")
-        e = Voice(document.file_id, document.file_unique_id, 0)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

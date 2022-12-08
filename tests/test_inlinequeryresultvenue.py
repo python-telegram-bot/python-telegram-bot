@@ -27,27 +27,27 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_venue():
     return InlineQueryResultVenue(
-        TestInlineQueryResultVenue.id_,
-        TestInlineQueryResultVenue.latitude,
-        TestInlineQueryResultVenue.longitude,
-        TestInlineQueryResultVenue.title,
-        TestInlineQueryResultVenue.address,
-        foursquare_id=TestInlineQueryResultVenue.foursquare_id,
-        foursquare_type=TestInlineQueryResultVenue.foursquare_type,
-        thumb_url=TestInlineQueryResultVenue.thumb_url,
-        thumb_width=TestInlineQueryResultVenue.thumb_width,
-        thumb_height=TestInlineQueryResultVenue.thumb_height,
-        input_message_content=TestInlineQueryResultVenue.input_message_content,
-        reply_markup=TestInlineQueryResultVenue.reply_markup,
-        google_place_id=TestInlineQueryResultVenue.google_place_id,
-        google_place_type=TestInlineQueryResultVenue.google_place_type,
+        Space.id_,
+        Space.latitude,
+        Space.longitude,
+        Space.title,
+        Space.address,
+        foursquare_id=Space.foursquare_id,
+        foursquare_type=Space.foursquare_type,
+        thumb_url=Space.thumb_url,
+        thumb_width=Space.thumb_width,
+        thumb_height=Space.thumb_height,
+        input_message_content=Space.input_message_content,
+        reply_markup=Space.reply_markup,
+        google_place_id=Space.google_place_id,
+        google_place_type=Space.google_place_type,
     )
 
 
-class TestInlineQueryResultVenue:
+class Space:
     id_ = "id"
     type_ = "venue"
     latitude = "latitude"
@@ -64,6 +64,8 @@ class TestInlineQueryResultVenue:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultVenueNoReq:
     def test_slot_behaviour(self, inline_query_result_venue, mro_slots):
         inst = inline_query_result_venue
         for attr in inst.__slots__:
@@ -71,24 +73,24 @@ class TestInlineQueryResultVenue:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_venue):
-        assert inline_query_result_venue.id == self.id_
-        assert inline_query_result_venue.type == self.type_
-        assert inline_query_result_venue.latitude == self.latitude
-        assert inline_query_result_venue.longitude == self.longitude
-        assert inline_query_result_venue.title == self.title
-        assert inline_query_result_venue.address == self.address
-        assert inline_query_result_venue.foursquare_id == self.foursquare_id
-        assert inline_query_result_venue.foursquare_type == self.foursquare_type
-        assert inline_query_result_venue.google_place_id == self.google_place_id
-        assert inline_query_result_venue.google_place_type == self.google_place_type
-        assert inline_query_result_venue.thumb_url == self.thumb_url
-        assert inline_query_result_venue.thumb_width == self.thumb_width
-        assert inline_query_result_venue.thumb_height == self.thumb_height
+        assert inline_query_result_venue.id == Space.id_
+        assert inline_query_result_venue.type == Space.type_
+        assert inline_query_result_venue.latitude == Space.latitude
+        assert inline_query_result_venue.longitude == Space.longitude
+        assert inline_query_result_venue.title == Space.title
+        assert inline_query_result_venue.address == Space.address
+        assert inline_query_result_venue.foursquare_id == Space.foursquare_id
+        assert inline_query_result_venue.foursquare_type == Space.foursquare_type
+        assert inline_query_result_venue.google_place_id == Space.google_place_id
+        assert inline_query_result_venue.google_place_type == Space.google_place_type
+        assert inline_query_result_venue.thumb_url == Space.thumb_url
+        assert inline_query_result_venue.thumb_width == Space.thumb_width
+        assert inline_query_result_venue.thumb_height == Space.thumb_height
         assert (
             inline_query_result_venue.input_message_content.to_dict()
-            == self.input_message_content.to_dict()
+            == Space.input_message_content.to_dict()
         )
-        assert inline_query_result_venue.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_venue.reply_markup.to_dict() == Space.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_venue):
         inline_query_result_venue_dict = inline_query_result_venue.to_dict()
@@ -135,14 +137,14 @@ class TestInlineQueryResultVenue:
 
     def test_equality(self):
         a = InlineQueryResultVenue(
-            self.id_, self.longitude, self.latitude, self.title, self.address
+            Space.id_, Space.longitude, Space.latitude, Space.title, Space.address
         )
         b = InlineQueryResultVenue(
-            self.id_, self.longitude, self.latitude, self.title, self.address
+            Space.id_, Space.longitude, Space.latitude, Space.title, Space.address
         )
-        c = InlineQueryResultVenue(self.id_, "", self.latitude, self.title, self.address)
-        d = InlineQueryResultVenue("", self.longitude, self.latitude, self.title, self.address)
-        e = InlineQueryResultVoice(self.id_, "", "")
+        c = InlineQueryResultVenue(Space.id_, "", Space.latitude, Space.title, Space.address)
+        d = InlineQueryResultVenue("", Space.longitude, Space.latitude, Space.title, Space.address)
+        e = InlineQueryResultVoice(Space.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

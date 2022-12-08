@@ -26,21 +26,23 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_game():
     return InlineQueryResultGame(
-        TestInlineQueryResultGame.id_,
-        TestInlineQueryResultGame.game_short_name,
-        reply_markup=TestInlineQueryResultGame.reply_markup,
+        Space.id_,
+        Space.game_short_name,
+        reply_markup=Space.reply_markup,
     )
 
 
-class TestInlineQueryResultGame:
+class Space:
     id_ = "id"
     type_ = "game"
     game_short_name = "game short name"
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultGameNoReq:
     def test_slot_behaviour(self, inline_query_result_game, mro_slots):
         inst = inline_query_result_game
         for attr in inst.__slots__:
@@ -48,10 +50,10 @@ class TestInlineQueryResultGame:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_game):
-        assert inline_query_result_game.type == self.type_
-        assert inline_query_result_game.id == self.id_
-        assert inline_query_result_game.game_short_name == self.game_short_name
-        assert inline_query_result_game.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_game.type == Space.type_
+        assert inline_query_result_game.id == Space.id_
+        assert inline_query_result_game.game_short_name == Space.game_short_name
+        assert inline_query_result_game.reply_markup.to_dict() == Space.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_game):
         inline_query_result_game_dict = inline_query_result_game.to_dict()
@@ -69,11 +71,11 @@ class TestInlineQueryResultGame:
         )
 
     def test_equality(self):
-        a = InlineQueryResultGame(self.id_, self.game_short_name)
-        b = InlineQueryResultGame(self.id_, self.game_short_name)
-        c = InlineQueryResultGame(self.id_, "")
-        d = InlineQueryResultGame("", self.game_short_name)
-        e = InlineQueryResultVoice(self.id_, "", "")
+        a = InlineQueryResultGame(Space.id_, Space.game_short_name)
+        b = InlineQueryResultGame(Space.id_, Space.game_short_name)
+        c = InlineQueryResultGame(Space.id_, "")
+        d = InlineQueryResultGame("", Space.game_short_name)
+        e = InlineQueryResultVoice(Space.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

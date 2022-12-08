@@ -22,43 +22,29 @@ import pytest
 from telegram import InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def reply_keyboard_markup():
     return ReplyKeyboardMarkup(
-        TestReplyKeyboardMarkup.keyboard,
-        resize_keyboard=TestReplyKeyboardMarkup.resize_keyboard,
-        one_time_keyboard=TestReplyKeyboardMarkup.one_time_keyboard,
-        selective=TestReplyKeyboardMarkup.selective,
+        Space.keyboard,
+        resize_keyboard=Space.resize_keyboard,
+        one_time_keyboard=Space.one_time_keyboard,
+        selective=Space.selective,
     )
 
 
-class TestReplyKeyboardMarkup:
+class Space:
     keyboard = [[KeyboardButton("button1"), KeyboardButton("button2")]]
     resize_keyboard = True
     one_time_keyboard = True
     selective = True
 
+
+class TestReplyKeyboardMarkupNoReq:
     def test_slot_behaviour(self, reply_keyboard_markup, mro_slots):
         inst = reply_keyboard_markup
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_message_with_reply_keyboard_markup(
-        self, bot, chat_id, reply_keyboard_markup
-    ):
-        message = await bot.send_message(chat_id, "Text", reply_markup=reply_keyboard_markup)
-
-        assert message.text == "Text"
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_message_with_data_markup(self, bot, chat_id):
-        message = await bot.send_message(
-            chat_id, "text 2", reply_markup={"keyboard": [["1", "2"]]}
-        )
-
-        assert message.text == "text 2"
 
     def test_from_button(self):
         reply_keyboard_markup = ReplyKeyboardMarkup.from_button(
@@ -100,9 +86,9 @@ class TestReplyKeyboardMarkup:
         assert all(isinstance(row, tuple) for row in reply_keyboard_markup.keyboard)
         assert isinstance(reply_keyboard_markup.keyboard[0][0], KeyboardButton)
         assert isinstance(reply_keyboard_markup.keyboard[0][1], KeyboardButton)
-        assert reply_keyboard_markup.resize_keyboard == self.resize_keyboard
-        assert reply_keyboard_markup.one_time_keyboard == self.one_time_keyboard
-        assert reply_keyboard_markup.selective == self.selective
+        assert reply_keyboard_markup.resize_keyboard == Space.resize_keyboard
+        assert reply_keyboard_markup.one_time_keyboard == Space.one_time_keyboard
+        assert reply_keyboard_markup.selective == Space.selective
 
     def test_wrong_keyboard_inputs(self):
         with pytest.raises(ValueError):
@@ -159,3 +145,19 @@ class TestReplyKeyboardMarkup:
 
         assert a != f
         assert hash(a) != hash(f)
+
+
+class TestReplyKeyboardMarkupReq:
+    async def test_send_message_with_reply_keyboard_markup(
+        self, bot, chat_id, reply_keyboard_markup
+    ):
+        message = await bot.send_message(chat_id, "Text", reply_markup=reply_keyboard_markup)
+
+        assert message.text == "Text"
+
+    async def test_send_message_with_data_markup(self, bot, chat_id):
+        message = await bot.send_message(
+            chat_id, "text 2", reply_markup={"keyboard": [["1", "2"]]}
+        )
+
+        assert message.text == "text 2"

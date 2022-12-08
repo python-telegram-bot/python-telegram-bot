@@ -21,18 +21,18 @@ import pytest
 from telegram import LabeledPrice, ShippingOption, Voice
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def shipping_option():
-    return ShippingOption(
-        TestShippingOption.id_, TestShippingOption.title, TestShippingOption.prices
-    )
+    return ShippingOption(Space.id_, Space.title, Space.prices)
 
 
-class TestShippingOption:
+class Space:
     id_ = "id"
     title = "title"
     prices = [LabeledPrice("Fish Container", 100), LabeledPrice("Premium Fish Container", 1000)]
 
+
+class TestShippingOptionNoReq:
     def test_slot_behaviour(self, shipping_option, mro_slots):
         inst = shipping_option
         for attr in inst.__slots__:
@@ -40,9 +40,9 @@ class TestShippingOption:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, shipping_option):
-        assert shipping_option.id == self.id_
-        assert shipping_option.title == self.title
-        assert shipping_option.prices == tuple(self.prices)
+        assert shipping_option.id == Space.id_
+        assert shipping_option.title == Space.title
+        assert shipping_option.prices == tuple(Space.prices)
 
     def test_to_dict(self, shipping_option):
         shipping_option_dict = shipping_option.to_dict()
@@ -54,11 +54,11 @@ class TestShippingOption:
         assert shipping_option_dict["prices"][1] == shipping_option.prices[1].to_dict()
 
     def test_equality(self):
-        a = ShippingOption(self.id_, self.title, self.prices)
-        b = ShippingOption(self.id_, self.title, self.prices)
-        c = ShippingOption(self.id_, "", [])
-        d = ShippingOption(0, self.title, self.prices)
-        e = Voice(self.id_, "someid", 0)
+        a = ShippingOption(Space.id_, Space.title, Space.prices)
+        b = ShippingOption(Space.id_, Space.title, Space.prices)
+        c = ShippingOption(Space.id_, "", [])
+        d = ShippingOption(0, Space.title, Space.prices)
+        e = Voice(Space.id_, "someid", 0)
 
         assert a == b
         assert hash(a) == hash(b)

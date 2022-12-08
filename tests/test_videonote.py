@@ -39,25 +39,25 @@ def video_note_file():
     f.close()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 async def video_note(bot, chat_id):
     with data_file("telegram2.mp4").open("rb") as f:
         return (await bot.send_video_note(chat_id, video_note=f, read_timeout=50)).video_note
 
 
-class TestVideoNote:
+class Space:
     length = 240
     duration = 3
     file_size = 132084
-
     thumb_width = 240
     thumb_height = 240
     thumb_file_size = 11547
-
     caption = "VideoNoteTest - Caption"
     videonote_file_id = "5a3128a4d2a04750b5b58397f3b5e812"
     videonote_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
+
+class TestVideoNoteNoReq:
     def test_slot_behaviour(self, video_note, mro_slots):
         for attr in video_note.__slots__:
             assert getattr(video_note, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -78,37 +78,10 @@ class TestVideoNote:
         assert video_note.thumb.file_unique_id != ""
 
     def test_expected_values(self, video_note):
-        assert video_note.length == self.length
-        assert video_note.duration == self.duration
-        assert video_note.file_size == self.file_size
+        assert video_note.length == Space.length
+        assert video_note.duration == Space.duration
+        assert video_note.file_size == Space.file_size
 
-    @pytest.mark.flaky(3, 1)
-    async def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
-        message = await bot.send_video_note(
-            chat_id,
-            video_note_file,
-            duration=self.duration,
-            length=self.length,
-            disable_notification=False,
-            protect_content=True,
-            thumb=thumb_file,
-        )
-
-        assert isinstance(message.video_note, VideoNote)
-        assert isinstance(message.video_note.file_id, str)
-        assert isinstance(message.video_note.file_unique_id, str)
-        assert message.video_note.file_id != ""
-        assert message.video_note.file_unique_id != ""
-        assert message.video_note.length == video_note.length
-        assert message.video_note.duration == video_note.duration
-        assert message.video_note.file_size == video_note.file_size
-
-        assert message.video_note.thumb.file_size == self.thumb_file_size
-        assert message.video_note.thumb.width == self.thumb_width
-        assert message.video_note.thumb.height == self.thumb_height
-        assert message.has_protected_content
-
-    @pytest.mark.flaky(3, 1)
     async def test_send_video_note_custom_filename(
         self, bot, chat_id, video_note_file, monkeypatch
     ):
@@ -118,29 +91,6 @@ class TestVideoNote:
         monkeypatch.setattr(bot.request, "post", make_assertion)
 
         assert await bot.send_video_note(chat_id, video_note_file, filename="custom_filename")
-
-    @pytest.mark.flaky(3, 1)
-    async def test_get_and_download(self, bot, video_note):
-        path = Path("telegram2.mp4")
-        if path.is_file():
-            path.unlink()
-
-        new_file = await bot.get_file(video_note.file_id)
-
-        assert new_file.file_size == self.file_size
-        assert new_file.file_id == video_note.file_id
-        assert new_file.file_unique_id == video_note.file_unique_id
-        assert new_file.file_path.startswith("https://")
-
-        await new_file.download_to_drive("telegram2.mp4")
-
-        assert path.is_file()
-
-    @pytest.mark.flaky(3, 1)
-    async def test_resend(self, bot, chat_id, video_note):
-        message = await bot.send_video_note(chat_id, video_note.file_id)
-
-        assert message.video_note == video_note
 
     async def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -152,20 +102,20 @@ class TestVideoNote:
 
     def test_de_json(self, bot):
         json_dict = {
-            "file_id": self.videonote_file_id,
-            "file_unique_id": self.videonote_file_unique_id,
-            "length": self.length,
-            "duration": self.duration,
-            "file_size": self.file_size,
+            "file_id": Space.videonote_file_id,
+            "file_unique_id": Space.videonote_file_unique_id,
+            "length": Space.length,
+            "duration": Space.duration,
+            "file_size": Space.file_size,
         }
         json_video_note = VideoNote.de_json(json_dict, bot)
         assert json_video_note.api_kwargs == {}
 
-        assert json_video_note.file_id == self.videonote_file_id
-        assert json_video_note.file_unique_id == self.videonote_file_unique_id
-        assert json_video_note.length == self.length
-        assert json_video_note.duration == self.duration
-        assert json_video_note.file_size == self.file_size
+        assert json_video_note.file_id == Space.videonote_file_id
+        assert json_video_note.file_unique_id == Space.videonote_file_unique_id
+        assert json_video_note.length == Space.length
+        assert json_video_note.duration == Space.duration
+        assert json_video_note.file_size == Space.file_size
 
     def test_to_dict(self, video_note):
         video_note_dict = video_note.to_dict()
@@ -203,7 +153,88 @@ class TestVideoNote:
         finally:
             bot._local_mode = False
 
-    @pytest.mark.flaky(3, 1)
+    async def test_error_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            await bot.send_video_note(chat_id=chat_id)
+
+    async def test_get_file_instance_method(self, monkeypatch, video_note):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["file_id"] == video_note.file_id
+
+        assert check_shortcut_signature(VideoNote.get_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(video_note.get_file, video_note.get_bot(), "get_file")
+        assert await check_defaults_handling(video_note.get_file, video_note.get_bot())
+
+        monkeypatch.setattr(video_note.get_bot(), "get_file", make_assertion)
+        assert await video_note.get_file()
+
+    def test_equality(self, video_note):
+        a = VideoNote(video_note.file_id, video_note.file_unique_id, Space.length, Space.duration)
+        b = VideoNote("", video_note.file_unique_id, Space.length, Space.duration)
+        c = VideoNote(video_note.file_id, video_note.file_unique_id, 0, 0)
+        d = VideoNote("", "", Space.length, Space.duration)
+        e = Voice(video_note.file_id, video_note.file_unique_id, Space.duration)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+class TestVideoNoteReq:
+    async def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
+        message = await bot.send_video_note(
+            chat_id,
+            video_note_file,
+            duration=Space.duration,
+            length=Space.length,
+            disable_notification=False,
+            protect_content=True,
+            thumb=thumb_file,
+        )
+
+        assert isinstance(message.video_note, VideoNote)
+        assert isinstance(message.video_note.file_id, str)
+        assert isinstance(message.video_note.file_unique_id, str)
+        assert message.video_note.file_id != ""
+        assert message.video_note.file_unique_id != ""
+        assert message.video_note.length == video_note.length
+        assert message.video_note.duration == video_note.duration
+        assert message.video_note.file_size == video_note.file_size
+
+        assert message.video_note.thumb.file_size == Space.thumb_file_size
+        assert message.video_note.thumb.width == Space.thumb_width
+        assert message.video_note.thumb.height == Space.thumb_height
+        assert message.has_protected_content
+
+    async def test_get_and_download(self, bot, video_note):
+        path = Path("telegram2.mp4")
+        if path.is_file():
+            path.unlink()
+
+        new_file = await bot.get_file(video_note.file_id)
+
+        assert new_file.file_size == Space.file_size
+        assert new_file.file_id == video_note.file_id
+        assert new_file.file_unique_id == video_note.file_unique_id
+        assert new_file.file_path.startswith("https://")
+
+        await new_file.download_to_drive("telegram2.mp4")
+
+        assert path.is_file()
+
+    async def test_resend(self, bot, chat_id, video_note):
+        message = await bot.send_video_note(chat_id, video_note.file_id)
+        assert message.video_note == video_note
+
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -237,7 +268,6 @@ class TestVideoNote:
                     chat_id, video_note, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_video_note_default_protect_content(self, chat_id, default_bot, video_note):
         protected = await default_bot.send_video_note(chat_id, video_note)
@@ -245,47 +275,10 @@ class TestVideoNote:
         unprotected = await default_bot.send_video_note(chat_id, video_note, protect_content=False)
         assert not unprotected.has_protected_content
 
-    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_video_note(chat_id, open(os.devnull, "rb"))
 
-    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_video_note(chat_id, "")
-
-    async def test_error_without_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError):
-            await bot.send_video_note(chat_id=chat_id)
-
-    async def test_get_file_instance_method(self, monkeypatch, video_note):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == video_note.file_id
-
-        assert check_shortcut_signature(VideoNote.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(video_note.get_file, video_note.get_bot(), "get_file")
-        assert await check_defaults_handling(video_note.get_file, video_note.get_bot())
-
-        monkeypatch.setattr(video_note.get_bot(), "get_file", make_assertion)
-        assert await video_note.get_file()
-
-    def test_equality(self, video_note):
-        a = VideoNote(video_note.file_id, video_note.file_unique_id, self.length, self.duration)
-        b = VideoNote("", video_note.file_unique_id, self.length, self.duration)
-        c = VideoNote(video_note.file_id, video_note.file_unique_id, 0, 0)
-        d = VideoNote("", "", self.length, self.duration)
-        e = Voice(video_note.file_id, video_note.file_unique_id, self.duration)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

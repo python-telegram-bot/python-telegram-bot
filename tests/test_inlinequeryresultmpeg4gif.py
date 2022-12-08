@@ -28,26 +28,26 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_mpeg4_gif():
     return InlineQueryResultMpeg4Gif(
-        TestInlineQueryResultMpeg4Gif.id_,
-        TestInlineQueryResultMpeg4Gif.mpeg4_url,
-        TestInlineQueryResultMpeg4Gif.thumb_url,
-        mpeg4_width=TestInlineQueryResultMpeg4Gif.mpeg4_width,
-        mpeg4_height=TestInlineQueryResultMpeg4Gif.mpeg4_height,
-        mpeg4_duration=TestInlineQueryResultMpeg4Gif.mpeg4_duration,
-        title=TestInlineQueryResultMpeg4Gif.title,
-        caption=TestInlineQueryResultMpeg4Gif.caption,
-        parse_mode=TestInlineQueryResultMpeg4Gif.parse_mode,
-        caption_entities=TestInlineQueryResultMpeg4Gif.caption_entities,
-        input_message_content=TestInlineQueryResultMpeg4Gif.input_message_content,
-        reply_markup=TestInlineQueryResultMpeg4Gif.reply_markup,
-        thumb_mime_type=TestInlineQueryResultMpeg4Gif.thumb_mime_type,
+        Space.id_,
+        Space.mpeg4_url,
+        Space.thumb_url,
+        mpeg4_width=Space.mpeg4_width,
+        mpeg4_height=Space.mpeg4_height,
+        mpeg4_duration=Space.mpeg4_duration,
+        title=Space.title,
+        caption=Space.caption,
+        parse_mode=Space.parse_mode,
+        caption_entities=Space.caption_entities,
+        input_message_content=Space.input_message_content,
+        reply_markup=Space.reply_markup,
+        thumb_mime_type=Space.thumb_mime_type,
     )
 
 
-class TestInlineQueryResultMpeg4Gif:
+class Space:
     id_ = "id"
     type_ = "mpeg4_gif"
     mpeg4_url = "mpeg4 url"
@@ -63,6 +63,8 @@ class TestInlineQueryResultMpeg4Gif:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultMpeg4GifNoReq:
     def test_slot_behaviour(self, inline_query_result_mpeg4_gif, mro_slots):
         inst = inline_query_result_mpeg4_gif
         for attr in inst.__slots__:
@@ -70,26 +72,26 @@ class TestInlineQueryResultMpeg4Gif:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_mpeg4_gif):
-        assert inline_query_result_mpeg4_gif.type == self.type_
-        assert inline_query_result_mpeg4_gif.id == self.id_
-        assert inline_query_result_mpeg4_gif.mpeg4_url == self.mpeg4_url
-        assert inline_query_result_mpeg4_gif.mpeg4_width == self.mpeg4_width
-        assert inline_query_result_mpeg4_gif.mpeg4_height == self.mpeg4_height
-        assert inline_query_result_mpeg4_gif.mpeg4_duration == self.mpeg4_duration
-        assert inline_query_result_mpeg4_gif.thumb_url == self.thumb_url
-        assert inline_query_result_mpeg4_gif.thumb_mime_type == self.thumb_mime_type
-        assert inline_query_result_mpeg4_gif.title == self.title
-        assert inline_query_result_mpeg4_gif.caption == self.caption
-        assert inline_query_result_mpeg4_gif.parse_mode == self.parse_mode
-        assert inline_query_result_mpeg4_gif.caption_entities == tuple(self.caption_entities)
+        assert inline_query_result_mpeg4_gif.type == Space.type_
+        assert inline_query_result_mpeg4_gif.id == Space.id_
+        assert inline_query_result_mpeg4_gif.mpeg4_url == Space.mpeg4_url
+        assert inline_query_result_mpeg4_gif.mpeg4_width == Space.mpeg4_width
+        assert inline_query_result_mpeg4_gif.mpeg4_height == Space.mpeg4_height
+        assert inline_query_result_mpeg4_gif.mpeg4_duration == Space.mpeg4_duration
+        assert inline_query_result_mpeg4_gif.thumb_url == Space.thumb_url
+        assert inline_query_result_mpeg4_gif.thumb_mime_type == Space.thumb_mime_type
+        assert inline_query_result_mpeg4_gif.title == Space.title
+        assert inline_query_result_mpeg4_gif.caption == Space.caption
+        assert inline_query_result_mpeg4_gif.parse_mode == Space.parse_mode
+        assert inline_query_result_mpeg4_gif.caption_entities == tuple(Space.caption_entities)
         assert (
             inline_query_result_mpeg4_gif.input_message_content.to_dict()
-            == self.input_message_content.to_dict()
+            == Space.input_message_content.to_dict()
         )
-        assert inline_query_result_mpeg4_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_mpeg4_gif.reply_markup.to_dict() == Space.reply_markup.to_dict()
 
     def test_caption_entities_always_tuple(self):
-        result = InlineQueryResultMpeg4Gif(self.id_, self.mpeg4_url, self.thumb_url)
+        result = InlineQueryResultMpeg4Gif(Space.id_, Space.mpeg4_url, Space.thumb_url)
         assert result.caption_entities == ()
 
     def test_to_dict(self, inline_query_result_mpeg4_gif):
@@ -143,11 +145,11 @@ class TestInlineQueryResultMpeg4Gif:
         )
 
     def test_equality(self):
-        a = InlineQueryResultMpeg4Gif(self.id_, self.mpeg4_url, self.thumb_url)
-        b = InlineQueryResultMpeg4Gif(self.id_, self.mpeg4_url, self.thumb_url)
-        c = InlineQueryResultMpeg4Gif(self.id_, "", self.thumb_url)
-        d = InlineQueryResultMpeg4Gif("", self.mpeg4_url, self.thumb_url)
-        e = InlineQueryResultVoice(self.id_, "", "")
+        a = InlineQueryResultMpeg4Gif(Space.id_, Space.mpeg4_url, Space.thumb_url)
+        b = InlineQueryResultMpeg4Gif(Space.id_, Space.mpeg4_url, Space.thumb_url)
+        c = InlineQueryResultMpeg4Gif(Space.id_, "", Space.thumb_url)
+        d = InlineQueryResultMpeg4Gif("", Space.mpeg4_url, Space.thumb_url)
+        e = InlineQueryResultVoice(Space.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

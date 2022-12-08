@@ -64,13 +64,13 @@ from tests.auxil.bot_method_checks import (
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def message(bot):
     message = Message(
-        message_id=TestMessage.id_,
-        date=TestMessage.date,
-        chat=copy(TestMessage.chat),
-        from_user=copy(TestMessage.from_user),
+        message_id=Space.id_,
+        date=Space.date,
+        chat=copy(Space.chat),
+        from_user=copy(Space.from_user),
     )
     message.set_bot(bot)
     message._unfreeze()
@@ -265,17 +265,17 @@ def message(bot):
 )
 def message_params(bot, request):
     message = Message(
-        message_id=TestMessage.id_,
-        from_user=TestMessage.from_user,
-        date=TestMessage.date,
-        chat=TestMessage.chat,
+        message_id=Space.id_,
+        from_user=Space.from_user,
+        date=Space.date,
+        chat=Space.chat,
         **request.param,
     )
     message.set_bot(bot)
     return message
 
 
-class TestMessage:
+class Space:
     id_ = 1
     from_user = User(2, "testuser", False)
     date = datetime.utcnow()
@@ -341,6 +341,8 @@ class TestMessage:
         caption_entities=[MessageEntity(**e) for e in test_entities_v2],
     )
 
+
+class TestMessageNoReq:
     def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
         assert new.api_kwargs == {}
@@ -365,16 +367,16 @@ class TestMessage:
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         message = Message(
             1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
+            from_user=Space.from_user,
+            date=Space.date,
+            chat=Space.chat,
             text=text,
             entities=[entity],
         )
         assert message.parse_entity(entity) == "http://google.com"
 
         with pytest.raises(RuntimeError, match="Message has no"):
-            Message(message_id=1, date=self.date, chat=self.chat).parse_entity(entity)
+            Message(message_id=1, date=Space.date, chat=Space.chat).parse_entity(entity)
 
     async def test_parse_caption_entity(self):
         caption = (
@@ -384,16 +386,16 @@ class TestMessage:
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         message = Message(
             1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
+            from_user=Space.from_user,
+            date=Space.date,
+            chat=Space.chat,
             caption=caption,
             caption_entities=[entity],
         )
         assert message.parse_caption_entity(entity) == "http://google.com"
 
         with pytest.raises(RuntimeError, match="Message has no"):
-            Message(message_id=1, date=self.date, chat=self.chat).parse_entity(entity)
+            Message(message_id=1, date=Space.date, chat=Space.chat).parse_entity(entity)
 
     async def test_parse_entities(self):
         text = (
@@ -404,9 +406,9 @@ class TestMessage:
         entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
         message = Message(
             1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
+            from_user=Space.from_user,
+            date=Space.date,
+            chat=Space.chat,
             text=text,
             entities=[entity_2, entity],
         )
@@ -422,9 +424,9 @@ class TestMessage:
         entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
         message = Message(
             1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
+            from_user=Space.from_user,
+            date=Space.date,
+            chat=Space.chat,
             caption=text,
             caption_entities=[entity_2, entity],
         )
@@ -445,7 +447,7 @@ class TestMessage:
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>.'
         )
-        text_html = self.test_message_v2.text_html
+        text_html = Space.test_message_v2.text_html
         assert text_html == test_html_string
 
     def test_text_html_empty(self, message):
@@ -464,7 +466,7 @@ class TestMessage:
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>.'
         )
-        text_html = self.test_message_v2.text_html_urled
+        text_html = Space.test_message_v2.text_html_urled
         assert text_html == test_html_string
 
     def test_text_markdown_simple(self):
@@ -474,7 +476,7 @@ class TestMessage:
             "[text-mention](tg://user?id=123456789) and ```python\npre```. "
             r"http://google.com/ab\_"
         )
-        text_markdown = self.test_message.text_markdown
+        text_markdown = Space.test_message.text_markdown
         assert text_markdown == test_md_string
 
     def test_text_markdown_v2_simple(self):
@@ -485,7 +487,7 @@ class TestMessage:
             r"http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. "
             "```python\nPython pre```\\. ||Spoiled||\\."
         )
-        text_markdown = self.test_message_v2.text_markdown_v2
+        text_markdown = Space.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
 
     def test_text_markdown_new_in_v2(self, message):
@@ -524,7 +526,7 @@ class TestMessage:
             "[text-mention](tg://user?id=123456789) and ```python\npre```. "
             "[http://google.com/ab_](http://google.com/ab_)"
         )
-        text_markdown = self.test_message.text_markdown_urled
+        text_markdown = Space.test_message.text_markdown_urled
         assert text_markdown == test_md_string
 
     def test_text_markdown_v2_urled(self):
@@ -535,7 +537,7 @@ class TestMessage:
             r"[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ "
             "nested in* italic_\\. ```python\nPython pre```\\. ||Spoiled||\\."
         )
-        text_markdown = self.test_message_v2.text_markdown_v2_urled
+        text_markdown = Space.test_message_v2.text_markdown_v2_urled
         assert text_markdown == test_md_string
 
     def test_text_html_emoji(self):
@@ -544,9 +546,9 @@ class TestMessage:
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
         message = Message(
             1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
+            from_user=Space.from_user,
+            date=Space.date,
+            chat=Space.chat,
             text=text,
             entities=[bold_entity],
         )
@@ -557,7 +559,7 @@ class TestMessage:
         expected = b"\\U0001f469\\u200d\\U0001f469\\u200d *ABC*".decode("unicode-escape")
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
         message = Message(
-            1, self.from_user, self.date, self.chat, text=text, entities=[bold_entity]
+            1, Space.from_user, Space.date, Space.chat, text=text, entities=[bold_entity]
         )
         assert expected == message.text_markdown
 
@@ -583,9 +585,9 @@ class TestMessage:
         )
         message = Message(
             1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
+            from_user=Space.from_user,
+            date=Space.date,
+            chat=Space.chat,
             text=text,
             entities=[emoji_entity],
         )
@@ -602,7 +604,7 @@ class TestMessage:
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>.'
         )
-        caption_html = self.test_message_v2.caption_html
+        caption_html = Space.test_message_v2.caption_html
         assert caption_html == test_html_string
 
     def test_caption_html_empty(self, message):
@@ -621,7 +623,7 @@ class TestMessage:
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>.'
         )
-        caption_html = self.test_message_v2.caption_html_urled
+        caption_html = Space.test_message_v2.caption_html_urled
         assert caption_html == test_html_string
 
     def test_caption_markdown_simple(self):
@@ -631,7 +633,7 @@ class TestMessage:
             "[text-mention](tg://user?id=123456789) and ```python\npre```. "
             r"http://google.com/ab\_"
         )
-        caption_markdown = self.test_message.caption_markdown
+        caption_markdown = Space.test_message.caption_markdown
         assert caption_markdown == test_md_string
 
     def test_caption_markdown_v2_simple(self):
@@ -642,7 +644,7 @@ class TestMessage:
             r"http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. "
             "```python\nPython pre```\\. ||Spoiled||\\."
         )
-        caption_markdown = self.test_message_v2.caption_markdown_v2
+        caption_markdown = Space.test_message_v2.caption_markdown_v2
         assert caption_markdown == test_md_string
 
     def test_caption_markdown_empty(self, message):
@@ -658,7 +660,7 @@ class TestMessage:
             "[text-mention](tg://user?id=123456789) and ```python\npre```. "
             "[http://google.com/ab_](http://google.com/ab_)"
         )
-        caption_markdown = self.test_message.caption_markdown_urled
+        caption_markdown = Space.test_message.caption_markdown_urled
         assert caption_markdown == test_md_string
 
     def test_caption_markdown_v2_urled(self):
@@ -669,7 +671,7 @@ class TestMessage:
             r"[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ "
             "nested in* italic_\\. ```python\nPython pre```\\. ||Spoiled||\\."
         )
-        caption_markdown = self.test_message_v2.caption_markdown_v2_urled
+        caption_markdown = Space.test_message_v2.caption_markdown_v2_urled
         assert caption_markdown == test_md_string
 
     def test_caption_html_emoji(self):
@@ -678,9 +680,9 @@ class TestMessage:
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
         message = Message(
             1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
+            from_user=Space.from_user,
+            date=Space.date,
+            chat=Space.chat,
             caption=caption,
             caption_entities=[bold_entity],
         )
@@ -692,9 +694,9 @@ class TestMessage:
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
         message = Message(
             1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
+            from_user=Space.from_user,
+            date=Space.date,
+            chat=Space.chat,
             caption=caption,
             caption_entities=[bold_entity],
         )
@@ -722,9 +724,9 @@ class TestMessage:
         )
         message = Message(
             1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
+            from_user=Space.from_user,
+            date=Space.date,
+            chat=Space.chat,
             caption=caption,
             caption_entities=[emoji_entity],
         )
@@ -735,7 +737,7 @@ class TestMessage:
         text = "some url"
         link_entity = MessageEntity(type=MessageEntity.URL, offset=0, length=8, url=url)
         message = Message(
-            1, self.from_user, self.date, self.chat, text=text, entities=[link_entity]
+            1, Space.from_user, Space.date, Space.chat, text=text, entities=[link_entity]
         )
         assert message.parse_entities() == {link_entity: text}
         assert next(iter(message.parse_entities())).url == url
@@ -855,14 +857,14 @@ class TestMessage:
         assert await check_shortcut_call(message.reply_text, message.get_bot(), "send_message")
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
-        text_markdown = self.test_message.text_markdown
+        text_markdown = Space.test_message.text_markdown
         assert text_markdown == test_md_string
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
-        assert await message.reply_markdown(self.test_message.text_markdown)
-        assert await message.reply_markdown(self.test_message.text_markdown, quote=True)
+        assert await message.reply_markdown(Space.test_message.text_markdown)
+        assert await message.reply_markdown(Space.test_message.text_markdown, quote=True)
         assert await message.reply_markdown(
-            self.test_message.text_markdown, reply_to_message_id=message.message_id, quote=True
+            Space.test_message.text_markdown, reply_to_message_id=message.message_id, quote=True
         )
 
     async def test_reply_markdown_v2(self, monkeypatch, message):
@@ -890,14 +892,14 @@ class TestMessage:
         assert await check_shortcut_call(message.reply_text, message.get_bot(), "send_message")
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
-        text_markdown = self.test_message_v2.text_markdown_v2
+        text_markdown = Space.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
-        assert await message.reply_markdown_v2(self.test_message_v2.text_markdown_v2)
-        assert await message.reply_markdown_v2(self.test_message_v2.text_markdown_v2, quote=True)
+        assert await message.reply_markdown_v2(Space.test_message_v2.text_markdown_v2)
+        assert await message.reply_markdown_v2(Space.test_message_v2.text_markdown_v2, quote=True)
         assert await message.reply_markdown_v2(
-            self.test_message_v2.text_markdown_v2,
+            Space.test_message_v2.text_markdown_v2,
             reply_to_message_id=message.message_id,
             quote=True,
         )
@@ -930,14 +932,14 @@ class TestMessage:
         assert await check_shortcut_call(message.reply_text, message.get_bot(), "send_message")
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
-        text_html = self.test_message_v2.text_html
+        text_html = Space.test_message_v2.text_html
         assert text_html == test_html_string
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
-        assert await message.reply_html(self.test_message_v2.text_html)
-        assert await message.reply_html(self.test_message_v2.text_html, quote=True)
+        assert await message.reply_html(Space.test_message_v2.text_html)
+        assert await message.reply_html(Space.test_message_v2.text_html, quote=True)
         assert await message.reply_html(
-            self.test_message_v2.text_html, reply_to_message_id=message.message_id, quote=True
+            Space.test_message_v2.text_html, reply_to_message_id=message.message_id, quote=True
         )
 
     async def test_reply_media_group(self, monkeypatch, message):
@@ -1825,18 +1827,18 @@ class TestMessage:
         id_ = 1
         a = Message(
             id_,
-            self.date,
-            self.chat,
-            from_user=self.from_user,
+            Space.date,
+            Space.chat,
+            from_user=Space.from_user,
         )
         b = Message(
             id_,
-            self.date,
-            self.chat,
-            from_user=self.from_user,
+            Space.date,
+            Space.chat,
+            from_user=Space.from_user,
         )
-        c = Message(id_, self.date, Chat(123, Chat.GROUP), from_user=User(0, "", False))
-        d = Message(0, self.date, self.chat, from_user=self.from_user)
+        c = Message(id_, Space.date, Chat(123, Chat.GROUP), from_user=User(0, "", False))
+        d = Message(0, Space.date, Space.chat, from_user=Space.from_user)
         e = Update(id_)
 
         assert a == b

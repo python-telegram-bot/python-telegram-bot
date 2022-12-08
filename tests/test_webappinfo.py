@@ -22,14 +22,16 @@ import pytest
 from telegram import WebAppInfo
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def web_app_info():
-    return WebAppInfo(url=TestWebAppInfo.url)
+    return WebAppInfo(url=Space.url)
 
 
-class TestWebAppInfo:
+class Space:
     url = "https://www.example.com"
 
+
+class TestWebAppInfoNoReq:
     def test_slot_behaviour(self, web_app_info, mro_slots):
         for attr in web_app_info.__slots__:
             assert getattr(web_app_info, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -39,18 +41,18 @@ class TestWebAppInfo:
         web_app_info_dict = web_app_info.to_dict()
 
         assert isinstance(web_app_info_dict, dict)
-        assert web_app_info_dict["url"] == self.url
+        assert web_app_info_dict["url"] == Space.url
 
     def test_de_json(self, bot):
-        json_dict = {"url": self.url}
+        json_dict = {"url": Space.url}
         web_app_info = WebAppInfo.de_json(json_dict, bot)
         assert web_app_info.api_kwargs == {}
 
-        assert web_app_info.url == self.url
+        assert web_app_info.url == Space.url
 
     def test_equality(self):
-        a = WebAppInfo(self.url)
-        b = WebAppInfo(self.url)
+        a = WebAppInfo(Space.url)
+        b = WebAppInfo(Space.url)
         c = WebAppInfo("")
         d = WebAppInfo("not_url")
 

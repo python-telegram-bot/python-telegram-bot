@@ -27,24 +27,21 @@ from tests.auxil.bot_method_checks import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def shipping_query(bot):
-    sq = ShippingQuery(
-        TestShippingQuery.id_,
-        TestShippingQuery.from_user,
-        TestShippingQuery.invoice_payload,
-        TestShippingQuery.shipping_address,
-    )
+    sq = ShippingQuery(Space.id_, Space.from_user, Space.invoice_payload, Space.shipping_address)
     sq.set_bot(bot)
     return sq
 
 
-class TestShippingQuery:
+class Space:
     id_ = "5"
     invoice_payload = "invoice_payload"
     from_user = User(0, "", False)
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
+
+class TestShippingQueryNoReq:
     def test_slot_behaviour(self, shipping_query, mro_slots):
         inst = shipping_query
         for attr in inst.__slots__:
@@ -53,18 +50,18 @@ class TestShippingQuery:
 
     def test_de_json(self, bot):
         json_dict = {
-            "id": TestShippingQuery.id_,
-            "invoice_payload": TestShippingQuery.invoice_payload,
-            "from": TestShippingQuery.from_user.to_dict(),
-            "shipping_address": TestShippingQuery.shipping_address.to_dict(),
+            "id": Space.id_,
+            "invoice_payload": Space.invoice_payload,
+            "from": Space.from_user.to_dict(),
+            "shipping_address": Space.shipping_address.to_dict(),
         }
         shipping_query = ShippingQuery.de_json(json_dict, bot)
         assert shipping_query.api_kwargs == {}
 
-        assert shipping_query.id == self.id_
-        assert shipping_query.invoice_payload == self.invoice_payload
-        assert shipping_query.from_user == self.from_user
-        assert shipping_query.shipping_address == self.shipping_address
+        assert shipping_query.id == Space.id_
+        assert shipping_query.invoice_payload == Space.invoice_payload
+        assert shipping_query.from_user == Space.from_user
+        assert shipping_query.shipping_address == Space.shipping_address
         assert shipping_query.get_bot() is bot
 
     def test_to_dict(self, shipping_query):
@@ -92,11 +89,15 @@ class TestShippingQuery:
         assert await shipping_query.answer(ok=True)
 
     def test_equality(self):
-        a = ShippingQuery(self.id_, self.from_user, self.invoice_payload, self.shipping_address)
-        b = ShippingQuery(self.id_, self.from_user, self.invoice_payload, self.shipping_address)
-        c = ShippingQuery(self.id_, None, "", None)
-        d = ShippingQuery(0, self.from_user, self.invoice_payload, self.shipping_address)
-        e = Update(self.id_)
+        a = ShippingQuery(
+            Space.id_, Space.from_user, Space.invoice_payload, Space.shipping_address
+        )
+        b = ShippingQuery(
+            Space.id_, Space.from_user, Space.invoice_payload, Space.shipping_address
+        )
+        c = ShippingQuery(Space.id_, None, "", None)
+        d = ShippingQuery(0, Space.from_user, Space.invoice_payload, Space.shipping_address)
+        e = Update(Space.id_)
 
         assert a == b
         assert hash(a) == hash(b)

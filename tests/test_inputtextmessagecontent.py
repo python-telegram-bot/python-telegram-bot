@@ -22,22 +22,24 @@ from telegram import InputTextMessageContent, MessageEntity
 from telegram.constants import ParseMode
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_text_message_content():
     return InputTextMessageContent(
-        TestInputTextMessageContent.message_text,
-        parse_mode=TestInputTextMessageContent.parse_mode,
-        entities=TestInputTextMessageContent.entities,
-        disable_web_page_preview=TestInputTextMessageContent.disable_web_page_preview,
+        Space.message_text,
+        parse_mode=Space.parse_mode,
+        entities=Space.entities,
+        disable_web_page_preview=Space.disable_web_page_preview,
     )
 
 
-class TestInputTextMessageContent:
+class Space:
     message_text = "*message text*"
     parse_mode = ParseMode.MARKDOWN
     entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     disable_web_page_preview = True
 
+
+class TestInputTextMessageContentNoReq:
     def test_slot_behaviour(self, input_text_message_content, mro_slots):
         inst = input_text_message_content
         for attr in inst.__slots__:
@@ -45,10 +47,12 @@ class TestInputTextMessageContent:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_text_message_content):
-        assert input_text_message_content.parse_mode == self.parse_mode
-        assert input_text_message_content.message_text == self.message_text
-        assert input_text_message_content.disable_web_page_preview == self.disable_web_page_preview
-        assert input_text_message_content.entities == tuple(self.entities)
+        assert input_text_message_content.parse_mode == Space.parse_mode
+        assert input_text_message_content.message_text == Space.message_text
+        assert (
+            input_text_message_content.disable_web_page_preview == Space.disable_web_page_preview
+        )
+        assert input_text_message_content.entities == tuple(Space.entities)
 
     def test_entities_always_tuple(self):
         input_text_message_content = InputTextMessageContent("text")

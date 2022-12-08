@@ -27,23 +27,25 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_cached_sticker():
     return InlineQueryResultCachedSticker(
-        TestInlineQueryResultCachedSticker.id_,
-        TestInlineQueryResultCachedSticker.sticker_file_id,
-        input_message_content=TestInlineQueryResultCachedSticker.input_message_content,
-        reply_markup=TestInlineQueryResultCachedSticker.reply_markup,
+        Space.id_,
+        Space.sticker_file_id,
+        input_message_content=Space.input_message_content,
+        reply_markup=Space.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedSticker:
+class Space:
     id_ = "id"
     type_ = "sticker"
     sticker_file_id = "sticker file id"
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultCachedStickerNoReq:
     def test_slot_behaviour(self, inline_query_result_cached_sticker, mro_slots):
         inst = inline_query_result_cached_sticker
         for attr in inst.__slots__:
@@ -51,16 +53,16 @@ class TestInlineQueryResultCachedSticker:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_cached_sticker):
-        assert inline_query_result_cached_sticker.type == self.type_
-        assert inline_query_result_cached_sticker.id == self.id_
-        assert inline_query_result_cached_sticker.sticker_file_id == self.sticker_file_id
+        assert inline_query_result_cached_sticker.type == Space.type_
+        assert inline_query_result_cached_sticker.id == Space.id_
+        assert inline_query_result_cached_sticker.sticker_file_id == Space.sticker_file_id
         assert (
             inline_query_result_cached_sticker.input_message_content.to_dict()
-            == self.input_message_content.to_dict()
+            == Space.input_message_content.to_dict()
         )
         assert (
             inline_query_result_cached_sticker.reply_markup.to_dict()
-            == self.reply_markup.to_dict()
+            == Space.reply_markup.to_dict()
         )
 
     def test_to_dict(self, inline_query_result_cached_sticker):
@@ -88,11 +90,11 @@ class TestInlineQueryResultCachedSticker:
         )
 
     def test_equality(self):
-        a = InlineQueryResultCachedSticker(self.id_, self.sticker_file_id)
-        b = InlineQueryResultCachedSticker(self.id_, self.sticker_file_id)
-        c = InlineQueryResultCachedSticker(self.id_, "")
-        d = InlineQueryResultCachedSticker("", self.sticker_file_id)
-        e = InlineQueryResultCachedVoice(self.id_, "", "")
+        a = InlineQueryResultCachedSticker(Space.id_, Space.sticker_file_id)
+        b = InlineQueryResultCachedSticker(Space.id_, Space.sticker_file_id)
+        c = InlineQueryResultCachedSticker(Space.id_, "")
+        d = InlineQueryResultCachedSticker("", Space.sticker_file_id)
+        e = InlineQueryResultCachedVoice(Space.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

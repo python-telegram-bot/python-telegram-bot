@@ -21,21 +21,19 @@ import pytest
 from telegram import PassportElementErrorReverseSide, PassportElementErrorSelfie
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def passport_element_error_reverse_side():
-    return PassportElementErrorReverseSide(
-        TestPassportElementErrorReverseSide.type_,
-        TestPassportElementErrorReverseSide.file_hash,
-        TestPassportElementErrorReverseSide.message,
-    )
+    return PassportElementErrorReverseSide(Space.type_, Space.file_hash, Space.message)
 
 
-class TestPassportElementErrorReverseSide:
+class Space:
     source = "reverse_side"
     type_ = "test_type"
     file_hash = "file_hash"
     message = "Error message"
 
+
+class TestPassportElementErrorReverseSideNoReq:
     def test_slot_behaviour(self, passport_element_error_reverse_side, mro_slots):
         inst = passport_element_error_reverse_side
         for attr in inst.__slots__:
@@ -43,10 +41,10 @@ class TestPassportElementErrorReverseSide:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, passport_element_error_reverse_side):
-        assert passport_element_error_reverse_side.source == self.source
-        assert passport_element_error_reverse_side.type == self.type_
-        assert passport_element_error_reverse_side.file_hash == self.file_hash
-        assert passport_element_error_reverse_side.message == self.message
+        assert passport_element_error_reverse_side.source == Space.source
+        assert passport_element_error_reverse_side.type == Space.type_
+        assert passport_element_error_reverse_side.file_hash == Space.file_hash
+        assert passport_element_error_reverse_side.message == Space.message
 
     def test_to_dict(self, passport_element_error_reverse_side):
         passport_element_error_reverse_side_dict = passport_element_error_reverse_side.to_dict()
@@ -70,12 +68,12 @@ class TestPassportElementErrorReverseSide:
         )
 
     def test_equality(self):
-        a = PassportElementErrorReverseSide(self.type_, self.file_hash, self.message)
-        b = PassportElementErrorReverseSide(self.type_, self.file_hash, self.message)
-        c = PassportElementErrorReverseSide(self.type_, "", "")
-        d = PassportElementErrorReverseSide("", self.file_hash, "")
-        e = PassportElementErrorReverseSide("", "", self.message)
-        f = PassportElementErrorSelfie(self.type_, self.file_hash, self.message)
+        a = PassportElementErrorReverseSide(Space.type_, Space.file_hash, Space.message)
+        b = PassportElementErrorReverseSide(Space.type_, Space.file_hash, Space.message)
+        c = PassportElementErrorReverseSide(Space.type_, "", "")
+        d = PassportElementErrorReverseSide("", Space.file_hash, "")
+        e = PassportElementErrorReverseSide("", "", Space.message)
+        f = PassportElementErrorSelfie(Space.type_, Space.file_hash, Space.message)
 
         assert a == b
         assert hash(a) == hash(b)

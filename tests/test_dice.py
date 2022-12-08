@@ -22,14 +22,16 @@ import pytest
 from telegram import BotCommand, Dice
 
 
-@pytest.fixture(scope="class", params=Dice.ALL_EMOJI)
+@pytest.fixture(scope="module", params=Dice.ALL_EMOJI)
 def dice(request):
     return Dice(value=5, emoji=request.param)
 
 
-class TestDice:
+class Space:
     value = 4
 
+
+class TestDiceNoReq:
     def test_slot_behaviour(self, dice, mro_slots):
         for attr in dice.__slots__:
             assert getattr(dice, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -37,11 +39,11 @@ class TestDice:
 
     @pytest.mark.parametrize("emoji", Dice.ALL_EMOJI)
     def test_de_json(self, bot, emoji):
-        json_dict = {"value": self.value, "emoji": emoji}
+        json_dict = {"value": Space.value, "emoji": emoji}
         dice = Dice.de_json(json_dict, bot)
         assert dice.api_kwargs == {}
 
-        assert dice.value == self.value
+        assert dice.value == Space.value
         assert dice.emoji == emoji
         assert Dice.de_json(None, bot) is None
 

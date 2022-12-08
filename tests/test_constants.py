@@ -36,7 +36,7 @@ class IntEnumTest(IntEnum):
     BAR = 2
 
 
-class TestConstants:
+class TestConstantsNoReq:
     """Also test _utils.enum.StringEnum on the fly because tg.constants is currently the only
     place where that class is used."""
 
@@ -110,30 +110,6 @@ class TestConstants:
 
         assert hash(IntEnumTest.FOO) == hash(1)
 
-    @pytest.mark.flaky(3, 1)
-    async def test_max_message_length(self, bot, chat_id):
-        await bot.send_message(chat_id=chat_id, text="a" * constants.MessageLimit.MAX_TEXT_LENGTH)
-
-        with pytest.raises(
-            BadRequest,
-            match="Message is too long",
-        ):
-            await bot.send_message(
-                chat_id=chat_id, text="a" * (constants.MessageLimit.MAX_TEXT_LENGTH + 1)
-            )
-
-    @pytest.mark.flaky(3, 1)
-    async def test_max_caption_length(self, bot, chat_id):
-        good_caption = "a" * constants.MessageLimit.CAPTION_LENGTH
-        with data_file("telegram.png").open("rb") as f:
-            good_msg = await bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
-        assert good_msg.caption == good_caption
-
-        bad_caption = good_caption + "Z"
-        match = "Message caption is too long"
-        with pytest.raises(BadRequest, match=match), data_file("telegram.png").open("rb") as f:
-            await bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
-
     def test_bot_api_version_and_info(self):
         assert constants.BOT_API_VERSION == str(constants.BOT_API_VERSION_INFO)
         assert constants.BOT_API_VERSION_INFO == tuple(
@@ -151,3 +127,27 @@ class TestConstants:
         assert vi < (vi[0] + 1, vi[1] + 1)
         assert vi[0] == vi.major
         assert vi[1] == vi.minor
+
+
+class TestConstantsReq:
+    async def test_max_message_length(self, bot, chat_id):
+        await bot.send_message(chat_id=chat_id, text="a" * constants.MessageLimit.MAX_TEXT_LENGTH)
+
+        with pytest.raises(
+            BadRequest,
+            match="Message is too long",
+        ):
+            await bot.send_message(
+                chat_id=chat_id, text="a" * (constants.MessageLimit.MAX_TEXT_LENGTH + 1)
+            )
+
+    async def test_max_caption_length(self, bot, chat_id):
+        good_caption = "a" * constants.MessageLimit.CAPTION_LENGTH
+        with data_file("telegram.png").open("rb") as f:
+            good_msg = await bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
+        assert good_msg.caption == good_caption
+
+        bad_caption = good_caption + "Z"
+        match = "Message caption is too long"
+        with pytest.raises(BadRequest, match=match), data_file("telegram.png").open("rb") as f:
+            await bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)

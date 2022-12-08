@@ -175,7 +175,7 @@ def chat_member_type(request):
     ],
     indirect=True,
 )
-class TestChatMemberTypes:
+class TestChatMemberTypesNoReq:
     def test_slot_behaviour(self, chat_member_type, mro_slots):
         inst = chat_member_type
         for attr in inst.__slots__:

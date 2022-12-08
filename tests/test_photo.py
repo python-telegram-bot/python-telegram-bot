@@ -40,7 +40,7 @@ def photo_file():
     f.close()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 async def _photo(bot, chat_id):
     async def func():
         with data_file("telegram.jpg").open("rb") as f:
@@ -52,17 +52,17 @@ async def _photo(bot, chat_id):
     )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def thumb(_photo):
     return _photo[0]
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def photo(_photo):
     return _photo[-1]
 
 
-class TestPhoto:
+class Space:
     width = 800
     height = 800
     caption = "<b>PhotoTest</b> - *Caption*"
@@ -71,6 +71,8 @@ class TestPhoto:
     # so we accept three different sizes here. Shouldn't be too much
     file_size = [29176, 27662]
 
+
+class TestPhotoNoReq:
     def test_slot_behaviour(self, photo, mro_slots):
         for attr in photo.__slots__:
             assert getattr(photo, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -91,40 +93,13 @@ class TestPhoto:
         assert thumb.file_unique_id != ""
 
     def test_expected_values(self, photo, thumb):
-        assert photo.width == self.width
-        assert photo.height == self.height
-        assert photo.file_size in self.file_size
+        assert photo.width == Space.width
+        assert photo.height == Space.height
+        assert photo.file_size in Space.file_size
         assert thumb.width == 90
         assert thumb.height == 90
         assert thumb.file_size == 1477
 
-    @pytest.mark.flaky(3, 1)
-    async def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
-        message = await bot.send_photo(
-            chat_id,
-            photo_file,
-            caption=self.caption,
-            disable_notification=False,
-            protect_content=True,
-            parse_mode="Markdown",
-        )
-
-        assert isinstance(message.photo[-2], PhotoSize)
-        assert isinstance(message.photo[-2].file_id, str)
-        assert isinstance(message.photo[-2].file_unique_id, str)
-        assert message.photo[-2].file_id != ""
-        assert message.photo[-2].file_unique_id != ""
-
-        assert isinstance(message.photo[-1], PhotoSize)
-        assert isinstance(message.photo[-1].file_id, str)
-        assert isinstance(message.photo[-1].file_unique_id, str)
-        assert message.photo[-1].file_id != ""
-        assert message.photo[-1].file_unique_id != ""
-
-        assert message.caption == TestPhoto.caption.replace("*", "")
-        assert message.has_protected_content
-
-    @pytest.mark.flaky(3, 1)
     async def test_send_photo_custom_filename(self, bot, chat_id, photo_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return list(request_data.multipart_data.values())[0][0] == "custom_filename"
@@ -132,107 +107,6 @@ class TestPhoto:
         monkeypatch.setattr(bot.request, "post", make_assertion)
 
         assert await bot.send_photo(chat_id, photo_file, filename="custom_filename")
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
-        message = await bot.send_photo(
-            chat_id, photo_file, caption=self.caption, parse_mode="Markdown"
-        )
-        assert isinstance(message.photo[-2], PhotoSize)
-        assert isinstance(message.photo[-2].file_id, str)
-        assert isinstance(message.photo[-2].file_unique_id, str)
-        assert message.photo[-2].file_id != ""
-        assert message.photo[-2].file_unique_id != ""
-
-        assert isinstance(message.photo[-1], PhotoSize)
-        assert isinstance(message.photo[-1].file_id, str)
-        assert isinstance(message.photo[-1].file_unique_id, str)
-        assert message.photo[-1].file_id != ""
-        assert message.photo[-1].file_unique_id != ""
-
-        assert message.caption == TestPhoto.caption.replace("*", "")
-        assert len(message.caption_entities) == 1
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file, thumb, photo):
-        message = await bot.send_photo(
-            chat_id, photo_file, caption=self.caption, parse_mode="HTML"
-        )
-        assert isinstance(message.photo[-2], PhotoSize)
-        assert isinstance(message.photo[-2].file_id, str)
-        assert isinstance(message.photo[-2].file_unique_id, str)
-        assert message.photo[-2].file_id != ""
-        assert message.photo[-2].file_unique_id != ""
-
-        assert isinstance(message.photo[-1], PhotoSize)
-        assert isinstance(message.photo[-1].file_id, str)
-        assert isinstance(message.photo[-1].file_unique_id, str)
-        assert message.photo[-1].file_id != ""
-        assert message.photo[-1].file_unique_id != ""
-
-        assert message.caption == TestPhoto.caption.replace("<b>", "").replace("</b>", "")
-        assert len(message.caption_entities) == 1
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_photo_caption_entities(self, bot, chat_id, photo_file, thumb, photo):
-        test_string = "Italic Bold Code"
-        entities = [
-            MessageEntity(MessageEntity.ITALIC, 0, 6),
-            MessageEntity(MessageEntity.ITALIC, 7, 4),
-            MessageEntity(MessageEntity.ITALIC, 12, 4),
-        ]
-        message = await bot.send_photo(
-            chat_id, photo_file, caption=test_string, caption_entities=entities
-        )
-
-        assert message.caption == test_string
-        assert message.caption_entities == tuple(entities)
-
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_send_photo_default_parse_mode_1(
-        self, default_bot, chat_id, photo_file, thumb, photo
-    ):
-        test_string = "Italic Bold Code"
-        test_markdown_string = "_Italic_ *Bold* `Code`"
-
-        message = await default_bot.send_photo(chat_id, photo_file, caption=test_markdown_string)
-        assert message.caption_markdown == test_markdown_string
-        assert message.caption == test_string
-
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_send_photo_default_parse_mode_2(
-        self, default_bot, chat_id, photo_file, thumb, photo
-    ):
-        test_markdown_string = "_Italic_ *Bold* `Code`"
-
-        message = await default_bot.send_photo(
-            chat_id, photo_file, caption=test_markdown_string, parse_mode=None
-        )
-        assert message.caption == test_markdown_string
-        assert message.caption_markdown == escape_markdown(test_markdown_string)
-
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_send_photo_default_parse_mode_3(
-        self, default_bot, chat_id, photo_file, thumb, photo
-    ):
-        test_markdown_string = "_Italic_ *Bold* `Code`"
-
-        message = await default_bot.send_photo(
-            chat_id, photo_file, caption=test_markdown_string, parse_mode="HTML"
-        )
-        assert message.caption == test_markdown_string
-        assert message.caption_markdown == escape_markdown(test_markdown_string)
-
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
-    async def test_send_photo_default_protect_content(self, chat_id, default_bot, photo):
-        protected = await default_bot.send_photo(chat_id, photo)
-        assert protected.has_protected_content
-        unprotected = await default_bot.send_photo(chat_id, photo, protect_content=False)
-        assert not unprotected.has_protected_content
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_photo_local_files(self, monkeypatch, bot, chat_id, local_mode):
@@ -256,7 +130,205 @@ class TestPhoto:
         finally:
             bot._local_mode = False
 
-    @pytest.mark.flaky(3, 1)
+    async def test_send_with_photosize(self, monkeypatch, bot, chat_id, photo):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["photo"] == photo.file_id
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        message = await bot.send_photo(photo=photo, chat_id=chat_id)
+        assert message
+
+    def test_de_json(self, bot, photo):
+        json_dict = {
+            "file_id": photo.file_id,
+            "file_unique_id": photo.file_unique_id,
+            "width": Space.width,
+            "height": Space.height,
+            "file_size": Space.file_size,
+        }
+        json_photo = PhotoSize.de_json(json_dict, bot)
+        assert json_photo.api_kwargs == {}
+
+        assert json_photo.file_id == photo.file_id
+        assert json_photo.file_unique_id == photo.file_unique_id
+        assert json_photo.width == Space.width
+        assert json_photo.height == Space.height
+        assert json_photo.file_size == Space.file_size
+
+    def test_to_dict(self, photo):
+        photo_dict = photo.to_dict()
+
+        assert isinstance(photo_dict, dict)
+        assert photo_dict["file_id"] == photo.file_id
+        assert photo_dict["file_unique_id"] == photo.file_unique_id
+        assert photo_dict["width"] == photo.width
+        assert photo_dict["height"] == photo.height
+        assert photo_dict["file_size"] == photo.file_size
+
+    async def test_error_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            await bot.send_photo(chat_id=chat_id)
+
+    async def test_get_file_instance_method(self, monkeypatch, photo):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["file_id"] == photo.file_id
+
+        assert check_shortcut_signature(PhotoSize.get_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(photo.get_file, photo.get_bot(), "get_file")
+        assert await check_defaults_handling(photo.get_file, photo.get_bot())
+
+        monkeypatch.setattr(photo.get_bot(), "get_file", make_assertion)
+        assert await photo.get_file()
+
+    def test_equality(self, photo):
+        a = PhotoSize(photo.file_id, photo.file_unique_id, Space.width, Space.height)
+        b = PhotoSize("", photo.file_unique_id, Space.width, Space.height)
+        c = PhotoSize(photo.file_id, photo.file_unique_id, 0, 0)
+        d = PhotoSize("", "", Space.width, Space.height)
+        e = Sticker(
+            photo.file_id,
+            photo.file_unique_id,
+            Space.width,
+            Space.height,
+            False,
+            False,
+            Sticker.REGULAR,
+        )
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+class TestPhotoReq:
+    async def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
+        message = await bot.send_photo(
+            chat_id,
+            photo_file,
+            caption=Space.caption,
+            disable_notification=False,
+            protect_content=True,
+            parse_mode="Markdown",
+        )
+
+        assert isinstance(message.photo[-2], PhotoSize)
+        assert isinstance(message.photo[-2].file_id, str)
+        assert isinstance(message.photo[-2].file_unique_id, str)
+        assert message.photo[-2].file_id != ""
+        assert message.photo[-2].file_unique_id != ""
+
+        assert isinstance(message.photo[-1], PhotoSize)
+        assert isinstance(message.photo[-1].file_id, str)
+        assert isinstance(message.photo[-1].file_unique_id, str)
+        assert message.photo[-1].file_id != ""
+        assert message.photo[-1].file_unique_id != ""
+
+        assert message.caption == Space.caption.replace("*", "")
+        assert message.has_protected_content
+
+    async def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
+        message = await bot.send_photo(
+            chat_id, photo_file, caption=Space.caption, parse_mode="Markdown"
+        )
+        assert isinstance(message.photo[-2], PhotoSize)
+        assert isinstance(message.photo[-2].file_id, str)
+        assert isinstance(message.photo[-2].file_unique_id, str)
+        assert message.photo[-2].file_id != ""
+        assert message.photo[-2].file_unique_id != ""
+
+        assert isinstance(message.photo[-1], PhotoSize)
+        assert isinstance(message.photo[-1].file_id, str)
+        assert isinstance(message.photo[-1].file_unique_id, str)
+        assert message.photo[-1].file_id != ""
+        assert message.photo[-1].file_unique_id != ""
+
+        assert message.caption == Space.caption.replace("*", "")
+        assert len(message.caption_entities) == 1
+
+    async def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file, thumb, photo):
+        message = await bot.send_photo(
+            chat_id, photo_file, caption=Space.caption, parse_mode="HTML"
+        )
+        assert isinstance(message.photo[-2], PhotoSize)
+        assert isinstance(message.photo[-2].file_id, str)
+        assert isinstance(message.photo[-2].file_unique_id, str)
+        assert message.photo[-2].file_id != ""
+        assert message.photo[-2].file_unique_id != ""
+
+        assert isinstance(message.photo[-1], PhotoSize)
+        assert isinstance(message.photo[-1].file_id, str)
+        assert isinstance(message.photo[-1].file_unique_id, str)
+        assert message.photo[-1].file_id != ""
+        assert message.photo[-1].file_unique_id != ""
+
+        assert message.caption == Space.caption.replace("<b>", "").replace("</b>", "")
+        assert len(message.caption_entities) == 1
+
+    async def test_send_photo_caption_entities(self, bot, chat_id, photo_file, thumb, photo):
+        test_string = "Italic Bold Code"
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = await bot.send_photo(
+            chat_id, photo_file, caption=test_string, caption_entities=entities
+        )
+
+        assert message.caption == test_string
+        assert message.caption_entities == tuple(entities)
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    async def test_send_photo_default_parse_mode_1(
+        self, default_bot, chat_id, photo_file, thumb, photo
+    ):
+        test_string = "Italic Bold Code"
+        test_markdown_string = "_Italic_ *Bold* `Code`"
+
+        message = await default_bot.send_photo(chat_id, photo_file, caption=test_markdown_string)
+        assert message.caption_markdown == test_markdown_string
+        assert message.caption == test_string
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    async def test_send_photo_default_parse_mode_2(
+        self, default_bot, chat_id, photo_file, thumb, photo
+    ):
+        test_markdown_string = "_Italic_ *Bold* `Code`"
+
+        message = await default_bot.send_photo(
+            chat_id, photo_file, caption=test_markdown_string, parse_mode=None
+        )
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    async def test_send_photo_default_parse_mode_3(
+        self, default_bot, chat_id, photo_file, thumb, photo
+    ):
+        test_markdown_string = "_Italic_ *Bold* `Code`"
+
+        message = await default_bot.send_photo(
+            chat_id, photo_file, caption=test_markdown_string, parse_mode="HTML"
+        )
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
+    async def test_send_photo_default_protect_content(self, chat_id, default_bot, photo):
+        protected = await default_bot.send_photo(chat_id, photo)
+        assert protected.has_protected_content
+        unprotected = await default_bot.send_photo(chat_id, photo, protect_content=False)
+        assert not unprotected.has_protected_content
+
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -290,7 +362,6 @@ class TestPhoto:
                     chat_id, photo_file, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @pytest.mark.flaky(3, 1)
     async def test_get_and_download(self, bot, photo):
         path = Path("telegram.jpg")
         if path.is_file():
@@ -306,9 +377,8 @@ class TestPhoto:
 
         assert path.is_file()
 
-    @pytest.mark.flaky(3, 1)
     async def test_send_url_jpg_file(self, bot, chat_id, thumb, photo):
-        message = await bot.send_photo(chat_id, photo=self.photo_file_url)
+        message = await bot.send_photo(chat_id, photo=Space.photo_file_url)
 
         assert isinstance(message.photo[-2], PhotoSize)
         assert isinstance(message.photo[-2].file_id, str)
@@ -322,7 +392,6 @@ class TestPhoto:
         assert message.photo[-1].file_id != ""
         assert message.photo[-1].file_unique_id != ""
 
-    @pytest.mark.flaky(3, 1)
     async def test_send_url_png_file(self, bot, chat_id):
         message = await bot.send_photo(
             photo="http://dummyimage.com/600x400/000/fff.png&text=telegram", chat_id=chat_id
@@ -336,7 +405,6 @@ class TestPhoto:
         assert photo.file_id != ""
         assert photo.file_unique_id != ""
 
-    @pytest.mark.flaky(3, 1)
     async def test_send_url_gif_file(self, bot, chat_id):
         message = await bot.send_photo(
             photo="http://dummyimage.com/600x400/000/fff.png&text=telegram", chat_id=chat_id
@@ -350,7 +418,6 @@ class TestPhoto:
         assert photo.file_id != ""
         assert photo.file_unique_id != ""
 
-    @pytest.mark.flaky(3, 1)
     async def test_send_file_unicode_filename(self, bot, chat_id):
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
@@ -366,7 +433,6 @@ class TestPhoto:
         assert photo.file_id != ""
         assert photo.file_unique_id != ""
 
-    @pytest.mark.flaky(3, 1)
     async def test_send_bytesio_jpg_file(self, bot, chat_id):
         filepath = data_file("telegram_no_standard_header.jpg")
 
@@ -394,15 +460,6 @@ class TestPhoto:
         assert photo.height == 720
         assert photo.file_size == 33372
 
-    async def test_send_with_photosize(self, monkeypatch, bot, chat_id, photo):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["photo"] == photo.file_id
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_photo(photo=photo, chat_id=chat_id)
-        assert message
-
-    @pytest.mark.flaky(3, 1)
     async def test_resend(self, bot, chat_id, photo, thumb):
         message = await bot.send_photo(chat_id=chat_id, photo=photo.file_id)
 
@@ -418,82 +475,10 @@ class TestPhoto:
         assert message.photo[-1].file_id != ""
         assert message.photo[-1].file_unique_id != ""
 
-    def test_de_json(self, bot, photo):
-        json_dict = {
-            "file_id": photo.file_id,
-            "file_unique_id": photo.file_unique_id,
-            "width": self.width,
-            "height": self.height,
-            "file_size": self.file_size,
-        }
-        json_photo = PhotoSize.de_json(json_dict, bot)
-        assert json_photo.api_kwargs == {}
-
-        assert json_photo.file_id == photo.file_id
-        assert json_photo.file_unique_id == photo.file_unique_id
-        assert json_photo.width == self.width
-        assert json_photo.height == self.height
-        assert json_photo.file_size == self.file_size
-
-    def test_to_dict(self, photo):
-        photo_dict = photo.to_dict()
-
-        assert isinstance(photo_dict, dict)
-        assert photo_dict["file_id"] == photo.file_id
-        assert photo_dict["file_unique_id"] == photo.file_unique_id
-        assert photo_dict["width"] == photo.width
-        assert photo_dict["height"] == photo.height
-        assert photo_dict["file_size"] == photo.file_size
-
-    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_photo(chat_id=chat_id, photo=open(os.devnull, "rb"))
 
-    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_photo(chat_id=chat_id, photo="")
-
-    async def test_error_without_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError):
-            await bot.send_photo(chat_id=chat_id)
-
-    async def test_get_file_instance_method(self, monkeypatch, photo):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == photo.file_id
-
-        assert check_shortcut_signature(PhotoSize.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(photo.get_file, photo.get_bot(), "get_file")
-        assert await check_defaults_handling(photo.get_file, photo.get_bot())
-
-        monkeypatch.setattr(photo.get_bot(), "get_file", make_assertion)
-        assert await photo.get_file()
-
-    def test_equality(self, photo):
-        a = PhotoSize(photo.file_id, photo.file_unique_id, self.width, self.height)
-        b = PhotoSize("", photo.file_unique_id, self.width, self.height)
-        c = PhotoSize(photo.file_id, photo.file_unique_id, 0, 0)
-        d = PhotoSize("", "", self.width, self.height)
-        e = Sticker(
-            photo.file_id,
-            photo.file_unique_id,
-            self.width,
-            self.height,
-            False,
-            False,
-            Sticker.REGULAR,
-        )
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

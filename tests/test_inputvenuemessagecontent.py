@@ -21,21 +21,21 @@ import pytest
 from telegram import InputVenueMessageContent, Location
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_venue_message_content():
     return InputVenueMessageContent(
-        TestInputVenueMessageContent.latitude,
-        TestInputVenueMessageContent.longitude,
-        TestInputVenueMessageContent.title,
-        TestInputVenueMessageContent.address,
-        foursquare_id=TestInputVenueMessageContent.foursquare_id,
-        foursquare_type=TestInputVenueMessageContent.foursquare_type,
-        google_place_id=TestInputVenueMessageContent.google_place_id,
-        google_place_type=TestInputVenueMessageContent.google_place_type,
+        Space.latitude,
+        Space.longitude,
+        Space.title,
+        Space.address,
+        foursquare_id=Space.foursquare_id,
+        foursquare_type=Space.foursquare_type,
+        google_place_id=Space.google_place_id,
+        google_place_type=Space.google_place_type,
     )
 
 
-class TestInputVenueMessageContent:
+class Space:
     latitude = 1.0
     longitude = 2.0
     title = "title"
@@ -45,6 +45,8 @@ class TestInputVenueMessageContent:
     google_place_id = "google place id"
     google_place_type = "google place type"
 
+
+class TestInputVenueMessageContentNoReq:
     def test_slot_behaviour(self, input_venue_message_content, mro_slots):
         inst = input_venue_message_content
         for attr in inst.__slots__:
@@ -52,14 +54,14 @@ class TestInputVenueMessageContent:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_venue_message_content):
-        assert input_venue_message_content.longitude == self.longitude
-        assert input_venue_message_content.latitude == self.latitude
-        assert input_venue_message_content.title == self.title
-        assert input_venue_message_content.address == self.address
-        assert input_venue_message_content.foursquare_id == self.foursquare_id
-        assert input_venue_message_content.foursquare_type == self.foursquare_type
-        assert input_venue_message_content.google_place_id == self.google_place_id
-        assert input_venue_message_content.google_place_type == self.google_place_type
+        assert input_venue_message_content.longitude == Space.longitude
+        assert input_venue_message_content.latitude == Space.latitude
+        assert input_venue_message_content.title == Space.title
+        assert input_venue_message_content.address == Space.address
+        assert input_venue_message_content.foursquare_id == Space.foursquare_id
+        assert input_venue_message_content.foursquare_type == Space.foursquare_type
+        assert input_venue_message_content.google_place_id == Space.google_place_id
+        assert input_venue_message_content.google_place_type == Space.google_place_type
 
     def test_to_dict(self, input_venue_message_content):
         input_venue_message_content_dict = input_venue_message_content.to_dict()

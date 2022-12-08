@@ -28,22 +28,22 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_voice():
     return InlineQueryResultVoice(
-        id=TestInlineQueryResultVoice.id_,
-        voice_url=TestInlineQueryResultVoice.voice_url,
-        title=TestInlineQueryResultVoice.title,
-        voice_duration=TestInlineQueryResultVoice.voice_duration,
-        caption=TestInlineQueryResultVoice.caption,
-        parse_mode=TestInlineQueryResultVoice.parse_mode,
-        caption_entities=TestInlineQueryResultVoice.caption_entities,
-        input_message_content=TestInlineQueryResultVoice.input_message_content,
-        reply_markup=TestInlineQueryResultVoice.reply_markup,
+        id=Space.id_,
+        voice_url=Space.voice_url,
+        title=Space.title,
+        voice_duration=Space.voice_duration,
+        caption=Space.caption,
+        parse_mode=Space.parse_mode,
+        caption_entities=Space.caption_entities,
+        input_message_content=Space.input_message_content,
+        reply_markup=Space.reply_markup,
     )
 
 
-class TestInlineQueryResultVoice:
+class Space:
     id_ = "id"
     type_ = "voice"
     voice_url = "voice url"
@@ -55,6 +55,8 @@ class TestInlineQueryResultVoice:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultVoiceNoReq:
     def test_slot_behaviour(self, inline_query_result_voice, mro_slots):
         inst = inline_query_result_voice
         for attr in inst.__slots__:
@@ -62,25 +64,25 @@ class TestInlineQueryResultVoice:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_voice):
-        assert inline_query_result_voice.type == self.type_
-        assert inline_query_result_voice.id == self.id_
-        assert inline_query_result_voice.voice_url == self.voice_url
-        assert inline_query_result_voice.title == self.title
-        assert inline_query_result_voice.voice_duration == self.voice_duration
-        assert inline_query_result_voice.caption == self.caption
-        assert inline_query_result_voice.parse_mode == self.parse_mode
-        assert inline_query_result_voice.caption_entities == tuple(self.caption_entities)
+        assert inline_query_result_voice.type == Space.type_
+        assert inline_query_result_voice.id == Space.id_
+        assert inline_query_result_voice.voice_url == Space.voice_url
+        assert inline_query_result_voice.title == Space.title
+        assert inline_query_result_voice.voice_duration == Space.voice_duration
+        assert inline_query_result_voice.caption == Space.caption
+        assert inline_query_result_voice.parse_mode == Space.parse_mode
+        assert inline_query_result_voice.caption_entities == tuple(Space.caption_entities)
         assert (
             inline_query_result_voice.input_message_content.to_dict()
-            == self.input_message_content.to_dict()
+            == Space.input_message_content.to_dict()
         )
-        assert inline_query_result_voice.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_voice.reply_markup.to_dict() == Space.reply_markup.to_dict()
 
     def test_caption_entities_always_tuple(self):
         result = InlineQueryResultVoice(
-            self.id_,
-            self.voice_url,
-            self.title,
+            Space.id_,
+            Space.voice_url,
+            Space.title,
         )
 
         assert result.caption_entities == ()
@@ -112,11 +114,11 @@ class TestInlineQueryResultVoice:
         )
 
     def test_equality(self):
-        a = InlineQueryResultVoice(self.id_, self.voice_url, self.title)
-        b = InlineQueryResultVoice(self.id_, self.voice_url, self.title)
-        c = InlineQueryResultVoice(self.id_, "", self.title)
-        d = InlineQueryResultVoice("", self.voice_url, self.title)
-        e = InlineQueryResultAudio(self.id_, "", "")
+        a = InlineQueryResultVoice(Space.id_, Space.voice_url, Space.title)
+        b = InlineQueryResultVoice(Space.id_, Space.voice_url, Space.title)
+        c = InlineQueryResultVoice(Space.id_, "", Space.title)
+        d = InlineQueryResultVoice("", Space.voice_url, Space.title)
+        e = InlineQueryResultAudio(Space.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

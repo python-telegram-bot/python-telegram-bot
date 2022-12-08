@@ -28,23 +28,23 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_article():
     return InlineQueryResultArticle(
-        TestInlineQueryResultArticle.id_,
-        TestInlineQueryResultArticle.title,
-        input_message_content=TestInlineQueryResultArticle.input_message_content,
-        reply_markup=TestInlineQueryResultArticle.reply_markup,
-        url=TestInlineQueryResultArticle.url,
-        hide_url=TestInlineQueryResultArticle.hide_url,
-        description=TestInlineQueryResultArticle.description,
-        thumb_url=TestInlineQueryResultArticle.thumb_url,
-        thumb_height=TestInlineQueryResultArticle.thumb_height,
-        thumb_width=TestInlineQueryResultArticle.thumb_width,
+        Space.id_,
+        Space.title,
+        input_message_content=Space.input_message_content,
+        reply_markup=Space.reply_markup,
+        url=Space.url,
+        hide_url=Space.hide_url,
+        description=Space.description,
+        thumb_url=Space.thumb_url,
+        thumb_height=Space.thumb_height,
+        thumb_width=Space.thumb_width,
     )
 
 
-class TestInlineQueryResultArticle:
+class Space:
     id_ = "id"
     type_ = "article"
     title = "title"
@@ -57,6 +57,8 @@ class TestInlineQueryResultArticle:
     thumb_height = 10
     thumb_width = 15
 
+
+class TestInlineQueryResultArticleNoReq:
     def test_slot_behaviour(self, inline_query_result_article, mro_slots, recwarn):
         inst = inline_query_result_article
         for attr in inst.__slots__:
@@ -64,20 +66,20 @@ class TestInlineQueryResultArticle:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_article):
-        assert inline_query_result_article.type == self.type_
-        assert inline_query_result_article.id == self.id_
-        assert inline_query_result_article.title == self.title
+        assert inline_query_result_article.type == Space.type_
+        assert inline_query_result_article.id == Space.id_
+        assert inline_query_result_article.title == Space.title
         assert (
             inline_query_result_article.input_message_content.to_dict()
-            == self.input_message_content.to_dict()
+            == Space.input_message_content.to_dict()
         )
-        assert inline_query_result_article.reply_markup.to_dict() == self.reply_markup.to_dict()
-        assert inline_query_result_article.url == self.url
-        assert inline_query_result_article.hide_url == self.hide_url
-        assert inline_query_result_article.description == self.description
-        assert inline_query_result_article.thumb_url == self.thumb_url
-        assert inline_query_result_article.thumb_height == self.thumb_height
-        assert inline_query_result_article.thumb_width == self.thumb_width
+        assert inline_query_result_article.reply_markup.to_dict() == Space.reply_markup.to_dict()
+        assert inline_query_result_article.url == Space.url
+        assert inline_query_result_article.hide_url == Space.hide_url
+        assert inline_query_result_article.description == Space.description
+        assert inline_query_result_article.thumb_url == Space.thumb_url
+        assert inline_query_result_article.thumb_height == Space.thumb_height
+        assert inline_query_result_article.thumb_width == Space.thumb_width
 
     def test_to_dict(self, inline_query_result_article):
         inline_query_result_article_dict = inline_query_result_article.to_dict()
@@ -113,11 +115,11 @@ class TestInlineQueryResultArticle:
         )
 
     def test_equality(self):
-        a = InlineQueryResultArticle(self.id_, self.title, self.input_message_content)
-        b = InlineQueryResultArticle(self.id_, self.title, self.input_message_content)
-        c = InlineQueryResultArticle(self.id_, "", self.input_message_content)
-        d = InlineQueryResultArticle("", self.title, self.input_message_content)
-        e = InlineQueryResultAudio(self.id_, "", "")
+        a = InlineQueryResultArticle(Space.id_, Space.title, Space.input_message_content)
+        b = InlineQueryResultArticle(Space.id_, Space.title, Space.input_message_content)
+        c = InlineQueryResultArticle(Space.id_, "", Space.input_message_content)
+        d = InlineQueryResultArticle("", Space.title, Space.input_message_content)
+        e = InlineQueryResultAudio(Space.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)
