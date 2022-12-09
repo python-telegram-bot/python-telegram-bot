@@ -42,7 +42,12 @@ class LabeledPrice(TelegramObject):
 
     Attributes:
         label (:obj:`str`): Portion label.
-        amount (:obj:`int`): Price of the product in the smallest units of the currency.
+        amount (:obj:`int`): Price of the product in the smallest units of the currency (integer,
+            not float/double). For example, for a price of US$ 1.45 ``amount`` is ``145``.
+            See the ``exp`` parameter in
+            `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
+            it shows the number of digits past the decimal point for each currency
+            (2 for the majority of currencies).
 
     """
 
