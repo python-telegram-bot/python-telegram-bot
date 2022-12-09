@@ -197,12 +197,6 @@ class InputMessageContentDWPP(InputMessageContent):
 
 
 class TestBotNoReq:
-    test_flag = None
-
-    @pytest.fixture(scope="function", autouse=True)
-    def reset(self):
-        self.test_flag = None
-
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     def test_slot_behaviour(self, bot_class, bot, mro_slots):
         inst = bot_class(bot.token)
@@ -210,66 +204,16 @@ class TestBotNoReq:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    async def test_initialize_and_shutdown(self, bot: DictExtBot, monkeypatch):
-        async def initialize(*args, **kwargs):
-            self.test_flag = ["initialize"]
-
-        async def stop(*args, **kwargs):
-            self.test_flag.append("stop")
-
-        temp_bot = Bot(token=bot.token)
-        orig_stop = temp_bot.request.shutdown
-
-        try:
-            monkeypatch.setattr(temp_bot.request, "initialize", initialize)
-            monkeypatch.setattr(temp_bot.request, "shutdown", stop)
-            await temp_bot.initialize()
-            assert self.test_flag == ["initialize"]
-            assert temp_bot.bot == bot.bot
-
-            await temp_bot.shutdown()
-            assert self.test_flag == ["initialize", "stop"]
-        finally:
-            await orig_stop()
-
-    async def test_multiple_inits_and_shutdowns(self, bot, monkeypatch):
-        self.received = defaultdict(int)
-
-        async def initialize(*args, **kwargs):
-            self.received["init"] += 1
-
-        async def shutdown(*args, **kwargs):
-            self.received["shutdown"] += 1
-
-        monkeypatch.setattr(HTTPXRequest, "initialize", initialize)
-        monkeypatch.setattr(HTTPXRequest, "shutdown", shutdown)
-
-        test_bot = Bot(bot.token)
-        await test_bot.initialize()
-        await test_bot.initialize()
-        await test_bot.initialize()
-        await test_bot.shutdown()
-        await test_bot.shutdown()
-        await test_bot.shutdown()
-
-        # 2 instead of 1 since we have to request objects for each bot
-        assert self.received["init"] == 2
-        assert self.received["shutdown"] == 2
-
-    async def test_multiple_init_cycles(self, bot):
-        # nothing really to assert - this should just not fail
-        test_bot = Bot(bot.token)
-        async with test_bot:
-            await test_bot.get_me()
-        async with test_bot:
-            await test_bot.get_me()
-
     async def test_context_manager(self, monkeypatch, bot):
+        test_flag = []
+
         async def initialize():
-            self.test_flag = ["initialize"]
+            nonlocal test_flag
+            test_flag = ["initialize"]
 
         async def shutdown(*args):
-            self.test_flag.append("stop")
+            nonlocal test_flag
+            test_flag.append("stop")
 
         monkeypatch.setattr(bot, "initialize", initialize)
         monkeypatch.setattr(bot, "shutdown", shutdown)
@@ -277,14 +221,17 @@ class TestBotNoReq:
         async with bot:
             pass
 
-        assert self.test_flag == ["initialize", "stop"]
+        assert test_flag == ["initialize", "stop"]
 
     async def test_context_manager_exception_on_init(self, monkeypatch, bot):
+        test_flag = []
+
         async def initialize():
             raise RuntimeError("initialize")
 
         async def shutdown():
-            self.test_flag = "stop"
+            nonlocal test_flag
+            test_flag = "stop"
 
         monkeypatch.setattr(bot, "initialize", initialize)
         monkeypatch.setattr(bot, "shutdown", shutdown)
@@ -293,7 +240,7 @@ class TestBotNoReq:
             async with bot:
                 pass
 
-        assert self.test_flag == "stop"
+        assert test_flag == "stop"
 
     async def test_log_decorator(self, bot: DictExtBot, caplog):
         # Second argument makes sure that we ignore logs from e.g. httpx
@@ -1495,6 +1442,66 @@ class TestBotReq:
             # This test class should never be run in if pytz is not installed, we intentionally
             # fail if this branch is ever reached.
             sys.exit(1)
+
+    test_flag = None
+
+    @pytest.fixture(scope="function", autouse=True)
+    def reset(self):
+        self.test_flag = None
+
+    async def test_initialize_and_shutdown(self, bot: DictExtBot, monkeypatch):
+        async def initialize(*args, **kwargs):
+            self.test_flag = ["initialize"]
+
+        async def stop(*args, **kwargs):
+            self.test_flag.append("stop")
+
+        temp_bot = Bot(token=bot.token)
+        orig_stop = temp_bot.request.shutdown
+
+        try:
+            monkeypatch.setattr(temp_bot.request, "initialize", initialize)
+            monkeypatch.setattr(temp_bot.request, "shutdown", stop)
+            await temp_bot.initialize()
+            assert self.test_flag == ["initialize"]
+            assert temp_bot.bot == bot.bot
+
+            await temp_bot.shutdown()
+            assert self.test_flag == ["initialize", "stop"]
+        finally:
+            await orig_stop()
+
+    async def test_multiple_inits_and_shutdowns(self, bot, monkeypatch):
+        self.received = defaultdict(int)
+
+        async def initialize(*args, **kwargs):
+            self.received["init"] += 1
+
+        async def shutdown(*args, **kwargs):
+            self.received["shutdown"] += 1
+
+        monkeypatch.setattr(HTTPXRequest, "initialize", initialize)
+        monkeypatch.setattr(HTTPXRequest, "shutdown", shutdown)
+
+        test_bot = Bot(bot.token)
+        await test_bot.initialize()
+        await test_bot.initialize()
+        await test_bot.initialize()
+        await test_bot.shutdown()
+        await test_bot.shutdown()
+        await test_bot.shutdown()
+
+        # 2 instead of 1 since we have to request objects for each bot
+        assert self.received["init"] == 2
+        assert self.received["shutdown"] == 2
+
+    async def test_multiple_init_cycles(self, bot):
+        # nothing really to assert - this should just not fail
+        test_bot = Bot(bot.token)
+        async with test_bot:
+            await test_bot.get_me()
+        async with test_bot:
+            await test_bot.get_me()
 
     async def test_forward_message(self, bot, chat_id, message):
         forward_message = await bot.forward_message(
