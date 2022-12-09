@@ -58,7 +58,7 @@ class InlineQueryResultVenue(InlineQueryResult):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
-            message to be sent instead of the location.
+            message to be sent instead of the venue.
         thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
@@ -74,8 +74,12 @@ class InlineQueryResultVenue(InlineQueryResult):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue if known.
         foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
         google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
-        google_place_type (:obj:`str`): Optional. Google Places type of the venue.
+        google_place_type (:obj:`str`): Optional. Google Places type of the venue. (See
+            `supported types <https://developers.google.com/maps/documentation/places/web-service\
+            /supported_types>`_.)
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
