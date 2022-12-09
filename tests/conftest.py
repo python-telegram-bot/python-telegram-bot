@@ -113,8 +113,6 @@ def bot_info():
 
 
 # Below classes are used to monkeypatch attributes since parent classes don't have __dict__
-
-
 class TestHttpxRequest(HTTPXRequest):
     async def _request_wrapper(
         self,
@@ -148,6 +146,12 @@ class DictExtBot(ExtBot):
         # Makes it easier to work with the bot in tests
         self._unfreeze()
 
+    # Here we override get_me for caching because we don't want to call the API repeatedly in tests
+    async def get_me(self, *args, **kwargs):
+        if self._bot_user is None:
+            self._bot_user = make_mock_user(self.token)
+        return self._bot_user
+
 
 class DictBot(Bot):
     def __init__(self, *args, **kwargs):
@@ -155,16 +159,38 @@ class DictBot(Bot):
         # Makes it easier to work with the bot in tests
         self._unfreeze()
 
+    # Here we override get_me for caching because we don't want to call the API repeatedly in tests
+    async def get_me(self, *args, **kwargs):
+        if self._bot_user is None:
+            self._bot_user = make_mock_user(self.token)
+        return self._bot_user
+
 
 class DictApplication(Application):
     pass
+
+
+def make_mock_user(token: str) -> User:
+    """Used to return a mock user in bot.get_me(). This saves API calls on every init."""
+    bot_info = get_bot()
+    user_id = int(token.split(":")[0] or bot_info["token"].split(":")[0])
+    first_name = bot_info.get("bot_name") or bot_info.get("name")
+    username = (bot_info.get("bot_username") or bot_info.get("username")).strip("@")
+    return User(
+        user_id,
+        first_name,
+        is_bot=True,
+        username=username,
+        can_join_groups=True,
+        can_read_all_group_messages=False,
+        supports_inline_queries=True,
+    )
 
 
 @pytest.fixture(scope="session")
 async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
     async with make_bot(bot_info) as _bot:
-        print("making new bot")
         yield _bot
 
 

@@ -44,7 +44,7 @@ def json_dict():
     }
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def user(bot):
     user = User(
         id=Space.id_,

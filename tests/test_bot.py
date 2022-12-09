@@ -95,7 +95,7 @@ def to_camel_case(snake_str):
     return components[0] + "".join(x.title() for x in components[1:])
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="class")
 async def message(bot, chat_id):
     to_reply_to = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
@@ -210,7 +210,7 @@ class TestBotNoReq:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    async def test_initialize_and_shutdown(self, bot, monkeypatch):
+    async def test_initialize_and_shutdown(self, bot: DictExtBot, monkeypatch):
         async def initialize(*args, **kwargs):
             self.test_flag = ["initialize"]
 
@@ -295,10 +295,10 @@ class TestBotNoReq:
 
         assert self.test_flag == "stop"
 
-    async def test_log_decorator(self, bot, caplog):
+    async def test_log_decorator(self, bot: DictExtBot, caplog):
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
-            await bot.get_me()
+            await super(bot.__class__, bot).get_me()  # call original get_me instead of overriden
             # Only for stabilizing this test-
             if len(caplog.records) == 4:
                 for idx, record in enumerate(caplog.records):
@@ -340,7 +340,7 @@ class TestBotNoReq:
 
     async def test_invalid_token_server_response(self):
         with pytest.raises(InvalidToken, match="The token `12` was rejected by the server."):
-            async with make_bot(token="12"):
+            async with ExtBot(token="12"):
                 pass
 
     @pytest.mark.parametrize(
@@ -365,12 +365,17 @@ class TestBotNoReq:
         finally:
             await bot.shutdown()
 
-    async def test_get_me_and_properties(self, bot: Bot):
-        get_me_bot = await bot.get_me()
+    async def test_get_me_and_properties(self, bot):
+        mocked = "mocked"
+        with bot._bot_user._unfrozen():
+            bot._bot_user.username = mocked  # set the attribute to a mocked value
+        assert bot.username == mocked  # To test we are using the mocked bot
+        # call the parent class get_me method instead of the overriden get_me method
+        get_me_bot = await super(bot.__class__, bot).get_me()
 
         assert isinstance(get_me_bot, User)
         assert get_me_bot.id == bot.id
-        assert get_me_bot.username == bot.username
+        assert get_me_bot.username == bot.username != mocked  # will be the real bot
         assert get_me_bot.first_name == bot.first_name
         assert get_me_bot.last_name == bot.last_name
         assert get_me_bot.name == bot.name
@@ -414,7 +419,13 @@ class TestBotNoReq:
 
     @bot_methods(ext_bot=False)
     async def test_defaults_handling(
-        self, bot_class, bot_method_name, bot_method, bot, raw_bot, monkeypatch
+        self,
+        bot_class,
+        bot_method_name: str,
+        bot_method,
+        bot: DictExtBot,
+        raw_bot: DictBot,
+        monkeypatch,
     ):
         """
         Here we check that the bot methods handle tg.ext.Defaults correctly. This has two parts:
@@ -2190,7 +2201,6 @@ class TestBotReq:
 
     async def test_get_chat(self, bot, super_group_id):
         chat = await bot.get_chat(super_group_id)
-
         assert chat.type == "supergroup"
         assert chat.title == f">>> telegram.Bot(test) @{bot.username}"
         assert chat.id == int(super_group_id)
