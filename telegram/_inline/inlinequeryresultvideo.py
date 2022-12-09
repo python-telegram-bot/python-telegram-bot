@@ -50,7 +50,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumb_url (:obj:`str`): URL of the thumbnail (JPEG only) for the video.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`, optional): Caption,
+        caption (:obj:`str`, optional): Caption of the video to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
@@ -63,7 +63,7 @@ class InlineQueryResultVideo(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the video. This field is required if
-            InlineQueryResultVideo is used to send an HTML-page as a result
+            ``InlineQueryResultVideo`` is used to send an HTML-page as a result
             (e.g., a YouTube video).
 
     Attributes:
@@ -75,20 +75,20 @@ class InlineQueryResultVideo(InlineQueryResult):
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumb_url (:obj:`str`): URL of the thumbnail (JPEG only) for the video.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`, optional): Caption of the video to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
-            entities parsing.
-        parse_mode (:obj:`str`, optional): |parse_mode|
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
-        video_width (:obj:`int`, optional): Video width.
-        video_height (:obj:`int`, optional): Video height.
-        video_duration (:obj:`int`, optional): Video duration in seconds.
-        description (:obj:`str`, optional): Short description of the result.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+        caption (:obj:`str`): Optional. Caption of the video to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
+            parsing.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        video_width (:obj:`int`): Optional. Video width.
+        video_height (:obj:`int`): Optional. Video height.
+        video_duration (:obj:`int`): Optional. Video duration in seconds.
+        description (:obj:`str`): Optional. Short description of the result.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the video. This field is required if
-            InlineQueryResultVideo is used to send an HTML-page as a result
+            ``InlineQueryResultVideo`` is used to send an HTML-page as a result
             (e.g., a YouTube video).
 
     """
