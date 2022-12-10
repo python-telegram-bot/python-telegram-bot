@@ -26,15 +26,11 @@ Because imports in pytest are intricate, we just run
 
 with the TEST_WITH_OPT_DEPS environment variable set to False in addition to the regular test suite
 """
-import os
-
 import pytest
 
 from telegram import _bot as bot
 from telegram._passport import credentials as credentials
-from tests.auxil.object_conversions import env_var_2_bool
-
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+from tests.conftest import TEST_WITH_OPT_DEPS
 
 
 @pytest.mark.skipif(

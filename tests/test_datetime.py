@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
-import os
 import time
 
 import pytest
@@ -26,7 +25,7 @@ from telegram._utils import datetime as tg_dtm
 from telegram.ext import Defaults
 
 # sample time specification values categorised into absolute / delta / time-of-day
-from tests.auxil.object_conversions import env_var_2_bool
+from tests.conftest import TEST_WITH_OPT_DEPS
 
 ABSOLUTE_TIME_SPECS = [
     dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))).replace(second=0, microsecond=0),
@@ -49,7 +48,6 @@ Because imports in pytest are intricate, we just run
 
 with the TEST_WITH_OPT_DEPS=False environment variable in addition to the regular test suite.
 """
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 class TestDatetime:

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import os
 import time
 from copy import deepcopy
 from datetime import datetime
@@ -28,15 +27,12 @@ from telegram import CallbackQuery, Chat, InlineKeyboardButton, InlineKeyboardMa
 from telegram._utils.datetime import UTC
 from telegram.ext import ExtBot
 from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
-from tests.auxil.object_conversions import env_var_2_bool
+from tests.conftest import TEST_WITH_OPT_DEPS
 
 
 @pytest.fixture(scope="function")
 def callback_data_cache(bot):
     return CallbackDataCache(bot)
-
-
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 @pytest.mark.skipif(

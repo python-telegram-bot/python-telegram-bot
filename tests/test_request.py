@@ -20,7 +20,6 @@
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import asyncio
 import json
-import os
 from collections import defaultdict
 from dataclasses import dataclass
 from http import HTTPStatus
@@ -43,7 +42,7 @@ from telegram.error import (
 )
 from telegram.request._httpxrequest import HTTPXRequest
 
-from .auxil.object_conversions import env_var_2_bool
+from .conftest import TEST_WITH_OPT_DEPS
 
 # We only need the first fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401
@@ -70,9 +69,6 @@ def mocker_factory(
 async def httpx_request():
     async with HTTPXRequest() as rq:
         yield rq
-
-
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 @pytest.mark.skipif(
