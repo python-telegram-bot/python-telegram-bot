@@ -441,9 +441,6 @@ class TestBot:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
-        if bot_method_name.lower().replace("_", "") == "getupdates":
-            return
-
         if bot_method_name.lower().replace("_", "") == "getme":
             # Mocking get_me within check_defaults_handling messes with the cached values like
             # Bot.{bot, username, id, …}` unless we return the expected User object.

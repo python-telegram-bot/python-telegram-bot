@@ -257,6 +257,7 @@ async def check_defaults_handling(
 
     """
     raw_bot = not isinstance(bot, ExtBot)
+    get_updates = method.__name__.lower().replace("_", "") == "getupdates"
 
     shortcut_signature = inspect.signature(method)
     kwargs_need_default = [
@@ -368,7 +369,8 @@ async def check_defaults_handling(
             return return_value.to_dict()
         return return_value
 
-    orig_post = bot.request.post
+    request = bot._request[0] if get_updates else bot.request
+    orig_post = request.post
     try:
         if raw_bot:
             combinations = [(DEFAULT_NONE, None)]
@@ -388,13 +390,13 @@ async def check_defaults_handling(
                 kwargs_need_default,
             )
             assertion_callback = functools.partial(make_assertion, df_value=default_value)
-            setattr(bot.request, "post", assertion_callback)
+            setattr(request, "post", assertion_callback)
             assert await method(**kwargs) in expected_return_values
 
             # 2: test that we get the manually passed non-None value
             kwargs = build_kwargs(shortcut_signature, kwargs_need_default, dfv="non-None-value")
             assertion_callback = functools.partial(make_assertion, df_value="non-None-value")
-            setattr(bot.request, "post", assertion_callback)
+            setattr(request, "post", assertion_callback)
             assert await method(**kwargs) in expected_return_values
 
             # 3: test that we get the manually passed None value
@@ -404,12 +406,12 @@ async def check_defaults_handling(
                 dfv=None,
             )
             assertion_callback = functools.partial(make_assertion, df_value=None)
-            setattr(bot.request, "post", assertion_callback)
+            setattr(request, "post", assertion_callback)
             assert await method(**kwargs) in expected_return_values
     except Exception as exc:
         raise exc
     finally:
-        setattr(bot.request, "post", orig_post)
+        setattr(request, "post", orig_post)
         if not raw_bot:
             bot._defaults = None
 
