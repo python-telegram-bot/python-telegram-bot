@@ -25,12 +25,14 @@ import pytest
 import pytz
 
 from telegram import (
+    Bot,
     ChatPermissions,
     File,
     InlineQueryResultArticle,
     InlineQueryResultCachedPhoto,
     InputMediaPhoto,
     InputTextMessageContent,
+    TelegramObject,
 )
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram.constants import InputMediaType
@@ -236,7 +238,7 @@ def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAUL
 
 async def check_defaults_handling(
     method: Callable,
-    bot: ExtBot,
+    bot: Bot,
     return_value=None,
 ) -> bool:
     """
@@ -244,11 +246,14 @@ async def check_defaults_handling(
 
     Args:
         method: The shortcut/bot_method
-        bot: The bot
+        bot: The bot. May be a telegram.Bot or a telegram.ext.ExtBot. In the former case, all
+            default values will be converted to None.
         return_value: Optional. The return value of Bot._post that the method expects. Defaults to
-            None. get_file is automatically handled.
+            None. get_file is automatically handled. If this is a `TelegramObject`, Bot._post will
+            return the `to_dict` representation of it.
 
     """
+    raw_bot = not isinstance(bot, ExtBot)
 
     shortcut_signature = inspect.signature(method)
     kwargs_need_default = [
@@ -356,15 +361,24 @@ async def check_defaults_handling(
         # That way we can check what gets passed to Request.post without having to actually
         # make a request
         # Some methods expect specific output, so we allow to customize that
+        if isinstance(return_value, TelegramObject):
+            return return_value.to_dict()
         return return_value
 
     orig_post = bot.request.post
     try:
-        for default_value, defaults in [
-            (DEFAULT_NONE, defaults_no_custom_defaults),
-            ("custom_default", defaults_custom_defaults),
-        ]:
-            bot._defaults = defaults
+        if raw_bot:
+            combinations = [(DEFAULT_NONE, None)]
+        else:
+            combinations = [
+                (DEFAULT_NONE, defaults_no_custom_defaults),
+                ("custom_default", defaults_custom_defaults),
+            ]
+
+        for default_value, defaults in combinations:
+            if not raw_bot:
+                bot._defaults = defaults
+
             # 1: test that we get the correct default value, if we don't specify anything
             kwargs = build_kwargs(
                 shortcut_signature,
@@ -393,6 +407,7 @@ async def check_defaults_handling(
         raise exc
     finally:
         setattr(bot.request, "post", orig_post)
-        bot._defaults = None
+        if not raw_bot:
+            bot._defaults = None
 
     return True
