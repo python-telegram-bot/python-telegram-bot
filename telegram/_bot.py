@@ -928,7 +928,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1037,7 +1038,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
             duration (:obj:`int`, optional): Duration of sent audio in seconds.
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
@@ -1163,7 +1165,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_content_type_detection (:obj:`bool`, optional): Disables automatic server-side
                 content type detection for files uploaded using multipart/form-data.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1365,7 +1368,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
             supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
                 suitable for streaming.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -1619,7 +1623,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1734,7 +1739,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
             duration (:obj:`int`, optional): Duration of the voice message in seconds.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
@@ -1828,9 +1834,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            media (Sequence[:class:`telegram.InputMediaAudio`, :class:`telegram.InputMediaDocument`, \
-                :class:`telegram.InputMediaPhoto`, :class:`telegram.InputMediaVideo`]): An array
-                describing messages to be sent, must include 2–10 items.
+            media (Sequence[:class:`telegram.InputMediaAudio`,
+                :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto`, \
+                :class:`telegram.InputMediaVideo`]): An array describing messages
+                to be sent, must include 2–10 items.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -3172,8 +3179,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            entities (Sequence[:class:`telegram.MessageEntity`], optional): List of special entities
-                that appear in message text, which can be specified instead of
+            entities (Sequence[:class:`telegram.MessageEntity`], optional): List of special
+                entities that appear in message text, which can be specified instead of
                 :paramref:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
@@ -3246,7 +3253,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
 
@@ -5940,8 +5948,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             explanation_parse_mode (:obj:`str`, optional): Mode for parsing entities in the
                 explanation. See the constants in :class:`telegram.constants.ParseMode` for the
                 available modes.
-            explanation_entities (Sequence[:class:`telegram.MessageEntity`], optional): List of special
-                entities that appear in message text, which can be specified instead of
+            explanation_entities (Sequence[:class:`telegram.MessageEntity`], optional): List of
+            special entities that appear in message text, which can be specified instead of
                 :paramref:`explanation_parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
                 after creation, :tg-const:`telegram.Poll.MIN_OPEN_PERIOD`-
@@ -6498,7 +6506,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 entities parsing. If not specified, the original caption is kept.
             parse_mode (:obj:`str`, optional): Mode for parsing entities in the new caption. See
                 the constants in :class:`telegram.constants.ParseMode` for the available modes.
-            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+                |caption_entities|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
