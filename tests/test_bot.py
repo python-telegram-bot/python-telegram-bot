@@ -453,10 +453,9 @@ class TestBot:
 
         # Check that ExtBot does the right thing
         bot_method = getattr(bot, bot_method_name)
+        raw_bot_method = getattr(raw_bot, bot_method_name)
         assert await check_defaults_handling(bot_method, bot, return_value=return_value)
-        assert await check_defaults_handling(
-            getattr(raw_bot, bot_method_name), raw_bot, return_value=return_value
-        )
+        assert await check_defaults_handling(raw_bot_method, raw_bot, return_value=return_value)
 
     def test_ext_bot_signature(self):
         """

@@ -487,9 +487,6 @@ async def expect_bad_request(func, message, reason):
             raise e
 
 
-# mainly for check_defaults_handling below
-
-
 async def send_webhook_message(
     ip: str,
     port: int,
