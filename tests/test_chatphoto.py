@@ -152,16 +152,6 @@ class TestChatPhotoNoReq:
 
 
 class TestChatPhotoReq:
-    async def test_send_all_args(
-        self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file
-    ):
-        async def func():
-            assert await bot.set_chat_photo(super_group_id, chatphoto_file)
-
-        await expect_bad_request(
-            func, "Type of file mismatch", "Telegram did not accept the file."
-        )
-
     async def test_get_and_download(self, bot, chat_photo):
         jpg_file = Path("telegram.jpg")
         if jpg_file.is_file():
@@ -184,6 +174,16 @@ class TestChatPhotoReq:
         await new_file.download_to_drive(jpg_file)
 
         assert jpg_file.is_file()
+
+    async def test_send_all_args(
+        self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file
+    ):
+        async def func():
+            assert await bot.set_chat_photo(super_group_id, chatphoto_file)
+
+        await expect_bad_request(
+            func, "Type of file mismatch", "Telegram did not accept the file."
+        )
 
     async def test_error_send_empty_file(self, bot, super_group_id):
         chatphoto_file = open(os.devnull, "rb")
