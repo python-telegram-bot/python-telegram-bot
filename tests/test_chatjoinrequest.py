@@ -22,7 +22,11 @@ import pytest
 
 from telegram import Bot, Chat, ChatInviteLink, ChatJoinRequest, User
 from telegram._utils.datetime import UTC, to_timestamp
-from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
+from tests.auxil.bot_method_checks import (
+    check_defaults_handling,
+    check_shortcut_call,
+    check_shortcut_signature,
+)
 
 
 @pytest.fixture(scope="class")

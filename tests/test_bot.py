@@ -76,15 +76,9 @@ from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
+from tests.auxil.bot_method_checks import build_kwargs, check_defaults_handling
 from tests.bots import FALLBACKS
-from tests.conftest import (
-    GITHUB_ACTION,
-    build_kwargs,
-    check_defaults_handling,
-    data_file,
-    expect_bad_request,
-    make_bot,
-)
+from tests.conftest import GITHUB_ACTION, data_file, expect_bad_request, make_bot
 
 
 def to_camel_case(snake_str):
