@@ -35,9 +35,8 @@ from tests.conftest import data_file
 
 @pytest.fixture(scope="function")
 def voice_file():
-    f = data_file("telegram.ogg").open("rb")
-    yield f
-    f.close()
+    with data_file("telegram.ogg").open("rb") as f:
+        yield f
 
 
 @pytest.fixture(scope="module")

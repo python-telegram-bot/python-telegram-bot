@@ -301,16 +301,14 @@ def data_file(filename: str) -> Path:
 
 @pytest.fixture(scope="function")
 def thumb_file():
-    f = data_file("thumb.jpg").open("rb")
-    yield f
-    f.close()
+    with data_file("thumb.jpg").open("rb") as f:
+        yield f
 
 
 @pytest.fixture(scope="module")
 def class_thumb_file():
-    f = data_file("thumb.jpg").open("rb")
-    yield f
-    f.close()
+    with data_file("thumb.jpg").open("rb") as f:
+        yield f
 
 
 def make_bot(bot_info=None, **kwargs):

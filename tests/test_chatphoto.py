@@ -33,14 +33,13 @@ from tests.auxil.bot_method_checks import (
 from tests.conftest import data_file, expect_bad_request
 
 
-@pytest.fixture(scope="module")
-def chatphoto_file():
-    f = data_file("telegram.jpg").open("rb")
-    yield f
-    f.close()
-
-
 @pytest.fixture(scope="function")
+def chatphoto_file():
+    with data_file("telegram.jpg").open("rb") as f:
+        yield f
+
+
+@pytest.fixture(scope="module")
 async def chat_photo(bot, super_group_id):
     async def func():
         return (await bot.get_chat(super_group_id, read_timeout=50)).photo

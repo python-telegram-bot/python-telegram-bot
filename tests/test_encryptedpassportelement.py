@@ -22,7 +22,7 @@ import pytest
 from telegram import EncryptedPassportElement, PassportElementError, PassportFile
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def encrypted_passport_element():
     return EncryptedPassportElement(
         Space.type_,

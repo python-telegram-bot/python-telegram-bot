@@ -34,9 +34,8 @@ from tests.conftest import data_file
 
 @pytest.fixture(scope="function")
 def video_note_file():
-    f = data_file("telegram2.mp4").open("rb")
-    yield f
-    f.close()
+    with data_file("telegram2.mp4").open("rb") as f:
+        yield f
 
 
 @pytest.fixture(scope="module")

@@ -33,19 +33,16 @@ from tests.auxil.bot_method_checks import (
 from tests.conftest import data_file
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def audio_file():
-    with open(data_file("telegram.mp3"), "rb") as f:
+    with data_file("telegram.mp3").open("rb") as f:
         yield f
 
 
 @pytest.fixture(scope="module")
 async def audio(bot, chat_id):
-    with data_file("telegram.mp3").open("rb") as f:
-        thumb = data_file("thumb.jpg")
-        return (
-            await bot.send_audio(chat_id, audio=f, read_timeout=50, thumb=thumb.open("rb"))
-        ).audio
+    with data_file("telegram.mp3").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
+        return (await bot.send_audio(chat_id, audio=f, read_timeout=50, thumb=thumb)).audio
 
 
 class Space:

@@ -35,17 +35,15 @@ from tests.conftest import data_file
 
 @pytest.fixture(scope="function")
 def animation_file():
-    f = data_file("game.gif").open("rb")
-    yield f
-    f.close()
+    with data_file("game.gif").open("rb") as f:
+        yield f
 
 
 @pytest.fixture(scope="module")
 async def animation(bot, chat_id):
-    with data_file("game.gif").open("rb") as f:
-        thumb = data_file("thumb.jpg")
+    with data_file("game.gif").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
         return (
-            await bot.send_animation(chat_id, animation=f, read_timeout=50, thumb=thumb.open("rb"))
+            await bot.send_animation(chat_id, animation=f, read_timeout=50, thumb=thumb)
         ).animation
 
 

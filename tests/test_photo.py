@@ -35,17 +35,15 @@ from tests.conftest import data_file, expect_bad_request
 
 @pytest.fixture(scope="function")
 def photo_file():
-    f = data_file("telegram.jpg").open("rb")
-    yield f
-    f.close()
+    with data_file("telegram.jpg").open("rb") as f:
+        yield f
 
 
 @pytest.fixture(scope="module")
 async def _photo(bot, chat_id):
     async def func():
         with data_file("telegram.jpg").open("rb") as f:
-            photo = (await bot.send_photo(chat_id, photo=f, read_timeout=50)).photo
-            return photo
+            return (await bot.send_photo(chat_id, photo=f, read_timeout=50)).photo
 
     return await expect_bad_request(
         func, "Type of file mismatch", "Telegram did not accept the file."
