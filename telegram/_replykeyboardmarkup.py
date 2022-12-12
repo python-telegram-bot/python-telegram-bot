@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import ClassVar, List, Sequence, Union
+from typing import ClassVar, Sequence, Union
 
 from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
@@ -178,7 +178,7 @@ class ReplyKeyboardMarkup(TelegramObject):
     @classmethod
     def from_row(
         cls,
-        button_row: List[Union[str, KeyboardButton]],
+        button_row: Sequence[Union[str, KeyboardButton]],
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
@@ -192,8 +192,8 @@ class ReplyKeyboardMarkup(TelegramObject):
         Return a ReplyKeyboardMarkup from a single row of KeyboardButtons.
 
         Args:
-            button_row (List[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to use in
-                the markup.
+            button_row (Sequence[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to
+                use in the markup.
             resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
                 vertically for optimal fit (e.g., make the keyboard smaller if there are just two
                 rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
@@ -230,7 +230,7 @@ class ReplyKeyboardMarkup(TelegramObject):
     @classmethod
     def from_column(
         cls,
-        button_column: List[Union[str, KeyboardButton]],
+        button_column: Sequence[Union[str, KeyboardButton]],
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
@@ -244,8 +244,8 @@ class ReplyKeyboardMarkup(TelegramObject):
         Return a ReplyKeyboardMarkup from a single column of KeyboardButtons.
 
         Args:
-            button_column (List[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to use
-                in the markup.
+            button_column (Sequence[:class:`telegram.KeyboardButton` | :obj:`str`]): The button
+                to use in the markup.
             resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
                 vertically for optimal fit (e.g., make the keyboard smaller if there are just two
                 rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
