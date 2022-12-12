@@ -55,7 +55,11 @@ from telegram import (
 )
 from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
-from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
+from tests.auxil.bot_method_checks import (
+    check_defaults_handling,
+    check_shortcut_call,
+    check_shortcut_signature,
+)
 from tests.test_passport import RAW_PASSPORT_DATA
 
 

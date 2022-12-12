@@ -38,14 +38,12 @@ from telegram import (
     ChatAdministratorRights,
     ChatPermissions,
     Dice,
-    File,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQueryResultArticle,
     InlineQueryResultDocument,
     InlineQueryResultVoice,
     InputFile,
-    InputMedia,
     InputMessageContent,
     InputTextMessageContent,
     LabeledPrice,
@@ -64,7 +62,7 @@ from telegram import (
     WebAppInfo,
 )
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
-from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
+from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.constants import (
     ChatAction,
     InlineQueryLimit,
@@ -76,15 +74,9 @@ from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
+from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.bots import FALLBACKS
-from tests.conftest import (
-    GITHUB_ACTION,
-    build_kwargs,
-    check_defaults_handling,
-    data_file,
-    expect_bad_request,
-    make_bot,
-)
+from tests.conftest import GITHUB_ACTION, data_file, expect_bad_request, make_bot
 
 
 def to_camel_case(snake_str):
@@ -449,77 +441,18 @@ class TestBot:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
-        if bot_method_name.lower().replace("_", "") == "getupdates":
-            return
+        if bot_method_name.lower().replace("_", "") == "getme":
+            # Mocking get_me within check_defaults_handling messes with the cached values like
+            # Bot.{bot, username, id, …}` unless we return the expected User object.
+            return_value = bot.bot
+        else:
+            return_value = None
 
-        try:
-            # Check that ExtBot does the right thing
-            bot_method = getattr(bot, bot_method_name)
-            assert await check_defaults_handling(bot_method, bot)
-
-            # check that tg.Bot does the right thing
-            # make_assertion basically checks everything that happens in
-            # Bot._insert_defaults and Bot._insert_defaults_for_ilq_results
-            async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-                json_data = request_data.parameters
-
-                # Check regular kwargs
-                for k, v in json_data.items():
-                    if isinstance(v, DefaultValue):
-                        pytest.fail(f"Parameter {k} was passed as DefaultValue to request")
-                    elif isinstance(v, InputMedia) and isinstance(v.parse_mode, DefaultValue):
-                        pytest.fail(f"Parameter {k} has a DefaultValue parse_mode")
-                    # Check InputMedia
-                    elif k == "media" and isinstance(v, list):
-                        if any(isinstance(med.get("parse_mode"), DefaultValue) for med in v):
-                            pytest.fail("One of the media items has a DefaultValue parse_mode")
-
-                # Check inline query results
-                if bot_method_name.lower().replace("_", "") == "answerinlinequery":
-                    for result_dict in json_data["results"]:
-                        if isinstance(result_dict.get("parse_mode"), DefaultValue):
-                            pytest.fail("InlineQueryResult has DefaultValue parse_mode")
-                        imc = result_dict.get("input_message_content")
-                        if imc and isinstance(imc.get("parse_mode"), DefaultValue):
-                            pytest.fail(
-                                "InlineQueryResult is InputMessageContext with DefaultValue "
-                                "parse_mode "
-                            )
-                        if imc and isinstance(imc.get("disable_web_page_preview"), DefaultValue):
-                            pytest.fail(
-                                "InlineQueryResult is InputMessageContext with DefaultValue "
-                                "disable_web_page_preview "
-                            )
-                # Check datetime conversion
-                until_date = json_data.pop("until_date", None)
-                if until_date and until_date != 946684800:
-                    pytest.fail("Naive until_date was not interpreted as UTC")
-
-                if bot_method_name in ["get_file", "getFile"]:
-                    # The get_file methods try to check if the result is a local file
-                    return File(file_id="result", file_unique_id="result").to_dict()
-
-            method = getattr(raw_bot, bot_method_name)
-            signature = inspect.signature(method)
-            kwargs_need_default = [
-                kwarg
-                for kwarg, value in signature.parameters.items()
-                if isinstance(value.default, DefaultValue)
-            ]
-            monkeypatch.setattr(raw_bot.request, "post", make_assertion)
-            await method(**build_kwargs(inspect.signature(method), kwargs_need_default))
-        finally:
-            await bot.get_me()  # because running the mock-get_me messages with bot.bot & friends
-
-        method = getattr(raw_bot, bot_method_name)
-        signature = inspect.signature(method)
-        kwargs_need_default = [
-            kwarg
-            for kwarg, value in signature.parameters.items()
-            if isinstance(value.default, DefaultValue)
-        ]
-        monkeypatch.setattr(raw_bot.request, "post", make_assertion)
-        await method(**build_kwargs(inspect.signature(method), kwargs_need_default))
+        # Check that ExtBot does the right thing
+        bot_method = getattr(bot, bot_method_name)
+        raw_bot_method = getattr(raw_bot, bot_method_name)
+        assert await check_defaults_handling(bot_method, bot, return_value=return_value)
+        assert await check_defaults_handling(raw_bot_method, raw_bot, return_value=return_value)
 
     def test_ext_bot_signature(self):
         """

@@ -25,12 +25,12 @@ from telegram import Bot, InputFile, MessageEntity, PhotoSize, Video, Voice
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
-from tests.conftest import (
+from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
-    data_file,
 )
+from tests.conftest import data_file
 
 
 @pytest.fixture(scope="function")

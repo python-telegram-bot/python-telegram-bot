@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup
 
 import telegram
 from telegram._utils.defaultvalue import DefaultValue
-from tests.conftest import env_var_2_bool
+from tests.auxil.object_conversions import env_var_2_bool
 
 IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
 IGNORED_PARAMETERS = {

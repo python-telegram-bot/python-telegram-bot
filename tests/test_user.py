@@ -20,7 +20,11 @@ import pytest
 
 from telegram import Bot, InlineKeyboardButton, Update, User
 from telegram.helpers import escape_markdown
-from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
+from tests.auxil.bot_method_checks import (
+    check_defaults_handling,
+    check_shortcut_call,
+    check_shortcut_signature,
+)
 
 
 @pytest.fixture(scope="function")

@@ -25,13 +25,12 @@ import pytest
 from telegram import Bot, ChatPhoto, Voice
 from telegram.error import TelegramError
 from telegram.request import RequestData
-from tests.conftest import (
+from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
-    data_file,
-    expect_bad_request,
 )
+from tests.conftest import data_file, expect_bad_request
 
 
 @pytest.fixture(scope="function")
