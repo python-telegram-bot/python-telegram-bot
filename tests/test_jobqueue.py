@@ -566,7 +566,7 @@ class TestJobQueue:
         )
         job_queue.set_application(application)
 
-        def callback(context):
+        async def callback(context):
             self.result = (
                 type(context),
                 context.user_data,

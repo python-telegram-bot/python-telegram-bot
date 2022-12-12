@@ -481,7 +481,7 @@ class TestApplication:
         async def one(update, context):
             self.received = context
 
-        def two(update, context):
+        async def two(update, context):
             if update.message.text == "test":
                 if context is not self.received:
                     pytest.fail("Expected same context object, got different")
@@ -874,7 +874,7 @@ class TestApplication:
             assert self.received == (CustomContext, float, complex, int)
 
     async def test_custom_context_handler_callback(self, test_bot):
-        def callback(_, context):
+        async def callback(_, context):
             self.received = (
                 type(context),
                 type(context.user_data),
