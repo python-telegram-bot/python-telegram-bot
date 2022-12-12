@@ -54,7 +54,7 @@ def pytest_runtestloop(session):
 
 
 if GITHUB_ACTION:
-    pytest_plugins = ["tests.plugin_github_group"]
+    pytest_plugins = ["tests.auxil.plugin_github_group"]
 
 if TEST_WITH_OPT_DEPS:
     import pytz
