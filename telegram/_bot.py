@@ -5949,7 +5949,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 explanation. See the constants in :class:`telegram.constants.ParseMode` for the
                 available modes.
             explanation_entities (Sequence[:class:`telegram.MessageEntity`], optional): List of
-            special entities that appear in message text, which can be specified instead of
+                special entities that appear in message text, which can be specified instead of
                 :paramref:`explanation_parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
                 after creation, :tg-const:`telegram.Poll.MIN_OPEN_PERIOD`-

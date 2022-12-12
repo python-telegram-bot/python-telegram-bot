@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple, Union
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
@@ -376,7 +376,7 @@ class User(TelegramObject):
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -424,7 +424,7 @@ class User(TelegramObject):
         reply_markup: ReplyMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -483,7 +483,7 @@ class User(TelegramObject):
         api_kwargs: JSONDict = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
     ) -> Tuple["Message", ...]:
         """Shortcut for::
 
@@ -527,7 +527,7 @@ class User(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -708,7 +708,7 @@ class User(TelegramObject):
         thumb: FileInput = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -800,7 +800,7 @@ class User(TelegramObject):
         payload: str,
         provider_token: str,
         currency: str,
-        prices: List["LabeledPrice"],
+        prices: Sequence["LabeledPrice"],
         start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
@@ -819,7 +819,7 @@ class User(TelegramObject):
         send_email_to_provider: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         max_tip_amount: int = None,
-        suggested_tip_amounts: List[int] = None,
+        suggested_tip_amounts: Sequence[int] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -952,7 +952,7 @@ class User(TelegramObject):
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1053,7 +1053,7 @@ class User(TelegramObject):
         supports_streaming: bool = None,
         thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1217,7 +1217,7 @@ class User(TelegramObject):
         reply_markup: ReplyMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1262,7 +1262,7 @@ class User(TelegramObject):
     async def send_poll(
         self,
         question: str,
-        options: List[str],
+        options: Sequence[str],
         is_anonymous: bool = None,
         type: str = None,
         allows_multiple_answers: bool = None,
@@ -1276,7 +1276,7 @@ class User(TelegramObject):
         open_period: int = None,
         close_date: Union[int, datetime] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        explanation_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1329,7 +1329,7 @@ class User(TelegramObject):
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
@@ -1379,7 +1379,7 @@ class User(TelegramObject):
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
