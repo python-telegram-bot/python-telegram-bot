@@ -21,6 +21,8 @@ import inspect
 import os
 from pathlib import Path
 
+import pytest
+
 from tests.auxil.slots import mro_slots
 
 included = {  # These modules/classes intentionally have __dict__.
@@ -30,6 +32,9 @@ included = {  # These modules/classes intentionally have __dict__.
 
 def test_class_has_slots_and_no_dict():
     tg_paths = Path("telegram").rglob("*.py")
+
+    if not tg_paths:
+        pytest.fail("No telegram files found. Please modify this test.")
 
     for path in tg_paths:
         if "__" in str(path):  # Exclude __init__, __main__, etc

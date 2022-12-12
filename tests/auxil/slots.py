@@ -19,6 +19,8 @@
 """Below classes are used in the tests to allow monkeypatching attributes since parent classes
 don't have __dict__.
 """
+import inspect
+
 from telegram import Bot
 from telegram.ext import Application, ExtBot
 
@@ -35,23 +37,24 @@ class DictApplication(Application):
     pass
 
 
-def mro_slots(cls, only_parents: bool = False):
+def mro_slots(obj, only_parents: bool = False):
     """Returns a list of all slots of a class and its parents.
 
     Args:
-        cls (:obj:`type`): The class to get the slots from.
+        obj (:obj:`type`): The class or class-instance to get the slots from.
         only_parents (:obj:`bool`, optional): If ``True``, only the slots of the parents are
             returned. Defaults to ``False``.
     """
+    cls = obj if inspect.isclass(obj) else obj.__class__
+
     if only_parents:
-        classes = cls.__class__.__mro__[1:-1]
+        classes = cls.__mro__[1:]
     else:
-        classes = cls.__class__.__mro__[:-1]
+        classes = cls.__mro__
 
     return [
         attr
         for cls in classes
         if hasattr(cls, "__slots__")  # The Exception class doesn't have slots
         for attr in cls.__slots__
-        if attr != "__dict__"  # left here for classes which still has __dict__
     ]
