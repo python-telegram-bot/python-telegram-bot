@@ -1944,7 +1944,6 @@ class TestApplication:
 
         assert len(recwarn) == 0
 
-    @pytest.mark.timeout(6)
     def test_signal_handlers(self, app, monkeypatch):
         # this test should make sure that signal handlers are set by default on Linux + Mac,
         # and not on Windows.
