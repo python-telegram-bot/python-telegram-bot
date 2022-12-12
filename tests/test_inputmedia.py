@@ -35,8 +35,10 @@ from telegram.constants import ParseMode
 # noinspection PyUnresolvedReferences
 from telegram.error import BadRequest
 from telegram.request import RequestData
-from tests.conftest import data_file, expect_bad_request
+from tests.auxil.slots import mro_slots
 
+from .auxil.files import data_file
+from .auxil.networking import expect_bad_request
 from .test_animation import animation, animation_file  # noqa: F401
 
 # noinspection PyUnresolvedReferences
@@ -131,7 +133,7 @@ class TestInputMediaVideo:
     supports_streaming = True
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
-    def test_slot_behaviour(self, input_media_video, mro_slots):
+    def test_slot_behaviour(self, input_media_video):
         inst = input_media_video
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -195,7 +197,7 @@ class TestInputMediaPhoto:
     parse_mode = "Markdown"
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
-    def test_slot_behaviour(self, input_media_photo, mro_slots):
+    def test_slot_behaviour(self, input_media_photo):
         inst = input_media_photo
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -247,7 +249,7 @@ class TestInputMediaAnimation:
     height = 30
     duration = 1
 
-    def test_slot_behaviour(self, input_media_animation, mro_slots):
+    def test_slot_behaviour(self, input_media_animation):
         inst = input_media_animation
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -306,7 +308,7 @@ class TestInputMediaAudio:
     parse_mode = "HTML"
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
-    def test_slot_behaviour(self, input_media_audio, mro_slots):
+    def test_slot_behaviour(self, input_media_audio):
         inst = input_media_audio
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -369,7 +371,7 @@ class TestInputMediaDocument:
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     disable_content_type_detection = True
 
-    def test_slot_behaviour(self, input_media_document, mro_slots):
+    def test_slot_behaviour(self, input_media_document):
         inst = input_media_document
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

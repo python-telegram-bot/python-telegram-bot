@@ -21,6 +21,7 @@ import pytest
 from telegram import Invoice, LabeledPrice
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -46,7 +47,7 @@ class TestInvoice:
     max_tip_amount = 42
     suggested_tip_amounts = [13, 42]
 
-    def test_slot_behaviour(self, invoice, mro_slots):
+    def test_slot_behaviour(self, invoice):
         for attr in invoice.__slots__:
             assert getattr(invoice, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invoice)) == len(set(mro_slots(invoice))), "duplicate slot"

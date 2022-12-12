@@ -21,6 +21,8 @@ import inspect
 import os
 from pathlib import Path
 
+from tests.auxil.slots import mro_slots
+
 included = {  # These modules/classes intentionally have __dict__.
     "CallbackContext",
 }
@@ -47,12 +49,7 @@ def test_class_has_slots_and_no_dict():
 
             # specify if a certain module/class/base class should have dict-
             if any(i in included for i in {cls.__module__, name, cls.__base__.__name__}):
-                assert "__dict__" in get_slots(cls), f"class {name!r} ({path}) has no __dict__"
+                assert "__dict__" in mro_slots(cls), f"class {name!r} ({path}) has no __dict__"
                 continue
 
-            assert "__dict__" not in get_slots(cls), f"class '{name}' in {path} has __dict__"
-
-
-def get_slots(_class):
-    slots = [attr for cls in _class.__mro__ if hasattr(cls, "__slots__") for attr in cls.__slots__]
-    return slots
+            assert "__dict__" not in mro_slots(cls), f"class '{name}' in {path} has __dict__"

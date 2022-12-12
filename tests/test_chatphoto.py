@@ -30,7 +30,9 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.conftest import data_file, expect_bad_request
+from tests.auxil.files import data_file
+from tests.auxil.networking import expect_bad_request
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -57,7 +59,7 @@ class TestChatPhoto:
     chatphoto_big_file_unique_id = "bigadc3145fd2e84d95b64d68eaa22aa33e"
     chatphoto_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.jpg"
 
-    def test_slot_behaviour(self, chat_photo, mro_slots):
+    def test_slot_behaviour(self, chat_photo):
         for attr in chat_photo.__slots__:
             assert getattr(chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(chat_photo)) == len(set(mro_slots(chat_photo))), "duplicate slot"

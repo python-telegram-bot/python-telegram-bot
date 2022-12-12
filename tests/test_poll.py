@@ -22,6 +22,7 @@ import pytest
 from telegram import MessageEntity, Poll, PollAnswer, PollOption, User
 from telegram._utils.datetime import to_timestamp
 from telegram.constants import PollType
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -33,7 +34,7 @@ class TestPollOption:
     text = "test option"
     voter_count = 3
 
-    def test_slot_behaviour(self, poll_option, mro_slots):
+    def test_slot_behaviour(self, poll_option):
         for attr in poll_option.__slots__:
             assert getattr(poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(poll_option)) == len(set(mro_slots(poll_option))), "duplicate slot"

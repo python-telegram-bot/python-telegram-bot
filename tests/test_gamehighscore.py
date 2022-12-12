@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import GameHighScore, User
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -34,7 +35,7 @@ class TestGameHighScore:
     user = User(2, "test user", False)
     score = 42
 
-    def test_slot_behaviour(self, game_highscore, mro_slots):
+    def test_slot_behaviour(self, game_highscore):
         for attr in game_highscore.__slots__:
             assert getattr(game_highscore, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(game_highscore)) == len(set(mro_slots(game_highscore))), "same slot"

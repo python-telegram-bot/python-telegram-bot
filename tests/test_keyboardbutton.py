@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import InlineKeyboardButton, KeyboardButton, KeyboardButtonPollType, WebAppInfo
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -39,7 +40,7 @@ class TestKeyboardButton:
     request_poll = KeyboardButtonPollType("quiz")
     web_app = WebAppInfo(url="https://example.com")
 
-    def test_slot_behaviour(self, keyboard_button, mro_slots):
+    def test_slot_behaviour(self, keyboard_button):
         inst = keyboard_button
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -25,6 +25,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -47,7 +48,7 @@ class TestInlineQuery:
     offset = "offset"
     location = Location(8.8, 53.1)
 
-    def test_slot_behaviour(self, inline_query, mro_slots):
+    def test_slot_behaviour(self, inline_query):
         for attr in inline_query.__slots__:
             assert getattr(inline_query, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inline_query)) == len(set(mro_slots(inline_query))), "duplicate slot"

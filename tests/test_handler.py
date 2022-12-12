@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 from telegram.ext._handler import BaseHandler
+from tests.auxil.slots import mro_slots
 
 
 class TestHandler:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         class SubclassHandler(BaseHandler):
             __slots__ = ()
 

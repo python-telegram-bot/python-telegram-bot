@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
 #  Copyright (C) 2015-2022
@@ -15,11 +16,12 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+from pathlib import Path
+
+PROJECT_ROOT_PATH = Path(__file__).parent.parent.parent.resolve()
+TEST_DATA_PATH = PROJECT_ROOT_PATH / "tests" / "data"
 
 
-def env_var_2_bool(env_var: object) -> bool:
-    if isinstance(env_var, bool):
-        return env_var
-    if not isinstance(env_var, str):
-        return False
-    return env_var.lower().strip() == "true"
+def data_file(filename: str) -> Path:
+    """Returns the requested file from the tests/data folder independent of the CWD."""
+    return TEST_DATA_PATH / filename

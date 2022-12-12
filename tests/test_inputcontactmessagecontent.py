@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import InputContactMessageContent, User
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -35,7 +36,7 @@ class TestInputContactMessageContent:
     first_name = "first name"
     last_name = "last name"
 
-    def test_slot_behaviour(self, input_contact_message_content, mro_slots):
+    def test_slot_behaviour(self, input_contact_message_content):
         inst = input_contact_message_content
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -25,6 +25,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -45,7 +46,7 @@ class TestShippingQuery:
     from_user = User(0, "", False)
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
-    def test_slot_behaviour(self, shipping_query, mro_slots):
+    def test_slot_behaviour(self, shipping_query):
         inst = shipping_query
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

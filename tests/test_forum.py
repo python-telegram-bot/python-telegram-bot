@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopicReopened, Sticker
+from tests.auxil.slots import mro_slots
 
 TEST_MSG_TEXT = "Topics are forever"
 TEST_TOPIC_ICON_COLOR = 0x6FB9F0
@@ -60,7 +61,7 @@ async def real_topic(bot, emoji_id, forum_group_id):
 
 
 class TestForumTopic:
-    def test_slot_behaviour(self, mro_slots, forum_topic_object):
+    def test_slot_behaviour(self, forum_topic_object):
         for attr in forum_topic_object.__slots__:
             assert getattr(forum_topic_object, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(forum_topic_object)) == len(
@@ -251,7 +252,7 @@ def topic_created():
 
 
 class TestForumTopicCreated:
-    def test_slot_behaviour(self, topic_created, mro_slots):
+    def test_slot_behaviour(self, topic_created):
         for attr in topic_created.__slots__:
             assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(topic_created)) == len(
@@ -300,7 +301,7 @@ class TestForumTopicCreated:
 
 
 class TestForumTopicClosed:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         action = ForumTopicClosed()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -318,7 +319,7 @@ class TestForumTopicClosed:
 
 
 class TestForumTopicReopened:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         action = ForumTopicReopened()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"

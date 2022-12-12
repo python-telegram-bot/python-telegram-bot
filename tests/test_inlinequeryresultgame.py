@@ -24,6 +24,7 @@ from telegram import (
     InlineQueryResultGame,
     InlineQueryResultVoice,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -41,7 +42,7 @@ class TestInlineQueryResultGame:
     game_short_name = "game short name"
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
-    def test_slot_behaviour(self, inline_query_result_game, mro_slots):
+    def test_slot_behaviour(self, inline_query_result_game):
         inst = inline_query_result_game
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -25,6 +25,7 @@ from telegram import (
     InlineQueryResultCachedVoice,
     InputTextMessageContent,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -44,7 +45,7 @@ class TestInlineQueryResultCachedSticker:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
-    def test_slot_behaviour(self, inline_query_result_cached_sticker, mro_slots):
+    def test_slot_behaviour(self, inline_query_result_cached_sticker):
         inst = inline_query_result_cached_sticker
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

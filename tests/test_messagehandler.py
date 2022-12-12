@@ -35,6 +35,7 @@ from telegram import (
 )
 from telegram.ext import CallbackContext, JobQueue, MessageHandler, filters
 from telegram.ext.filters import MessageFilter
+from tests.auxil.slots import mro_slots
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -73,7 +74,7 @@ class TestMessageHandler:
     test_flag = False
     SRE_TYPE = type(re.match("", ""))
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         handler = MessageHandler(filters.ALL, self.callback)
         for attr in handler.__slots__:
             assert getattr(handler, attr, "err") != "err", f"got extra slot '{attr}'"

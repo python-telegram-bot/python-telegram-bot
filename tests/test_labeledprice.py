@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import LabeledPrice, Location
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -30,7 +31,7 @@ class TestLabeledPrice:
     label = "label"
     amount = 100
 
-    def test_slot_behaviour(self, labeled_price, mro_slots):
+    def test_slot_behaviour(self, labeled_price):
         inst = labeled_price
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

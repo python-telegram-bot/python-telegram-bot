@@ -27,7 +27,8 @@ import pytest
 from telegram import Chat, Message, TelegramObject, Update, User
 from telegram.ext import ContextTypes, PersistenceInput, PicklePersistence
 from telegram.warnings import PTBUserWarning
-from tests.conftest import make_bot
+from tests.auxil.ci_bots import make_bot
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(autouse=True)
@@ -254,7 +255,7 @@ class TestPicklePersistence:
         def __init__(self, my_var):
             self.my_var = my_var
 
-    async def test_slot_behaviour(self, mro_slots, pickle_persistence):
+    async def test_slot_behaviour(self, pickle_persistence):
         inst = pickle_persistence
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -35,6 +35,7 @@ from telegram import (
     User,
 )
 from telegram.ext import filters
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -69,7 +70,7 @@ def base_class(request):
 
 
 class TestFilters:
-    def test_all_filters_slot_behaviour(self, mro_slots):
+    def test_all_filters_slot_behaviour(self):
         """
         Use depth first search to get all nested filters, and instantiate them (which need it) with
         the correct number of arguments, then test each filter separately. Also tests setting

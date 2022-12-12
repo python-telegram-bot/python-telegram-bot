@@ -20,6 +20,7 @@ import pytest
 
 from telegram import InputTextMessageContent, MessageEntity
 from telegram.constants import ParseMode
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -38,7 +39,7 @@ class TestInputTextMessageContent:
     entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     disable_web_page_preview = True
 
-    def test_slot_behaviour(self, input_text_message_content, mro_slots):
+    def test_slot_behaviour(self, input_text_message_content):
         inst = input_text_message_content
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

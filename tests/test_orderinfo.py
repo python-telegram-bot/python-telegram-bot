@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import OrderInfo, ShippingAddress
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -37,7 +38,7 @@ class TestOrderInfo:
     email = "email"
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
-    def test_slot_behaviour(self, order_info, mro_slots):
+    def test_slot_behaviour(self, order_info):
         for attr in order_info.__slots__:
             assert getattr(order_info, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(order_info)) == len(set(mro_slots(order_info))), "duplicate slot"

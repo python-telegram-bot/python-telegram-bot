@@ -23,6 +23,7 @@ import pytest
 
 from telegram import LoginUrl, WebhookInfo
 from telegram._utils.datetime import from_timestamp
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -49,7 +50,7 @@ class TestWebhookInfo:
     allowed_updates = ["type1", "type2"]
     last_synchronization_error_date = time.time()
 
-    def test_slot_behaviour(self, webhook_info, mro_slots):
+    def test_slot_behaviour(self, webhook_info):
         for attr in webhook_info.__slots__:
             assert getattr(webhook_info, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(webhook_info)) == len(set(mro_slots(webhook_info))), "duplicate slot"

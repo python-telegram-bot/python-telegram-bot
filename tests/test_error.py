@@ -34,6 +34,7 @@ from telegram.error import (
     TimedOut,
 )
 from telegram.ext import InvalidCallbackData
+from tests.auxil.slots import mro_slots
 
 
 class TestErrors:
@@ -142,7 +143,7 @@ class TestErrors:
             (InvalidCallbackData("test data")),
         ],
     )
-    def test_slot_behaviour(self, inst, mro_slots):
+    def test_slot_behaviour(self, inst):
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"

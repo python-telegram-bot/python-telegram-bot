@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Here we run tests directly with HTTPXRequest because that's easier than providing dummy
+from tests.auxil.slots import mro_slots
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import asyncio
 import json
@@ -43,7 +44,8 @@ from telegram.error import (
 )
 from telegram.request._httpxrequest import HTTPXRequest
 
-from .auxil.object_conversions import env_var_2_bool
+from .auxil.envvars import env_var_2_bool
+from .auxil.slots import mro_slots
 
 # We only need the first fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401
@@ -103,7 +105,7 @@ class TestRequest:
         with pytest.raises(ImportError, match=r"Other Error Message"):
             HTTPXRequest(proxy_url="socks5://foo")
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = HTTPXRequest()
         for attr in inst.__slots__:
             if attr.startswith("__"):

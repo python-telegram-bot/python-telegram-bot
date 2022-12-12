@@ -25,6 +25,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -76,7 +77,7 @@ class TestUser:
     is_premium = True
     added_to_attachment_menu = False
 
-    def test_slot_behaviour(self, user, mro_slots):
+    def test_slot_behaviour(self, user):
         for attr in user.__slots__:
             assert getattr(user, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(user)) == len(set(mro_slots(user))), "duplicate slot"

@@ -39,6 +39,7 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import from_timestamp
+from tests.auxil.slots import mro_slots
 
 message = Message(1, datetime.utcnow(), Chat(1, ""), from_user=User(1, "", False), text="Text")
 chat_member_updated = ChatMemberUpdated(
@@ -104,7 +105,7 @@ def update(request):
 class TestUpdate:
     update_id = 868573637
 
-    def test_slot_behaviour(self, update, mro_slots):
+    def test_slot_behaviour(self, update):
         for attr in update.__slots__:
             assert getattr(update, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"

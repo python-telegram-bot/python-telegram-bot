@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import WebAppInfo
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -30,7 +31,7 @@ def web_app_info():
 class TestWebAppInfo:
     url = "https://www.example.com"
 
-    def test_slot_behaviour(self, web_app_info, mro_slots):
+    def test_slot_behaviour(self, web_app_info):
         for attr in web_app_info.__slots__:
             assert getattr(web_app_info, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(web_app_info)) == len(set(mro_slots(web_app_info))), "duplicate slot"

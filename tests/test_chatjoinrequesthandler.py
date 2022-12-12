@@ -36,6 +36,7 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC
 from telegram.ext import CallbackContext, ChatJoinRequestHandler, JobQueue
+from tests.auxil.slots import mro_slots
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -102,7 +103,7 @@ def chat_join_request_update(bot, chat_join_request):
 class TestChatJoinRequestHandler:
     test_flag = False
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         action = ChatJoinRequestHandler(self.callback)
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"

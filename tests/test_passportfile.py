@@ -24,6 +24,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -44,7 +45,7 @@ class TestPassportFile:
     file_size = 50
     file_date = 1532879128
 
-    def test_slot_behaviour(self, passport_file, mro_slots):
+    def test_slot_behaviour(self, passport_file):
         inst = passport_file
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

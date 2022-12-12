@@ -23,7 +23,12 @@ import pytest
 
 from telegram import Bot, Chat, Message, Update
 from telegram.ext import CallbackContext, CommandHandler, JobQueue, filters
-from tests.conftest import make_command_message, make_command_update, make_message_update
+from tests.auxil.build_messages import (
+    make_command_message,
+    make_command_update,
+    make_message_update,
+)
+from tests.auxil.slots import mro_slots
 
 
 def is_match(handler, update):
@@ -130,7 +135,7 @@ class BaseTest:
 class TestCommandHandler(BaseTest):
     CMD = "/test"
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         handler = self.make_default_handler()
         for attr in handler.__slots__:
             assert getattr(handler, attr, "err") != "err", f"got extra slot '{attr}'"

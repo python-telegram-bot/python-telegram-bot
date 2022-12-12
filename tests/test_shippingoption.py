@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import LabeledPrice, ShippingOption, Voice
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -33,7 +34,7 @@ class TestShippingOption:
     title = "title"
     prices = [LabeledPrice("Fish Container", 100), LabeledPrice("Premium Fish Container", 1000)]
 
-    def test_slot_behaviour(self, shipping_option, mro_slots):
+    def test_slot_behaviour(self, shipping_option):
         inst = shipping_option
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

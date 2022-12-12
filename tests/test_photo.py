@@ -30,7 +30,9 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.conftest import data_file, expect_bad_request
+from tests.auxil.files import data_file
+from tests.auxil.networking import expect_bad_request
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -71,7 +73,7 @@ class TestPhoto:
     # so we accept three different sizes here. Shouldn't be too much
     file_size = [29176, 27662]
 
-    def test_slot_behaviour(self, photo, mro_slots):
+    def test_slot_behaviour(self, photo):
         for attr in photo.__slots__:
             assert getattr(photo, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(photo)) == len(set(mro_slots(photo))), "duplicate slot"

@@ -23,7 +23,7 @@ import pytest
 from telegram import constants
 from telegram._utils.enum import IntEnum, StringEnum
 from telegram.error import BadRequest
-from tests.conftest import data_file
+from tests.auxil.files import data_file
 
 
 class StrEnumTest(StringEnum):

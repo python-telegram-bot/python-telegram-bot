@@ -26,6 +26,7 @@ from telegram import (
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -41,7 +42,7 @@ class TestInlineKeyboardMarkup:
         ]
     ]
 
-    def test_slot_behaviour(self, inline_keyboard_markup, mro_slots):
+    def test_slot_behaviour(self, inline_keyboard_markup):
         inst = inline_keyboard_markup
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

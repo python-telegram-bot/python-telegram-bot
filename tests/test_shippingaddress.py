@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import ShippingAddress
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -41,7 +42,7 @@ class TestShippingAddress:
     street_line2 = "street_line2"
     post_code = "WC1"
 
-    def test_slot_behaviour(self, shipping_address, mro_slots):
+    def test_slot_behaviour(self, shipping_address):
         inst = shipping_address
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

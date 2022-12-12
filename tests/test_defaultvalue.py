@@ -20,10 +20,11 @@ import pytest
 
 from telegram import User
 from telegram._utils.defaultvalue import DefaultValue
+from tests.auxil.slots import mro_slots
 
 
 class TestDefaultValue:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = DefaultValue(1)
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -30,7 +30,8 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.conftest import data_file
+from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -58,7 +59,7 @@ class TestDocument:
     document_file_id = "5a3128a4d2a04750b5b58397f3b5e812"
     document_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
-    def test_slot_behaviour(self, document, mro_slots):
+    def test_slot_behaviour(self, document):
         for attr in document.__slots__:
             assert getattr(document, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(document)) == len(set(mro_slots(document))), "duplicate slot"

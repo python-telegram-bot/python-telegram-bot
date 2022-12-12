@@ -38,7 +38,7 @@ from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram.constants import InputMediaType
 from telegram.ext import Defaults, ExtBot
 from telegram.request import RequestData
-from tests.auxil.object_conversions import env_var_2_bool
+from tests.auxil.envvars import env_var_2_bool
 
 TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 if TEST_WITH_OPT_DEPS:

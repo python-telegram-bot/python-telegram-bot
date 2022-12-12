@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import BotCommand, ProximityAlertTriggered, User
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -35,7 +36,7 @@ class TestProximityAlertTriggered:
     watcher = User(2, "bar", False)
     distance = 42
 
-    def test_slot_behaviour(self, proximity_alert_triggered, mro_slots):
+    def test_slot_behaviour(self, proximity_alert_triggered):
         inst = proximity_alert_triggered
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

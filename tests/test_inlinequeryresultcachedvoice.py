@@ -26,6 +26,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -53,7 +54,7 @@ class TestInlineQueryResultCachedVoice:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
-    def test_slot_behaviour(self, inline_query_result_cached_voice, mro_slots):
+    def test_slot_behaviour(self, inline_query_result_cached_voice):
         inst = inline_query_result_cached_voice
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

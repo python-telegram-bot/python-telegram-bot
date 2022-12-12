@@ -34,6 +34,7 @@ from telegram import (
     User,
 )
 from telegram.ext import CallbackContext, JobQueue, PollHandler
+from tests.auxil.slots import mro_slots
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -87,7 +88,7 @@ def poll(bot):
 class TestPollHandler:
     test_flag = False
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = PollHandler(self.callback)
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import ForceReply, ReplyKeyboardRemove
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -35,7 +36,7 @@ class TestForceReply:
     selective = True
     input_field_placeholder = "force replies can be annoying if not used properly"
 
-    def test_slot_behaviour(self, force_reply, mro_slots):
+    def test_slot_behaviour(self, force_reply):
         for attr in force_reply.__slots__:
             assert getattr(force_reply, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(force_reply)) == len(set(mro_slots(force_reply))), "duplicate slot"

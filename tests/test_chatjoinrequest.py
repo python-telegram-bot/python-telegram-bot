@@ -27,6 +27,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -60,7 +61,7 @@ class TestChatJoinRequest:
         is_primary=False,
     )
 
-    def test_slot_behaviour(self, chat_join_request, mro_slots):
+    def test_slot_behaviour(self, chat_join_request):
         inst = chat_join_request
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

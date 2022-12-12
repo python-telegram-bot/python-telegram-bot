@@ -32,6 +32,7 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import UTC, to_timestamp
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -85,7 +86,7 @@ class TestChatMemberUpdated:
     old_status = ChatMember.MEMBER
     new_status = ChatMember.ADMINISTRATOR
 
-    def test_slot_behaviour(self, mro_slots, chat_member_updated):
+    def test_slot_behaviour(self, chat_member_updated):
         action = chat_member_updated
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"

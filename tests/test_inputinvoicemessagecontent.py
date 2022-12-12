@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import InputInvoiceMessageContent, InputTextMessageContent, LabeledPrice
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -70,7 +71,7 @@ class TestInputInvoiceMessageContent:
     send_email_to_provider = True
     is_flexible = True
 
-    def test_slot_behaviour(self, input_invoice_message_content, mro_slots):
+    def test_slot_behaviour(self, input_invoice_message_content):
         inst = input_invoice_message_content
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

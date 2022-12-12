@@ -43,7 +43,8 @@ from telegram.ext import (
     filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import DictApplication, make_message_update
+from tests.auxil.build_messages import make_message_update
+from tests.auxil.slots import DictApplication, mro_slots
 
 
 class HandlerStates(int, enum.Enum):
@@ -342,7 +343,7 @@ class TestBasePersistence:
 
         return callback
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = TrackingPersistence()
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

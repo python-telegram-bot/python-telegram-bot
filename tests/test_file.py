@@ -24,7 +24,8 @@ import pytest
 
 from telegram import File, FileCredentials, Voice
 from telegram.error import TelegramError
-from tests.conftest import data_file
+from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -93,7 +94,7 @@ class TestFile:
     file_size = 28232
     file_content = "Saint-Saëns".encode()  # Intentionally contains unicode chars.
 
-    def test_slot_behaviour(self, file, mro_slots):
+    def test_slot_behaviour(self, file):
         for attr in file.__slots__:
             assert getattr(file, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(file)) == len(set(mro_slots(file))), "duplicate slot"

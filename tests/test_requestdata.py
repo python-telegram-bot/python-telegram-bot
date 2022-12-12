@@ -25,7 +25,8 @@ import pytest
 from telegram import InputFile, InputMediaPhoto, InputMediaVideo, MessageEntity
 from telegram.request import RequestData
 from telegram.request._requestparameter import RequestParameter
-from tests.conftest import data_file
+from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -130,7 +131,7 @@ def mixed_rqs(mixed_params) -> RequestData:
 
 
 class TestRequestData:
-    def test_slot_behaviour(self, simple_rqs, mro_slots):
+    def test_slot_behaviour(self, simple_rqs):
         for attr in simple_rqs.__slots__:
             assert getattr(simple_rqs, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(simple_rqs)) == len(set(mro_slots(simple_rqs))), "duplicate slot"

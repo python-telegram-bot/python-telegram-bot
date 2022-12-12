@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import PassportElementErrorFile, PassportElementErrorSelfie
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -36,7 +37,7 @@ class TestPassportElementErrorFile:
     file_hash = "file_hash"
     message = "Error message"
 
-    def test_slot_behaviour(self, passport_element_error_file, mro_slots):
+    def test_slot_behaviour(self, passport_element_error_file):
         inst = passport_element_error_file
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

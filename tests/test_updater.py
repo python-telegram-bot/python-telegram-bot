@@ -31,15 +31,12 @@ from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from telegram.request import HTTPXRequest
-from tests.auxil.object_conversions import env_var_2_bool
-from tests.conftest import (
-    DictBot,
-    data_file,
-    make_bot,
-    make_message,
-    make_message_update,
-    send_webhook_message,
-)
+from tests.auxil.build_messages import make_message, make_message_update
+from tests.auxil.ci_bots import make_bot
+from tests.auxil.envvars import env_var_2_bool
+from tests.auxil.files import data_file
+from tests.auxil.networking import send_webhook_message
+from tests.auxil.slots import DictBot, mro_slots
 
 TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
@@ -87,7 +84,7 @@ class TestUpdater:
         self.received = update.message.text
         self.cb_handler_called.set()
 
-    async def test_slot_behaviour(self, updater, mro_slots):
+    async def test_slot_behaviour(self, updater):
         async with updater:
             for at in updater.__slots__:
                 at = f"_Updater{at}" if at.startswith("__") and not at.endswith("__") else at

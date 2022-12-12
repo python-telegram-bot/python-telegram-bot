@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import ChosenInlineResult, Location, User, Voice
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -36,7 +37,7 @@ class TestChosenInlineResult:
     result_id = "result id"
     query = "query text"
 
-    def test_slot_behaviour(self, chosen_inline_result, mro_slots):
+    def test_slot_behaviour(self, chosen_inline_result):
         inst = chosen_inline_result
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

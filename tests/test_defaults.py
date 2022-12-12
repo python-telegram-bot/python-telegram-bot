@@ -25,13 +25,14 @@ import pytest
 
 from telegram import User
 from telegram.ext import Defaults
-from tests.auxil.object_conversions import env_var_2_bool
+from tests.auxil.envvars import env_var_2_bool
+from tests.auxil.slots import mro_slots
 
 TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 class TestDefault:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         a = Defaults(parse_mode="HTML", quote=True)
         for attr in a.__slots__:
             assert getattr(a, attr, "err") != "err", f"got extra slot '{attr}'"

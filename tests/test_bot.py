@@ -75,8 +75,11 @@ from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
 from tests.auxil.bot_method_checks import check_defaults_handling
-from tests.bots import FALLBACKS
-from tests.conftest import GITHUB_ACTION, data_file, expect_bad_request, make_bot
+from tests.auxil.ci_bots import FALLBACKS, make_bot
+from tests.auxil.envvars import GITHUB_ACTION
+from tests.auxil.files import data_file
+from tests.auxil.networking import expect_bad_request
+from tests.auxil.slots import mro_slots
 
 
 def to_camel_case(snake_str):
@@ -211,7 +214,7 @@ class TestBot:
         self.test_flag = None
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
-    def test_slot_behaviour(self, bot_class, bot, mro_slots):
+    def test_slot_behaviour(self, bot_class, bot):
         inst = bot_class(bot.token)
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -19,6 +19,7 @@
 import pytest
 
 from telegram.ext import CallbackContext, ContextTypes
+from tests.auxil.slots import mro_slots
 
 
 class SubClass(CallbackContext):
@@ -26,7 +27,7 @@ class SubClass(CallbackContext):
 
 
 class TestContextTypes:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         instance = ContextTypes()
         for attr in instance.__slots__:
             assert getattr(instance, attr, "err") != "err", f"got extra slot '{attr}'"

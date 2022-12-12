@@ -30,7 +30,8 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.conftest import data_file
+from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -94,7 +95,7 @@ class TestSticker:
 
     premium_animation = File("this_is_an_id", "this_is_an_unique_id")
 
-    def test_slot_behaviour(self, sticker, mro_slots, recwarn):
+    def test_slot_behaviour(self, sticker, recwarn):
         for attr in sticker.__slots__:
             assert getattr(sticker, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(sticker)) == len(set(mro_slots(sticker))), "duplicate slot"

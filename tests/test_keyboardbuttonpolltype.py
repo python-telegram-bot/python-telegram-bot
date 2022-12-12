@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import KeyboardButtonPollType, Poll
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -29,7 +30,7 @@ def keyboard_button_poll_type():
 class TestKeyboardButtonPollType:
     type = Poll.QUIZ
 
-    def test_slot_behaviour(self, keyboard_button_poll_type, mro_slots):
+    def test_slot_behaviour(self, keyboard_button_poll_type):
         inst = keyboard_button_poll_type
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
