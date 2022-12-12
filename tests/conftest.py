@@ -102,11 +102,6 @@ def event_loop(request):
     # loop.close() # instead of closing here, do that at the every end of the test session
 
 
-# Related to the above, see https://stackoverflow.com/a/67307042/10606962
-def pytest_sessionfinish(session, exitstatus):
-    asyncio.get_event_loop().close()
-
-
 @pytest.fixture(scope="session")
 def bot_info():
     return get_bot()
