@@ -53,7 +53,18 @@ from telegram.ext import (
     filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import PROJECT_ROOT_PATH, call_after, make_message_update, send_webhook_message
+from tests.conftest import (
+    PROJECT_ROOT_PATH,
+    call_after,
+    make_bot,
+    make_message_update,
+    send_webhook_message,
+)
+
+
+@pytest.fixture(scope="function")
+def test_bot(bot_info):  # was needed since we get HTTPXRequest not initialized after app tests
+    return make_bot(bot_info)
 
 
 class CustomContext(CallbackContext):
@@ -113,8 +124,8 @@ class TestApplication:
         ):
             self.received = context.error.message
 
-    async def test_slot_behaviour(self, bot, mro_slots):
-        async with ApplicationBuilder().token(bot.token).build() as app:
+    async def test_slot_behaviour(self, test_bot, mro_slots):
+        async with ApplicationBuilder().bot(test_bot).build() as app:
             for at in app.__slots__:
                 at = f"_Application{at}" if at.startswith("__") and not at.endswith("__") else at
                 assert getattr(app, at, "err") != "err", f"got extra slot '{at}'"
@@ -143,12 +154,12 @@ class TestApplication:
         "concurrent_updates, expected", [(0, 0), (4, 4), (False, 0), (True, 256)]
     )
     @pytest.mark.filterwarnings("ignore: `Application` instances should")
-    def test_init(self, bot, concurrent_updates, expected):
+    def test_init(self, test_bot, concurrent_updates, expected):
         update_queue = asyncio.Queue()
         job_queue = JobQueue()
         persistence = PicklePersistence("file_path")
         context_types = ContextTypes()
-        updater = Updater(bot=bot, update_queue=update_queue)
+        updater = Updater(bot=test_bot, update_queue=update_queue)
 
         async def post_init(application: Application) -> None:
             pass
@@ -157,7 +168,7 @@ class TestApplication:
             pass
 
         app = Application(
-            bot=bot,
+            bot=test_bot,
             update_queue=update_queue,
             job_queue=job_queue,
             persistence=persistence,
@@ -167,7 +178,7 @@ class TestApplication:
             post_init=post_init,
             post_shutdown=post_shutdown,
         )
-        assert app.bot is bot
+        assert app.bot is test_bot
         assert app.update_queue is update_queue
         assert app.job_queue is job_queue
         assert app.persistence is persistence
@@ -190,7 +201,7 @@ class TestApplication:
 
         with pytest.raises(ValueError, match="must be a non-negative"):
             Application(
-                bot=bot,
+                bot=test_bot,
                 update_queue=update_queue,
                 job_queue=job_queue,
                 persistence=persistence,
@@ -201,13 +212,13 @@ class TestApplication:
                 post_shutdown=None,
             )
 
-    def test_job_queue(self, bot, app, recwarn):
+    def test_job_queue(self, test_bot, app, recwarn):
         expected_warning = (
             "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
             "`pip install python-telegram-bot[job_queue]`."
         )
         assert app.job_queue is app._job_queue
-        application = ApplicationBuilder().token(bot.token).job_queue(None).build()
+        application = ApplicationBuilder().bot(test_bot).job_queue(None).build()
         assert application.job_queue is None
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == expected_warning
@@ -221,14 +232,14 @@ class TestApplication:
             bot_data=complex,
         )
 
-        application = ApplicationBuilder().token(bot.token).context_types(cc).build()
+        application = ApplicationBuilder().bot(test_bot).context_types(cc).build()
 
         assert isinstance(application.user_data[1], int)
         assert isinstance(application.chat_data[1], float)
         assert isinstance(application.bot_data, complex)
 
     @pytest.mark.parametrize("updater", (True, False))
-    async def test_initialize(self, bot, monkeypatch, updater):
+    async def test_initialize(self, test_bot, monkeypatch, updater):
         """Initialization of persistence is tested test_basepersistence"""
         self.test_flag = set()
 
@@ -244,18 +255,18 @@ class TestApplication:
         )
 
         if updater:
-            app = ApplicationBuilder().token(bot.token).build()
+            app = ApplicationBuilder().bot(test_bot).build()
             await app.initialize()
             assert self.test_flag == {"bot", "updater"}
             await app.shutdown()
         else:
-            app = ApplicationBuilder().token(bot.token).updater(None).build()
+            app = ApplicationBuilder().bot(test_bot).updater(None).build()
             await app.initialize()
             assert self.test_flag == {"bot"}
             await app.shutdown()
 
     @pytest.mark.parametrize("updater", (True, False))
-    async def test_shutdown(self, bot, monkeypatch, updater):
+    async def test_shutdown(self, test_bot, monkeypatch, updater):
         """Shutdown of persistence is tested in test_basepersistence"""
         self.test_flag = set()
 
@@ -271,11 +282,11 @@ class TestApplication:
         )
 
         if updater:
-            async with ApplicationBuilder().token(bot.token).build():
+            async with ApplicationBuilder().bot(test_bot).build():
                 pass
             assert self.test_flag == {"bot", "updater"}
         else:
-            async with ApplicationBuilder().token(bot.token).updater(None).build():
+            async with ApplicationBuilder().bot(test_bot).updater(None).build():
                 pass
             assert self.test_flag == {"bot"}
 
@@ -322,12 +333,12 @@ class TestApplication:
                 await app.shutdown()
             await app.stop()
 
-    async def test_start_not_running_after_failure(self, bot, monkeypatch):
+    async def test_start_not_running_after_failure(self, test_bot, monkeypatch):
         def start(_):
             raise Exception("Test Exception")
 
         monkeypatch.setattr(JobQueue, "start", start)
-        app = ApplicationBuilder().token(bot.token).job_queue(JobQueue()).build()
+        app = ApplicationBuilder().bot(test_bot).job_queue(JobQueue()).build()
 
         async with app:
             with pytest.raises(Exception, match="Test Exception"):
@@ -398,12 +409,12 @@ class TestApplication:
 
     @pytest.mark.parametrize("job_queue", (True, False))
     @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
-    async def test_start_stop_processing_updates(self, bot, job_queue):
+    async def test_start_stop_processing_updates(self, test_bot, job_queue):
         # TODO: repeat a similar test for create_task, persistence processing and job queue
         if job_queue:
-            app = ApplicationBuilder().token(bot.token).build()
+            app = ApplicationBuilder().bot(test_bot).build()
         else:
-            app = ApplicationBuilder().token(bot.token).job_queue(None).build()
+            app = ApplicationBuilder().bot(test_bot).job_queue(None).build()
 
         async def callback(u, c):
             self.received = u
@@ -433,9 +444,10 @@ class TestApplication:
             await asyncio.sleep(0.05)
             assert app.update_queue.empty()
             assert self.received == 1
-
-            await app.updater.start_polling()
-            await app.stop()
+            try:  # just in case start_polling times out
+                await app.updater.start_polling()
+            finally:  # stop the app so it doesn't crash on shutdown
+                await app.stop()
             assert not app.running
             # app.stop() should not stop the updater!
             assert app.updater.running
@@ -636,7 +648,7 @@ class TestApplication:
             await asyncio.sleep(0.05)
             await app.stop()
 
-    async def test_flow_stop(self, app, bot):
+    async def test_flow_stop(self, app, test_bot):
         passed = []
 
         async def start1(b, u):
@@ -661,7 +673,8 @@ class TestApplication:
                 ],
             ),
         )
-        update.message.set_bot(bot)
+        await test_bot.initialize()
+        update.message.set_bot(test_bot)
 
         async with app:
             # If ApplicationHandlerStop raised handlers in other groups should not be called.
@@ -672,7 +685,7 @@ class TestApplication:
             await app.process_update(update)
             assert passed == ["start1"]
 
-    async def test_flow_stop_by_error_handler(self, app, bot):
+    async def test_flow_stop_by_error_handler(self, app):
         passed = []
         exception = Exception("General excepition")
 
@@ -721,7 +734,7 @@ class TestApplication:
         # Higher groups should still be called
         assert self.count == 42
 
-    async def test_error_in_handler_part_2(self, app, bot):
+    async def test_error_in_handler_part_2(self, app, test_bot):
         passed = []
         err = Exception("General exception")
 
@@ -751,7 +764,8 @@ class TestApplication:
                 ],
             ),
         )
-        update.message.set_bot(bot)
+        await test_bot.initialize()
+        update.message.set_bot(test_bot)
 
         async with app:
             # If an unhandled exception was caught, no further handlers from the same group should
@@ -830,7 +844,7 @@ class TestApplication:
 
                 await app.stop()
 
-    async def test_custom_context_error_handler(self, bot):
+    async def test_custom_context_error_handler(self, test_bot):
         async def error_handler(_, context):
             self.received = (
                 type(context),
@@ -841,7 +855,7 @@ class TestApplication:
 
         application = (
             ApplicationBuilder()
-            .token(bot.token)
+            .bot(test_bot)
             .context_types(
                 ContextTypes(
                     context=CustomContext, bot_data=int, user_data=float, chat_data=complex
@@ -859,7 +873,7 @@ class TestApplication:
             await asyncio.sleep(0.05)
             assert self.received == (CustomContext, float, complex, int)
 
-    async def test_custom_context_handler_callback(self, bot):
+    async def test_custom_context_handler_callback(self, test_bot):
         def callback(_, context):
             self.received = (
                 type(context),
@@ -870,7 +884,7 @@ class TestApplication:
 
         application = (
             ApplicationBuilder()
-            .token(bot.token)
+            .bot(test_bot)
             .context_types(
                 ContextTypes(
                     context=CustomContext, bot_data=int, user_data=float, chat_data=complex
@@ -1034,12 +1048,13 @@ class TestApplication:
         ), "incorrect stacklevel!"
 
     @pytest.mark.parametrize(["block", "expected_output"], [(False, 0), (True, 5)])
-    async def test_default_block_error_handler(self, bot, block, expected_output):
+    async def test_default_block_error_handler(self, bot_info, block, expected_output):
         async def error_handler(*args, **kwargs):
             await asyncio.sleep(0.1)
             self.count = 5
 
-        app = Application.builder().token(bot.token).defaults(Defaults(block=block)).build()
+        bot = make_bot(bot_info, defaults=Defaults(block=block))
+        app = Application.builder().bot(bot).build()
         async with app:
             app.add_handler(TypeHandler(object, self.callback_raise_error))
             app.add_error_handler(error_handler)
@@ -1050,8 +1065,9 @@ class TestApplication:
             assert self.count == 5
 
     @pytest.mark.parametrize(["block", "expected_output"], [(False, 0), (True, 5)])
-    async def test_default_block_handler(self, bot, block, expected_output):
-        app = Application.builder().token(bot.token).defaults(Defaults(block=block)).build()
+    async def test_default_block_handler(self, bot_info, block, expected_output):
+        bot = make_bot(bot_info, defaults=Defaults(block=block))
+        app = Application.builder().bot(bot).build()
         async with app:
             app.add_handler(TypeHandler(object, self.callback_set_count(5, sleep=0.1)))
             await app.process_update(1)
@@ -1296,10 +1312,10 @@ class TestApplication:
             await app.stop()
 
     @pytest.mark.parametrize("concurrent_updates", (15, 50, 100))
-    async def test_concurrent_updates(self, bot, concurrent_updates):
+    async def test_concurrent_updates(self, test_bot, concurrent_updates):
         # We don't test with `True` since the large number of parallel coroutines quickly leads
         # to test instabilities
-        app = Application.builder().token(bot.token).concurrent_updates(concurrent_updates).build()
+        app = Application.builder().bot(test_bot).concurrent_updates(concurrent_updates).build()
         events = {i: asyncio.Event() for i in range(app.concurrent_updates + 10)}
         queue = asyncio.Queue()
         for event in events.values():
@@ -1330,8 +1346,8 @@ class TestApplication:
 
             await app.stop()
 
-    async def test_concurrent_updates_done_on_shutdown(self, bot):
-        app = Application.builder().token(bot.token).concurrent_updates(True).build()
+    async def test_concurrent_updates_done_on_shutdown(self, test_bot):
+        app = Application.builder().bot(test_bot).concurrent_updates(True).build()
         event = asyncio.Event()
 
         async def callback(update, context):
@@ -1415,7 +1431,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_polling_post_init(self, bot, monkeypatch):
+    def test_run_polling_post_init(self, test_bot, monkeypatch):
         events = []
 
         async def get_updates(*args, **kwargs):
@@ -1436,7 +1452,7 @@ class TestApplication:
         async def post_init(app: Application) -> None:
             events.append("post_init")
 
-        app = Application.builder().token(bot.token).post_init(post_init).build()
+        app = Application.builder().bot(test_bot).post_init(post_init).build()
         app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         monkeypatch.setattr(
@@ -1458,7 +1474,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_polling_post_shutdown(self, bot, monkeypatch):
+    def test_run_polling_post_shutdown(self, test_bot, monkeypatch):
         events = []
 
         async def get_updates(*args, **kwargs):
@@ -1479,7 +1495,7 @@ class TestApplication:
         async def post_shutdown(app: Application) -> None:
             events.append("post_shutdown")
 
-        app = Application.builder().token(bot.token).post_shutdown(post_shutdown).build()
+        app = Application.builder().bot(test_bot).post_shutdown(post_shutdown).build()
         app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         monkeypatch.setattr(
@@ -1633,7 +1649,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_webhook_post_init(self, bot, monkeypatch):
+    def test_run_webhook_post_init(self, test_bot, monkeypatch):
         events = []
 
         async def delete_webhook(*args, **kwargs):
@@ -1660,7 +1676,7 @@ class TestApplication:
         async def post_init(app: Application) -> None:
             events.append("post_init")
 
-        app = Application.builder().token(bot.token).post_init(post_init).build()
+        app = Application.builder().bot(test_bot).post_init(post_init).build()
         app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
@@ -1693,7 +1709,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_webhook_post_shutdown(self, bot, monkeypatch):
+    def test_run_webhook_post_shutdown(self, test_bot, monkeypatch):
         events = []
 
         async def delete_webhook(*args, **kwargs):
@@ -1720,7 +1736,7 @@ class TestApplication:
         async def post_shutdown(app: Application) -> None:
             events.append("post_shutdown")
 
-        app = Application.builder().token(bot.token).post_shutdown(post_shutdown).build()
+        app = Application.builder().bot(test_bot).post_shutdown(post_shutdown).build()
         app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
@@ -1757,7 +1773,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_webhook_parameters_passing(self, bot, monkeypatch):
+    def test_run_webhook_parameters_passing(self, test_bot, monkeypatch):
         # Check that we pass them correctly
 
         async def start_webhook(_, **kwargs):
@@ -1772,7 +1788,7 @@ class TestApplication:
 
         monkeypatch.setattr(Updater, "start_webhook", start_webhook)
         monkeypatch.setattr(Updater, "stop", stop)
-        app = ApplicationBuilder().token(bot.token).build()
+        app = ApplicationBuilder().bot(test_bot).build()
         app_signature = inspect.signature(app.run_webhook)
 
         for name, param in updater_signature.parameters.items():
@@ -1813,8 +1829,8 @@ class TestApplication:
         assert set(self.received.keys()) == set(expected.keys())
         assert self.received == expected
 
-    def test_run_without_updater(self, bot):
-        app = ApplicationBuilder().token(bot.token).updater(None).build()
+    def test_run_without_updater(self, test_bot):
+        app = ApplicationBuilder().bot(test_bot).updater(None).build()
 
         with pytest.raises(RuntimeError, match="only available if the application has an Updater"):
             app.run_webhook()
@@ -1824,7 +1840,7 @@ class TestApplication:
 
     @pytest.mark.parametrize("method", ["start", "initialize"])
     @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
-    def test_run_error_in_application(self, bot, monkeypatch, method):
+    def test_run_error_in_application(self, test_bot, monkeypatch, method):
         shutdowns = []
 
         async def raise_method(*args, **kwargs):
@@ -1845,7 +1861,7 @@ class TestApplication:
         monkeypatch.setattr(
             Updater, "shutdown", call_after(Updater.shutdown, after_shutdown("updater"))
         )
-        app = ApplicationBuilder().token(bot.token).build()
+        app = ApplicationBuilder().bot(test_bot).build()
         with pytest.raises(RuntimeError, match="Test Exception"):
             app.run_polling(close_loop=False)
 
@@ -1860,7 +1876,7 @@ class TestApplication:
 
     @pytest.mark.parametrize("method", ["start_polling", "start_webhook"])
     @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
-    def test_run_error_in_updater(self, bot, monkeypatch, method):
+    def test_run_error_in_updater(self, test_bot, monkeypatch, method):
         shutdowns = []
 
         async def raise_method(*args, **kwargs):
@@ -1881,7 +1897,7 @@ class TestApplication:
         monkeypatch.setattr(
             Updater, "shutdown", call_after(Updater.shutdown, after_shutdown("updater"))
         )
-        app = ApplicationBuilder().token(bot.token).build()
+        app = ApplicationBuilder().bot(test_bot).build()
         with pytest.raises(RuntimeError, match="Test Exception"):
             if "polling" in method:
                 app.run_polling(close_loop=False)
@@ -1897,12 +1913,12 @@ class TestApplication:
         reason="Only really relevant on windows",
     )
     @pytest.mark.parametrize("method", ["start_polling", "start_webhook"])
-    def test_run_stop_signal_warning_windows(self, bot, method, recwarn, monkeypatch):
+    def test_run_stop_signal_warning_windows(self, test_bot, method, recwarn, monkeypatch):
         async def raise_method(*args, **kwargs):
             raise RuntimeError("Prevent Actually Running")
 
         monkeypatch.setattr(Application, "initialize", raise_method)
-        app = ApplicationBuilder().token(bot.token).build()
+        app = ApplicationBuilder().bot(test_bot).build()
 
         with pytest.raises(RuntimeError, match="Prevent Actually Running"):
             if "polling" in method:
@@ -1942,11 +1958,10 @@ class TestApplication:
         loop = asyncio.get_event_loop()
         monkeypatch.setattr(loop, "add_signal_handler", signal_handler_test)
 
-        async def abort_app():
-            await asyncio.sleep(2)
+        def abort_app():
             raise SystemExit
 
-        loop.create_task(abort_app())
+        loop.call_later(0.5, abort_app)
 
         app.run_polling(close_loop=False)
 
@@ -1956,7 +1971,7 @@ class TestApplication:
             assert received_signals == [signal.SIGINT, signal.SIGTERM, signal.SIGABRT]
 
         received_signals.clear()
-        loop.create_task(abort_app())
+        loop.call_later(0.5, abort_app)
         app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
 
         if platform.system() == "Windows":
