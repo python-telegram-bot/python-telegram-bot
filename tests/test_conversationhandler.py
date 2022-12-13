@@ -24,7 +24,6 @@ from warnings import filterwarnings
 import pytest
 
 from telegram import (
-    Bot,
     CallbackQuery,
     Chat,
     ChosenInlineResult,
@@ -45,7 +44,6 @@ from telegram.ext import (
     CommandHandler,
     ConversationHandler,
     Defaults,
-    ExtBot,
     InlineQueryHandler,
     JobQueue,
     MessageHandler,
@@ -59,7 +57,7 @@ from telegram.ext import (
     filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import make_command_message
+from tests.conftest import DictBot, make_bot, make_command_message
 
 
 @pytest.fixture(scope="class")
@@ -2114,7 +2112,7 @@ class TestConversationHandler:
     @pytest.mark.parametrize("handler_block", [True, False, None])
     @pytest.mark.parametrize("ext_bot", [True, False], ids=["ExtBot", "Bot"])
     async def test_blocking_resolution_order(
-        self, bot, default_block, ch_block, handler_block, ext_bot
+        self, bot_info, default_block, ch_block, handler_block, ext_bot
     ):
 
         event = asyncio.Event()
@@ -2151,7 +2149,7 @@ class TestConversationHandler:
                 fallbacks=[fallback],
             )
 
-        bot = ExtBot(bot.token, defaults=defaults) if ext_bot else Bot(bot.token)
+        bot = make_bot(bot_info, defaults=defaults) if ext_bot else DictBot(bot_info["token"])
         app = ApplicationBuilder().bot(bot).build()
         app.add_handler(conv_handler)
 

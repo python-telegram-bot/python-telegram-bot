@@ -43,7 +43,7 @@ from telegram.ext import (
     filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import DictApplication, make_message_update
+from tests.conftest import DictApplication, make_bot, make_message_update
 
 
 class HandlerStates(int, enum.Enum):
@@ -227,7 +227,11 @@ class PappInput(NamedTuple):
 
 
 def build_papp(
-    token: str, store_data: dict = None, update_interval: float = None, fill_data: bool = False
+    bot_info: dict = None,
+    token: str = None,
+    store_data: dict = None,
+    update_interval: float = None,
+    fill_data: bool = False,
 ) -> Application:
     store_data = PersistenceInput(**(store_data or {}))
     if update_interval is not None:
@@ -237,12 +241,15 @@ def build_papp(
     else:
         persistence = TrackingPersistence(store_data=store_data, fill_data=fill_data)
 
+    if bot_info is not None:
+        bot = make_bot(bot_info, arbitrary_callback_data=True)
+    else:
+        bot = make_bot(token=token, arbitrary_callback_data=True)
     return (
         ApplicationBuilder()
-        .token(token)
+        .bot(bot)
         .persistence(persistence)
         .application_class(DictApplication)
-        .arbitrary_callback_data(True)
         .build()
     )
 
@@ -252,7 +259,7 @@ def build_conversation_handler(name: str, persistent: bool = True) -> BaseHandle
 
 
 @pytest.fixture(scope="function")
-def papp(request, bot) -> Application:
+def papp(request, bot_info) -> Application:
     papp_input = request.param
     store_data = {}
     if papp_input.bot_data is not None:
@@ -265,7 +272,7 @@ def papp(request, bot) -> Application:
         store_data["callback_data"] = papp_input.callback_data
 
     app = build_papp(
-        bot.token,
+        bot_info=bot_info,
         store_data=store_data,
         update_interval=papp_input.update_interval,
         fill_data=papp_input.fill_data,
@@ -998,7 +1005,7 @@ class TestBasePersistence:
             assert papp.persistence.dropped_chat_ids == {1: 1}
             assert papp.persistence.updated_chat_ids == {2: 1}
 
-    async def test_errors_while_persisting(self, bot, caplog):
+    async def test_errors_while_persisting(self, bot_info, caplog):
         class ErrorPersistence(TrackingPersistence):
             def raise_error(self):
                 raise Exception("PersistenceError")
@@ -1032,8 +1039,7 @@ class TestBasePersistence:
 
         app = (
             ApplicationBuilder()
-            .token(bot.token)
-            .arbitrary_callback_data(True)
+            .bot(make_bot(bot_info, arbitrary_callback_data=True))
             .persistence(ErrorPersistence())
             .build()
         )

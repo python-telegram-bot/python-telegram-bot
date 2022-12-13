@@ -261,8 +261,8 @@ class TestBotNoReq:
         "acd_in,maxsize",
         [(True, 1024), (False, 1024), (0, 0), (None, None)],
     )
-    async def test_callback_data_maxsize(self, bot, acd_in, maxsize):
-        async with ExtBot(bot.token, arbitrary_callback_data=acd_in) as acd_bot:
+    async def test_callback_data_maxsize(self, bot_info, acd_in, maxsize):
+        async with make_bot(bot_info, arbitrary_callback_data=acd_in) as acd_bot:
             if acd_in is not False:
                 assert acd_bot.callback_data_cache.maxsize == maxsize
             else:
@@ -1445,7 +1445,7 @@ class TestBotReq:
         async def stop(*args, **kwargs):
             self.test_flag.append("stop")
 
-        temp_bot = Bot(token=bot.token)
+        temp_bot = DictBot(token=bot.token)
         orig_stop = temp_bot.request.shutdown
 
         try:
@@ -1472,7 +1472,7 @@ class TestBotReq:
         monkeypatch.setattr(HTTPXRequest, "initialize", initialize)
         monkeypatch.setattr(HTTPXRequest, "shutdown", shutdown)
 
-        test_bot = Bot(bot.token)
+        test_bot = DictBot(bot.token)
         await test_bot.initialize()
         await test_bot.initialize()
         await test_bot.initialize()

@@ -27,7 +27,7 @@ import time
 import pytest
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
-from tests.conftest import TEST_WITH_OPT_DEPS
+from tests.conftest import TEST_WITH_OPT_DEPS, make_bot
 
 if TEST_WITH_OPT_DEPS:
     import pytz
@@ -266,8 +266,8 @@ class TestJobQueue:
         await asyncio.sleep(0.3)
         assert self.result == 1
 
-    async def test_in_application(self, bot):
-        app = ApplicationBuilder().token(bot.token).build()
+    async def test_in_application(self, bot_info):
+        app = ApplicationBuilder().bot(make_bot(bot_info)).build()
         async with app:
             assert not app.job_queue.scheduler.running
             await app.start()
