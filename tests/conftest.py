@@ -69,9 +69,18 @@ def pytest_collection_modifyitems(items: List[pytest.Item]):
             and parent.name.endswith("Req")
             and not parent.get_closest_marker(name="flaky")
         ):
-            parent.add_marker(pytest.mark.flaky(3, 1))
+            parent.add_marker(pytest.mark.flaky(3, 1, rerun_filter=no_rerun_after_xfail_or_flood))
         elif parent.name.endswith("NoReq") and not parent.get_closest_marker(name="no_req"):
             parent.add_marker(pytest.mark.no_req)
+
+
+def no_rerun_after_xfail_or_flood(error, name, test: pytest.Function, plugin):
+    """Don't rerun tests that have xfailed when marked with xfail, or when we hit a flood limit."""
+    xfail_present = test.get_closest_marker(name="xfail")
+    did_we_flood = "flood" in getattr(error[1], "msg", "")  # _pytest.outcomes.XFailed has 'msg'
+    if xfail_present or did_we_flood:
+        return False
+    return True
 
 
 GITHUB_ACTION = os.getenv("GITHUB_ACTION", False)
