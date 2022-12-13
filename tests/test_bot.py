@@ -146,7 +146,7 @@ xfail = pytest.mark.xfail(
 )
 
 
-def bot_methods(ext_bot=True):
+def bot_methods(ext_bot=True, include_camel_case=False):
     arg_values = []
     ids = []
     non_api_methods = [
@@ -165,6 +165,8 @@ def bot_methods(ext_bot=True):
     for cls in classes:
         for name, attribute in inspect.getmembers(cls, predicate=inspect.isfunction):
             if name.startswith("_") or name in non_api_methods:
+                continue
+            if not include_camel_case and any(x.isupper() for x in name):
                 continue
             arg_values.append((cls, name, attribute))
             ids.append(f"{cls.__name__}.{name}")
@@ -1433,9 +1435,6 @@ class TestBotNoReq:
     @bot_methods()
     def test_coroutine_functions(self, bot_class, bot_method_name, bot_method):
         """Check that all bot methods are defined as async def  ..."""
-        # not islower() skips the camelcase aliases
-        if not bot_method_name.islower():
-            return
         # unfortunately `inspect.iscoroutinefunction` doesn't do the trick directly,
         # as the @_log decorator interferes
         source = "".join(inspect.getsourcelines(bot_method)[0])
