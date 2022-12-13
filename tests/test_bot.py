@@ -1433,14 +1433,10 @@ class TestBotNoReq:
         assert camel_case_function is bot_method, f"{camel_case_name} is not {bot_method}"
 
     @bot_methods()
-    def test_coroutine_functions(self, bot_class, bot_method_name, bot_method):
+    def test_coroutine_functions(self, bot_class, bot_method_name, bot_method, monkeypatch):
         """Check that all bot methods are defined as async def  ..."""
-        # unfortunately `inspect.iscoroutinefunction` doesn't do the trick directly,
-        # as the @_log decorator interferes
-        source = "".join(inspect.getsourcelines(bot_method)[0])
-        assert (
-            f"async def {bot_method_name}" in source
-        ), f"{bot_method_name} should be a coroutine function"
+        meth = getattr(bot_method, "__wrapped__", bot_method)
+        assert inspect.iscoroutinefunction(meth), f"{bot_method_name} must be a coroutine function"
 
     @bot_methods()
     def test_api_kwargs_and_timeouts_present(self, bot_class, bot_method_name, bot_method):
