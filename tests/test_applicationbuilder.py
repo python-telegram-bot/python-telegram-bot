@@ -38,7 +38,8 @@ from telegram.ext import (
 from telegram.ext._applicationbuilder import _BOT_CHECKS
 from telegram.request import HTTPXRequest
 
-from .conftest import PRIVATE_KEY, data_file, env_var_2_bool
+from .auxil.object_conversions import env_var_2_bool
+from .conftest import PRIVATE_KEY, data_file
 
 TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 

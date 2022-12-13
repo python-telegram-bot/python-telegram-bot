@@ -28,7 +28,7 @@ from telegram import CallbackQuery, Chat, InlineKeyboardButton, InlineKeyboardMa
 from telegram._utils.datetime import UTC
 from telegram.ext import ExtBot
 from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
-from tests.conftest import env_var_2_bool
+from tests.auxil.object_conversions import env_var_2_bool
 
 
 @pytest.fixture(scope="function")

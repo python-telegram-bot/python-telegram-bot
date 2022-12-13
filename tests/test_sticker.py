@@ -25,12 +25,12 @@ import pytest
 from telegram import Audio, Bot, File, InputFile, MaskPosition, PhotoSize, Sticker, StickerSet
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
-from tests.conftest import (
+from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
-    data_file,
 )
+from tests.conftest import data_file
 
 
 @pytest.fixture(scope="function")
