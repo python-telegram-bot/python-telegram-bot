@@ -1366,6 +1366,140 @@ class TestBotNoReq:
             message_thread_id=1,
         )
 
+    # In the following tests we check that get_updates inserts callback data correctly if necessary
+    # The same must be done in the webhook updater. This is tested over at test_updater.py, but
+    # here we test more extensively.
+
+    async def test_arbitrary_callback_data_no_insert(self, monkeypatch, cdc_bot):
+        """Updates that don't need insertion shouldn't fail obviously"""
+        bot = cdc_bot
+
+        async def post(*args, **kwargs):
+            update = Update(
+                17,
+                poll=Poll(
+                    "42",
+                    "question",
+                    options=[PollOption("option", 0)],
+                    total_voter_count=0,
+                    is_closed=False,
+                    is_anonymous=True,
+                    type=Poll.REGULAR,
+                    allows_multiple_answers=False,
+                ),
+            )
+            return [update.to_dict()]
+
+        try:
+            monkeypatch.setattr(BaseRequest, "post", post)
+            updates = await bot.get_updates(timeout=1)
+
+            assert len(updates) == 1
+            assert updates[0].update_id == 17
+            assert updates[0].poll.id == "42"
+        finally:
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+
+    @pytest.mark.parametrize(
+        "message_type", ["channel_post", "edited_channel_post", "message", "edited_message"]
+    )
+    async def test_arbitrary_callback_data_pinned_message_reply_to_message(
+        self, cdc_bot, monkeypatch, message_type
+    ):
+        bot = cdc_bot
+
+        reply_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text="text", callback_data="callback_data")
+        )
+
+        message = Message(
+            1,
+            dtm.datetime.utcnow(),
+            None,
+            reply_markup=bot.callback_data_cache.process_keyboard(reply_markup),
+        )
+        message._unfreeze()
+        # We do to_dict -> de_json to make sure those aren't the same objects
+        message.pinned_message = Message.de_json(message.to_dict(), bot)
+
+        async def post(*args, **kwargs):
+            update = Update(
+                17,
+                **{
+                    message_type: Message(
+                        1,
+                        dtm.datetime.utcnow(),
+                        None,
+                        pinned_message=message,
+                        reply_to_message=Message.de_json(message.to_dict(), bot),
+                    )
+                },
+            )
+            return [update.to_dict()]
+
+        try:
+            monkeypatch.setattr(BaseRequest, "post", post)
+            updates = await bot.get_updates(timeout=1)
+
+            assert isinstance(updates, tuple)
+            assert len(updates) == 1
+
+            effective_message = updates[0][message_type]
+            assert (
+                effective_message.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data
+                == "callback_data"
+            )
+            assert (
+                effective_message.pinned_message.reply_markup.inline_keyboard[0][0].callback_data
+                == "callback_data"
+            )
+
+            pinned_message = effective_message.reply_to_message.pinned_message
+            assert (
+                pinned_message.reply_markup.inline_keyboard[0][0].callback_data == "callback_data"
+            )
+
+        finally:
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+
+    async def test_get_updates_invalid_callback_data(self, cdc_bot, monkeypatch):
+        bot = cdc_bot
+
+        async def post(*args, **kwargs):
+            return [
+                Update(
+                    17,
+                    callback_query=CallbackQuery(
+                        id=1,
+                        from_user=None,
+                        chat_instance=123,
+                        data="invalid data",
+                        message=Message(
+                            1,
+                            from_user=User(1, "", False),
+                            date=dtm.datetime.utcnow(),
+                            chat=Chat(1, ""),
+                            text="Webhook",
+                        ),
+                    ),
+                ).to_dict()
+            ]
+
+        try:
+            monkeypatch.setattr(BaseRequest, "post", post)
+            updates = await bot.get_updates(timeout=1)
+
+            assert isinstance(updates, tuple)
+            assert len(updates) == 1
+            assert isinstance(updates[0].callback_query.data, InvalidCallbackData)
+
+        finally:
+            # Reset b/c bots scope is session
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+
     # TODO: Needs improvement. We need incoming inline query to test answer.
     async def test_replace_callback_data_answer_inline_query(self, monkeypatch, cdc_bot, chat_id):
         bot = cdc_bot
@@ -1418,6 +1552,49 @@ class TestBotNoReq:
 
             assert await bot.answer_inline_query(chat_id, results=results)
 
+        finally:
+            bot.callback_data_cache.clear_callback_data()
+            bot.callback_data_cache.clear_callback_queries()
+
+    @pytest.mark.parametrize(
+        "message_type", ["channel_post", "edited_channel_post", "message", "edited_message"]
+    )
+    @pytest.mark.parametrize("self_sender", [True, False])
+    async def test_arbitrary_callback_data_via_bot(
+        self, cdc_bot, monkeypatch, self_sender, message_type
+    ):
+        bot = cdc_bot
+        reply_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text="text", callback_data="callback_data")
+        )
+
+        reply_markup = bot.callback_data_cache.process_keyboard(reply_markup)
+        message = Message(
+            1,
+            dtm.datetime.utcnow(),
+            None,
+            reply_markup=reply_markup,
+            via_bot=bot.bot if self_sender else User(1, "first", False),
+        )
+
+        async def post(*args, **kwargs):
+            return [Update(17, **{message_type: message}).to_dict()]
+
+        try:
+            monkeypatch.setattr(BaseRequest, "post", post)
+            updates = await bot.get_updates(timeout=1)
+
+            assert isinstance(updates, tuple)
+            assert len(updates) == 1
+
+            message = updates[0][message_type]
+            if self_sender:
+                assert message.reply_markup.inline_keyboard[0][0].callback_data == "callback_data"
+            else:
+                assert (
+                    message.reply_markup.inline_keyboard[0][0].callback_data
+                    == reply_markup.inline_keyboard[0][0].callback_data
+                )
         finally:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
@@ -2101,43 +2278,6 @@ class TestBotReq:
         assert isinstance(updates, tuple)
         if updates:
             assert isinstance(updates[0], Update)
-
-    async def test_get_updates_invalid_callback_data(self, cdc_bot, monkeypatch):
-        bot = cdc_bot
-
-        async def post(*args, **kwargs):
-            return [
-                Update(
-                    17,
-                    callback_query=CallbackQuery(
-                        id=1,
-                        from_user=None,
-                        chat_instance=123,
-                        data="invalid data",
-                        message=Message(
-                            1,
-                            from_user=User(1, "", False),
-                            date=dtm.datetime.utcnow(),
-                            chat=Chat(1, ""),
-                            text="Webhook",
-                        ),
-                    ),
-                ).to_dict()
-            ]
-
-        try:
-            await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-            monkeypatch.setattr(BaseRequest, "post", post)
-            updates = await bot.get_updates(timeout=1)
-
-            assert isinstance(updates, tuple)
-            assert len(updates) == 1
-            assert isinstance(updates[0].callback_query.data, InvalidCallbackData)
-
-        finally:
-            # Reset b/c bots scope is session
-            bot.callback_data_cache.clear_callback_data()
-            bot.callback_data_cache.clear_callback_queries()
 
     @pytest.mark.parametrize("use_ip", [True, False])
     # local file path as file_input is tested below in test_set_webhook_params
@@ -2901,6 +3041,7 @@ class TestBotReq:
         else:
             assert len(message.caption_entities) == 0
 
+    # Continue testing arbitrary callback data here with actual requests:
     async def test_replace_callback_data_send_message(self, cdc_bot, chat_id):
         bot = cdc_bot
 
@@ -3016,106 +3157,6 @@ class TestBotReq:
             bot.callback_data_cache.clear_callback_queries()
             await bot.unpin_all_chat_messages(super_group_id)
 
-    # In the following tests we check that get_updates inserts callback data correctly if necessary
-    # The same must be done in the webhook updater. This is tested over at test_updater.py, but
-    # here we test more extensively.
-
-    async def test_arbitrary_callback_data_no_insert(self, monkeypatch, cdc_bot):
-        """Updates that don't need insertion shouldn't fail obviously"""
-        bot = cdc_bot
-
-        async def post(*args, **kwargs):
-            update = Update(
-                17,
-                poll=Poll(
-                    "42",
-                    "question",
-                    options=[PollOption("option", 0)],
-                    total_voter_count=0,
-                    is_closed=False,
-                    is_anonymous=True,
-                    type=Poll.REGULAR,
-                    allows_multiple_answers=False,
-                ),
-            )
-            return [update.to_dict()]
-
-        try:
-            monkeypatch.setattr(BaseRequest, "post", post)
-            await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-            updates = await bot.get_updates(timeout=1)
-
-            assert len(updates) == 1
-            assert updates[0].update_id == 17
-            assert updates[0].poll.id == "42"
-        finally:
-            bot.callback_data_cache.clear_callback_data()
-            bot.callback_data_cache.clear_callback_queries()
-
-    @pytest.mark.parametrize(
-        "message_type", ["channel_post", "edited_channel_post", "message", "edited_message"]
-    )
-    async def test_arbitrary_callback_data_pinned_message_reply_to_message(
-        self, super_group_id, cdc_bot, monkeypatch, message_type
-    ):
-        bot = cdc_bot
-
-        reply_markup = InlineKeyboardMarkup.from_button(
-            InlineKeyboardButton(text="text", callback_data="callback_data")
-        )
-
-        message = Message(
-            1,
-            dtm.datetime.utcnow(),
-            None,
-            reply_markup=bot.callback_data_cache.process_keyboard(reply_markup),
-        )
-        message._unfreeze()
-        # We do to_dict -> de_json to make sure those aren't the same objects
-        message.pinned_message = Message.de_json(message.to_dict(), bot)
-
-        async def post(*args, **kwargs):
-            update = Update(
-                17,
-                **{
-                    message_type: Message(
-                        1,
-                        dtm.datetime.utcnow(),
-                        None,
-                        pinned_message=message,
-                        reply_to_message=Message.de_json(message.to_dict(), bot),
-                    )
-                },
-            )
-            return [update.to_dict()]
-
-        try:
-            monkeypatch.setattr(BaseRequest, "post", post)
-            await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-            updates = await bot.get_updates(timeout=1)
-
-            assert isinstance(updates, tuple)
-            assert len(updates) == 1
-
-            effective_message = updates[0][message_type]
-            assert (
-                effective_message.reply_to_message.reply_markup.inline_keyboard[0][0].callback_data
-                == "callback_data"
-            )
-            assert (
-                effective_message.pinned_message.reply_markup.inline_keyboard[0][0].callback_data
-                == "callback_data"
-            )
-
-            pinned_message = effective_message.reply_to_message.pinned_message
-            assert (
-                pinned_message.reply_markup.inline_keyboard[0][0].callback_data == "callback_data"
-            )
-
-        finally:
-            bot.callback_data_cache.clear_callback_data()
-            bot.callback_data_cache.clear_callback_queries()
-
     async def test_arbitrary_callback_data_get_chat_no_pinned_message(
         self, super_group_id, cdc_bot
     ):
@@ -3128,50 +3169,6 @@ class TestBotReq:
             assert isinstance(chat, Chat)
             assert int(chat.id) == int(super_group_id)
             assert chat.pinned_message is None
-        finally:
-            bot.callback_data_cache.clear_callback_data()
-            bot.callback_data_cache.clear_callback_queries()
-
-    @pytest.mark.parametrize(
-        "message_type", ["channel_post", "edited_channel_post", "message", "edited_message"]
-    )
-    @pytest.mark.parametrize("self_sender", [True, False])
-    async def test_arbitrary_callback_data_via_bot(
-        self, super_group_id, cdc_bot, monkeypatch, self_sender, message_type
-    ):
-        bot = cdc_bot
-        reply_markup = InlineKeyboardMarkup.from_button(
-            InlineKeyboardButton(text="text", callback_data="callback_data")
-        )
-
-        reply_markup = bot.callback_data_cache.process_keyboard(reply_markup)
-        message = Message(
-            1,
-            dtm.datetime.utcnow(),
-            None,
-            reply_markup=reply_markup,
-            via_bot=bot.bot if self_sender else User(1, "first", False),
-        )
-
-        async def post(*args, **kwargs):
-            return [Update(17, **{message_type: message}).to_dict()]
-
-        try:
-            monkeypatch.setattr(BaseRequest, "post", post)
-            await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-            updates = await bot.get_updates(timeout=1)
-
-            assert isinstance(updates, tuple)
-            assert len(updates) == 1
-
-            message = updates[0][message_type]
-            if self_sender:
-                assert message.reply_markup.inline_keyboard[0][0].callback_data == "callback_data"
-            else:
-                assert (
-                    message.reply_markup.inline_keyboard[0][0].callback_data
-                    == reply_markup.inline_keyboard[0][0].callback_data
-                )
         finally:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
