@@ -42,6 +42,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         If an InlineQueryResultVideo message contains an embedded video (e.g., YouTube), you must
         replace its content using :attr:`input_message_content`.
 
+    .. seealso:: `Working with Files and Media <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-

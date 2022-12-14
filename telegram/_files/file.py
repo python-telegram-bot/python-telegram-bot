@@ -139,6 +139,9 @@ class File(TelegramObject):
             original file in order to decrypt the file without changing the existing one
             in-place.
 
+        .. seealso:: `Working with Files and Media <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+
         .. versionchanged:: 20.0
 
             * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
@@ -221,6 +224,9 @@ class File(TelegramObject):
         Download this file into memory. :paramref:`out` needs to be supplied with a
         :obj:`io.BufferedIOBase`, the file contents will be saved to that object using the
         :obj:`out.write<io.BufferedIOBase.write>` method.
+
+        .. seealso:: `Working with Files and Media <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
 
         .. versionadded:: 20.0
 

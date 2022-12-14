@@ -37,6 +37,9 @@ class InlineQueryResultAudio(InlineQueryResult):
     Alternatively, you can use :attr:`input_message_content` to send a message with the specified
     content instead of the audio.
 
+    .. seealso:: `Working with Files and Media <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
