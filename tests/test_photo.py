@@ -401,19 +401,6 @@ class TestPhotoReq:
         assert photo.file_id != ""
         assert photo.file_unique_id != ""
 
-    async def test_send_url_gif_file(self, bot, chat_id):
-        message = await bot.send_photo(
-            photo="http://dummyimage.com/600x400/000/fff.png&text=telegram", chat_id=chat_id
-        )
-
-        photo = message.photo[-1]
-
-        assert isinstance(photo, PhotoSize)
-        assert isinstance(photo.file_id, str)
-        assert isinstance(photo.file_unique_id, str)
-        assert photo.file_id != ""
-        assert photo.file_unique_id != ""
-
     async def test_send_file_unicode_filename(self, bot, chat_id):
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202

@@ -84,33 +84,45 @@ class TestInvoiceNoReq:
         assert invoice_dict["currency"] == invoice.currency
         assert invoice_dict["total_amount"] == invoice.total_amount
 
-    async def test_send_all_args_create_invoice_link(
-        self, bot, chat_id, provider_token, monkeypatch
-    ):
+    async def test_send_invoice_all_args_mock(self, bot, monkeypatch):
+        # We do this one as safety guard to make sure that we pass all of the optional
+        # parameters correctly because #2526 went unnoticed for 3 years …
         async def make_assertion(*args, **_):
             kwargs = args[1]
-            return (
-                kwargs["title"] == "title"
-                and kwargs["description"] == "description"
-                and kwargs["payload"] == "payload"
-                and kwargs["provider_token"] == "provider_token"
-                and kwargs["currency"] == "currency"
-                and kwargs["prices"] == Space.prices
-                and kwargs["max_tip_amount"] == "max_tip_amount"
-                and kwargs["suggested_tip_amounts"] == "suggested_tip_amounts"
-                and kwargs["provider_data"] == "provider_data"
-                and kwargs["photo_url"] == "photo_url"
-                and kwargs["photo_size"] == "photo_size"
-                and kwargs["photo_width"] == "photo_width"
-                and kwargs["photo_height"] == "photo_height"
-                and kwargs["need_name"] == "need_name"
-                and kwargs["need_phone_number"] == "need_phone_number"
-                and kwargs["need_email"] == "need_email"
-                and kwargs["need_shipping_address"] == "need_shipping_address"
-                and kwargs["send_phone_number_to_provider"] == "send_phone_number_to_provider"
-                and kwargs["send_email_to_provider"] == "send_email_to_provider"
-                and kwargs["is_flexible"] == "is_flexible"
-            )
+            return all([kwargs[i] == i for i in kwargs])
+
+        monkeypatch.setattr(bot, "_send_message", make_assertion)
+        assert await bot.send_invoice(
+            chat_id="chat_id",
+            title="title",
+            description="description",
+            payload="payload",
+            provider_token="provider_token",
+            currency="currency",
+            prices="prices",
+            max_tip_amount="max_tip_amount",
+            suggested_tip_amounts="suggested_tip_amounts",
+            start_parameter="start_parameter",
+            provider_data="provider_data",
+            photo_url="photo_url",
+            photo_size="photo_size",
+            photo_width="photo_width",
+            photo_height="photo_height",
+            need_name="need_name",
+            need_phone_number="need_phone_number",
+            need_email="need_email",
+            need_shipping_address="need_shipping_address",
+            send_phone_number_to_provider="send_phone_number_to_provider",
+            send_email_to_provider="send_email_to_provider",
+            is_flexible="is_flexible",
+            disable_notification=True,
+            protect_content=True,
+        )
+
+    async def test_send_all_args_create_invoice_link(self, bot, monkeypatch):
+        async def make_assertion(*args, **_):
+            kwargs = args[1]
+            return all([kwargs[i] == i for i in kwargs])
 
         monkeypatch.setattr(bot, "_post", make_assertion)
         assert await bot.create_invoice_link(
@@ -119,7 +131,7 @@ class TestInvoiceNoReq:
             payload="payload",
             provider_token="provider_token",
             currency="currency",
-            prices=Space.prices,
+            prices="prices",
             max_tip_amount="max_tip_amount",
             suggested_tip_amounts="suggested_tip_amounts",
             provider_data="provider_data",
@@ -281,7 +293,7 @@ class TestInvoiceReq:
                     reply_to_message_id=reply_to_message.message_id,
                 )
 
-    async def test_send_all_args_send_invoice(self, bot, chat_id, provider_token, monkeypatch):
+    async def test_send_all_args_send_invoice(self, bot, chat_id, provider_token):
         message = await bot.send_invoice(
             chat_id,
             Space.title,
@@ -295,8 +307,7 @@ class TestInvoiceReq:
             start_parameter=Space.start_parameter,
             provider_data=Space.provider_data,
             photo_url="https://raw.githubusercontent.com/"
-            "python-telegram-bot/logos/master/"
-            "logo/png/ptb-logo_240.png",
+            "python-telegram-bot/logos/master/logo/png/ptb-logo_240.png",
             photo_size=240,
             photo_width=240,
             photo_height=240,
@@ -311,66 +322,6 @@ class TestInvoiceReq:
             protect_content=True,
         )
 
-        assert message.invoice.currency == Space.currency
-        assert message.invoice.start_parameter == Space.start_parameter
-        assert message.invoice.description == Space.description
-        assert message.invoice.title == Space.title
-        assert message.invoice.total_amount == Space.total_amount
+        for attr in message.invoice.__slots__:
+            assert getattr(message.invoice, attr) == getattr(Space, attr)
         assert message.has_protected_content
-
-        # We do this next one as safety guard to make sure that we pass all of the optional
-        # parameters correctly because #2526 went unnoticed for 3 years …
-        async def make_assertion(*args, **_):
-            kwargs = args[1]
-            return (
-                kwargs["chat_id"] == "chat_id"
-                and kwargs["title"] == "title"
-                and kwargs["description"] == "description"
-                and kwargs["payload"] == "payload"
-                and kwargs["provider_token"] == "provider_token"
-                and kwargs["currency"] == "currency"
-                and kwargs["prices"] == Space.prices
-                and kwargs["max_tip_amount"] == "max_tip_amount"
-                and kwargs["suggested_tip_amounts"] == "suggested_tip_amounts"
-                and kwargs["start_parameter"] == "start_parameter"
-                and kwargs["provider_data"] == "provider_data"
-                and kwargs["photo_url"] == "photo_url"
-                and kwargs["photo_size"] == "photo_size"
-                and kwargs["photo_width"] == "photo_width"
-                and kwargs["photo_height"] == "photo_height"
-                and kwargs["need_name"] == "need_name"
-                and kwargs["need_phone_number"] == "need_phone_number"
-                and kwargs["need_email"] == "need_email"
-                and kwargs["need_shipping_address"] == "need_shipping_address"
-                and kwargs["send_phone_number_to_provider"] == "send_phone_number_to_provider"
-                and kwargs["send_email_to_provider"] == "send_email_to_provider"
-                and kwargs["is_flexible"] == "is_flexible"
-            )
-
-        monkeypatch.setattr(bot, "_send_message", make_assertion)
-        assert await bot.send_invoice(
-            chat_id="chat_id",
-            title="title",
-            description="description",
-            payload="payload",
-            provider_token="provider_token",
-            currency="currency",
-            prices=Space.prices,
-            max_tip_amount="max_tip_amount",
-            suggested_tip_amounts="suggested_tip_amounts",
-            start_parameter="start_parameter",
-            provider_data="provider_data",
-            photo_url="photo_url",
-            photo_size="photo_size",
-            photo_width="photo_width",
-            photo_height="photo_height",
-            need_name="need_name",
-            need_phone_number="need_phone_number",
-            need_email="need_email",
-            need_shipping_address="need_shipping_address",
-            send_phone_number_to_provider="send_phone_number_to_provider",
-            send_email_to_provider="send_email_to_provider",
-            is_flexible="is_flexible",
-            disable_notification=True,
-            protect_content=True,
-        )
