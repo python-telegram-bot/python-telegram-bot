@@ -383,9 +383,12 @@ class TestStickerReq:
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_sticker_default_protect_content(self, chat_id, sticker, default_bot):
-        protected = await default_bot.send_sticker(chat_id, sticker)
+        tasks = asyncio.gather(
+            default_bot.send_sticker(chat_id, sticker),
+            default_bot.send_sticker(chat_id, sticker, protect_content=False),
+        )
+        protected, unprotected = await tasks
         assert protected.has_protected_content
-        unprotected = await default_bot.send_sticker(chat_id, sticker, protect_content=False)
         assert not unprotected.has_protected_content
 
     async def test_premium_animation(self, bot):
@@ -758,17 +761,20 @@ class TestStickerSetReq:
             # chat_id was hardcoded as 95205500 but it stopped working for some reason
             file = await bot.upload_sticker_file(chat_id, f)
         assert file
-        assert await bot.add_sticker_to_set(
-            chat_id, f"test_by_{bot.username}", png_sticker=file.file_id, emojis="😄"
+
+        tasks = asyncio.gather(
+            bot.add_sticker_to_set(
+                chat_id, f"test_by_{bot.username}", png_sticker=file.file_id, emojis="😄"
+            ),
+            bot.add_sticker_to_set(  # Also test with file input and mask
+                chat_id,
+                f"test_by_{bot.username}",
+                png_sticker=sticker_file,
+                emojis="😄",
+                mask_position=MaskPosition(MaskPosition.EYES, -1, 1, 2),
+            ),
         )
-        # Also test with file input and mask
-        assert await bot.add_sticker_to_set(
-            chat_id,
-            f"test_by_{bot.username}",
-            png_sticker=sticker_file,
-            emojis="😄",
-            mask_position=MaskPosition(MaskPosition.EYES, -1, 1, 2),
-        )
+        assert all(await tasks)
 
     async def test_bot_methods_1_tgs(self, bot, chat_id):
         assert await bot.add_sticker_to_set(
@@ -804,12 +810,13 @@ class TestStickerSetReq:
     async def test_bot_methods_3_tgs(
         self, bot, chat_id, animated_sticker_file, animated_sticker_set
     ):
-        await asyncio.sleep(1)
         animated_test = f"animated_test_by_{bot.username}"
-        assert await bot.set_sticker_set_thumb(animated_test, chat_id, animated_sticker_file)
         file_id = animated_sticker_set.stickers[-1].file_id
-        # also test with file input and mask
-        assert await bot.set_sticker_set_thumb(animated_test, chat_id, file_id)
+        tasks = asyncio.gather(
+            bot.set_sticker_set_thumb(animated_test, chat_id, animated_sticker_file),
+            bot.set_sticker_set_thumb(animated_test, chat_id, file_id),
+        )
+        assert all(await tasks)
 
     # TODO: Try the below by creating a custom .webm and not by downloading another pack's thumb
     @pytest.mark.skip(
@@ -820,17 +827,14 @@ class TestStickerSetReq:
         pass
 
     async def test_bot_methods_4_png(self, bot, sticker_set):
-        await asyncio.sleep(1)
         file_id = sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
     async def test_bot_methods_4_tgs(self, bot, animated_sticker_set):
-        await asyncio.sleep(1)
         file_id = animated_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
     async def test_bot_methods_4_webm(self, bot, video_sticker_set):
-        await asyncio.sleep(1)
         file_id = video_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 

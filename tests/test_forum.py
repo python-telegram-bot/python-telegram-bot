@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
+
 import pytest
 
 from telegram import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopicReopened, Sticker
@@ -225,22 +227,20 @@ class TestForumTopicReq:
     @pytest.mark.xfail(reason="Can fail due to race conditions in GH actions CI")
     async def test_unpin_all_forum_topic_messages(self, bot, forum_group_id, real_topic):
         message_thread_id = real_topic.message_thread_id
+        pin_msg_tasks = set()
 
-        msgs = [
-            await (
-                await bot.send_message(
-                    chat_id=forum_group_id, text=TEST_MSG_TEXT, message_thread_id=message_thread_id
-                )
-            ).pin()
+        awaitables = {
+            bot.send_message(forum_group_id, TEST_MSG_TEXT, message_thread_id=message_thread_id)
             for _ in range(2)
-        ]
+        }
+        for coro in asyncio.as_completed(awaitables):
+            msg = await coro
+            pin_msg_tasks.add(asyncio.create_task(msg.pin()))
 
-        assert all(msgs) is True, "Message(s) were not pinned"
+        assert all([await task for task in pin_msg_tasks]) is True, "Message(s) were not pinned"
 
         # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
-        result = await bot.unpin_all_forum_topic_messages(
-            chat_id=forum_group_id, message_thread_id=message_thread_id
-        )
+        result = await bot.unpin_all_forum_topic_messages(forum_group_id, message_thread_id)
         assert result is True, "Failed to unpin all the messages in forum topic"
 
 

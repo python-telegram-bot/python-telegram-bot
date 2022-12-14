@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import copy
 
 import pytest
@@ -675,13 +676,13 @@ class TestSendMediaGroupReq:
 
     async def test_send_media_group_all_args(self, bot, raw_bot, chat_id, media_group):
         ext_bot = bot
-        for bot in (ext_bot, raw_bot):
-            # We need to test 1) below both the bot and raw_bot and setting this up with
-            # pytest.parametrize appears to be difficult ...
-
-            m1 = await bot.send_message(chat_id, text="test")
+        # We need to test 1) below both the bot and raw_bot and setting this up with
+        # pytest.parametrize appears to be difficult ...
+        aws = {b.send_message(chat_id, text="test") for b in (ext_bot, raw_bot)}
+        for msg_task in asyncio.as_completed(aws):
+            m1 = await msg_task
             copied_media_group = copy.copy(media_group)
-            messages = await bot.send_media_group(
+            messages = await m1.get_bot().send_media_group(
                 chat_id,
                 media_group,
                 disable_notification=True,
@@ -744,11 +745,12 @@ class TestSendMediaGroupReq:
     async def test_send_media_group_default_protect_content(
         self, chat_id, media_group, default_bot
     ):
-        protected = await default_bot.send_media_group(chat_id, media_group)
-        assert all(msg.has_protected_content for msg in protected)
-        unprotected = await default_bot.send_media_group(
-            chat_id, media_group, protect_content=False
+        tasks = asyncio.gather(
+            default_bot.send_media_group(chat_id, media_group),
+            default_bot.send_media_group(chat_id, media_group, protect_content=False),
         )
+        protected, unprotected = await tasks
+        assert all(msg.has_protected_content for msg in protected)
         assert not all(msg.has_protected_content for msg in unprotected)
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True)
@@ -762,19 +764,21 @@ class TestSendMediaGroupReq:
         # make sure no parse_mode was set as a side effect
         assert not any(item.parse_mode for item in media_group_no_caption_args)
 
-        overridden_markdown_v2 = await default_bot.send_media_group(
-            chat_id,
-            media_group_no_caption_args.copy(),
-            caption="*photo* 1",
-            parse_mode=ParseMode.MARKDOWN_V2,
+        tasks = asyncio.gather(
+            default_bot.send_media_group(
+                chat_id,
+                media_group_no_caption_args.copy(),
+                caption="*photo* 1",
+                parse_mode=ParseMode.MARKDOWN_V2,
+            ),
+            default_bot.send_media_group(
+                chat_id,
+                media_group_no_caption_args.copy(),
+                caption="<b>photo</b> 1",
+                parse_mode=None,
+            ),
         )
-
-        overridden_none = await default_bot.send_media_group(
-            chat_id,
-            media_group_no_caption_args.copy(),
-            caption="<b>photo</b> 1",
-            parse_mode=None,
-        )
+        overridden_markdown_v2, overridden_none = await tasks
 
         # Make sure first message got the caption, which will lead to Telegram
         # displaying its caption as group caption
@@ -797,15 +801,18 @@ class TestSendMediaGroupReq:
 
     async def test_edit_message_media(self, bot, raw_bot, chat_id, media_group):
         ext_bot = bot
-        for bot in (ext_bot, raw_bot):
-            # We need to test 1) below both the bot and raw_bot and setting this up with
-            # pytest.parametrize appears to be difficult ...
-            messages = await bot.send_media_group(chat_id, media_group)
+        # We need to test 1) below both the bot and raw_bot and setting this up with
+        # pytest.parametrize appears to be difficult ...
+        aws = {b.send_media_group(chat_id, media_group) for b in (ext_bot, raw_bot)}
+        for msg_task in asyncio.as_completed(aws):
+            messages = await msg_task
             cid = messages[-1].chat.id
             mid = messages[-1].message_id
             copied_media = copy.copy(media_group[0])
-            new_message = await bot.edit_message_media(
-                chat_id=cid, message_id=mid, media=media_group[0]
+            new_message = (
+                await messages[-1]
+                .get_bot()
+                .edit_message_media(chat_id=cid, message_id=mid, media=media_group[0])
             )
             assert isinstance(new_message, Message)
 

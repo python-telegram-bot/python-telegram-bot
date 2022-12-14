@@ -1494,25 +1494,28 @@ class TestBotReq:
         assert forward_message.forward_from.username == message.from_user.username
         assert isinstance(forward_message.forward_date, dtm.datetime)
 
-    async def test_forward_protected_message(self, bot, message, chat_id):
-        to_forward_protected = await bot.send_message(
-            chat_id, "cant forward me", protect_content=True
+    async def test_forward_protected_message(self, bot, chat_id):
+        tasks = asyncio.gather(
+            bot.send_message(chat_id, "cant forward me", protect_content=True),
+            bot.send_message(chat_id, "forward me", protect_content=False),
         )
+        to_forward_protected, to_forward_unprotected = await tasks
+
         assert to_forward_protected.has_protected_content
-
-        with pytest.raises(BadRequest, match="can't be forwarded"):
-            await to_forward_protected.forward(chat_id)
-
-        to_forward_unprotected = await bot.send_message(
-            chat_id, "forward me", protect_content=False
-        )
         assert not to_forward_unprotected.has_protected_content
+
         forwarded_but_now_protected = await to_forward_unprotected.forward(
             chat_id, protect_content=True
         )
         assert forwarded_but_now_protected.has_protected_content
-        with pytest.raises(BadRequest, match="can't be forwarded"):
-            await forwarded_but_now_protected.forward(chat_id)
+
+        tasks = asyncio.gather(
+            to_forward_protected.forward(chat_id),
+            forwarded_but_now_protected.forward(chat_id),
+            return_exceptions=True,
+        )
+        result = await tasks
+        assert all("can't be forwarded" in str(exc) for exc in result)
 
     async def test_delete_message(self, bot, chat_id):
         message = await bot.send_message(chat_id, text="will be deleted")
@@ -1539,17 +1542,25 @@ class TestBotReq:
         google_place_id = "google_place id"
         google_place_type = "google_place type"
 
-        message = await bot.send_venue(
-            chat_id=chat_id,
-            title=title,
-            address=address,
-            latitude=latitude,
-            longitude=longitude,
-            foursquare_id=foursquare_id,
-            foursquare_type=foursquare_type,
-            protect_content=True,
+        tasks = asyncio.gather(
+            *(
+                bot.send_venue(
+                    chat_id=chat_id,
+                    title=title,
+                    address=address,
+                    latitude=latitude,
+                    longitude=longitude,
+                    protect_content=True,
+                    **i,
+                )
+                for i in (
+                    {"foursquare_id": foursquare_id, "foursquare_type": foursquare_type},
+                    {"google_place_id": google_place_id, "google_place_type": google_place_type},
+                )
+            ),
         )
 
+        message, message2 = await tasks
         assert message.venue
         assert message.venue.title == title
         assert message.venue.address == address
@@ -1561,27 +1572,16 @@ class TestBotReq:
         assert message.venue.google_place_type is None
         assert message.has_protected_content
 
-        message = await bot.send_venue(
-            chat_id=chat_id,
-            title=title,
-            address=address,
-            latitude=latitude,
-            longitude=longitude,
-            google_place_id=google_place_id,
-            google_place_type=google_place_type,
-            protect_content=True,
-        )
-
-        assert message.venue
-        assert message.venue.title == title
-        assert message.venue.address == address
-        assert message.venue.location.latitude == latitude
-        assert message.venue.location.longitude == longitude
-        assert message.venue.google_place_id == google_place_id
-        assert message.venue.google_place_type == google_place_type
-        assert message.venue.foursquare_id is None
-        assert message.venue.foursquare_type is None
-        assert message.has_protected_content
+        assert message2.venue
+        assert message2.venue.title == title
+        assert message2.venue.address == address
+        assert message2.venue.location.latitude == latitude
+        assert message2.venue.location.longitude == longitude
+        assert message2.venue.google_place_id == google_place_id
+        assert message2.venue.google_place_type == google_place_type
+        assert message2.venue.foursquare_id is None
+        assert message2.venue.foursquare_type is None
+        assert message2.has_protected_content
 
     async def test_send_contact(self, bot, chat_id):
         phone_number = "+11234567890"
@@ -1617,16 +1617,36 @@ class TestBotReq:
     async def test_send_and_stop_poll(self, bot, super_group_id, reply_markup):
         question = "Is this a test?"
         answers = ["Yes", "No", "Maybe"]
-        message = await bot.send_poll(
-            chat_id=super_group_id,
-            question=question,
-            options=answers,
-            is_anonymous=False,
-            allows_multiple_answers=True,
-            read_timeout=60,
-            protect_content=True,
+        explanation = "[Here is a link](https://google.com)"
+        explanation_entities = [
+            MessageEntity(MessageEntity.TEXT_LINK, 0, 14, url="https://google.com")
+        ]
+
+        poll_task = asyncio.create_task(
+            bot.send_poll(
+                chat_id=super_group_id,
+                question=question,
+                options=answers,
+                is_anonymous=False,
+                allows_multiple_answers=True,
+                read_timeout=60,
+                protect_content=True,
+            )
+        )
+        quiz_task = asyncio.create_task(
+            bot.send_poll(
+                chat_id=super_group_id,
+                question=question,
+                options=answers,
+                type=Poll.QUIZ,
+                correct_option_id=2,
+                is_closed=True,
+                explanation=explanation,
+                explanation_parse_mode=ParseMode.MARKDOWN_V2,
+            )
         )
 
+        message = await poll_task
         assert message.poll
         assert message.poll.question == question
         assert message.poll.options[0].text == answers[0]
@@ -1657,25 +1677,13 @@ class TestBotReq:
         assert poll.question == question
         assert poll.total_voter_count == 0
 
-        explanation = "[Here is a link](https://google.com)"
-        explanation_entities = [
-            MessageEntity(MessageEntity.TEXT_LINK, 0, 14, url="https://google.com")
-        ]
-        message_quiz = await bot.send_poll(
-            chat_id=super_group_id,
-            question=question,
-            options=answers,
-            type=Poll.QUIZ,
-            correct_option_id=2,
-            is_closed=True,
-            explanation=explanation,
-            explanation_parse_mode=ParseMode.MARKDOWN_V2,
-        )
+        message_quiz = await quiz_task
         assert message_quiz.poll.correct_option_id == 2
         assert message_quiz.poll.type == Poll.QUIZ
         assert message_quiz.poll.is_closed
         assert message_quiz.poll.explanation == "Here is a link"
         assert message_quiz.poll.explanation_entities == tuple(explanation_entities)
+        assert poll_task.done() and quiz_task.done()
 
     @pytest.mark.parametrize(
         ["open_period", "close_date"], [(5, None), (None, True)], ids=["open_period", "close_date"]
@@ -1770,47 +1778,34 @@ class TestBotReq:
         question = "Is this a test?"
         answers = ["Yes", "No", "Maybe"]
 
-        message = await default_bot.send_poll(
-            chat_id=super_group_id,
-            question=question,
-            options=answers,
-            type=Poll.QUIZ,
-            correct_option_id=2,
-            is_closed=True,
-            explanation=explanation_markdown,
+        tasks = asyncio.gather(
+            *(
+                default_bot.send_poll(
+                    chat_id=super_group_id,
+                    question=question,
+                    options=answers,
+                    type=Poll.QUIZ,
+                    correct_option_id=2,
+                    is_closed=True,
+                    explanation=explanation_markdown,
+                    **i,
+                )
+                for i in ({}, {"explanation_parse_mode": None}, {"explanation_parse_mode": "HTML"})
+            ),
         )
-        assert message.poll.explanation == explanation
-        assert message.poll.explanation_entities == (
+        message1, message2, message3 = await tasks
+        assert message1.poll.explanation == explanation
+        assert message1.poll.explanation_entities == (
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.BOLD, 7, 4),
             MessageEntity(MessageEntity.CODE, 12, 4),
         )
 
-        message = await default_bot.send_poll(
-            chat_id=super_group_id,
-            question=question,
-            options=answers,
-            type=Poll.QUIZ,
-            correct_option_id=2,
-            is_closed=True,
-            explanation=explanation_markdown,
-            explanation_parse_mode=None,
-        )
-        assert message.poll.explanation == explanation_markdown
-        assert message.poll.explanation_entities == ()
+        assert message2.poll.explanation == explanation_markdown
+        assert message2.poll.explanation_entities == ()
 
-        message = await default_bot.send_poll(
-            chat_id=super_group_id,
-            question=question,
-            options=answers,
-            type=Poll.QUIZ,
-            correct_option_id=2,
-            is_closed=True,
-            explanation=explanation_markdown,
-            explanation_parse_mode="HTML",
-        )
-        assert message.poll.explanation == explanation_markdown
-        assert message.poll.explanation_entities == ()
+        assert message3.poll.explanation == explanation_markdown
+        assert message3.poll.explanation_entities == ()
 
     @pytest.mark.parametrize(
         "default_bot,custom",
@@ -1856,11 +1851,12 @@ class TestBotReq:
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_poll_default_protect_content(self, chat_id, default_bot):
-        protected_poll = await default_bot.send_poll(chat_id, "Test", ["1", "2"])
-        assert protected_poll.has_protected_content
-        unprotect_poll = await default_bot.send_poll(
-            chat_id, "test", ["1", "2"], protect_content=False
+        tasks = asyncio.gather(
+            default_bot.send_poll(chat_id, "Test", ["1", "2"]),
+            default_bot.send_poll(chat_id, "test", ["1", "2"], protect_content=False),
         )
+        protected_poll, unprotect_poll = await tasks
+        assert protected_poll.has_protected_content
         assert not unprotect_poll.has_protected_content
 
     @pytest.mark.parametrize("emoji", Dice.ALL_EMOJI + [None])
@@ -1909,9 +1905,11 @@ class TestBotReq:
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_dice_default_protect_content(self, chat_id, default_bot):
-        protected_dice = await default_bot.send_dice(chat_id)
+        tasks = asyncio.gather(
+            default_bot.send_dice(chat_id), default_bot.send_dice(chat_id, protect_content=False)
+        )
+        protected_dice, unprotected_dice = await tasks
         assert protected_dice.has_protected_content
-        unprotected_dice = await default_bot.send_dice(chat_id, protect_content=False)
         assert not unprotected_dice.has_protected_content
 
     @pytest.mark.parametrize("chat_action", list(ChatAction))
@@ -2625,49 +2623,43 @@ class TestBotReq:
         assert await bot.set_chat_description(channel_id, "Time: " + str(time.time()))
 
     async def test_pin_and_unpin_message(self, bot, super_group_id):
-        message1 = await bot.send_message(super_group_id, text="test_pin_message_1")
-        message2 = await bot.send_message(super_group_id, text="test_pin_message_2")
-        message3 = await bot.send_message(super_group_id, text="test_pin_message_3")
+        messages = []  # contains the Messages we sent
+        pinned_messages_tasks = set()  # contains the asyncio.Tasks that pin the messages
 
-        assert await bot.pin_chat_message(
-            chat_id=super_group_id,
-            message_id=message1.message_id,
-            disable_notification=True,
-            read_timeout=10,
-        )
-        await asyncio.sleep(1)
+        # Let's send 3 messages so we can pin them
+        awaitables = {bot.send_message(super_group_id, f"test_pin_message_{i}") for i in range(3)}
 
-        await bot.pin_chat_message(
-            chat_id=super_group_id,
-            message_id=message2.message_id,
-            disable_notification=True,
-            read_timeout=10,
-        )
-        await bot.pin_chat_message(
-            chat_id=super_group_id,
-            message_id=message3.message_id,
-            disable_notification=True,
-            read_timeout=10,
-        )
-        await asyncio.sleep(1)
+        # We will pin the messages immediately after sending them
+        for sending_msg in asyncio.as_completed(awaitables):  # as_completed sends the messages
+            msg = await sending_msg
+            coro = bot.pin_chat_message(super_group_id, msg.message_id, True, read_timeout=10)
+            pinned_messages_tasks.add(asyncio.create_task(coro))  # start pinning the message
+            messages.append(msg)
 
-        chat = await bot.get_chat(super_group_id)
-        assert chat.pinned_message == message3
+        assert len(messages) == 3  # Check if we sent 3 messages
 
-        assert await bot.unpin_chat_message(
-            super_group_id,
-            message_id=message2.message_id,
-            read_timeout=10,
-        )
-        assert await bot.unpin_chat_message(
-            super_group_id,
-            read_timeout=10,
-        )
+        assert all([await i for i in pinned_messages_tasks])  # Check if we pinned 3 messages
+        assert all([i.done() for i in pinned_messages_tasks])  # Check if all tasks are done
 
-        assert await bot.unpin_all_chat_messages(
-            super_group_id,
-            read_timeout=10,
+        chat = await bot.get_chat(super_group_id)  # get the chat to check the pinned message
+        assert chat.pinned_message in messages
+
+        # Determine which message is not the most recently pinned
+        for old_pin_msg in messages:
+            if chat.pinned_message != old_pin_msg:
+                break
+
+        # Test unpinning our messages
+        tasks = asyncio.gather(
+            bot.unpin_chat_message(  # unpins any message except the most recent
+                chat_id=super_group_id,  # because we don't want to accidentally unpin the same msg
+                message_id=old_pin_msg.message_id,  # twice
+                read_timeout=10,
+            ),
+            bot.unpin_chat_message(chat_id=super_group_id, read_timeout=10),  # unpins most recent
         )
+        assert all(await tasks)
+        assert await bot.unpin_all_chat_messages(super_group_id, read_timeout=10)
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
     # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers
@@ -2693,24 +2685,30 @@ class TestBotReq:
         test_string = "Italic Bold Code"
         test_markdown_string = "_Italic_ *Bold* `Code`"
 
-        message = await default_bot.send_message(chat_id, test_markdown_string)
-        assert message.text_markdown == test_markdown_string
-        assert message.text == test_string
+        tasks = asyncio.gather(
+            *(
+                default_bot.send_message(chat_id, test_markdown_string, **i)
+                for i in ({}, {"parse_mode": None}, {"parse_mode": "HTML"})
+            )
+        )
+        msg1, msg2, msg3 = await tasks
+        assert msg1.text_markdown == test_markdown_string
+        assert msg1.text == test_string
 
-        message = await default_bot.send_message(chat_id, test_markdown_string, parse_mode=None)
-        assert message.text == test_markdown_string
-        assert message.text_markdown == escape_markdown(test_markdown_string)
+        assert msg2.text == test_markdown_string
+        assert msg2.text_markdown == escape_markdown(test_markdown_string)
 
-        message = await default_bot.send_message(chat_id, test_markdown_string, parse_mode="HTML")
-        assert message.text == test_markdown_string
-        assert message.text_markdown == escape_markdown(test_markdown_string)
+        assert msg3.text == test_markdown_string
+        assert msg3.text_markdown == escape_markdown(test_markdown_string)
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_message_default_protect_content(self, default_bot, chat_id):
-        to_check = await default_bot.send_message(chat_id, "test")
+        tasks = asyncio.gather(
+            default_bot.send_message(chat_id, "test"),
+            default_bot.send_message(chat_id, "test", protect_content=False),
+        )
+        to_check, no_protect = await tasks
         assert to_check.has_protected_content
-
-        no_protect = await default_bot.send_message(chat_id, "test", protect_content=False)
         assert not no_protect.has_protected_content
 
     @pytest.mark.parametrize(
@@ -2748,14 +2746,14 @@ class TestBotReq:
 
     async def test_get_set_my_default_administrator_rights(self, bot):
         # Test that my default administrator rights for group are as all False
-        await bot.set_my_default_administrator_rights()
+        assert await bot.set_my_default_administrator_rights()  # clear any set rights
         my_admin_rights_grp = await bot.get_my_default_administrator_rights()
         assert isinstance(my_admin_rights_grp, ChatAdministratorRights)
         assert all(not getattr(my_admin_rights_grp, at) for at in my_admin_rights_grp.__slots__)
 
         # Test setting my default admin rights for channel
         my_rights = ChatAdministratorRights.all_rights()
-        await bot.set_my_default_administrator_rights(my_rights, for_channels=True)
+        assert await bot.set_my_default_administrator_rights(my_rights, for_channels=True)
         my_admin_rights_ch = await bot.get_my_default_administrator_rights(for_channels=True)
         assert my_admin_rights_ch.can_invite_users is my_rights.can_invite_users
         # tg bug? is_anonymous is False despite setting it True for channels:
@@ -2780,20 +2778,20 @@ class TestBotReq:
 
         # Test setting our chat menu button to Webapp.
         my_menu = MenuButtonWebApp("click me!", WebAppInfo("https://telegram.org/"))
-        await bot.set_chat_menu_button(chat_id=chat_id, menu_button=my_menu)
+        assert await bot.set_chat_menu_button(chat_id=chat_id, menu_button=my_menu)
         menu_button = await bot.get_chat_menu_button(chat_id)
         assert isinstance(menu_button, MenuButtonWebApp)
         assert menu_button.type == MenuButtonType.WEB_APP
         assert menu_button.text == my_menu.text
         assert menu_button.web_app.url == my_menu.web_app.url
 
-        await bot.set_chat_menu_button(chat_id=chat_id, menu_button=MenuButtonDefault())
+        assert await bot.set_chat_menu_button(chat_id=chat_id, menu_button=MenuButtonDefault())
         menu_button = await bot.get_chat_menu_button(chat_id=chat_id)
         assert isinstance(menu_button, MenuButtonDefault)
 
     async def test_set_and_get_my_commands(self, bot):
         commands = [BotCommand("cmd1", "descr1"), ["cmd2", "descr2"]]
-        await bot.set_my_commands([])
+        assert await bot.set_my_commands([])
         assert await bot.get_my_commands() == ()
         assert await bot.set_my_commands(commands)
 
@@ -2808,26 +2806,32 @@ class TestBotReq:
         private_scope = BotCommandScopeChat(chat_id)
 
         # Set supergroup command list with lang code and check if the same can be returned from api
-        await bot.set_my_commands(group_cmds, scope=group_scope, language_code="en")
+        assert await bot.set_my_commands(group_cmds, scope=group_scope, language_code="en")
         gotten_group_cmds = await bot.get_my_commands(scope=group_scope, language_code="en")
 
         assert len(gotten_group_cmds) == len(group_cmds)
         assert gotten_group_cmds[0].command == group_cmds[0].command
 
         # Set private command list and check if same can be returned from the api
-        await bot.set_my_commands(private_cmds, scope=private_scope)
+        assert await bot.set_my_commands(private_cmds, scope=private_scope)
         gotten_private_cmd = await bot.get_my_commands(scope=private_scope)
 
         assert len(gotten_private_cmd) == len(private_cmds)
         assert gotten_private_cmd[0].command == private_cmds[0].command
 
         # Delete command list from that supergroup and private chat-
-        await bot.delete_my_commands(private_scope)
-        await bot.delete_my_commands(group_scope, "en")
+        tasks = asyncio.gather(
+            bot.delete_my_commands(private_scope),
+            bot.delete_my_commands(group_scope, "en"),
+        )
+        assert all(await tasks)
 
         # Check if its been deleted-
-        deleted_priv_cmds = await bot.get_my_commands(scope=private_scope)
-        deleted_grp_cmds = await bot.get_my_commands(scope=group_scope, language_code="en")
+        tasks = asyncio.gather(
+            bot.get_my_commands(private_scope),
+            bot.get_my_commands(group_scope, "en"),
+        )
+        deleted_priv_cmds, deleted_grp_cmds = await tasks
 
         assert len(deleted_grp_cmds) == 0 == len(group_cmds) - 1
         assert len(deleted_priv_cmds) == 0 == len(private_cmds) - 1

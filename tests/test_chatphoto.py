@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+import asyncio
 import os
 from pathlib import Path
 
@@ -157,23 +158,18 @@ class TestChatPhotoReq:
         if jpg_file.is_file():
             jpg_file.unlink()
 
-        new_file = await bot.get_file(chat_photo.small_file_id)
+        tasks = {bot.get_file(chat_photo.small_file_id), bot.get_file(chat_photo.big_file_id)}
 
-        assert new_file.file_unique_id == chat_photo.small_file_unique_id
-        assert new_file.file_path.startswith("https://")
+        for task in asyncio.as_completed(tasks):
+            file = await task
+            assert file.file_unique_id in (
+                chat_photo.small_file_unique_id,
+                chat_photo.big_file_unique_id,
+            )
+            assert file.file_path.startswith("https://")
 
-        await new_file.download_to_drive(jpg_file)
-
-        assert jpg_file.is_file()
-
-        new_file = await bot.get_file(chat_photo.big_file_id)
-
-        assert new_file.file_unique_id == chat_photo.big_file_unique_id
-        assert new_file.file_path.startswith("https://")
-
-        await new_file.download_to_drive(jpg_file)
-
-        assert jpg_file.is_file()
+            await file.download_to_drive(jpg_file)
+            assert jpg_file.is_file()
 
     async def test_send_all_args(
         self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file

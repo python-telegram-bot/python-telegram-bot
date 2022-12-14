@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
+
 import pytest
 
 from telegram import Location, Venue
@@ -175,7 +177,10 @@ class TestVenueReq:
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_venue_default_protect_content(self, default_bot, chat_id, venue):
-        protected = await default_bot.send_venue(chat_id, venue=venue)
+        tasks = asyncio.gather(
+            default_bot.send_venue(chat_id, venue=venue),
+            default_bot.send_venue(chat_id, venue=venue, protect_content=False),
+        )
+        protected, unprotected = await tasks
         assert protected.has_protected_content
-        unprotected = await default_bot.send_venue(chat_id, venue=venue, protect_content=False)
         assert not unprotected.has_protected_content

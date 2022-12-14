@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import os
 from pathlib import Path
 
@@ -276,9 +277,12 @@ class TestVoiceReq:
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_voice_default_protect_content(self, chat_id, default_bot, voice):
-        protected = await default_bot.send_voice(chat_id, voice)
+        tasks = asyncio.gather(
+            default_bot.send_voice(chat_id, voice),
+            default_bot.send_voice(chat_id, voice, protect_content=False),
+        )
+        protected, unprotected = await tasks
         assert protected.has_protected_content
-        unprotected = await default_bot.send_voice(chat_id, voice, protect_content=False)
         assert not unprotected.has_protected_content
 
     @pytest.mark.parametrize(

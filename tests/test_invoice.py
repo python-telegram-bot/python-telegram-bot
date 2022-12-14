@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
+
 import pytest
 
 from telegram import Invoice, LabeledPrice
@@ -170,57 +172,61 @@ class TestInvoiceNoReq:
 
 class TestInvoiceReq:
     async def test_send_required_args_only(self, bot, chat_id, provider_token):
-        message = await bot.send_invoice(
-            chat_id=chat_id,
-            title=Space.title,
-            description=Space.description,
-            payload=Space.payload,
-            provider_token=provider_token,
-            currency=Space.currency,
-            prices=Space.prices,
+        send_inv_task = asyncio.create_task(
+            bot.send_invoice(
+                chat_id=chat_id,
+                title=Space.title,
+                description=Space.description,
+                payload=Space.payload,
+                provider_token=provider_token,
+                currency=Space.currency,
+                prices=Space.prices,
+            )
+        )
+        create_inv_link_task = asyncio.create_task(
+            bot.create_invoice_link(
+                title=Space.title,
+                description=Space.description,
+                payload=Space.payload,
+                provider_token=provider_token,
+                currency=Space.currency,
+                prices=Space.prices,
+            )
         )
 
+        message = await send_inv_task
         assert message.invoice.currency == Space.currency
         assert message.invoice.start_parameter == ""
         assert message.invoice.description == Space.description
         assert message.invoice.title == Space.title
         assert message.invoice.total_amount == Space.total_amount
 
-        link = await bot.create_invoice_link(
-            title=Space.title,
-            description=Space.description,
-            payload=Space.payload,
-            provider_token=provider_token,
-            currency=Space.currency,
-            prices=Space.prices,
-        )
+        link = await create_inv_link_task
         assert isinstance(link, str)
         assert link != ""
+        assert send_inv_task.done() and create_inv_link_task.done()
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_invoice_default_protect_content(
         self, chat_id, default_bot, provider_token
     ):
-        protected = await default_bot.send_invoice(
-            chat_id,
-            Space.title,
-            Space.description,
-            Space.payload,
-            provider_token,
-            Space.currency,
-            Space.prices,
+        tasks = asyncio.gather(
+            *(
+                default_bot.send_invoice(
+                    chat_id,
+                    Space.title,
+                    Space.description,
+                    Space.payload,
+                    provider_token,
+                    Space.currency,
+                    Space.prices,
+                    **i,
+                )
+                for i in ({}, {"protect_content": False})
+            )
         )
+        protected, unprotected = await tasks
         assert protected.has_protected_content
-        unprotected = await default_bot.send_invoice(
-            chat_id,
-            Space.title,
-            Space.description,
-            Space.payload,
-            provider_token,
-            Space.currency,
-            Space.prices,
-            protect_content=False,
-        )
         assert not unprotected.has_protected_content
 
     @pytest.mark.parametrize(

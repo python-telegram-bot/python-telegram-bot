@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import os
 from pathlib import Path
 
@@ -332,12 +333,13 @@ class TestAnimationReq:
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_animation_default_protect_content(self, default_bot, chat_id, animation):
-        animation_protected = await default_bot.send_animation(chat_id, animation)
-        assert animation_protected.has_protected_content
-        ani_unprotected = await default_bot.send_animation(
-            chat_id, animation, protect_content=False
+        tasks = asyncio.gather(
+            default_bot.send_animation(chat_id, animation),
+            default_bot.send_animation(chat_id, animation, protect_content=False),
         )
-        assert not ani_unprotected.has_protected_content
+        anim_protected, anim_unprotected = await tasks
+        assert anim_protected.has_protected_content
+        assert not anim_unprotected.has_protected_content
 
     async def test_resend(self, bot, chat_id, animation):
         message = await bot.send_animation(chat_id, animation.file_id)

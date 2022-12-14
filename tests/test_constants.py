@@ -16,9 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import json
-
-import pytest
 
 from telegram import constants
 from telegram._utils.enum import IntEnum, StringEnum
@@ -131,23 +130,23 @@ class TestConstantsNoReq:
 
 class TestConstantsReq:
     async def test_max_message_length(self, bot, chat_id):
-        await bot.send_message(chat_id=chat_id, text="a" * constants.MessageLimit.MAX_TEXT_LENGTH)
-
-        with pytest.raises(
-            BadRequest,
-            match="Message is too long",
-        ):
-            await bot.send_message(
-                chat_id=chat_id, text="a" * (constants.MessageLimit.MAX_TEXT_LENGTH + 1)
-            )
+        tasks = asyncio.gather(
+            bot.send_message(chat_id, text="a" * constants.MessageLimit.MAX_TEXT_LENGTH),
+            bot.send_message(chat_id, text="a" * (constants.MessageLimit.MAX_TEXT_LENGTH + 1)),
+            return_exceptions=True,
+        )
+        results = await tasks
+        assert len(results) == 2
+        assert isinstance(results[1], BadRequest) and "Message is too long" in str(results[1])
 
     async def test_max_caption_length(self, bot, chat_id):
         good_caption = "a" * constants.MessageLimit.CAPTION_LENGTH
-        with data_file("telegram.png").open("rb") as f:
-            good_msg = await bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
-        assert good_msg.caption == good_caption
-
         bad_caption = good_caption + "Z"
-        match = "Message caption is too long"
-        with pytest.raises(BadRequest, match=match), data_file("telegram.png").open("rb") as f:
-            await bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
+        tasks = asyncio.gather(
+            bot.send_photo(chat_id, data_file("telegram.png").read_bytes(), good_caption),
+            bot.send_photo(chat_id, data_file("telegram.png").read_bytes(), bad_caption),
+            return_exceptions=True,
+        )
+        good_msg, bad_msg = await tasks
+        assert good_msg.caption == good_caption
+        assert isinstance(bad_msg, BadRequest) and "Message caption is too long" in str(bad_msg)

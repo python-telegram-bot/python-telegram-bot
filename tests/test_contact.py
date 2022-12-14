@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+import asyncio
+
 import pytest
 
 from telegram import Contact, Voice
@@ -161,9 +163,10 @@ class TestContactReq:
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_contact_default_protect_content(self, chat_id, default_bot, contact):
-        protected = await default_bot.send_contact(chat_id, contact=contact)
-        assert protected.has_protected_content
-        unprotected = await default_bot.send_contact(
-            chat_id, contact=contact, protect_content=False
+        tasks = asyncio.gather(
+            default_bot.send_contact(chat_id, contact=contact),
+            default_bot.send_contact(chat_id, contact=contact, protect_content=False),
         )
+        protected, unprotected = await tasks
+        assert protected.has_protected_content
         assert not unprotected.has_protected_content
