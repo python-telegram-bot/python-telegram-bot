@@ -37,15 +37,15 @@ from tests.conftest import TEST_WITH_OPT_DEPS
     TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
 class TestNoPassportNoReq:
-    def test_bot_init(self, bot_info, monkeypatch):
+    def test_bot_init(self, bot_info):
         with pytest.raises(RuntimeError, match="passport"):
             bot.Bot(bot_info["token"], private_key=1, private_key_password=2)
 
-    def test_credentials_decrypt(self, monkeypatch):
+    def test_credentials_decrypt(self):
         with pytest.raises(RuntimeError, match="passport"):
             credentials.decrypt(1, 1, 1)
 
-    def test_encrypted_credentials_decrypted_secret(self, monkeypatch):
+    def test_encrypted_credentials_decrypted_secret(self):
         ec = credentials.EncryptedCredentials("data", "hash", "secret")
         with pytest.raises(RuntimeError, match="passport"):
             ec.decrypted_secret

@@ -125,7 +125,6 @@ class TestAudioNoReq:
             monkeypatch.setattr(bot, "_post", make_assertion)
             await bot.send_audio(chat_id, file, thumb=file)
             assert test_flag
-            monkeypatch.delattr(bot, "_post")
         finally:
             bot._local_mode = False
 

@@ -214,7 +214,6 @@ class TestChatNoReq:
 
         monkeypatch.setattr(chat.get_bot(), "send_chat_action", make_assertion)
         assert await chat.send_action(action=ChatAction.TYPING)
-        assert await chat.send_action(action=ChatAction.TYPING)
 
     async def test_leave(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):

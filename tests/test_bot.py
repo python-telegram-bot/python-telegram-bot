@@ -982,7 +982,7 @@ class TestBotNoReq:
     async def test_get_file_local_mode(self, bot, monkeypatch):
         path = str(data_file("game.gif"))
 
-        async def _post(*args, **kwargs):
+        async def make_assertion(*args, **kwargs):
             return {
                 "file_id": None,
                 "file_unique_id": None,
@@ -990,12 +990,11 @@ class TestBotNoReq:
                 "file_path": path,
             }
 
-        monkeypatch.setattr(bot, "_post", _post)
+        monkeypatch.setattr(bot, "_post", make_assertion)
 
         resulting_path = (await bot.get_file("file_id")).file_path
         assert bot.token not in resulting_path
         assert resulting_path == path
-        monkeypatch.delattr(bot, "_post")
 
     # TODO: Needs improvement. No feasible way to test until bots can add members.
     async def test_ban_chat_member(self, monkeypatch, bot):
@@ -1014,7 +1013,6 @@ class TestBotNoReq:
         assert await bot.ban_chat_member(2, 32, until_date=until)
         assert await bot.ban_chat_member(2, 32, until_date=1577887200)
         assert await bot.ban_chat_member(2, 32, revoke_messages=True)
-        monkeypatch.delattr(bot.request, "post")
 
     async def test_ban_chat_member_default_tz(self, monkeypatch, tz_bot):
         until = dtm.datetime(2020, 1, 11, 16, 13)
@@ -1043,7 +1041,6 @@ class TestBotNoReq:
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.ban_chat_sender_chat(2, 32)
-        monkeypatch.delattr(bot.request, "post")
 
     # TODO: Needs improvement.
     @pytest.mark.parametrize("only_if_banned", [True, False, None])

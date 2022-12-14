@@ -88,7 +88,6 @@ class TestAnimationNoReq:
         monkeypatch.setattr(bot.request, "post", make_assertion)
 
         assert await bot.send_animation(chat_id, animation_file, filename="custom_filename")
-        monkeypatch.delattr(bot.request, "post")
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_animation_local_files(self, monkeypatch, bot, chat_id, local_mode):
@@ -111,7 +110,6 @@ class TestAnimationNoReq:
             monkeypatch.setattr(bot, "_post", make_assertion)
             await bot.send_animation(chat_id, file, thumb=file)
             assert test_flag
-            monkeypatch.delattr(bot, "_post")
         finally:
             bot._local_mode = False
 

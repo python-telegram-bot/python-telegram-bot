@@ -171,9 +171,7 @@ class TestChatPhotoReq:
             await file.download_to_drive(jpg_file)
             assert jpg_file.is_file()
 
-    async def test_send_all_args(
-        self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file
-    ):
+    async def test_send_all_args(self, bot, super_group_id, chatphoto_file):
         async def func():
             assert await bot.set_chat_photo(super_group_id, chatphoto_file)
 

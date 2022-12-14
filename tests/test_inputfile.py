@@ -65,7 +65,7 @@ class TestInputFileNoReq:
             assert input_file.attach_name is None
             assert input_file.attach_uri is None
 
-    def test_mimetypes(self, caplog):
+    def test_mimetypes(self):
         # Only test a few to make sure logic works okay
         assert InputFile(data_file("telegram.jpg").open("rb")).mimetype == "image/jpeg"
         # For some reason python can guess the type on macOS

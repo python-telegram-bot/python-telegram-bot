@@ -96,7 +96,7 @@ class StickerSpace:
 
 
 class TestStickerNoReq:
-    def test_slot_behaviour(self, sticker, mro_slots, recwarn):
+    def test_slot_behaviour(self, sticker, mro_slots):
         for attr in sticker.__slots__:
             assert getattr(sticker, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(sticker)) == len(set(mro_slots(sticker))), "duplicate slot"
@@ -185,7 +185,6 @@ class TestStickerNoReq:
             monkeypatch.setattr(bot, "_post", make_assertion)
             await bot.send_sticker(chat_id, file)
             assert test_flag
-            monkeypatch.delattr(bot, "_post")
         finally:
             bot._local_mode = False
 
@@ -557,7 +556,6 @@ class TestStickerSetNoReq:
             monkeypatch.setattr(bot, "_post", make_assertion)
             await bot.upload_sticker_file(chat_id, file)
             assert test_flag
-            monkeypatch.delattr(bot, "_post")
         finally:
             bot._local_mode = False
 
@@ -596,7 +594,6 @@ class TestStickerSetNoReq:
                 webm_sticker=file,
             )
             assert test_flag
-            monkeypatch.delattr(bot, "_post")
         finally:
             bot._local_mode = False
 
@@ -624,7 +621,6 @@ class TestStickerSetNoReq:
             webm_sticker="wow.webm",
             sticker_type=Sticker.MASK,
         )
-        monkeypatch.delattr(bot, "_post")
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_add_sticker_to_set_local_files(self, monkeypatch, bot, chat_id, local_mode):
@@ -651,7 +647,6 @@ class TestStickerSetNoReq:
                 chat_id, "name", "emoji", png_sticker=file, tgs_sticker=file
             )
             assert test_flag
-            monkeypatch.delattr(bot, "_post")
         finally:
             bot._local_mode = False
 
@@ -674,7 +669,6 @@ class TestStickerSetNoReq:
             monkeypatch.setattr(bot, "_post", make_assertion)
             await bot.set_sticker_set_thumb("name", chat_id, thumb=file)
             assert test_flag
-            monkeypatch.delattr(bot, "_post")
         finally:
             bot._local_mode = False
 
@@ -741,7 +735,8 @@ class TestStickerSetReq:
         test_by = f"test_by_{bot.username}"
         for sticker_set in [test_by, f"animated_{test_by}", f"video_{test_by}"]:
             try:
-                await bot.get_sticker_set(sticker_set)
+                ss = await bot.get_sticker_set(sticker_set)
+                assert isinstance(ss, StickerSet)
             except BadRequest as e:
                 if not e.message == "Stickerset_invalid":
                     raise e

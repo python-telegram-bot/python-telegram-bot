@@ -2160,7 +2160,7 @@ class TestConversationHandler:
             fallback_message.set_bot(bot)
 
             # This loop makes sure that we test all of entry points, states handler & fallbacks
-            for message in [start_message, start_message, fallback_message]:
+            for message in [start_message, fallback_message]:
                 process_update_task = asyncio.create_task(
                     app.process_update(Update(0, message=message))
                 )

@@ -63,11 +63,10 @@ async def real_topic(bot, emoji_id, forum_group_id):
 
 class TestForumTopicNoReq:
     def test_slot_behaviour(self, mro_slots, forum_topic_object):
-        for attr in forum_topic_object.__slots__:
-            assert getattr(forum_topic_object, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(forum_topic_object)) == len(
-            set(mro_slots(forum_topic_object))
-        ), "duplicate slot"
+        inst = forum_topic_object
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     async def test_expected_values(self, emoji_id, forum_group_id, forum_topic_object):
         assert forum_topic_object.message_thread_id == forum_group_id

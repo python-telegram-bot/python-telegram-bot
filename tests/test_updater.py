@@ -30,7 +30,6 @@ from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from telegram.request import HTTPXRequest
-from tests.auxil.object_conversions import env_var_2_bool
 from tests.conftest import (
     TEST_WITH_OPT_DEPS,
     DictBot,

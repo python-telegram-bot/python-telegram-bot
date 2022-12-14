@@ -209,7 +209,7 @@ class TestPhotoNoReq:
 
 
 class TestPhotoReq:
-    async def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
+    async def test_send_photo_all_args(self, bot, chat_id, photo_file):
         message = await bot.send_photo(
             chat_id,
             photo_file,
@@ -234,7 +234,7 @@ class TestPhotoReq:
         assert message.caption == Space.caption.replace("*", "")
         assert message.has_protected_content
 
-    async def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
+    async def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file):
         message = await bot.send_photo(
             chat_id, photo_file, caption=Space.caption, parse_mode="Markdown"
         )
@@ -253,7 +253,7 @@ class TestPhotoReq:
         assert message.caption == Space.caption.replace("*", "")
         assert len(message.caption_entities) == 1
 
-    async def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file, thumb, photo):
+    async def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file):
         message = await bot.send_photo(
             chat_id, photo_file, caption=Space.caption, parse_mode="HTML"
         )
@@ -272,7 +272,7 @@ class TestPhotoReq:
         assert message.caption == Space.caption.replace("<b>", "").replace("</b>", "")
         assert len(message.caption_entities) == 1
 
-    async def test_send_photo_caption_entities(self, bot, chat_id, photo_file, thumb, photo):
+    async def test_send_photo_caption_entities(self, bot, chat_id, photo_file):
         test_string = "Italic Bold Code"
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
@@ -287,9 +287,7 @@ class TestPhotoReq:
         assert message.caption_entities == tuple(entities)
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_send_photo_default_parse_mode_1(
-        self, default_bot, chat_id, photo_file, thumb, photo
-    ):
+    async def test_send_photo_default_parse_mode_1(self, default_bot, chat_id, photo_file):
         test_string = "Italic Bold Code"
         test_markdown_string = "_Italic_ *Bold* `Code`"
 
@@ -298,9 +296,7 @@ class TestPhotoReq:
         assert message.caption == test_string
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_send_photo_default_parse_mode_2(
-        self, default_bot, chat_id, photo_file, thumb, photo
-    ):
+    async def test_send_photo_default_parse_mode_2(self, default_bot, chat_id, photo_file):
         test_markdown_string = "_Italic_ *Bold* `Code`"
 
         message = await default_bot.send_photo(
@@ -310,9 +306,7 @@ class TestPhotoReq:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_send_photo_default_parse_mode_3(
-        self, default_bot, chat_id, photo_file, thumb, photo
-    ):
+    async def test_send_photo_default_parse_mode_3(self, default_bot, chat_id, photo_file):
         test_markdown_string = "_Italic_ *Bold* `Code`"
 
         message = await default_bot.send_photo(
@@ -341,7 +335,7 @@ class TestPhotoReq:
         indirect=["default_bot"],
     )
     async def test_send_photo_default_allow_sending_without_reply(
-        self, default_bot, chat_id, photo_file, thumb, photo, custom
+        self, default_bot, chat_id, photo_file, custom
     ):
         reply_to_message = await default_bot.send_message(chat_id, "test")
         await reply_to_message.delete()
@@ -379,7 +373,7 @@ class TestPhotoReq:
 
         assert path.is_file()
 
-    async def test_send_url_jpg_file(self, bot, chat_id, thumb, photo):
+    async def test_send_url_jpg_file(self, bot, chat_id):
         message = await bot.send_photo(chat_id, photo=Space.photo_file_url)
 
         assert isinstance(message.photo[-2], PhotoSize)
@@ -462,7 +456,7 @@ class TestPhotoReq:
         assert photo.height == 720
         assert photo.file_size == 33372
 
-    async def test_resend(self, bot, chat_id, photo, thumb):
+    async def test_resend(self, bot, chat_id, photo):
         message = await bot.send_photo(chat_id=chat_id, photo=photo.file_id)
 
         assert isinstance(message.photo[-2], PhotoSize)

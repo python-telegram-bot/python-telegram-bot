@@ -23,7 +23,7 @@ from telegram import ChatLocation, Location, User
 
 
 @pytest.fixture(scope="module")
-def chat_location(bot):
+def chat_location():
     return ChatLocation(Space.location, Space.address)
 
 

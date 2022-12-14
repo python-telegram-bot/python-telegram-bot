@@ -28,12 +28,7 @@ from telegram.request import RequestData
 
 @pytest.fixture(scope="module")
 def contact():
-    return Contact(
-        Space.phone_number,
-        Space.first_name,
-        Space.last_name,
-        Space.user_id,
-    )
+    return Contact(Space.phone_number, Space.first_name, Space.last_name, Space.user_id)
 
 
 class Space:

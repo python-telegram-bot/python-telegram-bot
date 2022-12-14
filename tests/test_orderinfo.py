@@ -23,12 +23,7 @@ from telegram import OrderInfo, ShippingAddress
 
 @pytest.fixture(scope="module")
 def order_info():
-    return OrderInfo(
-        Space.name,
-        Space.phone_number,
-        Space.email,
-        Space.shipping_address,
-    )
+    return OrderInfo(Space.name, Space.phone_number, Space.email, Space.shipping_address)
 
 
 class Space:

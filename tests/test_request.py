@@ -44,7 +44,7 @@ from telegram.request._httpxrequest import HTTPXRequest
 
 from .conftest import TEST_WITH_OPT_DEPS
 
-# We only need the first fixture, but it uses the others, so pytest needs us to import them as well
+# We only need mixed_rqs fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401
     file_params,
     input_media_photo,
@@ -87,7 +87,7 @@ class TestRequestNoReq:
     def reset(self):
         self.test_flag = None
 
-    async def test_init_import_errors(self, bot, monkeypatch):
+    async def test_init_import_errors(self, monkeypatch):
         """Makes sure that import errors are forwarded - related to TestNoSocks above"""
 
         def __init__(self, *args, **kwargs):
@@ -565,7 +565,7 @@ class TestHTTPXRequestNoReq:
 
 
 class TestHTTPXRequestReq:
-    async def test_do_request_wait_for_pool(self, monkeypatch, httpx_request):
+    async def test_do_request_wait_for_pool(self, httpx_request):
         """The pool logic is buried rather deeply in httpxcore, so we make actual requests here
         instead of mocking"""
         task_1 = asyncio.create_task(

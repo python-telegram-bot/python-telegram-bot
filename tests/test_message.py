@@ -559,7 +559,7 @@ class TestMessageNoReq:
         expected = b"\\U0001f469\\u200d\\U0001f469\\u200d *ABC*".decode("unicode-escape")
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
         message = Message(
-            1, Space.from_user, Space.date, Space.chat, text=text, entities=[bold_entity]
+            1, Space.date, Space.chat, Space.from_user, text=text, entities=[bold_entity]
         )
         assert expected == message.text_markdown
 

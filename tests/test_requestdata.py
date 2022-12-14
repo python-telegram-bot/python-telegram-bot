@@ -201,7 +201,7 @@ class TestRequestDataNoReq:
         assert file_rqs.multipart_data == expected
         assert mixed_rqs.multipart_data == expected
 
-    def test_url_encoding(self, monkeypatch):
+    def test_url_encoding(self):
         data = RequestData(
             [
                 RequestParameter.from_input("chat_id", 123),

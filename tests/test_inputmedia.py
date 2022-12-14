@@ -72,7 +72,7 @@ def input_media_video(class_thumb_file):
 
 
 @pytest.fixture(scope="module")
-def input_media_photo(class_thumb_file):
+def input_media_photo():
     return InputMediaPhoto(
         media=PhotoSpace.media,
         caption=PhotoSpace.caption,
@@ -582,12 +582,7 @@ class TestSendMediaGroupReq:
         )
 
     async def test_send_media_group_new_files(
-        self,
-        bot,
-        chat_id,
-        video_file,  # noqa: F811
-        photo_file,  # noqa: F811
-        animation_file,  # noqa: F811
+        self, bot, chat_id, video_file, photo_file  # noqa: F811
     ):
         async def func():
             return await bot.send_media_group(

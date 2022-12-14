@@ -106,7 +106,8 @@ class Space:
 
 
 class TestUpdateNoReq:
-    def test_slot_behaviour(self, update, mro_slots):
+    def test_slot_behaviour(self, mro_slots):
+        update = Update(Space.update_id)
         for attr in update.__slots__:
             assert getattr(update, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"

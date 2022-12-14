@@ -37,7 +37,7 @@ from telegram.ext import (
 from telegram.ext._applicationbuilder import _BOT_CHECKS
 from telegram.request import HTTPXRequest
 
-from .conftest import PRIVATE_KEY, TEST_WITH_OPT_DEPS
+from .conftest import PRIVATE_KEY, TEST_WITH_OPT_DEPS, data_file
 
 
 @pytest.fixture(scope="function")
