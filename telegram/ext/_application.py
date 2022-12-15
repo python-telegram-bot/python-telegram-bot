@@ -164,7 +164,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 (and encouraged), but editing the mapping ``application.chat_data`` itself is not.
 
             .. tip::
-               Manually modifying :attr:`chat_data` is almost never needed and unadvisable.
+
+                * Manually modifying :attr:`chat_data` is almost never needed and unadvisable.
+                * Entries are never deleted automatically from this mapping. If you want to delete
+                  the data associated with a specific chat, e.g. if the bot got removed from that
+                  chat, please use :meth:`drop_chat_data`.
 
         user_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
             the user. For each integer user id, the corresponding value of this mapping is
@@ -177,7 +181,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 (and encouraged), but editing the mapping ``application.user_data`` itself is not.
 
             .. tip::
-               Manually modifying :attr:`user_data` is almost never needed and unadvisable.
+
+               * Manually modifying :attr:`user_data` is almost never needed and unadvisable.
+               * Entries are never deleted automatically from this mapping. If you want to delete
+                 the data associated with a specific user, e.g. if that user blocked the bot,
+                 please use :meth:`drop_user_data`.
 
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): The persistence class to
