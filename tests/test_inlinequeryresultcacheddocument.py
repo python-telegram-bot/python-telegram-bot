@@ -69,7 +69,7 @@ class TestInlineQueryResultCachedDocument:
         assert inline_query_result_cached_document.title == self.title
         assert inline_query_result_cached_document.caption == self.caption
         assert inline_query_result_cached_document.parse_mode == self.parse_mode
-        assert inline_query_result_cached_document.caption_entities == self.caption_entities
+        assert inline_query_result_cached_document.caption_entities == tuple(self.caption_entities)
         assert inline_query_result_cached_document.description == self.description
         assert (
             inline_query_result_cached_document.input_message_content.to_dict()
@@ -79,6 +79,10 @@ class TestInlineQueryResultCachedDocument:
             inline_query_result_cached_document.reply_markup.to_dict()
             == self.reply_markup.to_dict()
         )
+
+    def test_caption_entities_always_tuple(self):
+        test = InlineQueryResultCachedDocument(self.id_, self.title, self.document_file_id)
+        assert test.caption_entities == ()
 
     def test_to_dict(self, inline_query_result_cached_document):
         inline_query_result_cached_document_dict = inline_query_result_cached_document.to_dict()

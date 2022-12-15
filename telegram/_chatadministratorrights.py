@@ -167,6 +167,8 @@ class ChatAdministratorRights(TelegramObject):
             self.can_manage_topics,
         )
 
+        self._freeze()
+
     @classmethod
     def all_rights(cls) -> "ChatAdministratorRights":
         """

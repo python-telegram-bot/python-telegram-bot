@@ -86,6 +86,8 @@ class ChosenInlineResult(TelegramObject):
 
         self._id_attrs = (self.result_id,)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChosenInlineResult"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

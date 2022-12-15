@@ -43,7 +43,7 @@ from telegram.error import (
 )
 from telegram.request._httpxrequest import HTTPXRequest
 
-from .conftest import env_var_2_bool
+from .auxil.object_conversions import env_var_2_bool
 
 # We only need the first fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401

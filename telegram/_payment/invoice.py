@@ -87,6 +87,8 @@ class Invoice(TelegramObject):
             self.total_amount,
         )
 
+        self._freeze()
+
     MIN_TITLE_LENGTH: ClassVar[int] = constants.InvoiceLimit.MIN_TITLE_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MIN_TITLE_LENGTH`
 

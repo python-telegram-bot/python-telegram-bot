@@ -66,6 +66,8 @@ class ForumTopic(TelegramObject):
 
         self._id_attrs = (self.message_thread_id, self.name, self.icon_color)
 
+        self._freeze()
+
 
 class ForumTopicCreated(TelegramObject):
     """
@@ -106,6 +108,8 @@ class ForumTopicCreated(TelegramObject):
         self.icon_custom_emoji_id = icon_custom_emoji_id
 
         self._id_attrs = (self.name, self.icon_color)
+
+        self._freeze()
 
 
 class ForumTopicClosed(TelegramObject):

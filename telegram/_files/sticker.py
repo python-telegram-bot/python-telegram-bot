@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
-
-from typing import TYPE_CHECKING, ClassVar, List, Optional
+from typing import TYPE_CHECKING, ClassVar, Optional, Sequence
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -150,18 +150,19 @@ class Sticker(_BaseThumbedMedium):
             thumb=thumb,
             api_kwargs=api_kwargs,
         )
-        # Required
-        self.width = width
-        self.height = height
-        self.is_animated = is_animated
-        self.is_video = is_video
-        self.type = type
-        # Optional
-        self.emoji = emoji
-        self.set_name = set_name
-        self.mask_position = mask_position
-        self.premium_animation = premium_animation
-        self.custom_emoji_id = custom_emoji_id
+        with self._unfrozen():
+            # Required
+            self.width = width
+            self.height = height
+            self.is_animated = is_animated
+            self.is_video = is_video
+            self.type = type
+            # Optional
+            self.emoji = emoji
+            self.set_name = set_name
+            self.mask_position = mask_position
+            self.premium_animation = premium_animation
+            self.custom_emoji_id = custom_emoji_id
 
     REGULAR: ClassVar[str] = constants.StickerType.REGULAR
     """:const:`telegram.constants.StickerType.REGULAR`"""
@@ -206,7 +207,11 @@ class StickerSet(TelegramObject):
         is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
 
             .. versionadded:: 13.11
-        stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+        stickers (Sequence[:class:`telegram.Sticker`]): List of all set stickers.
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         sticker_type (:obj:`str`): Type of stickers in the set, currently one of
             :attr:`telegram.Sticker.REGULAR`, :attr:`telegram.Sticker.MASK`,
             :attr:`telegram.Sticker.CUSTOM_EMOJI`.
@@ -222,7 +227,11 @@ class StickerSet(TelegramObject):
         is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
 
             .. versionadded:: 13.11
-        stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+        stickers (Tuple[:class:`telegram.Sticker`]): List of all set stickers.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         sticker_type (:obj:`str`): Type of stickers in the set.
 
             .. versionadded:: 20.0
@@ -246,7 +255,7 @@ class StickerSet(TelegramObject):
         name: str,
         title: str,
         is_animated: bool,
-        stickers: List[Sticker],
+        stickers: Sequence[Sticker],
         is_video: bool,
         sticker_type: str,
         thumb: PhotoSize = None,
@@ -258,12 +267,14 @@ class StickerSet(TelegramObject):
         self.title = title
         self.is_animated = is_animated
         self.is_video = is_video
-        self.stickers = stickers
+        self.stickers = parse_sequence_arg(stickers)
         self.sticker_type = sticker_type
         # Optional
         self.thumb = thumb
 
         self._id_attrs = (self.name,)
+
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StickerSet"]:
@@ -339,3 +350,5 @@ class MaskPosition(TelegramObject):
         self.scale = scale
 
         self._id_attrs = (self.point, self.x_shift, self.y_shift, self.scale)
+
+        self._freeze()

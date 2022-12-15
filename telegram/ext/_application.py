@@ -64,7 +64,7 @@ from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD, ConversationKey, 
 
 if TYPE_CHECKING:
     from telegram import Message
-    from telegram.ext import ConversationHandler
+    from telegram.ext import ConversationHandler, JobQueue
     from telegram.ext._applicationbuilder import InitApplicationBuilder
     from telegram.ext._jobqueue import Job
 
@@ -151,8 +151,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         update_queue (:class:`asyncio.Queue`): The synchronized queue that will contain the
             updates.
         updater (:class:`telegram.ext.Updater`): Optional. The updater used by this application.
-        job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
-            instance to pass onto handler callbacks.
         chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
             the chat. For each integer chat id, the corresponding value of this mapping is
             available as :attr:`telegram.ext.CallbackContext.chat_data` in handler callbacks for
@@ -164,7 +162,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 (and encouraged), but editing the mapping ``application.chat_data`` itself is not.
 
             .. tip::
-               Manually modifying :attr:`chat_data` is almost never needed and unadvisable.
+
+                * Manually modifying :attr:`chat_data` is almost never needed and unadvisable.
+                * Entries are never deleted automatically from this mapping. If you want to delete
+                  the data associated with a specific chat, e.g. if the bot got removed from that
+                  chat, please use :meth:`drop_chat_data`.
 
         user_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
             the user. For each integer user id, the corresponding value of this mapping is
@@ -177,7 +179,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 (and encouraged), but editing the mapping ``application.user_data`` itself is not.
 
             .. tip::
-               Manually modifying :attr:`user_data` is almost never needed and unadvisable.
+
+               * Manually modifying :attr:`user_data` is almost never needed and unadvisable.
+               * Entries are never deleted automatically from this mapping. If you want to delete
+                 the data associated with a specific user, e.g. if that user blocked the bot,
+                 please use :meth:`drop_user_data`.
 
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): The persistence class to
@@ -218,6 +224,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         "_concurrent_updates_sem",
         "_conversation_handler_conversations",
         "_initialized",
+        "_job_queue",
         "_running",
         "_user_data",
         "_user_ids_to_be_deleted_in_persistence",
@@ -228,7 +235,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         "context_types",
         "error_handlers",
         "handlers",
-        "job_queue",
         "persistence",
         "post_init",
         "post_shutdown",
@@ -264,7 +270,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         self.bot = bot
         self.update_queue = update_queue
-        self.job_queue = job_queue
         self.context_types = context_types
         self.updater = updater
         self.handlers: Dict[int, List[BaseHandler]] = {}
@@ -306,6 +311,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         # A number of low-level helpers for the internal logic
         self._initialized = False
         self._running = False
+        self._job_queue = job_queue
         self.__update_fetcher_task: Optional[asyncio.Task] = None
         self.__update_persistence_task: Optional[asyncio.Task] = None
         self.__update_persistence_event = asyncio.Event()
@@ -336,6 +342,23 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
         """
         return self._concurrent_updates
+
+    @property
+    def job_queue(self) -> Optional["JobQueue"]:
+        """
+        :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
+            :class:`telegram.ext.Application`.
+
+        .. seealso:: `Job Queue <https://github.com/python-telegram-bot/
+            python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+        """
+        if self._job_queue is None:
+            warn(
+                "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
+                "`pip install python-telegram-bot[job_queue]`.",
+                stacklevel=2,
+            )
+        return self._job_queue
 
     async def initialize(self) -> None:
         """Initializes the Application by initializing:
@@ -516,8 +539,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 )
                 _logger.debug("Loop for updating persistence started")
 
-            if self.job_queue:
-                await self.job_queue.start()  # type: ignore[union-attr]
+            if self._job_queue:
+                await self._job_queue.start()  # type: ignore[union-attr]
                 _logger.debug("JobQueue started")
 
             self.__update_fetcher_task = asyncio.create_task(
@@ -566,9 +589,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             await self.__update_fetcher_task
         _logger.debug("Application stopped fetching of updates.")
 
-        if self.job_queue:
+        if self._job_queue:
             _logger.debug("Waiting for running jobs to finish")
-            await self.job_queue.stop(wait=True)  # type: ignore[union-attr]
+            await self._job_queue.stop(wait=True)  # type: ignore[union-attr]
             _logger.debug("JobQueue stopped")
 
         _logger.debug("Waiting for `create_task` calls to be processed")

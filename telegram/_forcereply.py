@@ -83,6 +83,8 @@ class ForceReply(TelegramObject):
 
         self._id_attrs = (self.selective,)
 
+        self._freeze()
+
     MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
     """:const:`telegram.constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER`
 

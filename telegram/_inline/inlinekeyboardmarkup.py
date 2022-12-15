@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
-
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Sequence
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -41,12 +40,20 @@ class InlineKeyboardMarkup(TelegramObject):
         * :any:`Inline Keyboard 2 <examples.inlinekeyboard2>`
 
     Args:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
-            each represented by a list of InlineKeyboardButton objects.
+        inline_keyboard (Sequence[Sequence[:class:`telegram.InlineKeyboardButton`]]): Sequence of
+            button rows, each represented by a sequence of :class:`~telegram.InlineKeyboardButton`
+            objects.
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
 
     Attributes:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
-            each represented by a list of InlineKeyboardButton objects.
+        inline_keyboard (Tuple[Tuple[:class:`telegram.InlineKeyboardButton`]]): Tuple of
+            button rows, each represented by a tuple of :class:`~telegram.InlineKeyboardButton`
+            objects.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
 
     """
 
@@ -54,20 +61,22 @@ class InlineKeyboardMarkup(TelegramObject):
 
     def __init__(
         self,
-        inline_keyboard: List[List[InlineKeyboardButton]],
+        inline_keyboard: Sequence[Sequence[InlineKeyboardButton]],
         *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(inline_keyboard):
             raise ValueError(
-                "The parameter `inline_keyboard` should be a list of "
-                "list of InlineKeyboardButtons"
+                "The parameter `inline_keyboard` should be a sequence of sequences of "
+                "InlineKeyboardButtons"
             )
         # Required
-        self.inline_keyboard = inline_keyboard
+        self.inline_keyboard = tuple(tuple(row) for row in inline_keyboard)
 
         self._id_attrs = (self.inline_keyboard,)
+
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineKeyboardMarkup"]:
@@ -134,6 +143,3 @@ class InlineKeyboardMarkup(TelegramObject):
         """
         button_grid = [[button] for button in button_column]
         return cls(button_grid, **kwargs)  # type: ignore[arg-type]
-
-    def __hash__(self) -> int:
-        return hash(tuple(tuple(button for button in row) for row in self.inline_keyboard))

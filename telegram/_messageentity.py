@@ -115,6 +115,8 @@ class MessageEntity(TelegramObject):
 
         self._id_attrs = (self.type, self.offset, self.length)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MessageEntity"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

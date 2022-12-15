@@ -202,6 +202,8 @@ class InlineKeyboardButton(TelegramObject):
         self._id_attrs = ()
         self._set_id_attrs()
 
+        self._freeze()
+
     def _set_id_attrs(self) -> None:
         self._id_attrs = (
             self.text,
@@ -239,8 +241,9 @@ class InlineKeyboardButton(TelegramObject):
         Args:
             callback_data (:class:`object`): The new callback data.
         """
-        self.callback_data = callback_data
-        self._set_id_attrs()
+        with self._unfrozen():
+            self.callback_data = callback_data
+            self._set_id_attrs()
 
     MIN_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA
     """:const:`telegram.constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA`

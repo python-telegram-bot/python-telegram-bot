@@ -18,7 +18,7 @@
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that allows to rate limit requests to the Bot API."""
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Coroutine, Dict, Generic, Optional, Union
+from typing import Any, Callable, Coroutine, Dict, Generic, List, Optional, Union
 
 from telegram._utils.types import JSONDict
 from telegram.ext._utils.types import RLARGS
@@ -58,13 +58,13 @@ class BaseRateLimiter(ABC, Generic[RLARGS]):
     @abstractmethod
     async def process_request(
         self,
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, None]]],
+        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
         args: Any,
         kwargs: Dict[str, Any],
         endpoint: str,
         data: Dict[str, Any],
         rate_limit_args: Optional[RLARGS],
-    ) -> Union[bool, JSONDict, None]:
+    ) -> Union[bool, JSONDict, List[JSONDict]]:
         """
         Process a request. Must be implemented by a subclass.
 

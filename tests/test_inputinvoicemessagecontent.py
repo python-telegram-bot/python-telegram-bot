@@ -82,11 +82,11 @@ class TestInputInvoiceMessageContent:
         assert input_invoice_message_content.payload == self.payload
         assert input_invoice_message_content.provider_token == self.provider_token
         assert input_invoice_message_content.currency == self.currency
-        assert input_invoice_message_content.prices == self.prices
+        assert input_invoice_message_content.prices == tuple(self.prices)
         assert input_invoice_message_content.max_tip_amount == self.max_tip_amount
-        assert input_invoice_message_content.suggested_tip_amounts == [
+        assert input_invoice_message_content.suggested_tip_amounts == tuple(
             int(amount) for amount in self.suggested_tip_amounts
-        ]
+        )
         assert input_invoice_message_content.provider_data == self.provider_data
         assert input_invoice_message_content.photo_url == self.photo_url
         assert input_invoice_message_content.photo_size == int(self.photo_size)
@@ -102,6 +102,44 @@ class TestInputInvoiceMessageContent:
         )
         assert input_invoice_message_content.send_email_to_provider == self.send_email_to_provider
         assert input_invoice_message_content.is_flexible == self.is_flexible
+
+    def test_suggested_tip_amonuts_always_tuple(self):
+        input_invoice_message_content = InputInvoiceMessageContent(
+            title=self.title,
+            description=self.description,
+            payload=self.payload,
+            provider_token=self.provider_token,
+            currency=self.currency,
+            prices=self.prices,
+            max_tip_amount=self.max_tip_amount,
+            suggested_tip_amounts=self.suggested_tip_amounts,
+            provider_data=self.provider_data,
+            photo_url=self.photo_url,
+            photo_size=self.photo_size,
+            photo_width=self.photo_width,
+            photo_height=self.photo_height,
+            need_name=self.need_name,
+            need_phone_number=self.need_phone_number,
+            need_email=self.need_email,
+            need_shipping_address=self.need_shipping_address,
+            send_phone_number_to_provider=self.send_phone_number_to_provider,
+            send_email_to_provider=self.send_email_to_provider,
+            is_flexible=self.is_flexible,
+        )
+        assert isinstance(input_invoice_message_content.suggested_tip_amounts, tuple)
+        assert input_invoice_message_content.suggested_tip_amounts == tuple(
+            int(amount) for amount in self.suggested_tip_amounts
+        )
+
+        input_invoice_message_content = InputInvoiceMessageContent(
+            title=self.title,
+            description=self.description,
+            payload=self.payload,
+            provider_token=self.provider_token,
+            currency=self.currency,
+            prices=self.prices,
+        )
+        assert input_invoice_message_content.suggested_tip_amounts == tuple()
 
     def test_to_dict(self, input_invoice_message_content):
         input_invoice_message_content_dict = input_invoice_message_content.to_dict()
@@ -130,9 +168,8 @@ class TestInputInvoiceMessageContent:
             input_invoice_message_content_dict["max_tip_amount"]
             == input_invoice_message_content.max_tip_amount
         )
-        assert (
-            input_invoice_message_content_dict["suggested_tip_amounts"]
-            == input_invoice_message_content.suggested_tip_amounts
+        assert input_invoice_message_content_dict["suggested_tip_amounts"] == list(
+            input_invoice_message_content.suggested_tip_amounts
         )
         assert (
             input_invoice_message_content_dict["provider_data"]
@@ -217,11 +254,11 @@ class TestInputInvoiceMessageContent:
         assert input_invoice_message_content.payload == self.payload
         assert input_invoice_message_content.provider_token == self.provider_token
         assert input_invoice_message_content.currency == self.currency
-        assert input_invoice_message_content.prices == self.prices
+        assert input_invoice_message_content.prices == tuple(self.prices)
         assert input_invoice_message_content.max_tip_amount == self.max_tip_amount
-        assert input_invoice_message_content.suggested_tip_amounts == [
+        assert input_invoice_message_content.suggested_tip_amounts == tuple(
             int(amount) for amount in self.suggested_tip_amounts
-        ]
+        )
         assert input_invoice_message_content.provider_data == self.provider_data
         assert input_invoice_message_content.photo_url == self.photo_url
         assert input_invoice_message_content.photo_size == int(self.photo_size)

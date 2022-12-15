@@ -102,6 +102,8 @@ class File(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
+        self._freeze()
+
     def _get_encoded_url(self) -> str:
         """Convert any UTF-8 char in :obj:`File.file_path` into a url encoded ASCII string."""
         sres = urllib_parse.urlsplit(str(self.file_path))

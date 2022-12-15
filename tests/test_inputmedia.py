@@ -145,9 +145,13 @@ class TestInputMediaVideo:
         assert input_media_video.height == self.height
         assert input_media_video.duration == self.duration
         assert input_media_video.parse_mode == self.parse_mode
-        assert input_media_video.caption_entities == self.caption_entities
+        assert input_media_video.caption_entities == tuple(self.caption_entities)
         assert input_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_media_video.thumb, InputFile)
+
+    def test_caption_entities_always_tuple(self):
+        input_media_video = InputMediaVideo(self.media)
+        assert input_media_video.caption_entities == ()
 
     def test_to_dict(self, input_media_video):
         input_media_video_dict = input_media_video.to_dict()
@@ -206,7 +210,11 @@ class TestInputMediaPhoto:
         assert input_media_photo.media == self.media
         assert input_media_photo.caption == self.caption
         assert input_media_photo.parse_mode == self.parse_mode
-        assert input_media_photo.caption_entities == self.caption_entities
+        assert input_media_photo.caption_entities == tuple(self.caption_entities)
+
+    def test_caption_entities_always_tuple(self):
+        input_media_photo = InputMediaPhoto(self.media)
+        assert input_media_photo.caption_entities == ()
 
     def test_to_dict(self, input_media_photo):
         input_media_photo_dict = input_media_photo.to_dict()
@@ -258,8 +266,12 @@ class TestInputMediaAnimation:
         assert input_media_animation.media == self.media
         assert input_media_animation.caption == self.caption
         assert input_media_animation.parse_mode == self.parse_mode
-        assert input_media_animation.caption_entities == self.caption_entities
+        assert input_media_animation.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_animation.thumb, InputFile)
+
+    def test_caption_entities_always_tuple(self):
+        input_media_animation = InputMediaAnimation(self.media)
+        assert input_media_animation.caption_entities == ()
 
     def test_to_dict(self, input_media_animation):
         input_media_animation_dict = input_media_animation.to_dict()
@@ -320,8 +332,12 @@ class TestInputMediaAudio:
         assert input_media_audio.performer == self.performer
         assert input_media_audio.title == self.title
         assert input_media_audio.parse_mode == self.parse_mode
-        assert input_media_audio.caption_entities == self.caption_entities
+        assert input_media_audio.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_audio.thumb, InputFile)
+
+    def test_caption_entities_always_tuple(self):
+        input_media_audio = InputMediaAudio(self.media)
+        assert input_media_audio.caption_entities == ()
 
     def test_to_dict(self, input_media_audio):
         input_media_audio_dict = input_media_audio.to_dict()
@@ -380,12 +396,16 @@ class TestInputMediaDocument:
         assert input_media_document.media == self.media
         assert input_media_document.caption == self.caption
         assert input_media_document.parse_mode == self.parse_mode
-        assert input_media_document.caption_entities == self.caption_entities
+        assert input_media_document.caption_entities == tuple(self.caption_entities)
         assert (
             input_media_document.disable_content_type_detection
             == self.disable_content_type_detection
         )
         assert isinstance(input_media_document.thumb, InputFile)
+
+    def test_caption_entities_always_tuple(self):
+        input_media_document = InputMediaDocument(self.media)
+        assert input_media_document.caption_entities == ()
 
     def test_to_dict(self, input_media_document):
         input_media_document_dict = input_media_document.to_dict()
@@ -459,13 +479,13 @@ class TestSendMediaGroup:
     @pytest.mark.flaky(3, 1)
     async def test_send_media_group_photo(self, bot, chat_id, media_group):
         messages = await bot.send_media_group(chat_id, media_group)
-        assert isinstance(messages, list)
+        assert isinstance(messages, tuple)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
         assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
         assert all(mes.caption == f"photo {idx+1}" for idx, mes in enumerate(messages))
         assert all(
-            mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)] for mes in messages
+            mes.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),) for mes in messages
         )
 
     async def test_send_media_group_with_message_thread_id(
@@ -476,7 +496,7 @@ class TestSendMediaGroup:
             media_group,
             message_thread_id=real_topic.message_thread_id,
         )
-        assert isinstance(messages, list)
+        assert isinstance(messages, tuple)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
         assert all(i.message_thread_id == real_topic.message_thread_id for i in messages)
@@ -538,7 +558,7 @@ class TestSendMediaGroup:
 
         assert not any(item.parse_mode for item in media_group_no_caption_args)
 
-        assert isinstance(messages, list)
+        assert isinstance(messages, tuple)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
 
@@ -548,7 +568,7 @@ class TestSendMediaGroup:
         # Make sure first message got the caption, which will lead
         # to Telegram displaying its caption as group caption
         assert first_message.caption
-        assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+        assert first_message.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),)
 
         # Check that other messages have no captions
         assert all(mes.caption is None for mes in other_messages)
@@ -578,13 +598,13 @@ class TestSendMediaGroup:
                 a.parse_mode == b.parse_mode for a, b in zip(media_group, copied_media_group)
             )
 
-            assert isinstance(messages, list)
+            assert isinstance(messages, tuple)
             assert len(messages) == 3
             assert all(isinstance(mes, Message) for mes in messages)
             assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
             assert all(mes.caption == f"photo {idx+1}" for idx, mes in enumerate(messages))
             assert all(
-                mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+                mes.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),)
                 for mes in messages
             )
             assert all(mes.has_protected_content for mes in messages)
@@ -658,7 +678,7 @@ class TestSendMediaGroup:
             func, "Type of file mismatch", "Telegram did not accept the file."
         )
 
-        assert isinstance(messages, list)
+        assert isinstance(messages, tuple)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
         assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
@@ -744,7 +764,7 @@ class TestSendMediaGroup:
         for mes_group in (default, overridden_markdown_v2):
             first_message = mes_group[0]
             assert first_message.caption == "photo 1"
-            assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+            assert first_message.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),)
 
         # This check is valid for all 3 groups of messages
         for mes_group in (default, overridden_markdown_v2, overridden_none):
@@ -854,7 +874,7 @@ class TestSendMediaGroup:
             message.message_id,
         )
         assert message.caption == test_caption
-        assert message.caption_entities == test_entities
+        assert message.caption_entities == tuple(test_entities)
         # make sure that the media was not modified
         assert media.parse_mode == copied_media.parse_mode
 
@@ -869,7 +889,7 @@ class TestSendMediaGroup:
             message.message_id,
         )
         assert message.caption == test_caption
-        assert message.caption_entities == test_entities
+        assert message.caption_entities == tuple(test_entities)
         # make sure that the media was not modified
         assert media.parse_mode == copied_media.parse_mode
 
@@ -884,6 +904,6 @@ class TestSendMediaGroup:
             message.message_id,
         )
         assert message.caption == markdown_caption
-        assert message.caption_entities == []
+        assert message.caption_entities == ()
         # make sure that the media was not modified
         assert media.parse_mode == copied_media.parse_mode

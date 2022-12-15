@@ -141,6 +141,8 @@ class ChatInviteLink(TelegramObject):
             self.is_revoked,
         )
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatInviteLink"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
