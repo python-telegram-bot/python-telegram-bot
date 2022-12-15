@@ -79,12 +79,16 @@ class TestInlineQueryResultPhoto:
         assert inline_query_result_photo.description == self.description
         assert inline_query_result_photo.caption == self.caption
         assert inline_query_result_photo.parse_mode == self.parse_mode
-        assert inline_query_result_photo.caption_entities == self.caption_entities
+        assert inline_query_result_photo.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_photo.input_message_content.to_dict()
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
+
+    def test_caption_entities_always_tuple(self):
+        result = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
+        assert result.caption_entities == ()
 
     def test_to_dict(self, inline_query_result_photo):
         inline_query_result_photo_dict = inline_query_result_photo.to_dict()

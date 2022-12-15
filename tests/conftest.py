@@ -127,11 +127,17 @@ class TestHttpxRequest(HTTPXRequest):
 
 
 class DictExtBot(ExtBot):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Makes it easier to work with the bot in tests
+        self._unfreeze()
 
 
 class DictBot(Bot):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Makes it easier to work with the bot in tests
+        self._unfreeze()
 
 
 class DictApplication(Application):

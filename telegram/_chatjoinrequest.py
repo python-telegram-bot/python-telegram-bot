@@ -88,6 +88,8 @@ class ChatJoinRequest(TelegramObject):
 
         self._id_attrs = (self.chat, self.from_user, self.date)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatJoinRequest"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

@@ -59,6 +59,8 @@ class ProximityAlertTriggered(TelegramObject):
 
         self._id_attrs = (self.traveler, self.watcher, self.distance)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ProximityAlertTriggered"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

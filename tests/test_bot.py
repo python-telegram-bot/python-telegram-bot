@@ -92,13 +92,15 @@ async def message(bot, chat_id):
     to_reply_to = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
     )
-    return await bot.send_message(
+    out = await bot.send_message(
         chat_id,
         "Text",
         reply_to_message_id=to_reply_to.message_id,
         disable_web_page_preview=True,
         disable_notification=True,
     )
+    out._unfreeze()
+    return out
 
 
 @pytest.fixture(scope="class")
@@ -390,8 +392,8 @@ class TestBot:
     async def test_equality(self):
         async with make_bot(token=FALLBACKS[0]["token"]) as a, make_bot(
             token=FALLBACKS[0]["token"]
-        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c:
-            d = Update(123456789)
+        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c, Bot(token=FALLBACKS[0]["token"]) as d:
+            e = Update(123456789)
 
             assert a == b
             assert hash(a) == hash(b)
@@ -402,6 +404,9 @@ class TestBot:
 
             assert a != d
             assert hash(a) != hash(d)
+
+            assert a != e
+            assert hash(a) != hash(e)
 
     @pytest.mark.flaky(3, 1)
     async def test_to_dict(self, bot):
@@ -687,7 +692,7 @@ class TestBot:
         assert message_quiz.poll.type == Poll.QUIZ
         assert message_quiz.poll.is_closed
         assert message_quiz.poll.explanation == "Here is a link"
-        assert message_quiz.poll.explanation_entities == explanation_entities
+        assert message_quiz.poll.explanation_entities == tuple(explanation_entities)
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
@@ -741,6 +746,7 @@ class TestBot:
             close_date=close_date,
             read_timeout=60,
         )
+        msg.poll._unfreeze()
         # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
         msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
         assert abs(msg.poll.close_date - aware_close_date) <= dtm.timedelta(seconds=5)
@@ -775,7 +781,7 @@ class TestBot:
         )
 
         assert message.poll.explanation == test_string
-        assert message.poll.explanation_entities == entities
+        assert message.poll.explanation_entities == tuple(entities)
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
@@ -795,11 +801,11 @@ class TestBot:
             explanation=explanation_markdown,
         )
         assert message.poll.explanation == explanation
-        assert message.poll.explanation_entities == [
+        assert message.poll.explanation_entities == (
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.BOLD, 7, 4),
             MessageEntity(MessageEntity.CODE, 12, 4),
-        ]
+        )
 
         message = await default_bot.send_poll(
             chat_id=super_group_id,
@@ -812,7 +818,7 @@ class TestBot:
             explanation_parse_mode=None,
         )
         assert message.poll.explanation == explanation_markdown
-        assert message.poll.explanation_entities == []
+        assert message.poll.explanation_entities == ()
 
         message = await default_bot.send_poll(
             chat_id=super_group_id,
@@ -825,7 +831,7 @@ class TestBot:
             explanation_parse_mode="HTML",
         )
         assert message.poll.explanation == explanation_markdown
-        assert message.poll.explanation_entities == []
+        assert message.poll.explanation_entities == ()
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
@@ -1611,7 +1617,7 @@ class TestBot:
         )
 
         assert message.text == test_string
-        assert message.entities == entities
+        assert message.entities == tuple(entities)
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
@@ -1684,7 +1690,7 @@ class TestBot:
         )
 
         assert message.caption == test_string
-        assert message.caption_entities == entities
+        assert message.caption_entities == tuple(entities)
 
     # edit_message_media is tested in test_inputmedia
 
@@ -1759,7 +1765,7 @@ class TestBot:
         await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
         updates = await bot.get_updates(timeout=1)
 
-        assert isinstance(updates, list)
+        assert isinstance(updates, tuple)
         if updates:
             assert isinstance(updates[0], Update)
 
@@ -1791,7 +1797,7 @@ class TestBot:
             monkeypatch.setattr(BaseRequest, "post", post)
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
             assert isinstance(updates[0].callback_query.data, InvalidCallbackData)
 
@@ -1827,7 +1833,7 @@ class TestBot:
         live_info = await bot.get_webhook_info()
         assert live_info.url == url
         assert live_info.max_connections == max_connections
-        assert live_info.allowed_updates == allowed_updates
+        assert live_info.allowed_updates == tuple(allowed_updates)
         assert live_info.ip_address == ip
         assert live_info.has_custom_certificate == use_ip
 
@@ -1916,7 +1922,7 @@ class TestBot:
     @pytest.mark.flaky(3, 1)
     async def test_get_chat_administrators(self, bot, channel_id):
         admins = await bot.get_chat_administrators(channel_id)
-        assert isinstance(admins, list)
+        assert isinstance(admins, tuple)
 
         for a in admins:
             assert a.status in ("administrator", "creator")
@@ -2561,7 +2567,7 @@ class TestBot:
         ]
         message = await bot.send_message(chat_id=chat_id, text=test_string, entities=entities)
         assert message.text == test_string
-        assert message.entities == entities
+        assert message.entities == tuple(entities)
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
@@ -2675,7 +2681,7 @@ class TestBot:
     async def test_set_and_get_my_commands(self, bot):
         commands = [BotCommand("cmd1", "descr1"), ["cmd2", "descr2"]]
         await bot.set_my_commands([])
-        assert await bot.get_my_commands() == []
+        assert await bot.get_my_commands() == ()
         assert await bot.set_my_commands(commands)
 
         for i, bc in enumerate(await bot.get_my_commands()):
@@ -3075,6 +3081,7 @@ class TestBot:
             None,
             reply_markup=bot.callback_data_cache.process_keyboard(reply_markup),
         )
+        message._unfreeze()
         # We do to_dict -> de_json to make sure those aren't the same objects
         message.pinned_message = Message.de_json(message.to_dict(), bot)
 
@@ -3098,7 +3105,7 @@ class TestBot:
             await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
 
             effective_message = updates[0][message_type]
@@ -3165,7 +3172,7 @@ class TestBot:
             await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
 
             message = updates[0][message_type]

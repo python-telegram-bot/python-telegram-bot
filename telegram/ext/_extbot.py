@@ -22,6 +22,7 @@ from copy import copy
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
     Dict,
     Generic,
@@ -211,20 +212,21 @@ class ExtBot(Bot, Generic[RLARGS]):
             private_key_password=private_key_password,
             local_mode=local_mode,
         )
-        self._defaults = defaults
-        self._rate_limiter = rate_limiter
-        self._callback_data_cache: Optional[CallbackDataCache] = None
+        with self._unfrozen():
+            self._defaults = defaults
+            self._rate_limiter = rate_limiter
+            self._callback_data_cache: Optional[CallbackDataCache] = None
 
-        # set up callback_data
-        if arbitrary_callback_data is False:
-            return
+            # set up callback_data
+            if arbitrary_callback_data is False:
+                return
 
-        if not isinstance(arbitrary_callback_data, bool):
-            maxsize = cast(int, arbitrary_callback_data)
-        else:
-            maxsize = 1024
+            if not isinstance(arbitrary_callback_data, bool):
+                maxsize = cast(int, arbitrary_callback_data)
+            else:
+                maxsize = 1024
 
-        self._callback_data_cache = CallbackDataCache(bot=self, maxsize=maxsize)
+            self._callback_data_cache = CallbackDataCache(bot=self, maxsize=maxsize)
 
     @property
     def callback_data_cache(self) -> Optional[CallbackDataCache]:
@@ -291,7 +293,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> Union[bool, JSONDict, None]:
+    ) -> Union[bool, JSONDict, List[JSONDict]]:
         """Order of method calls is: Bot.some_method -> Bot._post -> Bot._do_post.
         So we can override Bot._do_post to add rate limiting.
         """
@@ -380,14 +382,17 @@ class ExtBot(Bot, Generic[RLARGS]):
             elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:
                 # Copy object as not to edit it in-place
                 val = copy(val)
-                val.parse_mode = self.defaults.parse_mode if self.defaults else None
+                with val._unfrozen():
+                    val.parse_mode = self.defaults.parse_mode if self.defaults else None
                 data[key] = val
             elif key == "media" and isinstance(val, list):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy(media) for media in val]
                 for media in copy_list:
                     if media.parse_mode is DEFAULT_NONE:
-                        media.parse_mode = self.defaults.parse_mode if self.defaults else None
+                        with media._unfrozen():
+                            media.parse_mode = self.defaults.parse_mode if self.defaults else None
+
                 data[key] = copy_list
 
     def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
@@ -479,7 +484,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> Union[bool, Message]:
+    ) -> Any:
         # We override this method to call self._replace_keyboard and self._insert_callback_data.
         # This covers most methods that have a reply_markup
         result = await super()._send_message(
@@ -517,7 +522,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List[Update]:
+    ) -> Tuple[Update, ...]:
         updates = await super().get_updates(
             offset=offset,
             limit=limit,
@@ -563,8 +568,10 @@ class ExtBot(Bot, Generic[RLARGS]):
                 # We build a new result in case the user wants to use the same object in
                 # different places
                 new_result = copy(result)
-                markup = self._replace_keyboard(result.reply_markup)
-                new_result.reply_markup = markup  # type: ignore[attr-defined]
+                with new_result._unfrozen():
+                    markup = self._replace_keyboard(result.reply_markup)
+                    new_result.reply_markup = markup
+
                 results.append(new_result)
 
         return results, next_offset
@@ -579,8 +586,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         copied = False
         if hasattr(res, "parse_mode") and res.parse_mode is DEFAULT_NONE:
             res = copy(res)
-            copied = True
-            res.parse_mode = self.defaults.parse_mode if self.defaults else None
+            with res._unfrozen():
+                copied = True
+                res.parse_mode = self.defaults.parse_mode if self.defaults else None
         if hasattr(res, "input_message_content") and res.input_message_content:
             if (
                 hasattr(res.input_message_content, "parse_mode")
@@ -589,18 +597,20 @@ class ExtBot(Bot, Generic[RLARGS]):
                 if not copied:
                     res = copy(res)
                     copied = True
-                res.input_message_content.parse_mode = (
-                    self.defaults.parse_mode if self.defaults else None
-                )
+                with res.input_message_content._unfrozen():
+                    res.input_message_content.parse_mode = (
+                        self.defaults.parse_mode if self.defaults else None
+                    )
             if (
                 hasattr(res.input_message_content, "disable_web_page_preview")
                 and res.input_message_content.disable_web_page_preview is DEFAULT_NONE
             ):
                 if not copied:
                     res = copy(res)
-                res.input_message_content.disable_web_page_preview = (
-                    self.defaults.disable_web_page_preview if self.defaults else None
-                )
+                with res.input_message_content._unfrozen():
+                    res.input_message_content.disable_web_page_preview = (
+                        self.defaults.disable_web_page_preview if self.defaults else None
+                    )
 
         return res
 
@@ -1496,7 +1506,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> List[ChatMember]:
+    ) -> Tuple[ChatMember, ...]:
         return await super().get_chat_administrators(
             chat_id=chat_id,
             read_timeout=read_timeout,
@@ -1599,7 +1609,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> List[Sticker]:
+    ) -> Tuple[Sticker, ...]:
         return await super().get_forum_topic_icon_stickers(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1621,7 +1631,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> List[GameHighScore]:
+    ) -> Tuple[GameHighScore, ...]:
         return await super().get_game_high_scores(
             user_id=user_id,
             chat_id=chat_id,
@@ -1663,7 +1673,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> List[BotCommand]:
+    ) -> Tuple[BotCommand, ...]:
         return await super().get_my_commands(
             scope=scope,
             language_code=language_code,
@@ -1724,7 +1734,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> List[Sticker]:
+    ) -> Tuple[Sticker, ...]:
         return await super().get_custom_emoji_stickers(
             custom_emoji_ids=custom_emoji_ids,
             read_timeout=read_timeout,
@@ -2439,7 +2449,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-    ) -> List[Message]:
+    ) -> Tuple[Message, ...]:
         return await super().send_media_group(
             chat_id=chat_id,
             media=media,

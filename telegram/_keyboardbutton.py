@@ -107,6 +107,8 @@ class KeyboardButton(TelegramObject):
             self.web_app,
         )
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["KeyboardButton"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

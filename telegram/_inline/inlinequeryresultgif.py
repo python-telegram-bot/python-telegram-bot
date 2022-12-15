@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultGif."""
-
-from typing import TYPE_CHECKING, List, Tuple, Union
+from typing import TYPE_CHECKING, Sequence
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 from telegram.constants import InlineQueryResultType
@@ -54,7 +54,11 @@ class InlineQueryResultGif(InlineQueryResult):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -77,7 +81,12 @@ class InlineQueryResultGif(InlineQueryResult):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -114,24 +123,25 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_duration: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb_mime_type: str = None,
-        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        caption_entities: Sequence[MessageEntity] = None,
         *,
         api_kwargs: JSONDict = None,
     ):
 
         # Required
         super().__init__(InlineQueryResultType.GIF, id, api_kwargs=api_kwargs)
-        self.gif_url = gif_url
-        self.thumb_url = thumb_url
+        with self._unfrozen():
+            self.gif_url = gif_url
+            self.thumb_url = thumb_url
 
-        # Optionals
-        self.gif_width = gif_width
-        self.gif_height = gif_height
-        self.gif_duration = gif_duration
-        self.title = title
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = caption_entities
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_mime_type = thumb_mime_type
+            # Optionals
+            self.gif_width = gif_width
+            self.gif_height = gif_height
+            self.gif_duration = gif_duration
+            self.title = title
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = parse_sequence_arg(caption_entities)
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content
+            self.thumb_mime_type = thumb_mime_type

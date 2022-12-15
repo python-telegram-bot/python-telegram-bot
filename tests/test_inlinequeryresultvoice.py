@@ -69,12 +69,21 @@ class TestInlineQueryResultVoice:
         assert inline_query_result_voice.voice_duration == self.voice_duration
         assert inline_query_result_voice.caption == self.caption
         assert inline_query_result_voice.parse_mode == self.parse_mode
-        assert inline_query_result_voice.caption_entities == self.caption_entities
+        assert inline_query_result_voice.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_voice.input_message_content.to_dict()
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_voice.reply_markup.to_dict() == self.reply_markup.to_dict()
+
+    def test_caption_entities_always_tuple(self):
+        result = InlineQueryResultVoice(
+            self.id_,
+            self.voice_url,
+            self.title,
+        )
+
+        assert result.caption_entities == ()
 
     def test_to_dict(self, inline_query_result_voice):
         inline_query_result_voice_dict = inline_query_result_voice.to_dict()

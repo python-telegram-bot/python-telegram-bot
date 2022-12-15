@@ -60,6 +60,7 @@ def user(bot):
         added_to_attachment_menu=TestUser.added_to_attachment_menu,
     )
     user.set_bot(bot)
+    user._unfreeze()
     return user
 
 

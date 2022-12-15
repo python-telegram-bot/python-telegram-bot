@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVideo."""
-
-from typing import TYPE_CHECKING, List, Tuple, Union
+from typing import TYPE_CHECKING, Sequence
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 from telegram.constants import InlineQueryResultType
@@ -54,7 +54,11 @@ class InlineQueryResultVideo(InlineQueryResult):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         video_width (:obj:`int`, optional): Video width.
         video_height (:obj:`int`, optional): Video height.
         video_duration (:obj:`int`, optional): Video duration in seconds.
@@ -75,18 +79,24 @@ class InlineQueryResultVideo(InlineQueryResult):
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumb_url (:obj:`str`): URL of the thumbnail (JPEG only) for the video.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`, optional): Caption of the video to be sent,
+        caption (:obj:`str`): Optional. Caption of the video to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
-        parse_mode (:obj:`str`, optional): |parse_mode|
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
-        video_width (:obj:`int`, optional): Video width.
-        video_height (:obj:`int`, optional): Video height.
-        video_duration (:obj:`int`, optional): Video duration in seconds.
-        description (:obj:`str`, optional): Short description of the result.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
+
+        video_width (:obj:`int`): Optional. Video width.
+        video_height (:obj:`int`): Optional. Video height.
+        video_duration (:obj:`int`): Optional. Video duration in seconds.
+        description (:obj:`str`): Optional. Short description of the result.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
-        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the video. This field is required if
             InlineQueryResultVideo is used to send an HTML-page as a result
             (e.g., a YouTube video).
@@ -124,25 +134,26 @@ class InlineQueryResultVideo(InlineQueryResult):
         reply_markup: InlineKeyboardMarkup = None,
         input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        caption_entities: Sequence[MessageEntity] = None,
         *,
         api_kwargs: JSONDict = None,
     ):
 
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
-        self.video_url = video_url
-        self.mime_type = mime_type
-        self.thumb_url = thumb_url
-        self.title = title
+        with self._unfrozen():
+            self.video_url = video_url
+            self.mime_type = mime_type
+            self.thumb_url = thumb_url
+            self.title = title
 
-        # Optional
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = caption_entities
-        self.video_width = video_width
-        self.video_height = video_height
-        self.video_duration = video_duration
-        self.description = description
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
+            # Optional
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = parse_sequence_arg(caption_entities)
+            self.video_width = video_width
+            self.video_height = video_height
+            self.video_duration = video_duration
+            self.description = description
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content

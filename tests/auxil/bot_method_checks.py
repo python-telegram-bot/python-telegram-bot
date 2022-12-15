@@ -277,7 +277,7 @@ async def check_defaults_handling(
     kwargs["tzinfo"] = pytz.timezone("America/New_York")
     defaults_custom_defaults = Defaults(**kwargs)
 
-    expected_return_values = [None, []] if return_value is None else [return_value]
+    expected_return_values = [None, ()] if return_value is None else [return_value]
 
     async def make_assertion(
         url, request_data: RequestData, df_value=DEFAULT_NONE, *args, **kwargs

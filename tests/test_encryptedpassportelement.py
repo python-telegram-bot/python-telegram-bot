@@ -60,7 +60,7 @@ class TestEncryptedPassportElement:
         assert encrypted_passport_element.data == self.data
         assert encrypted_passport_element.phone_number == self.phone_number
         assert encrypted_passport_element.email == self.email
-        assert encrypted_passport_element.files == self.files
+        assert encrypted_passport_element.files == tuple(self.files)
         assert encrypted_passport_element.front_side == self.front_side
         assert encrypted_passport_element.reverse_side == self.reverse_side
         assert encrypted_passport_element.selfie == self.selfie
@@ -89,6 +89,11 @@ class TestEncryptedPassportElement:
             encrypted_passport_element_dict["selfie"]
             == encrypted_passport_element.selfie.to_dict()
         )
+
+    def test_attributes_always_tuple(self):
+        element = EncryptedPassportElement(self.type_, self.hash)
+        assert element.files == ()
+        assert element.translation == ()
 
     def test_equality(self):
         a = EncryptedPassportElement(self.type_, self.hash, data=self.data)

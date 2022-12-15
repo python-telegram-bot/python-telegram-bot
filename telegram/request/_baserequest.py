@@ -23,7 +23,7 @@ import json
 from contextlib import AbstractAsyncContextManager
 from http import HTTPStatus
 from types import TracebackType
-from typing import ClassVar, Optional, Tuple, Type, TypeVar, Union
+from typing import ClassVar, List, Optional, Tuple, Type, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
@@ -132,7 +132,7 @@ class BaseRequest(
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> Union[JSONDict, bool]:
+    ) -> Union[JSONDict, List[JSONDict], bool]:
         """Makes a request to the Bot API handles the return code and parses the answer.
 
         Warning:
@@ -161,7 +161,7 @@ class BaseRequest(
                 :attr:`DEFAULT_NONE`.
 
         Returns:
-          Dict[:obj:`str`, ...]: The JSON response of the Bot API.
+          The JSON response of the Bot API.
 
         """
         result = await self._request_wrapper(

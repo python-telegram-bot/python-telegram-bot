@@ -97,6 +97,8 @@ class InputLocationMessageContent(InputMessageContent):
 
         self._id_attrs = (self.latitude, self.longitude)
 
+        self._freeze()
+
     HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
 

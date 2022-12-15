@@ -55,6 +55,8 @@ class BotCommand(TelegramObject):
 
         self._id_attrs = (self.command, self.description)
 
+        self._freeze()
+
     MIN_COMMAND: ClassVar[int] = constants.BotCommandLimit.MIN_COMMAND
     """:const:`telegram.constants.BotCommandLimit.MIN_COMMAND`
 

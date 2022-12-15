@@ -89,7 +89,7 @@ class TestWebhookInfo:
         assert isinstance(webhook_info.last_error_date, datetime)
         assert webhook_info.last_error_date == from_timestamp(self.last_error_date)
         assert webhook_info.max_connections == self.max_connections
-        assert webhook_info.allowed_updates == self.allowed_updates
+        assert webhook_info.allowed_updates == tuple(self.allowed_updates)
         assert webhook_info.ip_address == self.ip_address
         assert isinstance(webhook_info.last_synchronization_error_date, datetime)
         assert webhook_info.last_synchronization_error_date == from_timestamp(
@@ -98,6 +98,12 @@ class TestWebhookInfo:
 
         none = WebhookInfo.de_json(None, bot)
         assert none is None
+
+    def test_always_tuple_allowed_updates(self):
+        webhook_info = WebhookInfo(
+            self.url, self.has_custom_certificate, self.pending_update_count
+        )
+        assert webhook_info.allowed_updates == ()
 
     def test_equality(self):
         a = WebhookInfo(

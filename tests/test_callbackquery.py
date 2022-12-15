@@ -39,6 +39,7 @@ def callback_query(bot, request):
         game_short_name=TestCallbackQuery.game_short_name,
     )
     cbq.set_bot(bot)
+    cbq._unfreeze()
     if request.param == "message":
         cbq.message = TestCallbackQuery.message
         cbq.message.set_bot(bot)

@@ -190,7 +190,7 @@ class TestVideo:
         )
 
         assert message.caption == test_string
-        assert message.caption_entities == entities
+        assert message.caption_entities == tuple(entities)
 
     @pytest.mark.flaky(3, 1)
     async def test_resend(self, bot, chat_id, video):

@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
-
-from typing import List, Tuple, Union
+from typing import Sequence
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -42,7 +42,11 @@ class InputTextMessageContent(InputMessageContent):
             :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
-        entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+        entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.
 
@@ -51,7 +55,12 @@ class InputTextMessageContent(InputMessageContent):
             1-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 
@@ -64,7 +73,7 @@ class InputTextMessageContent(InputMessageContent):
         message_text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        entities: Sequence[MessageEntity] = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -73,7 +82,9 @@ class InputTextMessageContent(InputMessageContent):
         self.message_text = message_text
         # Optionals
         self.parse_mode = parse_mode
-        self.entities = entities
+        self.entities = parse_sequence_arg(entities)
         self.disable_web_page_preview = disable_web_page_preview
 
         self._id_attrs = (self.message_text,)
+
+        self._freeze()
