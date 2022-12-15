@@ -501,6 +501,12 @@ class SetSpace:
 
 
 class TestStickerSetNoReq:
+    def test_slot_behaviour(self, mro_slots):
+        inst = StickerSet("this", "is", True, SetSpace.stickers, True, "not")
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
     def test_de_json(self, bot, sticker):
         name = f"test_by_{bot.username}"
         json_dict = {
@@ -864,6 +870,12 @@ class MaskSpace:
 
 
 class TestMaskPositionNoReq:
+    def test_slot_behaviour(self, mask_position, mro_slots):
+        inst = mask_position
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
     def test_mask_position_de_json(self, bot):
         json_dict = {
             "point": MaskSpace.point,

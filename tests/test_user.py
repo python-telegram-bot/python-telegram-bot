@@ -137,6 +137,22 @@ class TestUserNoReq:
         assert user.is_premium == Space.is_premium
         assert user.added_to_attachment_menu == Space.added_to_attachment_menu
 
+    def test_to_dict(self, user):
+        user_dict = user.to_dict()
+
+        assert isinstance(user_dict, dict)
+        assert user_dict["id"] == user.id
+        assert user_dict["is_bot"] == user.is_bot
+        assert user_dict["first_name"] == user.first_name
+        assert user_dict["last_name"] == user.last_name
+        assert user_dict["username"] == user.username
+        assert user_dict["language_code"] == user.language_code
+        assert user_dict["can_join_groups"] == user.can_join_groups
+        assert user_dict["can_read_all_group_messages"] == user.can_read_all_group_messages
+        assert user_dict["supports_inline_queries"] == user.supports_inline_queries
+        assert user_dict["is_premium"] == user.is_premium
+        assert user_dict["added_to_attachment_menu"] == user.added_to_attachment_menu
+
     def test_equality(self):
         a = User(Space.id_, Space.first_name, Space.is_bot, Space.last_name)
         b = User(Space.id_, Space.first_name, Space.is_bot, Space.last_name)
