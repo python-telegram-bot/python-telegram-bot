@@ -79,7 +79,7 @@ class _BaseMedium(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> "File":
-        """Convenience wrapper over :attr:`telegram.Bot.get_file`
+        """Convenience wrapper over :meth:`telegram.Bot.get_file`
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
 

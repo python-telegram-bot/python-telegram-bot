@@ -2,6 +2,7 @@ Passport
 --------
 
 .. toctree::
+    :titlesonly:
 
     telegram.credentials
     telegram.datacredentials

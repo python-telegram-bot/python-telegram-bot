@@ -111,7 +111,7 @@ class ChatPhoto(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> "File":
-        """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the small
+        """Convenience wrapper over :meth:`telegram.Bot.get_file` for getting the small
         (:tg-const:`telegram.ChatPhoto.SIZE_SMALL` x :tg-const:`telegram.ChatPhoto.SIZE_SMALL`)
         chat photo
 
@@ -142,7 +142,7 @@ class ChatPhoto(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> "File":
-        """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the
+        """Convenience wrapper over :meth:`telegram.Bot.get_file` for getting the
         big (:tg-const:`telegram.ChatPhoto.SIZE_BIG` x :tg-const:`telegram.ChatPhoto.SIZE_BIG`)
         chat photo
 

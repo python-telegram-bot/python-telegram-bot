@@ -157,7 +157,7 @@ class PassportFile(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> "File":
         """
-        Wrapper over :attr:`telegram.Bot.get_file`. Will automatically assign the correct
+        Wrapper over :meth:`telegram.Bot.get_file`. Will automatically assign the correct
         credentials to the returned :class:`telegram.File` if originating from
         :obj:`telegram.PassportData.decrypted_data`.
 

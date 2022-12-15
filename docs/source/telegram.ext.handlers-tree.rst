@@ -2,6 +2,7 @@ Handlers
 --------
 
 .. toctree::
+    :titlesonly:
 
     telegram.ext.basehandler
     telegram.ext.callbackqueryhandler

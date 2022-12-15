@@ -2,6 +2,7 @@ Inline Mode
 -----------
 
 .. toctree::
+    :titlesonly:
 
     telegram.choseninlineresult
     telegram.inlinequery

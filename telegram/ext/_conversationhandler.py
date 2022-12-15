@@ -208,6 +208,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             handled.
         allow_reentry (:obj:`bool`, optional): If set to :obj:`True`, a user that is currently in a
             conversation can restart the conversation by triggering one of the entry points.
+            Default is :obj:`False`.
         per_chat (:obj:`bool`, optional): If the conversation key should contain the Chat's ID.
             Default is :obj:`True`.
         per_user (:obj:`bool`, optional): If the conversation key should contain the User's ID.

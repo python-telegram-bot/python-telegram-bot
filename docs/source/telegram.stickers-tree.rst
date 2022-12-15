@@ -2,6 +2,7 @@ Stickers
 --------
 
 .. toctree::
+    :titlesonly:
 
     telegram.maskposition
     telegram.sticker
