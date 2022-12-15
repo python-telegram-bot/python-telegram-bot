@@ -27,7 +27,7 @@ from tests.auxil.bot_method_checks import (
 )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 def json_dict():
     return {
         "id": Space.id_,
@@ -93,43 +93,6 @@ class TestUserNoReq:
         assert user.first_name == Space.first_name
         assert user.last_name == Space.last_name
         assert user.username == Space.username
-        assert user.language_code == Space.language_code
-        assert user.can_join_groups == Space.can_join_groups
-        assert user.can_read_all_group_messages == Space.can_read_all_group_messages
-        assert user.supports_inline_queries == Space.supports_inline_queries
-        assert user.is_premium == Space.is_premium
-        assert user.added_to_attachment_menu == Space.added_to_attachment_menu
-
-    def test_de_json_without_username(self, json_dict, bot):
-        del json_dict["username"]
-
-        user = User.de_json(json_dict, bot)
-        assert user.api_kwargs == {}
-
-        assert user.id == Space.id_
-        assert user.is_bot == Space.is_bot
-        assert user.first_name == Space.first_name
-        assert user.last_name == Space.last_name
-        assert user.username is None
-        assert user.language_code == Space.language_code
-        assert user.can_join_groups == Space.can_join_groups
-        assert user.can_read_all_group_messages == Space.can_read_all_group_messages
-        assert user.supports_inline_queries == Space.supports_inline_queries
-        assert user.is_premium == Space.is_premium
-        assert user.added_to_attachment_menu == Space.added_to_attachment_menu
-
-    def test_de_json_without_username_and_last_name(self, json_dict, bot):
-        del json_dict["username"]
-        del json_dict["last_name"]
-
-        user = User.de_json(json_dict, bot)
-        assert user.api_kwargs == {}
-
-        assert user.id == Space.id_
-        assert user.is_bot == Space.is_bot
-        assert user.first_name == Space.first_name
-        assert user.last_name is None
-        assert user.username is None
         assert user.language_code == Space.language_code
         assert user.can_join_groups == Space.can_join_groups
         assert user.can_read_all_group_messages == Space.can_read_all_group_messages
