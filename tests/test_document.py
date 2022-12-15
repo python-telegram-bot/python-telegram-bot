@@ -80,6 +80,55 @@ class TestDocumentNoReq:
         assert document.thumb.width == Space.thumb_width
         assert document.thumb.height == Space.thumb_height
 
+    def test_de_json(self, bot, document):
+        json_dict = {
+            "file_id": Space.document_file_id,
+            "file_unique_id": Space.document_file_unique_id,
+            "thumb": document.thumb.to_dict(),
+            "file_name": Space.file_name,
+            "mime_type": Space.mime_type,
+            "file_size": Space.file_size,
+        }
+        test_document = Document.de_json(json_dict, bot)
+        assert test_document.api_kwargs == {}
+
+        assert test_document.file_id == Space.document_file_id
+        assert test_document.file_unique_id == Space.document_file_unique_id
+        assert test_document.thumb == document.thumb
+        assert test_document.file_name == Space.file_name
+        assert test_document.mime_type == Space.mime_type
+        assert test_document.file_size == Space.file_size
+
+    def test_to_dict(self, document):
+        document_dict = document.to_dict()
+
+        assert isinstance(document_dict, dict)
+        assert document_dict["file_id"] == document.file_id
+        assert document_dict["file_unique_id"] == document.file_unique_id
+        assert document_dict["file_name"] == document.file_name
+        assert document_dict["mime_type"] == document.mime_type
+        assert document_dict["file_size"] == document.file_size
+
+    def test_equality(self, document):
+        a = Document(document.file_id, document.file_unique_id)
+        b = Document("", document.file_unique_id)
+        d = Document("", "")
+        e = Voice(document.file_id, document.file_unique_id, 0)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+    async def test_error_send_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            await bot.send_document(chat_id=chat_id)
+
     @pytest.mark.parametrize("disable_content_type_detection", [True, False, None])
     async def test_send_with_document(
         self, monkeypatch, bot, chat_id, document, disable_content_type_detection
@@ -125,39 +174,6 @@ class TestDocumentNoReq:
         finally:
             bot._local_mode = False
 
-    def test_de_json(self, bot, document):
-        json_dict = {
-            "file_id": Space.document_file_id,
-            "file_unique_id": Space.document_file_unique_id,
-            "thumb": document.thumb.to_dict(),
-            "file_name": Space.file_name,
-            "mime_type": Space.mime_type,
-            "file_size": Space.file_size,
-        }
-        test_document = Document.de_json(json_dict, bot)
-        assert test_document.api_kwargs == {}
-
-        assert test_document.file_id == Space.document_file_id
-        assert test_document.file_unique_id == Space.document_file_unique_id
-        assert test_document.thumb == document.thumb
-        assert test_document.file_name == Space.file_name
-        assert test_document.mime_type == Space.mime_type
-        assert test_document.file_size == Space.file_size
-
-    def test_to_dict(self, document):
-        document_dict = document.to_dict()
-
-        assert isinstance(document_dict, dict)
-        assert document_dict["file_id"] == document.file_id
-        assert document_dict["file_unique_id"] == document.file_unique_id
-        assert document_dict["file_name"] == document.file_name
-        assert document_dict["mime_type"] == document.mime_type
-        assert document_dict["file_size"] == document.file_size
-
-    async def test_error_send_without_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError):
-            await bot.send_document(chat_id=chat_id)
-
     async def test_get_file_instance_method(self, monkeypatch, document):
         async def make_assertion(*_, **kwargs):
             return kwargs["file_id"] == document.file_id
@@ -168,22 +184,6 @@ class TestDocumentNoReq:
 
         monkeypatch.setattr(document.get_bot(), "get_file", make_assertion)
         assert await document.get_file()
-
-    def test_equality(self, document):
-        a = Document(document.file_id, document.file_unique_id)
-        b = Document("", document.file_unique_id)
-        d = Document("", "")
-        e = Voice(document.file_id, document.file_unique_id, 0)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)
 
 
 class TestDocumentReq:

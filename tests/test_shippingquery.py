@@ -73,21 +73,6 @@ class TestShippingQueryNoReq:
         assert shipping_query_dict["from"] == shipping_query.from_user.to_dict()
         assert shipping_query_dict["shipping_address"] == shipping_query.shipping_address.to_dict()
 
-    async def test_answer(self, monkeypatch, shipping_query):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["shipping_query_id"] == shipping_query.id
-
-        assert check_shortcut_signature(
-            ShippingQuery.answer, Bot.answer_shipping_query, ["shipping_query_id"], []
-        )
-        assert await check_shortcut_call(
-            shipping_query.answer, shipping_query._bot, "answer_shipping_query"
-        )
-        assert await check_defaults_handling(shipping_query.answer, shipping_query._bot)
-
-        monkeypatch.setattr(shipping_query._bot, "answer_shipping_query", make_assertion)
-        assert await shipping_query.answer(ok=True)
-
     def test_equality(self):
         a = ShippingQuery(
             Space.id_, Space.from_user, Space.invoice_payload, Space.shipping_address
@@ -111,3 +96,18 @@ class TestShippingQueryNoReq:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_answer(self, monkeypatch, shipping_query):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["shipping_query_id"] == shipping_query.id
+
+        assert check_shortcut_signature(
+            ShippingQuery.answer, Bot.answer_shipping_query, ["shipping_query_id"], []
+        )
+        assert await check_shortcut_call(
+            shipping_query.answer, shipping_query._bot, "answer_shipping_query"
+        )
+        assert await check_defaults_handling(shipping_query.answer, shipping_query._bot)
+
+        monkeypatch.setattr(shipping_query._bot, "answer_shipping_query", make_assertion)
+        assert await shipping_query.answer(ok=True)

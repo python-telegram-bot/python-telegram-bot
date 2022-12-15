@@ -88,46 +88,6 @@ class TestAudioNoReq:
         assert audio.thumb.width == Space.thumb_width
         assert audio.thumb.height == Space.thumb_height
 
-    async def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-
-        assert await bot.send_audio(chat_id, audio_file, filename="custom_filename")
-
-    async def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["audio"] == audio.file_id
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_audio(audio=audio, chat_id=chat_id)
-        assert message
-
-    @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_audio_local_files(self, monkeypatch, bot, chat_id, local_mode):
-        try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
-            test_flag = False
-            file = data_file("telegram.jpg")
-            expected = file.as_uri()
-
-            async def make_assertion(_, data, *args, **kwargs):
-                nonlocal test_flag
-                if local_mode:
-                    test_flag = data.get("audio") == expected and data.get("thumb") == expected
-                else:
-                    test_flag = isinstance(data.get("audio"), InputFile) and isinstance(
-                        data.get("thumb"), InputFile
-                    )
-
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_audio(chat_id, file, thumb=file)
-            assert test_flag
-        finally:
-            bot._local_mode = False
-
     def test_de_json(self, bot, audio):
         json_dict = {
             "file_id": Space.audio_file_id,
@@ -164,17 +124,6 @@ class TestAudioNoReq:
         assert audio_dict["file_size"] == audio.file_size
         assert audio_dict["file_name"] == audio.file_name
 
-    async def test_get_file_instance_method(self, monkeypatch, audio):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == audio.file_id
-
-        assert check_shortcut_signature(Audio.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(audio.get_file, audio.get_bot(), "get_file")
-        assert await check_defaults_handling(audio.get_file, audio.get_bot())
-
-        monkeypatch.setattr(audio._bot, "get_file", make_assertion)
-        assert await audio.get_file()
-
     def test_equality(self, audio):
         a = Audio(audio.file_id, audio.file_unique_id, audio.duration)
         b = Audio("", audio.file_unique_id, audio.duration)
@@ -194,6 +143,55 @@ class TestAudioNoReq:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["audio"] == audio.file_id
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_audio(audio=audio, chat_id=chat_id)
+
+    async def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_audio(chat_id, audio_file, filename="custom_filename")
+
+    @pytest.mark.parametrize("local_mode", [True, False])
+    async def test_send_audio_local_files(self, monkeypatch, bot, chat_id, local_mode):
+        try:
+            bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local bot API set up
+            test_flag = False
+            file = data_file("telegram.jpg")
+            expected = file.as_uri()
+
+            async def make_assertion(_, data, *args, **kwargs):
+                nonlocal test_flag
+                if local_mode:
+                    test_flag = data.get("audio") == expected and data.get("thumb") == expected
+                else:
+                    test_flag = isinstance(data.get("audio"), InputFile) and isinstance(
+                        data.get("thumb"), InputFile
+                    )
+
+            monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.send_audio(chat_id, file, thumb=file)
+            assert test_flag
+        finally:
+            bot._local_mode = False
+
+    async def test_get_file_instance_method(self, monkeypatch, audio):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["file_id"] == audio.file_id
+
+        assert check_shortcut_signature(Audio.get_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(audio.get_file, audio.get_bot(), "get_file")
+        assert await check_defaults_handling(audio.get_file, audio.get_bot())
+
+        monkeypatch.setattr(audio._bot, "get_file", make_assertion)
+        assert await audio.get_file()
 
 
 class TestAudioReq:
@@ -242,7 +240,6 @@ class TestAudioReq:
         assert str(new_file.file_path).startswith("https://")
 
         await new_file.download_to_drive("telegram.mp3")
-
         assert path.is_file()
 
     async def test_send_mp3_url_file(self, bot, chat_id, audio):
@@ -260,11 +257,6 @@ class TestAudioReq:
         assert message.audio.duration == audio.duration
         assert message.audio.mime_type == audio.mime_type
         assert message.audio.file_size == audio.file_size
-
-    async def test_resend(self, bot, chat_id, audio):
-        message = await bot.send_audio(chat_id=chat_id, audio=audio.file_id)
-
-        assert message.audio == audio
 
     async def test_send_audio_caption_entities(self, bot, chat_id, audio):
         test_string = "Italic Bold Code"
@@ -318,6 +310,10 @@ class TestAudioReq:
         protected, unprotected = await tasks
         assert protected.has_protected_content
         assert not unprotected.has_protected_content
+
+    async def test_resend(self, bot, chat_id, audio):
+        message = await bot.send_audio(chat_id=chat_id, audio=audio.file_id)
+        assert message.audio == audio
 
     async def test_error_send_empty_file(self, bot, chat_id):
         audio_file = open(os.devnull, "rb")

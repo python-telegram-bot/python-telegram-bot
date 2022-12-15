@@ -90,46 +90,6 @@ class TestVideoNoReq:
         assert video.file_size == Space.file_size
         assert video.mime_type == Space.mime_type
 
-    async def test_send_video_custom_filename(self, bot, chat_id, video_file, monkeypatch):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-
-        assert await bot.send_video(chat_id, video_file, filename="custom_filename")
-
-    async def test_send_with_video(self, monkeypatch, bot, chat_id, video):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["video"] == video.file_id
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_video(chat_id, video=video)
-        assert message
-
-    @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_video_local_files(self, monkeypatch, bot, chat_id, local_mode):
-        try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
-            test_flag = False
-            file = data_file("telegram.jpg")
-            expected = file.as_uri()
-
-            async def make_assertion(_, data, *args, **kwargs):
-                nonlocal test_flag
-                if local_mode:
-                    test_flag = data.get("video") == expected and data.get("thumb") == expected
-                else:
-                    test_flag = isinstance(data.get("video"), InputFile) and isinstance(
-                        data.get("thumb"), InputFile
-                    )
-
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_video(chat_id, file, thumb=file)
-            assert test_flag
-        finally:
-            bot._local_mode = False
-
     def test_de_json(self, bot):
         json_dict = {
             "file_id": Space.video_file_id,
@@ -166,21 +126,6 @@ class TestVideoNoReq:
         assert video_dict["file_size"] == video.file_size
         assert video_dict["file_name"] == video.file_name
 
-    async def test_error_without_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError):
-            await bot.send_video(chat_id=chat_id)
-
-    async def test_get_file_instance_method(self, monkeypatch, video):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == video.file_id
-
-        assert check_shortcut_signature(Video.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(video.get_file, video.get_bot(), "get_file")
-        assert await check_defaults_handling(video.get_file, video.get_bot())
-
-        monkeypatch.setattr(video.get_bot(), "get_file", make_assertion)
-        assert await video.get_file()
-
     def test_equality(self, video):
         a = Video(video.file_id, video.file_unique_id, Space.width, Space.height, Space.duration)
         b = Video("", video.file_unique_id, Space.width, Space.height, Space.duration)
@@ -200,6 +145,60 @@ class TestVideoNoReq:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_error_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            await bot.send_video(chat_id=chat_id)
+
+    async def test_send_with_video(self, monkeypatch, bot, chat_id, video):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["video"] == video.file_id
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_video(chat_id, video=video)
+
+    async def test_send_video_custom_filename(self, bot, chat_id, video_file, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        assert await bot.send_video(chat_id, video_file, filename="custom_filename")
+
+    @pytest.mark.parametrize("local_mode", [True, False])
+    async def test_send_video_local_files(self, monkeypatch, bot, chat_id, local_mode):
+        try:
+            bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local bot API set up
+            test_flag = False
+            file = data_file("telegram.jpg")
+            expected = file.as_uri()
+
+            async def make_assertion(_, data, *args, **kwargs):
+                nonlocal test_flag
+                if local_mode:
+                    test_flag = data.get("video") == expected and data.get("thumb") == expected
+                else:
+                    test_flag = isinstance(data.get("video"), InputFile) and isinstance(
+                        data.get("thumb"), InputFile
+                    )
+
+            monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.send_video(chat_id, file, thumb=file)
+            assert test_flag
+        finally:
+            bot._local_mode = False
+
+    async def test_get_file_instance_method(self, monkeypatch, video):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["file_id"] == video.file_id
+
+        assert check_shortcut_signature(Video.get_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(video.get_file, video.get_bot(), "get_file")
+        assert await check_defaults_handling(video.get_file, video.get_bot())
+
+        monkeypatch.setattr(video.get_bot(), "get_file", make_assertion)
+        assert await video.get_file()
 
 
 class TestVideoReq:

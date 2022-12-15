@@ -144,6 +144,26 @@ class TestUpdateNoReq:
             if getattr(update, _type) is not None:
                 assert update_dict[_type] == getattr(update, _type).to_dict()
 
+    def test_equality(self):
+        a = Update(Space.update_id, message=message)
+        b = Update(Space.update_id, message=message)
+        c = Update(Space.update_id)
+        d = Update(0, message=message)
+        e = User(Space.update_id, "", False)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
     def test_effective_chat(self, update):
         # Test that it's sometimes None per docstring
         chat = update.effective_chat
@@ -190,23 +210,3 @@ class TestUpdateNoReq:
             assert eff_message.message_id == message.message_id
         else:
             assert eff_message is None
-
-    def test_equality(self):
-        a = Update(Space.update_id, message=message)
-        b = Update(Space.update_id, message=message)
-        c = Update(Space.update_id)
-        d = Update(0, message=message)
-        e = User(Space.update_id, "", False)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

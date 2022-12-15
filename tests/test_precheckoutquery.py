@@ -93,27 +93,6 @@ class TestPreCheckoutQueryNoReq:
         assert pre_checkout_query_dict["from"] == pre_checkout_query.from_user.to_dict()
         assert pre_checkout_query_dict["order_info"] == pre_checkout_query.order_info.to_dict()
 
-    async def test_answer(self, monkeypatch, pre_checkout_query):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["pre_checkout_query_id"] == pre_checkout_query.id
-
-        assert check_shortcut_signature(
-            PreCheckoutQuery.answer, Bot.answer_pre_checkout_query, ["pre_checkout_query_id"], []
-        )
-        assert await check_shortcut_call(
-            pre_checkout_query.answer,
-            pre_checkout_query.get_bot(),
-            "answer_pre_checkout_query",
-        )
-        assert await check_defaults_handling(
-            pre_checkout_query.answer, pre_checkout_query.get_bot()
-        )
-
-        monkeypatch.setattr(
-            pre_checkout_query.get_bot(), "answer_pre_checkout_query", make_assertion
-        )
-        assert await pre_checkout_query.answer(ok=True)
-
     def test_equality(self):
         a = PreCheckoutQuery(
             Space.id_, Space.from_user, Space.currency, Space.total_amount, Space.invoice_payload
@@ -139,3 +118,24 @@ class TestPreCheckoutQueryNoReq:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_answer(self, monkeypatch, pre_checkout_query):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["pre_checkout_query_id"] == pre_checkout_query.id
+
+        assert check_shortcut_signature(
+            PreCheckoutQuery.answer, Bot.answer_pre_checkout_query, ["pre_checkout_query_id"], []
+        )
+        assert await check_shortcut_call(
+            pre_checkout_query.answer,
+            pre_checkout_query.get_bot(),
+            "answer_pre_checkout_query",
+        )
+        assert await check_defaults_handling(
+            pre_checkout_query.answer, pre_checkout_query.get_bot()
+        )
+
+        monkeypatch.setattr(
+            pre_checkout_query.get_bot(), "answer_pre_checkout_query", make_assertion
+        )
+        assert await pre_checkout_query.answer(ok=True)

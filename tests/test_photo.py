@@ -99,12 +99,70 @@ class TestPhotoNoReq:
         assert thumb.height == 90
         assert thumb.file_size == 1477
 
+    def test_de_json(self, bot, photo):
+        json_dict = {
+            "file_id": photo.file_id,
+            "file_unique_id": photo.file_unique_id,
+            "width": Space.width,
+            "height": Space.height,
+            "file_size": Space.file_size,
+        }
+        json_photo = PhotoSize.de_json(json_dict, bot)
+        assert json_photo.api_kwargs == {}
+
+        assert json_photo.file_id == photo.file_id
+        assert json_photo.file_unique_id == photo.file_unique_id
+        assert json_photo.width == Space.width
+        assert json_photo.height == Space.height
+        assert json_photo.file_size == Space.file_size
+
+    def test_to_dict(self, photo):
+        photo_dict = photo.to_dict()
+
+        assert isinstance(photo_dict, dict)
+        assert photo_dict["file_id"] == photo.file_id
+        assert photo_dict["file_unique_id"] == photo.file_unique_id
+        assert photo_dict["width"] == photo.width
+        assert photo_dict["height"] == photo.height
+        assert photo_dict["file_size"] == photo.file_size
+
+    def test_equality(self, photo):
+        a = PhotoSize(photo.file_id, photo.file_unique_id, Space.width, Space.height)
+        b = PhotoSize("", photo.file_unique_id, Space.width, Space.height)
+        c = PhotoSize(photo.file_id, photo.file_unique_id, 0, 0)
+        d = PhotoSize("", "", Space.width, Space.height)
+        e = Sticker(
+            photo.file_id,
+            photo.file_unique_id,
+            Space.width,
+            Space.height,
+            False,
+            False,
+            Sticker.REGULAR,
+        )
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+    async def test_error_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            await bot.send_photo(chat_id=chat_id)
+
     async def test_send_photo_custom_filename(self, bot, chat_id, photo_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return list(request_data.multipart_data.values())[0][0] == "custom_filename"
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
-
         assert await bot.send_photo(chat_id, photo_file, filename="custom_filename")
 
     @pytest.mark.parametrize("local_mode", [True, False])
@@ -134,39 +192,7 @@ class TestPhotoNoReq:
             return request_data.json_parameters["photo"] == photo.file_id
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_photo(photo=photo, chat_id=chat_id)
-        assert message
-
-    def test_de_json(self, bot, photo):
-        json_dict = {
-            "file_id": photo.file_id,
-            "file_unique_id": photo.file_unique_id,
-            "width": Space.width,
-            "height": Space.height,
-            "file_size": Space.file_size,
-        }
-        json_photo = PhotoSize.de_json(json_dict, bot)
-        assert json_photo.api_kwargs == {}
-
-        assert json_photo.file_id == photo.file_id
-        assert json_photo.file_unique_id == photo.file_unique_id
-        assert json_photo.width == Space.width
-        assert json_photo.height == Space.height
-        assert json_photo.file_size == Space.file_size
-
-    def test_to_dict(self, photo):
-        photo_dict = photo.to_dict()
-
-        assert isinstance(photo_dict, dict)
-        assert photo_dict["file_id"] == photo.file_id
-        assert photo_dict["file_unique_id"] == photo.file_unique_id
-        assert photo_dict["width"] == photo.width
-        assert photo_dict["height"] == photo.height
-        assert photo_dict["file_size"] == photo.file_size
-
-    async def test_error_without_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError):
-            await bot.send_photo(chat_id=chat_id)
+        assert await bot.send_photo(photo=photo, chat_id=chat_id)
 
     async def test_get_file_instance_method(self, monkeypatch, photo):
         async def make_assertion(*_, **kwargs):
@@ -178,34 +204,6 @@ class TestPhotoNoReq:
 
         monkeypatch.setattr(photo.get_bot(), "get_file", make_assertion)
         assert await photo.get_file()
-
-    def test_equality(self, photo):
-        a = PhotoSize(photo.file_id, photo.file_unique_id, Space.width, Space.height)
-        b = PhotoSize("", photo.file_unique_id, Space.width, Space.height)
-        c = PhotoSize(photo.file_id, photo.file_unique_id, 0, 0)
-        d = PhotoSize("", "", Space.width, Space.height)
-        e = Sticker(
-            photo.file_id,
-            photo.file_unique_id,
-            Space.width,
-            Space.height,
-            False,
-            False,
-            Sticker.REGULAR,
-        )
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)
 
 
 class TestPhotoReq:

@@ -64,14 +64,6 @@ class TestChatPhotoNoReq:
             assert getattr(chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(chat_photo)) == len(set(mro_slots(chat_photo))), "duplicate slot"
 
-    async def test_send_with_chat_photo(self, monkeypatch, bot, super_group_id, chat_photo):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.parameters["photo"] == chat_photo.to_dict()
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.set_chat_photo(photo=chat_photo, chat_id=super_group_id)
-        assert message
-
     def test_de_json(self, bot, chat_photo):
         json_dict = {
             "small_file_id": Space.chatphoto_small_file_id,
@@ -94,30 +86,6 @@ class TestChatPhotoNoReq:
         assert chat_photo_dict["big_file_id"] == chat_photo.big_file_id
         assert chat_photo_dict["small_file_unique_id"] == chat_photo.small_file_unique_id
         assert chat_photo_dict["big_file_unique_id"] == chat_photo.big_file_unique_id
-
-    async def test_get_small_file_instance_method(self, monkeypatch, chat_photo):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == chat_photo.small_file_id
-
-        assert check_shortcut_signature(ChatPhoto.get_small_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(
-            chat_photo.get_small_file, chat_photo.get_bot(), "get_file"
-        )
-        assert await check_defaults_handling(chat_photo.get_small_file, chat_photo.get_bot())
-
-        monkeypatch.setattr(chat_photo.get_bot(), "get_file", make_assertion)
-        assert await chat_photo.get_small_file()
-
-    async def test_get_big_file_instance_method(self, monkeypatch, chat_photo):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == chat_photo.big_file_id
-
-        assert check_shortcut_signature(ChatPhoto.get_big_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(chat_photo.get_big_file, chat_photo.get_bot(), "get_file")
-        assert await check_defaults_handling(chat_photo.get_big_file, chat_photo.get_bot())
-
-        monkeypatch.setattr(chat_photo.get_bot(), "get_file", make_assertion)
-        assert await chat_photo.get_big_file()
 
     def test_equality(self):
         a = ChatPhoto(
@@ -150,6 +118,38 @@ class TestChatPhotoNoReq:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_send_with_chat_photo(self, monkeypatch, bot, super_group_id, chat_photo):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters["photo"] == chat_photo.to_dict()
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        message = await bot.set_chat_photo(photo=chat_photo, chat_id=super_group_id)
+        assert message
+
+    async def test_get_small_file_instance_method(self, monkeypatch, chat_photo):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["file_id"] == chat_photo.small_file_id
+
+        assert check_shortcut_signature(ChatPhoto.get_small_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(
+            chat_photo.get_small_file, chat_photo.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(chat_photo.get_small_file, chat_photo.get_bot())
+
+        monkeypatch.setattr(chat_photo.get_bot(), "get_file", make_assertion)
+        assert await chat_photo.get_small_file()
+
+    async def test_get_big_file_instance_method(self, monkeypatch, chat_photo):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["file_id"] == chat_photo.big_file_id
+
+        assert check_shortcut_signature(ChatPhoto.get_big_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(chat_photo.get_big_file, chat_photo.get_bot(), "get_file")
+        assert await check_defaults_handling(chat_photo.get_big_file, chat_photo.get_bot())
+
+        monkeypatch.setattr(chat_photo.get_bot(), "get_file", make_assertion)
+        assert await chat_photo.get_big_file()
 
 
 class TestChatPhotoReq:

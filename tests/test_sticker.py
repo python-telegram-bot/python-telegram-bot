@@ -127,6 +127,20 @@ class TestStickerNoReq:
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert sticker.premium_animation == StickerSpace.premium_animation
 
+    def test_to_dict(self, sticker):
+        sticker_dict = sticker.to_dict()
+
+        assert isinstance(sticker_dict, dict)
+        assert sticker_dict["file_id"] == sticker.file_id
+        assert sticker_dict["file_unique_id"] == sticker.file_unique_id
+        assert sticker_dict["width"] == sticker.width
+        assert sticker_dict["height"] == sticker.height
+        assert sticker_dict["is_animated"] == sticker.is_animated
+        assert sticker_dict["is_video"] == sticker.is_video
+        assert sticker_dict["file_size"] == sticker.file_size
+        assert sticker_dict["thumb"] == sticker.thumb.to_dict()
+        assert sticker_dict["type"] == sticker.type
+
     def test_de_json(self, bot, sticker):
         json_dict = {
             "file_id": StickerSpace.sticker_file_id,
@@ -157,54 +171,6 @@ class TestStickerNoReq:
         assert json_sticker.premium_animation == StickerSpace.premium_animation
         assert json_sticker.type == StickerSpace.type
         assert json_sticker.custom_emoji_id == StickerSpace.custom_emoji_id
-
-    async def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["sticker"] == sticker.file_id
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_sticker(sticker=sticker, chat_id=chat_id)
-        assert message
-
-    @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_sticker_local_files(self, monkeypatch, bot, chat_id, local_mode):
-        try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
-            test_flag = False
-            file = data_file("telegram.jpg")
-            expected = file.as_uri()
-
-            async def make_assertion(_, data, *args, **kwargs):
-                nonlocal test_flag
-                if local_mode:
-                    test_flag = data.get("sticker") == expected
-                else:
-                    test_flag = isinstance(data.get("sticker"), InputFile)
-
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_sticker(chat_id, file)
-            assert test_flag
-        finally:
-            bot._local_mode = False
-
-    def test_to_dict(self, sticker):
-        sticker_dict = sticker.to_dict()
-
-        assert isinstance(sticker_dict, dict)
-        assert sticker_dict["file_id"] == sticker.file_id
-        assert sticker_dict["file_unique_id"] == sticker.file_unique_id
-        assert sticker_dict["width"] == sticker.width
-        assert sticker_dict["height"] == sticker.height
-        assert sticker_dict["is_animated"] == sticker.is_animated
-        assert sticker_dict["is_video"] == sticker.is_video
-        assert sticker_dict["file_size"] == sticker.file_size
-        assert sticker_dict["thumb"] == sticker.thumb.to_dict()
-        assert sticker_dict["type"] == sticker.type
-
-    async def test_error_without_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError):
-            await bot.send_sticker(chat_id)
 
     def test_equality(self, sticker):
         a = Sticker(
@@ -263,6 +229,39 @@ class TestStickerNoReq:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_error_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            await bot.send_sticker(chat_id)
+
+    async def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["sticker"] == sticker.file_id
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_sticker(sticker=sticker, chat_id=chat_id)
+
+    @pytest.mark.parametrize("local_mode", [True, False])
+    async def test_send_sticker_local_files(self, monkeypatch, bot, chat_id, local_mode):
+        try:
+            bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local bot API set up
+            test_flag = False
+            file = data_file("telegram.jpg")
+            expected = file.as_uri()
+
+            async def make_assertion(_, data, *args, **kwargs):
+                nonlocal test_flag
+                if local_mode:
+                    test_flag = data.get("sticker") == expected
+                else:
+                    test_flag = isinstance(data.get("sticker"), InputFile)
+
+            monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.send_sticker(chat_id, file)
+            assert test_flag
+        finally:
+            bot._local_mode = False
 
 
 class TestStickerReq:
@@ -537,6 +536,47 @@ class TestStickerSetNoReq:
         assert sticker_set_dict["thumb"] == sticker_set.thumb.to_dict()
         assert sticker_set_dict["sticker_type"] == sticker_set.sticker_type
 
+    def test_equality(self):
+        a = StickerSet(
+            SetSpace.name,
+            SetSpace.title,
+            SetSpace.is_animated,
+            SetSpace.stickers,
+            SetSpace.is_video,
+            SetSpace.sticker_type,
+        )
+        b = StickerSet(
+            SetSpace.name,
+            SetSpace.title,
+            SetSpace.is_animated,
+            SetSpace.stickers,
+            SetSpace.is_video,
+            SetSpace.sticker_type,
+        )
+        c = StickerSet(SetSpace.name, "title", False, [], True, Sticker.CUSTOM_EMOJI)
+        d = StickerSet(
+            "blah",
+            SetSpace.title,
+            SetSpace.is_animated,
+            SetSpace.stickers,
+            SetSpace.is_video,
+            SetSpace.sticker_type,
+        )
+        e = Audio(SetSpace.name, "", 0, None, None)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_upload_sticker_file_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
@@ -682,47 +722,6 @@ class TestStickerSetNoReq:
 
         monkeypatch.setattr(sticker.get_bot(), "get_file", make_assertion)
         assert await sticker.get_file()
-
-    def test_equality(self):
-        a = StickerSet(
-            SetSpace.name,
-            SetSpace.title,
-            SetSpace.is_animated,
-            SetSpace.stickers,
-            SetSpace.is_video,
-            SetSpace.sticker_type,
-        )
-        b = StickerSet(
-            SetSpace.name,
-            SetSpace.title,
-            SetSpace.is_animated,
-            SetSpace.stickers,
-            SetSpace.is_video,
-            SetSpace.sticker_type,
-        )
-        c = StickerSet(SetSpace.name, "title", False, [], True, Sticker.CUSTOM_EMOJI)
-        d = StickerSet(
-            "blah",
-            SetSpace.title,
-            SetSpace.is_animated,
-            SetSpace.stickers,
-            SetSpace.is_video,
-            SetSpace.sticker_type,
-        )
-        e = Audio(SetSpace.name, "", 0, None, None)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)
 
 
 class TestStickerSetReq:

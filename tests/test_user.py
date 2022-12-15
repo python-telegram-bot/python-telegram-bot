@@ -137,6 +137,26 @@ class TestUserNoReq:
         assert user.is_premium == Space.is_premium
         assert user.added_to_attachment_menu == Space.added_to_attachment_menu
 
+    def test_equality(self):
+        a = User(Space.id_, Space.first_name, Space.is_bot, Space.last_name)
+        b = User(Space.id_, Space.first_name, Space.is_bot, Space.last_name)
+        c = User(Space.id_, Space.first_name, Space.is_bot)
+        d = User(0, Space.first_name, Space.is_bot, Space.last_name)
+        e = Update(Space.id_)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
     def test_name(self, user):
         assert user.name == "@username"
         user.username = None
@@ -562,23 +582,3 @@ class TestUserNoReq:
             "the\\{name\\>\u2022", user.id
         )
         assert user.mention_markdown_v2(user.username) == expected.format(user.username, user.id)
-
-    def test_equality(self):
-        a = User(Space.id_, Space.first_name, Space.is_bot, Space.last_name)
-        b = User(Space.id_, Space.first_name, Space.is_bot, Space.last_name)
-        c = User(Space.id_, Space.first_name, Space.is_bot)
-        d = User(0, Space.first_name, Space.is_bot, Space.last_name)
-        e = Update(Space.id_)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

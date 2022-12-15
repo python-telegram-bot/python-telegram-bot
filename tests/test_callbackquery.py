@@ -123,6 +123,26 @@ class TestCallbackQueryNoReq:
         assert callback_query_dict["data"] == callback_query.data
         assert callback_query_dict["game_short_name"] == callback_query.game_short_name
 
+    def test_equality(self):
+        a = CallbackQuery(Space.id_, Space.from_user, "chat")
+        b = CallbackQuery(Space.id_, Space.from_user, "chat")
+        c = CallbackQuery(Space.id_, None, "")
+        d = CallbackQuery("", None, "chat")
+        e = Audio(Space.id_, "unique_id", 1)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
     async def test_answer(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
             return kwargs["callback_query_id"] == callback_query.id
@@ -449,23 +469,3 @@ class TestCallbackQueryNoReq:
 
         monkeypatch.setattr(callback_query.get_bot(), "copy_message", make_assertion)
         assert await callback_query.copy_message(1)
-
-    def test_equality(self):
-        a = CallbackQuery(Space.id_, Space.from_user, "chat")
-        b = CallbackQuery(Space.id_, Space.from_user, "chat")
-        c = CallbackQuery(Space.id_, None, "")
-        d = CallbackQuery("", None, "chat")
-        e = Audio(Space.id_, "unique_id", 1)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

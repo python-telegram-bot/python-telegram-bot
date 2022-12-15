@@ -27,6 +27,12 @@ from tests.conftest import data_file
 
 
 class TestRequestParameterNoReq:
+    def test_slot_behaviour(self, mro_slots):
+        inst = RequestParameter("name", "value", [1, 2])
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
     def test_init(self):
         request_parameter = RequestParameter("name", "value", [1, 2])
         assert request_parameter.name == "name"
@@ -37,12 +43,6 @@ class TestRequestParameterNoReq:
         assert request_parameter.name == "name"
         assert request_parameter.value == "value"
         assert request_parameter.input_files is None
-
-    def test_slot_behaviour(self, mro_slots):
-        inst = RequestParameter("name", "value", [1, 2])
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     @pytest.mark.parametrize(
         "value, expected",

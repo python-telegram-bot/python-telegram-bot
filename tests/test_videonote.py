@@ -82,24 +82,6 @@ class TestVideoNoteNoReq:
         assert video_note.duration == Space.duration
         assert video_note.file_size == Space.file_size
 
-    async def test_send_video_note_custom_filename(
-        self, bot, chat_id, video_note_file, monkeypatch
-    ):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-
-        assert await bot.send_video_note(chat_id, video_note_file, filename="custom_filename")
-
-    async def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["video_note"] == video_note.file_id
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_video_note(chat_id, video_note=video_note)
-        assert message
-
     def test_de_json(self, bot):
         json_dict = {
             "file_id": Space.videonote_file_id,
@@ -127,6 +109,47 @@ class TestVideoNoteNoReq:
         assert video_note_dict["duration"] == video_note.duration
         assert video_note_dict["file_size"] == video_note.file_size
 
+    def test_equality(self, video_note):
+        a = VideoNote(video_note.file_id, video_note.file_unique_id, Space.length, Space.duration)
+        b = VideoNote("", video_note.file_unique_id, Space.length, Space.duration)
+        c = VideoNote(video_note.file_id, video_note.file_unique_id, 0, 0)
+        d = VideoNote("", "", Space.length, Space.duration)
+        e = Voice(video_note.file_id, video_note.file_unique_id, Space.duration)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+    async def test_error_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            await bot.send_video_note(chat_id=chat_id)
+
+    async def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["video_note"] == video_note.file_id
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_video_note(chat_id, video_note=video_note)
+
+    async def test_send_video_note_custom_filename(
+        self, bot, chat_id, video_note_file, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        assert await bot.send_video_note(chat_id, video_note_file, filename="custom_filename")
+
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_video_note_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
@@ -153,10 +176,6 @@ class TestVideoNoteNoReq:
         finally:
             bot._local_mode = False
 
-    async def test_error_without_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError):
-            await bot.send_video_note(chat_id=chat_id)
-
     async def test_get_file_instance_method(self, monkeypatch, video_note):
         async def make_assertion(*_, **kwargs):
             return kwargs["file_id"] == video_note.file_id
@@ -167,26 +186,6 @@ class TestVideoNoteNoReq:
 
         monkeypatch.setattr(video_note.get_bot(), "get_file", make_assertion)
         assert await video_note.get_file()
-
-    def test_equality(self, video_note):
-        a = VideoNote(video_note.file_id, video_note.file_unique_id, Space.length, Space.duration)
-        b = VideoNote("", video_note.file_unique_id, Space.length, Space.duration)
-        c = VideoNote(video_note.file_id, video_note.file_unique_id, 0, 0)
-        d = VideoNote("", "", Space.length, Space.duration)
-        e = Voice(video_note.file_id, video_note.file_unique_id, Space.duration)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)
 
 
 class TestVideoNoteReq:

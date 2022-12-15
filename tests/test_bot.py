@@ -205,6 +205,20 @@ class TestBotNoReq:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
+    async def test_no_token_passed(self):
+        with pytest.raises(InvalidToken, match="You must pass the token"):
+            Bot("")
+
+    async def test_to_dict(self, bot):
+        to_dict_bot = bot.to_dict()
+
+        assert isinstance(to_dict_bot, dict)
+        assert to_dict_bot["id"] == bot.id
+        assert to_dict_bot["username"] == bot.username
+        assert to_dict_bot["first_name"] == bot.first_name
+        if bot.last_name:
+            assert to_dict_bot["last_name"] == bot.last_name
+
     async def test_initialize_and_shutdown(self, bot: DictExtBot, monkeypatch):
         test_flag = []
 
@@ -293,48 +307,24 @@ class TestBotNoReq:
 
         assert test_flag == "stop"
 
-    async def test_log_decorator(self, bot: DictExtBot, caplog):
-        # Second argument makes sure that we ignore logs from e.g. httpx
-        with caplog.at_level(logging.DEBUG, logger="telegram"):
-            await super(bot.__class__, bot).get_me()  # call original get_me instead of overriden
-            # Only for stabilizing this test-
-            if len(caplog.records) == 4:
-                for idx, record in enumerate(caplog.records):
-                    print(record)
-                    if record.getMessage().startswith("Task was destroyed but it is pending"):
-                        caplog.records.pop(idx)
-                    if record.getMessage().startswith("Task exception was never retrieved"):
-                        caplog.records.pop(idx)
-            assert len(caplog.records) == 3
-            assert caplog.records[0].getMessage().startswith("Entering: get_me")
-            assert caplog.records[-1].getMessage().startswith("Exiting: get_me")
+    async def test_equality(self):
+        async with make_bot(token=FALLBACKS[0]["token"]) as a, make_bot(
+            token=FALLBACKS[0]["token"]
+        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c, Bot(token=FALLBACKS[0]["token"]) as d:
+            e = Update(123456789)
 
-    @pytest.mark.parametrize(
-        "acd_in,maxsize",
-        [(True, 1024), (False, 1024), (0, 0), (None, None)],
-    )
-    async def test_callback_data_maxsize(self, bot_info, acd_in, maxsize):
-        async with make_bot(bot_info, arbitrary_callback_data=acd_in) as acd_bot:
-            if acd_in is not False:
-                assert acd_bot.callback_data_cache.maxsize == maxsize
-            else:
-                assert acd_bot.callback_data_cache is None
+            assert a == b
+            assert hash(a) == hash(b)
+            assert a is not b
 
-    async def test_no_token_passed(self):
-        with pytest.raises(InvalidToken, match="You must pass the token"):
-            Bot("")
+            assert a != c
+            assert hash(a) != hash(c)
 
-    async def test_unknown_kwargs(self, bot, monkeypatch):
-        async def post(url, request_data: RequestData, *args, **kwargs):
-            data = request_data.json_parameters
-            if not all([data["unknown_kwarg_1"] == "7", data["unknown_kwarg_2"] == "5"]):
-                pytest.fail("got wrong parameters")
-            return True
+            assert a != d
+            assert hash(a) != hash(d)
 
-        monkeypatch.setattr(bot.request, "post", post)
-        await bot.send_message(
-            123, "text", api_kwargs={"unknown_kwarg_1": 7, "unknown_kwarg_2": 5}
-        )
+            assert a != e
+            assert hash(a) != hash(e)
 
     @pytest.mark.parametrize(
         "attribute",
@@ -377,38 +367,63 @@ class TestBotNoReq:
         assert get_me_bot.supports_inline_queries == bot.supports_inline_queries
         assert f"https://t.me/{get_me_bot.username}" == bot.link
 
-    async def test_equality(self):
-        async with make_bot(token=FALLBACKS[0]["token"]) as a, make_bot(
-            token=FALLBACKS[0]["token"]
-        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c, Bot(token=FALLBACKS[0]["token"]) as d:
-            e = Update(123456789)
-
-            assert a == b
-            assert hash(a) == hash(b)
-            assert a is not b
-
-            assert a != c
-            assert hash(a) != hash(c)
-
-            assert a != d
-            assert hash(a) != hash(d)
-
-            assert a != e
-            assert hash(a) != hash(e)
-
-    async def test_to_dict(self, bot):
-        to_dict_bot = bot.to_dict()
-
-        assert isinstance(to_dict_bot, dict)
-        assert to_dict_bot["id"] == bot.id
-        assert to_dict_bot["username"] == bot.username
-        assert to_dict_bot["first_name"] == bot.first_name
-        if bot.last_name:
-            assert to_dict_bot["last_name"] == bot.last_name
-
     def test_bot_pickling_error(self, bot):
         with pytest.raises(pickle.PicklingError, match="Bot objects cannot be pickled"):
             pickle.dumps(bot)
+
+    async def test_log_decorator(self, bot: DictExtBot, caplog):
+        # Second argument makes sure that we ignore logs from e.g. httpx
+        with caplog.at_level(logging.DEBUG, logger="telegram"):
+            await super(bot.__class__, bot).get_me()  # call original get_me instead of overriden
+            # Only for stabilizing this test-
+            if len(caplog.records) == 4:
+                for idx, record in enumerate(caplog.records):
+                    print(record)
+                    if record.getMessage().startswith("Task was destroyed but it is pending"):
+                        caplog.records.pop(idx)
+                    if record.getMessage().startswith("Task exception was never retrieved"):
+                        caplog.records.pop(idx)
+            assert len(caplog.records) == 3
+            assert caplog.records[0].getMessage().startswith("Entering: get_me")
+            assert caplog.records[-1].getMessage().startswith("Exiting: get_me")
+
+    @bot_methods()
+    def test_camel_case_aliases(self, bot_class, bot_method_name, bot_method):
+        camel_case_name = to_camel_case(bot_method_name)
+        camel_case_function = getattr(bot_class, camel_case_name, False)
+        assert camel_case_function is not False, f"{camel_case_name} not found"
+        assert camel_case_function is bot_method, f"{camel_case_name} is not {bot_method}"
+
+    @bot_methods()
+    def test_coroutine_functions(self, bot_class, bot_method_name, bot_method):
+        """Check that all bot methods are defined as async def  ..."""
+        meth = getattr(bot_method, "__wrapped__", bot_method)
+        assert inspect.iscoroutinefunction(meth), f"{bot_method_name} must be a coroutine function"
+
+    @bot_methods()
+    def test_api_kwargs_and_timeouts_present(self, bot_class, bot_method_name, bot_method):
+        """Check that all bot methods have `api_kwargs` and timeout params."""
+        param_names = inspect.signature(bot_method).parameters.keys()
+        assert (
+            "pool_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `pool_timeout`"
+        assert (
+            "read_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `read_timeout`"
+        assert (
+            "connect_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `connect_timeout`"
+        assert (
+            "write_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `write_timeout`"
+        assert (
+            "api_kwargs" in param_names
+        ), f"{bot_method_name} is missing the parameter `api_kwargs`"
+
+        if bot_class is ExtBot and bot_method_name.replace("_", "").lower() != "getupdates":
+            assert (
+                "rate_limit_args" in param_names
+            ), f"{bot_method_name} of ExtBot is missing the parameter `rate_limit_args`"
 
     @bot_methods(ext_bot=False)
     async def test_defaults_handling(
@@ -418,7 +433,6 @@ class TestBotNoReq:
         bot_method,
         bot: DictExtBot,
         raw_bot: DictBot,
-        monkeypatch,
     ):
         """
         Here we check that the bot methods handle tg.ext.Defaults correctly. This has two parts:
@@ -487,6 +501,18 @@ class TestBotNoReq:
                 assert (
                     param.kind == ext_signature.parameters[param_name].kind
                 ), f"Wrong parameter kind for parameter {param_name} of method {name}"
+
+    async def test_unknown_kwargs(self, bot, monkeypatch):
+        async def post(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.json_parameters
+            if not all([data["unknown_kwarg_1"] == "7", data["unknown_kwarg_2"] == "5"]):
+                pytest.fail("got wrong parameters")
+            return True
+
+        monkeypatch.setattr(bot.request, "post", post)
+        await bot.send_message(
+            123, "text", api_kwargs={"unknown_kwarg_1": 7, "unknown_kwarg_2": 5}
+        )
 
     async def test_answer_web_app_query(self, bot, raw_bot, monkeypatch):
         params = False
@@ -1370,6 +1396,17 @@ class TestBotNoReq:
     # The same must be done in the webhook updater. This is tested over at test_updater.py, but
     # here we test more extensively.
 
+    @pytest.mark.parametrize(
+        "acd_in,maxsize",
+        [(True, 1024), (False, 1024), (0, 0), (None, None)],
+    )
+    async def test_callback_data_maxsize(self, bot_info, acd_in, maxsize):
+        async with make_bot(bot_info, arbitrary_callback_data=acd_in) as acd_bot:
+            if acd_in is not False:
+                assert acd_bot.callback_data_cache.maxsize == maxsize
+            else:
+                assert acd_bot.callback_data_cache is None
+
     async def test_arbitrary_callback_data_no_insert(self, monkeypatch, cdc_bot):
         """Updates that don't need insertion shouldn't fail obviously"""
         bot = cdc_bot
@@ -1598,44 +1635,6 @@ class TestBotNoReq:
         finally:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
-
-    @bot_methods()
-    def test_camel_case_aliases(self, bot_class, bot_method_name, bot_method):
-        camel_case_name = to_camel_case(bot_method_name)
-        camel_case_function = getattr(bot_class, camel_case_name, False)
-        assert camel_case_function is not False, f"{camel_case_name} not found"
-        assert camel_case_function is bot_method, f"{camel_case_name} is not {bot_method}"
-
-    @bot_methods()
-    def test_coroutine_functions(self, bot_class, bot_method_name, bot_method, monkeypatch):
-        """Check that all bot methods are defined as async def  ..."""
-        meth = getattr(bot_method, "__wrapped__", bot_method)
-        assert inspect.iscoroutinefunction(meth), f"{bot_method_name} must be a coroutine function"
-
-    @bot_methods()
-    def test_api_kwargs_and_timeouts_present(self, bot_class, bot_method_name, bot_method):
-        """Check that all bot methods have `api_kwargs` and timeout params."""
-        param_names = inspect.signature(bot_method).parameters.keys()
-        assert (
-            "pool_timeout" in param_names
-        ), f"{bot_method_name} is missing the parameter `pool_timeout`"
-        assert (
-            "read_timeout" in param_names
-        ), f"{bot_method_name} is missing the parameter `read_timeout`"
-        assert (
-            "connect_timeout" in param_names
-        ), f"{bot_method_name} is missing the parameter `connect_timeout`"
-        assert (
-            "write_timeout" in param_names
-        ), f"{bot_method_name} is missing the parameter `write_timeout`"
-        assert (
-            "api_kwargs" in param_names
-        ), f"{bot_method_name} is missing the parameter `api_kwargs`"
-
-        if bot_class is ExtBot and bot_method_name.replace("_", "").lower() != "getupdates":
-            assert (
-                "rate_limit_args" in param_names
-            ), f"{bot_method_name} of ExtBot is missing the parameter `rate_limit_args`"
 
 
 class TestBotReq:

@@ -75,39 +75,6 @@ class TestVenueNoReq:
         assert venue.google_place_id == Space.google_place_id
         assert venue.google_place_type == Space.google_place_type
 
-    async def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            data = request_data.json_parameters
-            return (
-                data["longitude"] == str(Space.location.longitude)
-                and data["latitude"] == str(Space.location.latitude)
-                and data["title"] == Space.title
-                and data["address"] == Space.address
-                and data["foursquare_id"] == Space.foursquare_id
-                and data["foursquare_type"] == Space.foursquare_type
-                and data["google_place_id"] == Space.google_place_id
-                and data["google_place_type"] == Space.google_place_type
-            )
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_venue(chat_id, venue=venue)
-        assert message
-
-    async def test_send_venue_without_required(self, bot, chat_id):
-        with pytest.raises(ValueError, match="Either venue or latitude, longitude, address and"):
-            await bot.send_venue(chat_id=chat_id)
-
-    async def test_send_venue_mutually_exclusive(self, bot, chat_id, venue):
-        with pytest.raises(ValueError, match="Not both"):
-            await bot.send_venue(
-                chat_id=chat_id,
-                latitude=1,
-                longitude=1,
-                address="address",
-                title="title",
-                venue=venue,
-            )
-
     def test_to_dict(self, venue):
         venue_dict = venue.to_dict()
 
@@ -139,6 +106,39 @@ class TestVenueNoReq:
 
         assert a != d2
         assert hash(a) != hash(d2)
+
+    async def test_send_venue_without_required(self, bot, chat_id):
+        with pytest.raises(ValueError, match="Either venue or latitude, longitude, address and"):
+            await bot.send_venue(chat_id=chat_id)
+
+    async def test_send_venue_mutually_exclusive(self, bot, chat_id, venue):
+        with pytest.raises(ValueError, match="Not both"):
+            await bot.send_venue(
+                chat_id=chat_id,
+                latitude=1,
+                longitude=1,
+                address="address",
+                title="title",
+                venue=venue,
+            )
+
+    async def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.json_parameters
+            return (
+                data["longitude"] == str(Space.location.longitude)
+                and data["latitude"] == str(Space.location.latitude)
+                and data["title"] == Space.title
+                and data["address"] == Space.address
+                and data["foursquare_id"] == Space.foursquare_id
+                and data["foursquare_type"] == Space.foursquare_type
+                and data["google_place_id"] == Space.google_place_id
+                and data["google_place_type"] == Space.google_place_type
+            )
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        message = await bot.send_venue(chat_id, venue=venue)
+        assert message
 
 
 class TestVenueReq:

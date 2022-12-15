@@ -67,21 +67,6 @@ class TestPassportFileNoReq:
         assert passport_file_dict["file_size"] == passport_file.file_size
         assert passport_file_dict["file_date"] == passport_file.file_date
 
-    async def test_get_file_instance_method(self, monkeypatch, passport_file):
-        async def make_assertion(*_, **kwargs):
-            result = kwargs["file_id"] == passport_file.file_id
-            # we need to be a bit hacky here, b/c PF.get_file needs Bot.get_file to return a File
-            return File(file_id=result, file_unique_id=result)
-
-        assert check_shortcut_signature(PassportFile.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(
-            passport_file.get_file, passport_file.get_bot(), "get_file"
-        )
-        assert await check_defaults_handling(passport_file.get_file, passport_file.get_bot())
-
-        monkeypatch.setattr(passport_file.get_bot(), "get_file", make_assertion)
-        assert (await passport_file.get_file()).file_id == "True"
-
     def test_equality(self):
         a = PassportFile(Space.file_id, Space.file_unique_id, Space.file_size, Space.file_date)
         b = PassportFile("", Space.file_unique_id, Space.file_size, Space.file_date)
@@ -101,3 +86,18 @@ class TestPassportFileNoReq:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_get_file_instance_method(self, monkeypatch, passport_file):
+        async def make_assertion(*_, **kwargs):
+            result = kwargs["file_id"] == passport_file.file_id
+            # we need to be a bit hacky here, b/c PF.get_file needs Bot.get_file to return a File
+            return File(file_id=result, file_unique_id=result)
+
+        assert check_shortcut_signature(PassportFile.get_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(
+            passport_file.get_file, passport_file.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(passport_file.get_file, passport_file.get_bot())
+
+        monkeypatch.setattr(passport_file.get_bot(), "get_file", make_assertion)
+        assert (await passport_file.get_file()).file_id == "True"

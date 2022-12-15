@@ -71,6 +71,46 @@ class TestLocationNoReq:
         assert location.heading == Space.heading
         assert location.proximity_alert_radius == Space.proximity_alert_radius
 
+    def test_to_dict(self, location):
+        location_dict = location.to_dict()
+
+        assert location_dict["latitude"] == location.latitude
+        assert location_dict["longitude"] == location.longitude
+        assert location_dict["horizontal_accuracy"] == location.horizontal_accuracy
+        assert location_dict["live_period"] == location.live_period
+        assert location["heading"] == location.heading
+        assert location["proximity_alert_radius"] == location.proximity_alert_radius
+
+    def test_equality(self):
+        a = Location(Space.longitude, Space.latitude)
+        b = Location(Space.longitude, Space.latitude)
+        d = Location(0, Space.latitude)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+    async def test_send_location_without_required(self, bot, chat_id):
+        with pytest.raises(ValueError, match="Either location or latitude and longitude"):
+            await bot.send_location(chat_id=chat_id)
+
+    async def test_edit_location_without_required(self, bot):
+        with pytest.raises(ValueError, match="Either location or latitude and longitude"):
+            await bot.edit_message_live_location(chat_id=2, message_id=3)
+
+    async def test_send_location_with_all_args(self, bot, location):
+        with pytest.raises(ValueError, match="Not both"):
+            await bot.send_location(chat_id=1, latitude=2.5, longitude=4.6, location=location)
+
+    async def test_edit_location_with_all_args(self, bot, location):
+        with pytest.raises(ValueError, match="Not both"):
+            await bot.edit_message_live_location(
+                chat_id=1, message_id=7, latitude=2.5, longitude=4.6, location=location
+            )
+
     # TODO: Needs improvement with in inline sent live location.
     async def test_edit_live_inline_message(self, monkeypatch, bot, location):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -118,46 +158,6 @@ class TestLocationNoReq:
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.edit_message_live_location(None, None, location=location)
-
-    async def test_send_location_without_required(self, bot, chat_id):
-        with pytest.raises(ValueError, match="Either location or latitude and longitude"):
-            await bot.send_location(chat_id=chat_id)
-
-    async def test_edit_location_without_required(self, bot):
-        with pytest.raises(ValueError, match="Either location or latitude and longitude"):
-            await bot.edit_message_live_location(chat_id=2, message_id=3)
-
-    async def test_send_location_with_all_args(self, bot, location):
-        with pytest.raises(ValueError, match="Not both"):
-            await bot.send_location(chat_id=1, latitude=2.5, longitude=4.6, location=location)
-
-    async def test_edit_location_with_all_args(self, bot, location):
-        with pytest.raises(ValueError, match="Not both"):
-            await bot.edit_message_live_location(
-                chat_id=1, message_id=7, latitude=2.5, longitude=4.6, location=location
-            )
-
-    def test_to_dict(self, location):
-        location_dict = location.to_dict()
-
-        assert location_dict["latitude"] == location.latitude
-        assert location_dict["longitude"] == location.longitude
-        assert location_dict["horizontal_accuracy"] == location.horizontal_accuracy
-        assert location_dict["live_period"] == location.live_period
-        assert location["heading"] == location.heading
-        assert location["proximity_alert_radius"] == location.proximity_alert_radius
-
-    def test_equality(self):
-        a = Location(Space.longitude, Space.latitude)
-        b = Location(Space.longitude, Space.latitude)
-        d = Location(0, Space.latitude)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a != d
-        assert hash(a) != hash(d)
 
 
 class TestLocationReq:

@@ -125,6 +125,26 @@ class TestFileNoReq:
         assert file_dict["file_path"] == file.file_path
         assert file_dict["file_size"] == file.file_size
 
+    def test_equality(self, bot):
+        a = File(Space.file_id, Space.file_unique_id, bot)
+        b = File("", Space.file_unique_id, bot)
+        c = File(Space.file_id, Space.file_unique_id, None)
+        d = File("", "", bot)
+        e = Voice(Space.file_id, Space.file_unique_id, 0)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
     async def test_download(self, monkeypatch, file):
         async def test(*args, **kwargs):
             return Space.file_content
@@ -219,22 +239,6 @@ class TestFileNoReq:
             custom_fobj.seek(0)
             assert custom_fobj.read() == data_file("image_decrypted.jpg").read_bytes()
 
-    @pytest.mark.parametrize(
-        "custom_path_type", [str, Path], ids=["str custom_path", "pathlib.Path custom_path"]
-    )
-    async def test_download_custom_path_local_file_encrypted(
-        self, encrypted_local_file, custom_path_type
-    ):
-        file_handle, custom_path = mkstemp()
-        custom_path = Path(custom_path)
-        try:
-            out_file = await encrypted_local_file.download_to_drive(custom_path_type(custom_path))
-            assert out_file == custom_path
-            assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
-        finally:
-            os.close(file_handle)
-            custom_path.unlink()
-
     async def test_download_file_obj_local_file_encrypted(self, monkeypatch, encrypted_local_file):
         async def test(*args, **kwargs):
             return data_file("image_encrypted.jpg").read_bytes()
@@ -261,26 +265,6 @@ class TestFileNoReq:
         assert buf3 is buf2
         assert buf2[len(buf) :] == buf
         assert buf2[: len(buf)] == buf
-
-    def test_equality(self, bot):
-        a = File(Space.file_id, Space.file_unique_id, bot)
-        b = File("", Space.file_unique_id, bot)
-        c = File(Space.file_id, Space.file_unique_id, None)
-        d = File("", "", bot)
-        e = Voice(Space.file_id, Space.file_unique_id, 0)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)
 
 
 class TestFileReq:
@@ -310,6 +294,22 @@ class TestFileReq:
             await local_file.download_to_memory(out=custom_fobj)
             custom_fobj.seek(0)
             assert custom_fobj.read() == Space.file_content
+
+    @pytest.mark.parametrize(
+        "custom_path_type", [str, Path], ids=["str custom_path", "pathlib.Path custom_path"]
+    )
+    async def test_download_custom_path_local_file_encrypted(
+        self, encrypted_local_file, custom_path_type
+    ):
+        file_handle, custom_path = mkstemp()
+        custom_path = Path(custom_path)
+        try:
+            out_file = await encrypted_local_file.download_to_drive(custom_path_type(custom_path))
+            assert out_file == custom_path
+            assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
+        finally:
+            os.close(file_handle)
+            custom_path.unlink()
 
     async def test_download_local_file_encrypted(self, encrypted_local_file):
         out_file = await encrypted_local_file.download_to_drive()

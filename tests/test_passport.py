@@ -389,6 +389,36 @@ class TestPassportNoReq:
         assert email.type == "email"
         assert email.email == "fb3e3i47zt@dispostable.com"
 
+    def test_de_json_and_to_dict(self, bot):
+        passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot)
+        assert passport_data.api_kwargs == {}
+        assert passport_data.to_dict() == RAW_PASSPORT_DATA
+
+        assert passport_data.decrypted_data
+        assert passport_data.to_dict() == RAW_PASSPORT_DATA
+
+    def test_equality(self, passport_data):
+        a = PassportData(passport_data.data, passport_data.credentials)
+        b = PassportData(passport_data.data, passport_data.credentials)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        passport_data.credentials._unfreeze()
+        passport_data.credentials.hash = "NOTAPROPERHASH"
+        c = PassportData(passport_data.data, passport_data.credentials)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+    def test_bot_init_invalid_key(self, bot):
+        with pytest.raises(TypeError):
+            Bot(bot.token, private_key="Invalid key!")
+
+        with pytest.raises(ValueError):
+            Bot(bot.token, private_key=b"Invalid key!")
+
     def test_all_types(self, passport_data, bot, all_passport_data):
         credentials = passport_data.decrypted_credentials.to_dict()
 
@@ -423,13 +453,6 @@ class TestPassportNoReq:
 
         assert isinstance(new, PassportData)
         assert new.decrypted_data
-
-    def test_bot_init_invalid_key(self, bot):
-        with pytest.raises(TypeError):
-            Bot(bot.token, private_key="Invalid key!")
-
-        with pytest.raises(ValueError):
-            Bot(bot.token, private_key=b"Invalid key!")
 
     async def test_passport_data_okay_with_non_crypto_bot(self, bot):
         async with make_bot(token=bot.token) as b:
@@ -508,26 +531,3 @@ class TestPassportNoReq:
             ],
         )
         assert message
-
-    def test_de_json_and_to_dict(self, bot):
-        passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot)
-        assert passport_data.api_kwargs == {}
-        assert passport_data.to_dict() == RAW_PASSPORT_DATA
-
-        assert passport_data.decrypted_data
-        assert passport_data.to_dict() == RAW_PASSPORT_DATA
-
-    def test_equality(self, passport_data):
-        a = PassportData(passport_data.data, passport_data.credentials)
-        b = PassportData(passport_data.data, passport_data.credentials)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        passport_data.credentials._unfreeze()
-        passport_data.credentials.hash = "NOTAPROPERHASH"
-        c = PassportData(passport_data.data, passport_data.credentials)
-
-        assert a != c
-        assert hash(a) != hash(c)

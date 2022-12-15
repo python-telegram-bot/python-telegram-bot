@@ -703,6 +703,36 @@ class TestSendMediaGroupReq:
             )
             assert all(mes.has_protected_content for mes in messages)
 
+    async def test_edit_message_media(self, bot, raw_bot, chat_id, media_group):
+        ext_bot = bot
+        # We need to test 1) below both the bot and raw_bot and setting this up with
+        # pytest.parametrize appears to be difficult ...
+        aws = {b.send_media_group(chat_id, media_group) for b in (ext_bot, raw_bot)}
+        for msg_task in asyncio.as_completed(aws):
+            messages = await msg_task
+            cid = messages[-1].chat.id
+            mid = messages[-1].message_id
+            copied_media = copy.copy(media_group[0])
+            new_message = (
+                await messages[-1]
+                .get_bot()
+                .edit_message_media(chat_id=cid, message_id=mid, media=media_group[0])
+            )
+            assert isinstance(new_message, Message)
+
+            # 1)
+            # make sure that the media was not modified
+            assert media_group[0].parse_mode == copied_media.parse_mode
+
+    async def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
+        messages = await bot.send_media_group(chat_id, media_group)
+        cid = messages[-1].chat.id
+        mid = messages[-1].message_id
+        new_message = await bot.edit_message_media(
+            chat_id=cid, message_id=mid, media=InputMediaPhoto(thumb_file)
+        )
+        assert isinstance(new_message, Message)
+
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -793,36 +823,6 @@ class TestSendMediaGroupReq:
             # Check that messages from 2nd message onwards have no captions
             assert all(mes.caption is None for mes in other_messages)
             assert not any(mes.caption_entities for mes in other_messages)
-
-    async def test_edit_message_media(self, bot, raw_bot, chat_id, media_group):
-        ext_bot = bot
-        # We need to test 1) below both the bot and raw_bot and setting this up with
-        # pytest.parametrize appears to be difficult ...
-        aws = {b.send_media_group(chat_id, media_group) for b in (ext_bot, raw_bot)}
-        for msg_task in asyncio.as_completed(aws):
-            messages = await msg_task
-            cid = messages[-1].chat.id
-            mid = messages[-1].message_id
-            copied_media = copy.copy(media_group[0])
-            new_message = (
-                await messages[-1]
-                .get_bot()
-                .edit_message_media(chat_id=cid, message_id=mid, media=media_group[0])
-            )
-            assert isinstance(new_message, Message)
-
-            # 1)
-            # make sure that the media was not modified
-            assert media_group[0].parse_mode == copied_media.parse_mode
-
-    async def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
-        messages = await bot.send_media_group(chat_id, media_group)
-        cid = messages[-1].chat.id
-        mid = messages[-1].message_id
-        new_message = await bot.edit_message_media(
-            chat_id=cid, message_id=mid, media=InputMediaPhoto(thumb_file)
-        )
-        assert isinstance(new_message, Message)
 
     @pytest.mark.parametrize(
         "default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True, ids=["HTML-Bot"]

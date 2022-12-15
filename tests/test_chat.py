@@ -202,6 +202,26 @@ class TestChatNoReq:
         )
         assert chat.full_name is None
 
+    def test_equality(self):
+        a = Chat(Space.id_, Space.title, Space.type_)
+        b = Chat(Space.id_, Space.title, Space.type_)
+        c = Chat(Space.id_, "", "")
+        d = Chat(0, Space.title, Space.type_)
+        e = User(Space.id_, "", False)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
     async def test_send_action(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == chat.id
@@ -1125,23 +1145,3 @@ class TestChatNoReq:
         ):
             chat = Chat(id=1, type="foo", username="user\u2022name")
             chat.mention_markdown_v2()
-
-    def test_equality(self):
-        a = Chat(Space.id_, Space.title, Space.type_)
-        b = Chat(Space.id_, Space.title, Space.type_)
-        c = Chat(Space.id_, "", "")
-        d = Chat(0, Space.title, Space.type_)
-        e = User(Space.id_, "", False)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

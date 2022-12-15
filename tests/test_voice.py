@@ -75,44 +75,6 @@ class TestVoiceNoReq:
         assert voice.mime_type == Space.mime_type
         assert voice.file_size == Space.file_size
 
-    async def test_send_voice_custom_filename(self, bot, chat_id, voice_file, monkeypatch):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-
-        assert await bot.send_voice(chat_id, voice_file, filename="custom_filename")
-
-    async def test_send_with_voice(self, monkeypatch, bot, chat_id, voice):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["voice"] == voice.file_id
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_voice(chat_id, voice=voice)
-        assert message
-
-    @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_voice_local_files(self, monkeypatch, bot, chat_id, local_mode):
-        try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
-            test_flag = False
-            file = data_file("telegram.jpg")
-            expected = file.as_uri()
-
-            async def make_assertion(_, data, *args, **kwargs):
-                nonlocal test_flag
-                if local_mode:
-                    test_flag = data.get("voice") == expected
-                else:
-                    test_flag = isinstance(data.get("voice"), InputFile)
-
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_voice(chat_id, file)
-            assert test_flag
-        finally:
-            bot._local_mode = False
-
     def test_de_json(self, bot):
         json_dict = {
             "file_id": Space.voice_file_id,
@@ -140,21 +102,6 @@ class TestVoiceNoReq:
         assert voice_dict["mime_type"] == voice.mime_type
         assert voice_dict["file_size"] == voice.file_size
 
-    async def test_error_without_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError):
-            await bot.sendVoice(chat_id)
-
-    async def test_get_file_instance_method(self, monkeypatch, voice):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == voice.file_id
-
-        assert check_shortcut_signature(Voice.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(voice.get_file, voice.get_bot(), "get_file")
-        assert await check_defaults_handling(voice.get_file, voice.get_bot())
-
-        monkeypatch.setattr(voice.get_bot(), "get_file", make_assertion)
-        assert await voice.get_file()
-
     def test_equality(self, voice):
         a = Voice(voice.file_id, voice.file_unique_id, Space.duration)
         b = Voice("", voice.file_unique_id, Space.duration)
@@ -174,6 +121,58 @@ class TestVoiceNoReq:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_error_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            await bot.sendVoice(chat_id)
+
+    async def test_send_voice_custom_filename(self, bot, chat_id, voice_file, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        assert await bot.send_voice(chat_id, voice_file, filename="custom_filename")
+
+    async def test_send_with_voice(self, monkeypatch, bot, chat_id, voice):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["voice"] == voice.file_id
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_voice(chat_id, voice=voice)
+
+    @pytest.mark.parametrize("local_mode", [True, False])
+    async def test_send_voice_local_files(self, monkeypatch, bot, chat_id, local_mode):
+        try:
+            bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local bot API set up
+            test_flag = False
+            file = data_file("telegram.jpg")
+            expected = file.as_uri()
+
+            async def make_assertion(_, data, *args, **kwargs):
+                nonlocal test_flag
+                if local_mode:
+                    test_flag = data.get("voice") == expected
+                else:
+                    test_flag = isinstance(data.get("voice"), InputFile)
+
+            monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.send_voice(chat_id, file)
+            assert test_flag
+        finally:
+            bot._local_mode = False
+
+    async def test_get_file_instance_method(self, monkeypatch, voice):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["file_id"] == voice.file_id
+
+        assert check_shortcut_signature(Voice.get_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(voice.get_file, voice.get_bot(), "get_file")
+        assert await check_defaults_handling(voice.get_file, voice.get_bot())
+
+        monkeypatch.setattr(voice.get_bot(), "get_file", make_assertion)
+        assert await voice.get_file()
 
 
 class TestVoiceReq:

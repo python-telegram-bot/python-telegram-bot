@@ -343,6 +343,11 @@ class Space:
 
 
 class TestMessageNoReq:
+    def test_slot_behaviour(self, message, mro_slots):
+        for attr in message.__slots__:
+            assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
+
     def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
         assert new.api_kwargs == {}
@@ -354,10 +359,26 @@ class TestMessageNoReq:
         for slot in new.__slots__:
             assert not isinstance(new[slot], dict)
 
-    def test_slot_behaviour(self, message, mro_slots):
-        for attr in message.__slots__:
-            assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
+    def test_equality(self):
+        id_ = 1
+        a = Message(id_, Space.date, Space.chat, from_user=Space.from_user)
+        b = Message(id_, Space.date, Space.chat, from_user=Space.from_user)
+        c = Message(id_, Space.date, Chat(123, Chat.GROUP), from_user=User(0, "", False))
+        d = Message(0, Space.date, Space.chat, from_user=Space.from_user)
+        e = Update(id_)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
 
     async def test_parse_entity(self):
         text = (
@@ -1822,34 +1843,3 @@ class TestMessageNoReq:
 
         monkeypatch.setattr(message.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
         assert await message.unpin_all_forum_topic_messages()
-
-    def test_equality(self):
-        id_ = 1
-        a = Message(
-            id_,
-            Space.date,
-            Space.chat,
-            from_user=Space.from_user,
-        )
-        b = Message(
-            id_,
-            Space.date,
-            Space.chat,
-            from_user=Space.from_user,
-        )
-        c = Message(id_, Space.date, Chat(123, Chat.GROUP), from_user=User(0, "", False))
-        d = Message(0, Space.date, Space.chat, from_user=Space.from_user)
-        e = Update(id_)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a != c
-        assert hash(a) != hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

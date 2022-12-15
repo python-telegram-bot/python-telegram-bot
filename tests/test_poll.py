@@ -222,6 +222,21 @@ class TestPollNoReq:
         assert poll_dict["open_period"] == poll.open_period
         assert poll_dict["close_date"] == to_timestamp(poll.close_date)
 
+    def test_equality(self):
+        a = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)
+        b = Poll(123, "question", ["o1", "o2"], 1, True, False, Poll.REGULAR, True)
+        c = Poll(456, "question", ["o1", "o2"], 1, True, False, Poll.REGULAR, True)
+        d = PollOption("Text", 1)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
     def test_enum_init(self):
         poll = Poll(
             type="foo",
@@ -271,18 +286,3 @@ class TestPollNoReq:
 
         assert poll.parse_explanation_entities(MessageEntity.URL) == {entity: "http://google.com"}
         assert poll.parse_explanation_entities() == {entity: "http://google.com", entity_2: "h"}
-
-    def test_equality(self):
-        a = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)
-        b = Poll(123, "question", ["o1", "o2"], 1, True, False, Poll.REGULAR, True)
-        c = Poll(456, "question", ["o1", "o2"], 1, True, False, Poll.REGULAR, True)
-        d = PollOption("Text", 1)
-
-        assert a == b
-        assert hash(a) == hash(b)
-
-        assert a != c
-        assert hash(a) != hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)

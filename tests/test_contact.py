@@ -67,31 +67,6 @@ class TestContactNoReq:
         assert contact.last_name == Space.last_name
         assert contact.user_id == Space.user_id
 
-    async def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            data = request_data.json_parameters
-            phone = data["phone_number"] == contact.phone_number
-            first = data["first_name"] == contact.first_name
-            last = data["last_name"] == contact.last_name
-            return phone and first and last
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_contact(contact=contact, chat_id=chat_id)
-        assert message
-
-    async def test_send_contact_without_required(self, bot, chat_id):
-        with pytest.raises(ValueError, match="Either contact or phone_number and first_name"):
-            await bot.send_contact(chat_id=chat_id)
-
-    async def test_send_mutually_exclusive(self, bot, chat_id, contact):
-        with pytest.raises(ValueError, match="Not both"):
-            await bot.send_contact(
-                chat_id=chat_id,
-                contact=contact,
-                phone_number=contact.phone_number,
-                first_name=contact.first_name,
-            )
-
     def test_to_dict(self, contact):
         contact_dict = contact.to_dict()
 
@@ -120,6 +95,30 @@ class TestContactNoReq:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_send_contact_without_required(self, bot, chat_id):
+        with pytest.raises(ValueError, match="Either contact or phone_number and first_name"):
+            await bot.send_contact(chat_id=chat_id)
+
+    async def test_send_mutually_exclusive(self, bot, chat_id, contact):
+        with pytest.raises(ValueError, match="Not both"):
+            await bot.send_contact(
+                chat_id=chat_id,
+                contact=contact,
+                phone_number=contact.phone_number,
+                first_name=contact.first_name,
+            )
+
+    async def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.json_parameters
+            phone = data["phone_number"] == contact.phone_number
+            first = data["first_name"] == contact.first_name
+            last = data["last_name"] == contact.last_name
+            return phone and first and last
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_contact(contact=contact, chat_id=chat_id)
 
 
 class TestContactReq:
