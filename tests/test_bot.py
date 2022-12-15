@@ -397,33 +397,21 @@ class TestBotNoReq:
     @bot_methods()
     def test_coroutine_functions(self, bot_class, bot_method_name, bot_method):
         """Check that all bot methods are defined as async def  ..."""
-        meth = getattr(bot_method, "__wrapped__", bot_method)
+        meth = getattr(bot_method, "__wrapped__", bot_method)  # to unwrap the @_log decorator
         assert inspect.iscoroutinefunction(meth), f"{bot_method_name} must be a coroutine function"
 
     @bot_methods()
     def test_api_kwargs_and_timeouts_present(self, bot_class, bot_method_name, bot_method):
         """Check that all bot methods have `api_kwargs` and timeout params."""
         param_names = inspect.signature(bot_method).parameters.keys()
-        assert (
-            "pool_timeout" in param_names
-        ), f"{bot_method_name} is missing the parameter `pool_timeout`"
-        assert (
-            "read_timeout" in param_names
-        ), f"{bot_method_name} is missing the parameter `read_timeout`"
-        assert (
-            "connect_timeout" in param_names
-        ), f"{bot_method_name} is missing the parameter `connect_timeout`"
-        assert (
-            "write_timeout" in param_names
-        ), f"{bot_method_name} is missing the parameter `write_timeout`"
-        assert (
-            "api_kwargs" in param_names
-        ), f"{bot_method_name} is missing the parameter `api_kwargs`"
+        params = ("pool_timeout", "read_timeout", "connect_timeout", "write_timeout", "api_kwargs")
 
-        if bot_class is ExtBot and bot_method_name.replace("_", "").lower() != "getupdates":
-            assert (
-                "rate_limit_args" in param_names
-            ), f"{bot_method_name} of ExtBot is missing the parameter `rate_limit_args`"
+        for param in params:
+            assert param in param_names, f"{bot_method_name} is missing the parameter `{param}`"
+
+        rate_arg = "rate_limit_args"
+        if bot_method_name.replace("_", "").lower() != "getupdates" and bot_class is ExtBot:
+            assert rate_arg in param_names, f"{bot_method} is missing the parameter `{rate_arg}`"
 
     @bot_methods(ext_bot=False)
     async def test_defaults_handling(
@@ -2105,6 +2093,7 @@ class TestBotReq:
 
     async def test_get_one_user_profile_photo(self, bot, chat_id):
         user_profile_photos = await bot.get_user_profile_photos(chat_id, offset=0, limit=1)
+        assert user_profile_photos.total_count == 1
         assert user_profile_photos.photos[0][0].file_size == 5403
 
     async def test_edit_message_text(self, bot, message):

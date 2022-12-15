@@ -105,29 +105,7 @@ class TestInputInvoiceMessageContentNoReq:
         assert input_invoice_message_content.send_email_to_provider == Space.send_email_to_provider
         assert input_invoice_message_content.is_flexible == Space.is_flexible
 
-    def test_suggested_tip_amonuts_always_tuple(self):
-        input_invoice_message_content = InputInvoiceMessageContent(
-            title=Space.title,
-            description=Space.description,
-            payload=Space.payload,
-            provider_token=Space.provider_token,
-            currency=Space.currency,
-            prices=Space.prices,
-            max_tip_amount=Space.max_tip_amount,
-            suggested_tip_amounts=Space.suggested_tip_amounts,
-            provider_data=Space.provider_data,
-            photo_url=Space.photo_url,
-            photo_size=Space.photo_size,
-            photo_width=Space.photo_width,
-            photo_height=Space.photo_height,
-            need_name=Space.need_name,
-            need_phone_number=Space.need_phone_number,
-            need_email=Space.need_email,
-            need_shipping_address=Space.need_shipping_address,
-            send_phone_number_to_provider=Space.send_phone_number_to_provider,
-            send_email_to_provider=Space.send_email_to_provider,
-            is_flexible=Space.is_flexible,
-        )
+    def test_suggested_tip_amonuts_always_tuple(self, input_invoice_message_content):
         assert isinstance(input_invoice_message_content.suggested_tip_amounts, tuple)
         assert input_invoice_message_content.suggested_tip_amounts == tuple(
             int(amount) for amount in Space.suggested_tip_amounts
