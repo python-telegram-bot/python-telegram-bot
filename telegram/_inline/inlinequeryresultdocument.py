@@ -38,8 +38,7 @@ class InlineQueryResultDocument(InlineQueryResult):
     specified content instead of the file. Currently, only .PDF and .ZIP files can be sent
     using this method.
 
-    .. seealso:: `Working with Files and Media <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
     Args:
         id (:obj:`str`): Unique identifier for this result,

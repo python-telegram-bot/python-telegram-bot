@@ -38,8 +38,7 @@ class InlineQueryResultCachedGif(InlineQueryResult):
     use :attr:`input_message_content` to send a message with specified content instead of
     the animation.
 
-    .. seealso:: `Working with Files and Media <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
     Args:
         id (:obj:`str`): Unique identifier for this result,

@@ -139,8 +139,7 @@ class File(TelegramObject):
             original file in order to decrypt the file without changing the existing one
             in-place.
 
-        .. seealso:: `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionchanged:: 20.0
 
@@ -225,8 +224,7 @@ class File(TelegramObject):
         :obj:`io.BufferedIOBase`, the file contents will be saved to that object using the
         :obj:`out.write<io.BufferedIOBase.write>` method.
 
-        .. seealso:: `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionadded:: 20.0
 

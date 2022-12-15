@@ -907,8 +907,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         .. seealso:: :meth:`telegram.Message.reply_photo`, :meth:`telegram.Chat.send_photo`,
             :meth:`telegram.User.send_photo`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1018,8 +1017,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         .. seealso:: :meth:`telegram.Message.reply_audio`, :meth:`telegram.Chat.send_audio`,
             :meth:`telegram.User.send_audio`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1147,8 +1145,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         .. seealso:: :meth:`telegram.Message.reply_document`, :meth:`telegram.Chat.send_document`,
             :meth:`telegram.User.send_document`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1261,8 +1258,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         .. seealso:: :meth:`telegram.Message.reply_sticker`, :meth:`telegram.Chat.send_sticker`,
             :meth:`telegram.User.send_sticker`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1358,8 +1354,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         .. seealso:: :meth:`telegram.Message.reply_video`, :meth:`telegram.Chat.send_video`,
             :meth:`telegram.User.send_video`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1491,8 +1486,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :meth:`telegram.Message.reply_video_note`,
             :meth:`telegram.Chat.send_video_note`,
             :meth:`telegram.User.send_video_note`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1619,8 +1613,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :meth:`telegram.Message.reply_animation`,
             :meth:`telegram.Chat.send_animation`,
             :meth:`telegram.User.send_animation`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1751,8 +1744,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         .. seealso:: :meth:`telegram.Message.reply_voice`, :meth:`telegram.Chat.send_voice`,
             :meth:`telegram.User.send_voice`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1861,8 +1853,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :meth:`telegram.Message.reply_media_group`,
             :meth:`telegram.Chat.send_media_group`,
             :meth:`telegram.User.send_media_group`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -2715,8 +2706,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             take care of passing the correct value.
 
         .. seealso:: :meth:`telegram.InlineQuery.answer`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
@@ -2873,8 +2863,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :meth:`telegram.PhotoSize.get_file`, :meth:`telegram.Sticker.get_file`,
             :meth:`telegram.Video.get_file`, :meth:`telegram.VideoNote.get_file`,
             :meth:`telegram.Voice.get_file`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             file_id (:obj:`str` | :class:`telegram.Animation` | :class:`telegram.Audio` |         \
@@ -3383,8 +3372,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         .. seealso:: :meth:`telegram.Message.edit_media`,
             :meth:`telegram.CallbackQuery.edit_message_media`,
-            `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             media (:class:`telegram.InputMedia`): An object for a new media content

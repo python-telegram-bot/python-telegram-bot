@@ -321,45 +321,37 @@ class Message(TelegramObject):
         audio (:class:`telegram.Audio`): Optional. Message is an audio file, information
             about the file.
 
-            .. seealso:: `Working with Files and Media <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         document (:class:`telegram.Document`): Optional. Message is a general file, information
             about the file.
 
-            .. seealso:: `Working with Files and Media <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         animation (:class:`telegram.Animation`): Optional. Message is an animation, information
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
 
-            .. seealso:: `Working with Files and Media <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
         photo (List[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available sizes
             of the photo. This list is empty if the message does not contain a photo.
 
-            .. seealso:: `Working with Files and Media <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         sticker (:class:`telegram.Sticker`): Optional. Message is a sticker, information
             about the sticker.
 
-            .. seealso:: `Working with Files and Media <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         video (:class:`telegram.Video`): Optional. Message is a video, information about the
             video.
 
-            .. seealso:: `Working with Files and Media <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         voice (:class:`telegram.Voice`): Optional. Message is a voice message, information about
             the file.
 
-            .. seealso:: `Working with Files and Media <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
             about the video message.
 
-            .. seealso:: `Working with Files and Media <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         new_chat_members (List[:class:`telegram.User`]): Optional. New members that were added to
             the group or supergroup and information about them (the bot itself may be one of these
             members). This list is empty if the message does not contain new chat members.
@@ -822,8 +814,7 @@ class Message(TelegramObject):
 
         Otherwise :obj:`None` is returned.
 
-        .. seealso:: `Working with Files and Media <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Working-with-Files-and-Media>`_
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionchanged:: 20.0
             :attr:`dice`, :attr:`passport_data` and :attr:`poll` are now also considered to be an
