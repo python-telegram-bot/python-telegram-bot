@@ -69,7 +69,7 @@ class TestInlineQueryResultCachedPhoto:
         assert inline_query_result_cached_photo.description == self.description
         assert inline_query_result_cached_photo.caption == self.caption
         assert inline_query_result_cached_photo.parse_mode == self.parse_mode
-        assert inline_query_result_cached_photo.caption_entities == self.caption_entities
+        assert inline_query_result_cached_photo.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_cached_photo.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -77,6 +77,10 @@ class TestInlineQueryResultCachedPhoto:
         assert (
             inline_query_result_cached_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
         )
+
+    def test_caption_entities_always_tuple(self):
+        result = InlineQueryResultCachedPhoto(self.id_, self.photo_file_id)
+        assert result.caption_entities == ()
 
     def test_to_dict(self, inline_query_result_cached_photo):
         inline_query_result_cached_photo_dict = inline_query_result_cached_photo.to_dict()

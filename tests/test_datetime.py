@@ -26,7 +26,7 @@ from telegram._utils import datetime as tg_dtm
 from telegram.ext import Defaults
 
 # sample time specification values categorised into absolute / delta / time-of-day
-from tests.conftest import env_var_2_bool
+from tests.auxil.object_conversions import env_var_2_bool
 
 ABSOLUTE_TIME_SPECS = [
     dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))).replace(second=0, microsecond=0),

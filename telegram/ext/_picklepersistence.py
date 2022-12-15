@@ -63,6 +63,9 @@ def _custom_reduction(cls: TelegramObj) -> Tuple[Callable, Tuple[Type[TelegramOb
     works as intended.
     """
     data = cls._get_attrs(include_private=True)  # pylint: disable=protected-access
+    # MappingProxyType is not pickable, so we convert it to a dict
+    # no need to convert back to MPT in _reconstruct_to, since it's done in __setstate__
+    data["api_kwargs"] = dict(data["api_kwargs"])  # type: ignore[arg-type]
     return _reconstruct_to, (cls.__class__, data)
 
 

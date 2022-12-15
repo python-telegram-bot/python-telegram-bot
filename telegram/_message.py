@@ -21,7 +21,7 @@
 import datetime
 import sys
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -48,6 +48,7 @@ from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
@@ -140,15 +141,23 @@ class Message(TelegramObject):
             message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
-        entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
+        entities (Sequence[:class:`telegram.MessageEntity`], optional): For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.
             This list is empty if the message does not contain entities.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): For messages with a
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
             caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
             methods for how to use properly. This list is empty if the message does not contain
             caption entities.
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         audio (:class:`telegram.Audio`, optional): Message is an audio file, information
             about the file.
         document (:class:`telegram.Document`, optional): Message is a general file, information
@@ -157,8 +166,12 @@ class Message(TelegramObject):
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
         game (:class:`telegram.Game`, optional): Message is a game, information about the game.
-        photo (List[:class:`telegram.PhotoSize`], optional): Message is a photo, available sizes
-            of the photo. This list is empty if the message does not contain a photo.
+        photo (Sequence[:class:`telegram.PhotoSize`], optional): Message is a photo, available
+            sizes of the photo. This list is empty if the message does not contain a photo.
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         sticker (:class:`telegram.Sticker`, optional): Message is a sticker, information
             about the sticker.
         video (:class:`telegram.Video`, optional): Message is a video, information about the
@@ -167,9 +180,13 @@ class Message(TelegramObject):
             the file.
         video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
             about the video message.
-        new_chat_members (List[:class:`telegram.User`], optional): New members that were added to
-            the group or supergroup and information about them (the bot itself may be one of these
-            members). This list is empty if the message does not contain new chat members.
+        new_chat_members (Sequence[:class:`telegram.User`], optional): New members that were added
+            to the group or supergroup and information about them (the bot itself may be one of
+            these members). This list is empty if the message does not contain new chat members.
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         caption (:obj:`str`, optional): Caption for the animation, audio, document, photo, video
             or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
@@ -182,8 +199,12 @@ class Message(TelegramObject):
         left_chat_member (:class:`telegram.User`, optional): A member was removed from the group,
             information about them (this member may be the bot itself).
         new_chat_title (:obj:`str`, optional): A chat title was changed to this value.
-        new_chat_photo (List[:class:`telegram.PhotoSize`], optional): A chat photo was changed to
-            this value. This list is empty if the message does not contain a new chat photo.
+        new_chat_photo (Sequence[:class:`telegram.PhotoSize`], optional): A chat photo was changed
+            to this value. This list is empty if the message does not contain a new chat photo.
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         delete_chat_photo (:obj:`bool`, optional): Service message: The chat photo was deleted.
         group_chat_created (:obj:`bool`, optional): Service message: The group has been created.
         supergroup_chat_created (:obj:`bool`, optional): Service message: The supergroup has been
@@ -309,15 +330,23 @@ class Message(TelegramObject):
             message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
-        entities (List[:class:`telegram.MessageEntity`]): Optional. For text messages, special
+        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.
             This list is empty if the message does not contain entities.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. For messages with a
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
             caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
             methods for how to use properly. This list is empty if the message does not contain
             caption entities.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         audio (:class:`telegram.Audio`): Optional. Message is an audio file, information
             about the file.
         document (:class:`telegram.Document`): Optional. Message is a general file, information
@@ -326,8 +355,12 @@ class Message(TelegramObject):
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
-        photo (List[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available sizes
-            of the photo. This list is empty if the message does not contain a photo.
+        photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
+            sizes of the photo. This list is empty if the message does not contain a photo.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         sticker (:class:`telegram.Sticker`): Optional. Message is a sticker, information
             about the sticker.
         video (:class:`telegram.Video`): Optional. Message is a video, information about the
@@ -336,9 +369,13 @@ class Message(TelegramObject):
             the file.
         video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
             about the video message.
-        new_chat_members (List[:class:`telegram.User`]): Optional. New members that were added to
-            the group or supergroup and information about them (the bot itself may be one of these
-            members). This list is empty if the message does not contain new chat members.
+        new_chat_members (Tuple[:class:`telegram.User`]): Optional. New members that were added
+            to the group or supergroup and information about them (the bot itself may be one of
+            these members). This list is empty if the message does not contain new chat members.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         caption (:obj:`str`): Optional. Caption for the animation, audio, document, photo, video
             or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information
@@ -351,8 +388,12 @@ class Message(TelegramObject):
         left_chat_member (:class:`telegram.User`): Optional. A member was removed from the group,
             information about them (this member may be the bot itself).
         new_chat_title (:obj:`str`): Optional. A chat title was changed to this value.
-        new_chat_photo (List[:class:`telegram.PhotoSize`]): A chat photo was changed to
+        new_chat_photo (Tuple[:class:`telegram.PhotoSize`]): A chat photo was changed to
             this value. This list is empty if the message does not contain a new chat photo.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         delete_chat_photo (:obj:`bool`): Optional. Service message: The chat photo was deleted.
         group_chat_created (:obj:`bool`): Optional. Service message: The group has been created.
         supergroup_chat_created (:obj:`bool`): Optional. Service message: The supergroup has been
@@ -528,24 +569,24 @@ class Message(TelegramObject):
         reply_to_message: "Message" = None,
         edit_date: datetime.datetime = None,
         text: str = None,
-        entities: List["MessageEntity"] = None,
-        caption_entities: List["MessageEntity"] = None,
+        entities: Sequence["MessageEntity"] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         audio: Audio = None,
         document: Document = None,
         game: Game = None,
-        photo: List[PhotoSize] = None,
+        photo: Sequence[PhotoSize] = None,
         sticker: Sticker = None,
         video: Video = None,
         voice: Voice = None,
         video_note: VideoNote = None,
-        new_chat_members: List[User] = None,
+        new_chat_members: Sequence[User] = None,
         caption: str = None,
         contact: Contact = None,
         location: Location = None,
         venue: Venue = None,
         left_chat_member: User = None,
         new_chat_title: str = None,
-        new_chat_photo: List[PhotoSize] = None,
+        new_chat_photo: Sequence[PhotoSize] = None,
         delete_chat_photo: bool = None,
         group_chat_created: bool = None,
         supergroup_chat_created: bool = None,
@@ -601,12 +642,12 @@ class Message(TelegramObject):
         self.edit_date = edit_date
         self.has_protected_content = has_protected_content
         self.text = text
-        self.entities = entities or []
-        self.caption_entities = caption_entities or []
+        self.entities = parse_sequence_arg(entities)
+        self.caption_entities = parse_sequence_arg(caption_entities)
         self.audio = audio
         self.game = game
         self.document = document
-        self.photo = photo or []
+        self.photo = parse_sequence_arg(photo)
         self.sticker = sticker
         self.video = video
         self.voice = voice
@@ -615,10 +656,10 @@ class Message(TelegramObject):
         self.contact = contact
         self.location = location
         self.venue = venue
-        self.new_chat_members = new_chat_members or []
+        self.new_chat_members = parse_sequence_arg(new_chat_members)
         self.left_chat_member = left_chat_member
         self.new_chat_title = new_chat_title
-        self.new_chat_photo = new_chat_photo or []
+        self.new_chat_photo = parse_sequence_arg(new_chat_photo)
         self.delete_chat_photo = bool(delete_chat_photo)
         self.group_chat_created = bool(group_chat_created)
         self.supergroup_chat_created = bool(supergroup_chat_created)
@@ -656,6 +697,8 @@ class Message(TelegramObject):
         self._effective_attachment = DEFAULT_NONE
 
         self._id_attrs = (self.message_id, self.chat)
+
+        self._freeze()
 
     @property
     def chat_id(self) -> int:
@@ -1095,7 +1138,7 @@ class Message(TelegramObject):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-    ) -> List["Message"]:
+    ) -> Tuple["Message", ...]:
         """Shortcut for::
 
              await bot.send_media_group(update.effective_message.chat_id, *args, **kwargs)
@@ -1109,7 +1152,7 @@ class Message(TelegramObject):
                 chats.
 
         Returns:
-            List[:class:`telegram.Message`]: An array of the sent Messages.
+            Tuple[:class:`telegram.Message`]: An array of the sent Messages.
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -2596,7 +2639,7 @@ class Message(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List["GameHighScore"]:
+    ) -> Tuple["GameHighScore", ...]:
         """Shortcut for::
 
              await bot.get_game_high_scores(
@@ -2612,7 +2655,7 @@ class Message(TelegramObject):
             behaviour is undocumented and might be changed by Telegram.
 
         Returns:
-            List[:class:`telegram.GameHighScore`]
+            Tuple[:class:`telegram.GameHighScore`]
         """
         return await self.get_bot().get_game_high_scores(
             chat_id=self.chat_id,

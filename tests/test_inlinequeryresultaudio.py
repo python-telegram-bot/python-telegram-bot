@@ -73,7 +73,7 @@ class TestInlineQueryResultAudio:
         assert inline_query_result_audio.audio_duration == self.audio_duration
         assert inline_query_result_audio.caption == self.caption
         assert inline_query_result_audio.parse_mode == self.parse_mode
-        assert inline_query_result_audio.caption_entities == self.caption_entities
+        assert inline_query_result_audio.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_audio.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -106,6 +106,10 @@ class TestInlineQueryResultAudio:
             inline_query_result_audio_dict["reply_markup"]
             == inline_query_result_audio.reply_markup.to_dict()
         )
+
+    def test_caption_entities_always_tuple(self):
+        inline_query_result_audio = InlineQueryResultAudio(self.id_, self.audio_url, self.title)
+        assert inline_query_result_audio.caption_entities == ()
 
     def test_equality(self):
         a = InlineQueryResultAudio(self.id_, self.audio_url, self.title)

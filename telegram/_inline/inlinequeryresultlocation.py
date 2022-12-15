@@ -127,22 +127,23 @@ class InlineQueryResultLocation(InlineQueryResult):
     ):
         # Required
         super().__init__(constants.InlineQueryResultType.LOCATION, id, api_kwargs=api_kwargs)
-        self.latitude = latitude
-        self.longitude = longitude
-        self.title = title
+        with self._unfrozen():
+            self.latitude = latitude
+            self.longitude = longitude
+            self.title = title
 
-        # Optionals
-        self.live_period = live_period
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_url = thumb_url
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
-        self.horizontal_accuracy = horizontal_accuracy
-        self.heading = heading
-        self.proximity_alert_radius = (
-            int(proximity_alert_radius) if proximity_alert_radius else None
-        )
+            # Optionals
+            self.live_period = live_period
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content
+            self.thumb_url = thumb_url
+            self.thumb_width = thumb_width
+            self.thumb_height = thumb_height
+            self.horizontal_accuracy = horizontal_accuracy
+            self.heading = heading
+            self.proximity_alert_radius = (
+                int(proximity_alert_radius) if proximity_alert_radius else None
+            )
 
     HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`

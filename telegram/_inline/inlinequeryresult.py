@@ -64,6 +64,8 @@ class InlineQueryResult(TelegramObject):
 
         self._id_attrs = (self.id,)
 
+        self._freeze()
+
     MIN_ID_LENGTH: ClassVar[int] = constants.InlineQueryResultLimit.MIN_ID_LENGTH
     """:const:`telegram.constants.InlineQueryResultLimit.MIN_ID_LENGTH`
 

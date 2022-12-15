@@ -102,14 +102,15 @@ class InlineQueryResultArticle(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.ARTICLE, id, api_kwargs=api_kwargs)
-        self.title = title
-        self.input_message_content = input_message_content
+        with self._unfrozen():
+            self.title = title
+            self.input_message_content = input_message_content
 
-        # Optional
-        self.reply_markup = reply_markup
-        self.url = url
-        self.hide_url = hide_url
-        self.description = description
-        self.thumb_url = thumb_url
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
+            # Optional
+            self.reply_markup = reply_markup
+            self.url = url
+            self.hide_url = hide_url
+            self.description = description
+            self.thumb_url = thumb_url
+            self.thumb_width = thumb_width
+            self.thumb_height = thumb_height

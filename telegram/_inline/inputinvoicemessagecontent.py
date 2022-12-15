@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that represents a Telegram InputInvoiceMessageContent."""
-
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._payment.labeledprice import LabeledPrice
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -52,20 +52,30 @@ class InputInvoiceMessageContent(InputMessageContent):
             `@Botfather <https://t.me/Botfather>`_.
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
             `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_
-        prices (List[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
+        prices (Sequence[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
             components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus,
             etc.)
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
             *smallest* units of the currency (integer, **not** float/double). For example, for a
             maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the ``exp`` parameter in
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
             shows the number of digits past the decimal point for each currency (2 for the majority
             of currencies). Defaults to ``0``.
-        suggested_tip_amounts (List[:obj:`int`], optional): An array of suggested
+        suggested_tip_amounts (Sequence[:obj:`int`], optional): An array of suggested
             amounts of tip in the *smallest* units of the currency (integer, **not** float/double).
             At most 4 suggested tip amounts can be specified. The suggested tip amounts must be
             positive, passed in a strictly increased order and must not exceed
             :attr:`max_tip_amount`.
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
+
         provider_data (:obj:`str`, optional): An object for data about the invoice,
             which will be shared with the payment provider. A detailed description of the required
             fields should be provided by the payment provider.
@@ -104,12 +114,20 @@ class InputInvoiceMessageContent(InputMessageContent):
             `@Botfather <https://t.me/Botfather>`_.
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
             `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_
-        prices (List[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
+        prices (Tuple[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
             components.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         max_tip_amount (:obj:`int`): Optional. The maximum accepted amount for tips in the smallest
             units of the currency (integer, not float/double).
-        suggested_tip_amounts (List[:obj:`int`]): Optional. An array of suggested
+        suggested_tip_amounts (Tuple[:obj:`int`]): Optional. An array of suggested
             amounts of tip in the smallest units of the currency (integer, not float/double).
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         provider_data (:obj:`str`): Optional. An object for data about the invoice,
             which will be shared with the payment provider.
         photo_url (:obj:`str`): Optional. URL of the product photo for the invoice.
@@ -163,9 +181,9 @@ class InputInvoiceMessageContent(InputMessageContent):
         payload: str,
         provider_token: str,
         currency: str,
-        prices: List[LabeledPrice],
+        prices: Sequence[LabeledPrice],
         max_tip_amount: int = None,
-        suggested_tip_amounts: List[int] = None,
+        suggested_tip_amounts: Sequence[int] = None,
         provider_data: str = None,
         photo_url: str = None,
         photo_size: int = None,
@@ -188,10 +206,10 @@ class InputInvoiceMessageContent(InputMessageContent):
         self.payload = payload
         self.provider_token = provider_token
         self.currency = currency
-        self.prices = prices
+        self.prices = parse_sequence_arg(prices)
         # Optionals
         self.max_tip_amount = max_tip_amount
-        self.suggested_tip_amounts = suggested_tip_amounts
+        self.suggested_tip_amounts = parse_sequence_arg(suggested_tip_amounts)
         self.provider_data = provider_data
         self.photo_url = photo_url
         self.photo_size = photo_size
@@ -214,19 +232,7 @@ class InputInvoiceMessageContent(InputMessageContent):
             self.prices,
         )
 
-    def __hash__(self) -> int:
-        # we override this as self.prices is a list and not hashable
-        prices = tuple(self.prices)
-        return hash(
-            (
-                self.title,
-                self.description,
-                self.payload,
-                self.provider_token,
-                self.currency,
-                prices,
-            )
-        )
+        self._freeze()
 
     @classmethod
     def de_json(

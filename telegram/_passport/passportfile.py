@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Encrypted PassportFile."""
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Tuple
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -87,6 +87,8 @@ class PassportFile(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
+        self._freeze()
+
     @classmethod
     def de_json_decrypted(
         cls, data: Optional[JSONDict], bot: "Bot", credentials: "FileCredentials"
@@ -115,26 +117,35 @@ class PassportFile(TelegramObject):
     @classmethod
     def de_list_decrypted(
         cls, data: Optional[List[JSONDict]], bot: "Bot", credentials: List["FileCredentials"]
-    ) -> List[Optional["PassportFile"]]:
+    ) -> Tuple[Optional["PassportFile"], ...]:
         """Variant of :meth:`telegram.TelegramObject.de_list` that also takes into account
         passport credentials.
 
+        .. versionchanged:: 20.0
+
+           * Returns a tuple instead of a list.
+           * Filters out any :obj:`None` values
+
         Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
+            data (List[Dict[:obj:`str`, ...]]): The JSON data.
             bot (:class:`telegram.Bot`): The bot associated with these objects.
             credentials (:class:`telegram.FileCredentials`): The credentials
 
         Returns:
-            List[:class:`telegram.PassportFile`]:
+            Tuple[:class:`telegram.PassportFile`]:
 
         """
         if not data:
-            return []
+            return ()
 
-        return [
-            cls.de_json_decrypted(passport_file, bot, credentials[i])
-            for i, passport_file in enumerate(data)
-        ]
+        return tuple(
+            obj
+            for obj in (
+                cls.de_json_decrypted(passport_file, bot, credentials[i])
+                for i, passport_file in enumerate(data)
+            )
+            if obj is not None
+        )
 
     async def get_file(
         self,

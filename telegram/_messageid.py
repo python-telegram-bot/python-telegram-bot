@@ -42,3 +42,5 @@ class MessageId(TelegramObject):
         self.message_id = message_id
 
         self._id_attrs = (self.message_id,)
+
+        self._freeze()

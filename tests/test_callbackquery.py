@@ -22,7 +22,11 @@ from datetime import datetime
 import pytest
 
 from telegram import Audio, Bot, CallbackQuery, Chat, Message, User
-from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
+from tests.auxil.bot_method_checks import (
+    check_defaults_handling,
+    check_shortcut_call,
+    check_shortcut_signature,
+)
 
 
 @pytest.fixture(scope="function", params=["message", "inline"])
@@ -35,6 +39,7 @@ def callback_query(bot, request):
         game_short_name=TestCallbackQuery.game_short_name,
     )
     cbq.set_bot(bot)
+    cbq._unfreeze()
     if request.param == "message":
         cbq.message = TestCallbackQuery.message
         cbq.message.set_bot(bot)

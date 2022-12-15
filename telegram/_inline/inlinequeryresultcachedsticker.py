@@ -71,8 +71,9 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.STICKER, id, api_kwargs=api_kwargs)
-        self.sticker_file_id = sticker_file_id
+        with self._unfrozen():
+            self.sticker_file_id = sticker_file_id
 
-        # Optionals
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
+            # Optionals
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content

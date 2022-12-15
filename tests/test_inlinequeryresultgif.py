@@ -69,6 +69,10 @@ class TestInlineQueryResultGif:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
+    def test_caption_entities_always_tuple(self):
+        result = InlineQueryResultGif(self.id_, self.gif_url, self.thumb_url)
+        assert result.caption_entities == ()
+
     def test_expected_values(self, inline_query_result_gif):
         assert inline_query_result_gif.type == self.type_
         assert inline_query_result_gif.id == self.id_
@@ -81,7 +85,7 @@ class TestInlineQueryResultGif:
         assert inline_query_result_gif.title == self.title
         assert inline_query_result_gif.caption == self.caption
         assert inline_query_result_gif.parse_mode == self.parse_mode
-        assert inline_query_result_gif.caption_entities == self.caption_entities
+        assert inline_query_result_gif.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_gif.input_message_content.to_dict()
             == self.input_message_content.to_dict()

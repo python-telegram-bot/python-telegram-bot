@@ -22,7 +22,11 @@ import pytest
 from telegram import Bot, Chat, ChatLocation, ChatPermissions, Location, User
 from telegram.constants import ChatAction, ChatType
 from telegram.helpers import escape_markdown
-from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
+from tests.auxil.bot_method_checks import (
+    check_defaults_handling,
+    check_shortcut_call,
+    check_shortcut_signature,
+)
 
 
 @pytest.fixture(scope="class")
@@ -49,6 +53,7 @@ def chat(bot):
         emoji_status_custom_emoji_id=TestChat.emoji_status_custom_emoji_id,
     )
     chat.set_bot(bot)
+    chat._unfreeze()
     return chat
 
 
@@ -134,7 +139,7 @@ class TestChat:
             "all_members_are_administrators": self.all_members_are_administrators
         }
         assert chat.is_forum == self.is_forum
-        assert chat.active_usernames == self.active_usernames
+        assert chat.active_usernames == tuple(self.active_usernames)
         assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
 
     def test_to_dict(self, chat):
@@ -159,8 +164,17 @@ class TestChat:
             == chat.has_restricted_voice_and_video_messages
         )
         assert chat_dict["is_forum"] == chat.is_forum
-        assert chat_dict["active_usernames"] == chat.active_usernames
+        assert chat_dict["active_usernames"] == list(chat.active_usernames)
         assert chat_dict["emoji_status_custom_emoji_id"] == chat.emoji_status_custom_emoji_id
+
+    def test_always_tuples_attributes(self):
+        chat = Chat(
+            id=123,
+            title="title",
+            type=Chat.PRIVATE,
+        )
+        assert isinstance(chat.active_usernames, tuple)
+        assert chat.active_usernames == ()
 
     def test_enum_init(self):
         chat = Chat(id=1, type="foo")

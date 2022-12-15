@@ -124,18 +124,19 @@ class InlineQueryResultVenue(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.VENUE, id, api_kwargs=api_kwargs)
-        self.latitude = latitude
-        self.longitude = longitude
-        self.title = title
-        self.address = address
+        with self._unfrozen():
+            self.latitude = latitude
+            self.longitude = longitude
+            self.title = title
+            self.address = address
 
-        # Optional
-        self.foursquare_id = foursquare_id
-        self.foursquare_type = foursquare_type
-        self.google_place_id = google_place_id
-        self.google_place_type = google_place_type
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_url = thumb_url
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
+            # Optional
+            self.foursquare_id = foursquare_id
+            self.foursquare_type = foursquare_type
+            self.google_place_id = google_place_id
+            self.google_place_type = google_place_type
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content
+            self.thumb_url = thumb_url
+            self.thumb_width = thumb_width
+            self.thumb_height = thumb_height

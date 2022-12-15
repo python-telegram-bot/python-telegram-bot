@@ -41,8 +41,8 @@ class ReplyKeyboardMarkup(TelegramObject):
         * :any:`Conversation Bot 2 <examples.conversationbot2>`
 
     Args:
-        keyboard (List[List[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of button rows,
-            each represented by an Array of :class:`telegram.KeyboardButton` objects.
+        keyboard (Sequence[Sequence[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of
+            button rows, each represented by an Array of :class:`telegram.KeyboardButton` objects.
         resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard vertically
             for optimal fit (e.g., make the keyboard smaller if there are just two rows of
             buttons). Defaults to :obj:`False`, in which case the custom keyboard is always of the
@@ -70,7 +70,8 @@ class ReplyKeyboardMarkup(TelegramObject):
             .. versionadded:: 13.7
 
     Attributes:
-        keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
+        keyboard (Tuple[Tuple[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button
+            rows.
         resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
         one_time_keyboard (:obj:`bool`): Optional. Requests clients to hide the keyboard as soon as
             it's been used.
@@ -103,20 +104,15 @@ class ReplyKeyboardMarkup(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(keyboard):
             raise ValueError(
-                "The parameter `keyboard` should be a list of list of "
+                "The parameter `keyboard` should be a sequence of sequences of "
                 "strings or KeyboardButtons"
             )
 
         # Required
-        self.keyboard = []
-        for row in keyboard:
-            button_row = []
-            for button in row:
-                if isinstance(button, KeyboardButton):
-                    button_row.append(button)  # telegram.KeyboardButton
-                else:
-                    button_row.append(KeyboardButton(button))  # str
-            self.keyboard.append(button_row)
+        self.keyboard = tuple(
+            tuple(KeyboardButton(button) if isinstance(button, str) else button for button in row)
+            for row in keyboard
+        )
 
         # Optionals
         self.resize_keyboard = resize_keyboard
@@ -125,6 +121,8 @@ class ReplyKeyboardMarkup(TelegramObject):
         self.input_field_placeholder = input_field_placeholder
 
         self._id_attrs = (self.keyboard,)
+
+        self._freeze()
 
     @classmethod
     def from_button(
@@ -280,16 +278,6 @@ class ReplyKeyboardMarkup(TelegramObject):
             selective=selective,
             input_field_placeholder=input_field_placeholder,
             **kwargs,  # type: ignore[arg-type]
-        )
-
-    def __hash__(self) -> int:
-        return hash(
-            (
-                tuple(tuple(button for button in row) for row in self.keyboard),
-                self.resize_keyboard,
-                self.one_time_keyboard,
-                self.selective,
-            )
         )
 
     MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER

@@ -53,3 +53,5 @@ class WebAppInfo(TelegramObject):
         self.url = url
 
         self._id_attrs = (self.url,)
+
+        self._freeze()

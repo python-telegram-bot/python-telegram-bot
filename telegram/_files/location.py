@@ -93,6 +93,8 @@ class Location(TelegramObject):
 
         self._id_attrs = (self.longitude, self.latitude)
 
+        self._freeze()
+
     HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
 

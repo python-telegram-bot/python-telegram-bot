@@ -62,6 +62,8 @@ class ChatLocation(TelegramObject):
 
         self._id_attrs = (self.location,)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatLocation"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
-
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._passport.credentials import EncryptedCredentials
 from telegram._passport.encryptedpassportelement import EncryptedPassportElement
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -39,13 +39,23 @@ class PassportData(TelegramObject):
         attribute :attr:`telegram.Credentials.nonce`.
 
     Args:
-        data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
-            about documents and other Telegram Passport elements that was shared with the bot.
+        data (Sequence[:class:`telegram.EncryptedPassportElement`]): Array with encrypted
+            information about documents and other Telegram Passport elements that was shared with
+            the bot.
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         credentials (:class:`telegram.EncryptedCredentials`)): Encrypted credentials.
 
     Attributes:
-        data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
-            about documents and other Telegram Passport elements that was shared with the bot.
+        data (Tuple[:class:`telegram.EncryptedPassportElement`]): Array with encrypted
+            information about documents and other Telegram Passport elements that was shared with
+            the bot.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials.
 
 
@@ -55,18 +65,20 @@ class PassportData(TelegramObject):
 
     def __init__(
         self,
-        data: List[EncryptedPassportElement],
+        data: Sequence[EncryptedPassportElement],
         credentials: EncryptedCredentials,
         *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
-        self.data = data
+        self.data = parse_sequence_arg(data)
         self.credentials = credentials
 
-        self._decrypted_data: Optional[List[EncryptedPassportElement]] = None
+        self._decrypted_data: Optional[Tuple[EncryptedPassportElement]] = None
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
+
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["PassportData"]:
@@ -82,23 +94,26 @@ class PassportData(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
     @property
-    def decrypted_data(self) -> List[EncryptedPassportElement]:
+    def decrypted_data(self) -> Tuple[EncryptedPassportElement, ...]:
         """
-        List[:class:`telegram.EncryptedPassportElement`]: Lazily decrypt and return information
+        Tuple[:class:`telegram.EncryptedPassportElement`]: Lazily decrypt and return information
             about documents and other Telegram Passport elements which were shared with the bot.
+
+        .. versionchanged:: 20.0
+            Returns a tuple instead of a list.
 
         Raises:
             telegram.error.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
         if self._decrypted_data is None:
-            self._decrypted_data = [
-                EncryptedPassportElement.de_json_decrypted(  # type: ignore[misc]
+            self._decrypted_data = tuple(  # type: ignore[assignment]
+                EncryptedPassportElement.de_json_decrypted(
                     element.to_dict(), self.get_bot(), self.decrypted_credentials
                 )
                 for element in self.data
-            ]
-        return self._decrypted_data
+            )
+        return self._decrypted_data  # type: ignore[return-value]
 
     @property
     def decrypted_credentials(self) -> "Credentials":

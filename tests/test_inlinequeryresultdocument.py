@@ -76,7 +76,7 @@ class TestInlineQueryResultDocument:
         assert inline_query_result_document.title == self.title
         assert inline_query_result_document.caption == self.caption
         assert inline_query_result_document.parse_mode == self.parse_mode
-        assert inline_query_result_document.caption_entities == self.caption_entities
+        assert inline_query_result_document.caption_entities == tuple(self.caption_entities)
         assert inline_query_result_document.mime_type == self.mime_type
         assert inline_query_result_document.description == self.description
         assert inline_query_result_document.thumb_url == self.thumb_url
@@ -87,6 +87,10 @@ class TestInlineQueryResultDocument:
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_document.reply_markup.to_dict() == self.reply_markup.to_dict()
+
+    def test_caption_entities_always_tuple(self):
+        result = InlineQueryResultDocument(self.id_, self.document_url, self.title, self.mime_type)
+        assert result.caption_entities == ()
 
     def test_to_dict(self, inline_query_result_document):
         inline_query_result_document_dict = inline_query_result_document.to_dict()

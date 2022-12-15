@@ -86,13 +86,19 @@ class TestInlineKeyboardMarkup:
         assert len(inline_keyboard_markup[1]) == 1
 
     def test_expected_values(self, inline_keyboard_markup):
-        assert inline_keyboard_markup.inline_keyboard == self.inline_keyboard
+        assert inline_keyboard_markup.inline_keyboard == tuple(
+            tuple(row) for row in self.inline_keyboard
+        )
 
     def test_wrong_keyboard_inputs(self):
         with pytest.raises(ValueError):
             InlineKeyboardMarkup(
                 [[InlineKeyboardButton("b1", "1")], InlineKeyboardButton("b2", "2")]
             )
+        with pytest.raises(ValueError):
+            InlineKeyboardMarkup("strings_are_not_allowed")
+        with pytest.raises(ValueError):
+            InlineKeyboardMarkup(["strings_are_not_allowed_in_the_rows_either"])
         with pytest.raises(ValueError):
             InlineKeyboardMarkup(InlineKeyboardButton("b1", "1"))
 
@@ -121,8 +127,10 @@ class TestInlineKeyboardMarkup:
             assert bool("'switch_inline_query': ''" in str(data["reply_markup"]))
             assert bool("'switch_inline_query_current_chat': ''" in str(data["reply_markup"]))
 
+        inline_keyboard_markup.inline_keyboard[0][0]._unfreeze()
         inline_keyboard_markup.inline_keyboard[0][0].callback_data = None
         inline_keyboard_markup.inline_keyboard[0][0].switch_inline_query = ""
+        inline_keyboard_markup.inline_keyboard[0][1]._unfreeze()
         inline_keyboard_markup.inline_keyboard[0][1].callback_data = None
         inline_keyboard_markup.inline_keyboard[0][1].switch_inline_query_current_chat = ""
 

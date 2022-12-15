@@ -28,7 +28,7 @@ from telegram import CallbackQuery, Chat, InlineKeyboardButton, InlineKeyboardMa
 from telegram._utils.datetime import UTC
 from telegram.ext import ExtBot
 from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
-from tests.conftest import env_var_2_bool
+from tests.auxil.object_conversions import env_var_2_bool
 
 
 @pytest.fixture(scope="function")
@@ -185,6 +185,7 @@ class TestCallbackDataCache:
 
         chat = Chat(1, "private")
         effective_message = Message(message_id=1, date=datetime.now(), chat=chat, reply_markup=out)
+        effective_message._unfreeze()
         effective_message.reply_to_message = deepcopy(effective_message)
         effective_message.pinned_message = deepcopy(effective_message)
         cq_id = uuid4().hex

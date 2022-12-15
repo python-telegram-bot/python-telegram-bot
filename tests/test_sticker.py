@@ -25,12 +25,12 @@ import pytest
 from telegram import Audio, Bot, File, InputFile, MaskPosition, PhotoSize, Sticker, StickerSet
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
-from tests.conftest import (
+from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
-    data_file,
 )
+from tests.conftest import data_file
 
 
 @pytest.fixture(scope="function")
@@ -505,7 +505,7 @@ class TestStickerSet:
         assert sticker_set.title == self.title
         assert sticker_set.is_animated == self.is_animated
         assert sticker_set.is_video == self.is_video
-        assert sticker_set.stickers == self.stickers
+        assert sticker_set.stickers == tuple(self.stickers)
         assert sticker_set.thumb == sticker.thumb
         assert sticker_set.sticker_type == self.sticker_type
         assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks}
@@ -824,7 +824,7 @@ class TestStickerSet:
             self.is_video,
             self.sticker_type,
         )
-        c = StickerSet(self.name, None, None, None, None, Sticker.CUSTOM_EMOJI)
+        c = StickerSet(self.name, "title", False, [], True, Sticker.CUSTOM_EMOJI)
         d = StickerSet(
             "blah",
             self.title,

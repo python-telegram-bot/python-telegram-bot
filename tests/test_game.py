@@ -24,7 +24,7 @@ from telegram import Animation, Game, MessageEntity, PhotoSize
 
 @pytest.fixture(scope="function")
 def game():
-    return Game(
+    game = Game(
         TestGame.title,
         TestGame.description,
         TestGame.photo,
@@ -32,6 +32,8 @@ def game():
         text_entities=TestGame.text_entities,
         animation=TestGame.animation,
     )
+    game._unfreeze()
+    return game
 
 
 class TestGame:
@@ -61,7 +63,7 @@ class TestGame:
 
         assert game.title == self.title
         assert game.description == self.description
-        assert game.photo == self.photo
+        assert game.photo == tuple(self.photo)
 
     def test_de_json_all(self, bot):
         json_dict = {
@@ -77,9 +79,9 @@ class TestGame:
 
         assert game.title == self.title
         assert game.description == self.description
-        assert game.photo == self.photo
+        assert game.photo == tuple(self.photo)
         assert game.text == self.text
-        assert game.text_entities == self.text_entities
+        assert game.text_entities == tuple(self.text_entities)
         assert game.animation == self.animation
 
     def test_to_dict(self, game):

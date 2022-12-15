@@ -49,3 +49,5 @@ class SentWebAppMessage(TelegramObject):
         self.inline_message_id = inline_message_id
 
         self._id_attrs = (self.inline_message_id,)
+
+        self._freeze()

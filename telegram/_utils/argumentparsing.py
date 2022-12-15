@@ -11,35 +11,30 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser Public License for more details.
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a helper function for Telegram's ReplyMarkups
-
-.. versionchanged:: 20.0
-   Previously, the contents of this module were available through the (no longer existing)
-   class ``telegram.ReplyMarkup``.
+"""This module contains helper functions related to parsing arguments for classes and methods.
 
 Warning:
     Contents of this module are intended to be used internally by the library and *not* by the
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-from collections.abc import Sequence
+from typing import Optional, Sequence, Tuple, TypeVar
+
+T = TypeVar("T")
 
 
-def check_keyboard_type(keyboard: object) -> bool:
-    """Checks if the keyboard provided is of the correct type - A list of lists.
-    Implicitly tested in the init-tests of `{Inline, Reply}KeyboardMarkup`
+def parse_sequence_arg(arg: Optional[Sequence[T]]) -> Tuple[T, ...]:
+    """Parses an optional sequence into a tuple
+
+    Args:
+        arg (:obj:`Sequence`): The sequence to parse.
+
+    Returns:
+        :obj:`Tuple`: The sequence converted to a tuple or an empty tuple.
     """
-    # string and bytes may actually be used for ReplyKeyboardMarkup in which case each button
-    # would contain a single character. But that use case should be discouraged and we don't
-    # allow it here.
-    if not isinstance(keyboard, Sequence) or isinstance(keyboard, (str, bytes)):
-        return False
-    for row in keyboard:
-        if not isinstance(row, Sequence) or isinstance(row, (str, bytes)):
-            return False
-    return True
+    return tuple(arg) if arg else ()

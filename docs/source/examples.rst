@@ -40,6 +40,7 @@ up a job to send a message to that user after 30 seconds. The user can
 also cancel the timer by sending ``/unset``. To learn more about the
 ``JobQueue``, read `this wiki
 article <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`__.
+Note: To use ``JobQueue``, you must install PTB via ``pip install python-telegram-bot[job-queue]``
 
 :any:`examples.conversationbot`
 -------------------------------
@@ -115,6 +116,7 @@ Don’t forget to enable and configure payments with
 `@BotFather <https://telegram.me/BotFather>`_. Check out this
 `guide <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Telegram-Passport>`__
 on Telegram passports in PTB.
+Note: To use Telegram Passport, you must install PTB via ``pip install python-telegram-bot[passport]``
 
 :any:`examples.paymentbot`
 --------------------------
@@ -162,6 +164,7 @@ combination with ``telegram.ext.Application``.
 
 This example showcases how PTBs “arbitrary callback data” feature can be
 used.
+Note: To use arbitrary callback data, you must install PTB via ``pip install python-telegram-bot[callback-data]``
 
 Pure API
 --------
