@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from copy import copy
 from datetime import datetime
 
 import pytest
@@ -55,7 +56,11 @@ from telegram import (
 )
 from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
-from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
+from tests.auxil.bot_method_checks import (
+    check_defaults_handling,
+    check_shortcut_call,
+    check_shortcut_signature,
+)
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -64,10 +69,13 @@ def message(bot):
     message = Message(
         message_id=TestMessage.id_,
         date=TestMessage.date,
-        chat=TestMessage.chat,
-        from_user=TestMessage.from_user,
+        chat=copy(TestMessage.chat),
+        from_user=copy(TestMessage.from_user),
     )
     message.set_bot(bot)
+    message._unfreeze()
+    message.chat._unfreeze()
+    message.from_user._unfreeze()
     return message
 
 

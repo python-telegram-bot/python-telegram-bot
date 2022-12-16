@@ -69,7 +69,7 @@ class TestInlineQueryResultCachedVideo:
         assert inline_query_result_cached_video.description == self.description
         assert inline_query_result_cached_video.caption == self.caption
         assert inline_query_result_cached_video.parse_mode == self.parse_mode
-        assert inline_query_result_cached_video.caption_entities == self.caption_entities
+        assert inline_query_result_cached_video.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_cached_video.input_message_content.to_dict()
             == self.input_message_content.to_dict()
@@ -77,6 +77,11 @@ class TestInlineQueryResultCachedVideo:
         assert (
             inline_query_result_cached_video.reply_markup.to_dict() == self.reply_markup.to_dict()
         )
+
+    def test_caption_entities_always_tuple(self):
+        video = InlineQueryResultCachedVideo(self.id_, self.video_file_id, self.title)
+
+        assert video.caption_entities == ()
 
     def test_to_dict(self, inline_query_result_cached_video):
         inline_query_result_cached_video_dict = inline_query_result_cached_video.to_dict()

@@ -38,7 +38,7 @@ CallbackContext.refresh_data is tested in TestBasePersistence
 
 
 class TestCallbackContext:
-    def test_slot_behaviour(self, app, mro_slots, recwarn):
+    def test_slot_behaviour(self, app, mro_slots):
         c = CallbackContext(app)
         for attr in c.__slots__:
             assert getattr(c, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -57,6 +57,21 @@ class TestCallbackContext:
         assert callback_context.bot is app.bot
         assert callback_context.job_queue is app.job_queue
         assert callback_context.update_queue is app.update_queue
+
+    def test_job_queue(self, bot, app, recwarn):
+        expected_warning = (
+            "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
+            "`pip install python-telegram-bot[job_queue]`."
+        )
+
+        callback_context = CallbackContext(app)
+        assert callback_context.job_queue is app.job_queue
+        app = ApplicationBuilder().job_queue(None).token(bot.token).build()
+        callback_context = CallbackContext(app)
+        assert callback_context.job_queue is None
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_from_update(self, app):
         update = Update(

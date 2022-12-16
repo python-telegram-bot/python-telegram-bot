@@ -100,6 +100,8 @@ class ChatPhoto(TelegramObject):
             self.big_file_unique_id,
         )
 
+        self._freeze()
+
     async def get_small_file(
         self,
         *,

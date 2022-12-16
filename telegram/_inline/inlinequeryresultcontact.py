@@ -101,14 +101,15 @@ class InlineQueryResultContact(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.CONTACT, id, api_kwargs=api_kwargs)
-        self.phone_number = phone_number
-        self.first_name = first_name
+        with self._unfrozen():
+            self.phone_number = phone_number
+            self.first_name = first_name
 
-        # Optionals
-        self.last_name = last_name
-        self.vcard = vcard
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_url = thumb_url
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
+            # Optionals
+            self.last_name = last_name
+            self.vcard = vcard
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content
+            self.thumb_url = thumb_url
+            self.thumb_width = thumb_width
+            self.thumb_height = thumb_height

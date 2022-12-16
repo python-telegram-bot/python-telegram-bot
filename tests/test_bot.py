@@ -38,14 +38,12 @@ from telegram import (
     ChatAdministratorRights,
     ChatPermissions,
     Dice,
-    File,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQueryResultArticle,
     InlineQueryResultDocument,
     InlineQueryResultVoice,
     InputFile,
-    InputMedia,
     InputMessageContent,
     InputTextMessageContent,
     LabeledPrice,
@@ -64,7 +62,7 @@ from telegram import (
     WebAppInfo,
 )
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
-from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
+from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.constants import (
     ChatAction,
     InlineQueryLimit,
@@ -76,15 +74,9 @@ from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
+from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.bots import FALLBACKS
-from tests.conftest import (
-    GITHUB_ACTION,
-    build_kwargs,
-    check_defaults_handling,
-    data_file,
-    expect_bad_request,
-    make_bot,
-)
+from tests.conftest import GITHUB_ACTION, data_file, expect_bad_request, make_bot
 
 
 def to_camel_case(snake_str):
@@ -100,13 +92,15 @@ async def message(bot, chat_id):
     to_reply_to = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
     )
-    return await bot.send_message(
+    out = await bot.send_message(
         chat_id,
         "Text",
         reply_to_message_id=to_reply_to.message_id,
         disable_web_page_preview=True,
         disable_notification=True,
     )
+    out._unfreeze()
+    return out
 
 
 @pytest.fixture(scope="class")
@@ -398,8 +392,8 @@ class TestBot:
     async def test_equality(self):
         async with make_bot(token=FALLBACKS[0]["token"]) as a, make_bot(
             token=FALLBACKS[0]["token"]
-        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c:
-            d = Update(123456789)
+        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c, Bot(token=FALLBACKS[0]["token"]) as d:
+            e = Update(123456789)
 
             assert a == b
             assert hash(a) == hash(b)
@@ -410,6 +404,9 @@ class TestBot:
 
             assert a != d
             assert hash(a) != hash(d)
+
+            assert a != e
+            assert hash(a) != hash(e)
 
     @pytest.mark.flaky(3, 1)
     async def test_to_dict(self, bot):
@@ -449,77 +446,18 @@ class TestBot:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
-        if bot_method_name.lower().replace("_", "") == "getupdates":
-            return
+        if bot_method_name.lower().replace("_", "") == "getme":
+            # Mocking get_me within check_defaults_handling messes with the cached values like
+            # Bot.{bot, username, id, …}` unless we return the expected User object.
+            return_value = bot.bot
+        else:
+            return_value = None
 
-        try:
-            # Check that ExtBot does the right thing
-            bot_method = getattr(bot, bot_method_name)
-            assert await check_defaults_handling(bot_method, bot)
-
-            # check that tg.Bot does the right thing
-            # make_assertion basically checks everything that happens in
-            # Bot._insert_defaults and Bot._insert_defaults_for_ilq_results
-            async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-                json_data = request_data.parameters
-
-                # Check regular kwargs
-                for k, v in json_data.items():
-                    if isinstance(v, DefaultValue):
-                        pytest.fail(f"Parameter {k} was passed as DefaultValue to request")
-                    elif isinstance(v, InputMedia) and isinstance(v.parse_mode, DefaultValue):
-                        pytest.fail(f"Parameter {k} has a DefaultValue parse_mode")
-                    # Check InputMedia
-                    elif k == "media" and isinstance(v, list):
-                        if any(isinstance(med.get("parse_mode"), DefaultValue) for med in v):
-                            pytest.fail("One of the media items has a DefaultValue parse_mode")
-
-                # Check inline query results
-                if bot_method_name.lower().replace("_", "") == "answerinlinequery":
-                    for result_dict in json_data["results"]:
-                        if isinstance(result_dict.get("parse_mode"), DefaultValue):
-                            pytest.fail("InlineQueryResult has DefaultValue parse_mode")
-                        imc = result_dict.get("input_message_content")
-                        if imc and isinstance(imc.get("parse_mode"), DefaultValue):
-                            pytest.fail(
-                                "InlineQueryResult is InputMessageContext with DefaultValue "
-                                "parse_mode "
-                            )
-                        if imc and isinstance(imc.get("disable_web_page_preview"), DefaultValue):
-                            pytest.fail(
-                                "InlineQueryResult is InputMessageContext with DefaultValue "
-                                "disable_web_page_preview "
-                            )
-                # Check datetime conversion
-                until_date = json_data.pop("until_date", None)
-                if until_date and until_date != 946684800:
-                    pytest.fail("Naive until_date was not interpreted as UTC")
-
-                if bot_method_name in ["get_file", "getFile"]:
-                    # The get_file methods try to check if the result is a local file
-                    return File(file_id="result", file_unique_id="result").to_dict()
-
-            method = getattr(raw_bot, bot_method_name)
-            signature = inspect.signature(method)
-            kwargs_need_default = [
-                kwarg
-                for kwarg, value in signature.parameters.items()
-                if isinstance(value.default, DefaultValue)
-            ]
-            monkeypatch.setattr(raw_bot.request, "post", make_assertion)
-            await method(**build_kwargs(inspect.signature(method), kwargs_need_default))
-        finally:
-            await bot.get_me()  # because running the mock-get_me messages with bot.bot & friends
-
-        method = getattr(raw_bot, bot_method_name)
-        signature = inspect.signature(method)
-        kwargs_need_default = [
-            kwarg
-            for kwarg, value in signature.parameters.items()
-            if isinstance(value.default, DefaultValue)
-        ]
-        monkeypatch.setattr(raw_bot.request, "post", make_assertion)
-        await method(**build_kwargs(inspect.signature(method), kwargs_need_default))
+        # Check that ExtBot does the right thing
+        bot_method = getattr(bot, bot_method_name)
+        raw_bot_method = getattr(raw_bot, bot_method_name)
+        assert await check_defaults_handling(bot_method, bot, return_value=return_value)
+        assert await check_defaults_handling(raw_bot_method, raw_bot, return_value=return_value)
 
     def test_ext_bot_signature(self):
         """
@@ -754,7 +692,7 @@ class TestBot:
         assert message_quiz.poll.type == Poll.QUIZ
         assert message_quiz.poll.is_closed
         assert message_quiz.poll.explanation == "Here is a link"
-        assert message_quiz.poll.explanation_entities == explanation_entities
+        assert message_quiz.poll.explanation_entities == tuple(explanation_entities)
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
@@ -808,6 +746,7 @@ class TestBot:
             close_date=close_date,
             read_timeout=60,
         )
+        msg.poll._unfreeze()
         # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
         msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
         assert abs(msg.poll.close_date - aware_close_date) <= dtm.timedelta(seconds=5)
@@ -842,7 +781,7 @@ class TestBot:
         )
 
         assert message.poll.explanation == test_string
-        assert message.poll.explanation_entities == entities
+        assert message.poll.explanation_entities == tuple(entities)
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
@@ -862,11 +801,11 @@ class TestBot:
             explanation=explanation_markdown,
         )
         assert message.poll.explanation == explanation
-        assert message.poll.explanation_entities == [
+        assert message.poll.explanation_entities == (
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.BOLD, 7, 4),
             MessageEntity(MessageEntity.CODE, 12, 4),
-        ]
+        )
 
         message = await default_bot.send_poll(
             chat_id=super_group_id,
@@ -879,7 +818,7 @@ class TestBot:
             explanation_parse_mode=None,
         )
         assert message.poll.explanation == explanation_markdown
-        assert message.poll.explanation_entities == []
+        assert message.poll.explanation_entities == ()
 
         message = await default_bot.send_poll(
             chat_id=super_group_id,
@@ -892,7 +831,7 @@ class TestBot:
             explanation_parse_mode="HTML",
         )
         assert message.poll.explanation == explanation_markdown
-        assert message.poll.explanation_entities == []
+        assert message.poll.explanation_entities == ()
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
@@ -1678,7 +1617,7 @@ class TestBot:
         )
 
         assert message.text == test_string
-        assert message.entities == entities
+        assert message.entities == tuple(entities)
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
@@ -1751,7 +1690,7 @@ class TestBot:
         )
 
         assert message.caption == test_string
-        assert message.caption_entities == entities
+        assert message.caption_entities == tuple(entities)
 
     # edit_message_media is tested in test_inputmedia
 
@@ -1826,7 +1765,7 @@ class TestBot:
         await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
         updates = await bot.get_updates(timeout=1)
 
-        assert isinstance(updates, list)
+        assert isinstance(updates, tuple)
         if updates:
             assert isinstance(updates[0], Update)
 
@@ -1858,7 +1797,7 @@ class TestBot:
             monkeypatch.setattr(BaseRequest, "post", post)
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
             assert isinstance(updates[0].callback_query.data, InvalidCallbackData)
 
@@ -1894,7 +1833,7 @@ class TestBot:
         live_info = await bot.get_webhook_info()
         assert live_info.url == url
         assert live_info.max_connections == max_connections
-        assert live_info.allowed_updates == allowed_updates
+        assert live_info.allowed_updates == tuple(allowed_updates)
         assert live_info.ip_address == ip
         assert live_info.has_custom_certificate == use_ip
 
@@ -1910,8 +1849,8 @@ class TestBot:
         self, bot, drop_pending_updates, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            data = request_data.json_parameters
-            return bool(data.get("drop_pending_updates")) == drop_pending_updates
+            data = request_data.parameters
+            return data.get("drop_pending_updates") == drop_pending_updates
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
 
@@ -1983,7 +1922,7 @@ class TestBot:
     @pytest.mark.flaky(3, 1)
     async def test_get_chat_administrators(self, bot, channel_id):
         admins = await bot.get_chat_administrators(channel_id)
-        assert isinstance(admins, list)
+        assert isinstance(admins, tuple)
 
         for a in admins:
             assert a.status in ("administrator", "creator")
@@ -2628,7 +2567,7 @@ class TestBot:
         ]
         message = await bot.send_message(chat_id=chat_id, text=test_string, entities=entities)
         assert message.text == test_string
-        assert message.entities == entities
+        assert message.entities == tuple(entities)
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
@@ -2742,7 +2681,7 @@ class TestBot:
     async def test_set_and_get_my_commands(self, bot):
         commands = [BotCommand("cmd1", "descr1"), ["cmd2", "descr2"]]
         await bot.set_my_commands([])
-        assert await bot.get_my_commands() == []
+        assert await bot.get_my_commands() == ()
         assert await bot.set_my_commands(commands)
 
         for i, bc in enumerate(await bot.get_my_commands()):
@@ -3142,6 +3081,7 @@ class TestBot:
             None,
             reply_markup=bot.callback_data_cache.process_keyboard(reply_markup),
         )
+        message._unfreeze()
         # We do to_dict -> de_json to make sure those aren't the same objects
         message.pinned_message = Message.de_json(message.to_dict(), bot)
 
@@ -3165,7 +3105,7 @@ class TestBot:
             await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
 
             effective_message = updates[0][message_type]
@@ -3232,7 +3172,7 @@ class TestBot:
             await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
 
             message = updates[0][message_type]

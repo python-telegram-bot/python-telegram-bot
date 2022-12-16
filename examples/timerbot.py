@@ -16,6 +16,10 @@ Usage:
 Basic Alarm Bot example, sends a message after a set time.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
+
+Note:
+To use arbitrary callback data, you must install ptb via
+`pip install python-telegram-bot[callback-data]`
 """
 
 import logging

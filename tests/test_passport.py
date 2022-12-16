@@ -523,6 +523,7 @@ class TestPassport:
         assert hash(a) == hash(b)
         assert a is not b
 
+        passport_data.credentials._unfreeze()
         passport_data.credentials.hash = "NOTAPROPERHASH"
         c = PassportData(passport_data.data, passport_data.credentials)
 

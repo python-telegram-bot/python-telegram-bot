@@ -65,3 +65,5 @@ class InputContactMessageContent(InputMessageContent):
         self.vcard = vcard
 
         self._id_attrs = (self.phone_number,)
+
+        self._freeze()

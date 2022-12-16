@@ -25,7 +25,7 @@ import pytest
 
 from telegram import User
 from telegram.ext import Defaults
-from tests.conftest import env_var_2_bool
+from tests.auxil.object_conversions import env_var_2_bool
 
 TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 

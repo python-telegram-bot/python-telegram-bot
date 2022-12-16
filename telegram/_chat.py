@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Chat."""
 from datetime import datetime
 from html import escape
-from typing import TYPE_CHECKING, ClassVar, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, ClassVar, List, Optional, Sequence, Tuple, Union
 
 from telegram import constants
 from telegram._chatlocation import ChatLocation
@@ -30,6 +30,7 @@ from telegram._forumtopic import ForumTopic
 from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram.helpers import escape_markdown
@@ -153,7 +154,7 @@ class Chat(TelegramObject):
             (has topics_ enabled).
 
             .. versionadded:: 20.0
-        active_usernames (List[:obj:`str`], optional):  If set, the list of all `active chat
+        active_usernames (Sequence[:obj:`str`], optional):  If set, the list of all `active chat
             usernames <https://telegram.org/blog/topics-in-groups-collectible-usernames\
             #collectible-usernames>`_; for private chats, supergroups and channels. Returned
             only in :meth:`telegram.Bot.get_chat`.
@@ -234,10 +235,12 @@ class Chat(TelegramObject):
             (has topics_ enabled).
 
             .. versionadded:: 20.0
-        active_usernames (List[:obj:`str`]): Optional. If set, the list of all `active chat
+        active_usernames (Tuple[:obj:`str`]): Optional. If set, the list of all `active chat
             usernames <https://telegram.org/blog/topics-in-groups-collectible-usernames\
             #collectible-usernames>`_; for private chats, supergroups and channels. Returned
             only in :meth:`telegram.Bot.get_chat`.
+            This list is empty if the chat has no active usernames or this chat instance was not
+            obtained via :meth:`~telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
         emoji_status_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji
@@ -318,7 +321,7 @@ class Chat(TelegramObject):
         join_by_request: bool = None,
         has_restricted_voice_and_video_messages: bool = None,
         is_forum: bool = None,
-        active_usernames: List[str] = None,
+        active_usernames: Sequence[str] = None,
         emoji_status_custom_emoji_id: str = None,
         *,
         api_kwargs: JSONDict = None,
@@ -352,10 +355,12 @@ class Chat(TelegramObject):
         self.join_by_request = join_by_request
         self.has_restricted_voice_and_video_messages = has_restricted_voice_and_video_messages
         self.is_forum = is_forum
-        self.active_usernames = active_usernames
+        self.active_usernames = parse_sequence_arg(active_usernames)
         self.emoji_status_custom_emoji_id = emoji_status_custom_emoji_id
 
         self._id_attrs = (self.id,)
+
+        self._freeze()
 
     @property
     def full_name(self) -> Optional[str]:
@@ -546,7 +551,7 @@ class Chat(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List["ChatMember"]:
+    ) -> Tuple["ChatMember", ...]:
         """Shortcut for::
 
              await bot.get_chat_administrators(update.effective_chat.id, *args, **kwargs)
@@ -555,7 +560,7 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.get_chat_administrators`.
 
         Returns:
-            List[:class:`telegram.ChatMember`]: A list of administrators in a chat. An Array of
+            Tuple[:class:`telegram.ChatMember`]: A tuple of administrators in a chat. An Array of
             :class:`telegram.ChatMember` objects that contains information about all
             chat administrators except other bots. If the chat is a group or a supergroup
             and no administrators were appointed, only the creator will be returned.
@@ -1292,7 +1297,7 @@ class Chat(TelegramObject):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-    ) -> List["Message"]:
+    ) -> Tuple["Message", ...]:
         """Shortcut for::
 
              await bot.send_media_group(update.effective_chat.id, *args, **kwargs)
@@ -1300,7 +1305,8 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
         Returns:
-            List[:class:`telegram.Message`]: On success, instance representing the message posted.
+            Tuple[:class:`telegram.Message`]: On success, a tuple of :class:`~telegram.Message`
+            instances that were sent is returned.
 
         """
         return await self.get_bot().send_media_group(

@@ -108,6 +108,8 @@ class ChatMemberUpdated(TelegramObject):
             self.new_chat_member,
         )
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatMemberUpdated"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

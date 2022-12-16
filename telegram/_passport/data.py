@@ -100,6 +100,8 @@ class PersonalDetails(TelegramObject):
         self.last_name_native = last_name_native
         self.middle_name_native = middle_name_native
 
+        self._freeze()
+
 
 class ResidentialAddress(TelegramObject):
     """
@@ -151,6 +153,8 @@ class ResidentialAddress(TelegramObject):
         self.country_code = country_code
         self.post_code = post_code
 
+        self._freeze()
+
 
 class IdDocumentData(TelegramObject):
     """
@@ -177,3 +181,5 @@ class IdDocumentData(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.document_no = document_no
         self.expiry_date = expiry_date
+
+        self._freeze()

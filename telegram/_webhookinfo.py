@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
-
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -55,8 +55,13 @@ class WebhookInfo(TelegramObject):
             most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
             connections to the webhook for update delivery.
-        allowed_updates (List[:obj:`str`], optional): A list of update types the bot is subscribed
-            to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
+        allowed_updates (Sequence[:obj:`str`], optional): A list of update types the bot is
+            subscribed to. Defaults to all update types, except
+            :attr:`telegram.Update.chat_member`.
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         last_synchronization_error_date (:obj:`int`, optional): Unix time of the most recent error
             that happened when trying to synchronize available updates with Telegram datacenters.
 
@@ -73,8 +78,14 @@ class WebhookInfo(TelegramObject):
             most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
             connections to the webhook for update delivery.
-        allowed_updates (List[:obj:`str`]): Optional. A list of update types the bot is subscribed
-            to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
+        allowed_updates (Tuple[:obj:`str`]): Optional. A list of update types the bot is
+            subscribed to. Defaults to all update types, except
+            :attr:`telegram.Update.chat_member`.
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         last_synchronization_error_date (:obj:`int`): Optional. Unix time of the most recent error
             that happened when trying to synchronize available updates with Telegram datacenters.
 
@@ -101,7 +112,7 @@ class WebhookInfo(TelegramObject):
         last_error_date: int = None,
         last_error_message: str = None,
         max_connections: int = None,
-        allowed_updates: List[str] = None,
+        allowed_updates: Sequence[str] = None,
         ip_address: str = None,
         last_synchronization_error_date: int = None,
         *,
@@ -118,7 +129,7 @@ class WebhookInfo(TelegramObject):
         self.last_error_date = last_error_date
         self.last_error_message = last_error_message
         self.max_connections = max_connections
-        self.allowed_updates = allowed_updates
+        self.allowed_updates = parse_sequence_arg(allowed_updates)
         self.last_synchronization_error_date = last_synchronization_error_date
 
         self._id_attrs = (
@@ -132,6 +143,8 @@ class WebhookInfo(TelegramObject):
             self.allowed_updates,
             self.last_synchronization_error_date,
         )
+
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["WebhookInfo"]:

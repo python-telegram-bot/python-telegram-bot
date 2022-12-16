@@ -111,6 +111,8 @@ class InlineQuery(TelegramObject):
 
         self._id_attrs = (self.id,)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineQuery"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

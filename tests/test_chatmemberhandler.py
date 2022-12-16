@@ -82,7 +82,9 @@ def chat_member_updated():
 
 @pytest.fixture(scope="function")
 def chat_member(bot, chat_member_updated):
-    return Update(0, my_chat_member=chat_member_updated)
+    update = Update(0, my_chat_member=chat_member_updated)
+    update._unfreeze()
+    return update
 
 
 class TestChatMemberHandler:

@@ -162,6 +162,7 @@ class TestChatJoinRequestHandler:
         handler = ChatJoinRequestHandler(self.callback, username=["@user_b"])
         assert not handler.check_update(chat_join_request_update)
 
+        chat_join_request_update.chat_join_request.from_user._unfreeze()
         chat_join_request_update.chat_join_request.from_user.username = None
         assert not handler.check_update(chat_join_request_update)
 

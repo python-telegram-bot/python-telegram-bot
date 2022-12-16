@@ -35,6 +35,8 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
     be sent by the user. Alternatively, you can use :attr:`input_message_content` to send a
     message with the specified content instead of the sticker.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
@@ -71,8 +73,9 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.STICKER, id, api_kwargs=api_kwargs)
-        self.sticker_file_id = sticker_file_id
+        with self._unfrozen():
+            self.sticker_file_id = sticker_file_id
 
-        # Optionals
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
+            # Optionals
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content

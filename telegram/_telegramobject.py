@@ -20,16 +20,20 @@
 import datetime
 import inspect
 import json
+from collections.abc import Sized
+from contextlib import contextmanager
 from copy import deepcopy
 from itertools import chain
+from types import MappingProxyType
 from typing import (
     TYPE_CHECKING,
+    Any,
     Dict,
     Iterator,
     List,
+    Mapping,
     Optional,
     Set,
-    Sized,
     Tuple,
     Type,
     TypeVar,
@@ -61,6 +65,9 @@ class TelegramObject:
         * String representations objects of this type was overhauled. See :meth:`__repr__` for
           details. As this class doesn't implement :meth:`object.__str__`, the default
           implementation will be used, which is equivalent to :meth:`__repr__`.
+        * Objects of this class (or subclasses) are now immutable. This means that you can't set
+          or delete attributes anymore. Moreover, attributes that were formerly of type
+          :obj:`list` are now of type :obj:`tuple`.
 
     Arguments:
         api_kwargs (Dict[:obj:`str`, any], optional): |toapikwargsarg|
@@ -68,13 +75,13 @@ class TelegramObject:
             .. versionadded:: 20.0
 
     Attributes:
-        api_kwargs (Dict[:obj:`str`, any]): |toapikwargsattr|
+        api_kwargs (:obj:`types.MappingProxyType` [:obj:`str`, any]): |toapikwargsattr|
 
             .. versionadded:: 20.0
 
     """
 
-    __slots__ = ("_id_attrs", "_bot", "api_kwargs")
+    __slots__ = ("_id_attrs", "_bot", "_frozen", "api_kwargs")
 
     # Used to cache the names of the parameters of the __init__ method of the class
     # Must be a private attribute to avoid name clashes between subclasses
@@ -85,14 +92,34 @@ class TelegramObject:
     __INIT_PARAMS_CHECK: Optional[Type["TelegramObject"]] = None
 
     def __init__(self, *, api_kwargs: JSONDict = None) -> None:
+        self._frozen: bool = False
         self._id_attrs: Tuple[object, ...] = ()
         self._bot: Optional["Bot"] = None
         # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
-        self.api_kwargs: JSONDict = api_kwargs or {}
+        self.api_kwargs: Mapping[str, Any] = MappingProxyType(api_kwargs or {})
 
-    def _apply_api_kwargs(self) -> None:
+    def _freeze(self) -> None:
+        self._frozen = True
+
+    def _unfreeze(self) -> None:
+        self._frozen = False
+
+    @contextmanager
+    def _unfrozen(self: Tele_co) -> Iterator[Tele_co]:
+        """Context manager to temporarily unfreeze the object. For internal use only.
+
+        Note:
+            with to._unfrozen() as other_to:
+                assert to is other_to
+        """
+        self._unfreeze()
+        yield self
+        self._freeze()
+
+    def _apply_api_kwargs(self, api_kwargs: JSONDict) -> None:
         """Loops through the api kwargs and for every key that exists as attribute of the
         object (and is None), it moves the value from `api_kwargs` to the attribute.
+        *Edits `api_kwargs` in place!*
 
         This method is currently only called in the unpickling process, i.e. not on "normal" init.
         This is because
@@ -105,9 +132,39 @@ class TelegramObject:
           then you can pass everything as proper argument.
         """
         # we convert to list to ensure that the list doesn't change length while we loop
-        for key in list(self.api_kwargs.keys()):
+        for key in list(api_kwargs.keys()):
             if getattr(self, key, True) is None:
-                setattr(self, key, self.api_kwargs.pop(key))
+                setattr(self, key, api_kwargs.pop(key))
+
+    def __setattr__(self, key: str, value: object) -> None:
+        """Overrides :meth:`object.__setattr__` to prevent the overriding of attributes.
+
+        Raises:
+            :exc:`AttributeError`
+        """
+        # protected attributes can always be set for convenient internal use
+        if key[0] == "_" or not getattr(self, "_frozen", True):
+            super().__setattr__(key, value)
+            return
+
+        raise AttributeError(
+            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be set!"
+        )
+
+    def __delattr__(self, key: str) -> None:
+        """Overrides :meth:`object.__delattr__` to prevent the deletion of attributes.
+
+        Raises:
+            :exc:`AttributeError`
+        """
+        # protected attributes can always be set for convenient internal use
+        if key[0] == "_" or not getattr(self, "_frozen", True):
+            super().__delattr__(key)
+            return
+
+        raise AttributeError(
+            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be deleted!"
+        )
 
     def __repr__(self) -> str:
         """Gives a string representation of this object in the form
@@ -130,6 +187,9 @@ class TelegramObject:
         if not self.api_kwargs:
             # Drop api_kwargs from the representation, if empty
             as_dict.pop("api_kwargs", None)
+        else:
+            # Otherwise, we want to skip the "mappingproxy" part of the repr
+            as_dict["api_kwargs"] = dict(self.api_kwargs)
 
         contents = ", ".join(
             f"{k}={as_dict[k]!r}"
@@ -189,7 +249,11 @@ class TelegramObject:
         Returns:
             state (Dict[:obj:`str`, :obj:`object`]): The state of the object.
         """
-        return self._get_attrs(include_private=True, recursive=False, remove_bot=True)
+        out = self._get_attrs(include_private=True, recursive=False, remove_bot=True)
+        # MappingProxyType is not pickable, so we convert it to a dict and revert in
+        # __setstate__
+        out["api_kwargs"] = dict(self.api_kwargs)
+        return out
 
     def __setstate__(self, state: dict) -> None:
         """
@@ -208,19 +272,36 @@ class TelegramObject:
         Args:
             state (:obj:`dict`): The data to set as attributes of this object.
         """
+        self._unfreeze()
+
         # Make sure that we have a `_bot` attribute. This is necessary, since __getstate__ omits
         # this as Bots are not pickable.
         setattr(self, "_bot", None)
 
-        setattr(self, "api_kwargs", state.pop("api_kwargs", {}))  # assign api_kwargs first
+        # get api_kwargs first because we may need to add entries to it (see try-except below)
+        api_kwargs = state.pop("api_kwargs", {})
+        # get _frozen before the loop to avoid setting it to True in the loop
+        frozen = state.pop("_frozen", False)
 
         for key, val in state.items():
+
             try:
                 setattr(self, key, val)
-            except AttributeError:  # catch cases when old attributes are removed from new versions
-                self.api_kwargs[key] = val  # add it to api_kwargs as fallback
+            except AttributeError:
+                # catch cases when old attributes are removed from new versions
+                api_kwargs[key] = val  # add it to api_kwargs as fallback
 
-        self._apply_api_kwargs()
+        # For api_kwargs we first apply any kwargs that are already attributes of the object
+        # and then set the rest as MappingProxyType attribute. Converting to MappingProxyType
+        # is necessary, since __getstate__ converts it to a dict as MPT is not pickable.
+        self._apply_api_kwargs(api_kwargs)
+        setattr(self, "api_kwargs", MappingProxyType(api_kwargs))
+
+        # Apply freezing if necessary
+        # we .get(…) the setting for backwards compatibility with objects that were pickled
+        # before the freeze feature was introduced
+        if frozen:
+            self._freeze()
 
     def __deepcopy__(self: Tele_co, memodict: dict) -> Tele_co:
         """
@@ -243,9 +324,19 @@ class TelegramObject:
         result = cls.__new__(cls)  # create a new instance
         memodict[id(self)] = result  # save the id of the object in the dict
 
-        for k in self._get_attrs_names(
-            include_private=True
-        ):  # now we set the attributes in the deepcopied object
+        setattr(result, "_frozen", False)  # unfreeze the new object for setting the attributes
+
+        # now we set the attributes in the deepcopied object
+        for k in self._get_attrs_names(include_private=True):
+            if k == "_frozen":
+                # Setting the frozen status to True would prevent the attributes from being set
+                continue
+            if k == "api_kwargs":
+                # Need to copy api_kwargs manually, since it's a MappingProxyType is not
+                # pickable and deepcopy uses the pickle interface
+                setattr(result, k, MappingProxyType(deepcopy(dict(self.api_kwargs), memodict)))
+                continue
+
             try:
                 setattr(result, k, deepcopy(getattr(self, k), memodict))
             except AttributeError:
@@ -253,6 +344,10 @@ class TelegramObject:
                 # file that was created with an older version of the library, where the class
                 # did not have the attribute yet.
                 continue
+
+        # Apply freezing if necessary
+        if self._frozen:
+            result._freeze()
 
         result.set_bot(bot)  # Assign the bots back
         self.set_bot(bot)
@@ -372,21 +467,26 @@ class TelegramObject:
     @classmethod
     def de_list(
         cls: Type[Tele_co], data: Optional[List[JSONDict]], bot: "Bot"
-    ) -> List[Optional[Tele_co]]:
-        """Converts JSON data to a list of Telegram objects.
+    ) -> Tuple[Tele_co, ...]:
+        """Converts a list of JSON objects to a tuple of Telegram objects.
+
+        .. versionchanged:: 20.0
+
+           * Returns a tuple instead of a list.
+           * Filters out any :obj:`None` values.
 
         Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
+            data (List[Dict[:obj:`str`, ...]]): The JSON data.
             bot (:class:`telegram.Bot`): The bot associated with these objects.
 
         Returns:
-            A list of Telegram objects.
+            A tuple of Telegram objects.
 
         """
         if not data:
-            return []
+            return ()
 
-        return [cls.de_json(d, bot) for d in data]
+        return tuple(obj for obj in (cls.de_json(d, bot) for d in data) if obj is not None)
 
     def to_json(self) -> str:
         """Gives a JSON representation of object.
@@ -403,7 +503,9 @@ class TelegramObject:
         """Gives representation of object as :obj:`dict`.
 
         .. versionchanged:: 20.0
-            Now includes all entries of :attr:`api_kwargs`.
+
+            * Now includes all entries of :attr:`api_kwargs`.
+            * Attributes whose values are empty sequences are no longer included.
 
         Args:
             recursive (:obj:`bool`, optional): If :obj:`True`, will convert any TelegramObjects
@@ -420,13 +522,19 @@ class TelegramObject:
         # Now we should convert TGObjects to dicts inside objects such as sequences, and convert
         # datetimes to timestamps. This mostly eliminates the need for subclasses to override
         # `to_dict`
+        pop_keys: Set[str] = set()
         for key, value in out.items():
-            if isinstance(value, (tuple, list)) and value:
+            if isinstance(value, (tuple, list)):
+                if not value:
+                    # not popping directly to avoid changing the dict size during iteration
+                    pop_keys.add(key)
+                    continue
+
                 val = []  # empty list to append our converted values to
                 for item in value:
                     if hasattr(item, "to_dict"):
                         val.append(item.to_dict(recursive=recursive))
-                    # This branch is useful for e.g. List[List[PhotoSize|KeyboardButton]]
+                    # This branch is useful for e.g. Tuple[Tuple[PhotoSize|KeyboardButton]]
                     elif isinstance(item, (tuple, list)):
                         val.append(
                             [
@@ -440,6 +548,9 @@ class TelegramObject:
 
             elif isinstance(value, datetime.datetime):
                 out[key] = to_timestamp(value)
+
+        for key in pop_keys:
+            out.pop(key)
 
         # Effectively "unpack" api_kwargs into `out`:
         out.update(out.pop("api_kwargs", {}))  # type: ignore[call-overload]

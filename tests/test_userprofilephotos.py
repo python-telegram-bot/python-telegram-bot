@@ -43,7 +43,7 @@ class TestUserProfilePhotos:
         user_profile_photos = UserProfilePhotos.de_json(json_dict, bot)
         assert user_profile_photos.api_kwargs == {}
         assert user_profile_photos.total_count == self.total_count
-        assert user_profile_photos.photos == self.photos
+        assert user_profile_photos.photos == tuple(tuple(p) for p in self.photos)
 
     def test_to_dict(self):
         user_profile_photos = UserProfilePhotos(self.total_count, self.photos)

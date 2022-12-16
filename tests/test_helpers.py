@@ -125,7 +125,7 @@ class TestHelpers:
             config.update(**kwargs)
             return Message(**config)
 
-        message = build_test_message({message_type: True})
+        message = build_test_message({message_type: (True,)})  # tuple for array-type args
         entity = message if entity_type is Message else Update(1, message=message)
         assert helpers.effective_message_type(entity) == message_type
 

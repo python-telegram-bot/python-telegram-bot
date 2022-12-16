@@ -278,6 +278,8 @@ class Update(TelegramObject):
 
         self._id_attrs = (self.update_id,)
 
+        self._freeze()
+
     @property
     def effective_user(self) -> Optional["User"]:
         """

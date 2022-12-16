@@ -216,7 +216,10 @@ class TestChatMemberUpdated:
         # We deliberately change an optional argument here to make sure that comparison doesn't
         # just happens by id/required args
         new_user = User(1, "First name", False, last_name="last name")
-        new_chat_member.user = new_user
+        new_chat_member = ChatMember(new_user, "new_status")
+        chat_member_updated = ChatMemberUpdated(
+            chat, user, datetime.datetime.utcnow(), old_chat_member, new_chat_member
+        )
         assert chat_member_updated.difference() == {
             "status": ("old_status", "new_status"),
             "user": (user, new_user),

@@ -53,3 +53,5 @@ class KeyboardButtonPollType(TelegramObject):
         self.type = type
 
         self._id_attrs = (self.type,)
+
+        self._freeze()

@@ -72,6 +72,7 @@ class Document(_BaseThumbedMedium):
             thumb=thumb,
             api_kwargs=api_kwargs,
         )
-        # Optional
-        self.mime_type = mime_type
-        self.file_name = file_name
+        with self._unfrozen():
+            # Optional
+            self.mime_type = mime_type
+            self.file_name = file_name

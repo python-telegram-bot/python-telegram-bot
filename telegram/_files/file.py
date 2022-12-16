@@ -103,6 +103,8 @@ class File(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
+        self._freeze()
+
     def _get_encoded_url(self) -> str:
         """Convert any UTF-8 char in :obj:`File.file_path` into a url encoded ASCII string."""
         sres = urllib_parse.urlsplit(str(self.file_path))
@@ -139,6 +141,8 @@ class File(TelegramObject):
             file with the prefix `decrypted_` will be created in the same directory as the
             original file in order to decrypt the file without changing the existing one
             in-place.
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionchanged:: 20.0
 
@@ -222,6 +226,8 @@ class File(TelegramObject):
         Download this file into memory. :paramref:`out` needs to be supplied with a
         :obj:`io.BufferedIOBase`, the file contents will be saved to that object using the
         :obj:`out.write<io.BufferedIOBase.write>` method.
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionadded:: 20.0
 

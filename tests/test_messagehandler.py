@@ -65,6 +65,8 @@ def false_update(request):
 @pytest.fixture(scope="class")
 def message(bot):
     message = Message(1, None, Chat(1, ""), from_user=User(1, "", False))
+    message._unfreeze()
+    message.chat._unfreeze()
     message.set_bot(bot)
     return message
 

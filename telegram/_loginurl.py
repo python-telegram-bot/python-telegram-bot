@@ -100,3 +100,5 @@ class LoginUrl(TelegramObject):
         self.request_write_access = request_write_access
 
         self._id_attrs = (self.url,)
+
+        self._freeze()

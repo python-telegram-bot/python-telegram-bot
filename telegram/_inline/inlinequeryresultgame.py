@@ -58,7 +58,8 @@ class InlineQueryResultGame(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.GAME, id, api_kwargs=api_kwargs)
-        self.id = id
-        self.game_short_name = game_short_name
+        with self._unfrozen():
+            self.id = id
+            self.game_short_name = game_short_name
 
-        self.reply_markup = reply_markup
+            self.reply_markup = reply_markup

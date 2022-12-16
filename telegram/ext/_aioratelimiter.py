@@ -23,7 +23,7 @@ import asyncio
 import contextlib
 import logging
 import sys
-from typing import Any, AsyncIterator, Callable, Coroutine, Dict, Optional, Union
+from typing import Any, AsyncIterator, Callable, Coroutine, Dict, List, Optional, Union
 
 try:
     from aiolimiter import AsyncLimiter
@@ -187,10 +187,10 @@ class AIORateLimiter(BaseRateLimiter[int]):
         self,
         chat: bool,
         group: Union[str, int, bool],
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, None]]],
+        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
         args: Any,
         kwargs: Dict[str, Any],
-    ) -> Union[bool, JSONDict, None]:
+    ) -> Union[bool, JSONDict, List[JSONDict]]:
         base_context = self._base_limiter if (chat and self._base_limiter) else null_context()
         group_context = (
             self._get_group_limiter(group) if group and self._group_max_rate else null_context()
@@ -206,13 +206,13 @@ class AIORateLimiter(BaseRateLimiter[int]):
     # mypy doesn't understand that the last run of the for loop raises an exception
     async def process_request(  # type: ignore[return]
         self,
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, None]]],
+        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
         args: Any,
         kwargs: Dict[str, Any],
         endpoint: str,  # skipcq: PYL-W0613
         data: Dict[str, Any],
         rate_limit_args: Optional[int],
-    ) -> Union[bool, JSONDict, None]:
+    ) -> Union[bool, JSONDict, List[JSONDict]]:
         """
         Processes a request by applying rate limiting.
 
