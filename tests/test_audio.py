@@ -227,11 +227,12 @@ class TestAudioReq:
         assert message.audio.thumb.height == Space.thumb_height
         assert message.has_protected_content
 
-    async def test_get_and_download(self, bot, audio):
+    async def test_get_and_download(self, bot, chat_id, audio):
         path = Path("telegram.mp3")
         if path.is_file():
             path.unlink()
 
+        audio = (await bot.send_audio(chat_id, audio.file_id, read_timeout=50)).audio
         new_file = await bot.get_file(audio.file_id)
 
         assert new_file.file_size == Space.file_size

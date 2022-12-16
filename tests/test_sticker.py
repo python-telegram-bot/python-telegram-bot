@@ -294,11 +294,12 @@ class TestStickerReq:
         assert message.sticker.thumb.height == sticker.thumb.height
         assert message.sticker.thumb.file_size == sticker.thumb.file_size
 
-    async def test_get_and_download(self, bot, sticker):
+    async def test_get_and_download(self, bot, sticker, chat_id):
         path = Path("telegram.webp")
         if path.is_file():
             path.unlink()
 
+        sticker = (await bot.send_sticker(chat_id, sticker, read_timeout=50)).sticker
         new_file = await bot.get_file(sticker.file_id)
 
         assert new_file.file_size == sticker.file_size
@@ -780,6 +781,7 @@ class TestStickerSetReq:
             file = await bot.upload_sticker_file(chat_id, f)
         assert file
 
+        await asyncio.sleep(1)
         tasks = asyncio.gather(
             bot.add_sticker_to_set(
                 chat_id, f"test_by_{bot.username}", png_sticker=file.file_id, emojis="😄"
@@ -795,6 +797,7 @@ class TestStickerSetReq:
         assert all(await tasks)
 
     async def test_bot_methods_1_tgs(self, bot, chat_id):
+        await asyncio.sleep(1)
         assert await bot.add_sticker_to_set(
             chat_id,
             f"animated_test_by_{bot.username}",
@@ -803,24 +806,29 @@ class TestStickerSetReq:
         )
 
     async def test_bot_methods_1_webm(self, bot, chat_id):
+        await asyncio.sleep(1)
         with data_file("telegram_video_sticker.webm").open("rb") as f:
             assert await bot.add_sticker_to_set(
                 chat_id, f"video_test_by_{bot.username}", webm_sticker=f, emojis="🤔"
             )
 
     async def test_bot_methods_2_png(self, bot, sticker_set):
+        await asyncio.sleep(1)
         file_id = sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
     async def test_bot_methods_2_tgs(self, bot, animated_sticker_set):
+        await asyncio.sleep(1)
         file_id = animated_sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
     async def test_bot_methods_2_webm(self, bot, video_sticker_set):
+        await asyncio.sleep(1)
         file_id = video_sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
     async def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
+        await asyncio.sleep(1)
         assert await bot.set_sticker_set_thumb(
             f"test_by_{bot.username}", chat_id, sticker_set_thumb_file
         )
@@ -828,6 +836,7 @@ class TestStickerSetReq:
     async def test_bot_methods_3_tgs(
         self, bot, chat_id, animated_sticker_file, animated_sticker_set
     ):
+        await asyncio.sleep(1)
         animated_test = f"animated_test_by_{bot.username}"
         file_id = animated_sticker_set.stickers[-1].file_id
         tasks = asyncio.gather(
@@ -845,14 +854,17 @@ class TestStickerSetReq:
         pass
 
     async def test_bot_methods_4_png(self, bot, sticker_set):
+        await asyncio.sleep(1)
         file_id = sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
     async def test_bot_methods_4_tgs(self, bot, animated_sticker_set):
+        await asyncio.sleep(1)
         file_id = animated_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
     async def test_bot_methods_4_webm(self, bot, video_sticker_set):
+        await asyncio.sleep(1)
         file_id = video_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 

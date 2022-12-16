@@ -94,17 +94,10 @@ def to_camel_case(snake_str):
     return components[0] + "".join(x.title() for x in components[1:])
 
 
-@pytest.fixture(scope="class")
-async def message(bot, chat_id):
-    to_reply_to = await bot.send_message(
-        chat_id, "Text", disable_web_page_preview=True, disable_notification=True
-    )
+@pytest.fixture(scope="function")
+async def message(bot, chat_id):  # mostly used in tests for edit_message
     out = await bot.send_message(
-        chat_id,
-        "Text",
-        reply_to_message_id=to_reply_to.message_id,
-        disable_web_page_preview=True,
-        disable_notification=True,
+        chat_id, "Text", disable_web_page_preview=True, disable_notification=True
     )
     out._unfreeze()
     return out

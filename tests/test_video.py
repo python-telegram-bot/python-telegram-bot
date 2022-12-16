@@ -236,11 +236,12 @@ class TestVideoReq:
         assert message.video.file_name == Space.file_name
         assert message.has_protected_content
 
-    async def test_get_and_download(self, bot, video):
+    async def test_get_and_download(self, bot, video, chat_id):
         path = Path("telegram.mp4")
         if path.is_file():
             path.unlink()
 
+        video = (await bot.send_video(chat_id, video.file_id, read_timeout=50)).video
         new_file = await bot.get_file(video.file_id)
 
         assert new_file.file_size == Space.file_size

@@ -214,11 +214,12 @@ class TestVideoNoteReq:
         assert message.video_note.thumb.height == Space.thumb_height
         assert message.has_protected_content
 
-    async def test_get_and_download(self, bot, video_note):
+    async def test_get_and_download(self, bot, video_note, chat_id):
         path = Path("telegram2.mp4")
         if path.is_file():
             path.unlink()
 
+        video_note = (await bot.send_video_note(chat_id, video_note, read_timeout=50)).video_note
         new_file = await bot.get_file(video_note.file_id)
 
         assert new_file.file_size == Space.file_size

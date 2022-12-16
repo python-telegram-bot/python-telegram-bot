@@ -198,11 +198,12 @@ class TestVoiceReq:
         assert message.caption == Space.caption.replace("*", "")
         assert message.has_protected_content
 
-    async def test_get_and_download(self, bot, voice):
+    async def test_get_and_download(self, bot, voice, chat_id):
         path = Path("telegram.ogg")
         if path.is_file():
             path.unlink()
 
+        voice = (await bot.send_voice(chat_id, voice, read_timeout=50)).voice
         new_file = await bot.get_file(voice.file_id)
 
         assert new_file.file_size == voice.file_size

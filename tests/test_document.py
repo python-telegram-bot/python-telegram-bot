@@ -196,11 +196,12 @@ class TestDocumentReq:
         with pytest.raises(TelegramError):
             await bot.send_document(chat_id=chat_id, document="")
 
-    async def test_get_and_download(self, bot, document):
+    async def test_get_and_download(self, bot, document, chat_id):
         path = Path("telegram.png")
         if path.is_file():
             path.unlink()
 
+        document = (await bot.send_document(chat_id, document, read_timeout=50)).document
         new_file = await bot.get_file(document.file_id)
 
         assert new_file.file_size == document.file_size
