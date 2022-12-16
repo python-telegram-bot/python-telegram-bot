@@ -38,6 +38,8 @@ class InlineQueryResultDocument(InlineQueryResult):
     specified content instead of the file. Currently, only .PDF and .ZIP files can be sent
     using this method.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
