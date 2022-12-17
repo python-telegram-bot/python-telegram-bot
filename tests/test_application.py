@@ -1944,6 +1944,7 @@ class TestApplication:
 
         assert len(recwarn) == 0
 
+    @pytest.mark.flaky(3, 1)  # We could run into a flood error from run_webhook
     def test_signal_handlers(self, app, monkeypatch):
         # this test should make sure that signal handlers are set by default on Linux + Mac,
         # and not on Windows.
