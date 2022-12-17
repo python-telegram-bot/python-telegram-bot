@@ -835,8 +835,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         :attr:`telegram.ext.Application.job_queue`. If not called, a job queue will be
         instantiated if the requirements of :class:`telegram.ext.JobQueue` are installed.
 
-        .. seealso:: `JobQueue <https://github.com/python-telegram-bot/python-telegram-bot/wiki\
-            /Extensions-%E2%80%93-JobQueue>`_, :any:`examples.timerbot`
+        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`, :any:`examples.timerbot`
 
         Note:
             * :meth:`telegram.ext.JobQueue.set_application` will be called automatically by
