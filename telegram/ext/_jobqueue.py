@@ -58,10 +58,8 @@ class JobQueue:
 
     .. seealso:: :attr:`telegram.ext.Application.job_queue`,
         :attr:`telegram.ext.CallbackContext.job_queue`,
-        `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        `Job Queue <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+        :wiki:`Architecture Overview <Architecture>`,
+        :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
 
     .. versionchanged:: 20.0
         To use this class, PTB must be installed via
@@ -643,8 +641,7 @@ class Job:
         This class should not be instantiated manually.
         Use the methods of :class:`telegram.ext.JobQueue` to schedule jobs.
 
-    .. seealso:: `Job Queue <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+    .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
 
     .. versionchanged:: 20.0
 

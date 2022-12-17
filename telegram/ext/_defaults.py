@@ -26,10 +26,8 @@ from telegram._utils.datetime import UTC
 class Defaults:
     """Convenience Class to gather all parameters with a (user defined) default value
 
-    .. seealso:: `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        `Adding Defaults to Your Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Adding-defaults-to-your-bot>`_
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
+        :wiki:`Adding Defaults to Your Bot <Adding-defaults-to-your-bot>`
 
     .. versionchanged:: 20.0
         Removed the argument and attribute ``timeout``. Specify default timeout behavior for the
