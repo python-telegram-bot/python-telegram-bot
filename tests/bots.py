@@ -47,6 +47,8 @@ if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
 
 FALLBACKS = json.loads(base64.b64decode(FALLBACKS).decode("utf-8"))  # type: list[dict[str, str]]
 
+chosen_bot = {}
+
 
 def get(key, fallback):
     # If we have TOKEN, PAYMENT_PROVIDER_TOKEN, CHAT_ID, SUPER_GROUP_ID,
@@ -65,7 +67,6 @@ def get(key, fallback):
                 return BOTS[JOB_INDEX]["username"]
             elif key == "bot_name":
                 return BOTS[JOB_INDEX]["name"]
-            raise
         except IndexError:
             pass
 
@@ -74,4 +75,8 @@ def get(key, fallback):
 
 
 def get_bot():
-    return {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}
+    global chosen_bot
+    if chosen_bot:
+        return chosen_bot
+    chosen_bot = {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}
+    return chosen_bot
