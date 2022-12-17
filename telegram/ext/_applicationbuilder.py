@@ -669,8 +669,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the private key and corresponding password for decryption of telegram passport data
         for :attr:`telegram.ext.Application.bot`.
 
-        .. seealso:: :any:`Passport Bot Example <examples.passportbot>`,
-            :wiki:`Telegram Passports <Telegram-Passport>`
+        Examples:
+            :any:`Passport Bot <examples.passportbot>`
+
+        .. seealso:: :wiki:`Telegram Passports <Telegram-Passport>`
 
         Args:
             private_key (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): The private key or the
@@ -729,8 +731,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
                pip install python-telegram-bot[callback-data]
 
-        .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`,
-            :any:`examples.arbitrarycallbackdatabot`
+        Examples:
+            :any:`Arbitrary callback_data Bot <examples.arbitrarycallbackdatabot>`
+
+        .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
         Args:
             arbitrary_callback_data (:obj:`bool` | :obj:`int`): If :obj:`True` is passed, the
@@ -835,7 +839,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         :attr:`telegram.ext.Application.job_queue`. If not called, a job queue will be
         instantiated if the requirements of :class:`telegram.ext.JobQueue` are installed.
 
-        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`, :any:`examples.timerbot`
+        Examples:
+            :any:`Timer Bot <examples.timerbot>`
+
+        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
 
         Note:
             * :meth:`telegram.ext.JobQueue.set_application` will be called automatically by
@@ -870,8 +877,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :func:`copy.deepcopy`. This is due to the data being deep copied before handing it over
             to the persistence in order to avoid race conditions.
 
-        .. seealso:: :wiki:`Making Your Bot Persistent <Making-your-bot-persistent>`,
-            :any:`examples.persistentconversationbot`
+        Examples:
+            :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
+
+        .. seealso:: :wiki:`Making Your Bot Persistent <Making-your-bot-persistent>`
 
         Warning:
             If a :class:`telegram.ext.ContextTypes` instance is set via :meth:`context_types`,
@@ -893,7 +902,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets a :class:`telegram.ext.ContextTypes` instance for
         :attr:`telegram.ext.Application.context_types`.
 
-        .. seealso:: :any:`examples.contexttypesbot`
+        Examples:
+            :any:`Context Types Bot <examples.contexttypesbot>`
 
         Args:
             context_types (:class:`telegram.ext.ContextTypes`): The context types.
