@@ -29,13 +29,13 @@ FALLBACKS = (
     "W3sidG9rZW4iOiAiNTc5Njk0NzE0OkFBRnBLOHc2emtrVXJENHhTZVl3RjNNTzhlLTRHcm1jeTdjIiwgInBheW1lbnRfc"
     "HJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6TmpRME5qWmxOekk1WWpKaSIsICJjaGF0X2lkIjogIjY3NTY2Nj"
     "IyNCIsICJzdXBlcl9ncm91cF9pZCI6ICItMTAwMTMxMDkxMTEzNSIsICJmb3J1bV9ncm91cF9pZCI6ICItMTAwMTYxOTE"
-    "1OTQwNCIsICJjaGFubmVsX2lkIjogIkBweXRob250ZWxlZ3JhbWJvdHRlc3RzIiwgImJvdF9uYW1lIjogIlBUQiB0ZXN0"
-    "cyBmYWxsYmFjayAxIiwgImJvdF91c2VybmFtZSI6ICJAcHRiX2ZhbGxiYWNrXzFfYm90In0sIHsidG9rZW4iOiAiNTU4M"
-    "Tk0MDY2OkFBRndEUElGbHpHVWxDYVdIdFRPRVg0UkZyWDh1OURNcWZvIiwgInBheW1lbnRfcHJvdmlkZXJfdG9rZW4iOi"
-    "AiMjg0Njg1MDYzOlRFU1Q6WWpFd09EUXdNVEZtTkRjeSIsICJjaGF0X2lkIjogIjY3NTY2NjIyNCIsICJzdXBlcl9ncm9"
-    "1cF9pZCI6ICItMTAwMTIyMTIxNjgzMCIsICJmb3J1bV9ncm91cF9pZCI6ICItMTAwMTYxOTE1OTQwNCIsICJjaGFubmVs"
-    "X2lkIjogIkBweXRob250ZWxlZ3JhbWJvdHRlc3RzIiwgImJvdF9uYW1lIjogIlBUQiB0ZXN0cyBmYWxsYmFjayAyIiwgI"
-    "mJvdF91c2VybmFtZSI6ICJAcHRiX2ZhbGxiYWNrXzJfYm90In1d "
+    "1OTQwNCIsICJjaGFubmVsX2lkIjogIk BweXRob250ZWxlZ3JhbWJvdHRlc3RzIiwgIm5hbWUiOiAiUFRCIHRlc3RzIGZ"
+    "hbGxiYWNrIDEiLCAidXNlcm5hbWUiOiAiQHB0Yl9mYWxsYmFja18xX2JvdCJ9LCB7InRva2VuIjogIjU1ODE5NDA2NjpB"
+    "QUZ3RFBJRmx6R1VsQ2FXSHRUT0VYNFJGclg4dTlETXFmbyIsICJwYXltZW50X3Byb3ZpZGVyX3Rva2VuIjogIjI4NDY4N"
+    "TA2MzpURVNUOllqRXdPRFF3TVRGbU5EY3kiLCAiY2hhdF9pZCI6ICI2NzU2NjYyMj QiLCAic3VwZXJfZ3JvdXBfaWQiO"
+    "iAiLTEwMDEyMjEyMTY4MzAiLCAiZm9ydW1fZ3JvdXBfaWQiOiAiLTEwMDE2MTkxNTk0MDQiLCAiY2hhbm5lbF9pZCI6IC"
+    "JAcHl0aG9udGVsZWdyYW1ib3R0ZXN0cyIsICJuYW1lIjogIlBUQiB0ZXN0cyBmYWxsYmFjayAyIiwgInVzZXJuYW1lIjo"
+    "gIkBwdGJfZmFsbGJhY2tfMl9ib3QifV0="
 )
 
 GITHUB_ACTION = os.getenv("GITHUB_ACTION", None)
@@ -61,13 +61,7 @@ def get(key, fallback):
     if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
         try:
             return BOTS[JOB_INDEX][key]
-        except KeyError:
-            # py3.10 bots and later are saved with a different key
-            if key == "bot_username":
-                return BOTS[JOB_INDEX]["username"]
-            elif key == "bot_name":
-                return BOTS[JOB_INDEX]["name"]
-        except IndexError:
+        except (IndexError, KeyError):
             pass
 
     # Otherwise go with the fallback
