@@ -54,8 +54,7 @@ class BaseHandler(Generic[UT, CCT], ABC):
            also used for the mentioned method arguments. That way, a type checker can check whether
            this handler fits the definition of the :class:`~Application`.
 
-    .. seealso:: `Types of Handlers <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
+    .. seealso:: :wiki:`Types of Handlers <Types-of-Handlers>`
 
     .. versionchanged:: 20.0
 
@@ -75,8 +74,7 @@ class BaseHandler(Generic[UT, CCT], ABC):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
-            .. seealso:: `Concurrency <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+            .. seealso:: :wiki:`Concurrency`
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.

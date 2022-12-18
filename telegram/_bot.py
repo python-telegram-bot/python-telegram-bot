@@ -149,10 +149,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     .. seealso:: :attr:`telegram.ext.Application.bot`,
         :attr:`telegram.ext.CallbackContext.bot`,
         :attr:`telegram.ext.Updater.bot`,
-        `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
-        `Builder Pattern <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+        :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+        :wiki:`Builder Pattern <Builder-Pattern>`
 
     .. versionadded:: 13.2
         Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -3568,9 +3566,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 integration.
             certificate (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`):
                 Upload your public key certificate so that the root
-                certificate in use can be checked. See our `self-signed guide <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Webhooks#creating-a-self-signed-\
-                certificate-using-openssl>`_ for details. |uploadinputnopath|
+                certificate in use can be checked. See our :wiki:`self-signed guide\
+                <Webhooks#creating-a-self-signed-certificate-using-openssl>` for details.
+                |uploadinputnopath|
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
                 webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS

@@ -136,8 +136,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     Examples:
         :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
 
-    .. seealso:: `Making Your Bot Persistent <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Making-your-bot-persistent>`_
+    .. seealso:: :wiki:`Making Your Bot Persistent <Making-your-bot-persistent>`
 
     .. versionchanged:: 20.0
 

@@ -43,8 +43,7 @@ class DictPersistence(BasePersistence):
         * This implementation of :class:`BasePersistence` does not handle data that cannot be
           serialized by :func:`json.dumps`.
 
-    .. seealso:: `Making Your Bot Persistent <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Making-your-bot-persistent>`_
+    .. seealso:: :wiki:`Making Your Bot Persistent <Making-your-bot-persistent>`
 
     .. versionchanged:: 20.0
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.

@@ -53,8 +53,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
-            .. seealso:: `Concurrency <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+            .. seealso:: :wiki:`Concurrency`
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Regex pattern. If not
             :obj:`None`, :func:`re.match`
             is used on :attr:`telegram.ChosenInlineResult.result_id` to determine if an update
