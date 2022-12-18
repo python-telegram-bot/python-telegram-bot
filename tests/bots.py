@@ -51,12 +51,6 @@ chosen_bot = {}
 
 
 def get(key, fallback):
-    # If we have TOKEN, PAYMENT_PROVIDER_TOKEN, CHAT_ID, SUPER_GROUP_ID,
-    # CHANNEL_ID, BOT_NAME, or BOT_USERNAME in the environment, then use that
-    val = os.getenv(key.upper())
-    if val:
-        return val
-
     # If we're running as a github action then fetch bots from the repo secrets
     if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
         try:
