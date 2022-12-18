@@ -65,10 +65,8 @@ class Updater(AbstractAsyncContextManager):
         finally:
             await updater.shutdown()
 
-    .. seealso:: `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        `Builder Pattern <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
+        :wiki:`Builder Pattern <Builder-Pattern>`
 
     .. versionchanged:: 20.0
 
@@ -397,8 +395,7 @@ class Updater(AbstractAsyncContextManager):
 
                pip install python-telegram-bot[webhooks]
 
-        .. seealso:: `Webhooks <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_
+        .. seealso:: :wiki:`Webhooks`
 
         .. versionchanged:: 13.4
             :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass

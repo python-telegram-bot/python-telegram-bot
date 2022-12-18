@@ -123,8 +123,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     Examples:
         :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
 
-    .. seealso:: `Arbitrary callback_data <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
+    .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
     .. versionadded:: 13.6
 
@@ -141,8 +140,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             Pass an integer to specify the maximum number of objects cached in memory.
             Defaults to :obj:`False`.
 
-            .. seealso:: `Arbitrary callback_data <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
+            .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
         rate_limiter (:class:`telegram.ext.BaseRateLimiter`, optional): A rate limiter to use for
             limiting the number of requests made by the bot per time interval.
 

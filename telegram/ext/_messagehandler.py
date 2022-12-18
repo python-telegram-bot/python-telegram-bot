@@ -47,8 +47,7 @@ class MessageHandler(BaseHandler[Update, CCT]):
             operators (& for and, | for or, ~ for not). Passing :obj:`None` is a shortcut
             to passing :class:`telegram.ext.filters.ALL`.
 
-            .. seealso:: `Advanced Filters <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Advanced-Filters>`_
+            .. seealso:: :wiki:`Advanced Filters <Extensions-–-Advanced-Filters>`
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::
@@ -61,8 +60,7 @@ class MessageHandler(BaseHandler[Update, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
-            .. seealso:: `Concurrency <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+            .. seealso:: :wiki:`Concurrency`
 
     Attributes:
         filters (:class:`telegram.ext.filters.BaseFilter`): Only allow updates with these Filters.

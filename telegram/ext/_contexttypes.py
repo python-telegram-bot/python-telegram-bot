@@ -36,10 +36,8 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
     Examples:
         :any:`ContextTypes Bot <examples.contexttypesbot>`
 
-    .. seealso:: `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        `Storing Bot, User and Chat Related Data <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-chat-related-data>`_
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
+        :wiki:`Storing Bot, User and Chat Related Data <Storing-bot%2C-user-and-chat-related-data>`
 
     .. versionadded:: 13.6
 
