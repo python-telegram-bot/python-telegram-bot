@@ -20,8 +20,6 @@ import asyncio
 import calendar
 import datetime as dtm
 import logging
-import os
-import platform
 import time
 
 import pytest
@@ -68,11 +66,6 @@ class TestNoJobQueue:
 @pytest.mark.skipif(
     not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
 )
-@pytest.mark.skipif(
-    os.getenv("GITHUB_ACTIONS", False) and platform.system() in ["Windows", "Darwin"],
-    reason="On Windows & MacOS precise timings are not accurate.",
-)
-@pytest.mark.flaky(10, 1)  # Timings aren't quite perfect
 class TestJobQueue:
     result = 0
     job_time = 0
@@ -83,6 +76,12 @@ class TestJobQueue:
         self.result = 0
         self.job_time = 0
         self.received_error = None
+        self.done_with_cb = asyncio.Event()
+
+    async def wait_for_cbs(self, number: int = 1):
+        for _ in range(number):
+            await self.done_with_cb.wait()
+            self.done_with_cb.clear()
 
     async def job_run_once(self, context):
         if (
@@ -94,7 +93,9 @@ class TestJobQueue:
             and context.user_data is None
             and isinstance(context.bot_data, dict)
         ):
-            self.result += 1
+            if not self.done_with_cb.is_set():
+                self.result += 1
+                self.done_with_cb.set()
 
     async def job_with_exception(self, context):
         raise Exception("Test Error")
@@ -102,12 +103,16 @@ class TestJobQueue:
     async def job_remove_self(self, context):
         self.result += 1
         context.job.schedule_removal()
+        self.done_with_cb.set()
 
     async def job_run_once_with_data(self, context):
         self.result += context.job.data
+        if hasattr(self, "done_with_cb"):
+            self.done_with_cb.set()
 
     async def job_datetime_tests(self, context):
         self.job_time = time.time()
+        self.done_with_cb.set()
 
     async def error_handler_context(self, update, context):
         self.received_error = (
@@ -116,6 +121,7 @@ class TestJobQueue:
             context.user_data,
             context.chat_data,
         )
+        self.done_with_cb.set()
 
     async def error_handler_raise_error(self, *args):
         raise Exception("Failing bigly")
@@ -138,7 +144,7 @@ class TestJobQueue:
 
     async def test_run_once(self, job_queue):
         job_queue.run_once(self.job_run_once, 0.1)
-        await asyncio.sleep(0.2)
+        await self.wait_for_cbs()
         assert self.result == 1
 
     async def test_run_once_timezone(self, job_queue, timezone):
@@ -147,24 +153,24 @@ class TestJobQueue:
         # of an xpass when the test is run in a timezone with the same UTC offset
         when = dtm.datetime.now(timezone)
         job_queue.run_once(self.job_run_once, when)
-        await asyncio.sleep(0.1)
+        await self.wait_for_cbs()
         assert self.result == 1
 
     async def test_job_with_data(self, job_queue):
         job_queue.run_once(self.job_run_once_with_data, 0.1, data=5)
-        await asyncio.sleep(0.2)
+        await self.wait_for_cbs()
         assert self.result == 5
 
     async def test_run_repeating(self, job_queue):
         job_queue.run_repeating(self.job_run_once, 0.1)
-        await asyncio.sleep(0.25)
+        await self.wait_for_cbs(2)
         assert self.result == 2
 
     async def test_run_repeating_first(self, job_queue):
         job_queue.run_repeating(self.job_run_once, 0.5, first=0.2)
         await asyncio.sleep(0.15)
         assert self.result == 0
-        await asyncio.sleep(0.1)
+        await self.wait_for_cbs()
         assert self.result == 1
 
     async def test_run_repeating_first_timezone(self, job_queue, timezone):
@@ -172,24 +178,23 @@ class TestJobQueue:
         job_queue.run_repeating(
             self.job_run_once, 0.5, first=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.2)
         )
-        await asyncio.sleep(0.15)
         assert self.result == 0
-        await asyncio.sleep(0.2)
+        await self.wait_for_cbs()
         assert self.result == 1
 
     async def test_run_repeating_last(self, job_queue):
         job_queue.run_repeating(self.job_run_once, 0.25, last=0.4)
-        await asyncio.sleep(0.3)
+        await self.wait_for_cbs()
         assert self.result == 1
-        await asyncio.sleep(0.4)
+        await asyncio.sleep(0.3)
         assert self.result == 1
 
     async def test_run_repeating_last_timezone(self, job_queue, timezone):
-        """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
+        """Test correct scheduling of job when passing a timezone-aware datetime as ``last``"""
         job_queue.run_repeating(
             self.job_run_once, 0.25, last=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.4)
         )
-        await asyncio.sleep(0.3)
+        await self.wait_for_cbs()
         assert self.result == 1
         await asyncio.sleep(0.4)
         assert self.result == 1
@@ -200,19 +205,19 @@ class TestJobQueue:
 
     async def test_run_repeating_timedelta(self, job_queue):
         job_queue.run_repeating(self.job_run_once, dtm.timedelta(seconds=0.1))
-        await asyncio.sleep(0.25)
+        await self.wait_for_cbs(2)
         assert self.result == 2
 
     async def test_run_custom(self, job_queue):
         job_queue.run_custom(self.job_run_once, {"trigger": "interval", "seconds": 0.2})
-        await asyncio.sleep(0.5)
+        await self.wait_for_cbs(2)
         assert self.result == 2
 
     async def test_multiple(self, job_queue):
         job_queue.run_once(self.job_run_once, 0.1)
         job_queue.run_once(self.job_run_once, 0.2)
         job_queue.run_repeating(self.job_run_once, 0.2)
-        await asyncio.sleep(0.55)
+        await self.wait_for_cbs(4)
         assert self.result == 4
 
     async def test_disabled(self, job_queue):
@@ -228,7 +233,7 @@ class TestJobQueue:
 
         j1.enabled = True
 
-        await asyncio.sleep(0.6)
+        await self.wait_for_cbs(1)
 
         assert self.result == 1
 
@@ -236,7 +241,7 @@ class TestJobQueue:
         j1 = job_queue.run_once(self.job_run_once, 0.3)
         j2 = job_queue.run_repeating(self.job_run_once, 0.2)
 
-        await asyncio.sleep(0.25)
+        await self.wait_for_cbs(1)
 
         j1.schedule_removal()
         j2.schedule_removal()
@@ -248,7 +253,8 @@ class TestJobQueue:
     async def test_schedule_removal_from_within(self, job_queue):
         job_queue.run_repeating(self.job_remove_self, 0.1)
 
-        await asyncio.sleep(0.5)
+        await self.wait_for_cbs(1)
+        await asyncio.sleep(0.3)
 
         assert self.result == 1
 
@@ -256,14 +262,15 @@ class TestJobQueue:
         job_queue.run_once(self.job_run_once, 0.2)
         job_queue.run_once(self.job_run_once, 0.1)
 
-        await asyncio.sleep(0.15)
+        await self.wait_for_cbs(1)
+        await asyncio.sleep(0.05)
 
         assert self.result == 1
 
     async def test_error(self, job_queue):
         job_queue.run_repeating(self.job_with_exception, 0.1)
         job_queue.run_repeating(self.job_run_once, 0.2)
-        await asyncio.sleep(0.3)
+        await self.wait_for_cbs(1)
         assert self.result == 1
 
     async def test_in_application(self, bot_info):
@@ -274,7 +281,7 @@ class TestJobQueue:
             assert app.job_queue.scheduler.running
 
             app.job_queue.run_repeating(self.job_run_once, 0.2)
-            await asyncio.sleep(0.3)
+            await self.wait_for_cbs(1)
             assert self.result == 1
             await app.stop()
             assert not app.job_queue.scheduler.running
@@ -287,7 +294,7 @@ class TestJobQueue:
         expected_time = time.time() + delta
 
         job_queue.run_once(self.job_datetime_tests, delta)
-        await asyncio.sleep(0.6)
+        await self.wait_for_cbs()
         assert pytest.approx(self.job_time) == expected_time
 
     async def test_time_unit_dt_timedelta(self, job_queue):
@@ -297,17 +304,17 @@ class TestJobQueue:
         expected_time = time.time() + interval.total_seconds()
 
         job_queue.run_once(self.job_datetime_tests, interval)
-        await asyncio.sleep(0.6)
+        await self.wait_for_cbs()
         assert pytest.approx(self.job_time) == expected_time
 
     async def test_time_unit_dt_datetime(self, job_queue):
         # Testing running at a specific datetime
         delta, now = dtm.timedelta(seconds=0.5), dtm.datetime.now(UTC)
         when = now + delta
-        expected_time = (now + delta).timestamp()
+        expected_time = when.timestamp()
 
         job_queue.run_once(self.job_datetime_tests, when)
-        await asyncio.sleep(0.6)
+        await self.wait_for_cbs()
         assert self.job_time == pytest.approx(expected_time)
 
     async def test_time_unit_dt_time_today(self, job_queue):
@@ -318,7 +325,7 @@ class TestJobQueue:
         expected_time = expected_time.timestamp()
 
         job_queue.run_once(self.job_datetime_tests, when)
-        await asyncio.sleep(0.6)
+        await self.wait_for_cbs()
         assert self.job_time == pytest.approx(expected_time)
 
     async def test_time_unit_dt_time_tomorrow(self, job_queue):
@@ -342,7 +349,7 @@ class TestJobQueue:
         expected_reschedule_time = (now + dtm.timedelta(seconds=delta, days=1)).timestamp()
 
         job_queue.run_daily(self.job_run_once, time_of_day)
-        await asyncio.sleep(delta + 0.1)
+        await self.wait_for_cbs()
         assert self.result == 1
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
@@ -395,7 +402,7 @@ class TestJobQueue:
         expected_reschedule_time = expected_reschedule_time.timestamp()
 
         job_queue.run_monthly(self.job_run_once, time_of_day, day)
-        await asyncio.sleep(delta + 0.1)
+        await self.wait_for_cbs()
         assert self.result == 1
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time, rel=1e-3)
@@ -428,7 +435,7 @@ class TestJobQueue:
 
         when = dtm.datetime.now(tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=0.1)
         jq.run_once(self.job_run_once, when.time())
-        await asyncio.sleep(0.15)
+        await self.wait_for_cbs()
         assert self.result == 1
 
         await jq.stop()
@@ -437,8 +444,11 @@ class TestJobQueue:
         callback = self.job_run_once
 
         job1 = job_queue.run_once(callback, 10, name="name1")
+        await asyncio.sleep(0.03)
         job2 = job_queue.run_once(callback, 10, name="name1")
+        await asyncio.sleep(0.03)
         job3 = job_queue.run_once(callback, 10, name="name2")
+        await asyncio.sleep(0.03)
 
         assert job_queue.jobs() == (job1, job2, job3)
         assert job_queue.get_jobs_by_name("name1") == (job1, job2)
@@ -453,20 +463,20 @@ class TestJobQueue:
 
     async def test_enable_disable_job(self, job_queue):
         job = job_queue.run_repeating(self.job_run_once, 0.2)
-        await asyncio.sleep(0.5)
+        await self.wait_for_cbs(2)
         assert self.result == 2
         job.enabled = False
         assert not job.enabled
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.25)
         assert self.result == 2
         job.enabled = True
         assert job.enabled
-        await asyncio.sleep(0.5)
+        await self.wait_for_cbs(2)
         assert self.result == 4
 
     async def test_remove_job(self, job_queue):
         job = job_queue.run_repeating(self.job_run_once, 0.2)
-        await asyncio.sleep(0.5)
+        await self.wait_for_cbs(2)
         assert self.result == 2
         assert not job.removed
         job.schedule_removal()
@@ -497,7 +507,7 @@ class TestJobQueue:
         app.add_error_handler(self.error_handler_context)
 
         job = job_queue.run_once(self.job_with_exception, 0.1, chat_id=42, user_id=43)
-        await asyncio.sleep(0.15)
+        await self.wait_for_cbs()
         assert self.received_error[0] == "Test Error"
         assert self.received_error[1] is job
         self.received_error = None
@@ -573,9 +583,10 @@ class TestJobQueue:
                 context.chat_data,
                 type(context.bot_data),
             )
+            self.done_with_cb.set()
 
         job_queue.run_once(callback, 0.1)
-        await asyncio.sleep(0.15)
+        await self.wait_for_cbs()
         assert self.result == (CustomContext, None, None, int)
 
     async def test_attribute_error(self):
@@ -600,8 +611,8 @@ class TestJobQueue:
         if wait:
             assert not task.done()
             ready_event.set()
-            await asyncio.sleep(0.1)
+            await task  # no CancelledError here (see source code of JobQueue.stop for details)
             assert task.done()
         else:
-            await asyncio.sleep(0.1)
+            await task  # unfortunately we will get a CancelledError here
             assert task.done()
