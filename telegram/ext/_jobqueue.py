@@ -804,9 +804,6 @@ class Job:
                 f"Neither 'telegram.ext.Job' nor 'apscheduler.job.Job' has attribute '{item}'"
             ) from exc
 
-    def __lt__(self, other: object) -> bool:
-        return False
-
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
             return self.id == other.id
