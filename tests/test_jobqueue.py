@@ -70,6 +70,7 @@ class TestJobQueue:
     result = 0
     job_time = 0
     received_error = None
+    # we have 2 more variables which define in `reset` since it needs to be on the same event loop
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -252,10 +253,11 @@ class TestJobQueue:
         assert self.result == 1
 
     async def test_schedule_removal(self, job_queue):
-        j1 = job_queue.run_once(self.job_run_once, 0.3)
+        j1 = job_queue.run_once(self.job_run_once, 0.5)
         j2 = job_queue.run_repeating(self.job_run_once, 0.2)
 
         await self.wait_for_cbs(1)
+        assert self.result == 1
 
         j1.schedule_removal()
         j2.schedule_removal()
