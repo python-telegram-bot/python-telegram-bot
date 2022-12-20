@@ -81,14 +81,26 @@ class TestJobQueue:
         self.done_with_err_cb = asyncio.Event()
 
     async def wait_for_cbs(self, number: int = 1):
-        for _ in range(number):
-            await self.done_with_cb.wait()
-            self.done_with_cb.clear()
+        async def _wait_for_cbs():
+            for _ in range(number):
+                await self.done_with_cb.wait()
+                self.done_with_cb.clear()
+
+        try:
+            await asyncio.wait_for(_wait_for_cbs(), 10)
+        except asyncio.TimeoutError:  # just in case, don't want to hang the tests
+            pass
 
     async def wait_for_err_cbs(self, number: int = 1):
-        for _ in range(number):
-            await self.done_with_err_cb.wait()
-            self.done_with_err_cb.clear()
+        async def _wait_for_err_cbs():
+            for _ in range(number):
+                await self.done_with_err_cb.wait()
+                self.done_with_err_cb.clear()
+
+        try:
+            await asyncio.wait_for(_wait_for_err_cbs(), 10)
+        except asyncio.TimeoutError:  # just in case, don't want to hang the tests
+            pass
 
     async def job_run_once(self, context):
         if (
