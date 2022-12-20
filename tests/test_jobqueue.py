@@ -42,7 +42,7 @@ class CustomContext(CallbackContext):
 
 
 @pytest.fixture(scope="function")
-async def job_queue(bot, app):
+async def job_queue(app):
     jq = JobQueue()
     jq.set_application(app)
     await jq.start()
@@ -77,11 +77,17 @@ class TestJobQueue:
         self.job_time = 0
         self.received_error = None
         self.done_with_cb = asyncio.Event()
+        self.done_with_err_cb = asyncio.Event()
 
     async def wait_for_cbs(self, number: int = 1):
         for _ in range(number):
             await self.done_with_cb.wait()
             self.done_with_cb.clear()
+
+    async def wait_for_err_cbs(self, number: int = 1):
+        for _ in range(number):
+            await self.done_with_err_cb.wait()
+            self.done_with_err_cb.clear()
 
     async def job_run_once(self, context):
         if (
@@ -98,7 +104,11 @@ class TestJobQueue:
                 self.done_with_cb.set()
 
     async def job_with_exception(self, context):
-        raise Exception("Test Error")
+        try:
+            raise Exception("Test Error")
+        finally:
+            if not self.done_with_err_cb.is_set():
+                self.done_with_err_cb.set()
 
     async def job_remove_self(self, context):
         self.result += 1
@@ -107,7 +117,7 @@ class TestJobQueue:
 
     async def job_run_once_with_data(self, context):
         self.result += context.job.data
-        if hasattr(self, "done_with_cb"):
+        if not self.done_with_cb.is_set():
             self.done_with_cb.set()
 
     async def job_datetime_tests(self, context):
@@ -124,7 +134,11 @@ class TestJobQueue:
         self.done_with_cb.set()
 
     async def error_handler_raise_error(self, *args):
-        raise Exception("Failing bigly")
+        try:
+            raise Exception("Failing bigly")
+        finally:
+            if not self.done_with_cb.is_set():
+                self.done_with_cb.set()
 
     def test_slot_behaviour(self, job_queue, mro_slots):
         for attr in job_queue.__slots__:
@@ -263,14 +277,14 @@ class TestJobQueue:
         job_queue.run_once(self.job_run_once, 0.1)
 
         await self.wait_for_cbs(1)
-        await asyncio.sleep(0.05)
 
         assert self.result == 1
 
     async def test_error(self, job_queue):
         job_queue.run_repeating(self.job_with_exception, 0.1)
         job_queue.run_repeating(self.job_run_once, 0.2)
-        await self.wait_for_cbs(1)
+        await self.wait_for_err_cbs()
+        await self.wait_for_cbs()
         assert self.result == 1
 
     async def test_in_application(self, bot_info):
@@ -444,7 +458,7 @@ class TestJobQueue:
         callback = self.job_run_once
 
         job1 = job_queue.run_once(callback, 10, name="name1")
-        await asyncio.sleep(0.03)
+        await asyncio.sleep(0.03)  # To stablize tests on windows
         job2 = job_queue.run_once(callback, 10, name="name1")
         await asyncio.sleep(0.03)
         job3 = job_queue.run_once(callback, 10, name="name2")
@@ -456,9 +470,9 @@ class TestJobQueue:
 
     async def test_job_run(self, app):
         job = app.job_queue.run_repeating(self.job_run_once, 0.02)
-        await asyncio.sleep(0.05)
-        assert self.result == 0
-        await job.run(app)
+        await asyncio.sleep(0.05)  # the job queue has not started yet
+        assert self.result == 0  # so the job will not run
+        await job.run(app)  # but this will force it to run
         assert self.result == 1
 
     async def test_enable_disable_job(self, job_queue):
@@ -507,6 +521,7 @@ class TestJobQueue:
         app.add_error_handler(self.error_handler_context)
 
         job = job_queue.run_once(self.job_with_exception, 0.1, chat_id=42, user_id=43)
+        await self.wait_for_err_cbs()
         await self.wait_for_cbs()
         assert self.received_error[0] == "Test Error"
         assert self.received_error[1] is job
@@ -522,7 +537,7 @@ class TestJobQueue:
         self.received_error = None
 
         job = job_queue.run_once(self.job_with_exception, 0.1)
-        await asyncio.sleep(0.15)
+        await self.wait_for_err_cbs()
         assert self.received_error is None
         await job.run(app)
         assert self.received_error is None
@@ -532,7 +547,8 @@ class TestJobQueue:
 
         with caplog.at_level(logging.ERROR):
             job = job_queue.run_once(self.job_with_exception, 0.1)
-        await asyncio.sleep(0.15)
+        await self.wait_for_err_cbs()
+        await self.wait_for_cbs()
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert "An error was raised and an uncaught" in rec.getMessage()
@@ -540,6 +556,7 @@ class TestJobQueue:
 
         with caplog.at_level(logging.ERROR):
             await job.run(app)
+        await self.wait_for_err_cbs()
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert "uncaught error was raised while handling" in rec.getMessage()
@@ -551,7 +568,8 @@ class TestJobQueue:
 
         with caplog.at_level(logging.ERROR):
             job = job_queue.run_once(self.job_with_exception, 0.1)
-        await asyncio.sleep(0.15)
+        await self.wait_for_err_cbs()
+        await asyncio.sleep(0.1)  # sleep for a bit so that caplog fixture registers an error
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert "No error handlers are registered" in rec.getMessage()
