@@ -2396,6 +2396,7 @@ class TestBotReq:
         protected = await default_bot.send_game(chat_id, "test_game", protect_content=val)
         assert protected.has_protected_content is val
 
+    @pytest.mark.xdist_group("game")
     @xfail
     async def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
@@ -2415,6 +2416,7 @@ class TestBotReq:
         assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text != game.game.text
 
+    @pytest.mark.xdist_group("game")
     @xfail
     async def test_set_game_score_2(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
@@ -2437,6 +2439,7 @@ class TestBotReq:
         assert message.game.animation.file_unique_id == game.game.animation.file_unique_id
         assert message.game.text == game.game.text
 
+    @pytest.mark.xdist_group("game")
     @xfail
     async def test_set_game_score_3(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
@@ -2451,6 +2454,7 @@ class TestBotReq:
                 user_id=chat_id, score=score, chat_id=game.chat_id, message_id=game.message_id
             )
 
+    @pytest.mark.xdist_group("game")
     @xfail
     async def test_set_game_score_4(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
@@ -2478,6 +2482,7 @@ class TestBotReq:
         game2 = await bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
+    @pytest.mark.xdist_group("game")
     @xfail
     async def test_get_game_high_scores(self, bot, chat_id):
         # We need a game to get the scores for

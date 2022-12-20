@@ -731,6 +731,7 @@ class TestStickerSetNoReq:
         assert await sticker.get_file()
 
 
+@pytest.mark.xdist_group("stickerset")
 class TestStickerSetReq:
     async def test_create_sticker_set(
         self, bot, chat_id, sticker_file, animated_sticker_file, video_sticker_file

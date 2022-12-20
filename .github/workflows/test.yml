@@ -76,9 +76,9 @@ jobs:
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
           pip install -r requirements-opts.txt
-          # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU
-          # worker
-          pytest -v --cov --cov-append -n auto --dist loadfile
+          # `-n 10 --dist=loadgroup` uses pytest-xdist to run distribute each tests across
+          # 10 CPUs. Tests marked with `xdist_group` run in the same worker (in order).
+          pytest -v --cov --cov-append -n 10 --dist=loadgroup
           status=$(( $? > status ? $? : status))
           exit ${status}
         env:
