@@ -237,8 +237,6 @@ class Message(TelegramObject):
             of the post author if present.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
-        forward_sender_name (:obj:`str`, optional): Sender's name for messages forwarded from
-            users who disallow adding a link to their account in forwarded messages.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
