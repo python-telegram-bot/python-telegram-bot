@@ -491,10 +491,6 @@ class TestJobQueue:
         assert hash(job) != hash(job_2)
         assert hash(job) == hash(job_3)
 
-        assert not job < job
-        assert not job < job_2
-        assert not job < job_3
-
     async def test_process_error_context(self, job_queue, app):
         app.add_error_handler(self.error_handler_context)
 
