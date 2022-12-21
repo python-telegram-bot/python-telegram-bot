@@ -1,6 +1,45 @@
 =========
 Changelog
 =========
+Version 20.0b0
+==============
+*Released 2022-12-15*
+
+This is the technical changelog for version 20.0b0. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Make `TelegramObject` Immutable (`#3249`_)
+
+Minor Changes, Documentation Improvements and CI
+------------------------------------------------
+
+- Reduce Code Duplication in Testing ``Defaults`` (`#3419`_)
+- Add Notes and Warnings About Optional Dependencies (`#3393`_)
+- Simplify Internals of ``Bot`` Methods (`#3396`_)
+- Reduce Code Duplication in Several ``Bot`` Methods (`#3385`_)
+- Documentation Improvements (`#3386`_, `#3395`_, `#3398`_, `#3403`_)
+
+Dependencies
+------------
+
+- Bump ``pytest-xdist`` from 3.0.2 to 3.1.0 (`#3415`_)
+- Bump ``pytest-asyncio`` from 0.20.2 to 0.20.3 (`#3417`_)
+- ``pre-commit`` autoupdate (`#3409`_)
+
+.. _`#3249`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3249
+.. _`#3419`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3419
+.. _`#3393`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3393
+.. _`#3396`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3396
+.. _`#3385`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3385
+.. _`#3386`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3386
+.. _`#3395`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3395
+.. _`#3398`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3398
+.. _`#3403`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3403
+.. _`#3415`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3415
+.. _`#3417`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3417
+.. _`#3409`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3409
 
 Version 20.0a6
 ==============
