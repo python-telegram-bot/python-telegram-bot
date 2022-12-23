@@ -44,8 +44,7 @@ class ChatInviteLink(TelegramObject):
        * Comparing objects of this class now also takes :attr:`creates_join_request` into account.
 
     Args:
-        invite_link (:obj:`str`): The invite link. If the link was created by another chat
-            administrator, then the second part of the link will be replaced with ``'…'``.
+        invite_link (:obj:`str`): The invite link.
         creator (:class:`telegram.User`): Creator of the link.
         creates_join_request (:obj:`bool`): :obj:`True`, if users joining the chat via
             the link need to be approved by chat administrators.
