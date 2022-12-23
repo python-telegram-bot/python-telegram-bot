@@ -51,7 +51,7 @@ class TestSetupWindows:
         assert (
             os.system(".\\venv_setup_test\\Scripts\\python.exe setup.py bdist_dumb") == 0
         )  # pragma: no cover
-        # this is a need hack, convincing the local python venv that ptb isn't installed
+        # this is a neat hack, convincing the local python venv that ptb isn't installed
         # there are more files (see above), but this one is the one python apperently uses to
         # discover local packages
         os.system("rmdir /s /q python_telegram_bot.egg-info")
