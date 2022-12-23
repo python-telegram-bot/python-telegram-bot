@@ -3,7 +3,7 @@
 
 from setuptools import setup
 
-from setup import avoid_common_setup_errors, get_setup_kwargs
+from setup import check_namespace_clashes, get_setup_kwargs
 
-avoid_common_setup_errors(raw=True)
+check_namespace_clashes(raw=True)
 setup(**get_setup_kwargs(raw=True))

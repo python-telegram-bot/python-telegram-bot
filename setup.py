@@ -117,17 +117,27 @@ def get_setup_kwargs(raw=False):
     return kwargs
 
 
-def avoid_common_setup_errors(raw=False):
+DEBUG_STRING = """
+            =============================DEBUG ASSISTANCE==========================
+            {}
+            =============================DEBUG ASSISTANCE==========================
+            """
+
+
+def check_namespace_clashes(raw=False):
     # This runs before the setup, trying to catch common setup errors
     try:
         get_distribution("telegram")
         print(
-            """
-            =============================DEBUG ASSISTANCE==========================
-            You can not use python-telegram-bot and telegram. Please run 
-            pip uninstall telegram and try again.
-            =============================DEBUG ASSISTANCE==========================
-            """
+            DEBUG_STRING.format(
+                """You are trying to install the `python-telegram-bot` library,
+            but the `telegram` library is already installed.
+            Both libraries provide a Python package called `telegram`, 
+            which will lead to a namespace clash.
+            If you want to use the `python-telegram-bot` library, 
+            please first uninstall the `telegram` library 
+            before installing the `python-telegram-bot` library again."""
+            )
         )
         raise Exception("BuildError")
     except DistributionNotFound:
@@ -135,12 +145,10 @@ def avoid_common_setup_errors(raw=False):
     try:
         get_distribution(f'python-telegram-bot{"" if raw else "-raw"}')
         print(
-            f"""
-            =============================DEBUG ASSISTANCE==========================
-            You can not use python-telegram-bot and python-telegram-bot-raw. Please 
-            run pip uninstall python-telegram-bot{"" if raw else "-raw"} and try again.
-            =============================DEBUG ASSISTANCE==========================
-            """
+            DEBUG_STRING.format(
+                f"""You can not use python-telegram-bot and python-telegram-bot-raw.
+            Please uninstall python-telegram-bot{"" if raw else "-raw"} and try again."""
+            )
         )
         raise Exception("BuildError")
     except DistributionNotFound:
@@ -150,14 +158,13 @@ def avoid_common_setup_errors(raw=False):
         import telegram
 
         print(
-            """
-            =============================DEBUG ASSISTANCE==========================
-            The python-telegram-bot library uses the telegram namespace. You 
+            DEBUG_STRING.format(
+                """The python-telegram-bot library uses the telegram namespace. You 
             probably have a local file or folder called telegram. Please rename it
-            and try again.
-            =============================DEBUG ASSISTANCE==========================
-            """
+            and try again."""
+            )
         )
+        raise Exception("BuildError")
     except ModuleNotFoundError:
         pass
 
@@ -169,7 +176,7 @@ def main():
         args.extend(sys.argv[1:])
         subprocess.run(args, check=True, capture_output=True)
 
-    avoid_common_setup_errors(raw=False)
+    check_namespace_clashes(raw=False)
     setup(**get_setup_kwargs(raw=False))
 
 

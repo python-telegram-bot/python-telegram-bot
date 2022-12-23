@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+import platform
 
 import pytest
 
@@ -34,10 +35,69 @@ def change_test_dir(request, monkeypatch):
 
 
 @skip_disabled
-def test_build():
-    assert os.system("python setup.py bdist_dumb") == 0  # pragma: no cover
+@pytest.mark.skipif(platform.system() != "Windows", reason="Cmdline stuff for only windows")
+class TestSetupWindows:
+    @classmethod
+    def setup_class(cls):
+        """Added so we can setup a venv folder"""
+        os.system("python -m venv venv_setup_test")
+
+    @classmethod
+    def teardown_class(cls):
+        """Remove the venv folder and other build stuff"""
+        os.system('for %d in (build dist venv_setup_test) do rmdir "%~d" /s /q')
+
+    def test_build(self):
+        assert (
+            os.system(".\\venv_setup_test\\Scripts\\python.exe setup.py bdist_dumb") == 0
+        )  # pragma: no cover
+        # this is a need hack, convincing the local python venv that ptb isn't installed
+        # there are more files (see above), but this one is the one python apperently uses to
+        # discover local packages
+        os.system("rmdir /s /q python_telegram_bot.egg-info")
+
+    def test_build_raw(self):
+        assert (
+            os.system(".\\venv_setup_test\\Scripts\\python.exe setup-raw.py bdist_dumb") == 0
+        )  # pragma: no cover
+        os.system("rmdir /s /q python_telegram_bot_raw.egg-info")
 
 
 @skip_disabled
-def test_build_raw():
-    assert os.system("python setup-raw.py bdist_dumb") == 0  # pragma: no cover
+def test_build_with_telegram_package():
+    os.system("pip install telegram")
+    res = os.popen("python setup.py bdist_dumb")
+    assert "Both libraries provide a Python package called `telegram`" in res.read()
+    assert res.close() == 1
+    res = os.popen("python setup-raw.py bdist_dumb")
+    assert "Both libraries provide a Python package called `telegram`" in res.read()
+    assert res.close() == 1
+    os.system("pip uninstall -y telegram")
+
+
+@skip_disabled
+def test_build_with_telegram_not_raw_package():
+    os.system("pip install python-telegram-bot-raw")
+    res = os.popen("python setup.py bdist_dumb")
+    assert "uninstall python-telegram-bot-raw " in res.read()
+    assert res.close() == 1
+    os.system("pip uninstall -y python-telegram-bot-raw")
+
+
+@skip_disabled
+def test_build_with_telegram_raw_package():
+    os.system("pip install python-telegram-bot")
+    res = os.popen("python setup-raw.py bdist_dumb")
+    assert "uninstall python-telegram-bot " in res.read()
+    assert res.close() == 1
+    os.system("pip uninstall -y python-telegram-bot")
+
+
+@skip_disabled
+def test_build_with_local_telegram_package():
+    res = os.popen("python setup.py bdist_dumb")
+    assert "Please rename it" in res.read()
+    assert res.close() == 1
+    res = os.popen("python setup-raw.py bdist_dumb")
+    assert "Please rename it" in res.read()
+    assert res.close() == 1
