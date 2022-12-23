@@ -76,21 +76,22 @@ def test_build_with_telegram_package():
 
 
 @skip_disabled
-def test_build_with_telegram_not_raw_package():
-    os.system("pip install python-telegram-bot-raw")
-    res = os.popen("python setup.py bdist_dumb")
-    assert "uninstall python-telegram-bot-raw " in res.read()
-    assert res.close() == 1
-    os.system("pip uninstall -y python-telegram-bot-raw")
-
-
-@skip_disabled
 def test_build_with_telegram_raw_package():
     os.system("pip install python-telegram-bot")
     res = os.popen("python setup-raw.py bdist_dumb")
     assert "uninstall python-telegram-bot " in res.read()
     assert res.close() == 1
     os.system("pip uninstall -y python-telegram-bot")
+
+
+@skip_disabled
+def test_build_with_telegram_not_raw_package():
+    os.system("pip install python-telegram-bot-raw")
+    res = os.popen("python setup.py bdist_dumb")
+    assert "uninstall python-telegram-bot-raw " in res.read()
+    assert res.close() == 1
+    os.system("pip uninstall -y python-telegram-bot-raw")
+    os.system("pip uninstall -y tornado")
 
 
 @skip_disabled
