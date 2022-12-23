@@ -46,6 +46,7 @@ class TestSetupWindows:
     def teardown_class(cls):
         """Remove the venv folder and other build stuff"""
         os.system('for %d in (build dist venv_setup_test) do rmdir "%~d" /s /q')
+        os.system("pip install -r requirements.txt")
 
     def test_build(self):
         assert (
