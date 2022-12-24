@@ -20,6 +20,7 @@ import os
 import platform
 
 import pytest
+from pkg_resources import get_distribution
 
 from tests.auxil.object_conversions import env_var_2_bool
 
@@ -67,6 +68,7 @@ class TestSetupWindows:
 @skip_disabled
 def test_build_with_telegram_package():
     os.system("pip install telegram")
+    vars(get_distribution("telegram"))
     res = os.popen("python setup.py bdist_dumb")
     assert "Both libraries provide a Python package called `telegram`" in res.read()
     assert res.close() != 0
@@ -79,6 +81,7 @@ def test_build_with_telegram_package():
 @skip_disabled
 def test_build_with_telegram_raw_package():
     os.system("pip uninstall -y telegram")
+    vars(get_distribution("telegram"))
     os.system("pip install python-telegram-bot --pre")
     res = os.popen("python setup-raw.py bdist_dumb")
     assert "uninstall python-telegram-bot " in res.read()
@@ -89,6 +92,7 @@ def test_build_with_telegram_raw_package():
 @skip_disabled
 def test_build_with_telegram_not_raw_package():
     os.system("pip uninstall -y telegram")
+    vars(get_distribution("telegram"))
     os.system("pip install python-telegram-bot-raw --pre")
     res = os.popen("python setup.py bdist_dumb")
     assert "uninstall python-telegram-bot-raw " in res.read()
@@ -99,6 +103,7 @@ def test_build_with_telegram_not_raw_package():
 @skip_disabled
 def test_build_with_local_telegram_package():
     os.system("pip uninstall -y telegram")
+    vars(get_distribution("telegram"))
     res = os.popen("python setup.py bdist_dumb")
     assert "Please rename it" in res.read()
     assert res.close() != 0
