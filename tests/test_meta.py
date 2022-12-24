@@ -69,7 +69,7 @@ class TestSetupWindows:
 def test_build_with_telegram_package():
     os.system("pip install telegram")
     try:
-        vars(get_distribution("telegram"))
+        print(vars(get_distribution("telegram")))
     except DistributionNotFound:
         pass
     res = os.popen("python setup.py bdist_dumb")
@@ -85,7 +85,7 @@ def test_build_with_telegram_package():
 def test_build_with_telegram_raw_package():
     os.system("pip uninstall -y telegram")
     try:
-        vars(get_distribution("telegram"))
+        print(vars(get_distribution("telegram")))
     except DistributionNotFound:
         pass
     os.system("pip install python-telegram-bot --pre")
@@ -99,7 +99,7 @@ def test_build_with_telegram_raw_package():
 def test_build_with_telegram_not_raw_package():
     os.system("pip uninstall -y telegram")
     try:
-        vars(get_distribution("telegram"))
+        print(vars(get_distribution("telegram")))
     except DistributionNotFound:
         pass
     os.system("pip install python-telegram-bot-raw --pre")
@@ -113,7 +113,7 @@ def test_build_with_telegram_not_raw_package():
 def test_build_with_local_telegram_package():
     os.system("pip uninstall -y telegram")
     try:
-        vars(get_distribution("telegram"))
+        print(vars(get_distribution("telegram")))
     except DistributionNotFound:
         pass
     res = os.popen("python setup.py bdist_dumb")
