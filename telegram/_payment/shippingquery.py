@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingQuery."""
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._payment.shippingaddress import ShippingAddress
 from telegram._payment.shippingoption import ShippingOption
@@ -92,7 +92,7 @@ class ShippingQuery(TelegramObject):
     async def answer(  # pylint: disable=invalid-name
         self,
         ok: bool,
-        shipping_options: List[ShippingOption] = None,
+        shipping_options: Sequence[ShippingOption] = None,
         error_message: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
