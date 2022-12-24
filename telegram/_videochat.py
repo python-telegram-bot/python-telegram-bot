@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram video chats."""
-
 import datetime as dtm
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -76,6 +76,8 @@ class VideoChatEnded(TelegramObject):
         self.duration = duration
         self._id_attrs = (self.duration,)
 
+        self._freeze()
+
 
 class VideoChatParticipantsInvited(TelegramObject):
     """
@@ -89,10 +91,16 @@ class VideoChatParticipantsInvited(TelegramObject):
         This class was renamed from ``VoiceChatParticipantsInvited`` in accordance to Bot API 6.0.
 
     Args:
-        users (List[:class:`telegram.User`]): New members that were invited to the video chat.
+        users (Sequence[:class:`telegram.User`]): New members that were invited to the video chat.
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
 
     Attributes:
-        users (List[:class:`telegram.User`]): New members that were invited to the video chat.
+        users (Tuple[:class:`telegram.User`]): New members that were invited to the video chat.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
 
     """
 
@@ -100,13 +108,15 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     def __init__(
         self,
-        users: List[User],
+        users: Sequence[User],
         *,
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.users = users
+        self.users = parse_sequence_arg(users)
         self._id_attrs = (self.users,)
+
+        self._freeze()
 
     @classmethod
     def de_json(
@@ -120,17 +130,6 @@ class VideoChatParticipantsInvited(TelegramObject):
 
         data["users"] = User.de_list(data.get("users", []), bot)
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
-
-        if self.users is not None:
-            data["users"] = [u.to_dict() for u in self.users]
-        return data
-
-    def __hash__(self) -> int:
-        return hash(None) if self.users is None else hash(tuple(self.users))
 
 
 class VideoChatScheduled(TelegramObject):
@@ -164,6 +163,8 @@ class VideoChatScheduled(TelegramObject):
 
         self._id_attrs = (self.start_date,)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["VideoChatScheduled"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -175,12 +176,3 @@ class VideoChatScheduled(TelegramObject):
         data["start_date"] = from_timestamp(data["start_date"])
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
-
-        # Required
-        data["start_date"] = to_timestamp(self.start_date)
-
-        return data

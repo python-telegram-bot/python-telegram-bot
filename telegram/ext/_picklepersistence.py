@@ -63,6 +63,9 @@ def _custom_reduction(cls: TelegramObj) -> Tuple[Callable, Tuple[Type[TelegramOb
     works as intended.
     """
     data = cls._get_attrs(include_private=True)  # pylint: disable=protected-access
+    # MappingProxyType is not pickable, so we convert it to a dict
+    # no need to convert back to MPT in _reconstruct_to, since it's done in __setstate__
+    data["api_kwargs"] = dict(data["api_kwargs"])  # type: ignore[arg-type]
     return _reconstruct_to, (cls.__class__, data)
 
 
@@ -130,6 +133,12 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         :attr:`~BasePersistence.bot` will be replaced by a placeholder before pickling and
         :attr:`~BasePersistence.bot` will be inserted back when loading the data.
 
+    Examples:
+        :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
+
+    .. seealso:: `Making Your Bot Persistent <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Making-your-bot-persistent>`_
+
     .. versionchanged:: 20.0
 
         * The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
@@ -169,7 +178,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         single_file (:obj:`bool`): Optional. When :obj:`False` will store 5 separate files of
             `filename_user_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
-        on_flush (:obj:`bool`, optional): When :obj:`True` will only save to file when
+        on_flush (:obj:`bool`): Optional. When :obj:`True` will only save to file when
             :meth:`flush` is called and keep data in memory until that happens. When
             :obj:`False` will store data on any transaction *and* on call to :meth:`flush`.
             Default is :obj:`False`.

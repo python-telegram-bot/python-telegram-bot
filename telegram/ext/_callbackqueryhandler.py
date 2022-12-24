@@ -81,11 +81,17 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             If :attr:`telegram.CallbackQuery.data` is :obj:`None`, the
             :class:`telegram.CallbackQuery` update will not be handled.
 
+            .. seealso:: `Arbitrary callback_data <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
+
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
+
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
@@ -152,8 +158,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,
-        application: "Application",
+        update: Update,  # skipcq: BAN-B301
+        application: "Application",  # skipcq: BAN-B301
         check_result: Union[bool, Match],
     ) -> None:
         """Add the result of ``re.match(pattern, update.callback_query.data)`` to

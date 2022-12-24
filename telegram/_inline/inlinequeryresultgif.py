@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultGif."""
-
-from typing import TYPE_CHECKING, List, Tuple, Union
+from typing import TYPE_CHECKING, Sequence
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 from telegram.constants import InlineQueryResultType
@@ -38,7 +38,9 @@ class InlineQueryResultGif(InlineQueryResult):
     send a message with the specified content instead of the animation.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
         gif_width (:obj:`int`, optional): Width of the GIF.
         gif_height (:obj:`int`, optional): Height of the GIF.
@@ -51,12 +53,12 @@ class InlineQueryResultGif(InlineQueryResult):
         caption (:obj:`str`, optional): Caption of the GIF file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -64,7 +66,9 @@ class InlineQueryResultGif(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GIF`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
         gif_width (:obj:`int`): Optional. Width of the GIF.
         gif_height (:obj:`int`): Optional. Height of the GIF.
@@ -76,12 +80,13 @@ class InlineQueryResultGif(InlineQueryResult):
         caption (:obj:`str`): Optional. Caption of the GIF file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -118,24 +123,25 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_duration: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb_mime_type: str = None,
-        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        caption_entities: Sequence[MessageEntity] = None,
         *,
         api_kwargs: JSONDict = None,
     ):
 
         # Required
         super().__init__(InlineQueryResultType.GIF, id, api_kwargs=api_kwargs)
-        self.gif_url = gif_url
-        self.thumb_url = thumb_url
+        with self._unfrozen():
+            self.gif_url = gif_url
+            self.thumb_url = thumb_url
 
-        # Optionals
-        self.gif_width = gif_width
-        self.gif_height = gif_height
-        self.gif_duration = gif_duration
-        self.title = title
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = caption_entities
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_mime_type = thumb_mime_type
+            # Optionals
+            self.gif_width = gif_width
+            self.gif_height = gif_height
+            self.gif_duration = gif_duration
+            self.title = title
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = parse_sequence_arg(caption_entities)
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content
+            self.thumb_mime_type = thumb_mime_type

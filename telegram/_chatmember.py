@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -44,7 +44,8 @@ class ChatMember(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user` and :attr:`status` are equal.
 
-    .. seealso:: `Chat Member Example <examples.chatmemberbot.html>`_
+    Examples:
+         :any:`Chat Member Bot <examples.chatmemberbot>`
 
     .. versionchanged:: 20.0
 
@@ -97,6 +98,8 @@ class ChatMember(TelegramObject):
 
         self._id_attrs = (self.user, self.status)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatMember"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -122,15 +125,6 @@ class ChatMember(TelegramObject):
             data["until_date"] = from_timestamp(data["until_date"])
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
-
-        if data.get("until_date", False):
-            data["until_date"] = to_timestamp(data["until_date"])
-
-        return data
 
 
 class ChatMemberOwner(ChatMember):
@@ -167,8 +161,9 @@ class ChatMemberOwner(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.OWNER, user=user, api_kwargs=api_kwargs)
-        self.is_anonymous = is_anonymous
-        self.custom_title = custom_title
+        with self._unfrozen():
+            self.is_anonymous = is_anonymous
+            self.custom_title = custom_title
 
 
 class ChatMemberAdministrator(ChatMember):
@@ -181,6 +176,8 @@ class ChatMemberAdministrator(ChatMember):
        * Argument and attribute ``can_manage_voice_chats`` were renamed to
          :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
          Bot API 6.0.
+       * The argument :paramref:`can_manage_topics` was added, which changes the position of the
+         optional argument :paramref:`custom_title`.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -215,6 +212,10 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
+        can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only.
+
+            .. versionadded:: 20.0
         custom_title (:obj:`str`, optional): Custom title for this user.
 
     Attributes:
@@ -252,6 +253,10 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
+        can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only
+
+            .. versionadded:: 20.0
         custom_title (:obj:`str`): Optional. Custom title for this user.
     """
 
@@ -268,6 +273,7 @@ class ChatMemberAdministrator(ChatMember):
         "can_post_messages",
         "can_edit_messages",
         "can_pin_messages",
+        "can_manage_topics",
         "custom_title",
     )
 
@@ -286,24 +292,27 @@ class ChatMemberAdministrator(ChatMember):
         can_post_messages: bool = None,
         can_edit_messages: bool = None,
         can_pin_messages: bool = None,
+        can_manage_topics: bool = None,
         custom_title: str = None,
         *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.ADMINISTRATOR, user=user, api_kwargs=api_kwargs)
-        self.can_be_edited = can_be_edited
-        self.is_anonymous = is_anonymous
-        self.can_manage_chat = can_manage_chat
-        self.can_delete_messages = can_delete_messages
-        self.can_manage_video_chats = can_manage_video_chats
-        self.can_restrict_members = can_restrict_members
-        self.can_promote_members = can_promote_members
-        self.can_change_info = can_change_info
-        self.can_invite_users = can_invite_users
-        self.can_post_messages = can_post_messages
-        self.can_edit_messages = can_edit_messages
-        self.can_pin_messages = can_pin_messages
-        self.custom_title = custom_title
+        with self._unfrozen():
+            self.can_be_edited = can_be_edited
+            self.is_anonymous = is_anonymous
+            self.can_manage_chat = can_manage_chat
+            self.can_delete_messages = can_delete_messages
+            self.can_manage_video_chats = can_manage_video_chats
+            self.can_restrict_members = can_restrict_members
+            self.can_promote_members = can_promote_members
+            self.can_change_info = can_change_info
+            self.can_invite_users = can_invite_users
+            self.can_post_messages = can_post_messages
+            self.can_edit_messages = can_edit_messages
+            self.can_pin_messages = can_pin_messages
+            self.can_manage_topics = can_manage_topics
+            self.custom_title = custom_title
 
 
 class ChatMemberMember(ChatMember):
@@ -332,6 +341,7 @@ class ChatMemberMember(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class ChatMemberRestricted(ChatMember):
@@ -340,6 +350,9 @@ class ChatMemberRestricted(ChatMember):
     in the chat. Supergroups only.
 
     .. versionadded:: 13.7
+    .. versionchanged:: 20.0
+       The argument :paramref:`can_manage_topics` was added, which changes the position of the
+       optional argument :paramref:`until_date`.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -361,6 +374,10 @@ class ChatMemberRestricted(ChatMember):
             to send animations, games, stickers and use inline bots.
         can_add_web_page_previews (:obj:`bool`): :obj:`True`, if the user is
            allowed to add web page previews to their messages.
+        can_manage_topics (:obj:`bool`): :obj:`True`, if the user is allowed to create
+            forum topics.
+
+            .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
@@ -386,6 +403,10 @@ class ChatMemberRestricted(ChatMember):
             to send animations, games, stickers and use inline bots.
         can_add_web_page_previews (:obj:`bool`): :obj:`True`, if the user is
            allowed to add web page previews to their messages.
+        can_manage_topics (:obj:`bool`): :obj:`True`, if the user is allowed to create
+            forum topics.
+
+            .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
@@ -401,6 +422,7 @@ class ChatMemberRestricted(ChatMember):
         "can_send_polls",
         "can_send_other_messages",
         "can_add_web_page_previews",
+        "can_manage_topics",
         "until_date",
     )
 
@@ -416,21 +438,24 @@ class ChatMemberRestricted(ChatMember):
         can_send_polls: bool,
         can_send_other_messages: bool,
         can_add_web_page_previews: bool,
+        can_manage_topics: bool,
         until_date: datetime.datetime,
         *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
-        self.is_member = is_member
-        self.can_change_info = can_change_info
-        self.can_invite_users = can_invite_users
-        self.can_pin_messages = can_pin_messages
-        self.can_send_messages = can_send_messages
-        self.can_send_media_messages = can_send_media_messages
-        self.can_send_polls = can_send_polls
-        self.can_send_other_messages = can_send_other_messages
-        self.can_add_web_page_previews = can_add_web_page_previews
-        self.until_date = until_date
+        with self._unfrozen():
+            self.is_member = is_member
+            self.can_change_info = can_change_info
+            self.can_invite_users = can_invite_users
+            self.can_pin_messages = can_pin_messages
+            self.can_send_messages = can_send_messages
+            self.can_send_media_messages = can_send_media_messages
+            self.can_send_polls = can_send_polls
+            self.can_send_other_messages = can_send_other_messages
+            self.can_add_web_page_previews = can_add_web_page_previews
+            self.can_manage_topics = can_manage_topics
+            self.until_date = until_date
 
 
 class ChatMemberLeft(ChatMember):
@@ -458,6 +483,7 @@ class ChatMemberLeft(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class ChatMemberBanned(ChatMember):
@@ -491,4 +517,5 @@ class ChatMemberBanned(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
-        self.until_date = until_date
+        with self._unfrozen():
+            self.until_date = until_date

@@ -73,6 +73,7 @@ class VideoNote(_BaseThumbedMedium):
             thumb=thumb,
             api_kwargs=api_kwargs,
         )
-        # Required
-        self.length = length
-        self.duration = duration
+        with self._unfrozen():
+            # Required
+            self.length = length
+            self.duration = duration

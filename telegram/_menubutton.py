@@ -62,6 +62,8 @@ class MenuButton(TelegramObject):
 
         self._id_attrs = (self.type,)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MenuButton"]:
         """Converts JSON data to the appropriate :class:`MenuButton` object, i.e. takes
@@ -114,6 +116,7 @@ class MenuButtonCommands(MenuButton):
 
     def __init__(self, *, api_kwargs: JSONDict = None):
         super().__init__(type=constants.MenuButtonType.COMMANDS, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class MenuButtonWebApp(MenuButton):
@@ -144,10 +147,11 @@ class MenuButtonWebApp(MenuButton):
 
     def __init__(self, text: str, web_app: WebAppInfo, *, api_kwargs: JSONDict = None):
         super().__init__(type=constants.MenuButtonType.WEB_APP, api_kwargs=api_kwargs)
-        self.text = text
-        self.web_app = web_app
+        with self._unfrozen():
+            self.text = text
+            self.web_app = web_app
 
-        self._id_attrs = (self.type, self.text, self.web_app)
+            self._id_attrs = (self.type, self.text, self.web_app)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MenuButtonWebApp"]:
@@ -160,12 +164,6 @@ class MenuButtonWebApp(MenuButton):
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
-
-    def to_dict(self) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
-        data["web_app"] = self.web_app.to_dict()
-        return data
 
 
 class MenuButtonDefault(MenuButton):
@@ -180,3 +178,4 @@ class MenuButtonDefault(MenuButton):
 
     def __init__(self, *, api_kwargs: JSONDict = None):
         super().__init__(type=constants.MenuButtonType.DEFAULT, api_kwargs=api_kwargs)
+        self._freeze()

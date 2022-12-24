@@ -21,7 +21,7 @@ import platform
 
 import pytest
 
-from tests.conftest import env_var_2_bool
+from tests.auxil.object_conversions import env_var_2_bool
 
 skip_disabled = pytest.mark.skipif(
     not env_var_2_bool(os.getenv("TEST_BUILD", False)), reason="TEST_BUILD not enabled"

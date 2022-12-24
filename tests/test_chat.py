@@ -21,7 +21,12 @@ import pytest
 
 from telegram import Bot, Chat, ChatLocation, ChatPermissions, Location, User
 from telegram.constants import ChatAction, ChatType
-from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
+from telegram.helpers import escape_markdown
+from tests.auxil.bot_method_checks import (
+    check_defaults_handling,
+    check_shortcut_call,
+    check_shortcut_signature,
+)
 
 
 @pytest.fixture(scope="class")
@@ -43,8 +48,12 @@ def chat(bot):
         join_to_send_messages=True,
         join_by_request=True,
         has_restricted_voice_and_video_messages=True,
+        is_forum=True,
+        active_usernames=TestChat.active_usernames,
+        emoji_status_custom_emoji_id=TestChat.emoji_status_custom_emoji_id,
     )
     chat.set_bot(bot)
+    chat._unfreeze()
     return chat
 
 
@@ -70,6 +79,9 @@ class TestChat:
     join_to_send_messages = True
     join_by_request = True
     has_restricted_voice_and_video_messages = True
+    is_forum = True
+    active_usernames = ["These", "Are", "Usernames!"]
+    emoji_status_custom_emoji_id = "VeryUniqueCustomEmojiID"
 
     def test_slot_behaviour(self, chat, mro_slots):
         for attr in chat.__slots__:
@@ -97,6 +109,9 @@ class TestChat:
             "has_restricted_voice_and_video_messages": (
                 self.has_restricted_voice_and_video_messages
             ),
+            "is_forum": self.is_forum,
+            "active_usernames": self.active_usernames,
+            "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id,
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -123,6 +138,9 @@ class TestChat:
         assert chat.api_kwargs == {
             "all_members_are_administrators": self.all_members_are_administrators
         }
+        assert chat.is_forum == self.is_forum
+        assert chat.active_usernames == tuple(self.active_usernames)
+        assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -145,6 +163,18 @@ class TestChat:
             chat_dict["has_restricted_voice_and_video_messages"]
             == chat.has_restricted_voice_and_video_messages
         )
+        assert chat_dict["is_forum"] == chat.is_forum
+        assert chat_dict["active_usernames"] == list(chat.active_usernames)
+        assert chat_dict["emoji_status_custom_emoji_id"] == chat.emoji_status_custom_emoji_id
+
+    def test_always_tuples_attributes(self):
+        chat = Chat(
+            id=123,
+            title="title",
+            type=Chat.PRIVATE,
+        )
+        assert isinstance(chat.active_usernames, tuple)
+        assert chat.active_usernames == ()
 
     def test_enum_init(self):
         chat = Chat(id=1, type="foo")
@@ -879,6 +909,221 @@ class TestChat:
 
         monkeypatch.setattr(chat.get_bot(), "decline_chat_join_request", make_assertion)
         assert await chat.decline_join_request(user_id=42)
+
+    async def test_create_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["name"] == "New Name"
+                and kwargs["icon_color"] == 0x6FB9F0
+                and kwargs["icon_custom_emoji_id"] == "12345"
+            )
+
+        assert check_shortcut_signature(
+            Chat.create_forum_topic, Bot.create_forum_topic, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.create_forum_topic,
+            chat.get_bot(),
+            "create_forum_topic",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.create_forum_topic, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "create_forum_topic", make_assertion)
+        assert await chat.create_forum_topic(
+            name="New Name", icon_color=0x6FB9F0, icon_custom_emoji_id="12345"
+        )
+
+    async def test_edit_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["message_thread_id"] == 42
+                and kwargs["name"] == "New Name"
+                and kwargs["icon_custom_emoji_id"] == "12345"
+            )
+
+        assert check_shortcut_signature(
+            Chat.edit_forum_topic, Bot.edit_forum_topic, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.edit_forum_topic, chat.get_bot(), "edit_forum_topic", shortcut_kwargs=["chat_id"]
+        )
+        assert await check_defaults_handling(chat.edit_forum_topic, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "edit_forum_topic", make_assertion)
+        assert await chat.edit_forum_topic(
+            message_thread_id=42, name="New Name", icon_custom_emoji_id="12345"
+        )
+
+    async def test_close_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["message_thread_id"] == 42
+
+        assert check_shortcut_signature(
+            Chat.close_forum_topic, Bot.close_forum_topic, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.close_forum_topic,
+            chat.get_bot(),
+            "close_forum_topic",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.close_forum_topic, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "close_forum_topic", make_assertion)
+        assert await chat.close_forum_topic(message_thread_id=42)
+
+    async def test_reopen_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["message_thread_id"] == 42
+
+        assert check_shortcut_signature(
+            Chat.reopen_forum_topic, Bot.reopen_forum_topic, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.reopen_forum_topic,
+            chat.get_bot(),
+            "reopen_forum_topic",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.reopen_forum_topic, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "reopen_forum_topic", make_assertion)
+        assert await chat.reopen_forum_topic(message_thread_id=42)
+
+    async def test_delete_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["message_thread_id"] == 42
+
+        assert check_shortcut_signature(
+            Chat.delete_forum_topic, Bot.delete_forum_topic, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.delete_forum_topic,
+            chat.get_bot(),
+            "delete_forum_topic",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.delete_forum_topic, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "delete_forum_topic", make_assertion)
+        assert await chat.delete_forum_topic(message_thread_id=42)
+
+    async def test_unpin_all_forum_topic_messages(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["message_thread_id"] == 42
+
+        assert check_shortcut_signature(
+            Chat.unpin_all_forum_topic_messages,
+            Bot.unpin_all_forum_topic_messages,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.unpin_all_forum_topic_messages,
+            chat.get_bot(),
+            "unpin_all_forum_topic_messages",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.unpin_all_forum_topic_messages, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
+        assert await chat.unpin_all_forum_topic_messages(message_thread_id=42)
+
+    def test_mention_html(self):
+        with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
+            chat = Chat(id=1, type="foo")
+            chat.mention_html()
+
+        expected = '<a href="tg://user?id={}">{}</a>'
+        chat = Chat(
+            id=1, type=Chat.PRIVATE, first_name="first\u2022name", last_name="last\u2022name"
+        )
+        assert chat.mention_html("the_name*\u2022") == expected.format(chat.id, "the_name*\u2022")
+        assert chat.mention_html() == expected.format(chat.id, chat.full_name)
+        with pytest.raises(
+            TypeError, match="Can not create a mention to a private chat without first name"
+        ):
+            chat = Chat(id=1, type=Chat.PRIVATE, last_name="last\u2022name")
+            chat.mention_html()
+
+        expected = '<a href="https://t.me/{}">{}</a>'
+        chat = Chat(id=1, type="foo", username="user\u2022name", title="\u2022title")
+        assert chat.mention_html("the_name*\u2022") == expected.format(
+            chat.username, "the_name*\u2022"
+        )
+        assert chat.mention_html() == expected.format(chat.username, chat.title)
+        with pytest.raises(
+            TypeError, match="Can not create a mention to a public chat without title"
+        ):
+            chat = Chat(id=1, type="foo", username="user\u2022name")
+            chat.mention_html()
+
+    def test_mention_markdown(self):
+        with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
+            chat = Chat(id=1, type="foo")
+            chat.mention_markdown()
+
+        expected = "[{}](tg://user?id={})"
+        chat = Chat(
+            id=1, type=Chat.PRIVATE, first_name="first\u2022name", last_name="last\u2022name"
+        )
+        assert chat.mention_markdown("the_name*\u2022") == expected.format(
+            "the_name*\u2022", chat.id
+        )
+        assert chat.mention_markdown() == expected.format(chat.full_name, chat.id)
+        with pytest.raises(
+            TypeError, match="Can not create a mention to a private chat without first name"
+        ):
+            chat = Chat(id=1, type=Chat.PRIVATE, last_name="last\u2022name")
+            chat.mention_markdown()
+
+        expected = "[{}](https://t.me/{})"
+        chat = Chat(id=1, type="foo", username="user\u2022name", title="\u2022title")
+        assert chat.mention_markdown("the_name*\u2022") == expected.format(
+            "the_name*\u2022", chat.username
+        )
+        assert chat.mention_markdown() == expected.format(chat.title, chat.username)
+        with pytest.raises(
+            TypeError, match="Can not create a mention to a public chat without title"
+        ):
+            chat = Chat(id=1, type="foo", username="user\u2022name")
+            chat.mention_markdown()
+
+    def test_mention_markdown_v2(self):
+        with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
+            chat = Chat(id=1, type="foo")
+            chat.mention_markdown_v2()
+
+        expected = "[{}](tg://user?id={})"
+        chat = Chat(id=1, type=Chat.PRIVATE, first_name="first{name", last_name="last_name")
+        assert chat.mention_markdown_v2("the{name>\u2022") == expected.format(
+            "the\\{name\\>\u2022", chat.id
+        )
+        assert chat.mention_markdown_v2() == expected.format(
+            escape_markdown(chat.full_name, version=2), chat.id
+        )
+        with pytest.raises(
+            TypeError, match="Can not create a mention to a private chat without first name"
+        ):
+            chat = Chat(id=1, type=Chat.PRIVATE, last_name="last_name")
+            chat.mention_markdown_v2()
+
+        expected = "[{}](https://t.me/{})"
+        chat = Chat(id=1, type="foo", username="user{name", title="{title")
+        assert chat.mention_markdown_v2("the{name>\u2022") == expected.format(
+            "the\\{name\\>\u2022", chat.username
+        )
+        assert chat.mention_markdown_v2() == expected.format(
+            escape_markdown(chat.title, version=2), chat.username
+        )
+        with pytest.raises(
+            TypeError, match="Can not create a mention to a public chat without title"
+        ):
+            chat = Chat(id=1, type="foo", username="user\u2022name")
+            chat.mention_markdown_v2()
 
     def test_equality(self):
         a = Chat(self.id_, self.title, self.type_)

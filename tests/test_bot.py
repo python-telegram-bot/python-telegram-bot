@@ -17,17 +17,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import copy
 import datetime as dtm
 import inspect
 import logging
 import pickle
 import socket
+import sys
 import time
 from collections import defaultdict
 
 import pytest
-import pytz
-from flaky import flaky
 
 from telegram import (
     Bot,
@@ -38,14 +38,13 @@ from telegram import (
     ChatAdministratorRights,
     ChatPermissions,
     Dice,
-    File,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQueryResultArticle,
     InlineQueryResultDocument,
     InlineQueryResultVoice,
     InputFile,
-    InputMedia,
+    InputMessageContent,
     InputTextMessageContent,
     LabeledPrice,
     MenuButton,
@@ -62,22 +61,22 @@ from telegram import (
     User,
     WebAppInfo,
 )
-from telegram._utils.datetime import from_timestamp, to_timestamp
-from telegram._utils.defaultvalue import DefaultValue
-from telegram.constants import ChatAction, InlineQueryLimit, MenuButtonType, ParseMode
+from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram.constants import (
+    ChatAction,
+    InlineQueryLimit,
+    InlineQueryResultType,
+    MenuButtonType,
+    ParseMode,
+)
 from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
+from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.bots import FALLBACKS
-from tests.conftest import (
-    GITHUB_ACTION,
-    build_kwargs,
-    check_defaults_handling,
-    data_file,
-    expect_bad_request,
-    make_bot,
-)
+from tests.conftest import GITHUB_ACTION, data_file, expect_bad_request, make_bot
 
 
 def to_camel_case(snake_str):
@@ -93,13 +92,15 @@ async def message(bot, chat_id):
     to_reply_to = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
     )
-    return await bot.send_message(
+    out = await bot.send_message(
         chat_id,
         "Text",
         reply_to_message_id=to_reply_to.message_id,
         disable_web_page_preview=True,
         disable_notification=True,
     )
+    out._unfreeze()
+    return out
 
 
 @pytest.fixture(scope="class")
@@ -166,10 +167,44 @@ def bot_methods(ext_bot=True):
     )
 
 
+class InputMessageContentDWPP(InputMessageContent):
+    """
+    This is here to cover the case of InputMediaContent classes in testing answer_ilq that have
+    `disable_web_page_preview` but not `parse_mode`. Unlikely to ever happen, but better be save
+    than sorry …
+    """
+
+    __slots__ = ("disable_web_page_preview", "parse_mode", "entities", "message_text")
+
+    def __init__(
+        self,
+        message_text: str,
+        disable_web_page_preview=DEFAULT_NONE,
+        *,
+        api_kwargs=None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.message_text = message_text
+        self.disable_web_page_preview = disable_web_page_preview
+
+
 class TestBot:
     """
     Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
+
+    Behavior for init of ExtBot with missing optional dependency cachetools (for CallbackDataCache)
+    is tested in `test_callbackdatacache`
     """
+
+    @staticmethod
+    def localize(dt, tzinfo):
+        try:
+            return tzinfo.localize(dt)
+        except AttributeError:
+            # We get here if tzinfo is not a pytz timezone but a datetime.timezone class
+            # This test class should never be run in if pytz is not installed, we intentionally
+            # fail if this branch is ever reached.
+            sys.exit(1)
 
     test_flag = None
 
@@ -279,6 +314,8 @@ class TestBot:
                     print(record)
                     if record.getMessage().startswith("Task was destroyed but it is pending"):
                         caplog.records.pop(idx)
+                    if record.getMessage().startswith("Task exception was never retrieved"):
+                        caplog.records.pop(idx)
             assert len(caplog.records) == 3
             assert caplog.records[0].getMessage().startswith("Entering: get_me")
             assert caplog.records[-1].getMessage().startswith("Exiting: get_me")
@@ -315,7 +352,7 @@ class TestBot:
             123, "text", api_kwargs={"unknown_kwarg_1": 7, "unknown_kwarg_2": 5}
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_me_and_properties(self, bot: Bot):
         get_me_bot = await bot.get_me()
 
@@ -355,8 +392,8 @@ class TestBot:
     async def test_equality(self):
         async with make_bot(token=FALLBACKS[0]["token"]) as a, make_bot(
             token=FALLBACKS[0]["token"]
-        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c:
-            d = Update(123456789)
+        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c, Bot(token=FALLBACKS[0]["token"]) as d:
+            e = Update(123456789)
 
             assert a == b
             assert hash(a) == hash(b)
@@ -368,7 +405,10 @@ class TestBot:
             assert a != d
             assert hash(a) != hash(d)
 
-    @flaky(3, 1)
+            assert a != e
+            assert hash(a) != hash(e)
+
+    @pytest.mark.flaky(3, 1)
     async def test_to_dict(self, bot):
         to_dict_bot = bot.to_dict()
 
@@ -406,77 +446,18 @@ class TestBot:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
-        if bot_method_name.lower().replace("_", "") == "getupdates":
-            return
+        if bot_method_name.lower().replace("_", "") == "getme":
+            # Mocking get_me within check_defaults_handling messes with the cached values like
+            # Bot.{bot, username, id, …}` unless we return the expected User object.
+            return_value = bot.bot
+        else:
+            return_value = None
 
-        try:
-            # Check that ExtBot does the right thing
-            bot_method = getattr(bot, bot_method_name)
-            assert await check_defaults_handling(bot_method, bot)
-
-            # check that tg.Bot does the right thing
-            # make_assertion basically checks everything that happens in
-            # Bot._insert_defaults and Bot._insert_defaults_for_ilq_results
-            async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-                json_data = request_data.parameters
-
-                # Check regular kwargs
-                for k, v in json_data.items():
-                    if isinstance(v, DefaultValue):
-                        pytest.fail(f"Parameter {k} was passed as DefaultValue to request")
-                    elif isinstance(v, InputMedia) and isinstance(v.parse_mode, DefaultValue):
-                        pytest.fail(f"Parameter {k} has a DefaultValue parse_mode")
-                    # Check InputMedia
-                    elif k == "media" and isinstance(v, list):
-                        if any(isinstance(med.get("parse_mode"), DefaultValue) for med in v):
-                            pytest.fail("One of the media items has a DefaultValue parse_mode")
-
-                # Check inline query results
-                if bot_method_name.lower().replace("_", "") == "answerinlinequery":
-                    for result_dict in json_data["results"]:
-                        if isinstance(result_dict.get("parse_mode"), DefaultValue):
-                            pytest.fail("InlineQueryResult has DefaultValue parse_mode")
-                        imc = result_dict.get("input_message_content")
-                        if imc and isinstance(imc.get("parse_mode"), DefaultValue):
-                            pytest.fail(
-                                "InlineQueryResult is InputMessageContext with DefaultValue "
-                                "parse_mode "
-                            )
-                        if imc and isinstance(imc.get("disable_web_page_preview"), DefaultValue):
-                            pytest.fail(
-                                "InlineQueryResult is InputMessageContext with DefaultValue "
-                                "disable_web_page_preview "
-                            )
-                # Check datetime conversion
-                until_date = json_data.pop("until_date", None)
-                if until_date and until_date != 946684800:
-                    pytest.fail("Naive until_date was not interpreted as UTC")
-
-                if bot_method_name in ["get_file", "getFile"]:
-                    # The get_file methods try to check if the result is a local file
-                    return File(file_id="result", file_unique_id="result").to_dict()
-
-            method = getattr(raw_bot, bot_method_name)
-            signature = inspect.signature(method)
-            kwargs_need_default = [
-                kwarg
-                for kwarg, value in signature.parameters.items()
-                if isinstance(value.default, DefaultValue)
-            ]
-            monkeypatch.setattr(raw_bot.request, "post", make_assertion)
-            await method(**build_kwargs(inspect.signature(method), kwargs_need_default))
-        finally:
-            await bot.get_me()  # because running the mock-get_me messages with bot.bot & friends
-
-        method = getattr(raw_bot, bot_method_name)
-        signature = inspect.signature(method)
-        kwargs_need_default = [
-            kwarg
-            for kwarg, value in signature.parameters.items()
-            if isinstance(value.default, DefaultValue)
-        ]
-        monkeypatch.setattr(raw_bot.request, "post", make_assertion)
-        await method(**build_kwargs(inspect.signature(method), kwargs_need_default))
+        # Check that ExtBot does the right thing
+        bot_method = getattr(bot, bot_method_name)
+        raw_bot_method = getattr(raw_bot, bot_method_name)
+        assert await check_defaults_handling(bot_method, bot, return_value=return_value)
+        assert await check_defaults_handling(raw_bot_method, raw_bot, return_value=return_value)
 
     def test_ext_bot_signature(self):
         """
@@ -514,7 +495,7 @@ class TestBot:
                     param.kind == ext_signature.parameters[param_name].kind
                 ), f"Wrong parameter kind for parameter {param_name} of method {name}"
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_forward_message(self, bot, chat_id, message):
         forward_message = await bot.forward_message(
             chat_id, from_chat_id=chat_id, message_id=message.message_id
@@ -544,14 +525,14 @@ class TestBot:
         with pytest.raises(BadRequest, match="can't be forwarded"):
             await forwarded_but_now_protected.forward(chat_id)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_delete_message(self, bot, chat_id):
         message = await bot.send_message(chat_id, text="will be deleted")
         await asyncio.sleep(2)
 
         assert await bot.delete_message(chat_id=chat_id, message_id=message.message_id) is True
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_delete_message_old_message(self, bot, chat_id):
         with pytest.raises(BadRequest):
             # Considering that the first message is old enough
@@ -561,7 +542,7 @@ class TestBot:
     # send_media_group and send_animation are tested in their respective test modules. No need to
     # duplicate here.
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_venue(self, bot, chat_id):
         longitude = -46.788279
         latitude = -23.691288
@@ -616,7 +597,7 @@ class TestBot:
         assert message.venue.foursquare_type is None
         assert message.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_contact(self, bot, chat_id):
         phone_number = "+11234567890"
         first_name = "Leandro"
@@ -637,7 +618,7 @@ class TestBot:
 
     # TODO: Add bot to group to test polls too
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "reply_markup",
         [
@@ -711,9 +692,9 @@ class TestBot:
         assert message_quiz.poll.type == Poll.QUIZ
         assert message_quiz.poll.is_closed
         assert message_quiz.poll.explanation == "Here is a link"
-        assert message_quiz.poll.explanation_entities == explanation_entities
+        assert message_quiz.poll.explanation_entities == tuple(explanation_entities)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         ["open_period", "close_date"], [(5, None), (None, True)], ids=["open_period", "close_date"]
     )
@@ -747,7 +728,7 @@ class TestBot:
         assert new_message.poll.id == message.poll.id
         assert new_message.poll.is_closed
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_close_date_default_tz(self, tz_bot, super_group_id):
         question = "Is this a test?"
         answers = ["Yes", "No", "Maybe"]
@@ -765,6 +746,7 @@ class TestBot:
             close_date=close_date,
             read_timeout=60,
         )
+        msg.poll._unfreeze()
         # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
         msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
         assert abs(msg.poll.close_date - aware_close_date) <= dtm.timedelta(seconds=5)
@@ -780,7 +762,7 @@ class TestBot:
         assert new_message.poll.id == msg.poll.id
         assert new_message.poll.is_closed
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_poll_explanation_entities(self, bot, chat_id):
         test_string = "Italic Bold Code"
         entities = [
@@ -799,9 +781,9 @@ class TestBot:
         )
 
         assert message.poll.explanation == test_string
-        assert message.poll.explanation_entities == entities
+        assert message.poll.explanation_entities == tuple(entities)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_poll_default_parse_mode(self, default_bot, super_group_id):
         explanation = "Italic Bold Code"
@@ -819,11 +801,11 @@ class TestBot:
             explanation=explanation_markdown,
         )
         assert message.poll.explanation == explanation
-        assert message.poll.explanation_entities == [
+        assert message.poll.explanation_entities == (
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.BOLD, 7, 4),
             MessageEntity(MessageEntity.CODE, 12, 4),
-        ]
+        )
 
         message = await default_bot.send_poll(
             chat_id=super_group_id,
@@ -836,7 +818,7 @@ class TestBot:
             explanation_parse_mode=None,
         )
         assert message.poll.explanation == explanation_markdown
-        assert message.poll.explanation_entities == []
+        assert message.poll.explanation_entities == ()
 
         message = await default_bot.send_poll(
             chat_id=super_group_id,
@@ -849,9 +831,9 @@ class TestBot:
             explanation_parse_mode="HTML",
         )
         assert message.poll.explanation == explanation_markdown
-        assert message.poll.explanation_entities == []
+        assert message.poll.explanation_entities == ()
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -894,7 +876,7 @@ class TestBot:
                     reply_to_message_id=reply_to_message.message_id,
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_poll_default_protect_content(self, chat_id, default_bot):
         protected_poll = await default_bot.send_poll(chat_id, "Test", ["1", "2"])
@@ -904,7 +886,7 @@ class TestBot:
         )
         assert not unprotect_poll.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("emoji", Dice.ALL_EMOJI + [None])
     async def test_send_dice(self, bot, chat_id, emoji):
         message = await bot.send_dice(chat_id, emoji=emoji, protect_content=True)
@@ -916,7 +898,7 @@ class TestBot:
         else:
             assert message.dice.emoji == emoji
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -950,7 +932,7 @@ class TestBot:
                     chat_id, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_dice_default_protect_content(self, chat_id, default_bot):
         protected_dice = await default_bot.send_dice(chat_id)
@@ -958,7 +940,7 @@ class TestBot:
         unprotected_dice = await default_bot.send_dice(chat_id, protect_content=False)
         assert not unprotected_dice.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("chat_action", list(ChatAction))
     async def test_send_chat_action(self, bot, chat_id, chat_action):
         assert await bot.send_chat_action(chat_id, chat_action)
@@ -968,7 +950,7 @@ class TestBot:
             await bot.send_chat_action(chat_id, "unknown action")
 
     @pytest.mark.asyncio
-    async def test_answer_web_app_query(self, bot, monkeypatch):
+    async def test_answer_web_app_query(self, bot, raw_bot, monkeypatch):
         params = False
 
         # For now just test that our internals pass the correct data
@@ -977,20 +959,145 @@ class TestBot:
             nonlocal params
             params = request_data.parameters == {
                 "web_app_query_id": "12345",
-                "result": result.to_dict(),
+                "result": {
+                    "title": "title",
+                    "input_message_content": {
+                        "message_text": "text",
+                    },
+                    "type": InlineQueryResultType.ARTICLE,
+                    "id": "1",
+                },
             }
             web_app_msg = SentWebAppMessage("321").to_dict()
             return web_app_msg
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        # We test different result types more thoroughly for answer_inline_query, so we just
+        # use the one type here
         result = InlineQueryResultArticle("1", "title", InputTextMessageContent("text"))
-        web_app_msg = await bot.answer_web_app_query("12345", result)
+        copied_result = copy.copy(result)
+
+        ext_bot = bot
+        for bot in (ext_bot, raw_bot):
+            # We need to test 1) below both the bot and raw_bot and setting this up with
+            # pytest.parametrize appears to be difficult ...
+            monkeypatch.setattr(bot.request, "post", make_assertion)
+            web_app_msg = await bot.answer_web_app_query("12345", result)
+            assert params, "something went wrong with passing arguments to the request"
+            assert isinstance(web_app_msg, SentWebAppMessage)
+            assert web_app_msg.inline_message_id == "321"
+
+            # 1)
+            # make sure that the results were not edited in-place
+            assert result == copied_result
+            assert (
+                result.input_message_content.parse_mode
+                == copied_result.input_message_content.parse_mode
+            )
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        indirect=True,
+    )
+    @pytest.mark.parametrize(
+        "ilq_result,expected_params",
+        [
+            (
+                InlineQueryResultArticle("1", "title", InputTextMessageContent("text")),
+                {
+                    "web_app_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "parse_mode": "Markdown",
+                            "disable_web_page_preview": True,
+                        },
+                        "type": InlineQueryResultType.ARTICLE,
+                        "id": "1",
+                    },
+                },
+            ),
+            (
+                InlineQueryResultArticle(
+                    "1",
+                    "title",
+                    InputTextMessageContent(
+                        "text", parse_mode="HTML", disable_web_page_preview=False
+                    ),
+                ),
+                {
+                    "web_app_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "parse_mode": "HTML",
+                            "disable_web_page_preview": False,
+                        },
+                        "type": InlineQueryResultType.ARTICLE,
+                        "id": "1",
+                    },
+                },
+            ),
+            (
+                InlineQueryResultArticle(
+                    "1",
+                    "title",
+                    InputTextMessageContent(
+                        "text", parse_mode=None, disable_web_page_preview="False"
+                    ),
+                ),
+                {
+                    "web_app_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "disable_web_page_preview": "False",
+                        },
+                        "type": InlineQueryResultType.ARTICLE,
+                        "id": "1",
+                    },
+                },
+            ),
+        ],
+    )
+    async def test_answer_web_app_query_defaults(
+        self, default_bot, ilq_result, expected_params, monkeypatch
+    ):
+        bot = default_bot
+        params = False
+
+        # For now just test that our internals pass the correct data
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            nonlocal params
+            params = request_data.parameters == expected_params
+            web_app_msg = SentWebAppMessage("321").to_dict()
+            return web_app_msg
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        # We test different result types more thoroughly for answer_inline_query, so we just
+        # use the one type here
+        copied_result = copy.copy(ilq_result)
+
+        web_app_msg = await bot.answer_web_app_query("12345", ilq_result)
         assert params, "something went wrong with passing arguments to the request"
         assert isinstance(web_app_msg, SentWebAppMessage)
         assert web_app_msg.inline_message_id == "321"
 
+        # make sure that the results were not edited in-place
+        assert ilq_result == copied_result
+        assert (
+            ilq_result.input_message_content.parse_mode
+            == copied_result.input_message_content.parse_mode
+        )
+
     # TODO: Needs improvement. We need incoming inline query to test answer.
-    async def test_answer_inline_query(self, monkeypatch, bot):
+    async def test_answer_inline_query(self, monkeypatch, bot, raw_bot):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters == {
@@ -1008,6 +1115,100 @@ class TestBot:
                         "type": "article",
                         "input_message_content": {"message_text": "second"},
                     },
+                    {
+                        "title": "test_result",
+                        "id": "123",
+                        "type": "document",
+                        "document_url": "https://raw.githubusercontent.com/python-telegram-bot"
+                        "/logos/master/logo/png/ptb-logo_240.png",
+                        "mime_type": "image/png",
+                        "caption": "ptb_logo",
+                        "input_message_content": {"message_text": "imc"},
+                    },
+                ],
+                "next_offset": "42",
+                "switch_pm_parameter": "start_pm",
+                "inline_query_id": 1234,
+                "is_personal": True,
+                "switch_pm_text": "switch pm",
+            }
+
+        results = [
+            InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
+            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
+            InlineQueryResultDocument(
+                id="123",
+                document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
+                "logo/png/ptb-logo_240.png",
+                title="test_result",
+                mime_type="image/png",
+                caption="ptb_logo",
+                input_message_content=InputMessageContentDWPP("imc"),
+            ),
+        ]
+
+        copied_results = copy.copy(results)
+        ext_bot = bot
+        for bot in (ext_bot, raw_bot):
+            # We need to test 1) below both the bot and raw_bot and setting this up with
+            # pytest.parametrize appears to be difficult ...
+            monkeypatch.setattr(bot.request, "post", make_assertion)
+            assert await bot.answer_inline_query(
+                1234,
+                results=results,
+                cache_time=300,
+                is_personal=True,
+                next_offset="42",
+                switch_pm_text="switch pm",
+                switch_pm_parameter="start_pm",
+            )
+
+            # 1)
+            # make sure that the results were not edited in-place
+            assert results == copied_results
+            for idx, result in enumerate(results):
+                if hasattr(result, "parse_mode"):
+                    assert result.parse_mode == copied_results[idx].parse_mode
+                if hasattr(result, "input_message_content"):
+                    assert getattr(result.input_message_content, "parse_mode", None) == getattr(
+                        copied_results[idx].input_message_content, "parse_mode", None
+                    )
+                    assert getattr(
+                        result.input_message_content, "disable_web_page_preview", None
+                    ) == getattr(
+                        copied_results[idx].input_message_content, "disable_web_page_preview", None
+                    )
+
+            monkeypatch.delattr(bot.request, "post")
+
+    async def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters == {
+                "cache_time": 300,
+                "results": [
+                    {
+                        "title": "first",
+                        "id": "11",
+                        "type": "article",
+                        "input_message_content": {"message_text": "first"},
+                    },
+                    {
+                        "title": "second",
+                        "id": "12",
+                        "type": "article",
+                        "input_message_content": {"message_text": "second"},
+                    },
+                    {
+                        "title": "test_result",
+                        "id": "123",
+                        "type": "document",
+                        "document_url": "https://raw.githubusercontent.com/"
+                        "python-telegram-bot/logos/master/logo/png/"
+                        "ptb-logo_240.png",
+                        "mime_type": "image/png",
+                        "caption": "ptb_logo",
+                        "input_message_content": {"message_text": "imc"},
+                    },
                 ],
                 "next_offset": "42",
                 "switch_pm_parameter": "start_pm",
@@ -1019,45 +1220,7 @@ class TestBot:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputTextMessageContent("second")),
-        ]
-
-        assert await bot.answer_inline_query(
-            1234,
-            results=results,
-            cache_time=300,
-            is_personal=True,
-            next_offset="42",
-            switch_pm_text="switch pm",
-            switch_pm_parameter="start_pm",
-        )
-        monkeypatch.delattr(bot.request, "post")
-
-    async def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.parameters == {
-                "cache_time": 300,
-                "results": [
-                    {
-                        "title": "test_result",
-                        "id": "123",
-                        "type": "document",
-                        "document_url": "https://raw.githubusercontent.com/"
-                        "python-telegram-bot/logos/master/logo/png/"
-                        "ptb-logo_240.png",
-                        "mime_type": "image/png",
-                        "caption": "ptb_logo",
-                    }
-                ],
-                "next_offset": "42",
-                "switch_pm_parameter": "start_pm",
-                "inline_query_id": 1234,
-                "is_personal": True,
-                "switch_pm_text": "switch pm",
-            }
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        results = [
+            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
@@ -1065,9 +1228,11 @@ class TestBot:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
-            )
+                input_message_content=InputMessageContentDWPP("imc"),
+            ),
         ]
 
+        copied_results = copy.copy(results)
         assert await bot.answer_inline_query(
             1234,
             results=results,
@@ -1077,13 +1242,50 @@ class TestBot:
             switch_pm_text="switch pm",
             switch_pm_parameter="start_pm",
         )
+        # make sure that the results were not edited in-place
+        assert results == copied_results
+        for idx, result in enumerate(results):
+            if hasattr(result, "parse_mode"):
+                assert result.parse_mode == copied_results[idx].parse_mode
+            if hasattr(result, "input_message_content"):
+                assert getattr(result.input_message_content, "parse_mode", None) == getattr(
+                    copied_results[idx].input_message_content, "parse_mode", None
+                )
+                assert getattr(
+                    result.input_message_content, "disable_web_page_preview", None
+                ) == getattr(
+                    copied_results[idx].input_message_content, "disable_web_page_preview", None
+                )
 
-    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        indirect=True,
+    )
     async def test_answer_inline_query_default_parse_mode(self, monkeypatch, default_bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters == {
                 "cache_time": 300,
                 "results": [
+                    {
+                        "title": "first",
+                        "id": "11",
+                        "type": "article",
+                        "input_message_content": {
+                            "message_text": "first",
+                            "parse_mode": "Markdown",
+                            "disable_web_page_preview": True,
+                        },
+                    },
+                    {
+                        "title": "second",
+                        "id": "12",
+                        "type": "article",
+                        "input_message_content": {
+                            "message_text": "second",
+                            "disable_web_page_preview": True,
+                        },
+                    },
                     {
                         "title": "test_result",
                         "id": "123",
@@ -1094,7 +1296,12 @@ class TestBot:
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
                         "parse_mode": "Markdown",
-                    }
+                        "input_message_content": {
+                            "message_text": "imc",
+                            "disable_web_page_preview": True,
+                            "parse_mode": "Markdown",
+                        },
+                    },
                 ],
                 "next_offset": "42",
                 "switch_pm_parameter": "start_pm",
@@ -1105,6 +1312,8 @@ class TestBot:
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         results = [
+            InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
+            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
@@ -1112,9 +1321,11 @@ class TestBot:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
-            )
+                input_message_content=InputTextMessageContent("imc"),
+            ),
         ]
 
+        copied_results = copy.copy(results)
         assert await default_bot.answer_inline_query(
             1234,
             results=results,
@@ -1124,6 +1335,20 @@ class TestBot:
             switch_pm_text="switch pm",
             switch_pm_parameter="start_pm",
         )
+        # make sure that the results were not edited in-place
+        assert results == copied_results
+        for idx, result in enumerate(results):
+            if hasattr(result, "parse_mode"):
+                assert result.parse_mode == copied_results[idx].parse_mode
+            if hasattr(result, "input_message_content"):
+                assert getattr(result.input_message_content, "parse_mode", None) == getattr(
+                    copied_results[idx].input_message_content, "parse_mode", None
+                )
+                assert getattr(
+                    result.input_message_content, "disable_web_page_preview", None
+                ) == getattr(
+                    copied_results[idx].input_message_content, "disable_web_page_preview", None
+                )
 
     async def test_answer_inline_query_current_offset_error(self, bot, inline_results):
         with pytest.raises(ValueError, match=("`current_offset` and `next_offset`")):
@@ -1221,13 +1446,13 @@ class TestBot:
             1234, results=inline_results_callback, current_offset=6
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_user_profile_photos(self, bot, chat_id):
         user_profile_photos = await bot.get_user_profile_photos(chat_id)
 
         assert user_profile_photos.photos[0][0].file_size == 5403
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_one_user_profile_photo(self, bot, chat_id):
         user_profile_photos = await bot.get_user_profile_photos(chat_id, offset=0, limit=1)
         assert user_profile_photos.photos[0][0].file_size == 5403
@@ -1364,7 +1589,7 @@ class TestBot:
             23, text="answer", show_alert=True, url="no_url", cache_time=1
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_edit_message_text(self, bot, message):
         message = await bot.edit_message_text(
             text="new_text",
@@ -1376,7 +1601,7 @@ class TestBot:
 
         assert message.text == "new_text"
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_edit_message_text_entities(self, bot, message):
         test_string = "Italic Bold Code"
         entities = [
@@ -1392,9 +1617,9 @@ class TestBot:
         )
 
         assert message.text == test_string
-        assert message.entities == entities
+        assert message.entities == tuple(entities)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_edit_message_text_default_parse_mode(self, default_bot, message):
         test_string = "Italic Bold Code"
@@ -1439,7 +1664,7 @@ class TestBot:
     async def test_edit_message_text_inline(self):
         pass
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_edit_message_caption(self, bot, media_message):
         message = await bot.edit_message_caption(
             caption="new_caption",
@@ -1449,7 +1674,7 @@ class TestBot:
 
         assert message.caption == "new_caption"
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_edit_message_caption_entities(self, bot, media_message):
         test_string = "Italic Bold Code"
         entities = [
@@ -1465,11 +1690,11 @@ class TestBot:
         )
 
         assert message.caption == test_string
-        assert message.caption_entities == entities
+        assert message.caption_entities == tuple(entities)
 
     # edit_message_media is tested in test_inputmedia
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_edit_message_caption_default_parse_mode(self, default_bot, media_message):
         test_string = "Italic Bold Code"
@@ -1506,7 +1731,7 @@ class TestBot:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_edit_message_caption_with_parse_mode(self, bot, media_message):
         message = await bot.edit_message_caption(
             caption="new *caption*",
@@ -1521,7 +1746,7 @@ class TestBot:
     async def test_edit_message_caption_inline(self):
         pass
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_edit_reply_markup(self, bot, message):
         new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text="test", callback_data="1")]])
         message = await bot.edit_message_reply_markup(
@@ -1535,12 +1760,12 @@ class TestBot:
         pass
 
     # TODO: Actually send updates to the test bot so this can be tested properly
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_updates(self, bot):
         await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
         updates = await bot.get_updates(timeout=1)
 
-        assert isinstance(updates, list)
+        assert isinstance(updates, tuple)
         if updates:
             assert isinstance(updates[0], Update)
 
@@ -1559,7 +1784,7 @@ class TestBot:
                         message=Message(
                             1,
                             from_user=User(1, "", False),
-                            date=None,
+                            date=dtm.datetime.utcnow(),
                             chat=Chat(1, ""),
                             text="Webhook",
                         ),
@@ -1572,7 +1797,7 @@ class TestBot:
             monkeypatch.setattr(BaseRequest, "post", post)
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
             assert isinstance(updates[0].callback_query.data, InvalidCallbackData)
 
@@ -1581,7 +1806,7 @@ class TestBot:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("use_ip", [True, False])
     # local file path as file_input is tested below in test_set_webhook_params
     @pytest.mark.parametrize("file_input", ["bytes", "file_handle"])
@@ -1608,7 +1833,7 @@ class TestBot:
         live_info = await bot.get_webhook_info()
         assert live_info.url == url
         assert live_info.max_connections == max_connections
-        assert live_info.allowed_updates == allowed_updates
+        assert live_info.allowed_updates == tuple(allowed_updates)
         assert live_info.ip_address == ip
         assert live_info.has_custom_certificate == use_ip
 
@@ -1624,8 +1849,8 @@ class TestBot:
         self, bot, drop_pending_updates, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            data = request_data.json_parameters
-            return bool(data.get("drop_pending_updates")) == drop_pending_updates
+            data = request_data.parameters
+            return data.get("drop_pending_updates") == drop_pending_updates
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
 
@@ -1678,7 +1903,7 @@ class TestBot:
             "SoSecretToken",
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_leave_chat(self, bot):
         with pytest.raises(BadRequest, match="Chat not found"):
             await bot.leave_chat(-123456)
@@ -1686,7 +1911,7 @@ class TestBot:
         with pytest.raises(NetworkError, match="Chat not found"):
             await bot.leave_chat(-123456)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_chat(self, bot, super_group_id):
         chat = await bot.get_chat(super_group_id)
 
@@ -1694,21 +1919,21 @@ class TestBot:
         assert chat.title == f">>> telegram.Bot(test) @{bot.username}"
         assert chat.id == int(super_group_id)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_chat_administrators(self, bot, channel_id):
         admins = await bot.get_chat_administrators(channel_id)
-        assert isinstance(admins, list)
+        assert isinstance(admins, tuple)
 
         for a in admins:
             assert a.status in ("administrator", "creator")
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_chat_member_count(self, bot, channel_id):
         count = await bot.get_chat_member_count(channel_id)
         assert isinstance(count, int)
         assert count > 3
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_chat_member(self, bot, channel_id, chat_id):
         chat_member = await bot.get_chat_member(channel_id, chat_id)
 
@@ -1724,7 +1949,7 @@ class TestBot:
     async def test_delete_chat_sticker_set(self):
         pass
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_game(self, bot, chat_id):
         game_short_name = "test_game"
         message = await bot.send_game(chat_id, game_short_name, protect_content=True)
@@ -1739,7 +1964,7 @@ class TestBot:
         assert message.game.photo[0].file_size in [851, 4928, 850]
         assert message.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -1776,7 +2001,7 @@ class TestBot:
                     chat_id, game_short_name, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,val",
         [({"protect_content": True}, True), ({"protect_content": False}, None)],
@@ -1928,7 +2153,7 @@ class TestBot:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.answer_pre_checkout_query(1, False, error_message="Not enough fish")
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_restrict_chat_member(self, bot, channel_id, chat_permissions):
         # TODO: Add bot to supergroup so this can be tested properly
         with pytest.raises(BadRequest, match="Method is available only for supergroups"):
@@ -1955,7 +2180,7 @@ class TestBot:
             channel_id, 95205500, chat_permissions, until_date=until_timestamp
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_promote_chat_member(self, bot, channel_id, monkeypatch):
         # TODO: Add bot to supergroup so this can be tested properly / give bot perms
         with pytest.raises(BadRequest, match="Not enough rights"):
@@ -1973,6 +2198,7 @@ class TestBot:
                 can_promote_members=True,
                 can_manage_chat=True,
                 can_manage_video_chats=True,
+                can_manage_topics=True,
             )
 
         # Test that we pass the correct params to TG
@@ -1992,6 +2218,7 @@ class TestBot:
                 and data.get("can_promote_members") == 9
                 and data.get("can_manage_chat") == 10
                 and data.get("can_manage_video_chats") == 11
+                and data.get("can_manage_topics") == 12
             )
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -2009,16 +2236,17 @@ class TestBot:
             can_promote_members=9,
             can_manage_chat=10,
             can_manage_video_chats=11,
+            can_manage_topics=12,
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_export_chat_invite_link(self, bot, channel_id):
         # Each link is unique apparently
         invite_link = await bot.export_chat_invite_link(channel_id)
         assert isinstance(invite_link, str)
         assert invite_link != ""
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_edit_revoke_chat_invite_link_passing_link_objects(self, bot, channel_id):
         invite_link = await bot.create_chat_invite_link(chat_id=channel_id)
         assert invite_link.name is None
@@ -2036,7 +2264,7 @@ class TestBot:
         assert revoked_link.is_revoked is True
         assert revoked_link.name == "some_name"
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("creates_join_request", [True, False])
     @pytest.mark.parametrize("name", [None, "name"])
     async def test_create_chat_invite_link_basics(
@@ -2059,7 +2287,7 @@ class TestBot:
         )
         assert revoked_link.is_revoked
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("datetime", argvalues=[True, False], ids=["datetime", "integer"])
     async def test_advanced_chat_invite_links(self, bot, channel_id, datetime):
         # we are testing this all in one function in order to save api calls
@@ -2067,7 +2295,7 @@ class TestBot:
         add_seconds = dtm.timedelta(0, 70)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
-        aware_time_in_future = pytz.UTC.localize(time_in_future)
+        aware_time_in_future = self.localize(time_in_future, UTC)
 
         invite_link = await bot.create_chat_invite_link(
             channel_id, expire_date=expire_time, member_limit=10
@@ -2080,7 +2308,7 @@ class TestBot:
         add_seconds = dtm.timedelta(0, 80)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
-        aware_time_in_future = pytz.UTC.localize(time_in_future)
+        aware_time_in_future = self.localize(time_in_future, UTC)
 
         edited_invite_link = await bot.edit_chat_invite_link(
             channel_id,
@@ -2114,7 +2342,7 @@ class TestBot:
         assert revoked_invite_link.invite_link == invite_link.invite_link
         assert revoked_invite_link.is_revoked
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_advanced_chat_invite_links_default_tzinfo(self, tz_bot, channel_id):
         # we are testing this all in one function in order to save api calls
         add_seconds = dtm.timedelta(0, 70)
@@ -2163,7 +2391,7 @@ class TestBot:
         assert revoked_invite_link.invite_link == invite_link.invite_link
         assert revoked_invite_link.is_revoked
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_approve_chat_join_request(self, bot, chat_id, channel_id):
         # TODO: Need incoming join request to properly test
         # Since we can't create join requests on the fly, we just tests the call to TG
@@ -2171,7 +2399,7 @@ class TestBot:
         with pytest.raises(BadRequest, match="User_already_participant"):
             await bot.approve_chat_join_request(chat_id=channel_id, user_id=chat_id)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_decline_chat_join_request(self, bot, chat_id, channel_id):
         # TODO: Need incoming join request to properly test
         # Since we can't create join requests on the fly, we just tests the call to TG
@@ -2182,7 +2410,7 @@ class TestBot:
         with pytest.raises(BadRequest, match="User_already_participant|Hide_requester_missing"):
             await bot.decline_chat_join_request(chat_id=channel_id, user_id=chat_id)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_set_chat_photo(self, bot, channel_id):
         async def func():
             assert await bot.set_chat_photo(channel_id, f)
@@ -2214,22 +2442,22 @@ class TestBot:
         finally:
             bot._local_mode = False
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_delete_chat_photo(self, bot, channel_id):
         async def func():
             assert await bot.delete_chat_photo(channel_id)
 
         await expect_bad_request(func, "Chat_not_modified", "Chat photo was not set.")
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_set_chat_title(self, bot, channel_id):
         assert await bot.set_chat_title(channel_id, ">>> telegram.Bot() - Tests")
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_set_chat_description(self, bot, channel_id):
         assert await bot.set_chat_description(channel_id, "Time: " + str(time.time()))
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_pin_and_unpin_message(self, bot, super_group_id):
         message1 = await bot.send_message(super_group_id, text="test_pin_message_1")
         message2 = await bot.send_message(super_group_id, text="test_pin_message_2")
@@ -2279,6 +2507,9 @@ class TestBot:
     # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers
     # are tested in the test_sticker module.
 
+    # get_forum_topic_icon_stickers, edit_forum_topic, etc...
+    # are tested in the test_forum module.
+
     async def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
         # Use BaseException that's not a subclass of Exception such that
         # OkException should not be caught anywhere
@@ -2325,7 +2556,7 @@ class TestBot:
         with pytest.raises(OkException):
             await bot.send_photo(chat_id, data_file("telegram.jpg").open("rb"))
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_message_entities(self, bot, chat_id):
         test_string = "Italic Bold Code Spoiler"
         entities = [
@@ -2336,9 +2567,9 @@ class TestBot:
         ]
         message = await bot.send_message(chat_id=chat_id, text=test_string, entities=entities)
         assert message.text == test_string
-        assert message.entities == entities
+        assert message.entities == tuple(entities)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_message_default_parse_mode(self, default_bot, chat_id):
         test_string = "Italic Bold Code"
@@ -2356,7 +2587,7 @@ class TestBot:
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_message_default_protect_content(self, default_bot, chat_id):
         to_check = await default_bot.send_message(chat_id, "test")
@@ -2365,7 +2596,7 @@ class TestBot:
         no_protect = await default_bot.send_message(chat_id, "test", protect_content=False)
         assert not no_protect.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -2423,6 +2654,7 @@ class TestBot:
         assert my_admin_rights_ch.can_promote_members is my_rights.can_promote_members
         assert my_admin_rights_ch.can_restrict_members is my_rights.can_restrict_members
         assert my_admin_rights_ch.can_pin_messages is None  # Not returned for channels
+        assert my_admin_rights_ch.can_manage_topics is None  # Not returned for channels
 
     @pytest.mark.asyncio
     async def test_get_set_chat_menu_button(self, bot, chat_id):
@@ -2445,18 +2677,18 @@ class TestBot:
         menu_button = await bot.get_chat_menu_button(chat_id=chat_id)
         assert isinstance(menu_button, MenuButtonDefault)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_set_and_get_my_commands(self, bot):
         commands = [BotCommand("cmd1", "descr1"), ["cmd2", "descr2"]]
         await bot.set_my_commands([])
-        assert await bot.get_my_commands() == []
+        assert await bot.get_my_commands() == ()
         assert await bot.set_my_commands(commands)
 
         for i, bc in enumerate(await bot.get_my_commands()):
             assert bc.command == f"cmd{i+1}"
             assert bc.description == f"descr{i+1}"
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_set_delete_my_commands_with_scope(self, bot, super_group_id, chat_id):
         group_cmds = [BotCommand("group_cmd", "visible to this supergroup only")]
         private_cmds = [BotCommand("private_cmd", "visible to this private chat only")]
@@ -2509,7 +2741,7 @@ class TestBot:
 
         assert await bot.close()
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("json_keyboard", [True, False])
     @pytest.mark.parametrize("caption", ["<b>Test</b>", "", None])
     async def test_copy_message(
@@ -2536,6 +2768,7 @@ class TestBot:
                     data["caption_entities"]
                     == [MessageEntity(MessageEntity.BOLD, 0, 4).to_dict()],
                     data["protect_content"] is True,
+                    data["message_thread_id"] == 1,
                 ]
             ):
                 pytest.fail("I got wrong parameters in post")
@@ -2553,9 +2786,10 @@ class TestBot:
             reply_markup=keyboard.to_json() if json_keyboard else keyboard,
             disable_notification=True,
             protect_content=True,
+            message_thread_id=1,
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_copy_message_without_reply(self, bot, chat_id, media_message):
         keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton(text="test", callback_data="test2")]]
@@ -2581,7 +2815,7 @@ class TestBot:
         assert len(message.caption_entities) == 1
         assert message.reply_markup == keyboard
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot",
         [
@@ -2842,8 +3076,12 @@ class TestBot:
         )
 
         message = Message(
-            1, None, None, reply_markup=bot.callback_data_cache.process_keyboard(reply_markup)
+            1,
+            dtm.datetime.utcnow(),
+            None,
+            reply_markup=bot.callback_data_cache.process_keyboard(reply_markup),
         )
+        message._unfreeze()
         # We do to_dict -> de_json to make sure those aren't the same objects
         message.pinned_message = Message.de_json(message.to_dict(), bot)
 
@@ -2853,7 +3091,7 @@ class TestBot:
                 **{
                     message_type: Message(
                         1,
-                        None,
+                        dtm.datetime.utcnow(),
                         None,
                         pinned_message=message,
                         reply_to_message=Message.de_json(message.to_dict(), bot),
@@ -2867,7 +3105,7 @@ class TestBot:
             await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
 
             effective_message = updates[0][message_type]
@@ -2920,7 +3158,7 @@ class TestBot:
         reply_markup = bot.callback_data_cache.process_keyboard(reply_markup)
         message = Message(
             1,
-            None,
+            dtm.datetime.utcnow(),
             None,
             reply_markup=reply_markup,
             via_bot=bot.bot if self_sender else User(1, "first", False),
@@ -2934,7 +3172,7 @@ class TestBot:
             await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
 
             message = updates[0][message_type]

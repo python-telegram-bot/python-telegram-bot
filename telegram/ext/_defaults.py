@@ -17,41 +17,44 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
+import datetime
 from typing import Any, Dict, NoReturn, Optional
 
-import pytz
+from telegram._utils.datetime import UTC
 
 
 class Defaults:
     """Convenience Class to gather all parameters with a (user defined) default value
+
+    .. seealso:: `Architecture Overview <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
+        `Adding Defaults to Your Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Adding-defaults-to-your-bot>`_
 
     .. versionchanged:: 20.0
         Removed the argument and attribute ``timeout``. Specify default timeout behavior for the
         networking backend directly via :class:`telegram.ext.ApplicationBuilder` instead.
 
     Parameters:
-        parse_mode (:obj:`str`, optional): Send :attr:`~telegram.constants.ParseMode.MARKDOWN` or
-            :attr:`~telegram.constants.ParseMode.HTML`, if you want Telegram apps to show
-            bold, italic, fixed-width text or URLs in your bot's message.
-        disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-            receive a notification with no sound.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        disable_notification (:obj:`bool`, optional): |disable_notification|
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in this
             message.
-        allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-            should be sent even if the specified replied-to message is not found.
+        allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
         quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
             to the message. If ``reply_to_message_id`` is passed, this parameter will
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
-        tzinfo (:obj:`tzinfo`, optional): A timezone to be used for all date(time) inputs
-            appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
-            somewhere, it will be assumed to be in :paramref:`tzinfo`. Must be a timezone provided
-            by the ``pytz`` module. Defaults to UTC.
+        tzinfo (:class:`datetime.tzinfo`, optional): A timezone to be used for all date(time)
+            inputs appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
+            somewhere, it will be assumed to be in :paramref:`tzinfo`. If the
+            :class:`telegram.ext.JobQueue` is used, this must be a timezone provided
+            by the ``pytz`` module. Defaults to ``pytz.utc``, if available, and
+            :attr:`datetime.timezone.utc` otherwise.
         block (:obj:`bool`, optional): Default setting for the :paramref:`BaseHandler.block`
             parameter
             of handlers and error handlers registered through :meth:`Application.add_handler` and
             :meth:`Application.add_error_handler`. Defaults to :obj:`True`.
-        protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-            forwarding and saving.
+        protect_content (:obj:`bool`, optional): |protect_content|
 
             .. versionadded:: 20.0
     """
@@ -74,7 +77,7 @@ class Defaults:
         disable_notification: bool = None,
         disable_web_page_preview: bool = None,
         quote: bool = None,
-        tzinfo: pytz.BaseTzInfo = pytz.utc,
+        tzinfo: datetime.tzinfo = UTC,
         block: bool = True,
         allow_sending_without_reply: bool = None,
         protect_content: bool = None,
@@ -182,7 +185,7 @@ class Defaults:
         raise AttributeError("You can not assign a new value to quote after initialization.")
 
     @property
-    def tzinfo(self) -> pytz.BaseTzInfo:
+    def tzinfo(self) -> datetime.tzinfo:
         """:obj:`tzinfo`: A timezone to be used for all date(time) objects appearing
         throughout PTB.
         """

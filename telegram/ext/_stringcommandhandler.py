@@ -57,6 +57,9 @@ class StringCommandHandler(BaseHandler[str, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
     Attributes:
         command (:obj:`str`): The command this handler should listen for.
         callback (:term:`coroutine function`): The callback function for this handler.
@@ -96,8 +99,8 @@ class StringCommandHandler(BaseHandler[str, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: str,
-        application: "Application",
+        update: str,  # skipcq: BAN-B301
+        application: "Application",  # skipcq: BAN-B301
         check_result: Optional[List[str]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Sequence, Union
 
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
@@ -27,6 +27,7 @@ from telegram._files.photosize import PhotoSize
 from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict, ODVInput
@@ -55,20 +56,25 @@ class InputMedia(TelegramObject):
         caption (:obj:`str`, optional): Caption of the media to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
+        parse_mode (:obj:`str`, optional): |parse_mode|
 
     Attributes:
         type (:obj:`str`): Type of the input media.
         media (:obj:`str` | :class:`telegram.InputFile`): Media to send.
         caption (:obj:`str`): Optional. Caption of the media to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
+
     """
 
     __slots__ = ("caption", "caption_entities", "media", "parse_mode", "type")
@@ -78,7 +84,7 @@ class InputMedia(TelegramObject):
         media_type: str,
         media: Union[str, InputFile, MediaType],
         caption: str = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Sequence[MessageEntity] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         *,
         api_kwargs: JSONDict = None,
@@ -87,17 +93,10 @@ class InputMedia(TelegramObject):
         self.type = media_type
         self.media = media
         self.caption = caption
-        self.caption_entities = caption_entities
+        self.caption_entities = parse_sequence_arg(caption_entities)
         self.parse_mode = parse_mode
 
-    def to_dict(self) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
-
-        if self.caption_entities:
-            data["caption_entities"] = [ce.to_dict() for ce in self.caption_entities]
-
-        return data
+        self._freeze()
 
     @staticmethod
     def _parse_thumb_input(thumb: Optional[FileInput]) -> Optional[Union[str, InputFile]]:
@@ -136,12 +135,12 @@ class InputMediaAnimation(InputMedia):
         caption (:obj:`str`, optional): Caption of the animation to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         width (:obj:`int`, optional): Animation width.
         height (:obj:`int`, optional): Animation height.
         duration (:obj:`int`, optional): Animation duration in seconds.
@@ -151,8 +150,13 @@ class InputMediaAnimation(InputMedia):
         media (:obj:`str` | :class:`telegram.InputFile`): Animation to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
+
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
         width (:obj:`int`): Optional. Animation width.
         height (:obj:`int`): Optional. Animation height.
@@ -171,7 +175,7 @@ class InputMediaAnimation(InputMedia):
         width: int = None,
         height: int = None,
         duration: int = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Sequence[MessageEntity] = None,
         filename: str = None,
         *,
         api_kwargs: JSONDict = None,
@@ -194,10 +198,11 @@ class InputMediaAnimation(InputMedia):
             parse_mode,
             api_kwargs=api_kwargs,
         )
-        self.thumb = self._parse_thumb_input(thumb)
-        self.width = width
-        self.height = height
-        self.duration = duration
+        with self._unfrozen():
+            self.thumb = self._parse_thumb_input(thumb)
+            self.width = width
+            self.height = height
+            self.duration = duration
 
 
 class InputMediaPhoto(InputMedia):
@@ -218,20 +223,23 @@ class InputMediaPhoto(InputMedia):
         caption (:obj:`str`, optional ): Caption of the photo to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
 
     """
 
@@ -242,7 +250,7 @@ class InputMediaPhoto(InputMedia):
         media: Union[FileInput, PhotoSize],
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Sequence[MessageEntity] = None,
         filename: str = None,
         *,
         api_kwargs: JSONDict = None,
@@ -258,6 +266,8 @@ class InputMediaPhoto(InputMedia):
             parse_mode,
             api_kwargs=api_kwargs,
         )
+
+        self._freeze()
 
 
 class InputMediaVideo(InputMedia):
@@ -286,12 +296,12 @@ class InputMediaVideo(InputMedia):
         caption (:obj:`str`, optional): Caption of the video to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
         duration (:obj:`int`, optional): Video duration in seconds.
@@ -308,8 +318,12 @@ class InputMediaVideo(InputMedia):
         media (:obj:`str` | :class:`telegram.InputFile`): Video file to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int`): Optional. Video duration in seconds.
@@ -331,7 +345,7 @@ class InputMediaVideo(InputMedia):
         supports_streaming: bool = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Sequence[MessageEntity] = None,
         filename: str = None,
         *,
         api_kwargs: JSONDict = None,
@@ -355,11 +369,12 @@ class InputMediaVideo(InputMedia):
             parse_mode,
             api_kwargs=api_kwargs,
         )
-        self.width = width
-        self.height = height
-        self.duration = duration
-        self.thumb = self._parse_thumb_input(thumb)
-        self.supports_streaming = supports_streaming
+        with self._unfrozen():
+            self.width = width
+            self.height = height
+            self.duration = duration
+            self.thumb = self._parse_thumb_input(thumb)
+            self.supports_streaming = supports_streaming
 
 
 class InputMediaAudio(InputMedia):
@@ -385,12 +400,12 @@ class InputMediaAudio(InputMedia):
         caption (:obj:`str`, optional): Caption of the audio to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
         performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
             tags.
@@ -406,8 +421,12 @@ class InputMediaAudio(InputMedia):
         media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         duration (:obj:`int`): Duration of the audio in seconds.
         performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
             tags.
@@ -427,7 +446,7 @@ class InputMediaAudio(InputMedia):
         duration: int = None,
         performer: str = None,
         title: str = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Sequence[MessageEntity] = None,
         filename: str = None,
         *,
         api_kwargs: JSONDict = None,
@@ -450,10 +469,11 @@ class InputMediaAudio(InputMedia):
             parse_mode,
             api_kwargs=api_kwargs,
         )
-        self.thumb = self._parse_thumb_input(thumb)
-        self.duration = duration
-        self.title = title
-        self.performer = performer
+        with self._unfrozen():
+            self.thumb = self._parse_thumb_input(thumb)
+            self.duration = duration
+            self.title = title
+            self.performer = performer
 
 
 class InputMediaDocument(InputMedia):
@@ -474,12 +494,12 @@ class InputMediaDocument(InputMedia):
         caption (:obj:`str`, optional): Caption of the document to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
 
@@ -494,8 +514,12 @@ class InputMediaDocument(InputMedia):
         media (:obj:`str` | :class:`telegram.InputFile`): File to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
         disable_content_type_detection (:obj:`bool`): Optional. Disables automatic server-side
             content type detection for files uploaded using multipart/form-data. Always true, if
@@ -512,7 +536,7 @@ class InputMediaDocument(InputMedia):
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_content_type_detection: bool = None,
-        caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
+        caption_entities: Sequence[MessageEntity] = None,
         filename: str = None,
         *,
         api_kwargs: JSONDict = None,
@@ -528,5 +552,6 @@ class InputMediaDocument(InputMedia):
             parse_mode,
             api_kwargs=api_kwargs,
         )
-        self.thumb = self._parse_thumb_input(thumb)
-        self.disable_content_type_detection = disable_content_type_detection
+        with self._unfrozen():
+            self.thumb = self._parse_thumb_input(thumb)
+            self.disable_content_type_detection = disable_content_type_detection

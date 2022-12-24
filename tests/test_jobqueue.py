@@ -25,10 +25,20 @@ import platform
 import time
 
 import pytest
-import pytz
-from flaky import flaky
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
+from tests.auxil.object_conversions import env_var_2_bool
+
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+
+if TEST_WITH_OPT_DEPS:
+    import pytz
+
+    UTC = pytz.utc
+else:
+    import datetime
+
+    UTC = datetime.timezone.utc
 
 
 class CustomContext(CallbackContext):
@@ -45,10 +55,26 @@ async def job_queue(bot, app):
 
 
 @pytest.mark.skipif(
+    TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
+)
+class TestNoJobQueue:
+    def test_init_job_queue(self):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[job-queue\]"):
+            JobQueue()
+
+    def test_init_job(self):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[job-queue\]"):
+            Job(None)
+
+
+@pytest.mark.skipif(
+    not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
+)
+@pytest.mark.skipif(
     os.getenv("GITHUB_ACTIONS", False) and platform.system() in ["Windows", "Darwin"],
     reason="On Windows & MacOS precise timings are not accurate.",
 )
-@flaky(10, 1)  # Timings aren't quite perfect
+@pytest.mark.flaky(10, 1)  # Timings aren't quite perfect
 class TestJobQueue:
     result = 0
     job_time = 0
@@ -278,7 +304,7 @@ class TestJobQueue:
 
     async def test_time_unit_dt_datetime(self, job_queue):
         # Testing running at a specific datetime
-        delta, now = dtm.timedelta(seconds=0.5), dtm.datetime.now(pytz.utc)
+        delta, now = dtm.timedelta(seconds=0.5), dtm.datetime.now(UTC)
         when = now + delta
         expected_time = (now + delta).timestamp()
 
@@ -288,7 +314,7 @@ class TestJobQueue:
 
     async def test_time_unit_dt_time_today(self, job_queue):
         # Testing running at a specific time today
-        delta, now = 0.5, dtm.datetime.now(pytz.utc)
+        delta, now = 0.5, dtm.datetime.now(UTC)
         expected_time = now + dtm.timedelta(seconds=delta)
         when = expected_time.time()
         expected_time = expected_time.timestamp()
@@ -300,7 +326,7 @@ class TestJobQueue:
     async def test_time_unit_dt_time_tomorrow(self, job_queue):
         # Testing running at a specific time that has passed today. Since we can't wait a day, we
         # test if the job's next scheduled execution time has been calculated correctly
-        delta, now = -2, dtm.datetime.now(pytz.utc)
+        delta, now = -2, dtm.datetime.now(UTC)
         when = (now + dtm.timedelta(seconds=delta)).time()
         expected_time = (now + dtm.timedelta(seconds=delta, days=1)).timestamp()
 
@@ -313,7 +339,7 @@ class TestJobQueue:
             "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
             "We recommend double checking if the passed value is correct."
         )
-        delta, now = 1, dtm.datetime.now(pytz.utc)
+        delta, now = 1, dtm.datetime.now(UTC)
         time_of_day = (now + dtm.timedelta(seconds=delta)).time()
         expected_reschedule_time = (now + dtm.timedelta(seconds=delta, days=1)).timestamp()
 
@@ -332,7 +358,7 @@ class TestJobQueue:
             "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
             "We recommend double checking if the passed value is correct."
         )
-        delta, now = 1, dtm.datetime.now(pytz.utc)
+        delta, now = 1, dtm.datetime.now(UTC)
         time_of_day = (now + dtm.timedelta(seconds=delta)).time()
         # offset in days until next weekday
         offset = (weekday + 6 - now.weekday()) % 7
@@ -464,10 +490,6 @@ class TestJobQueue:
         assert hash(job) != hash(job_queue)
         assert hash(job) != hash(job_2)
         assert hash(job) == hash(job_3)
-
-        assert not job < job
-        assert not job < job_2
-        assert not job < job_3
 
     async def test_process_error_context(self, job_queue, app):
         app.add_error_handler(self.error_handler_context)

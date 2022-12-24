@@ -111,6 +111,11 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
        type of the argument of :meth:`refresh_bot_data` and the return value of
        :meth:`get_bot_data`.
 
+    .. seealso:: `Architecture Overview <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
+        `Making Your Bot Persistent <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Making-your-bot-persistent>`_
+
     .. versionchanged:: 20.0
 
         * The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
@@ -173,16 +178,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Raises:
             :exc:`TypeError`: If :attr:`PersistenceInput.callback_data` is :obj:`True` and the
-                :paramref:`bot` is not an instance of :class:`telegram.ext.ExtBot` or
-                :attr:`~telegram.ext.ExtBot.callback_data_cache` is :obj:`None`.
+                :paramref:`bot` is not an instance of :class:`telegram.ext.ExtBot`.
         """
-        if self.store_data.callback_data and (
-            not isinstance(bot, ExtBot) or bot.callback_data_cache is None
-        ):
-            raise TypeError(
-                "callback_data can only be stored when using telegram.ext.ExtBot with arbitrary "
-                "callback_data enabled. "
-            )
+        if self.store_data.callback_data and (not isinstance(bot, ExtBot)):
+            raise TypeError("callback_data can only be stored when using telegram.ext.ExtBot.")
 
         self.bot = bot
 

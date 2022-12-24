@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVoice."""
-
-from typing import TYPE_CHECKING, List, Tuple, Union
+from typing import TYPE_CHECKING, Sequence
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 from telegram.constants import InlineQueryResultType
@@ -39,18 +39,20 @@ class InlineQueryResultVoice(InlineQueryResult):
     the voice message.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         voice_url (:obj:`str`): A valid URL for the voice recording.
         title (:obj:`str`): Recording title.
         caption (:obj:`str`, optional): Caption,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceclassargs|
+
         voice_duration (:obj:`int`, optional): Recording duration in seconds.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
@@ -59,18 +61,21 @@ class InlineQueryResultVoice(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VOICE`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         voice_url (:obj:`str`): A valid URL for the voice recording.
         title (:obj:`str`): Recording title.
         caption (:obj:`str`): Optional. Caption,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         voice_duration (:obj:`int`): Optional. Recording duration in seconds.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
@@ -100,20 +105,21 @@ class InlineQueryResultVoice(InlineQueryResult):
         reply_markup: InlineKeyboardMarkup = None,
         input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        caption_entities: Sequence[MessageEntity] = None,
         *,
         api_kwargs: JSONDict = None,
     ):
 
         # Required
         super().__init__(InlineQueryResultType.VOICE, id, api_kwargs=api_kwargs)
-        self.voice_url = voice_url
-        self.title = title
+        with self._unfrozen():
+            self.voice_url = voice_url
+            self.title = title
 
-        # Optional
-        self.voice_duration = voice_duration
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = caption_entities
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
+            # Optional
+            self.voice_duration = voice_duration
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = parse_sequence_arg(caption_entities)
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content

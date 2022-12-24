@@ -67,7 +67,8 @@ class Voice(_BaseMedium):
             file_size=file_size,
             api_kwargs=api_kwargs,
         )
-        # Required
-        self.duration = duration
-        # Optional
-        self.mime_type = mime_type
+        with self._unfrozen():
+            # Required
+            self.duration = duration
+            # Optional
+            self.mime_type = mime_type

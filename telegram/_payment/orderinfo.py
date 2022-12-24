@@ -68,6 +68,8 @@ class OrderInfo(TelegramObject):
 
         self._id_attrs = (self.name, self.phone_number, self.email, self.shipping_address)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["OrderInfo"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

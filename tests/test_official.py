@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup
 
 import telegram
 from telegram._utils.defaultvalue import DefaultValue
-from tests.conftest import env_var_2_bool
+from tests.auxil.object_conversions import env_var_2_bool
 
 IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
 IGNORED_PARAMETERS = {
@@ -118,6 +118,9 @@ def check_method(h4):
         ignored |= {"venue"}  # Added for ease of use
     elif name == "answerInlineQuery":
         ignored |= {"current_offset"}  # Added for ease of use
+    elif name == "sendMediaGroup":
+        # Added for ease of use
+        ignored |= {"caption", "parse_mode", "caption_entities"}
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 

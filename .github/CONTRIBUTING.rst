@@ -13,7 +13,7 @@ Setting things up
 
    .. code-block:: bash
 
-      $ git clone https://github.com/<your username>/python-telegram-bot --recursive
+      $ git clone https://github.com/<your username>/python-telegram-bot
       $ cd python-telegram-bot
 
 3. Add a track to the original repository:
@@ -97,6 +97,13 @@ Here's how to make a one-off code change.
      .. code-block:: bash
 
         $ pytest -v
+
+     Since the tests can take a while to run, you can speed things up by running them in parallel
+     using `pytest-xdist`_ (note that this may effect the result of the test in some rare cases):
+
+     .. code-block:: bash
+
+        $ pytest -v -n auto --dist=loadfile
 
      To run ``test_official`` (particularly useful if you made API changes), run
 
@@ -280,3 +287,4 @@ break the API classes. For example:
 .. _`RTD build`: https://docs.python-telegram-bot.org/en/doc-fixes
 .. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html
 .. _`section`: #documenting
+.. _`pytest-xdist`: https://github.com/pytest-dev/pytest-xdist

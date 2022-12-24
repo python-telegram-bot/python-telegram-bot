@@ -23,7 +23,7 @@ import asyncio
 import contextlib
 import logging
 import sys
-from typing import Any, AsyncIterator, Callable, Coroutine, Dict, Optional, Union
+from typing import Any, AsyncIterator, Callable, Coroutine, Dict, List, Optional, Union
 
 try:
     from aiolimiter import AsyncLimiter
@@ -51,7 +51,7 @@ else:
 class AIORateLimiter(BaseRateLimiter[int]):
     """
     Implementation of :class:`~telegram.ext.BaseRateLimiter` using the library
-    `aiolimiter <https://aiolimiter.readthedocs.io/>`_.
+    `aiolimiter <https://aiolimiter.readthedocs.io/en/stable>`_.
 
     Important:
         If you want to use this class, you must install PTB with the optional requirement
@@ -89,6 +89,9 @@ class AIORateLimiter(BaseRateLimiter[int]):
         If you would like to handle rate limiting in a more sophisticated, fine-tuned way, we
         welcome you to implement your own subclass of :class:`~telegram.ext.BaseRateLimiter`.
         Feel free to check out the source code of this class for inspiration.
+
+    .. seealso:: `Avoiding Flood Limits <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Avoiding-flood-limits>`_
 
     .. versionadded:: 20.0
 
@@ -184,10 +187,10 @@ class AIORateLimiter(BaseRateLimiter[int]):
         self,
         chat: bool,
         group: Union[str, int, bool],
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, None]]],
+        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
         args: Any,
         kwargs: Dict[str, Any],
-    ) -> Union[bool, JSONDict, None]:
+    ) -> Union[bool, JSONDict, List[JSONDict]]:
         base_context = self._base_limiter if (chat and self._base_limiter) else null_context()
         group_context = (
             self._get_group_limiter(group) if group and self._group_max_rate else null_context()
@@ -203,13 +206,13 @@ class AIORateLimiter(BaseRateLimiter[int]):
     # mypy doesn't understand that the last run of the for loop raises an exception
     async def process_request(  # type: ignore[return]
         self,
-        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, None]]],
+        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
         args: Any,
         kwargs: Dict[str, Any],
         endpoint: str,  # skipcq: PYL-W0613
         data: Dict[str, Any],
         rate_limit_args: Optional[int],
-    ) -> Union[bool, JSONDict, None]:
+    ) -> Union[bool, JSONDict, List[JSONDict]]:
         """
         Processes a request by applying rate limiting.
 

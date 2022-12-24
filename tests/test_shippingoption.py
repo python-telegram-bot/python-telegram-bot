@@ -42,7 +42,7 @@ class TestShippingOption:
     def test_expected_values(self, shipping_option):
         assert shipping_option.id == self.id_
         assert shipping_option.title == self.title
-        assert shipping_option.prices == self.prices
+        assert shipping_option.prices == tuple(self.prices)
 
     def test_to_dict(self, shipping_option):
         shipping_option_dict = shipping_option.to_dict()

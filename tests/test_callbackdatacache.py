@@ -16,21 +16,44 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
 import time
 from copy import deepcopy
 from datetime import datetime
 from uuid import uuid4
 
 import pytest
-import pytz
 
 from telegram import CallbackQuery, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Message, User
+from telegram._utils.datetime import UTC
+from telegram.ext import ExtBot
 from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
+from tests.auxil.object_conversions import env_var_2_bool
 
 
 @pytest.fixture(scope="function")
 def callback_data_cache(bot):
     return CallbackDataCache(bot)
+
+
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+
+
+@pytest.mark.skipif(
+    TEST_WITH_OPT_DEPS,
+    reason="Only relevant if the optional dependency is not installed",
+)
+class TestNoCallbackDataCache:
+    def test_init(self, bot):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[callback-data\]"):
+            CallbackDataCache(bot=bot)
+
+    def test_bot_init(self):
+        bot = ExtBot(token="TOKEN")
+        assert bot.callback_data_cache is None
+
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[callback-data\]"):
+            ExtBot(token="TOKEN", arbitrary_callback_data=True)
 
 
 class TestInvalidCallbackData:
@@ -53,6 +76,10 @@ class TestKeyboardData:
         ), "duplicate slot"
 
 
+@pytest.mark.skipif(
+    not TEST_WITH_OPT_DEPS,
+    reason="Only relevant if the optional dependency is installed",
+)
 class TestCallbackDataCache:
     def test_slot_behaviour(self, callback_data_cache, mro_slots):
         for attr in callback_data_cache.__slots__:
@@ -158,6 +185,7 @@ class TestCallbackDataCache:
 
         chat = Chat(1, "private")
         effective_message = Message(message_id=1, date=datetime.now(), chat=chat, reply_markup=out)
+        effective_message._unfreeze()
         effective_message.reply_to_message = deepcopy(effective_message)
         effective_message.pinned_message = deepcopy(effective_message)
         cq_id = uuid4().hex
@@ -350,7 +378,7 @@ class TestCallbackDataCache:
         if time_method == "time":
             cutoff = time.time()
         elif time_method == "datetime":
-            cutoff = datetime.now(pytz.utc)
+            cutoff = datetime.now(UTC)
         else:
             cutoff = datetime.now(tz_bot.defaults.tzinfo).replace(tzinfo=None)
             callback_data_cache.bot = tz_bot

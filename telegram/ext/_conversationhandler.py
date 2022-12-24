@@ -185,10 +185,11 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         conversation. For an example on nested :class:`ConversationHandler` s, see
         :any:`examples.nestedconversationbot`.
 
-    .. seealso:: `Conversation Example <examples.conversationbot.html>`_,
-        `Conversation Example 2 <examples.conversationbot2.html>`_,
-        `Nested Conversation Example <examples.nestedconversationbot.html>`_,
-        `Persistent Conversation Example <examples.persistentconversationbot.html>`_
+    Examples:
+        * :any:`Conversation Bot <examples.conversationbot>`
+        * :any:`Conversation Bot 2 <examples.conversationbot2>`
+        * :any:`Nested Conversation Bot <examples.nestedconversationbot>`
+        * :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
 
     Args:
         entry_points (List[:class:`telegram.ext.BaseHandler`]): A list of :obj:`BaseHandler`
@@ -207,6 +208,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             handled.
         allow_reentry (:obj:`bool`, optional): If set to :obj:`True`, a user that is currently in a
             conversation can restart the conversation by triggering one of the entry points.
+            Default is :obj:`False`.
         per_chat (:obj:`bool`, optional): If the conversation key should contain the Chat's ID.
             Default is :obj:`True`.
         per_user (:obj:`bool`, optional): If the conversation key should contain the User's ID.
@@ -220,10 +222,13 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             handled by *ALL* the handler's whose :meth:`check_update` method returns :obj:`True`
             that are in the state :attr:`ConversationHandler.TIMEOUT`.
 
-            Note:
-                 Using :paramref:`conversation_timeout` with nested conversations is currently not
-                 supported. You can still try to use it, but it will likely behave differently
-                 from what you expect.
+            Caution:
+                * This feature relies on the :attr:`telegram.ext.Application.job_queue` being set
+                  and hence requires that the dependencies that :class:`telegram.ext.JobQueue`
+                  relies on are installed.
+                * Using :paramref:`conversation_timeout` with nested conversations is currently
+                  not supported. You can still try to use it, but it will likely behave
+                  differently from what you expect.
 
         name (:obj:`str`, optional): The name for this conversation handler. Required for
             persistence.
@@ -244,6 +249,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             1. :attr:`telegram.ext.BaseHandler.block` (if set)
             2. the value passed to this parameter (if any)
             3. :attr:`telegram.ext.Defaults.block` (if defaults are used)
+
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
 
             .. versionchanged:: 20.0
                 No longer overrides the handlers settings. Resolution order was changed.
@@ -669,7 +677,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         try:
             # both job_queue & conversation_timeout are checked before calling _schedule_job
             j_queue = application.job_queue
-            self.timeout_jobs[conversation_key] = j_queue.run_once(
+            self.timeout_jobs[conversation_key] = j_queue.run_once(  # type: ignore[union-attr]
                 self._trigger_timeout,
                 self.conversation_timeout,  # type: ignore[arg-type]
                 data=_ConversationTimeoutContext(conversation_key, update, application, context),

@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -56,7 +56,8 @@ class ChatInviteLink(TelegramObject):
             has been expired.
         member_limit (:obj:`int`, optional): Maximum number of users that can be members of the
             chat simultaneously after joining the chat via this invite link;
-            1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
+            :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
+            :tg-const:`telegram.constants.ChatInviteLinkLimit.MAX_MEMBER_LIMIT`.
         name (:obj:`str`, optional): Invite link name.
             0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
@@ -78,7 +79,9 @@ class ChatInviteLink(TelegramObject):
         expire_date (:class:`datetime.datetime`): Optional. Date when the link will expire or
             has been expired.
         member_limit (:obj:`int`): Optional. Maximum number of users that can be members
-            of the chat simultaneously after joining the chat via this invite link; 1-99999.
+            of the chat simultaneously after joining the chat via this invite link;
+            :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
+            :tg-const:`telegram.constants.ChatInviteLinkLimit.MAX_MEMBER_LIMIT`.
         name (:obj:`str`): Optional. Invite link name.
 
             .. versionadded:: 13.8
@@ -138,6 +141,8 @@ class ChatInviteLink(TelegramObject):
             self.is_revoked,
         )
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatInviteLink"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -150,11 +155,3 @@ class ChatInviteLink(TelegramObject):
         data["expire_date"] = from_timestamp(data.get("expire_date", None))
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
-
-        data["expire_date"] = to_timestamp(self.expire_date)
-
-        return data

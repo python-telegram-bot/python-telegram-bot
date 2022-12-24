@@ -101,3 +101,5 @@ class InputVenueMessageContent(InputMessageContent):
             self.longitude,
             self.title,
         )
+
+        self._freeze()

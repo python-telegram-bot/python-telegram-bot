@@ -21,6 +21,31 @@ python:
      - requirements: docs/requirements-docs.txt
 
 build:
-   os: ubuntu-20.04
+   os: ubuntu-22.04
    tools:
       python: "3"  # latest stable cpython version
+
+search:
+   ranking:  # bump up rank of commonly searched pages: (default: 0, values range from -10 to 10)
+      telegram.bot.html: 7
+      telegram.message.html: 3
+      telegram.update.html: 3
+      telegram.user.html: 2
+      telegram.chat.html: 2
+      telegram.ext.application.html: 3
+      telegram.ext.filters.html: 3
+      telegram.ext.callbackcontext.html: 2
+      telegram.ext.inlinekeyboardbutton.html: 1
+
+      telegram.passport*.html: -7
+
+   ignore:
+      - changelog.html
+      - coc.html
+      - bot_methods.html#
+      - bot_methods.html
+      # Defaults
+      - search.html
+      - search/index.html
+      - 404.html
+      - 404/index.html'

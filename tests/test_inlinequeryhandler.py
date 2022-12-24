@@ -69,7 +69,7 @@ def false_update(request):
 
 @pytest.fixture(scope="function")
 def inline_query(bot):
-    return Update(
+    update = Update(
         0,
         inline_query=InlineQuery(
             "id",
@@ -79,6 +79,9 @@ def inline_query(bot):
             location=Location(latitude=-23.691288, longitude=-46.788279),
         ),
     )
+    update._unfreeze()
+    update.inline_query._unfreeze()
+    return update
 
 
 class TestInlineQueryHandler:
@@ -143,6 +146,7 @@ class TestInlineQueryHandler:
             update = Update(
                 update_id=0, inline_query=InlineQuery(id="id", from_user=None, query="", offset="")
             )
+            update.inline_query._unfreeze()
             assert not handler.check_update(update)
             update.inline_query.query = "not_a_match"
             assert not handler.check_update(update)

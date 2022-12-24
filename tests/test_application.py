@@ -201,6 +201,18 @@ class TestApplication:
                 post_shutdown=None,
             )
 
+    def test_job_queue(self, bot, app, recwarn):
+        expected_warning = (
+            "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
+            "`pip install python-telegram-bot[job_queue]`."
+        )
+        assert app.job_queue is app._job_queue
+        application = ApplicationBuilder().token(bot.token).job_queue(None).build()
+        assert application.job_queue is None
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
+
     def test_custom_context_init(self, bot):
         cc = ContextTypes(
             context=CustomContext,
@@ -385,6 +397,7 @@ class TestApplication:
         builder_2.token(app.bot.token)
 
     @pytest.mark.parametrize("job_queue", (True, False))
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     async def test_start_stop_processing_updates(self, bot, job_queue):
         # TODO: repeat a similar test for create_task, persistence processing and job queue
         if job_queue:
@@ -470,7 +483,7 @@ class TestApplication:
             u = make_message_update(message="test")
             await app.process_update(u)
             self.received = None
-            u.message.text = "something"
+            u = make_message_update(message="something")
             await app.process_update(u)
 
     def test_add_handler_errors(self, app):
@@ -540,7 +553,7 @@ class TestApplication:
         app.add_handler(msg_handler_set_count, 1)
         app.add_handlers((msg_handler_inc_count, msg_handler_inc_count), 1)
 
-        photo_update = make_message_update(message=Message(2, None, None, photo=True))
+        photo_update = make_message_update(message=Message(2, None, None, photo=(True,)))
 
         async with app:
             await app.start()
@@ -1424,6 +1437,7 @@ class TestApplication:
             events.append("post_init")
 
         app = Application.builder().token(bot.token).post_init(post_init).build()
+        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         monkeypatch.setattr(
             app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
@@ -1466,6 +1480,7 @@ class TestApplication:
             events.append("post_shutdown")
 
         app = Application.builder().token(bot.token).post_shutdown(post_shutdown).build()
+        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         monkeypatch.setattr(
             app, "shutdown", call_after(app.shutdown, lambda _: events.append("shutdown"))
@@ -1646,6 +1661,7 @@ class TestApplication:
             events.append("post_init")
 
         app = Application.builder().token(bot.token).post_init(post_init).build()
+        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
         monkeypatch.setattr(
@@ -1705,6 +1721,7 @@ class TestApplication:
             events.append("post_shutdown")
 
         app = Application.builder().token(bot.token).post_shutdown(post_shutdown).build()
+        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
         monkeypatch.setattr(

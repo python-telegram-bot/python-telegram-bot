@@ -17,10 +17,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+from datetime import datetime
+
 import pytest
 
 from telegram import Audio, Bot, CallbackQuery, Chat, Message, User
-from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
+from tests.auxil.bot_method_checks import (
+    check_defaults_handling,
+    check_shortcut_call,
+    check_shortcut_signature,
+)
 
 
 @pytest.fixture(scope="function", params=["message", "inline"])
@@ -33,6 +39,7 @@ def callback_query(bot, request):
         game_short_name=TestCallbackQuery.game_short_name,
     )
     cbq.set_bot(bot)
+    cbq._unfreeze()
     if request.param == "message":
         cbq.message = TestCallbackQuery.message
         cbq.message.set_bot(bot)
@@ -45,7 +52,7 @@ class TestCallbackQuery:
     id_ = "id"
     from_user = User(1, "test_user", False)
     chat_instance = "chat_instance"
-    message = Message(3, None, Chat(4, "private"), from_user=User(5, "bot", False))
+    message = Message(3, datetime.utcnow(), Chat(4, "private"), from_user=User(5, "bot", False))
     data = "data"
     inline_message_id = "inline_message_id"
     game_short_name = "the_game"

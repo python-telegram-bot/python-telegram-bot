@@ -46,7 +46,9 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
           chats and may not be set for inline queries coming from third-party clients. These
           updates won't be handled, if :attr:`chat_types` is passed.
 
-    .. seealso:: `Inlinebot Example <examples.inlinebot.html>`_
+    Examples:
+        :any:`Inline Bot <examples.inlinebot>`
+
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -63,6 +65,9 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
+
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
         chat_types (List[:obj:`str`], optional): List of allowed chat types. If passed, will only
             handle inline queries with the appropriate :attr:`telegram.InlineQuery.chat_type`.
 
@@ -125,8 +130,8 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,
-        application: "Application",
+        update: Update,  # skipcq: BAN-B301
+        application: "Application",  # skipcq: BAN-B301
         check_result: Optional[Union[bool, Match]],
     ) -> None:
         """Add the result of ``re.match(pattern, update.inline_query.query)`` to

@@ -56,7 +56,12 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
 
 
 class TelegramError(Exception):
-    """Base class for Telegram errors."""
+    """
+    Base class for Telegram errors.
+
+    .. seealso:: `Exceptions, Warnings and Logging <https://github.com/\
+    python-telegram-bot/python-telegram-bot/wiki/Exceptions%2C-Warnings-and-Logging>`_
+    """
 
     __slots__ = ("message",)
 
@@ -84,6 +89,9 @@ class TelegramError(Exception):
 class Forbidden(TelegramError):
     """Raised when the bot has not enough rights to perform the requested action.
 
+    Examples:
+        :any:`Raw API Bot <examples.rawapibot>`
+
     .. versionchanged:: 20.0
         This class was previously named ``Unauthorized``.
     """
@@ -107,7 +115,11 @@ class InvalidToken(TelegramError):
 
 
 class NetworkError(TelegramError):
-    """Base class for exceptions due to networking errors."""
+    """Base class for exceptions due to networking errors.
+
+    Examples:
+        :any:`Raw API Bot <examples.rawapibot>`
+    """
 
     __slots__ = ()
 
@@ -136,6 +148,10 @@ class TimedOut(NetworkError):
 class ChatMigrated(TelegramError):
     """
     Raised when the requested group chat migrated to supergroup and has a new chat id.
+
+    .. seealso:: `Storing Bot, User and Chat Related Data <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-\
+        chat-related-data>`_,
 
     Args:
         new_chat_id (:obj:`int`): The new chat id of the group.

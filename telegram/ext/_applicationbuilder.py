@@ -112,6 +112,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
           use :class:`telegram.ext.ExtBot` for the bot.
 
+    .. seealso:: `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+        `Builder Pattern for Application <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern
     """
 
@@ -177,7 +182,14 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._local_mode: DVInput[bool] = DEFAULT_FALSE
         self._bot: DVInput[Bot] = DEFAULT_NONE
         self._update_queue: DVInput[Queue] = DefaultValue(Queue())
-        self._job_queue: ODVInput["JobQueue"] = DefaultValue(JobQueue())
+
+        try:
+            self._job_queue: ODVInput["JobQueue"] = DefaultValue(JobQueue())
+        except RuntimeError as exc:
+            if "PTB must be installed via" not in str(exc):
+                raise exc
+            self._job_queue = DEFAULT_NONE
+
         self._persistence: ODVInput["BasePersistence"] = DEFAULT_NONE
         self._context_types: DVInput[ContextTypes] = DefaultValue(ContextTypes())
         self._application_class: DVInput[Type[Application]] = DefaultValue(Application)
@@ -714,8 +726,16 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         cached in memory. If not called, only strings can be used as callback data and no data will
         be stored in memory.
 
-        .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot\
-            /python-telegram-bot/wiki/Arbitrary-callback_data>`_,
+        Important:
+            If you want to use this feature, you must install PTB with the optional requirement
+            ``callback-data``, i.e.
+
+            .. code-block:: bash
+
+               pip install python-telegram-bot[callback-data]
+
+        .. seealso:: `Arbitrary callback_data <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_,
             :any:`examples.arbitrarycallbackdatabot`
 
         Args:
@@ -820,7 +840,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     ) -> "ApplicationBuilder[BT, CCT, UD, CD, BD, InJQ]":
         """Sets a :class:`telegram.ext.JobQueue` instance for
         :attr:`telegram.ext.Application.job_queue`. If not called, a job queue will be
-        instantiated.
+        instantiated if the requirements of :class:`telegram.ext.JobQueue` are installed.
 
         .. seealso:: `JobQueue <https://github.com/python-telegram-bot/python-telegram-bot/wiki\
             /Extensions-%E2%80%93-JobQueue>`_, :any:`examples.timerbot`
@@ -831,9 +851,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             * The job queue will be automatically started and stopped by
               :meth:`telegram.ext.Application.start` and :meth:`telegram.ext.Application.stop`,
               respectively.
-            * When passing :obj:`None`,
-              :attr:`telegram.ext.ConversationHandler.conversation_timeout` can not be used, as
-              this uses :attr:`telegram.ext.Application.job_queue` internally.
+            * When passing :obj:`None` or when the requirements of :class:`telegram.ext.JobQueue`
+              are not installed, :attr:`telegram.ext.ConversationHandler.conversation_timeout`
+              can not be used, as this uses :attr:`telegram.ext.Application.job_queue` internally.
 
         Args:
             job_queue (:class:`telegram.ext.JobQueue`): The job queue. Pass :obj:`None` if you

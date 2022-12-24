@@ -32,10 +32,13 @@ if TYPE_CHECKING:
 class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
 
-    .. seealso:: `Inline Example <examples.inlinebot.html>`_
+    Examples:
+        :any:`Inline Bot <examples.inlinebot>`
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         title (:obj:`str`): Title of the result.
         input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
             be sent.
@@ -51,7 +54,9 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.ARTICLE`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         title (:obj:`str`): Title of the result.
         input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
             be sent.
@@ -97,14 +102,15 @@ class InlineQueryResultArticle(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.ARTICLE, id, api_kwargs=api_kwargs)
-        self.title = title
-        self.input_message_content = input_message_content
+        with self._unfrozen():
+            self.title = title
+            self.input_message_content = input_message_content
 
-        # Optional
-        self.reply_markup = reply_markup
-        self.url = url
-        self.hide_url = hide_url
-        self.description = description
-        self.thumb_url = thumb_url
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
+            # Optional
+            self.reply_markup = reply_markup
+            self.url = url
+            self.hide_url = hide_url
+            self.description = description
+            self.thumb_url = thumb_url
+            self.thumb_width = thumb_width
+            self.thumb_height = thumb_height

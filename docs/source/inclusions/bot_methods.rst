@@ -259,6 +259,35 @@
 .. raw:: html
 
    <details>
+   <summary>Forum topic management</summary>
+
+.. list-table::
+    :align: left
+    :widths: 1 4
+
+    * - :meth:`~telegram.Bot.close_forum_topic`
+      - Used for closing a forum topic
+    * - :meth:`~telegram.Bot.create_forum_topic`
+      - Used to create a topic
+    * - :meth:`~telegram.Bot.delete_forum_topic`
+      - Used for deleting a forum topic
+    * - :meth:`~telegram.Bot.edit_forum_topic`
+      - Used to edit a topic
+    * - :meth:`~telegram.Bot.reopen_forum_topic`
+      - Used to reopen a topic
+    * - :meth:`~telegram.Bot.get_forum_topic_icon_stickers`
+      - Used to get custom emojis to use as topic icons
+    * - :meth:`~telegram.Bot.unpin_all_forum_topic_messages`
+      - Used to unpin all messages in a forum topic
+
+.. raw:: html
+
+   </details>
+   <br>
+
+.. raw:: html
+
+   <details>
    <summary>Miscellaneous</summary>
 
 .. list-table::
@@ -290,6 +319,10 @@
     :align: left
     :widths: 1 4
 
+    * - :attr:`~telegram.Bot.base_file_url`
+      - Telegram Bot API file URL
+    * - :attr:`~telegram.Bot.base_url`
+      - Telegram Bot API service URL
     * - :attr:`~telegram.Bot.bot`
       - The user instance of the bot as returned by :meth:`~telegram.Bot.get_me`
     * - :attr:`~telegram.Bot.can_join_groups`
@@ -310,8 +343,12 @@
       - The username of the bot, without leading ``@``
     * - :attr:`~telegram.Bot.link`
       - The t.me link of the bot
+    * - :attr:`~telegram.Bot.private_key`
+      - Deserialized private key for decryption of telegram passport data
     * - :attr:`~telegram.Bot.supports_inline_queries`
       - Whether the bot supports inline queries
+    * - :attr:`~telegram.Bot.token`
+      - Bot's unique authentication token
 
 .. raw:: html
 

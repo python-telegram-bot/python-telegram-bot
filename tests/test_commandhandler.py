@@ -104,7 +104,7 @@ class BaseTest:
         app.add_handler(handler)
         update = make_command_update(text, bot=app.bot)
         assert not await self.response(app, update)
-        update.message.text += " one two"
+        update = make_command_update(text + " one two", bot=app.bot)
         assert await self.response(app, update)
 
     def _test_edited(self, message, handler_edited, handler_not_edited):

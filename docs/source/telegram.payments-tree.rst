@@ -2,6 +2,7 @@ Payments
 --------
 
 .. toctree::
+    :titlesonly:
 
     telegram.invoice
     telegram.labeledprice

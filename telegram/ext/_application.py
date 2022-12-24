@@ -64,7 +64,7 @@ from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD, ConversationKey, 
 
 if TYPE_CHECKING:
     from telegram import Message
-    from telegram.ext import ConversationHandler
+    from telegram.ext import ConversationHandler, JobQueue
     from telegram.ext._applicationbuilder import InitApplicationBuilder
     from telegram.ext._jobqueue import Job
 
@@ -133,6 +133,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         finally:
             await application.shutdown()
 
+    Examples:
+        :any:`Echo Bot <examples.echobot>`
+
+    .. seealso:: `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+        `Architecture Overview <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_
+
     .. versionchanged:: 20.0
 
         * Initialization is now done through the :class:`telegram.ext.ApplicationBuilder`.
@@ -143,25 +151,39 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         update_queue (:class:`asyncio.Queue`): The synchronized queue that will contain the
             updates.
         updater (:class:`telegram.ext.Updater`): Optional. The updater used by this application.
-        job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
-            instance to pass onto handler callbacks.
         chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
-            the chat.
+            the chat. For each integer chat id, the corresponding value of this mapping is
+            available as :attr:`telegram.ext.CallbackContext.chat_data` in handler callbacks for
+            updates from that chat.
 
             .. versionchanged:: 20.0
-                :attr:`chat_data` is now read-only
+                :attr:`chat_data` is now read-only. Note that the values of the mapping are still
+                mutable, i.e. editing ``context.chat_data`` within a handler callback is possible
+                (and encouraged), but editing the mapping ``application.chat_data`` itself is not.
 
             .. tip::
-               Manually modifying :attr:`chat_data` is almost never needed and unadvisable.
+
+                * Manually modifying :attr:`chat_data` is almost never needed and unadvisable.
+                * Entries are never deleted automatically from this mapping. If you want to delete
+                  the data associated with a specific chat, e.g. if the bot got removed from that
+                  chat, please use :meth:`drop_chat_data`.
 
         user_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
-            the user.
+            the user. For each integer user id, the corresponding value of this mapping is
+            available as :attr:`telegram.ext.CallbackContext.user_data` in handler callbacks for
+            updates from that user.
 
             .. versionchanged:: 20.0
-               :attr:`user_data` is now read-only
+                :attr:`user_data` is now read-only. Note that the values of the mapping are still
+                mutable, i.e. editing ``context.user_data`` within a handler callback is possible
+                (and encouraged), but editing the mapping ``application.user_data`` itself is not.
 
             .. tip::
-               Manually modifying :attr:`user_data` is almost never needed and unadvisable.
+
+               * Manually modifying :attr:`user_data` is almost never needed and unadvisable.
+               * Entries are never deleted automatically from this mapping. If you want to delete
+                 the data associated with a specific user, e.g. if that user blocked the bot,
+                 please use :meth:`drop_user_data`.
 
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): The persistence class to
@@ -202,6 +224,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         "_concurrent_updates_sem",
         "_conversation_handler_conversations",
         "_initialized",
+        "_job_queue",
         "_running",
         "_user_data",
         "_user_ids_to_be_deleted_in_persistence",
@@ -212,7 +235,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         "context_types",
         "error_handlers",
         "handlers",
-        "job_queue",
         "persistence",
         "post_init",
         "post_shutdown",
@@ -248,7 +270,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         self.bot = bot
         self.update_queue = update_queue
-        self.job_queue = job_queue
         self.context_types = context_types
         self.updater = updater
         self.handlers: Dict[int, List[BaseHandler]] = {}
@@ -290,6 +311,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         # A number of low-level helpers for the internal logic
         self._initialized = False
         self._running = False
+        self._job_queue = job_queue
         self.__update_fetcher_task: Optional[asyncio.Task] = None
         self.__update_persistence_task: Optional[asyncio.Task] = None
         self.__update_persistence_event = asyncio.Event()
@@ -315,8 +337,28 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     def concurrent_updates(self) -> int:
         """:obj:`int`: The number of concurrent updates that will be processed in parallel. A
         value of ``0`` indicates updates are *not* being processed concurrently.
+
+        .. seealso:: `Concurrency <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
         """
         return self._concurrent_updates
+
+    @property
+    def job_queue(self) -> Optional["JobQueue"]:
+        """
+        :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
+            :class:`telegram.ext.Application`.
+
+        .. seealso:: `Job Queue <https://github.com/python-telegram-bot/
+            python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+        """
+        if self._job_queue is None:
+            warn(
+                "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
+                "`pip install python-telegram-bot[job_queue]`.",
+                stacklevel=2,
+            )
+        return self._job_queue
 
     async def initialize(self) -> None:
         """Initializes the Application by initializing:
@@ -432,13 +474,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 raise ValueError(
                     f"bot_data must be of type {self.context_types.bot_data.__name__}"
                 )
-        if self.persistence.store_data.callback_data:
+
+        # Mypy doesn't know that persistence.set_bot (see above) already checks that
+        # self.bot is an instance of ExtBot if callback_data should be stored ...
+        if self.persistence.store_data.callback_data and (
+            self.bot.callback_data_cache is not None  # type: ignore[attr-defined]
+        ):
             persistent_data = await self.persistence.get_callback_data()
             if persistent_data is not None:
                 if not isinstance(persistent_data, tuple) or len(persistent_data) != 2:
                     raise ValueError("callback_data must be a tuple of length 2")
-                # Mypy doesn't know that persistence.set_bot (see above) already checks that
-                # self.bot is an instance of ExtBot if callback_data should be stored ...
                 self.bot.callback_data_cache.load_persistence_data(  # type: ignore[attr-defined]
                     persistent_data
                 )
@@ -467,6 +512,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             either start :attr:`updater` manually or use one of :meth:`run_polling` or
             :meth:`run_webhook`.
 
+        Tip:
+            When using a custom logic for startup and shutdown of the application, eventual
+            cancellation of pending tasks should happen only `after` :meth:`stop` has been called
+            in order to ensure that the tasks mentioned above are not cancelled prematurely.
+
         .. seealso::
             :meth:`stop`
 
@@ -489,8 +539,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 )
                 _logger.debug("Loop for updating persistence started")
 
-            if self.job_queue:
-                await self.job_queue.start()  # type: ignore[union-attr]
+            if self._job_queue:
+                await self._job_queue.start()  # type: ignore[union-attr]
                 _logger.debug("JobQueue started")
 
             self.__update_fetcher_task = asyncio.create_task(
@@ -539,9 +589,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             await self.__update_fetcher_task
         _logger.debug("Application stopped fetching of updates.")
 
-        if self.job_queue:
+        if self._job_queue:
             _logger.debug("Waiting for running jobs to finish")
-            await self.job_queue.stop(wait=True)  # type: ignore[union-attr]
+            await self._job_queue.stop(wait=True)  # type: ignore[union-attr]
             _logger.debug("JobQueue stopped")
 
         _logger.debug("Waiting for `create_task` calls to be processed")
@@ -584,9 +634,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
         and :meth:`telegram.ext.Updater.shutdown`.
 
+        .. include:: inclusions/application_run_tip.rst
+
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_polling`, :meth:`run_webhook`
+            :meth:`telegram.ext.Updater.start_polling`, :meth:`telegram.ext.Updater.stop`,
+            :meth:`run_webhook`
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -616,7 +669,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
             close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
-                closed upon shutdown.
+                closed upon shutdown. Defaults to :obj:`True`.
 
                 .. seealso::
                     :meth:`asyncio.loop.close`
@@ -677,7 +730,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         secret_token: str = None,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
-        polling updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
+        listening for updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
         a graceful shutdown of the app on exit.
 
         The app will shut down when :exc:`KeyboardInterrupt` or :exc:`SystemExit` is raised.
@@ -697,9 +750,21 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
         and :meth:`telegram.ext.Updater.shutdown`.
 
+        Important:
+            If you want to use this method, you must install PTB with the optional requirement
+            ``webhooks``, i.e.
+
+            .. code-block:: bash
+
+               pip install python-telegram-bot[webhooks]
+
+        .. include:: inclusions/application_run_tip.rst
+
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_webhook`, :meth:`run_polling`
+            :meth:`telegram.ext.Updater.start_webhook`, :meth:`telegram.ext.Updater.stop`,
+            :meth:`run_polling`,
+            `Webhooks <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Defaults to
@@ -844,6 +909,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             * If the application is currently running, tasks created by this method will be
               awaited with :meth:`stop`.
 
+        .. seealso:: `Concurrency <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
         Args:
             coroutine (:term:`coroutine function`): The coroutine to run as task.
             update (:obj:`object`, optional): If set, will be passed to :meth:`process_error`
@@ -959,6 +1027,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     async def process_update(self, update: object) -> None:
         """Processes a single update and marks the update to be updated by the persistence later.
         Exceptions raised by handler callbacks will be processed by :meth:`process_update`.
+
+        .. seealso:: `Concurrency <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
 
         .. versionchanged:: 20.0
             Persistence is now updated in an interval set by
@@ -1199,6 +1270,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             to the asynchronous nature of these features. Please make sure that your program can
             avoid or handle such situations.
 
+        .. seealso:: `Storing Bot, User and Chat Related Data <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-\
+            chat-related-data>`_,
+
         Args:
             message (:class:`telegram.Message`, optional): A message with either
                 :attr:`~telegram.Message.migrate_from_chat_id` or
@@ -1304,9 +1379,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         coroutines: Set[Coroutine] = set()
 
-        if self.persistence.store_data.callback_data:
-            # Mypy doesn't know that persistence.set_bot (see above) already checks that
-            # self.bot is an instance of ExtBot if callback_data should be stored ...
+        # Mypy doesn't know that persistence.set_bot (see above) already checks that
+        # self.bot is an instance of ExtBot if callback_data should be stored ...
+        if self.persistence.store_data.callback_data and (
+            self.bot.callback_data_cache is not None  # type: ignore[attr-defined]
+        ):
             coroutines.add(
                 self.persistence.update_callback_data(
                     deepcopy(
@@ -1415,7 +1492,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         Note:
             Attempts to add the same callback multiple times will be ignored.
 
-        .. seealso:: `Errorhandler Example <examples.errorhandlerbot.py>`_
+        Examples:
+            :any:`Errorhandler Bot <examples.errorhandlerbot>`
+
+        .. seealso:: `Exceptions, Warnings and Logging <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Exceptions%2C-Warnings-and-Logging>`_
 
         Args:
             callback (:term:`coroutine function`): The callback function for this error handler.

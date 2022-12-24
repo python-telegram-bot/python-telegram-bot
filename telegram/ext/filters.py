@@ -28,11 +28,11 @@ This module contains filters for use with :class:`telegram.ext.MessageHandler`,
        :mod:`~telegram.ext.filters` module.
     #. The names of all filters has been updated:
 
-        * Filter classes which are ready for use, e.g ``Filters.all`` are now capitalized, e.g
-          ``filters.ALL``.
-        * Filters which need to be initialized are now in CamelCase. E.g. ``filters.User(...)``.
-        * Filters which do both (like ``Filters.text``) are now split as ready-to-use version
-          ``filters.TEXT`` and class version ``filters.Text(...)``.
+       * Filter classes which are ready for use, e.g ``Filters.all`` are now capitalized, e.g
+         ``filters.ALL``.
+       * Filters which need to be initialized are now in CamelCase. E.g. ``filters.User(...)``.
+       * Filters which do both (like ``Filters.text``) are now split as ready-to-use version
+         ``filters.TEXT`` and class version ``filters.Text(...)``.
 
 """
 
@@ -61,6 +61,7 @@ __all__ = (
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
     "IS_AUTOMATIC_FORWARD",
+    "IS_TOPIC_MESSAGE",
     "LOCATION",
     "Language",
     "MessageFilter",
@@ -230,6 +231,9 @@ class MessageFilter(BaseFilter):
     to :meth:`filter` is :obj:`telegram.Update.effective_message`.
 
     Please see :class:`BaseFilter` for details on how to create custom filters.
+
+    .. seealso:: `Advanced Filters <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Advanced-Filters>`_
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
@@ -546,7 +550,8 @@ class CaptionEntity(MessageFilter):
 
 class CaptionRegex(MessageFilter):
     """
-    Filters updates by searching for an occurrence of :paramref:`pattern` in the message caption.
+    Filters updates by searching for an occurrence of :paramref:`~CaptionRegex.pattern` in the
+    message caption.
 
     This filter works similarly to :class:`Regex`, with the only exception being that
     it applies to the message caption instead of the text.
@@ -1418,6 +1423,20 @@ IS_AUTOMATIC_FORWARD = _IsAutomaticForward(name="filters.IS_AUTOMATIC_FORWARD")
 """
 
 
+class _IsTopicMessage(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.is_topic_message)
+
+
+IS_TOPIC_MESSAGE = _IsTopicMessage(name="filters.IS_TOPIC_MESSAGE")
+"""Messages that contain :attr:`telegram.Message.is_topic_message`.
+
+    .. versionadded:: 20.0
+"""
+
+
 class Language(MessageFilter):
     """Filters messages to only allow those which are from users with a certain language code.
 
@@ -1501,7 +1520,8 @@ POLL = _Poll(name="filters.POLL")
 
 class Regex(MessageFilter):
     """
-    Filters updates by searching for an occurrence of :paramref:`pattern` in the message text.
+    Filters updates by searching for an occurrence of :paramref:`~Regex.pattern` in the message
+    text.
     The :func:`re.search` function is used to determine whether an update should be filtered.
 
     Refer to the documentation of the :obj:`re` module for more information.
@@ -1524,6 +1544,9 @@ class Regex(MessageFilter):
 
         With a :attr:`telegram.Message.text` of `x`, will only ever return the matches for the
         first filter, since the second one is never evaluated.
+
+    .. seealso:: `Types of Handlers <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
 
     Args:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
@@ -1697,6 +1720,9 @@ class StatusUpdate:
                 or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
                 or StatusUpdate.WEB_APP_DATA.check_update(update)
+                or StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
+                or StatusUpdate.FORUM_TOPIC_CLOSED.check_update(update)
+                or StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -1881,6 +1907,42 @@ class StatusUpdate:
 
     WEB_APP_DATA = _WebAppData(name="filters.StatusUpdate.WEB_APP_DATA")
     """Messages that contain :attr:`telegram.Message.web_app_data`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _ForumTopicCreated(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_created)
+
+    FORUM_TOPIC_CREATED = _ForumTopicCreated(name="filters.StatusUpdate.FORUM_TOPIC_CREATED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_created`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _ForumTopicClosed(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_closed)
+
+    FORUM_TOPIC_CLOSED = _ForumTopicClosed(name="filters.StatusUpdate.FORUM_TOPIC_CLOSED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_closed`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _ForumTopicReopened(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_reopened)
+
+    FORUM_TOPIC_REOPENED = _ForumTopicReopened(name="filters.StatusUpdate.FORUM_TOPIC_REOPENED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_reopened`.
 
     .. versionadded:: 20.0
     """

@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import List, Sequence, Union
+from typing import ClassVar, List, Sequence, Union
 
+from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils.markup import check_keyboard_type
@@ -32,13 +33,16 @@ class ReplyKeyboardMarkup(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their size of :attr:`keyboard` and all the buttons are equal.
 
-    Example:
-        A user requests to change the bot's language, bot replies to the request with a keyboard
-        to select the new language. Other users in the group don't see the keyboard.
+    Examples:
+        * Example usage: A user requests to change the bot's language, bot replies to the request
+          with a keyboard to select the new language. Other users in the group don't see
+          the keyboard.
+        * :any:`Conversation Bot <examples.conversationbot>`
+        * :any:`Conversation Bot 2 <examples.conversationbot2>`
 
     Args:
-        keyboard (List[List[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of button rows,
-            each represented by an Array of :class:`telegram.KeyboardButton` objects.
+        keyboard (Sequence[Sequence[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of
+            button rows, each represented by an Array of :class:`telegram.KeyboardButton` objects.
         resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard vertically
             for optimal fit (e.g., make the keyboard smaller if there are just two rows of
             buttons). Defaults to :obj:`False`, in which case the custom keyboard is always of the
@@ -58,12 +62,16 @@ class ReplyKeyboardMarkup(TelegramObject):
             Defaults to :obj:`False`.
 
         input_field_placeholder (:obj:`str`, optional): The placeholder to be shown in the input
-            field when the keyboard is active; 1-64 characters.
+            field when the keyboard is active;
+            :tg-const:`telegram.ReplyKeyboardMarkup.MIN_INPUT_FIELD_PLACEHOLDER`-
+            :tg-const:`telegram.ReplyKeyboardMarkup.MAX_INPUT_FIELD_PLACEHOLDER`
+            characters.
 
             .. versionadded:: 13.7
 
     Attributes:
-        keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
+        keyboard (Tuple[Tuple[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button
+            rows.
         resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
         one_time_keyboard (:obj:`bool`): Optional. Requests clients to hide the keyboard as soon as
             it's been used.
@@ -96,20 +104,15 @@ class ReplyKeyboardMarkup(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(keyboard):
             raise ValueError(
-                "The parameter `keyboard` should be a list of list of "
+                "The parameter `keyboard` should be a sequence of sequences of "
                 "strings or KeyboardButtons"
             )
 
         # Required
-        self.keyboard = []
-        for row in keyboard:
-            button_row = []
-            for button in row:
-                if isinstance(button, KeyboardButton):
-                    button_row.append(button)  # telegram.KeyboardButton
-                else:
-                    button_row.append(KeyboardButton(button))  # str
-            self.keyboard.append(button_row)
+        self.keyboard = tuple(
+            tuple(KeyboardButton(button) if isinstance(button, str) else button for button in row)
+            for row in keyboard
+        )
 
         # Optionals
         self.resize_keyboard = resize_keyboard
@@ -119,14 +122,7 @@ class ReplyKeyboardMarkup(TelegramObject):
 
         self._id_attrs = (self.keyboard,)
 
-    def to_dict(self) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
-
-        data["keyboard"] = []
-        for row in self.keyboard:
-            data["keyboard"].append([button.to_dict() for button in row])
-        return data
+        self._freeze()
 
     @classmethod
     def from_button(
@@ -284,12 +280,13 @@ class ReplyKeyboardMarkup(TelegramObject):
             **kwargs,  # type: ignore[arg-type]
         )
 
-    def __hash__(self) -> int:
-        return hash(
-            (
-                tuple(tuple(button for button in row) for row in self.keyboard),
-                self.resize_keyboard,
-                self.one_time_keyboard,
-                self.selective,
-            )
-        )
+    MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
+    """:const:`telegram.constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER`
+
+    .. versionadded:: 20.0
+    """
+    MAX_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
+    """:const:`telegram.constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER`
+
+    .. versionadded:: 20.0
+    """

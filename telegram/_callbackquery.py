@@ -134,6 +134,8 @@ class CallbackQuery(TelegramObject):
 
         self._id_attrs = (self.id,)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["CallbackQuery"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -590,7 +592,7 @@ class CallbackQuery(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List["GameHighScore"]:
+    ) -> Tuple["GameHighScore", ...]:
         """Shortcut for either::
 
             await update.callback_query.message.get_game_high_score(*args, **kwargs)
@@ -606,7 +608,7 @@ class CallbackQuery(TelegramObject):
         :meth:`telegram.Message.get_game_high_scores`.
 
         Returns:
-            List[:class:`telegram.GameHighScore`]
+            Tuple[:class:`telegram.GameHighScore`]
 
         """
         if self.inline_message_id:
@@ -724,6 +726,7 @@ class CallbackQuery(TelegramObject):
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -761,6 +764,7 @@ class CallbackQuery(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     MAX_ANSWER_TEXT_LENGTH: ClassVar[

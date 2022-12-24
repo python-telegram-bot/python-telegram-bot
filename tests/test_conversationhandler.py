@@ -22,7 +22,6 @@ import logging
 from warnings import filterwarnings
 
 import pytest
-from flaky import flaky
 
 from telegram import (
     Bot,
@@ -519,6 +518,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
@@ -570,6 +571,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -609,6 +612,8 @@ class TestConversationHandler:
             entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/eat"))],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -661,6 +666,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             try:
@@ -694,6 +701,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -740,6 +749,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
 
         # First check that updates without user won't be handled
         message.from_user = None
@@ -802,6 +813,7 @@ class TestConversationHandler:
         )
         if message:
             message.set_bot(bot)
+            message._unfreeze()
         inline_message_id = "42" if inline else None
 
         async with app:
@@ -823,6 +835,7 @@ class TestConversationHandler:
                 inline_message_id=inline_message_id,
             )
             cbq_2.set_bot(bot)
+            cbq_2._unfreeze()
             await app.process_update(Update(update_id=0, callback_query=cbq_1))
 
             # Make sure that we're in the correct state
@@ -862,6 +875,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert handler.check_update(Update(update_id=0, message=message))
@@ -888,6 +903,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             # give the task a chance to finish
@@ -907,6 +924,7 @@ class TestConversationHandler:
         # User starts the state machine and a callback function returns None
         message = Message(0, None, self.group, from_user=user1, text="/start")
         message.set_bot(bot)
+        message._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             # Check that the same message is accepted again, i.e. the conversation immediately
@@ -934,6 +952,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             # Give the task a chance to finish
@@ -959,6 +979,7 @@ class TestConversationHandler:
         )
         message = Message(0, date=None, chat=Chat(0, Chat.CHANNEL, "Misses Test"))
         message.set_bot(bot)
+        message._unfreeze()
 
         update = Update(0, channel_post=message)
         assert not handler.check_update(update)
@@ -972,6 +993,7 @@ class TestConversationHandler:
         )
         message = Message(0, None, self.group, from_user=user1, text="ignore")
         message.set_bot(bot)
+        message._unfreeze()
         callback_query = CallbackQuery(0, user1, None, message=message, data="data")
         callback_query.set_bot(bot)
         chosen_inline_result = ChosenInlineResult(0, user1, "query")
@@ -997,11 +1019,8 @@ class TestConversationHandler:
             fallbacks=self.fallbacks,
             conversation_timeout=0.5,
         )
-        # save app.job_queue in temp variable jqueue
-        # and then set app.job_queue to None.
-        jqueue = app.job_queue
         if not jq:
-            app.job_queue = None
+            app = ApplicationBuilder().token(bot.token).job_queue(None).build()
         app.add_handler(handler)
 
         message = Message(
@@ -1015,15 +1034,21 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.5)
-            assert len(recwarn) == 1
-            assert str(recwarn[0].message).startswith("Ignoring `conversation_timeout`")
-            assert ("is not running" if jq else "has no JobQueue.") in str(recwarn[0].message)
+            if jq:
+                assert len(recwarn) == 1
+            else:
+                assert len(recwarn) == 2
+            assert str(recwarn[0].message if jq else recwarn[1].message).startswith(
+                "Ignoring `conversation_timeout`"
+            )
+            assert ("is not running" if jq else "No `JobQueue` set up.") in str(recwarn[0].message)
             # now set app.job_queue back to it's original value
-            app.job_queue = jqueue
 
     async def test_schedule_job_exception(self, app, bot, user1, monkeypatch, caplog):
         def mocked_run_once(*a, **kw):
@@ -1032,7 +1057,7 @@ class TestConversationHandler:
         class DictJB(JobQueue):
             pass
 
-        app.job_queue = DictJB()
+        app = ApplicationBuilder().token(bot.token).job_queue(DictJB()).build()
         monkeypatch.setattr(app.job_queue, "run_once", mocked_run_once)
         handler = ConversationHandler(
             entry_points=self.entry_points,
@@ -1053,6 +1078,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
 
         async with app:
             await app.start()
@@ -1101,6 +1128,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         # start the conversation
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -1149,6 +1178,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         # start the conversation
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -1255,6 +1286,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         async with app:
             # start the conversation
             await app.process_update(Update(update_id=0, message=message))
@@ -1300,6 +1333,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         brew_message = Message(
             0,
             None,
@@ -1348,6 +1383,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         update = Update(update_id=0, message=message)
 
         async def timeout_callback(u, c):
@@ -1379,7 +1416,7 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_conversation_timeout_keeps_extending(self, app, bot, user1):
         handler = ConversationHandler(
             entry_points=self.entry_points,
@@ -1407,6 +1444,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
 
         async with app:
             await app.start()
@@ -1458,6 +1497,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
 
         async with app:
             await app.start()
@@ -1518,6 +1559,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
 
         async with app:
             await app.start()
@@ -1591,6 +1634,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         async with app:
             await app.start()
 
@@ -1673,6 +1718,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
 
         async with app:
             await app.start()
@@ -1722,6 +1769,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
@@ -1850,6 +1899,8 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
+        message._unfreeze()
+        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
@@ -2183,6 +2234,7 @@ class TestConversationHandler:
             text="/start",
             from_user=user1,
         )
+        message._unfreeze()
 
         async with app:
             await app.process_update(Update(0, message=message))

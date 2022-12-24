@@ -24,7 +24,7 @@ from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -88,6 +88,8 @@ class ChatJoinRequest(TelegramObject):
 
         self._id_attrs = (self.chat, self.from_user, self.date)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatJoinRequest"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -102,14 +104,6 @@ class ChatJoinRequest(TelegramObject):
         data["invite_link"] = ChatInviteLink.de_json(data.get("invite_link"), bot)
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
-
-        data["date"] = to_timestamp(self.date)
-
-        return data
 
     async def approve(
         self,

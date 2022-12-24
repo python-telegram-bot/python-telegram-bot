@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
-from flaky import flaky
 
 from telegram import InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 
@@ -45,7 +44,7 @@ class TestReplyKeyboardMarkup:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_message_with_reply_keyboard_markup(
         self, bot, chat_id, reply_keyboard_markup
     ):
@@ -53,7 +52,7 @@ class TestReplyKeyboardMarkup:
 
         assert message.text == "Text"
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_message_with_data_markup(self, bot, chat_id):
         message = await bot.send_message(
             chat_id, "text 2", reply_markup={"keyboard": [["1", "2"]]}
@@ -97,7 +96,8 @@ class TestReplyKeyboardMarkup:
         assert len(reply_keyboard_markup[1]) == 1
 
     def test_expected_values(self, reply_keyboard_markup):
-        assert isinstance(reply_keyboard_markup.keyboard, list)
+        assert isinstance(reply_keyboard_markup.keyboard, tuple)
+        assert all(isinstance(row, tuple) for row in reply_keyboard_markup.keyboard)
         assert isinstance(reply_keyboard_markup.keyboard[0][0], KeyboardButton)
         assert isinstance(reply_keyboard_markup.keyboard[0][1], KeyboardButton)
         assert reply_keyboard_markup.resize_keyboard == self.resize_keyboard
@@ -106,9 +106,13 @@ class TestReplyKeyboardMarkup:
 
     def test_wrong_keyboard_inputs(self):
         with pytest.raises(ValueError):
-            ReplyKeyboardMarkup([["button1"], "Button2"])
+            ReplyKeyboardMarkup([["button1"], 1])
         with pytest.raises(ValueError):
-            ReplyKeyboardMarkup("button")
+            ReplyKeyboardMarkup("strings_are_not_allowed")
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup(["strings_are_not_allowed_in_the_rows_either"])
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup(KeyboardButton("button1"))
 
     def test_to_dict(self, reply_keyboard_markup):
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()

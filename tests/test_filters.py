@@ -39,7 +39,7 @@ from telegram.ext import filters
 
 @pytest.fixture(scope="function")
 def update():
-    return Update(
+    update = Update(
         0,
         Message(
             0,
@@ -52,6 +52,15 @@ def update():
             forward_from_chat=Chat(0, "Channel"),
         ),
     )
+    update._unfreeze()
+    update.message._unfreeze()
+    update.message.chat._unfreeze()
+    update.message.from_user._unfreeze()
+    update.message.via_bot._unfreeze()
+    update.message.sender_chat._unfreeze()
+    update.message.forward_from._unfreeze()
+    update.message.forward_from_chat._unfreeze()
+    return update
 
 
 @pytest.fixture(scope="function", params=MessageEntity.ALL_TYPES)
@@ -125,6 +134,22 @@ class TestFilters:
 
             for attr in cls.__slots__:
                 assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}' for {name}"
+
+    def test__all__(self):
+        expected = {
+            key
+            for key, member in filters.__dict__.items()
+            if (
+                not key.startswith("_")
+                # exclude imported stuff
+                and getattr(member, "__module__", "unknown module") == "telegram.ext.filters"
+                and key != "sys"
+            )
+        }
+        actual = set(filters.__all__)
+        assert (
+            actual == expected
+        ), f"Members {expected - actual} were not listed in constants.__all__"
 
     def test_filters_all(self, update):
         assert filters.ALL.check_update(update)
@@ -602,6 +627,7 @@ class TestFilters:
         update.message.document = Document(
             "file_id", "unique_id", mime_type="application/vnd.android.package-archive"
         )
+        update.message.document._unfreeze()
         assert filters.Document.APK.check_update(update)
         assert filters.Document.APPLICATION.check_update(update)
         assert not filters.Document.DOC.check_update(update)
@@ -711,6 +737,7 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
+        update.message.document._unfreeze()
         assert filters.Document.FileExtension("jpg").check_update(update)
         assert not filters.Document.FileExtension("jpeg").check_update(update)
         assert not filters.Document.FileExtension("file.jpg").check_update(update)
@@ -734,6 +761,7 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
+        update.message.document._unfreeze()
         assert not filters.Document.FileExtension(".jpg").check_update(update)
         assert not filters.Document.FileExtension("e.jpg").check_update(update)
         assert not filters.Document.FileExtension("file.jpg").check_update(update)
@@ -763,6 +791,7 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
+        update.message.document._unfreeze()
         assert not filters.Document.FileExtension(None).check_update(update)
 
         update.message.document.file_name = "file"
@@ -782,6 +811,7 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
+        update.message.document._unfreeze()
         assert filters.Document.FileExtension("JPG").check_update(update)
         assert filters.Document.FileExtension("jpG").check_update(update)
 
@@ -829,6 +859,7 @@ class TestFilters:
     def test_filters_sticker(self, update):
         assert not filters.Sticker.ALL.check_update(update)
         update.message.sticker = Sticker("1", "uniq", 1, 2, False, False, Sticker.REGULAR)
+        update.message.sticker._unfreeze()
         assert filters.Sticker.ALL.check_update(update)
         assert filters.Sticker.STATIC.check_update(update)
         assert not filters.Sticker.VIDEO.check_update(update)
@@ -979,6 +1010,21 @@ class TestFilters:
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.WEB_APP_DATA.check_update(update)
         update.message.web_app_data = None
+
+        update.message.forum_topic_created = "topic"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
+        update.message.forum_topic_created = None
+
+        update.message.forum_topic_closed = "topic"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.FORUM_TOPIC_CLOSED.check_update(update)
+        update.message.forum_topic_closed = None
+
+        update.message.forum_topic_reopened = "topic"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
+        update.message.forum_topic_reopened = None
 
     def test_filters_forwarded(self, update):
         assert not filters.FORWARDED.check_update(update)
@@ -1763,6 +1809,11 @@ class TestFilters:
         assert not filters.IS_AUTOMATIC_FORWARD.check_update(update)
         update.message.is_automatic_forward = True
         assert filters.IS_AUTOMATIC_FORWARD.check_update(update)
+
+    def test_filters_is_topic_message(self, update):
+        assert not filters.IS_TOPIC_MESSAGE.check_update(update)
+        update.message.is_topic_message = True
+        assert filters.IS_TOPIC_MESSAGE.check_update(update)
 
     def test_filters_has_protected_content(self, update):
         assert not filters.HAS_PROTECTED_CONTENT.check_update(update)
