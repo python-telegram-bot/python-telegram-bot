@@ -74,6 +74,7 @@ def test_build_with_telegram_package():
     assert "Both libraries provide a Python package called `telegram`" in res.read()
     assert res.close() != 0
     os.system("pip uninstall -y telegram")
+    raise
 
 
 @skip_disabled
