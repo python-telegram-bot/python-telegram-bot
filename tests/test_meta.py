@@ -73,12 +73,11 @@ def test_build_with_telegram_package():
     res = os.popen("python setup-raw.py bdist_dumb")
     assert "Both libraries provide a Python package called `telegram`" in res.read()
     assert res.close() != 0
-    os.system("pip uninstall -y telegram")
-    raise
 
 
 @skip_disabled
 def test_build_with_telegram_raw_package():
+    os.system("pip uninstall -y telegram")
     os.system("pip install python-telegram-bot --pre")
     res = os.popen("python setup-raw.py bdist_dumb")
     assert "uninstall python-telegram-bot " in res.read()
