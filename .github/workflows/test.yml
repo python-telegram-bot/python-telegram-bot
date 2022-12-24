@@ -48,7 +48,7 @@ jobs:
           pip install -r requirements-opts.txt
           # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU
           # worker
-          pytest -v --cov -k test_meta.py
+          pytest -v --cov --cov-append -n tests_meta.py --dist loadfile
           status=$(( $? > status ? $? : status))
           exit ${status}
         env:
