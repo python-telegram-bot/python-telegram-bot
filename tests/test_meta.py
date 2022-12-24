@@ -69,10 +69,10 @@ def test_build_with_telegram_package():
     os.system("pip install telegram")
     res = os.popen("python setup.py bdist_dumb")
     assert "Both libraries provide a Python package called `telegram`" in res.read()
-    assert res.close() == 1
+    assert res.close() != 0
     res = os.popen("python setup-raw.py bdist_dumb")
     assert "Both libraries provide a Python package called `telegram`" in res.read()
-    assert res.close() == 1
+    assert res.close() != 0
     os.system("pip uninstall -y telegram")
 
 
@@ -81,7 +81,7 @@ def test_build_with_telegram_raw_package():
     os.system("pip install python-telegram-bot --pre")
     res = os.popen("python setup-raw.py bdist_dumb")
     assert "uninstall python-telegram-bot " in res.read()
-    assert res.close() == 1
+    assert res.close() != 0
     os.system("pip uninstall -y python-telegram-bot")
 
 
@@ -90,16 +90,15 @@ def test_build_with_telegram_not_raw_package():
     os.system("pip install python-telegram-bot-raw --pre")
     res = os.popen("python setup.py bdist_dumb")
     assert "uninstall python-telegram-bot-raw " in res.read()
-    assert res.close() == 1
+    assert res.close() != 0
     os.system("pip uninstall -y python-telegram-bot-raw")
-    os.system("pip uninstall -y tornado")
 
 
 @skip_disabled
 def test_build_with_local_telegram_package():
     res = os.popen("python setup.py bdist_dumb")
     assert "Please rename it" in res.read()
-    assert res.close() == 1
+    assert res.close() != 0
     res = os.popen("python setup-raw.py bdist_dumb")
     assert "Please rename it" in res.read()
-    assert res.close() == 1
+    assert res.close() != 0
