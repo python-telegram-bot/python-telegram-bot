@@ -73,6 +73,10 @@ jobs:
           pytest -v --cov --cov-append -k test_request.py
           status=$(( $? > status ? $? : status))
 
+          # Test meta on its own because race conditions happened otherwise
+          pytest -v --cov --cov-append -k test_meta.py
+          status=$(( $? > status ? $? : status))
+
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
           pip install -r requirements-opts.txt
