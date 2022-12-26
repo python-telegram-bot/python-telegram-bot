@@ -327,7 +327,7 @@ class TestBot:
         # not islower() skips the camelcase aliases
         if not bot_method_name.islower():
             return
-        source = "".join(inspect.getsourcelines(bot_method)[0])
+        source = inspect.getsource(bot_method)
         assert (
             # Use re.match to only match at *the beginning* of the string
             re.match(rf"\s*\@\_log\s*async def {bot_method_name}", source)
