@@ -115,6 +115,18 @@ Note
 
 Installing the ``.tar.gz`` archive available on PyPi directly via ``pip`` will *not* work as expected, as ``pip`` does not recognize that it should use ``setup-raw.py`` instead of ``setup.py``.
 
+Verifying Releases
+------------------
+
+We sign all the releases with a GPG key.
+The signatures are uploaded to both the `GitHub releases page <https://github.com/python-telegram-bot/python-telegram-bot/releases>`_ and the `PyPI project <https://pypi.org/project/python-telegram-bot/>`_ and end with a suffix ``.asc``.
+Please find the public keys `here <https://github.com/python-telegram-bot/python-telegram-bot/tree/master/public_keys>`_.
+The keys are named in the format ``<first_version>-<last_version>.gpg`` or ``<first_version>-current.gpg`` if the key is currently being used for new releases.
+
+In addition, the GitHub release page also contains the sha1 hashes of the release files in the files with the suffix ``.sha1``.
+
+This allows you to verify that a release file that you downloaded was indeed provided by the ``python-telegram-bot`` team.
+
 Dependencies & Their Versions
 -----------------------------
 
