@@ -34,11 +34,12 @@ jobs:
           python -W ignore -m pip install pytest-xdist[psutil]
 
       - name: Test with pytest
-        # We run 4 different suites here
+        # We run 5 different suites here
         # 1. Test just utils.datetime.py without pytz being installed
         # 2. Test just test_no_passport.py without passport dependencies being installed
         # 3. Test just test_rate_limiter.py without passport dependencies being installed
-        # 4. Test everything else
+        # 4. Test just test_meta.py, since otherwise race conditions happened
+        # 5. Test everything else
         # The first & second one are achieved by mocking the corresponding import
         # See test_helpers.py & test_no_passport.py for details
         run: |
@@ -76,6 +77,7 @@ jobs:
           # Test meta on its own because race conditions happened otherwise
           pytest -v --cov --cov-append -k test_meta.py
           status=$(( $? > status ? $? : status))
+          export TEST_BUILD='false'
 
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'

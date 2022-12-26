@@ -20,7 +20,6 @@ import os
 import platform
 
 import pytest
-from pkg_resources import DistributionNotFound, get_distribution
 
 from tests.auxil.object_conversions import env_var_2_bool
 
@@ -47,7 +46,6 @@ class TestSetupWindows:
     def teardown_class(cls):
         """Remove the venv folder and other build stuff"""
         os.system('for %d in (build dist venv_setup_test) do rmdir "%~d" /s /q')
-        os.system("pip install -r requirements.txt")
 
     def test_build(self):
         assert (
@@ -68,10 +66,6 @@ class TestSetupWindows:
 @skip_disabled
 def test_build_with_telegram_package():
     os.system("pip install telegram")
-    try:
-        print(vars(get_distribution("telegram")))
-    except DistributionNotFound:
-        pass
     res = os.popen("python setup.py bdist_dumb")
     assert "Both libraries provide a Python package called `telegram`" in res.read()
     assert res.close() != 0
@@ -83,11 +77,6 @@ def test_build_with_telegram_package():
 
 @skip_disabled
 def test_build_with_telegram_raw_package():
-    os.system("pip uninstall -y telegram")
-    try:
-        print(vars(get_distribution("telegram")))
-    except DistributionNotFound:
-        pass
     os.system("pip install python-telegram-bot --pre")
     res = os.popen("python setup-raw.py bdist_dumb")
     assert "uninstall python-telegram-bot " in res.read()
@@ -97,11 +86,6 @@ def test_build_with_telegram_raw_package():
 
 @skip_disabled
 def test_build_with_telegram_not_raw_package():
-    os.system("pip uninstall -y telegram")
-    try:
-        print(vars(get_distribution("telegram")))
-    except DistributionNotFound:
-        pass
     os.system("pip install python-telegram-bot-raw --pre")
     res = os.popen("python setup.py bdist_dumb")
     assert "uninstall python-telegram-bot-raw " in res.read()
@@ -111,11 +95,6 @@ def test_build_with_telegram_not_raw_package():
 
 @skip_disabled
 def test_build_with_local_telegram_package():
-    os.system("pip uninstall -y telegram")
-    try:
-        print(vars(get_distribution("telegram")))
-    except DistributionNotFound:
-        pass
     res = os.popen("python setup.py bdist_dumb")
     assert "Please rename it" in res.read()
     assert res.close() != 0
