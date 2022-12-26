@@ -35,8 +35,11 @@ def change_test_dir(request, monkeypatch):
 
 
 @skip_disabled
-@pytest.mark.skipif(platform.system() != "Windows", reason="Cmdline stuff for only windows")
-class TestSetupWindows:
+@pytest.mark.skipif(platform.system() != "Windows", reason="Currently only setup for windows")
+class TestBuild:
+    """This needs to be its own class since we need to run the setup inside an env where
+    telegram is not known"""
+
     @classmethod
     def setup_class(cls):
         """Added so we can setup a venv folder"""
@@ -45,21 +48,26 @@ class TestSetupWindows:
     @classmethod
     def teardown_class(cls):
         """Remove the venv folder and other build stuff"""
-        os.system('for %d in (build dist venv_setup_test) do rmdir "%~d" /s /q')
+        if platform.system() == "Windows":
+            os.system('for %d in (build dist venv_setup_test) do rmdir "%~d" /s /q')
 
     def test_build(self):
-        assert (
-            os.system(".\\venv_setup_test\\Scripts\\python.exe setup.py bdist_dumb") == 0
-        )  # pragma: no cover
-        # this is a neat hack, convincing the local python venv that ptb isn't installed
-        # there are more files (see above), but this one is the one python apperently uses to
-        # discover local packages
-        os.system("rmdir /s /q python_telegram_bot.egg-info")
+        if platform.system() == "Windows":
+            assert (
+                os.system(".\\venv_setup_test\\Scripts\\python.exe setup.py bdist_dumb") == 0
+            )  # pragma: no cover
+        # what follows is a neat hack, convincing the local python venv that ptb isn't installed.
+        # There are more files (see teardown_class), but this is the one python apparently
+        # uses to discover local packages
+        if platform.system() == "Windows":
+            os.system("rmdir /s /q python_telegram_bot.egg-info")
 
     def test_build_raw(self):
-        assert (
-            os.system(".\\venv_setup_test\\Scripts\\python.exe setup-raw.py bdist_dumb") == 0
-        )  # pragma: no cover
+        if platform.system() == "Windows":
+            assert (
+                os.system(".\\venv_setup_test\\Scripts\\python.exe setup-raw.py bdist_dumb") == 0
+            )  # pragma: no cover
+        # we need to remove the info file again since otherwise the other tests fail
         os.system("rmdir /s /q python_telegram_bot_raw.egg-info")
 
 
