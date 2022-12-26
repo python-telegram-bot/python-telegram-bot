@@ -44,6 +44,8 @@ class InputMedia(TelegramObject):
         Added arguments and attributes :attr:`type`, :attr:`media`, :attr:`caption`,
             :attr:`caption_entities`, :paramref:`parse_mode`.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Args:
         media_type (:obj:`str`): Type of media that the instance represents.
         media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
@@ -114,6 +116,8 @@ class InputMediaAnimation(InputMedia):
         When using a :class:`telegram.Animation` for the :attr:`media` attribute, it will take the
         width, height and duration from that video, unless otherwise specified with the optional
         arguments.
+
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
     Args:
         media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
@@ -208,6 +212,8 @@ class InputMediaAnimation(InputMedia):
 class InputMediaPhoto(InputMedia):
     """Represents a photo to be sent.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Args:
         media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.PhotoSize`): File to send. |fileinputnopath|
@@ -272,6 +278,8 @@ class InputMediaPhoto(InputMedia):
 
 class InputMediaVideo(InputMedia):
     """Represents a video to be sent.
+
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
     Note:
         *  When using a :class:`telegram.Video` for the :attr:`media` attribute, it will take the
@@ -380,6 +388,8 @@ class InputMediaVideo(InputMedia):
 class InputMediaAudio(InputMedia):
     """Represents an audio file to be treated as music to be sent.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Note:
         When using a :class:`telegram.Audio` for the :attr:`media` attribute, it will take the
         duration, performer and title from that video, unless otherwise specified with the
@@ -478,6 +488,8 @@ class InputMediaAudio(InputMedia):
 
 class InputMediaDocument(InputMedia):
     """Represents a general file to be sent.
+
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
     Args:
         media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \

@@ -73,10 +73,8 @@ class BaseRequest(
         To use a custom library for this, you can override :meth:`parse_json_payload` and implement
         custom logic to encode the keys of :attr:`telegram.request.RequestData.parameters`.
 
-    .. seealso:: `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        `Builder Pattern <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
+        :wiki:`Builder Pattern <Builder-Pattern>`
 
     .. versionadded:: 20.0
     """
