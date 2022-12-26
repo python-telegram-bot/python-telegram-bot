@@ -42,9 +42,48 @@ jobs:
         # The first & second one are achieved by mocking the corresponding import
         # See test_helpers.py & test_no_passport.py for details
         run: |
-          # Solo
-          pytest -v --cov -k test_meta.py
+          # Test without passport
+          pytest -v --cov -k test_no_passport.py
           status=$?
+
+          # test without pytz
+          pytest -v --cov --cov-append -k test_datetime.py
+          status=$(( $? > status ? $? : status))
+          pytest -v --cov --cov-append -k test_defaults.py
+          status=$(( $? > status ? $? : status))
+
+          # test without pytz & jobqueue
+          pytest -v --cov --cov-append -k test_jobqueue.py
+          pytest -v --cov --cov-append -k test_applicationbuilder.py
+          status=$(( $? > status ? $? : status))
+
+          # Test without ratelimiter
+          pytest -v --cov --cov-append -k test_ratelimiter.py
+          status=$(( $? > status ? $? : status))
+
+          # Test without webhooks
+          pytest -v --cov --cov-append -k test_updater.py
+          status=$(( $? > status ? $? : status))
+
+          # Test without callback-data
+          pytest -v --cov --cov-append -k test_callbackdatacache.py
+          status=$(( $? > status ? $? : status))
+
+          # Test without socks
+          pytest -v --cov --cov-append -k test_request.py
+          status=$(( $? > status ? $? : status))
+
+          # Test meta on its own because race conditions happened otherwise
+          pytest -v --cov --cov-append -k test_meta.py
+          status=$(( $? > status ? $? : status))
+
+          # Test the rest
+          export TEST_WITH_OPT_DEPS='true'
+          pip install -r requirements-opts.txt
+          # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU
+          # worker
+          pytest -v --cov --cov-append -n auto --dist loadfile
+          status=$(( $? > status ? $? : status))
           exit ${status}
         env:
           JOB_INDEX: ${{ strategy.job-index }}
@@ -59,3 +98,30 @@ jobs:
           env_vars: OS,PYTHON
           name: ${{ matrix.os }}-${{ matrix.python-version }}
           fail_ci_if_error: true
+  test_official:
+    name: test-official
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        python-version: [3.7]
+        os: [ubuntu-latest]
+      fail-fast: False
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -W ignore -m pip install --upgrade pip
+          python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-opts.txt
+          python -W ignore -m pip install -r requirements-dev.txt
+      - name: Compare to official api
+        run: |
+          pytest -v tests/test_official.py
+          exit $?
+        env:
+          TEST_OFFICIAL: "true"
+        shell: bash --noprofile --norc {0}
