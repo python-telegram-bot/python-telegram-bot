@@ -22,6 +22,7 @@ import datetime as dtm
 import inspect
 import logging
 import pickle
+import re
 import socket
 import sys
 import time
@@ -319,6 +320,18 @@ class TestBot:
             assert len(caplog.records) == 3
             assert caplog.records[0].getMessage().startswith("Entering: get_me")
             assert caplog.records[-1].getMessage().startswith("Exiting: get_me")
+
+    @bot_methods(ext_bot=False)
+    def test_api_methods_have_log_decorator(self, bot_class, bot_method_name, bot_method):
+        """Check that all bot methods have the log decorator ..."""
+        # not islower() skips the camelcase aliases
+        if not bot_method_name.islower():
+            return
+        source = inspect.getsource(bot_method)
+        assert (
+            # Use re.match to only match at *the beginning* of the string
+            re.match(rf"\s*\@\_log\s*async def {bot_method_name}", source)
+        ), f"{bot_method_name} is missing the @_log decorator"
 
     @pytest.mark.parametrize(
         "acd_in,maxsize",
