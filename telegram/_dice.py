@@ -75,6 +75,14 @@ class Dice(TelegramObject):
 
     Attributes:
         value (:obj:`int`): Value of the dice.
+            :tg-const:`telegram.Dice.MIN_VALUE`-:tg-const:`telegram.Dice.MAX_VALUE_BOWLING`
+            for :tg-const:`telegram.Dice.DICE`, :tg-const:`telegram.Dice.DARTS` and
+            :tg-const:`telegram.Dice.BOWLING` base emoji,
+            :tg-const:`telegram.Dice.MIN_VALUE`-:tg-const:`telegram.Dice.MAX_VALUE_BASKETBALL`
+            for :tg-const:`telegram.Dice.BASKETBALL` and :tg-const:`telegram.Dice.FOOTBALL`
+            base emoji,
+            :tg-const:`telegram.Dice.MIN_VALUE`-:tg-const:`telegram.Dice.MAX_VALUE_SLOT_MACHINE`
+            for :tg-const:`telegram.Dice.SLOT_MACHINE` base emoji.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     """

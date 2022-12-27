@@ -41,8 +41,12 @@ class BotCommand(TelegramObject):
             :tg-const:`telegram.BotCommand.MAX_DESCRIPTION` characters.
 
     Attributes:
-        command (:obj:`str`): Text of the command.
-        description (:obj:`str`): Description of the command.
+        command (:obj:`str`): Text of the command; :tg-const:`telegram.BotCommand.MIN_COMMAND`-
+            :tg-const:`telegram.BotCommand.MAX_COMMAND` characters. Can contain only lowercase
+            English letters, digits and underscores.
+        description (:obj:`str`): Description of the command;
+            :tg-const:`telegram.BotCommand.MIN_DESCRIPTION`-
+            :tg-const:`telegram.BotCommand.MAX_DESCRIPTION` characters.
 
     """
 

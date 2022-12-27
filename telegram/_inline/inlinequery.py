@@ -72,11 +72,16 @@ class InlineQuery(TelegramObject):
         query (:obj:`str`): Text of the query (up to
             :tg-const:`telegram.InlineQuery.MAX_QUERY_LENGTH` characters).
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
-        location (:class:`telegram.Location`): Optional. Sender location, only for bots that
-            request user location.
         chat_type (:obj:`str`): Optional. Type of the chat, from which the inline query was sent.
+            Can be either :tg-const:`telegram.Chat.SENDER` for a private chat with the inline query
+            sender, :tg-const:`telegram.Chat.PRIVATE`, :tg-const:`telegram.Chat.GROUP`,
+            :tg-const:`telegram.Chat.SUPERGROUP` or :tg-const:`telegram.Chat.CHANNEL`. The chat
+            type should be always known for requests sent from official clients and most
+            third-party clients, unless the request was sent from a secret chat.
 
             .. versionadded:: 13.5
+        location (:class:`telegram.Location`): Optional. Sender location, only for bots that
+            request user location.
 
     """
 

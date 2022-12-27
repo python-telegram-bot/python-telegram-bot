@@ -75,13 +75,21 @@ class InlineQueryResultLocation(InlineQueryResult):
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.
         horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
-            measured in meters.
-        live_period (:obj:`int`): Optional. Period in seconds for which the location can be
-            updated, should be between 60 and 86400.
+            measured in meters; 0-
+            :tg-const:`telegram.InlineQueryResultLocation.HORIZONTAL_ACCURACY`.
+        live_period (:obj:`int`): Optional. Period in seconds for which the location will be
+            updated, should be between
+            :tg-const:`telegram.InlineQueryResultLocation.MIN_LIVE_PERIOD` and
+            :tg-const:`telegram.InlineQueryResultLocation.MAX_LIVE_PERIOD`.
         heading (:obj:`int`): Optional. For live locations, a direction in which the user is
-            moving, in degrees.
-        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance for
-            proximity alerts about approaching another chat member, in meters.
+            moving, in degrees. Must be between
+            :tg-const:`telegram.InlineQueryResultLocation.MIN_HEADING` and
+            :tg-const:`telegram.InlineQueryResultLocation.MAX_HEADING` if specified.
+        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance
+            for proximity alerts about approaching another chat member, in meters. Must be
+            between :tg-const:`telegram.InlineQueryResultLocation.MIN_PROXIMITY_ALERT_RADIUS`
+            and :tg-const:`telegram.InlineQueryResultLocation.MAX_PROXIMITY_ALERT_RADIUS`
+            if specified.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
