@@ -38,12 +38,14 @@ class InlineQueryResultCachedGif(InlineQueryResult):
     use :attr:`input_message_content` to send a message with specified content instead of
     the animation.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
             :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         gif_file_id (:obj:`str`): A valid file identifier for the GIF file.
-        title (:obj:`str`, optional): Title for the result.caption (:obj:`str`, optional):
+        title (:obj:`str`, optional): Title for the result.
         caption (:obj:`str`, optional): Caption of the GIF file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.

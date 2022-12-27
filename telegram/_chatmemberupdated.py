@@ -65,7 +65,7 @@ class ChatMemberUpdated(TelegramObject):
         old_chat_member (:class:`telegram.ChatMember`): Previous information about the chat member.
         new_chat_member (:class:`telegram.ChatMember`): New information about the chat member.
         invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link, which was used
-            by the user to join the chat.
+            by the user to join the chat. For joining by invite link events only.
 
     """
 

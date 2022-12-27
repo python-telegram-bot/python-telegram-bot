@@ -249,6 +249,28 @@ class SecureData(TelegramObject):
     This object represents the credentials that were used to decrypt the encrypted data.
     All fields are optional and depend on fields that were requested.
 
+    Args:
+        personal_details (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            personal details.
+        passport (:class:`telegram.SecureValue`, optional): Credentials for encrypted passport.
+        internal_passport (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            internal passport.
+        driver_license (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            driver license.
+        identity_card (:class:`telegram.SecureValue`, optional): Credentials for encrypted ID card
+        address (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            residential address.
+        utility_bill (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            utility bill.
+        bank_statement (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            bank statement.
+        rental_agreement (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            rental agreement.
+        passport_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            registration from internal passport.
+        temporary_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            temporary registration.
+
     Attributes:
         personal_details (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             personal details.
@@ -350,6 +372,26 @@ class SecureValue(TelegramObject):
     """
     This object represents the credentials that were used to decrypt the encrypted value.
     All fields are optional and depend on the type of field.
+
+    Args:
+        data (:class:`telegram.DataCredentials`, optional): Credentials for encrypted Telegram
+            Passport data. Available for "personal_details", "passport", "driver_license",
+            "identity_card", "identity_passport" and "address" types.
+        front_side (:class:`telegram.FileCredentials`, optional): Credentials for encrypted
+            document's front side. Available for "passport", "driver_license", "identity_card"
+            and "internal_passport".
+        reverse_side (:class:`telegram.FileCredentials`, optional): Credentials for encrypted
+            document's reverse side. Available for "driver_license" and "identity_card".
+        selfie (:class:`telegram.FileCredentials`, optional): Credentials for encrypted selfie
+            of the user with a document. Can be available for "passport", "driver_license",
+            "identity_card" and "internal_passport".
+        translation (List[:class:`telegram.FileCredentials`], optional): Credentials for an
+            encrypted translation of the document. Available for "passport", "driver_license",
+            "identity_card", "internal_passport", "utility_bill", "bank_statement",
+            "rental_agreement", "passport_registration" and "temporary_registration".
+        files (List[:class:`telegram.FileCredentials`], optional): Credentials for encrypted
+            files. Available for "utility_bill", "bank_statement", "rental_agreement",
+            "passport_registration" and "temporary_registration" types.
 
     Attributes:
         data (:class:`telegram.DataCredentials`): Optional. Credentials for encrypted Telegram

@@ -28,8 +28,7 @@ class PTBUserWarning(UserWarning):
     """
     Custom user warning class used for warnings in this library.
 
-    .. seealso:: `Exceptions, Warnings and Logging <https://github.com/\
-    python-telegram-bot/python-telegram-bot/wiki/Exceptions%2C-Warnings-and-Logging>`_
+    .. seealso:: :wiki:`Exceptions, Warnings and Logging <Exceptions%2C-Warnings-and-Logging>`
 
     .. versionadded:: 20.0
     """

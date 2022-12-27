@@ -1,6 +1,7 @@
 =========
 Changelog
 =========
+
 Version 20.0b0
 ==============
 *Released 2022-12-15*
@@ -10,7 +11,7 @@ This is the technical changelog for version 20.0b0. More elaborate release notes
 Major Changes
 -------------
 
-- Make `TelegramObject` Immutable (`#3249`_)
+- Make ``TelegramObject`` Immutable (`#3249`_)
 
 Minor Changes, Documentation Improvements and CI
 ------------------------------------------------

@@ -53,8 +53,7 @@ class TypeHandler(BaseHandler[UT, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
-            .. seealso:: `Concurrency <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+            .. seealso:: :wiki:`Concurrency`
 
     Attributes:
         type (:external:class:`type`): The :external:class:`type` of updates this handler should
