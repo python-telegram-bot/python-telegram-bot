@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Chat."""
 from datetime import datetime
 from html import escape
-from typing import TYPE_CHECKING, ClassVar, List, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, ClassVar, Optional, Sequence, Tuple, Union
 
 from telegram import constants
 from telegram._chatlocation import ChatLocation
@@ -1280,7 +1280,7 @@ class Chat(TelegramObject):
 
     async def send_media_group(
         self,
-        media: List[
+        media: Sequence[
             Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,

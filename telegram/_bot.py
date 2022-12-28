@@ -1821,7 +1821,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def send_media_group(
         self,
         chat_id: Union[int, str],
-        media: List[
+        media: Sequence[
             Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
@@ -1855,9 +1855,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            media (List[:class:`telegram.InputMediaAudio`, :class:`telegram.InputMediaDocument`,\
-                :class:`telegram.InputMediaPhoto`, :class:`telegram.InputMediaVideo`]):
-                An array describing messages to be sent, must include 2–10 items.
+            media (Sequence[:class:`telegram.InputMediaAudio`,\
+                :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto`,\
+                :class:`telegram.InputMediaVideo`]): An array
+                describing messages to be sent, must include 2–10 items.
+
+                .. versionchanged:: 20.0
+                    Accept :obj:`Sequence` instead of :obj:`List`.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1889,6 +1893,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionadded:: 20.0
 
+                .. versionchanged:: 20.0
+                    Accept :obj:`Sequence` instead of :obj:`List`.
+
         Returns:
             Tuple[:class:`telegram.Message`]: An array of the sent Messages.
 
@@ -1916,7 +1923,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 item_to_get_caption.caption_entities = parse_sequence_arg(caption_entities)
 
             # copy the list (just the references) to avoid mutating the original list
-            media = media[:]
+            media = list(media)
             media[0] = item_to_get_caption
 
         data: JSONDict = {

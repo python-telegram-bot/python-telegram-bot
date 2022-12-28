@@ -2431,7 +2431,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def send_media_group(
         self,
         chat_id: Union[int, str],
-        media: List[
+        media: Sequence[
             Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
