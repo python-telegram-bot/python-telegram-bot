@@ -1855,10 +1855,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            media (List[:class:`telegram.InputMediaAudio`,
-                :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto`, \
-                :class:`telegram.InputMediaVideo`]): An array describing messages
-                to be sent, must include 2–10 items.
+            media (List[:class:`telegram.InputMediaAudio`, :class:`telegram.InputMediaDocument`,\
+                :class:`telegram.InputMediaPhoto`, :class:`telegram.InputMediaVideo`]):
+                An array describing messages to be sent, must include 2–10 items.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
