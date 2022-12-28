@@ -3970,6 +3970,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         )
         return result
 
+    @_log
     async def get_webhook_info(
         self,
         *,
