@@ -141,7 +141,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         * Bots should not be serialized since if you for e.g. change the bots token, then your
           serialized instance will not reflect that change. Trying to pickle a bot instance will
           raise :exc:`pickle.PicklingError`. Trying to deepcopy a bot instance will raise
-          :exce:`TypeError`.
+          :exc:`TypeError`.
 
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
@@ -167,7 +167,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
           :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
           instead.
         * Attempting to pickle a bot instance will now raise :exc:`pickle.PicklingError`.
-        * Attempting to deepcopy a bot instance will now raise :exce:`TypeError`.
+        * Attempting to deepcopy a bot instance will now raise :exc:`TypeError`.
         * The following are now keyword-only arguments in Bot methods:
           ``location``, ``filename``, ``venue``, ``contact``,
           ``{read, write, connect, pool}_timeout``, ``api_kwargs``. Use a named argument for those,
