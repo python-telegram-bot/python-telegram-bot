@@ -6696,9 +6696,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 float/double). At most :tg-const:`telegram.Invoice.MAX_TIP_AMOUNTS` suggested tip
                 amounts can be specified. The suggested tip amounts must be positive, passed in a
                 strictly increased order and must not exceed :paramref:`max_tip_amount`.
-
-                .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
             provider_data (:obj:`str` | :obj:`object`, optional): Data about the
                 invoice, which will be shared with the payment provider. A detailed description of
                 required fields should be provided by the payment provider. When an object is
