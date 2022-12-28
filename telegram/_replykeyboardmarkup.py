@@ -194,6 +194,9 @@ class ReplyKeyboardMarkup(TelegramObject):
         Args:
             button_row (Sequence[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to
                 use in the markup.
+
+                .. versionchanged:: 20.0
+                    Accept :obj:`Sequence` instead of :obj:`List`.
             resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
                 vertically for optimal fit (e.g., make the keyboard smaller if there are just two
                 rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
@@ -246,6 +249,9 @@ class ReplyKeyboardMarkup(TelegramObject):
         Args:
             button_column (Sequence[:class:`telegram.KeyboardButton` | :obj:`str`]): The button
                 to use in the markup.
+
+                .. versionchanged:: 20.0
+                    Accept :obj:`Sequence` instead of :obj:`List`.
             resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
                 vertically for optimal fit (e.g., make the keyboard smaller if there are just two
                 rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
