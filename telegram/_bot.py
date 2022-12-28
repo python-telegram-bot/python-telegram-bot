@@ -299,8 +299,22 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return self._private_key
 
     def __reduce__(self) -> NoReturn:
-        """Called by pickle.dumps(). Serializing bots is unadvisable, so we forbid pickling."""
+        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
+        be pickled and this method will always raise an exception.
+
+        Raises:
+            :exc:`pickle.PicklingError`
+        """
         raise pickle.PicklingError("Bot objects cannot be pickled!")
+
+    def __deepcopy__(self, memodict: dict) -> NoReturn:
+        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
+        be deepcopied and this method will always raise an exception.
+
+        Raises:
+            :exc:`TypeError`
+        """
+        raise TypeError("Bot objects cannot be deepcopied!")
 
     # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
     # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
