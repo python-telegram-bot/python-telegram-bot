@@ -1425,8 +1425,9 @@ class UpdateType(StringEnum):
 
 
 class InvoiceLimit(IntEnum):
-    """This enum contains limitations for :meth:`telegram.Bot.create_invoice_link`. The enum
-    members of this enumeration are instances of :class:`int` and can be treated as such.
+    """This enum contains limitations for :class:`telegram.InputInvoiceMessageContent`,
+    :meth:`telegram.Bot.send_invoice`, and :meth:`telegram.Bot.create_invoice_link`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
     """
@@ -1491,6 +1492,14 @@ class InvoiceLimit(IntEnum):
     * :paramref:`~telegram.Bot.send_invoice.payload` parameter of
       :meth:`telegram.Bot.send_invoice`.
     * :paramref:`~telegram.Bot.create_invoice_link.payload` parameter of
+      :meth:`telegram.Bot.create_invoice_link`.
+    """
+    MAX_TIP_AMOUNTS = 4
+    """:obj:`int`: Maximum length of a :obj:`Sequence` passed as:
+
+    * :paramref:`~telegram.Bot.send_invoice.suggested_tip_amounts` parameter of
+      :meth:`telegram.Bot.send_invoice`.
+    * :paramref:`~telegram.Bot.create_invoice_link.suggested_tip_amounts` parameter of
       :meth:`telegram.Bot.create_invoice_link`.
     """
 
