@@ -119,8 +119,3 @@ class Invoice(TelegramObject):
 
     .. versionadded:: 20.0
     """
-    MAX_TIP_AMOUNTS: ClassVar[int] = constants.InvoiceLimit.MAX_TIP_AMOUNTS
-    """:const:`telegram.constants.InvoiceLimit.MAX_TIP_AMOUNTS`
-
-    .. versionadded:: 20.0
-    """
