@@ -935,7 +935,7 @@ class MediaGroupLimit(IntEnum):
     :meth:`telegram.Bot.send_media_group`.
     """
     MAX_MEDIA_LENGTH = 10
-    """:obj:`int`: Minimum length of a :obj:`list` passed as the
+    """:obj:`int`: Maximum length of a :obj:`list` passed as the
     :paramref:`~telegram.Bot.send_media_group.media` parameter of
     :meth:`telegram.Bot.send_media_group`.
     """
