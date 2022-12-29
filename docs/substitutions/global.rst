@@ -42,8 +42,10 @@
 
 .. |reply_to_msg_id| replace:: If the message is a reply, ID of the original message.
 
-.. |sequenceclassargs| replace:: Accepts any :class:`collections.abc.Sequence` as input instead of just a list. The input is converted to a tuple.
+.. |sequenceclassargs| replace:: |sequenceargs| The input is converted to a tuple.
 
 .. |tupleclassattrs| replace:: This attribute is now an immutable tuple.
 
 .. |alwaystuple| replace:: This attribute is now always a tuple, that may be empty.
+
+.. |sequenceargs| replace:: Accepts any :class:`collections.abc.Sequence` as input instead of just a list.

@@ -720,7 +720,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :paramref:`parse_mode`.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -935,7 +935,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 |caption_entities|
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1048,7 +1048,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 |caption_entities|
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             duration (:obj:`int`, optional): Duration of sent audio in seconds.
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
@@ -1178,7 +1178,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 |caption_entities|
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1384,7 +1384,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 |caption_entities|
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
                 suitable for streaming.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -1642,7 +1642,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 |caption_entities|
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1761,7 +1761,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 |caption_entities|
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             duration (:obj:`int`, optional): Duration of the voice message in seconds.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
@@ -1861,7 +1861,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 describing messages to be sent, must include 2–10 items.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1892,9 +1892,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 Defaults to :obj:`None`.
 
                 .. versionadded:: 20.0
-
-                .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
 
         Returns:
             Tuple[:class:`telegram.Message`]: An array of the sent Messages.
@@ -3211,7 +3208,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :paramref:`parse_mode`.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
@@ -3287,7 +3284,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 |caption_entities|
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
 
@@ -3497,7 +3494,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 a short period of time.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
 
         Returns:
             Tuple[:class:`telegram.Update`]
@@ -3622,7 +3619,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 a short period of time.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
                 updates.
             secret_token (:obj:`str`, optional): A secret token to be sent in a header
@@ -4205,7 +4202,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 bonus, etc.).
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
                 *smallest* units of the currency (integer, **not** float/double). For example, for
                 a maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
@@ -4223,7 +4220,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionadded:: 13.5
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             start_parameter (:obj:`str`, optional): Unique deep-linking parameter. If left empty,
                 *forwarded copies* of the sent message will have a *Pay* button, allowing
                 multiple users to pay directly from the forwarded message, using the same invoice.
@@ -4346,11 +4343,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             ok (:obj:`bool`): Specify :obj:`True` if delivery to the specified address is possible
                 and :obj:`False` if there are any problems (for example, if delivery to the
                 specified address is not possible).
-            shipping_options (Sequence[:class:`telegram.ShippingOption`]), optional]: Required if
+            shipping_options (Sequence[:class:`telegram.ShippingOption`]), optional): Required if
                 :paramref:`ok` is :obj:`True`. A sequence of available shipping options.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             error_message (:obj:`str`, optional): Required if :paramref:`ok` is :obj:`False`.
                 Error message in human readable form that explains why it is impossible to complete
                 the order (e.g. "Sorry, delivery to your desired address is unavailable"). Telegram
@@ -5474,7 +5471,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
 
         Returns:
             Tuple[:class:`telegram.Sticker`]
@@ -5922,7 +5919,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             errors (Sequence[:class:`PassportElementError`]): A Sequence describing the errors.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5989,7 +5986,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Poll.MAX_OPTION_LENGTH` characters each.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             is_anonymous (:obj:`bool`, optional): :obj:`True`, if the poll needs to be anonymous,
                 defaults to :obj:`True`.
             type (:obj:`str`, optional): Poll type, :tg-const:`telegram.Poll.QUIZ` or
@@ -6011,7 +6008,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :paramref:`explanation_parse_mode`.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
                 after creation, :tg-const:`telegram.Poll.MIN_OPEN_PERIOD`-
                 :tg-const:`telegram.Poll.MAX_OPEN_PERIOD`. Can't be used together with
@@ -6379,7 +6376,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 specified.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             scope (:class:`telegram.BotCommandScope`, optional): An object,
                 describing scope of users for which the commands are relevant. Defaults to
                 :class:`telegram.BotCommandScopeDefault`.
@@ -6574,7 +6571,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 |caption_entities|
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -6760,7 +6757,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 bonus, etc.).
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
                 *smallest* units of the currency (integer, **not** float/double). For example, for
                 a maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
@@ -6774,7 +6771,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :paramref:`max_tip_amount`.
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
             provider_data (:obj:`str` | :obj:`object`, optional): Data about the
                 invoice, which will be shared with the payment provider. A detailed description of
                 required fields should be provided by the payment provider. When an object is

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
-from typing import TYPE_CHECKING, List, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -124,7 +124,7 @@ class InlineKeyboardMarkup(TelegramObject):
                 in the markup
 
                 .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
 
         """
         return cls([button_row], **kwargs)  # type: ignore[arg-type]
@@ -144,7 +144,7 @@ class InlineKeyboardMarkup(TelegramObject):
                 in the markup
 
                  .. versionchanged:: 20.0
-                    Accept :obj:`Sequence` instead of :obj:`List`.
+                    |sequenceargs|
 
         """
         button_grid = [[button] for button in button_column]
