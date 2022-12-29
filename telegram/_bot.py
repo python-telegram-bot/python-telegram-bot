@@ -715,7 +715,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`): |parse_mode|
-            entities (Sequence[:class:`telegram.MessageEntity`], optional): List of special
+            entities (Sequence[:class:`telegram.MessageEntity`], optional): Sequence of special
                 entities that appear in message text, which can be specified instead of
                 :paramref:`parse_mode`.
 
@@ -3206,7 +3206,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
-            entities (Sequence[:class:`telegram.MessageEntity`], optional): List of special
+            entities (Sequence[:class:`telegram.MessageEntity`], optional): Sequence of special
                 entities that appear in message text, which can be specified instead of
                 :paramref:`parse_mode`.
 
@@ -3486,11 +3486,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             timeout (:obj:`int`, optional): Timeout in seconds for long polling. Defaults to ``0``,
                 i.e. usual short polling. Should be positive, short polling should be used for
                 testing purposes only.
-            allowed_updates (Sequence[:obj:`str`]), optional): A list the types of
+            allowed_updates (Sequence[:obj:`str`]), optional): A sequence the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
-                Specify an empty list to receive all updates except
+                Specify an empty sequence to receive all updates except
                 :attr:`telegram.Update.chat_member` (default). If not specified, the previous
                 setting will be used. Please note that this parameter doesn't affect updates
                 created before the call to the get_updates, so unwanted updates may be received for
@@ -3611,11 +3611,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.WebhookLimit.MAX_CONNECTIONS_LIMIT`.
                 Defaults to ``40``. Use lower values to limit the load on your bot's server,
                 and higher values to increase your bot's throughput.
-            allowed_updates (Sequence[:obj:`str`], optional): A list the types of
+            allowed_updates (Sequence[:obj:`str`], optional): A sequence the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
-                Specify an empty list to receive all updates except
+                Specify an empty sequence to receive all updates except
                 :attr:`telegram.Update.chat_member` (default). If not specified, the previous
                 setting will be used. Please note that this parameter doesn't affect updates
                 created before the call to the set_webhook, so unwanted updates may be received for
@@ -4200,7 +4200,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 `@BotFather <https://t.me/BotFather>`_.
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_.
-            prices (Sequence[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
+            prices (Sequence[:class:`telegram.LabeledPrice`)]: Price breakdown, a sequence
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
 
@@ -4347,7 +4347,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 and :obj:`False` if there are any problems (for example, if delivery to the
                 specified address is not possible).
             shipping_options (Sequence[:class:`telegram.ShippingOption`]), optional]: Required if
-                :paramref:`ok` is :obj:`True`. A list of available shipping options.
+                :paramref:`ok` is :obj:`True`. A sequence of available shipping options.
 
                 .. versionchanged:: 20.0
                     Accept :obj:`Sequence` instead of :obj:`List`.
@@ -5469,7 +5469,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             Returns a tuple instead of a list.
 
         Args:
-            custom_emoji_ids (Sequence[:obj:`str`]): List of custom emoji identifiers.
+            custom_emoji_ids (Sequence[:obj:`str`]): Sequence of custom emoji identifiers.
                 At most :tg-const:`telegram.constants.CustomEmojiStickerLimit.\
 CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
@@ -5919,7 +5919,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             user_id (:obj:`int`): User identifier
-            errors (Sequence[:class:`PassportElementError`]): A list describing the errors.
+            errors (Sequence[:class:`PassportElementError`]): A Sequence describing the errors.
 
                 .. versionchanged:: 20.0
                     Accept :obj:`Sequence` instead of :obj:`List`.
@@ -5982,7 +5982,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
                 :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
-            options (Sequence[:obj:`str`]): List of answer options,
+            options (Sequence[:obj:`str`]): Sequence of answer options,
                 :tg-const:`telegram.Poll.MIN_OPTION_NUMBER`-
                 :tg-const:`telegram.Poll.MAX_OPTION_NUMBER` strings
                 :tg-const:`telegram.Poll.MIN_OPTION_LENGTH`-
@@ -6006,7 +6006,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             explanation_parse_mode (:obj:`str`, optional): Mode for parsing entities in the
                 explanation. See the constants in :class:`telegram.constants.ParseMode` for the
                 available modes.
-            explanation_entities (Sequence[:class:`telegram.MessageEntity`], optional): List of
+            explanation_entities (Sequence[:class:`telegram.MessageEntity`], optional): Sequence of
                 special entities that appear in message text, which can be specified instead of
                 :paramref:`explanation_parse_mode`.
 
@@ -6373,7 +6373,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. seealso:: :meth:`get_my_commands`, :meth:`delete_my_commands`
 
         Args:
-            commands (Sequence[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A list
+            commands (Sequence[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A sequence
                 of bot commands to be set as the list of the bot's commands. At most
                 :tg-const:`telegram.constants.BotCommandLimit.MAX_COMMAND_NUMBER` commands can be
                 specified.
@@ -6755,7 +6755,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 `@BotFather <https://t.me/BotFather>`_.
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_.
-            prices (Sequence[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
+            prices (Sequence[:class:`telegram.LabeledPrice`)]: Price breakdown, a sequence
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
 

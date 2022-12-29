@@ -111,7 +111,7 @@ class InlineKeyboardMarkup(TelegramObject):
 
     @classmethod
     def from_row(
-        cls, button_row: List[InlineKeyboardButton], **kwargs: object
+        cls, button_row: Sequence[InlineKeyboardButton], **kwargs: object
     ) -> "InlineKeyboardMarkup":
         """Shortcut for::
 
@@ -120,15 +120,18 @@ class InlineKeyboardMarkup(TelegramObject):
         Return an InlineKeyboardMarkup from a single row of InlineKeyboardButtons
 
         Args:
-            button_row (List[:class:`telegram.InlineKeyboardButton`]): The button to use in the
-                markup
+            button_row (Sequence[:class:`telegram.InlineKeyboardButton`]): The button to use
+                in the markup
+
+                .. versionchanged:: 20.0
+                    Accept :obj:`Sequence` instead of :obj:`List`.
 
         """
         return cls([button_row], **kwargs)  # type: ignore[arg-type]
 
     @classmethod
     def from_column(
-        cls, button_column: List[InlineKeyboardButton], **kwargs: object
+        cls, button_column: Sequence[InlineKeyboardButton], **kwargs: object
     ) -> "InlineKeyboardMarkup":
         """Shortcut for::
 
@@ -137,8 +140,11 @@ class InlineKeyboardMarkup(TelegramObject):
         Return an InlineKeyboardMarkup from a single column of InlineKeyboardButtons
 
         Args:
-            button_column (List[:class:`telegram.InlineKeyboardButton`]): The button to use in the
-                markup
+            button_column (Sequence[:class:`telegram.InlineKeyboardButton`]): The button to use
+                in the markup
+
+                 .. versionchanged:: 20.0
+                    Accept :obj:`Sequence` instead of :obj:`List`.
 
         """
         button_grid = [[button] for button in button_column]

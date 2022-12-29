@@ -143,7 +143,7 @@ class RequestParameter:
         """Builds an instance of this class for a given key-value pair that represents the raw
         input as passed along from a method of :class:`telegram.Bot`.
         """
-        if not isinstance(value, str) and isinstance(value, Sequence):
+        if not isinstance(value, (str, bytes)) and isinstance(value, Sequence):
             param_values = []
             input_files = []
             for obj in value:
