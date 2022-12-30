@@ -1780,6 +1780,30 @@ class StatusUpdate:
     DELETE_CHAT_PHOTO = _DeleteChatPhoto(name="filters.StatusUpdate.DELETE_CHAT_PHOTO")
     """Messages that contain :attr:`telegram.Message.delete_chat_photo`."""
 
+    class _ForumTopicClosed(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_closed)
+
+    FORUM_TOPIC_CLOSED = _ForumTopicClosed(name="filters.StatusUpdate.FORUM_TOPIC_CLOSED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_closed`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _ForumTopicCreated(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_created)
+
+    FORUM_TOPIC_CREATED = _ForumTopicCreated(name="filters.StatusUpdate.FORUM_TOPIC_CREATED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_created`.
+
+    .. versionadded:: 20.0
+    """
+
     class _ForumTopicEdited(MessageFilter):
         __slots__ = ()
 
@@ -1788,6 +1812,18 @@ class StatusUpdate:
 
     FORUM_TOPIC_EDITED = _ForumTopicEdited(name="filters.StatusUpdate.FORUM_TOPIC_EDITED")
     """Messages that contain :attr:`telegram.Message.forum_topic_edited`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _ForumTopicReopened(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_reopened)
+
+    FORUM_TOPIC_REOPENED = _ForumTopicReopened(name="filters.StatusUpdate.FORUM_TOPIC_REOPENED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_reopened`.
 
     .. versionadded:: 20.0
     """
@@ -1978,42 +2014,6 @@ class StatusUpdate:
 
     WRITE_ACCESS_ALLOWED = _WriteAccessAllowed(name="filters.StatusUpdate.WRITE_ACCESS_ALLOWED")
     """Messages that contain :attr:`telegram.Message.write_access_allowed`.
-
-    .. versionadded:: 20.0
-    """
-
-    class _ForumTopicCreated(MessageFilter):
-        __slots__ = ()
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.forum_topic_created)
-
-    FORUM_TOPIC_CREATED = _ForumTopicCreated(name="filters.StatusUpdate.FORUM_TOPIC_CREATED")
-    """Messages that contain :attr:`telegram.Message.forum_topic_created`.
-
-    .. versionadded:: 20.0
-    """
-
-    class _ForumTopicClosed(MessageFilter):
-        __slots__ = ()
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.forum_topic_closed)
-
-    FORUM_TOPIC_CLOSED = _ForumTopicClosed(name="filters.StatusUpdate.FORUM_TOPIC_CLOSED")
-    """Messages that contain :attr:`telegram.Message.forum_topic_closed`.
-
-    .. versionadded:: 20.0
-    """
-
-    class _ForumTopicReopened(MessageFilter):
-        __slots__ = ()
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.forum_topic_reopened)
-
-    FORUM_TOPIC_REOPENED = _ForumTopicReopened(name="filters.StatusUpdate.FORUM_TOPIC_REOPENED")
-    """Messages that contain :attr:`telegram.Message.forum_topic_reopened`.
 
     .. versionadded:: 20.0
     """
