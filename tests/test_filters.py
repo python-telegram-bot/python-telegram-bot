@@ -1026,6 +1026,26 @@ class TestFilters:
         assert filters.StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
         update.message.forum_topic_reopened = None
 
+        update.message.forum_topic_edited = "topic_edited"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.FORUM_TOPIC_EDITED.check_update(update)
+        update.message.forum_topic_edited = None
+
+        update.message.general_forum_topic_hidden = "topic_hidden"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GENERAL_FORUM_TOPIC_HIDDEN.check_update(update)
+        update.message.general_forum_topic_hidden = None
+
+        update.message.general_forum_topic_unhidden = "topic_unhidden"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GENERAL_FORUM_TOPIC_UNHIDDEN.check_update(update)
+        update.message.general_forum_topic_unhidden = None
+
+        update.message.write_access_allowed = "allowed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
+        update.message.write_access_allowed = None
+
     def test_filters_forwarded(self, update):
         assert not filters.FORWARDED.check_update(update)
         update.message.forward_date = datetime.datetime.utcnow()

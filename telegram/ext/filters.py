@@ -1723,6 +1723,10 @@ class StatusUpdate:
                 or StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
                 or StatusUpdate.FORUM_TOPIC_CLOSED.check_update(update)
                 or StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
+                or StatusUpdate.FORUM_TOPIC_EDITED.check_update(update)
+                or StatusUpdate.GENERAL_FORUM_TOPIC_HIDDEN.check_update(update)
+                or StatusUpdate.GENERAL_FORUM_TOPIC_UNHIDDEN.check_update(update)
+                or StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -1760,6 +1764,46 @@ class StatusUpdate:
 
     DELETE_CHAT_PHOTO = _DeleteChatPhoto(name="filters.StatusUpdate.DELETE_CHAT_PHOTO")
     """Messages that contain :attr:`telegram.Message.delete_chat_photo`."""
+
+    class _ForumTopicEdited(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_edited)
+
+    FORUM_TOPIC_EDITED = _ForumTopicEdited(name="filters.StatusUpdate.FORUM_TOPIC_EDITED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_edited`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _GeneralForumTopicHidden(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.general_forum_topic_hidden)
+
+    GENERAL_FORUM_TOPIC_HIDDEN = _GeneralForumTopicHidden(
+        name="filters.StatusUpdate.GENERAL_FORUM_TOPIC_HIDDEN"
+    )
+    """Messages that contain :attr:`telegram.Message.general_forum_topic_hidden`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _GeneralForumTopicUnhidden(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.general_forum_topic_unhidden)
+
+    GENERAL_FORUM_TOPIC_UNHIDDEN = _GeneralForumTopicUnhidden(
+        name="filters.StatusUpdate.GENERAL_FORUM_TOPIC_UNHIDDEN"
+    )
+    """Messages that contain :attr:`telegram.Message.general_forum_topic_unhidden`.
+
+    .. versionadded:: 20.0
+    """
 
     class _LeftChatMember(MessageFilter):
         __slots__ = ()
@@ -1907,6 +1951,18 @@ class StatusUpdate:
 
     WEB_APP_DATA = _WebAppData(name="filters.StatusUpdate.WEB_APP_DATA")
     """Messages that contain :attr:`telegram.Message.web_app_data`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _WriteAccessAllowed(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.write_access_allowed)
+
+    WRITE_ACCESS_ALLOWED = _WriteAccessAllowed(name="filters.StatusUpdate.WRITE_ACCESS_ALLOWED")
+    """Messages that contain :attr:`telegram.Message.write_access_allowed`.
 
     .. versionadded:: 20.0
     """
