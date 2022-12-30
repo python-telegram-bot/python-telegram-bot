@@ -277,6 +277,7 @@ class TestForumMethods:
         )
         assert result is True, "Failed to reopen general forum topic"
 
+    @pytest.mark.xfail(reason="Can fail due to race conditions in GH actions CI")
     async def test_hide_and_unhide_general_forum_topic(self, bot, forum_group_id):
 
         result = await bot.hide_general_forum_topic(

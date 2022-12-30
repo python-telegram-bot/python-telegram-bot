@@ -3880,7 +3880,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         api_kwargs: JSONDict = None,
     ) -> ChatMember:
         """Use this method to get information about a member of a chat. The method is guaranteed
-            to work only if the bot is an administrator in the chat.
+        to work only if the bot is an administrator in the chat.
 
         .. seealso:: :meth:`telegram.Chat.get_member`
 
@@ -6929,7 +6929,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             name (:obj:`str`, optional): New topic name,
                 :tg-const:`telegram.constants.ForumTopicLimit.MIN_NAME_LENGTH`-
                 :tg-const:`telegram.constants.ForumTopicLimit.MAX_NAME_LENGTH` characters. If
-                not specififed or empty, the current name of the topic will be kept.
+                not specified or empty, the current name of the topic will be kept.
             icon_custom_emoji_id (:obj:`str`, optional): New unique identifier of the custom emoji
                 shown as the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers`
                 to get all allowed custom emoji identifiers.Pass an empty string to remove the
