@@ -1537,14 +1537,22 @@ class ForumTopicLimit(IntEnum):
     __slots__ = ()
 
     MIN_NAME_LENGTH = 1
-    """:obj:`int`: Minimum length of a :obj:`str` passed as the
-    :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
-    :meth:`telegram.Bot.create_forum_topic` and :paramref:`~telegram.Bot.edit_forum_topic.name`
-    parameter of :meth:`telegram.Bot.edit_forum_topic`.
+    """:obj:`int`: Minimum length of a :obj:`str` passed as:
+
+    * :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
+      :meth:`telegram.Bot.create_forum_topic`
+    * :paramref:`~telegram.Bot.edit_forum_topic.name` parameter of
+      :meth:`telegram.Bot.edit_forum_topic`
+    * :paramref:`~telegram.Bot.edit_general_forum_topic.name` parameter of
+      :meth:`telegram.Bot.edit_general_forum_topic`
     """
     MAX_NAME_LENGTH = 128
-    """:obj:`int`: Maximum length of a :obj:`str` passed as the
-    :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
-    :meth:`telegram.Bot.create_forum_topic` and :paramref:`~telegram.Bot.edit_forum_topic.name`
-    parameter of :meth:`telegram.Bot.edit_forum_topic`.
+    """:obj:`int`: Maximum length of a :obj:`str` passed as:
+
+    * :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
+      :meth:`telegram.Bot.create_forum_topic`
+    * :paramref:`~telegram.Bot.edit_forum_topic.name` parameter of
+      :meth:`telegram.Bot.edit_forum_topic`
+    * :paramref:`~telegram.Bot.edit_general_forum_topic.name` parameter of
+      :meth:`telegram.Bot.edit_general_forum_topic`
     """

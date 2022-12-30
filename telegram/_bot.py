@@ -7141,6 +7141,227 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
+    @_log
+    async def edit_general_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        name: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to edit the name of the 'General' topic in a forum supergroup chat. The bot
+        must be an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+
+        .. seealso:: :meth:`telegram.Message.edit_general_forum_topic`,
+            :meth:`telegram.Chat.edit_general_forum_topic`,
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            name (:obj:`str`): New topic name,
+                :tg-const:`telegram.constants.ForumTopicLimit.MIN_NAME_LENGTH`-
+                :tg-const:`telegram.constants.ForumTopicLimit.MAX_NAME_LENGTH` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id, "name": name}
+
+        return await self._post(
+            "editGeneralForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def close_general_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to close an open 'General' topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+
+        .. seealso:: :meth:`telegram.Message.close_general_forum_topic`,
+            :meth:`telegram.Chat.close_general_forum_topic`,
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id}
+
+        return await self._post(
+            "closeGeneralForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def reopen_general_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to reopen a closed 'General' topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+        The topic will be automatically unhidden if it was hidden.
+
+        .. seealso:: :meth:`telegram.Message.reopen_general_forum_topic`,
+            :meth:`telegram.Chat.reopen_general_forum_topic`,
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id}
+
+        return await self._post(
+            "reopenGeneralForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def hide_general_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to hide the 'General' topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+        The topic will be automatically closed if it was open.
+
+        .. seealso:: :meth:`telegram.Message.hide_general_forum_topic`,
+            :meth:`telegram.Chat.hide_general_forum_topic`,
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id}
+
+        return await self._post(
+            "hideGeneralForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def unhide_general_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to unhide the 'General' topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+
+        .. seealso:: :meth:`telegram.Message.unhide_general_forum_topic`,
+            :meth:`telegram.Chat.unhide_general_forum_topic`,
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id}
+
+        return await self._post(
+            "unhideGeneralForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # skipcq: PYL-W0613
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -7349,3 +7570,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`delete_forum_topic`"""
     unpinAllForumTopicMessages = unpin_all_forum_topic_messages
     """Alias for :meth:`unpin_all_forum_topic_messages`"""
+    editGeneralForumTopic = edit_general_forum_topic
+    """Alias for :meth:`edit_general_forum_topic`"""
+    closeGeneralForumTopic = close_general_forum_topic
+    """Alias for :meth:`close_general_forum_topic`"""
+    reopenGeneralForumTopic = reopen_general_forum_topic
+    """Alias for :meth:`reopen_general_forum_topic`"""
+    hideGeneralForumTopic = hide_general_forum_topic
+    """Alias for :meth:`hide_general_forum_topic`"""
+    unhideGeneralForumTopic = unhide_general_forum_topic
+    """Alias for :meth:`unhide_general_forum_topic`"""
