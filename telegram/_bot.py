@@ -1848,9 +1848,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            media (List[:class:`telegram.InputMediaAudio`, :class:`telegram.InputMediaDocument`, \
-                :class:`telegram.InputMediaPhoto`, :class:`telegram.InputMediaVideo`]): An array
-                describing messages to be sent, must include 2–10 items.
+            media (List[:class:`telegram.InputMediaAudio`, :class:`telegram.InputMediaDocument`,\
+                :class:`telegram.InputMediaPhoto`, :class:`telegram.InputMediaVideo`]):
+                An array describing messages to be sent, must include
+                :tg-const:`telegram.constants.MediaGroupLimit.MIN_MEDIA_LENGTH`–
+                :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -4186,9 +4188,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionadded:: 13.5
             suggested_tip_amounts (List[:obj:`int`], optional): An array of
                 suggested amounts of tips in the *smallest* units of the currency (integer, **not**
-                float/double). At most 4 suggested tip amounts can be specified. The suggested tip
-                amounts must be positive, passed in a strictly increased order and must not exceed
-                :paramref:`max_tip_amount`.
+                float/double). At most :tg-const:`telegram.Invoice.MAX_TIP_AMOUNTS` suggested tip
+                amounts can be specified. The suggested tip amounts must be positive, passed in a
+                strictly increased order and must not exceed :paramref:`max_tip_amount`.
 
                 .. versionadded:: 13.5
             start_parameter (:obj:`str`, optional): Unique deep-linking parameter. If left empty,
@@ -6711,9 +6713,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 majority of currencies). Defaults to ``0``.
             suggested_tip_amounts (List[:obj:`int`], optional): An array of
                 suggested amounts of tips in the *smallest* units of the currency (integer, **not**
-                float/double). At most 4 suggested tip amounts can be specified. The suggested tip
-                amounts must be positive, passed in a strictly increased order and must not exceed
-                :paramref:`max_tip_amount`.
+                float/double). At most :tg-const:`telegram.Invoice.MAX_TIP_AMOUNTS` suggested tip
+                amounts can be specified. The suggested tip amounts must be positive, passed in a
+                strictly increased order and must not exceed :paramref:`max_tip_amount`.
             provider_data (:obj:`str` | :obj:`object`, optional): Data about the
                 invoice, which will be shared with the payment provider. A detailed description of
                 required fields should be provided by the payment provider. When an object is
