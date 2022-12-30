@@ -61,6 +61,7 @@ __all__ = [
     "InvoiceLimit",
     "LocationLimit",
     "MaskPosition",
+    "MediaGroupLimit",
     "MenuButtonType",
     "MessageAttachmentType",
     "MessageEntityType",
@@ -919,6 +920,27 @@ class MaskPosition(StringEnum):
     """:obj:`str`: Mask position for a sticker on the chin."""
 
 
+class MediaGroupLimit(IntEnum):
+    """This enum contains limitations for :meth:`telegram.Bot.send_media_group`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_MEDIA_LENGTH = 2
+    """:obj:`int`: Minimum length of a :obj:`list` passed as the
+    :paramref:`~telegram.Bot.send_media_group.media` parameter of
+    :meth:`telegram.Bot.send_media_group`.
+    """
+    MAX_MEDIA_LENGTH = 10
+    """:obj:`int`: Maximum length of a :obj:`list` passed as the
+    :paramref:`~telegram.Bot.send_media_group.media` parameter of
+    :meth:`telegram.Bot.send_media_group`.
+    """
+
+
 class MenuButtonType(StringEnum):
     """This enum contains the available types of :class:`telegram.MenuButton`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -1403,8 +1425,9 @@ class UpdateType(StringEnum):
 
 
 class InvoiceLimit(IntEnum):
-    """This enum contains limitations for :meth:`telegram.Bot.create_invoice_link`. The enum
-    members of this enumeration are instances of :class:`int` and can be treated as such.
+    """This enum contains limitations for :class:`telegram.InputInvoiceMessageContent`,
+    :meth:`telegram.Bot.send_invoice`, and :meth:`telegram.Bot.create_invoice_link`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
     """
@@ -1469,6 +1492,14 @@ class InvoiceLimit(IntEnum):
     * :paramref:`~telegram.Bot.send_invoice.payload` parameter of
       :meth:`telegram.Bot.send_invoice`.
     * :paramref:`~telegram.Bot.create_invoice_link.payload` parameter of
+      :meth:`telegram.Bot.create_invoice_link`.
+    """
+    MAX_TIP_AMOUNTS = 4
+    """:obj:`int`: Maximum length of a :obj:`Sequence` passed as:
+
+    * :paramref:`~telegram.Bot.send_invoice.suggested_tip_amounts` parameter of
+      :meth:`telegram.Bot.send_invoice`.
+    * :paramref:`~telegram.Bot.create_invoice_link.suggested_tip_amounts` parameter of
       :meth:`telegram.Bot.create_invoice_link`.
     """
 
