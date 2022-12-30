@@ -1835,6 +1835,11 @@ class TestFilters:
         update.message.is_topic_message = True
         assert filters.IS_TOPIC_MESSAGE.check_update(update)
 
+    def test_filters_has_media_spoiler(self, update):
+        assert not filters.HAS_MEDIA_SPOILER.check_update(update)
+        update.message.has_media_spoiler = True
+        assert filters.HAS_MEDIA_SPOILER.check_update(update)
+
     def test_filters_has_protected_content(self, update):
         assert not filters.HAS_PROTECTED_CONTENT.check_update(update)
         update.message.has_protected_content = True

@@ -58,6 +58,7 @@ __all__ = (
     "FORWARDED",
     "ForwardedFrom",
     "GAME",
+    "HAS_MEDIA_SPOILER",
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
     "IS_AUTOMATIC_FORWARD",
@@ -1382,6 +1383,20 @@ class _Game(MessageFilter):
 
 GAME = _Game(name="filters.GAME")
 """Messages that contain :attr:`telegram.Message.game`."""
+
+
+class _HasMediaSpoiler(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.has_media_spoiler)
+
+
+HAS_MEDIA_SPOILER = _HasMediaSpoiler(name="filters.HAS_MEDIA_SPOILER")
+"""Messages that contain :attr:`telegram.Message.has_media_spoiler`.
+
+    .. versionadded:: 20.0
+"""
 
 
 class _HasProtectedContent(MessageFilter):
