@@ -963,7 +963,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            has_spoiler (:obj:`int`, optional): Pass :obj:`True` if the photo needs to be covered
+            has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the photo needs to be covered
                 with a spoiler animation.
 
                 .. versionadded:: 20.0
@@ -1418,7 +1418,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
-            has_spoiler (:obj:`int`, optional): Pass :obj:`True` if the video needs to be covered
+            has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the video needs to be covered
                 with a spoiler animation.
 
                 .. versionadded:: 20.0
@@ -1667,7 +1667,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            has_spoiler (:obj:`int`, optional): Pass :obj:`True` if the animation needs to be
+            has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the animation needs to be
                 covered with a spoiler animation.
 
                 .. versionadded:: 20.0
@@ -6928,10 +6928,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_thread_id (:obj:`int`): |message_thread_id|
             name (:obj:`str`, optional): New topic name,
                 :tg-const:`telegram.constants.ForumTopicLimit.MIN_NAME_LENGTH`-
-                :tg-const:`telegram.constants.ForumTopicLimit.MAX_NAME_LENGTH` characters.
+                :tg-const:`telegram.constants.ForumTopicLimit.MAX_NAME_LENGTH` characters. If
+                not specififed or empty, the current name of the topic will be kept.
             icon_custom_emoji_id (:obj:`str`, optional): New unique identifier of the custom emoji
                 shown as the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers`
-                to get all allowed custom emoji identifiers.
+                to get all allowed custom emoji identifiers.Pass an empty string to remove the
+                icon. If not specified, the current icon will be kept.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
