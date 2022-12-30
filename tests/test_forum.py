@@ -265,13 +265,12 @@ class TestForumMethods:
         assert result is True, "Failed to edit general forum topic"
         # no way of checking the edited name, just the boolean result
 
+    @pytest.mark.xfail(reason="Can fail due to race conditions in GH actions CI")
     async def test_close_and_reopen_general_forum_topic(self, bot, forum_group_id):
         result = await bot.close_general_forum_topic(
             chat_id=forum_group_id,
         )
         assert result is True, "Failed to close general forum topic"
-        # bot will still be able to send a message to a closed topic, so can't test anything like
-        # the inability to post to the topic
 
         result = await bot.reopen_general_forum_topic(
             chat_id=forum_group_id,
@@ -284,8 +283,6 @@ class TestForumMethods:
             chat_id=forum_group_id,
         )
         assert result is True, "Failed to hide general forum topic"
-        # bot will still be able to send a message to a closed topic, so can't test anything like
-        # the inability to post to the topic
 
         result = await bot.unhide_general_forum_topic(
             chat_id=forum_group_id,
