@@ -436,6 +436,10 @@ class TestBot:
         with pytest.raises(pickle.PicklingError, match="Bot objects cannot be pickled"):
             pickle.dumps(bot)
 
+    def test_bot_deepcopy_error(self, bot):
+        with pytest.raises(TypeError, match="Bot objects cannot be deepcopied"):
+            copy.deepcopy(bot)
+
     @bot_methods(ext_bot=False)
     async def test_defaults_handling(
         self, bot_class, bot_method_name, bot_method, bot, raw_bot, monkeypatch
