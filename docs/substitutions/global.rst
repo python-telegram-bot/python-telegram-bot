@@ -47,5 +47,3 @@
 .. |tupleclassattrs| replace:: This attribute is now an immutable tuple.
 
 .. |alwaystuple| replace:: This attribute is now always a tuple, that may be empty.
-
-.. |has_spoiler| replace:: Pass :obj:`True` if the photo needs to be covered with a spoiler animation.

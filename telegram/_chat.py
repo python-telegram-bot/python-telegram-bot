@@ -2859,8 +2859,7 @@ class Chat(TelegramObject):
 
     async def edit_general_forum_topic(
         self,
-        message_thread_id: int,
-        name: str = None,
+        name: str,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2884,7 +2883,6 @@ class Chat(TelegramObject):
         """
         return await self.get_bot().edit_general_forum_topic(
             chat_id=self.id,
-            message_thread_id=message_thread_id,
             name=name,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2895,7 +2893,6 @@ class Chat(TelegramObject):
 
     async def close_general_forum_topic(
         self,
-        message_thread_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2917,7 +2914,6 @@ class Chat(TelegramObject):
         """
         return await self.get_bot().close_general_forum_topic(
             chat_id=self.id,
-            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2927,7 +2923,6 @@ class Chat(TelegramObject):
 
     async def reopen_general_forum_topic(
         self,
-        message_thread_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2951,7 +2946,6 @@ class Chat(TelegramObject):
         """
         return await self.get_bot().reopen_general_forum_topic(
             chat_id=self.id,
-            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2961,7 +2955,6 @@ class Chat(TelegramObject):
 
     async def hide_general_forum_topic(
         self,
-        message_thread_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2983,7 +2976,6 @@ class Chat(TelegramObject):
         """
         return await self.get_bot().hide_general_forum_topic(
             chat_id=self.id,
-            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2993,7 +2985,6 @@ class Chat(TelegramObject):
 
     async def unhide_general_forum_topic(
         self,
-        message_thread_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3017,7 +3008,6 @@ class Chat(TelegramObject):
         """
         return await self.get_bot().unhide_general_forum_topic(
             chat_id=self.id,
-            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

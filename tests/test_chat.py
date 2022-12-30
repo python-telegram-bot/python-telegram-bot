@@ -1044,6 +1044,111 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
         assert await chat.unpin_all_forum_topic_messages(message_thread_id=42)
 
+    async def test_edit_general_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["name"] == "WhatAName"
+
+        assert check_shortcut_signature(
+            Chat.edit_general_forum_topic,
+            Bot.edit_general_forum_topic,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.edit_general_forum_topic,
+            chat.get_bot(),
+            "edit_general_forum_topic",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.edit_general_forum_topic, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "edit_general_forum_topic", make_assertion)
+        assert await chat.edit_general_forum_topic(name="WhatAName")
+
+    async def test_close_general_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.close_general_forum_topic,
+            Bot.close_general_forum_topic,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.close_general_forum_topic,
+            chat.get_bot(),
+            "close_general_forum_topic",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.close_general_forum_topic, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "close_general_forum_topic", make_assertion)
+        assert await chat.close_general_forum_topic()
+
+    async def test_reopen_general_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.reopen_general_forum_topic,
+            Bot.reopen_general_forum_topic,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.reopen_general_forum_topic,
+            chat.get_bot(),
+            "reopen_general_forum_topic",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.reopen_general_forum_topic, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "reopen_general_forum_topic", make_assertion)
+        assert await chat.reopen_general_forum_topic()
+
+    async def test_hide_general_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.hide_general_forum_topic,
+            Bot.hide_general_forum_topic,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.hide_general_forum_topic,
+            chat.get_bot(),
+            "hide_general_forum_topic",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.hide_general_forum_topic, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "hide_general_forum_topic", make_assertion)
+        assert await chat.hide_general_forum_topic()
+
+    async def test_unhide_general_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.unhide_general_forum_topic,
+            Bot.unhide_general_forum_topic,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.unhide_general_forum_topic,
+            chat.get_bot(),
+            "unhide_general_forum_topic",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(chat.unhide_general_forum_topic, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "unhide_general_forum_topic", make_assertion)
+        assert await chat.unhide_general_forum_topic()
+
     def test_mention_html(self):
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
             chat = Chat(id=1, type="foo")

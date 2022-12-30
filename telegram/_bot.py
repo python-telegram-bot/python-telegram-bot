@@ -963,7 +963,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            has_spoiler (:obj:`int`, optional): |message_thread_id_arg|
+            has_spoiler (:obj:`int`, optional): Pass :obj:`True` if the photo needs to be covered
+                with a spoiler animation.
 
                 .. versionadded:: 20.0
 
@@ -1417,7 +1418,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
-            has_spoiler (:obj:`int`, optional): |message_thread_id_arg|
+            has_spoiler (:obj:`int`, optional): Pass :obj:`True` if the video needs to be covered
+                with a spoiler animation.
 
                 .. versionadded:: 20.0
 
@@ -1665,7 +1667,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            has_spoiler (:obj:`int`, optional): |message_thread_id_arg|
+            has_spoiler (:obj:`int`, optional): Pass :obj:`True` if the animation needs to be
+                covered with a spoiler animation.
 
                 .. versionadded:: 20.0
 
@@ -3876,7 +3879,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> ChatMember:
-        """Use this method to get information about a member of a chat.
+        """Use this method to get information about a member of a chat. The method is guaranteed
+            to work only if the bot is an administrator in the chat.
 
         .. seealso:: :meth:`telegram.Chat.get_member`
 

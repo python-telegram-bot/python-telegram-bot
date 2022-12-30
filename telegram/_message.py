@@ -3053,7 +3053,7 @@ class Message(TelegramObject):
 
     async def edit_general_forum_topic(
         self,
-        name: str = None,
+        name: str,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3064,7 +3064,7 @@ class Message(TelegramObject):
         """Shortcut for::
 
              await bot.edit_general_forum_topic(
-                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                chat_id=message.chat_id, *args,
                 **kwargs
              )
 
@@ -3078,7 +3078,6 @@ class Message(TelegramObject):
         """
         return await self.get_bot().edit_general_forum_topic(
             chat_id=self.chat_id,
-            message_thread_id=self.message_thread_id,
             name=name,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -3099,7 +3098,7 @@ class Message(TelegramObject):
         """Shortcut for::
 
              await bot.close_general_forum_topic(
-                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                chat_id=message.chat_id, *args,
                 **kwargs
              )
 
@@ -3113,7 +3112,6 @@ class Message(TelegramObject):
         """
         return await self.get_bot().close_general_forum_topic(
             chat_id=self.chat_id,
-            message_thread_id=self.message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3133,7 +3131,7 @@ class Message(TelegramObject):
         """Shortcut for::
 
             await bot.reopen_general_forum_topic(
-                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                chat_id=message.chat_id, *args,
                 **kwargs
              )
 
@@ -3147,7 +3145,6 @@ class Message(TelegramObject):
         """
         return await self.get_bot().reopen_general_forum_topic(
             chat_id=self.chat_id,
-            message_thread_id=self.message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3167,7 +3164,7 @@ class Message(TelegramObject):
         """Shortcut for::
 
             await bot.hide_general_forum_topic(
-                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                chat_id=message.chat_id, *args,
                 **kwargs
              )
 
@@ -3181,7 +3178,6 @@ class Message(TelegramObject):
         """
         return await self.get_bot().hide_general_forum_topic(
             chat_id=self.chat_id,
-            message_thread_id=self.message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3201,7 +3197,7 @@ class Message(TelegramObject):
         """Shortcut for::
 
             await bot.unhide_general_forum_topic(
-                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                chat_id=message.chat_id, *args,
                 **kwargs
              )
 
@@ -3215,7 +3211,6 @@ class Message(TelegramObject):
         """
         return await self.get_bot().unhide_general_forum_topic(
             chat_id=self.chat_id,
-            message_thread_id=self.message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

@@ -2536,7 +2536,7 @@ class TestBot:
     # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers
     # are tested in the test_sticker module.
 
-    # get_forum_topic_icon_stickers, edit_forum_topic, etc...
+    # get_forum_topic_icon_stickers, edit_forum_topic, general_forum etc...
     # are tested in the test_forum module.
 
     async def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):

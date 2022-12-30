@@ -148,6 +148,8 @@ class TestForumTopic:
         assert a != e
         assert hash(a) != hash(e)
 
+
+class TestForumMethods:
     @pytest.mark.flaky(3, 1)
     async def test_create_forum_topic(self, real_topic):
         result = real_topic
@@ -252,6 +254,42 @@ class TestForumTopic:
             chat_id=forum_group_id, message_thread_id=message_thread_id
         )
         assert result is True, "Failed to unpin all the messages in forum topic"
+
+    async def test_edit_general_forum_topic(self, bot, forum_group_id):
+        result = await bot.edit_general_forum_topic(
+            chat_id=forum_group_id,
+            name="GENERAL_EDITED",
+        )
+        assert result is True, "Failed to edit general forum topic"
+        # no way of checking the edited name, just the boolean result
+
+    async def test_close_and_reopen_general_forum_topic(self, bot, forum_group_id):
+
+        result = await bot.close_general_forum_topic(
+            chat_id=forum_group_id,
+        )
+        assert result is True, "Failed to close general forum topic"
+        # bot will still be able to send a message to a closed topic, so can't test anything like
+        # the inability to post to the topic
+
+        result = await bot.reopen_general_forum_topic(
+            chat_id=forum_group_id,
+        )
+        assert result is True, "Failed to reopen general forum topic"
+
+    async def test_hide_and_unhide_general_forum_topic(self, bot, forum_group_id):
+
+        result = await bot.hide_general_forum_topic(
+            chat_id=forum_group_id,
+        )
+        assert result is True, "Failed to hide general forum topic"
+        # bot will still be able to send a message to a closed topic, so can't test anything like
+        # the inability to post to the topic
+
+        result = await bot.unhide_general_forum_topic(
+            chat_id=forum_group_id,
+        )
+        assert result is True, "Failed to unhide general forum topic"
 
 
 @pytest.fixture
