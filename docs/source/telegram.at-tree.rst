@@ -39,7 +39,10 @@ Available Types
     telegram.forumtopic
     telegram.forumtopicclosed
     telegram.forumtopiccreated
+    telegram.forumtopicedited
     telegram.forumtopicreopened
+    telegram.generalforumtopichidden
+    telegram.generalforumtopicunhidden
     telegram.inlinekeyboardbutton
     telegram.inlinekeyboardmarkup
     telegram.inputfile
@@ -84,4 +87,5 @@ Available Types
     telegram.webappdata
     telegram.webappinfo
     telegram.webhookinfo
+    telegram.writeaccessallowed
 

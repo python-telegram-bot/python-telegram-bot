@@ -918,6 +918,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -962,6 +963,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            has_spoiler (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the photo, when uploading a
@@ -980,6 +984,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "photo": self._parse_file_input(photo, PhotoSize, filename=filename),
+            "has_spoiler": has_spoiler,
         }
 
         return await self._send_message(
@@ -1341,6 +1346,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1411,6 +1417,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
+            has_spoiler (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video, when uploading a
@@ -1434,6 +1443,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "height": height,
             "supports_streaming": supports_streaming,
             "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
+            "has_spoiler": has_spoiler,
         }
 
         return await self._send_message(
@@ -1589,6 +1599,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1654,6 +1665,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            has_spoiler (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the animation, when uploading a
@@ -1676,6 +1690,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "width": width,
             "height": height,
             "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
+            "has_spoiler": has_spoiler,
         }
 
         return await self._send_message(
@@ -2507,6 +2522,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         action: str,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2528,6 +2544,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             action(:obj:`str`): Type of action to broadcast. Choose one, depending on what the user
                 is about to receive. For convenience look at the constants in
                 :class:`telegram.constants.ChatAction`.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 20.0
 
         Returns:
             :obj:`bool`:  On success, :obj:`True` is returned.
@@ -2536,7 +2555,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "action": action}
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "action": action,
+            "message_thread_id": message_thread_id,
+        }
         result = await self._post(
             "sendChatAction",
             data,
@@ -6874,8 +6897,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[str, int],
         message_thread_id: int,
-        name: str,
-        icon_custom_emoji_id: str,
+        name: str = None,
+        icon_custom_emoji_id: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6897,12 +6920,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             message_thread_id (:obj:`int`): |message_thread_id|
-            name (:obj:`str`): New topic name,
+            name (:obj:`str`, optional): New topic name,
                 :tg-const:`telegram.constants.ForumTopicLimit.MIN_NAME_LENGTH`-
                 :tg-const:`telegram.constants.ForumTopicLimit.MAX_NAME_LENGTH` characters.
-            icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
-                the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
-                allowed custom emoji identifiers.
+            icon_custom_emoji_id (:obj:`str`, optional): New unique identifier of the custom emoji
+                shown as the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers`
+                to get all allowed custom emoji identifiers.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

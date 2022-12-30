@@ -427,6 +427,7 @@ class User(TelegramObject):
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -463,6 +464,7 @@ class User(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            has_spoiler=has_spoiler,
         )
 
     async def send_media_group(
@@ -955,6 +957,7 @@ class User(TelegramObject):
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -995,6 +998,7 @@ class User(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            has_spoiler=has_spoiler,
         )
 
     async def send_sticker(
@@ -1056,6 +1060,7 @@ class User(TelegramObject):
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1097,6 +1102,7 @@ class User(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            has_spoiler=has_spoiler,
         )
 
     async def send_venue(

@@ -29,6 +29,7 @@ def reply_keyboard_markup():
         resize_keyboard=TestReplyKeyboardMarkup.resize_keyboard,
         one_time_keyboard=TestReplyKeyboardMarkup.one_time_keyboard,
         selective=TestReplyKeyboardMarkup.selective,
+        is_persistent=TestReplyKeyboardMarkup.is_persistent,
     )
 
 
@@ -37,6 +38,7 @@ class TestReplyKeyboardMarkup:
     resize_keyboard = True
     one_time_keyboard = True
     selective = True
+    is_persistent = True
 
     def test_slot_behaviour(self, reply_keyboard_markup, mro_slots):
         inst = reply_keyboard_markup
@@ -103,6 +105,7 @@ class TestReplyKeyboardMarkup:
         assert reply_keyboard_markup.resize_keyboard == self.resize_keyboard
         assert reply_keyboard_markup.one_time_keyboard == self.one_time_keyboard
         assert reply_keyboard_markup.selective == self.selective
+        assert reply_keyboard_markup.is_persistent == self.is_persistent
 
     def test_wrong_keyboard_inputs(self):
         with pytest.raises(ValueError):
@@ -134,6 +137,7 @@ class TestReplyKeyboardMarkup:
             == reply_keyboard_markup.one_time_keyboard
         )
         assert reply_keyboard_markup_dict["selective"] == reply_keyboard_markup.selective
+        assert reply_keyboard_markup_dict["is_persistent"] == reply_keyboard_markup.is_persistent
 
     def test_equality(self):
         a = ReplyKeyboardMarkup.from_column(["button1", "button2", "button3"])

@@ -18,7 +18,16 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopicReopened, Sticker
+from telegram import (
+    ForumTopic,
+    ForumTopicClosed,
+    ForumTopicCreated,
+    ForumTopicEdited,
+    ForumTopicReopened,
+    GeneralForumTopicHidden,
+    GeneralForumTopicUnhidden,
+    Sticker,
+)
 
 TEST_MSG_TEXT = "Topics are forever"
 TEST_TOPIC_ICON_COLOR = 0x6FB9F0
@@ -331,5 +340,97 @@ class TestForumTopicReopened:
 
     def test_to_dict(self):
         action = ForumTopicReopened()
+        action_dict = action.to_dict()
+        assert action_dict == {}
+
+
+@pytest.fixture
+def topic_edited(emoji_id):
+    return ForumTopicEdited(name=TEST_TOPIC_NAME, icon_custom_emoji_id=emoji_id)
+
+
+class TestForumTopicEdited:
+    def test_slot_behaviour(self, topic_edited, mro_slots):
+        for attr in topic_edited.__slots__:
+            assert getattr(topic_edited, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(topic_edited)) == len(set(mro_slots(topic_edited))), "duplicate slot"
+
+    def test_expected_values(self, topic_edited, emoji_id):
+        assert topic_edited.name == TEST_TOPIC_NAME
+        assert topic_edited.icon_custom_emoji_id == emoji_id
+
+    def test_de_json(self, bot, emoji_id):
+        assert ForumTopicEdited.de_json(None, bot=bot) is None
+
+        json_dict = {"name": TEST_TOPIC_NAME, "icon_custom_emoji_id": emoji_id}
+        action = ForumTopicEdited.de_json(json_dict, bot)
+        assert action.api_kwargs == {}
+
+        assert action.name == TEST_TOPIC_NAME
+        assert action.icon_custom_emoji_id == emoji_id
+        # special test since it is mentioned in the docs that icon_custom_emoji_id can be an
+        # empty string
+        json_dict = {"icon_custom_emoji_id": ""}
+        action = ForumTopicEdited.de_json(json_dict, bot)
+        assert action.icon_custom_emoji_id == ""
+
+    def test_to_dict(self, topic_edited, emoji_id):
+        action_dict = topic_edited.to_dict()
+
+        assert isinstance(action_dict, dict)
+        assert action_dict["name"] == TEST_TOPIC_NAME
+        assert action_dict["icon_custom_emoji_id"] == emoji_id
+
+    def test_equality(self, emoji_id):
+        a = ForumTopicEdited(name=TEST_TOPIC_NAME, icon_custom_emoji_id="")
+        b = ForumTopicEdited(
+            name=TEST_TOPIC_NAME,
+            icon_custom_emoji_id="",
+        )
+        c = ForumTopicEdited(name=f"{TEST_TOPIC_NAME}!", icon_custom_emoji_id=emoji_id)
+        d = ForumTopicEdited(icon_custom_emoji_id="")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+class TestGeneralForumTopicHidden:
+    def test_slot_behaviour(self, mro_slots):
+        action = GeneralForumTopicHidden()
+        for attr in action.__slots__:
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+
+    def test_de_json(self):
+        action = GeneralForumTopicHidden.de_json({}, None)
+        assert action.api_kwargs == {}
+        assert isinstance(action, GeneralForumTopicHidden)
+
+    def test_to_dict(self):
+        action = GeneralForumTopicHidden()
+        action_dict = action.to_dict()
+        assert action_dict == {}
+
+
+class TestGeneralForumTopicUnhidden:
+    def test_slot_behaviour(self, mro_slots):
+        action = GeneralForumTopicUnhidden()
+        for attr in action.__slots__:
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+
+    def test_de_json(self):
+        action = GeneralForumTopicUnhidden.de_json({}, None)
+        assert action.api_kwargs == {}
+        assert isinstance(action, GeneralForumTopicUnhidden)
+
+    def test_to_dict(self):
+        action = GeneralForumTopicUnhidden()
         action_dict = action.to_dict()
         assert action_dict == {}

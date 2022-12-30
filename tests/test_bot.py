@@ -966,6 +966,18 @@ class TestBot:
         with pytest.raises(BadRequest, match="Wrong parameter action"):
             await bot.send_chat_action(chat_id, "unknown action")
 
+    async def test_send_chat_action_all_args(self, bot, chat_id, provider_token, monkeypatch):
+        async def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs["chat_id"] == chat_id
+                and kwargs["action"] == "action"
+                and kwargs["message_thread_id"] == 1
+            )
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+        assert await bot.send_chat_action(chat_id, "action", 1)
+
     @pytest.mark.asyncio
     async def test_answer_web_app_query(self, bot, raw_bot, monkeypatch):
         params = False

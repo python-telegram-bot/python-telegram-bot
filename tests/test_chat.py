@@ -51,6 +51,8 @@ def chat(bot):
         is_forum=True,
         active_usernames=TestChat.active_usernames,
         emoji_status_custom_emoji_id=TestChat.emoji_status_custom_emoji_id,
+        has_aggressive_anti_spam_enabled=TestChat.has_aggressive_anti_spam_enabled,
+        has_hidden_members=TestChat.has_hidden_members,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -82,6 +84,8 @@ class TestChat:
     is_forum = True
     active_usernames = ["These", "Are", "Usernames!"]
     emoji_status_custom_emoji_id = "VeryUniqueCustomEmojiID"
+    has_aggressive_anti_spam_enabled = True
+    has_hidden_members = True
 
     def test_slot_behaviour(self, chat, mro_slots):
         for attr in chat.__slots__:
@@ -112,6 +116,8 @@ class TestChat:
             "is_forum": self.is_forum,
             "active_usernames": self.active_usernames,
             "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id,
+            "has_aggressive_anti_spam_enabled": self.has_aggressive_anti_spam_enabled,
+            "has_hidden_members": self.has_hidden_members,
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -141,6 +147,8 @@ class TestChat:
         assert chat.is_forum == self.is_forum
         assert chat.active_usernames == tuple(self.active_usernames)
         assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
+        assert chat.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
+        assert chat.has_hidden_members == self.has_hidden_members
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -166,6 +174,10 @@ class TestChat:
         assert chat_dict["is_forum"] == chat.is_forum
         assert chat_dict["active_usernames"] == list(chat.active_usernames)
         assert chat_dict["emoji_status_custom_emoji_id"] == chat.emoji_status_custom_emoji_id
+        assert (
+            chat_dict["has_aggressive_anti_spam_enabled"] == chat.has_aggressive_anti_spam_enabled
+        )
+        assert chat_dict["has_hidden_members"] == chat.has_hidden_members
 
     def test_always_tuples_attributes(self):
         chat = Chat(

@@ -70,9 +70,12 @@ __all__ = (  # Keep this alphabetically ordered
     "ForumTopic",
     "ForumTopicClosed",
     "ForumTopicCreated",
+    "ForumTopicEdited",
     "ForumTopicReopened",
     "Game",
     "GameHighScore",
+    "GeneralForumTopicHidden",
+    "GeneralForumTopicUnhidden",
     "helpers",
     "IdDocumentData",
     "InlineKeyboardButton",
@@ -176,6 +179,7 @@ __all__ = (  # Keep this alphabetically ordered
     "WebAppData",
     "WebAppInfo",
     "WebhookInfo",
+    "WriteAccessAllowed",
 )
 
 
@@ -234,7 +238,15 @@ from ._files.video import Video
 from ._files.videonote import VideoNote
 from ._files.voice import Voice
 from ._forcereply import ForceReply
-from ._forumtopic import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopicReopened
+from ._forumtopic import (
+    ForumTopic,
+    ForumTopicClosed,
+    ForumTopicCreated,
+    ForumTopicEdited,
+    ForumTopicReopened,
+    GeneralForumTopicHidden,
+    GeneralForumTopicUnhidden,
+)
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore
@@ -326,6 +338,7 @@ from ._videochat import (
 from ._webappdata import WebAppData
 from ._webappinfo import WebAppInfo
 from ._webhookinfo import WebhookInfo
+from ._writeaccessallowed import WriteAccessAllowed
 
 #: :obj:`str`: The version of the `python-telegram-bot` library as string.
 #: To get detailed information about the version number, please use :data:`__version_info__`
