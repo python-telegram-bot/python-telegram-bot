@@ -147,6 +147,8 @@ class InputMediaAnimation(InputMedia):
         has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the animation needs to be covered
             with a spoiler animation.
 
+            .. versionadded:: 20.0
+
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATION`.
         media (:obj:`str` | :class:`telegram.InputFile`): Animation to send.
@@ -166,6 +168,7 @@ class InputMediaAnimation(InputMedia):
         has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the animation is covered with a
             spoiler animation.
 
+            .. versionadded:: 20.0
     """
 
     __slots__ = ("duration", "height", "thumb", "width", "has_spoiler")
@@ -237,6 +240,8 @@ class InputMediaPhoto(InputMedia):
         has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the photo needs to be covered
             with a spoiler animation.
 
+            .. versionadded:: 20.0
+
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
@@ -251,6 +256,7 @@ class InputMediaPhoto(InputMedia):
         has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the photo is covered with a
             spoiler animation.
 
+            .. versionadded:: 20.0
     """
 
     __slots__ = ("has_spoiler",)
@@ -327,6 +333,8 @@ class InputMediaVideo(InputMedia):
         has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the video needs to be covered
             with a spoiler animation.
 
+            .. versionadded:: 20.0
+
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.VIDEO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Video file to send.
@@ -347,6 +355,7 @@ class InputMediaVideo(InputMedia):
         has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the video is covered with a
             spoiler animation.
 
+            .. versionadded:: 20.0
     """
 
     __slots__ = ("duration", "height", "thumb", "supports_streaming", "width", "has_spoiler")
