@@ -380,7 +380,7 @@ class TestForumTopicReopened:
         assert action_dict == {}
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def topic_edited(emoji_id):
     return ForumTopicEdited(name=TEST_TOPIC_NAME, icon_custom_emoji_id=emoji_id)
 

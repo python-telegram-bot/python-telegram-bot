@@ -19,20 +19,19 @@
 from telegram import WriteAccessAllowed
 
 
-def test_slot_behaviour(mro_slots):
-    action = WriteAccessAllowed()
-    for attr in action.__slots__:
-        assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-    assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+class TestWriteAccessAllowed:
+    def test_slot_behaviour(self, mro_slots):
+        action = WriteAccessAllowed()
+        for attr in action.__slots__:
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
+    def test_de_json(self):
+        action = WriteAccessAllowed.de_json({}, None)
+        assert action.api_kwargs == {}
+        assert isinstance(action, WriteAccessAllowed)
 
-def test_de_json():
-    action = WriteAccessAllowed.de_json({}, None)
-    assert action.api_kwargs == {}
-    assert isinstance(action, WriteAccessAllowed)
-
-
-def test_to_dict():
-    action = WriteAccessAllowed()
-    action_dict = action.to_dict()
-    assert action_dict == {}
+    def test_to_dict(self):
+        action = WriteAccessAllowed()
+        action_dict = action.to_dict()
+        assert action_dict == {}

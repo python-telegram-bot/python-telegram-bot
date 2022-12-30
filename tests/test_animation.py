@@ -80,8 +80,7 @@ class TestAnimation:
         assert animation.file_name.startswith("game.gif") == self.file_name.startswith("game.gif")
         assert isinstance(animation.thumb, PhotoSize)
 
-    @pytest.mark.dev
-    # @pytest.mark.flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_all_args(self, bot, chat_id, animation_file, animation, thumb_file):
         message = await bot.send_animation(
             chat_id,

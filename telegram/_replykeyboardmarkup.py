@@ -86,7 +86,8 @@ class ReplyKeyboardMarkup(TelegramObject):
 
             .. versionadded:: 13.7
         is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard when
-            the regular keyboard is hidden.
+            the regular keyboard is hidden. If :obj:`False`, the custom keyboard can be hidden and
+            opened with a keyboard icon.
 
             .. versionadded:: 20.0
 
@@ -179,7 +180,8 @@ class ReplyKeyboardMarkup(TelegramObject):
 
                 .. versionadded:: 13.7
             is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
-                when the regular keyboard is hidden.
+                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
+                custom keyboard can be hidden and opened with a keyboard icon.
 
                 .. versionadded:: 20.0
         """
@@ -236,7 +238,8 @@ class ReplyKeyboardMarkup(TelegramObject):
 
                 .. versionadded:: 13.7
             is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
-                when the regular keyboard is hidden.
+                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
+                custom keyboard can be hidden and opened with a keyboard icon.
 
                 .. versionadded:: 20.0
 
@@ -294,7 +297,8 @@ class ReplyKeyboardMarkup(TelegramObject):
 
                 .. versionadded:: 13.7
             is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
-                when the regular keyboard is hidden.
+                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
+                custom keyboard can be hidden and opened with a keyboard icon.
 
                 .. versionadded:: 20.0
 
