@@ -2044,6 +2044,7 @@ class Message(TelegramObject):
     async def reply_chat_action(
         self,
         action: str,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2065,6 +2066,7 @@ class Message(TelegramObject):
         """
         return await self.get_bot().send_chat_action(
             chat_id=self.chat_id,
+            message_thread_id=message_thread_id,
             action=action,
             read_timeout=read_timeout,
             write_timeout=write_timeout,

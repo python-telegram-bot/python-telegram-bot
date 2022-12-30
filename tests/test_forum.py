@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime
+
 import pytest
 
 from telegram import (
@@ -258,13 +260,12 @@ class TestForumMethods:
     async def test_edit_general_forum_topic(self, bot, forum_group_id):
         result = await bot.edit_general_forum_topic(
             chat_id=forum_group_id,
-            name="GENERAL_EDITED",
+            name=f"GENERAL_{datetime.datetime.now().timestamp()}",
         )
         assert result is True, "Failed to edit general forum topic"
         # no way of checking the edited name, just the boolean result
 
     async def test_close_and_reopen_general_forum_topic(self, bot, forum_group_id):
-
         result = await bot.close_general_forum_topic(
             chat_id=forum_group_id,
         )

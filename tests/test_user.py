@@ -254,6 +254,7 @@ class TestUser:
         monkeypatch.setattr(user.get_bot(), "send_audio", make_assertion)
         assert await user.send_audio("test_audio")
 
+    @pytest.mark.dev
     async def test_instance_method_send_chat_action(self, monkeypatch, user):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == user.id and kwargs["action"] == "test_chat_action"

@@ -1291,7 +1291,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def edit_general_forum_topic(
         self,
         chat_id: Union[str, int],
-        name: str = None,
+        name: str,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
