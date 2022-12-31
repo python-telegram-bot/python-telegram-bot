@@ -78,13 +78,12 @@ class InputTextMessageContent(InputMessageContent):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.message_text = message_text
-        # Optionals
-        self.parse_mode = parse_mode
-        self.entities = parse_sequence_arg(entities)
-        self.disable_web_page_preview = disable_web_page_preview
+        with self._unfrozen():
+            # Required
+            self.message_text = message_text
+            # Optionals
+            self.parse_mode = parse_mode
+            self.entities = parse_sequence_arg(entities)
+            self.disable_web_page_preview = disable_web_page_preview
 
-        self._id_attrs = (self.message_text,)
-
-        self._freeze()
+            self._id_attrs = (self.message_text,)
