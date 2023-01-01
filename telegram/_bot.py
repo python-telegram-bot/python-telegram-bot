@@ -937,6 +937,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 |fileinput|
                 Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
 
+                Caution:
+                    * The photo must be at most 10MB in size.
+                    * The photo's width and height must not exceed 10000 in total.
+                    * Width and height ratio must be at most 20.
+
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
 
