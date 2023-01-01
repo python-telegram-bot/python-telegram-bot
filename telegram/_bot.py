@@ -383,7 +383,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 with val._unfrozen():
                     val.parse_mode = DefaultValue.get_value(val.parse_mode)
                 data[key] = val
-            elif key == "media" and isinstance(val, list):
+            elif key == "media" and isinstance(val, Sequence):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy.copy(media) for media in val]
                 for media in copy_list:

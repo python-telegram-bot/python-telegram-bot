@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import copy
+from collections.abc import Sequence
 
 import pytest
 
@@ -118,6 +119,17 @@ def input_media_document(class_thumb_file):
         caption_entities=TestInputMediaDocument.caption_entities,
         disable_content_type_detection=TestInputMediaDocument.disable_content_type_detection,
     )
+
+
+class CustomSequence(Sequence):
+    def __init__(self, items):
+        self.items = items
+
+    def __getitem__(self, index):
+        return self.items[index]
+
+    def __len__(self):
+        return len(self.items)
 
 
 class TestInputMediaVideo:
@@ -678,6 +690,22 @@ class TestSendMediaGroup:
             func, "Type of file mismatch", "Telegram did not accept the file."
         )
 
+        assert isinstance(messages, tuple)
+        assert len(messages) == 3
+        assert all(isinstance(mes, Message) for mes in messages)
+        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
+
+    @pytest.mark.flaky(3, 1)
+    @pytest.mark.parametrize("sequence_type", [list, tuple, CustomSequence])
+    @pytest.mark.parametrize("bot_class", ["raw_bot", "ext_bot"])
+    async def test_send_media_group_different_sequences(
+        self, bot, chat_id, media_group, sequence_type, bot_class, raw_bot
+    ):
+        """Test that send_media_group accepts different sequence types. This test ensures that
+        Bot._insert_defaults works for arbitrary sequence types."""
+        bot = bot if bot_class == "ext_bot" else raw_bot
+
+        messages = await bot.send_media_group(chat_id, sequence_type(media_group))
         assert isinstance(messages, tuple)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)

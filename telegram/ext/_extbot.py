@@ -385,7 +385,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 with val._unfrozen():
                     val.parse_mode = self.defaults.parse_mode if self.defaults else None
                 data[key] = val
-            elif key == "media" and isinstance(val, list):
+            elif key == "media" and isinstance(val, Sequence):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy(media) for media in val]
                 for media in copy_list:
