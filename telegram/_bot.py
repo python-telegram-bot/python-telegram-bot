@@ -1838,7 +1838,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Tuple[Message, ...]:
-        """Use this method to send a group of photos or videos as an album.
+        """Use this method to send a group of photos, videos, documents or audios as an album.
+        Documents and audio files can be only grouped in an album with messages of the same type.
 
         .. versionchanged:: 20.0
             Returns a tuple instead of a list.
