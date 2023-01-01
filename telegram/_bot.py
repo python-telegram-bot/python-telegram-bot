@@ -141,7 +141,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
           passing files.
         * Bots should not be serialized since if you for e.g. change the bots token, then your
           serialized instance will not reflect that change. Trying to pickle a bot instance will
-          raise :exc:`pickle.PicklingError`.
+          raise :exc:`pickle.PicklingError`. Trying to deepcopy a bot instance will raise
+          :exc:`TypeError`.
 
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
@@ -167,6 +168,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
           :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
           instead.
         * Attempting to pickle a bot instance will now raise :exc:`pickle.PicklingError`.
+        * Attempting to deepcopy a bot instance will now raise :exc:`TypeError`.
         * The following are now keyword-only arguments in Bot methods:
           ``location``, ``filename``, ``venue``, ``contact``,
           ``{read, write, connect, pool}_timeout``, ``api_kwargs``. Use a named argument for those,
@@ -302,8 +304,26 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return self._private_key
 
     def __reduce__(self) -> NoReturn:
-        """Called by pickle.dumps(). Serializing bots is unadvisable, so we forbid pickling."""
+        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
+        be pickled and this method will always raise an exception.
+
+        .. versionadded:: 20.0
+
+        Raises:
+            :exc:`pickle.PicklingError`
+        """
         raise pickle.PicklingError("Bot objects cannot be pickled!")
+
+    def __deepcopy__(self, memodict: dict) -> NoReturn:
+        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
+        be deepcopied and this method will always raise an exception.
+
+        .. versionadded:: 20.0
+
+        Raises:
+            :exc:`TypeError`
+        """
+        raise TypeError("Bot objects cannot be deepcopied!")
 
     # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
     # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
@@ -1857,9 +1877,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             media (Sequence[:class:`telegram.InputMediaAudio`,\
                 :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto`,\
-                :class:`telegram.InputMediaVideo`]): An array
-                describing messages to be sent, must include 2–10 items.
-
+                :class:`telegram.InputMediaVideo`]): An array 
+                describing messages to be sent, must include
+                :tg-const:`telegram.constants.MediaGroupLimit.MIN_MEDIA_LENGTH`–
+                :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
+                
                 .. versionchanged:: 20.0
                     |sequenceargs|
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -4213,9 +4235,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionadded:: 13.5
             suggested_tip_amounts (Sequence[:obj:`int`], optional): An array of
                 suggested amounts of tips in the *smallest* units of the currency (integer, **not**
-                float/double). At most 4 suggested tip amounts can be specified. The suggested tip
-                amounts must be positive, passed in a strictly increased order and must not exceed
-                :paramref:`max_tip_amount`.
+                float/double). At most :tg-const:`telegram.Invoice.MAX_TIP_AMOUNTS` suggested tip
+                amounts can be specified. The suggested tip amounts must be positive, passed in a
+                strictly increased order and must not exceed :paramref:`max_tip_amount`.
 
                 .. versionadded:: 13.5
 
@@ -6766,10 +6788,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 majority of currencies). Defaults to ``0``.
             suggested_tip_amounts (Sequence[:obj:`int`], optional): An array of
                 suggested amounts of tips in the *smallest* units of the currency (integer, **not**
-                float/double). At most 4 suggested tip amounts can be specified. The suggested tip
-                amounts must be positive, passed in a strictly increased order and must not exceed
-                :paramref:`max_tip_amount`.
-
+                float/double). At most :tg-const:`telegram.Invoice.MAX_TIP_AMOUNTS` suggested tip
+                amounts can be specified. The suggested tip amounts must be positive, passed in a
+                strictly increased order and must not exceed :paramref:`max_tip_amount`.
+                
                 .. versionchanged:: 20.0
                     |sequenceargs|
             provider_data (:obj:`str` | :obj:`object`, optional): Data about the
