@@ -622,6 +622,22 @@ class TestSendMediaGroup:
             assert all(mes.has_protected_content for mes in messages)
 
     @pytest.mark.flaky(3, 1)
+    async def test_send_media_group_with_spoiler(
+        self, bot, chat_id, photo_file, video_file
+    ):  # noqa: F811
+        # Media groups can't contain Animations, so that is tested in test_animation.py
+        media = [
+            InputMediaPhoto(photo_file, has_spoiler=True),
+            InputMediaVideo(video_file, has_spoiler=True),
+        ]
+        messages = await bot.send_media_group(chat_id, media)
+        assert isinstance(messages, tuple)
+        assert len(messages) == 2
+        assert all(isinstance(mes, Message) for mes in messages)
+        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
+        assert all(mes.has_media_spoiler for mes in messages)
+
+    @pytest.mark.flaky(3, 1)
     async def test_send_media_group_custom_filename(
         self,
         bot,
