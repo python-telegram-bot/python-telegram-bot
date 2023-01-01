@@ -428,7 +428,8 @@ class TestTelegramObject:
 
     @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
     def test_subclasses_are_frozen(self, cls):
-        if cls.__name__.startswith("_"):
+        if cls is TelegramObject or cls.__name__.startswith("_"):
+            # Protected classes don't need to be frozen and neither does the base class
             return
 
         # instantiating each subclass would be tedious as some attributes require special init
@@ -437,9 +438,16 @@ class TestTelegramObject:
         source_file = inspect.getsourcefile(cls.__init__)
         parents = Path(source_file).parents
         is_test_file = Path(__file__).parent.resolve() in parents
-        if is_test_file or source_file.endswith("telegramobject.py"):
-            # classes without their own `__init__` can be ignored
+
+        if is_test_file:
+            # If the class is defined in a test file, we don't want to test it.
             return
+
+        if source_file.endswith("telegramobject.py"):
+            pytest.fail(
+                f"{cls.__name__} does not have its own `__init__` "
+                "and can therefore not be frozen correctly"
+            )
 
         source_lines, first_line = inspect.getsourcelines(cls.__init__)
 
