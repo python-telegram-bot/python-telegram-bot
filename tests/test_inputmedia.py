@@ -623,8 +623,8 @@ class TestSendMediaGroup:
 
     @pytest.mark.flaky(3, 1)
     async def test_send_media_group_with_spoiler(
-        self, bot, chat_id, photo_file, video_file
-    ):  # noqa: F811
+        self, bot, chat_id, photo_file, video_file  # noqa: F811
+    ):
         # Media groups can't contain Animations, so that is tested in test_animation.py
         media = [
             InputMediaPhoto(photo_file, has_spoiler=True),

@@ -7164,10 +7164,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to edit the name of the 'General' topic in a forum supergroup chat. The bot
         must be an administrator in the chat for this to work and must have
-        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
-        .. seealso:: :meth:`telegram.Message.edit_general_forum_topic`,
-            :meth:`telegram.Chat.edit_general_forum_topic`,
+        .. seealso:: :meth:`telegram.Chat.edit_general_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7210,10 +7209,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to close an open 'General' topic in a forum supergroup chat. The bot must
         be an administrator in the chat for this to work and must have
-        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
-        .. seealso:: :meth:`telegram.Message.close_general_forum_topic`,
-            :meth:`telegram.Chat.close_general_forum_topic`,
+        .. seealso:: :meth:`telegram.Chat.close_general_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7253,11 +7251,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to reopen a closed 'General' topic in a forum supergroup chat. The bot must
         be an administrator in the chat for this to work and must have
-        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
         The topic will be automatically unhidden if it was hidden.
 
-        .. seealso:: :meth:`telegram.Message.reopen_general_forum_topic`,
-            :meth:`telegram.Chat.reopen_general_forum_topic`,
+        .. seealso:: :meth:`telegram.Chat.reopen_general_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7297,11 +7294,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to hide the 'General' topic in a forum supergroup chat. The bot must
         be an administrator in the chat for this to work and must have
-        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
         The topic will be automatically closed if it was open.
 
-        .. seealso:: :meth:`telegram.Message.hide_general_forum_topic`,
-            :meth:`telegram.Chat.hide_general_forum_topic`,
+        .. seealso:: :meth:`telegram.Chat.hide_general_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7341,10 +7337,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to unhide the 'General' topic in a forum supergroup chat. The bot must
         be an administrator in the chat for this to work and must have
-        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
-        .. seealso:: :meth:`telegram.Message.unhide_general_forum_topic`,
-            :meth:`telegram.Chat.unhide_general_forum_topic`,
+        .. seealso:: :meth:`telegram.Chat.unhide_general_forum_topic`
 
         .. versionadded:: 20.0
 
