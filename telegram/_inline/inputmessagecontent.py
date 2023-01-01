@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InputMessageContent."""
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class InputMessageContent(TelegramObject):
@@ -32,3 +33,8 @@ class InputMessageContent(TelegramObject):
     """
 
     __slots__ = ()
+
+    def __init__(self, *, api_kwargs: JSONDict = None) -> None:
+        super().__init__(api_kwargs=api_kwargs)
+
+        self._freeze()

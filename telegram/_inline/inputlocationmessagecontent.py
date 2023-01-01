@@ -83,21 +83,20 @@ class InputLocationMessageContent(InputMessageContent):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.latitude = latitude
-        self.longitude = longitude
+        with self._unfrozen():
+            # Required
+            self.latitude = latitude
+            self.longitude = longitude
 
-        # Optionals
-        self.live_period = live_period
-        self.horizontal_accuracy = horizontal_accuracy
-        self.heading = heading
-        self.proximity_alert_radius = (
-            int(proximity_alert_radius) if proximity_alert_radius else None
-        )
+            # Optionals
+            self.live_period = live_period
+            self.horizontal_accuracy = horizontal_accuracy
+            self.heading = heading
+            self.proximity_alert_radius = (
+                int(proximity_alert_radius) if proximity_alert_radius else None
+            )
 
-        self._id_attrs = (self.latitude, self.longitude)
-
-        self._freeze()
+            self._id_attrs = (self.latitude, self.longitude)
 
     HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
