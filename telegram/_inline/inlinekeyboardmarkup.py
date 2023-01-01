@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
-from typing import TYPE_CHECKING, List, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -111,7 +111,7 @@ class InlineKeyboardMarkup(TelegramObject):
 
     @classmethod
     def from_row(
-        cls, button_row: List[InlineKeyboardButton], **kwargs: object
+        cls, button_row: Sequence[InlineKeyboardButton], **kwargs: object
     ) -> "InlineKeyboardMarkup":
         """Shortcut for::
 
@@ -120,15 +120,18 @@ class InlineKeyboardMarkup(TelegramObject):
         Return an InlineKeyboardMarkup from a single row of InlineKeyboardButtons
 
         Args:
-            button_row (List[:class:`telegram.InlineKeyboardButton`]): The button to use in the
-                markup
+            button_row (Sequence[:class:`telegram.InlineKeyboardButton`]): The button to use
+                in the markup
+
+                .. versionchanged:: 20.0
+                    |sequenceargs|
 
         """
         return cls([button_row], **kwargs)  # type: ignore[arg-type]
 
     @classmethod
     def from_column(
-        cls, button_column: List[InlineKeyboardButton], **kwargs: object
+        cls, button_column: Sequence[InlineKeyboardButton], **kwargs: object
     ) -> "InlineKeyboardMarkup":
         """Shortcut for::
 
@@ -137,8 +140,11 @@ class InlineKeyboardMarkup(TelegramObject):
         Return an InlineKeyboardMarkup from a single column of InlineKeyboardButtons
 
         Args:
-            button_column (List[:class:`telegram.InlineKeyboardButton`]): The button to use in the
-                markup
+            button_column (Sequence[:class:`telegram.InlineKeyboardButton`]): The button to use
+                in the markup
+
+                 .. versionchanged:: 20.0
+                    |sequenceargs|
 
         """
         button_grid = [[button] for button in button_column]
