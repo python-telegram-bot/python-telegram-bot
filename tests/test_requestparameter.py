@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+from typing import Sequence
 
 import pytest
-from typing import Sequence
 
 from telegram import InputFile, InputMediaPhoto, InputMediaVideo, MessageEntity
 from telegram.constants import ChatType
@@ -172,14 +172,14 @@ class TestRequestParameter:
         assert request_parameter.input_files is None
 
     def test_from_input_different_sequences(self):
-        input_list = ['item1', 'item2']
-        request_parameter =  RequestParameter.from_input('input', input_list)
+        input_list = ["item1", "item2"]
+        request_parameter = RequestParameter.from_input("input", input_list)
         assert request_parameter.value == input_list
         assert request_parameter.name == "input"
         assert request_parameter.input_files is None
 
         input_tuple = tuple(input_list)
-        request_parameter =  RequestParameter.from_input('input', input_tuple)
+        request_parameter = RequestParameter.from_input("input", input_tuple)
         assert request_parameter.value == input_list
         assert request_parameter.name == "input"
         assert request_parameter.input_files is None
@@ -193,8 +193,9 @@ class TestRequestParameter:
 
             def __len__(self):
                 return len(self.items)
+
         input_custom_sequence = CustomSequence(input_list)
-        request_parameter =  RequestParameter.from_input('input', input_custom_sequence)
+        request_parameter = RequestParameter.from_input("input", input_custom_sequence)
         assert request_parameter.value == input_list
         assert request_parameter.name == "input"
         assert request_parameter.input_files is None

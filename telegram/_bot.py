@@ -1877,11 +1877,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             media (Sequence[:class:`telegram.InputMediaAudio`,\
                 :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto`,\
-                :class:`telegram.InputMediaVideo`]): An array 
+                :class:`telegram.InputMediaVideo`]): An array
                 describing messages to be sent, must include
                 :tg-const:`telegram.constants.MediaGroupLimit.MIN_MEDIA_LENGTH`–
                 :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
-                
+
                 .. versionchanged:: 20.0
                     |sequenceargs|
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -6791,7 +6791,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 float/double). At most :tg-const:`telegram.Invoice.MAX_TIP_AMOUNTS` suggested tip
                 amounts can be specified. The suggested tip amounts must be positive, passed in a
                 strictly increased order and must not exceed :paramref:`max_tip_amount`.
-                
+
                 .. versionchanged:: 20.0
                     |sequenceargs|
             provider_data (:obj:`str` | :obj:`object`, optional): Data about the

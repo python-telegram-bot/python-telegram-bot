@@ -55,7 +55,7 @@ class InputTextMessageContent(InputMessageContent):
             1-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 
