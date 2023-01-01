@@ -151,8 +151,8 @@ class TestForumTopic:
         assert hash(a) != hash(e)
 
 
+@pytest.mark.flaky(3, 1)
 class TestForumMethods:
-    @pytest.mark.flaky(3, 1)
     async def test_create_forum_topic(self, real_topic):
         result = real_topic
         assert isinstance(result, ForumTopic)
@@ -174,7 +174,6 @@ class TestForumMethods:
         )
         assert result is True, "Failed to delete forum topic"
 
-    @pytest.mark.flaky(3, 1)
     async def test_get_forum_topic_icon_stickers(self, bot):
         emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
         first_sticker = emoji_sticker_list[0]
@@ -207,7 +206,6 @@ class TestForumMethods:
         assert result is True, "Failed to edit forum topic"
         # no way of checking the edited name, just the boolean result
 
-    @pytest.mark.flaky(3, 1)
     async def test_send_message_to_topic(self, bot, forum_group_id, real_topic):
         message_thread_id = real_topic.message_thread_id
 
@@ -286,6 +284,12 @@ class TestForumMethods:
             chat_id=forum_group_id,
         )
         assert result is True, "Failed to unhide general forum topic"
+
+        # hiding the general topic also closes it, so we reopen it
+        result = await bot.reopen_general_forum_topic(
+            chat_id=forum_group_id,
+        )
+        assert result is True, "Failed to reopen general forum topic"
 
 
 @pytest.fixture
