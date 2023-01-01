@@ -56,14 +56,12 @@ class InputContactMessageContent(InputMessageContent):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
+        with self._unfrozen():
+            # Required
+            self.phone_number = phone_number
+            self.first_name = first_name
+            # Optionals
+            self.last_name = last_name
+            self.vcard = vcard
 
-        # Required
-        self.phone_number = phone_number
-        self.first_name = first_name
-        # Optionals
-        self.last_name = last_name
-        self.vcard = vcard
-
-        self._id_attrs = (self.phone_number,)
-
-        self._freeze()
+            self._id_attrs = (self.phone_number,)

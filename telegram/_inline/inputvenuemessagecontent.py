@@ -84,22 +84,20 @@ class InputVenueMessageContent(InputMessageContent):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
+        with self._unfrozen():
+            # Required
+            self.latitude = latitude
+            self.longitude = longitude
+            self.title = title
+            self.address = address
+            # Optionals
+            self.foursquare_id = foursquare_id
+            self.foursquare_type = foursquare_type
+            self.google_place_id = google_place_id
+            self.google_place_type = google_place_type
 
-        # Required
-        self.latitude = latitude
-        self.longitude = longitude
-        self.title = title
-        self.address = address
-        # Optionals
-        self.foursquare_id = foursquare_id
-        self.foursquare_type = foursquare_type
-        self.google_place_id = google_place_id
-        self.google_place_type = google_place_type
-
-        self._id_attrs = (
-            self.latitude,
-            self.longitude,
-            self.title,
-        )
-
-        self._freeze()
+            self._id_attrs = (
+                self.latitude,
+                self.longitude,
+                self.title,
+            )

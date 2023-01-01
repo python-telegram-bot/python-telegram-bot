@@ -200,39 +200,38 @@ class InputInvoiceMessageContent(InputMessageContent):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.title = title
-        self.description = description
-        self.payload = payload
-        self.provider_token = provider_token
-        self.currency = currency
-        self.prices = parse_sequence_arg(prices)
-        # Optionals
-        self.max_tip_amount = max_tip_amount
-        self.suggested_tip_amounts = parse_sequence_arg(suggested_tip_amounts)
-        self.provider_data = provider_data
-        self.photo_url = photo_url
-        self.photo_size = photo_size
-        self.photo_width = photo_width
-        self.photo_height = photo_height
-        self.need_name = need_name
-        self.need_phone_number = need_phone_number
-        self.need_email = need_email
-        self.need_shipping_address = need_shipping_address
-        self.send_phone_number_to_provider = send_phone_number_to_provider
-        self.send_email_to_provider = send_email_to_provider
-        self.is_flexible = is_flexible
+        with self._unfrozen():
+            # Required
+            self.title = title
+            self.description = description
+            self.payload = payload
+            self.provider_token = provider_token
+            self.currency = currency
+            self.prices = parse_sequence_arg(prices)
+            # Optionals
+            self.max_tip_amount = max_tip_amount
+            self.suggested_tip_amounts = parse_sequence_arg(suggested_tip_amounts)
+            self.provider_data = provider_data
+            self.photo_url = photo_url
+            self.photo_size = photo_size
+            self.photo_width = photo_width
+            self.photo_height = photo_height
+            self.need_name = need_name
+            self.need_phone_number = need_phone_number
+            self.need_email = need_email
+            self.need_shipping_address = need_shipping_address
+            self.send_phone_number_to_provider = send_phone_number_to_provider
+            self.send_email_to_provider = send_email_to_provider
+            self.is_flexible = is_flexible
 
-        self._id_attrs = (
-            self.title,
-            self.description,
-            self.payload,
-            self.provider_token,
-            self.currency,
-            self.prices,
-        )
-
-        self._freeze()
+            self._id_attrs = (
+                self.title,
+                self.description,
+                self.payload,
+                self.provider_token,
+                self.currency,
+                self.prices,
+            )
 
     @classmethod
     def de_json(
