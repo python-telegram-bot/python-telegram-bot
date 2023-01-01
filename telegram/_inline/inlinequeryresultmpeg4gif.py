@@ -54,7 +54,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
-        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+            |captionentitiesattr|
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|

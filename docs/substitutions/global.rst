@@ -34,7 +34,7 @@
 
 .. |allow_sending_without_reply| replace:: Pass :obj:`True`, if the message should be sent even if the specified replied-to message is not found.
 
-.. |caption_entities| replace:: List of special entities that appear in the caption, which can be specified instead of ``parse_mode``.
+.. |caption_entities| replace:: Sequence of special entities that appear in the caption, which can be specified instead of ``parse_mode``.
 
 .. |protect_content| replace:: Protects the contents of the sent message from forwarding and saving.
 
@@ -42,8 +42,12 @@
 
 .. |reply_to_msg_id| replace:: If the message is a reply, ID of the original message.
 
-.. |sequenceclassargs| replace:: Accepts any :class:`collections.abc.Sequence` as input instead of just a list. The input is converted to a tuple.
+.. |sequenceclassargs| replace:: |sequenceargs| The input is converted to a tuple.
 
 .. |tupleclassattrs| replace:: This attribute is now an immutable tuple.
 
 .. |alwaystuple| replace:: This attribute is now always a tuple, that may be empty.
+
+.. |sequenceargs| replace:: Accepts any :class:`collections.abc.Sequence` as input instead of just a list.
+
+.. |captionentitiesattr| replace:: Tuple of special entities that appear in the caption, which can be specified instead of ``parse_mode``.

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+from typing import Sequence
 
 import pytest
 
@@ -156,3 +157,45 @@ class TestRequestParameter:
         request_parameter = RequestParameter.from_input("key", input_media)
         assert request_parameter.value == {"type": "video"}
         assert request_parameter.input_files == [input_media.media, input_media.thumb]
+
+    def test_from_input_str_and_bytes(self):
+        input_str = "test_input"
+        request_parameter = RequestParameter.from_input("input", input_str)
+        assert request_parameter.value == input_str
+        assert request_parameter.name == "input"
+        assert request_parameter.input_files is None
+
+        input_bytes = b"test_input"
+        request_parameter = RequestParameter.from_input("input", input_bytes)
+        assert request_parameter.value == input_bytes
+        assert request_parameter.name == "input"
+        assert request_parameter.input_files is None
+
+    def test_from_input_different_sequences(self):
+        input_list = ["item1", "item2"]
+        request_parameter = RequestParameter.from_input("input", input_list)
+        assert request_parameter.value == input_list
+        assert request_parameter.name == "input"
+        assert request_parameter.input_files is None
+
+        input_tuple = tuple(input_list)
+        request_parameter = RequestParameter.from_input("input", input_tuple)
+        assert request_parameter.value == input_list
+        assert request_parameter.name == "input"
+        assert request_parameter.input_files is None
+
+        class CustomSequence(Sequence):
+            def __init__(self, items):
+                self.items = items
+
+            def __getitem__(self, index):
+                return self.items[index]
+
+            def __len__(self):
+                return len(self.items)
+
+        input_custom_sequence = CustomSequence(input_list)
+        request_parameter = RequestParameter.from_input("input", input_custom_sequence)
+        assert request_parameter.value == input_list
+        assert request_parameter.name == "input"
+        assert request_parameter.input_files is None

@@ -385,7 +385,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 with val._unfrozen():
                     val.parse_mode = self.defaults.parse_mode if self.defaults else None
                 data[key] = val
-            elif key == "media" and isinstance(val, list):
+            elif key == "media" and isinstance(val, Sequence):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy(media) for media in val]
                 for media in copy_list:
@@ -476,7 +476,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_thread_id: int = None,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -515,7 +515,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         offset: int = None,
         limit: int = None,
         timeout: float = None,
-        allowed_updates: List[str] = None,
+        allowed_updates: Sequence[str] = None,
         *,
         read_timeout: float = 2,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -646,7 +646,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
@@ -828,7 +828,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         shipping_query_id: str,
         ok: bool,
-        shipping_options: List[ShippingOption] = None,
+        shipping_options: Sequence[ShippingOption] = None,
         error_message: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -977,9 +977,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         payload: str,
         provider_token: str,
         currency: str,
-        prices: List["LabeledPrice"],
+        prices: Sequence["LabeledPrice"],
         max_tip_amount: int = None,
-        suggested_tip_amounts: List[int] = None,
+        suggested_tip_amounts: Sequence[int] = None,
         provider_data: Union[str, object] = None,
         photo_url: str = None,
         photo_size: int = None,
@@ -1296,7 +1296,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1421,7 +1421,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: InlineKeyboardMarkup = None,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        entities: Sequence["MessageEntity"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1726,7 +1726,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_custom_emoji_stickers(
         self,
-        custom_emoji_ids: List[str],
+        custom_emoji_ids: Sequence[str],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2044,7 +2044,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -2094,7 +2094,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -2240,7 +2240,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         thumb: FileInput = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -2316,7 +2316,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         payload: str,
         provider_token: str,
         currency: str,
-        prices: List["LabeledPrice"],
+        prices: Sequence["LabeledPrice"],
         start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
@@ -2335,7 +2335,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         send_email_to_provider: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         max_tip_amount: int = None,
-        suggested_tip_amounts: List[int] = None,
+        suggested_tip_amounts: Sequence[int] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -2431,7 +2431,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def send_media_group(
         self,
         chat_id: Union[int, str],
-        media: List[
+        media: Sequence[
             Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
@@ -2448,7 +2448,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         rate_limit_args: RLARGS = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
     ) -> Tuple[Message, ...]:
         return await super().send_media_group(
             chat_id=chat_id,
@@ -2473,7 +2473,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         chat_id: Union[int, str],
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        entities: Sequence["MessageEntity"] = None,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2518,7 +2518,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_markup: ReplyMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -2554,7 +2554,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         question: str,
-        options: List[str],
+        options: Sequence[str],
         is_anonymous: bool = None,
         type: str = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool = None,
@@ -2568,7 +2568,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         open_period: int = None,
         close_date: Union[int, datetime] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        explanation_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -2705,7 +2705,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         supports_streaming: bool = None,
         thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -2795,7 +2795,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_markup: ReplyMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -3018,7 +3018,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_my_commands(
         self,
-        commands: List[Union[BotCommand, Tuple[str, str]]],
+        commands: Sequence[Union[BotCommand, Tuple[str, str]]],
         scope: BotCommandScope = None,
         language_code: str = None,
         *,
@@ -3065,7 +3065,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_passport_data_errors(
         self,
         user_id: Union[str, int],
-        errors: List[PassportElementError],
+        errors: Sequence[PassportElementError],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3135,7 +3135,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         url: str,
         certificate: FileInput = None,
         max_connections: int = None,
-        allowed_updates: List[str] = None,
+        allowed_updates: Sequence[str] = None,
         ip_address: str = None,
         drop_pending_updates: bool = None,
         secret_token: str = None,
