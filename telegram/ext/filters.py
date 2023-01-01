@@ -232,8 +232,7 @@ class MessageFilter(BaseFilter):
 
     Please see :class:`BaseFilter` for details on how to create custom filters.
 
-    .. seealso:: `Advanced Filters <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Advanced-Filters>`_
+    .. seealso:: :wiki:`Advanced Filters <Extensions-–-Advanced-Filters>`
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
@@ -1545,8 +1544,7 @@ class Regex(MessageFilter):
         With a :attr:`telegram.Message.text` of `x`, will only ever return the matches for the
         first filter, since the second one is never evaluated.
 
-    .. seealso:: `Types of Handlers <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
+    .. seealso:: :wiki:`Types of Handlers <Types-of-Handlers>`
 
     Args:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
@@ -1761,6 +1759,42 @@ class StatusUpdate:
     DELETE_CHAT_PHOTO = _DeleteChatPhoto(name="filters.StatusUpdate.DELETE_CHAT_PHOTO")
     """Messages that contain :attr:`telegram.Message.delete_chat_photo`."""
 
+    class _ForumTopicClosed(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_closed)
+
+    FORUM_TOPIC_CLOSED = _ForumTopicClosed(name="filters.StatusUpdate.FORUM_TOPIC_CLOSED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_closed`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _ForumTopicCreated(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_created)
+
+    FORUM_TOPIC_CREATED = _ForumTopicCreated(name="filters.StatusUpdate.FORUM_TOPIC_CREATED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_created`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _ForumTopicReopened(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_reopened)
+
+    FORUM_TOPIC_REOPENED = _ForumTopicReopened(name="filters.StatusUpdate.FORUM_TOPIC_REOPENED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_reopened`.
+
+    .. versionadded:: 20.0
+    """
+
     class _LeftChatMember(MessageFilter):
         __slots__ = ()
 
@@ -1907,42 +1941,6 @@ class StatusUpdate:
 
     WEB_APP_DATA = _WebAppData(name="filters.StatusUpdate.WEB_APP_DATA")
     """Messages that contain :attr:`telegram.Message.web_app_data`.
-
-    .. versionadded:: 20.0
-    """
-
-    class _ForumTopicCreated(MessageFilter):
-        __slots__ = ()
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.forum_topic_created)
-
-    FORUM_TOPIC_CREATED = _ForumTopicCreated(name="filters.StatusUpdate.FORUM_TOPIC_CREATED")
-    """Messages that contain :attr:`telegram.Message.forum_topic_created`.
-
-    .. versionadded:: 20.0
-    """
-
-    class _ForumTopicClosed(MessageFilter):
-        __slots__ = ()
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.forum_topic_closed)
-
-    FORUM_TOPIC_CLOSED = _ForumTopicClosed(name="filters.StatusUpdate.FORUM_TOPIC_CLOSED")
-    """Messages that contain :attr:`telegram.Message.forum_topic_closed`.
-
-    .. versionadded:: 20.0
-    """
-
-    class _ForumTopicReopened(MessageFilter):
-        __slots__ = ()
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.forum_topic_reopened)
-
-    FORUM_TOPIC_REOPENED = _ForumTopicReopened(name="filters.StatusUpdate.FORUM_TOPIC_REOPENED")
-    """Messages that contain :attr:`telegram.Message.forum_topic_reopened`.
 
     .. versionadded:: 20.0
     """

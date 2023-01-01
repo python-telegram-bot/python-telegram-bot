@@ -42,7 +42,7 @@ class File(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    .. versionchanged:: 20.0:
+    .. versionchanged:: 20.0
         ``download`` was split into :meth:`download_to_drive` and :meth:`download_to_memory`.
 
     Note:
@@ -58,18 +58,19 @@ class File(TelegramObject):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_size (:obj:`int`, optional): Optional. File size in bytes, if known.
+        file_size (:obj:`int`, optional): File size in bytes, if known.
         file_path (:obj:`str`, optional): File path. Use e.g. :meth:`download_to_drive` to get the
             file.
 
     Attributes:
-        file_id (:obj:`str`): Identifier for this file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_size (:obj:`str`): Optional. File size in bytes.
-        file_path (:obj:`str`): Optional. File path. Use e.g. :meth:`download_to_drive` to get
-            the file.
+        file_size (:obj:`int`): Optional. File size in bytes, if known.
+        file_path (:obj:`str`): Optional. File path. Use e.g. :meth:`download_to_drive` to get the
+            file.
     """
 
     __slots__ = (
@@ -140,6 +141,8 @@ class File(TelegramObject):
             file with the prefix `decrypted_` will be created in the same directory as the
             original file in order to decrypt the file without changing the existing one
             in-place.
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionchanged:: 20.0
 
@@ -223,6 +226,8 @@ class File(TelegramObject):
         Download this file into memory. :paramref:`out` needs to be supplied with a
         :obj:`io.BufferedIOBase`, the file contents will be saved to that object using the
         :obj:`out.write<io.BufferedIOBase.write>` method.
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionadded:: 20.0
 

@@ -45,7 +45,7 @@ class ChatMember(TelegramObject):
     considered equal, if their :attr:`user` and :attr:`status` are equal.
 
     Examples:
-         :any:`Chat Member Bot <examples.chatmemberbot>`
+        :any:`Chat Member Bot <examples.chatmemberbot>`
 
     .. versionchanged:: 20.0
 
@@ -65,7 +65,10 @@ class ChatMember(TelegramObject):
 
     Attributes:
         user (:class:`telegram.User`): Information about the user.
-        status (:obj:`str`): The member's status in the chat.
+        status (:obj:`str`): The member's status in the chat. Can be
+            :attr:`~telegram.ChatMember.ADMINISTRATOR`, :attr:`~telegram.ChatMember.OWNER`,
+            :attr:`~telegram.ChatMember.BANNED`, :attr:`~telegram.ChatMember.LEFT`,
+            :attr:`~telegram.ChatMember.MEMBER` or :attr:`~telegram.ChatMember.RESTRICTED`.
 
     """
 

@@ -78,23 +78,27 @@ class CallbackQuery(TelegramObject):
         inline_message_id (:obj:`str`, optional): Identifier of the message sent via the bot in
             inline mode, that originated the query.
         game_short_name (:obj:`str`, optional): Short name of a Game to be returned, serves as
-            the unique identifier for the game
+            the unique identifier for the game.
 
     Attributes:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
         chat_instance (:obj:`str`): Global identifier, uniquely corresponding to the chat to which
-            the message with the callback button was sent.
+            the message with the callback button was sent. Useful for high scores in games.
         message (:class:`telegram.Message`): Optional. Message with the callback button that
-            originated the query.
+            originated the query. Note that message content and message date will not be available
+            if the message is too old.
         data (:obj:`str` | :obj:`object`): Optional. Data associated with the callback button.
+            Be aware that the message, which originated the query, can contain no callback buttons
+            with this data.
 
             Tip:
                 The value here is the same as the value passed in
                 :paramref:`telegram.InlineKeyboardButton.callback_data`.
         inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
-                inline mode, that originated the query.
-        game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.
+            inline mode, that originated the query.
+        game_short_name (:obj:`str`): Optional. Short name of a Game to be returned, serves as
+            the unique identifier for the game.
 
 
     """

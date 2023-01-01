@@ -44,10 +44,14 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinx.ext.linkcode",
+    "sphinx.ext.extlinks",
     "sphinx_paramlinks",
     "sphinxcontrib.mermaid",
     "sphinx_search.extension",
 ]
+
+# For shorter links to Wiki in docstrings
+extlinks = {"wiki": ("https://github.com/python-telegram-bot/python-telegram-bot/wiki/%s", "%s")}
 
 # Use intersphinx to reference the python builtin library docs
 intersphinx_mapping = {

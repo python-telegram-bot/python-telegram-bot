@@ -44,7 +44,8 @@ class Video(_BaseThumbedMedium):
         file_size (:obj:`int`, optional): File size in bytes.
 
     Attributes:
-        file_id (:obj:`str`): Identifier for this file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
@@ -55,7 +56,6 @@ class Video(_BaseThumbedMedium):
         file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of a file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.
-
 
     """
 

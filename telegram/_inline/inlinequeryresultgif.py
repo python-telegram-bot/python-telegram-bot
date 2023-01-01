@@ -37,6 +37,8 @@ class InlineQueryResultGif(InlineQueryResult):
     the user with optional caption. Alternatively, you can use :attr:`input_message_content` to
     send a message with the specified content instead of the animation.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
@@ -75,7 +77,8 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_duration (:obj:`int`): Optional. Duration of the GIF in seconds.
         thumb_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for
             the result.
-        thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail.
+        thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
+            ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
         title (:obj:`str`): Optional. Title for the result.
         caption (:obj:`str`): Optional. Caption of the GIF file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters

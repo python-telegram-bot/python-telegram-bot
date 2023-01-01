@@ -70,14 +70,31 @@ class ReplyKeyboardMarkup(TelegramObject):
             .. versionadded:: 13.7
 
     Attributes:
-        keyboard (Tuple[Tuple[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button
-            rows.
-        resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
+        keyboard (Tuple[Tuple[:class:`telegram.KeyboardButton`]]): Array of button rows,
+            each represented by an Array of :class:`telegram.KeyboardButton` objects.
+        resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard vertically
+            for optimal fit (e.g., make the keyboard smaller if there are just two rows of
+            buttons). Defaults to :obj:`False`, in which case the custom keyboard is always of the
+            same height as the app's standard keyboard.
         one_time_keyboard (:obj:`bool`): Optional. Requests clients to hide the keyboard as soon as
-            it's been used.
+            it's been used. The keyboard will still be available, but clients will automatically
+            display the usual letter-keyboard in the chat - the user can press a special button in
+            the input field to see the custom keyboard again. Defaults to :obj:`False`.
         selective (:obj:`bool`): Optional. Show the keyboard to specific users only.
-        input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
-            field when the reply is active.
+            Targets:
+
+            1) Users that are @mentioned in the :attr:`~telegram.Message.text` of the
+               :class:`telegram.Message` object.
+            2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+               original message.
+
+            Defaults to :obj:`False`.
+
+        input_field_placeholder (:obj:`str`): Optional. The placeholder to be shown in the input
+            field when the keyboard is active;
+            :tg-const:`telegram.ReplyKeyboardMarkup.MIN_INPUT_FIELD_PLACEHOLDER`-
+            :tg-const:`telegram.ReplyKeyboardMarkup.MAX_INPUT_FIELD_PLACEHOLDER`
+            characters.
 
             .. versionadded:: 13.7
 
