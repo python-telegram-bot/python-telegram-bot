@@ -76,7 +76,7 @@ class InlineQueryResultDocument(InlineQueryResult):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 

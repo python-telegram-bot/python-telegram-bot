@@ -78,7 +78,7 @@ class Game(TelegramObject):
             0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         text_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that
             appear in text, such as usernames, URLs, bot commands, etc.
-            This list is empty if the message does not contain text entities.
+            This tuple is empty if the message does not contain text entities.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|

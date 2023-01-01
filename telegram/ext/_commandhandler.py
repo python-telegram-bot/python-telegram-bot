@@ -70,7 +70,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
     Args:
         command (:obj:`str` | Collection[:obj:`str`]):
             The command or list of commands this handler should listen for. Case-insensitive.
-            Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
+            Limitations are the same as for :attr:`telegram.BotCommand.command`.
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::

@@ -185,6 +185,7 @@ class InputMessageContentDWPP(InputMessageContent):
         api_kwargs=None,
     ):
         super().__init__(api_kwargs=api_kwargs)
+        self._unfreeze()
         self.message_text = message_text
         self.disable_web_page_preview = disable_web_page_preview
 

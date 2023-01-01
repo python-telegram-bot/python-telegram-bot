@@ -72,7 +72,7 @@ class InputMedia(TelegramObject):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 
@@ -159,7 +159,7 @@ class InputMediaAnimation(InputMedia):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 
@@ -245,7 +245,7 @@ class InputMediaPhoto(InputMedia):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 
@@ -333,7 +333,7 @@ class InputMediaVideo(InputMedia):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 
@@ -440,7 +440,7 @@ class InputMediaAudio(InputMedia):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 
@@ -537,7 +537,7 @@ class InputMediaDocument(InputMedia):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 

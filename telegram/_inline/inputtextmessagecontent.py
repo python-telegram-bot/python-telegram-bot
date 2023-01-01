@@ -56,7 +56,7 @@ class InputTextMessageContent(InputMessageContent):
             :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 
@@ -79,13 +79,12 @@ class InputTextMessageContent(InputMessageContent):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.message_text = message_text
-        # Optionals
-        self.parse_mode = parse_mode
-        self.entities = parse_sequence_arg(entities)
-        self.disable_web_page_preview = disable_web_page_preview
+        with self._unfrozen():
+            # Required
+            self.message_text = message_text
+            # Optionals
+            self.parse_mode = parse_mode
+            self.entities = parse_sequence_arg(entities)
+            self.disable_web_page_preview = disable_web_page_preview
 
-        self._id_attrs = (self.message_text,)
-
-        self._freeze()
+            self._id_attrs = (self.message_text,)
