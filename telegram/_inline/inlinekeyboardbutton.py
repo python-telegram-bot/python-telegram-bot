@@ -95,8 +95,7 @@ class InlineKeyboardButton(TelegramObject):
             Tip:
                 The value entered here will be available in :attr:`telegram.CallbackQuery.data`.
 
-            .. seealso:: `Arbitrary callback_data <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
+            .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
         web_app (:obj:`telegram.WebAppInfo`, optional): Description of the `Web App
             <https://core.telegram.org/bots/webapps>`_  that will be launched when the user presses
@@ -110,7 +109,7 @@ class InlineKeyboardButton(TelegramObject):
             specified inline query in the input field. Can be empty, in which case just the bot's
             username will be inserted. This offers an easy way for users to start using your bot
             in inline mode when they are currently in a private chat with it. Especially useful
-            when combined with switch_pm* actions - in this case the user will be automatically
+            when combined with ``switch_pm*`` actions - in this case the user will be automatically
             returned to the chat they switched from, skipping the chat selection screen.
         switch_inline_query_current_chat (:obj:`str`, optional): If set, pressing the button will
             insert the bot's username and the specified inline query in the current chat's input
@@ -118,11 +117,11 @@ class InlineKeyboardButton(TelegramObject):
             offers a quick way for the user to open your bot in inline mode in the same chat - good
             for selecting something from multiple options.
         callback_game (:class:`telegram.CallbackGame`, optional): Description of the game that will
-            be launched when the user presses the button. This type of button must always be
-            the ``first`` button in the first row.
+            be launched when the user presses the button. This type of button **must** always be
+            the **first** button in the first row.
         pay (:obj:`bool`, optional): Specify :obj:`True`, to send a Pay button. This type of button
-            must always be the `first` button in the first row and can only be used in invoice
-            messages.
+            **must** always be the **first** button in the first row and can only be used in
+            invoice messages.
 
     Attributes:
         text (:obj:`str`): Label text on the button.
@@ -148,15 +147,24 @@ class InlineKeyboardButton(TelegramObject):
             private chats between a user and the bot.
 
             .. versionadded:: 20.0
-        switch_inline_query (:obj:`str`): Optional. Will prompt the user to select one of their
-            chats, open that chat and insert the bot's username and the specified inline query in
-            the input field. Can be empty, in which case just the bot's username will be inserted.
-        switch_inline_query_current_chat (:obj:`str`): Optional. Will insert the bot's username and
-            the specified inline query in the current chat's input field. Can be empty, in which
-            case just the bot's username will be inserted.
+        switch_inline_query (:obj:`str`): Optional. If set, pressing the button will prompt the
+            user to select one of their chats, open that chat and insert the bot's username and the
+            specified inline query in the input field. Can be empty, in which case just the bot's
+            username will be inserted. This offers an easy way for users to start using your bot
+            in inline mode when they are currently in a private chat with it. Especially useful
+            when combined with ``switch_pm*`` actions - in this case the user will be automatically
+            returned to the chat they switched from, skipping the chat selection screen.
+        switch_inline_query_current_chat (:obj:`str`): Optional. If set, pressing the button will
+            insert the bot's username and the specified inline query in the current chat's input
+            field. Can be empty, in which case only the bot's username will be inserted. This
+            offers a quick way for the user to open your bot in inline mode in the same chat - good
+            for selecting something from multiple options.
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
-            be launched when the user presses the button.
-        pay (:obj:`bool`): Optional. Specify :obj:`True`, to send a Pay button.
+            be launched when the user presses the button. This type of button **must** always be
+            the **first** button in the first row.
+        pay (:obj:`bool`): Optional. Specify :obj:`True`, to send a Pay button. This type of button
+            **must** always be the **first** button in the first row and can only be used in
+            invoice messages.
 
     """
 

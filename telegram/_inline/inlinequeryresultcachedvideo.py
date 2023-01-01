@@ -38,6 +38,8 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
     :attr:`input_message_content` to send a message with the specified content instead
     of the video.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-

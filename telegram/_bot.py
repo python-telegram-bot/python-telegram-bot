@@ -150,10 +150,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     .. seealso:: :attr:`telegram.ext.Application.bot`,
         :attr:`telegram.ext.CallbackContext.bot`,
         :attr:`telegram.ext.Updater.bot`,
-        `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
-        `Builder Pattern <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+        :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+        :wiki:`Builder Pattern <Builder-Pattern>`
 
     .. versionadded:: 13.2
         Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -933,7 +931,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """Use this method to send photos.
 
         .. seealso:: :meth:`telegram.Message.reply_photo`, :meth:`telegram.Chat.send_photo`,
-            :meth:`telegram.User.send_photo`
+            :meth:`telegram.User.send_photo`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -941,6 +940,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`telegram.PhotoSize`): Photo to send.
                 |fileinput|
                 Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
+
+                Caution:
+                    * The photo must be at most 10MB in size.
+                    * The photo's width and height must not exceed 10000 in total.
+                    * Width and height ratio must be at most 20.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
@@ -1051,7 +1055,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         For sending voice messages, use the :meth:`send_voice` method instead.
 
         .. seealso:: :meth:`telegram.Message.reply_audio`, :meth:`telegram.Chat.send_audio`,
-            :meth:`telegram.User.send_audio`
+            :meth:`telegram.User.send_audio`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1176,7 +1181,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         changed in the future.
 
         .. seealso:: :meth:`telegram.Message.reply_document`, :meth:`telegram.Chat.send_document`,
-            :meth:`telegram.User.send_document`
+            :meth:`telegram.User.send_document`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1289,7 +1295,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to send static ``.WEBP``, animated ``.TGS``, or video ``.WEBM`` stickers.
 
         .. seealso:: :meth:`telegram.Message.reply_sticker`, :meth:`telegram.Chat.send_sticker`,
-            :meth:`telegram.User.send_sticker`
+            :meth:`telegram.User.send_sticker`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1385,7 +1392,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             changed by Telegram.
 
         .. seealso:: :meth:`telegram.Message.reply_video`, :meth:`telegram.Chat.send_video`,
-            :meth:`telegram.User.send_video`
+            :meth:`telegram.User.send_video`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1519,7 +1527,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         .. seealso:: :meth:`telegram.Message.reply_video_note`,
             :meth:`telegram.Chat.send_video_note`,
-            :meth:`telegram.User.send_video_note`
+            :meth:`telegram.User.send_video_note`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1642,7 +1651,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         .. seealso:: :meth:`telegram.Message.reply_animation`,
             :meth:`telegram.Chat.send_animation`,
-            :meth:`telegram.User.send_animation`
+            :meth:`telegram.User.send_animation`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1776,7 +1786,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             sent as files.
 
         .. seealso:: :meth:`telegram.Message.reply_voice`, :meth:`telegram.Chat.send_voice`,
-            :meth:`telegram.User.send_voice`
+            :meth:`telegram.User.send_voice`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1877,7 +1888,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] = None,
     ) -> Tuple[Message, ...]:
-        """Use this method to send a group of photos or videos as an album.
+        """Use this method to send a group of photos, videos, documents or audios as an album.
+        Documents and audio files can be only grouped in an album with messages of the same type.
 
         .. versionchanged:: 20.0
             Returns a tuple instead of a list.
@@ -1889,7 +1901,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         .. seealso:: :meth:`telegram.Message.reply_media_group`,
             :meth:`telegram.Chat.send_media_group`,
-            :meth:`telegram.User.send_media_group`
+            :meth:`telegram.User.send_media_group`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -2743,7 +2756,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :paramref:`telegram.InlineQuery.answer.auto_pagination` set to :obj:`True`, which will
             take care of passing the correct value.
 
-        .. seealso:: :meth:`telegram.InlineQuery.answer`
+        .. seealso:: :meth:`telegram.InlineQuery.answer`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
@@ -2891,7 +2905,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :meth:`telegram.Document.get_file`, :meth:`telegram.PassportFile.get_file`,
             :meth:`telegram.PhotoSize.get_file`, :meth:`telegram.Sticker.get_file`,
             :meth:`telegram.Video.get_file`, :meth:`telegram.VideoNote.get_file`,
-            :meth:`telegram.Voice.get_file`
+            :meth:`telegram.Voice.get_file`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             file_id (:obj:`str` | :class:`telegram.Animation` | :class:`telegram.Audio` |         \
@@ -3390,7 +3405,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             |editreplymarkup|
 
         .. seealso:: :meth:`telegram.Message.edit_media`,
-            :meth:`telegram.CallbackQuery.edit_message_media`
+            :meth:`telegram.CallbackQuery.edit_message_media`,
+            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             media (:class:`telegram.InputMedia`): An object for a new media content
@@ -3645,9 +3661,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 integration.
             certificate (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`):
                 Upload your public key certificate so that the root
-                certificate in use can be checked. See our `self-signed guide <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Webhooks#creating-a-self-signed-\
-                certificate-using-openssl>`_ for details. |uploadinputnopath|
+                certificate in use can be checked. See our :wiki:`self-signed guide\
+                <Webhooks#creating-a-self-signed-certificate-using-openssl>` for details.
+                |uploadinputnopath|
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
                 webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS

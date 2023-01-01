@@ -83,6 +83,7 @@ class ChatInviteLink(TelegramObject):
             :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
             :tg-const:`telegram.constants.ChatInviteLinkLimit.MAX_MEMBER_LIMIT`.
         name (:obj:`str`): Optional. Invite link name.
+            0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
             .. versionadded:: 13.8
         pending_join_request_count (:obj:`int`): Optional. Number of pending join requests

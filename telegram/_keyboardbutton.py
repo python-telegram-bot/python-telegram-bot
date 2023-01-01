@@ -68,12 +68,19 @@ class KeyboardButton(TelegramObject):
 
             .. versionadded:: 20.0
     Attributes:
-        text (:obj:`str`): Text of the button.
-        request_contact (:obj:`bool`): Optional. The user's phone number will be sent.
-        request_location (:obj:`bool`): Optional. The user's current location will be sent.
-        request_poll (:class:`KeyboardButtonPollType`): Optional. If the user should create a poll.
-        web_app (:class:`WebAppInfo`): Optional. If the described Web App will be launched when the
-            button is pressed.
+        text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
+            sent to the bot as a message when the button is pressed.
+        request_contact (:obj:`bool`): Optional. If :obj:`True`, the user's phone number will be
+            sent as a contact when the button is pressed. Available in private chats only.
+        request_location (:obj:`bool`): Optional. If :obj:`True`, the user's current location will
+            be sent when the button is pressed. Available in private chats only.
+        request_poll (:class:`KeyboardButtonPollType`): Optional. If specified, the user will be
+            asked to create a poll and send it to the bot when the button is pressed. Available in
+            private chats only.
+        web_app (:class:`WebAppInfo`): Optional. If specified, the described `Web App
+            <https://core.telegram.org/bots/webapps>`_ will be launched when the button is pressed.
+            The Web App will be able to send a :attr:`Message.web_app_data` service message.
+            Available in private chats only.
 
             .. versionadded:: 20.0
     """

@@ -133,14 +133,16 @@ class MenuButtonWebApp(MenuButton):
         text (:obj:`str`): Text of the button.
         web_app (:class:`telegram.WebAppInfo`): Description of the Web App that will be launched
             when the user presses the button. The Web App will be able to send an arbitrary
-            message on behalf of the user using the method :meth:`~telegram.Bot.answerWebAppQuery`.
+            message on behalf of the user using the method :meth:`~telegram.Bot.answerWebAppQuery`
+            of :class:`~telegram.Bot`.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.MenuButtonType.WEB_APP`.
         text (:obj:`str`): Text of the button.
         web_app (:class:`telegram.WebAppInfo`): Description of the Web App that will be launched
             when the user presses the button. The Web App will be able to send an arbitrary
-            message on behalf of the user using the method :meth:`~telegram.Bot.answerWebAppQuery`.
+            message on behalf of the user using the method :meth:`~telegram.Bot.answerWebAppQuery`
+            of :class:`~telegram.Bot`.
     """
 
     __slots__ = ("text", "web_app")

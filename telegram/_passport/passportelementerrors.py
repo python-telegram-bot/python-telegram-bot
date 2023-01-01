@@ -35,6 +35,7 @@ class PassportElementError(TelegramObject):
     Args:
         source (:obj:`str`): Error source.
         type (:obj:`str`): The section of the user's Telegram Passport which has the error.
+        message (:obj:`str`): Error message.
 
     Attributes:
         source (:obj:`str`): Error source.

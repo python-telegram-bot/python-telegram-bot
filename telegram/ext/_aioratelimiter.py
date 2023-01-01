@@ -90,8 +90,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
         welcome you to implement your own subclass of :class:`~telegram.ext.BaseRateLimiter`.
         Feel free to check out the source code of this class for inspiration.
 
-    .. seealso:: `Avoiding Flood Limits <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Avoiding-flood-limits>`_
+    .. seealso:: :wiki:`Avoiding Flood Limits <Avoiding-flood-limits>`
 
     .. versionadded:: 20.0
 

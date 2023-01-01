@@ -46,8 +46,7 @@ class Update(TelegramObject):
     Note:
         At most one of the optional parameters can be present in any given update.
 
-    .. seealso:: `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`
 
     Args:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
@@ -98,23 +97,33 @@ class Update(TelegramObject):
 
             .. versionadded:: 13.8
     Attributes:
-        update_id (:obj:`int`): The update's unique identifier.
-        message (:class:`telegram.Message`): Optional. New incoming message.
-        edited_message (:class:`telegram.Message`): Optional. New version of a message.
-        channel_post (:class:`telegram.Message`): Optional. New incoming channel post.
-        edited_channel_post (:class:`telegram.Message`): Optional. New version of a channel post.
+        update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
+            certain positive number and increase sequentially. This ID becomes especially handy if
+            you're using Webhooks, since it allows you to ignore repeated updates or to restore the
+            correct update sequence, should they get out of order. If there are no new updates for
+            at least a week, then identifier of the next update will be chosen randomly instead of
+            sequentially.
+        message (:class:`telegram.Message`): Optional. New incoming message of any kind - text,
+            photo, sticker, etc.
+        edited_message (:class:`telegram.Message`): Optional. New version of a message that is
+            known to the bot and was edited.
+        channel_post (:class:`telegram.Message`): Optional. New incoming channel post of any kind
+            - text, photo, sticker, etc.
+        edited_channel_post (:class:`telegram.Message`): Optional. New version of a channel post
+            that is known to the bot and was edited.
         inline_query (:class:`telegram.InlineQuery`): Optional. New incoming inline query.
         chosen_inline_result (:class:`telegram.ChosenInlineResult`): Optional. The result of an
-            inline query that was chosen by a user.
+            inline query that was chosen by a user and sent to their chat partner.
         callback_query (:class:`telegram.CallbackQuery`): Optional. New incoming callback query.
 
             Examples:
                 :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
         shipping_query (:class:`telegram.ShippingQuery`): Optional. New incoming shipping query.
+            Only for invoices with flexible price.
         pre_checkout_query (:class:`telegram.PreCheckoutQuery`): Optional. New incoming
-            pre-checkout query.
-        poll (:class:`telegram.Poll`): Optional. New poll state. Bots receive only updates
-            about stopped polls and polls, which are sent by the bot.
+            pre-checkout query. Contains full information about checkout.
+        poll (:class:`telegram.Poll`): Optional. New poll state. Bots receive only updates about
+            stopped polls and polls, which are sent by the bot.
         poll_answer (:class:`telegram.PollAnswer`): Optional. A user changed their answer
             in a non-anonymous poll. Bots receive new votes only in polls that were sent
             by the bot itself.

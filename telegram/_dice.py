@@ -52,8 +52,8 @@ class Dice(TelegramObject):
 
         If :attr:`emoji` is :tg-const:`telegram.Dice.SLOT_MACHINE`, each value
         corresponds to a unique combination of symbols, which
-        can be found at our `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki\
-        /Code-snippets#map-a-slot-machine-dice-value-to-the-corresponding-symbols>`_.
+        can be found in our
+        :wiki:`wiki <Code-snippets#map-a-slot-machine-dice-value-to-the-corresponding-symbols>`.
         However, this behaviour is undocumented and might be changed by Telegram.
 
     ..
@@ -75,6 +75,14 @@ class Dice(TelegramObject):
 
     Attributes:
         value (:obj:`int`): Value of the dice.
+            :tg-const:`telegram.Dice.MIN_VALUE`-:tg-const:`telegram.Dice.MAX_VALUE_BOWLING`
+            for :tg-const:`telegram.Dice.DICE`, :tg-const:`telegram.Dice.DARTS` and
+            :tg-const:`telegram.Dice.BOWLING` base emoji,
+            :tg-const:`telegram.Dice.MIN_VALUE`-:tg-const:`telegram.Dice.MAX_VALUE_BASKETBALL`
+            for :tg-const:`telegram.Dice.BASKETBALL` and :tg-const:`telegram.Dice.FOOTBALL`
+            base emoji,
+            :tg-const:`telegram.Dice.MIN_VALUE`-:tg-const:`telegram.Dice.MAX_VALUE_SLOT_MACHINE`
+            for :tg-const:`telegram.Dice.SLOT_MACHINE` base emoji.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     """
