@@ -2,6 +2,54 @@
 Changelog
 =========
 
+Version 20.0
+============
+*Released 2023-01-01*
+
+This is the technical changelog for version 20.0. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support For Bot API 6.4 (`#3449`_)
+
+Minor Changes, Documentation Improvements and CI
+------------------------------------------------
+
+- Documentation Improvements (`#3428`_, `#3423`_, `#3429`_, `#3441`_, `#3404`_, `#3443`_)
+- Allow ``Sequence`` Input for Bot Methods (`#3412`_)
+- Update Link-Check CI and Replace a Dead Link (`#3456`_)
+- Freeze Classes Without Arguments (`#3453`_)
+- Add New Constants (`#3444`_)
+- Override ``Bot.__deepcopy__`` to Raise ``TypeError`` (`#3446`_)
+- Add Log Decorator to ``Bot.get_webhook_info`` (`#3442`_)
+- Add Documentation On Verifying Releases (`#3436`_)
+- Drop Undocumented ``Job.__lt__`` (`#3432`_)
+
+Dependencies
+------------
+
+- Downgrade ``sphinx`` to 5.3.0 to Fix Search (`#3457`_)
+- Bump ``sphinx`` from 5.3.0 to 6.0.0 (`#3450`_)
+
+.. _`#3449`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3449
+.. _`#3428`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3428
+.. _`#3423`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3423
+.. _`#3429`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3429
+.. _`#3441`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3441
+.. _`#3404`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3404
+.. _`#3443`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3443
+.. _`#3412`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3412
+.. _`#3456`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3456
+.. _`#3453`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3453
+.. _`#3444`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3444
+.. _`#3446`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3446
+.. _`#3442`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3442
+.. _`#3436`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3436
+.. _`#3432`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3432
+.. _`#3457`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3457
+.. _`#3450`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3450
+
 Version 20.0b0
 ==============
 *Released 2022-12-15*
