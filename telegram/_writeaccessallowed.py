@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to the write access allowed service message."""
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class WriteAccessAllowed(TelegramObject):
@@ -29,3 +30,8 @@ class WriteAccessAllowed(TelegramObject):
     """
 
     __slots__ = ()
+
+    def __init__(self, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
+
+        self._freeze()

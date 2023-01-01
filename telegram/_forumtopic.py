@@ -182,6 +182,11 @@ class GeneralForumTopicHidden(TelegramObject):
 
     __slots__ = ()
 
+    def __init__(self, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
+
+        self._freeze()
+
 
 class GeneralForumTopicUnhidden(TelegramObject):
     """
@@ -192,3 +197,8 @@ class GeneralForumTopicUnhidden(TelegramObject):
     """
 
     __slots__ = ()
+
+    def __init__(self, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
+
+        self._freeze()
