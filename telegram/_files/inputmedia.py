@@ -150,6 +150,10 @@ class InputMediaAnimation(InputMedia):
         width (:obj:`int`, optional): Animation width.
         height (:obj:`int`, optional): Animation height.
         duration (:obj:`int`, optional): Animation duration in seconds.
+        has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the animation needs to be covered
+            with a spoiler animation.
+
+            .. versionadded:: 20.0
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATION`.
@@ -168,10 +172,13 @@ class InputMediaAnimation(InputMedia):
         width (:obj:`int`): Optional. Animation width.
         height (:obj:`int`): Optional. Animation height.
         duration (:obj:`int`): Optional. Animation duration in seconds.
+        has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the animation is covered with a
+            spoiler animation.
 
+            .. versionadded:: 20.0
     """
 
-    __slots__ = ("duration", "height", "thumb", "width")
+    __slots__ = ("duration", "height", "thumb", "width", "has_spoiler")
 
     def __init__(
         self,
@@ -184,6 +191,7 @@ class InputMediaAnimation(InputMedia):
         duration: int = None,
         caption_entities: Sequence[MessageEntity] = None,
         filename: str = None,
+        has_spoiler: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -210,6 +218,7 @@ class InputMediaAnimation(InputMedia):
             self.width = width
             self.height = height
             self.duration = duration
+            self.has_spoiler = has_spoiler
 
 
 class InputMediaPhoto(InputMedia):
@@ -237,6 +246,10 @@ class InputMediaPhoto(InputMedia):
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|
+        has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the photo needs to be covered
+            with a spoiler animation.
+
+            .. versionadded:: 20.0
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
@@ -251,10 +264,13 @@ class InputMediaPhoto(InputMedia):
 
                 * |tupleclassattrs|
                 * |alwaystuple|
+        has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the photo is covered with a
+            spoiler animation.
 
+            .. versionadded:: 20.0
     """
 
-    __slots__ = ()
+    __slots__ = ("has_spoiler",)
 
     def __init__(
         self,
@@ -263,6 +279,7 @@ class InputMediaPhoto(InputMedia):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence[MessageEntity] = None,
         filename: str = None,
+        has_spoiler: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -278,7 +295,8 @@ class InputMediaPhoto(InputMedia):
             api_kwargs=api_kwargs,
         )
 
-        self._freeze()
+        with self._unfrozen():
+            self.has_spoiler = has_spoiler
 
 
 class InputMediaVideo(InputMedia):
@@ -325,6 +343,10 @@ class InputMediaVideo(InputMedia):
 
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
+        has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the video needs to be covered
+            with a spoiler animation.
+
+            .. versionadded:: 20.0
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.VIDEO`.
@@ -345,10 +367,13 @@ class InputMediaVideo(InputMedia):
         supports_streaming (:obj:`bool`): Optional. :obj:`True`, if the uploaded video is
             suitable for streaming.
         thumb (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
+        has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the video is covered with a
+            spoiler animation.
 
+            .. versionadded:: 20.0
     """
 
-    __slots__ = ("duration", "height", "thumb", "supports_streaming", "width")
+    __slots__ = ("duration", "height", "thumb", "supports_streaming", "width", "has_spoiler")
 
     def __init__(
         self,
@@ -362,6 +387,7 @@ class InputMediaVideo(InputMedia):
         thumb: FileInput = None,
         caption_entities: Sequence[MessageEntity] = None,
         filename: str = None,
+        has_spoiler: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -390,6 +416,7 @@ class InputMediaVideo(InputMedia):
             self.duration = duration
             self.thumb = self._parse_thumb_input(thumb)
             self.supports_streaming = supports_streaming
+            self.has_spoiler = has_spoiler
 
 
 class InputMediaAudio(InputMedia):

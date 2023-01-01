@@ -68,6 +68,7 @@ def input_media_video(class_thumb_file):
         caption_entities=TestInputMediaVideo.caption_entities,
         thumb=class_thumb_file,
         supports_streaming=TestInputMediaVideo.supports_streaming,
+        has_spoiler=TestInputMediaVideo.has_spoiler,
     )
 
 
@@ -78,6 +79,7 @@ def input_media_photo(class_thumb_file):
         caption=TestInputMediaPhoto.caption,
         parse_mode=TestInputMediaPhoto.parse_mode,
         caption_entities=TestInputMediaPhoto.caption_entities,
+        has_spoiler=TestInputMediaPhoto.has_spoiler,
     )
 
 
@@ -92,6 +94,7 @@ def input_media_animation(class_thumb_file):
         height=TestInputMediaAnimation.height,
         thumb=class_thumb_file,
         duration=TestInputMediaAnimation.duration,
+        has_spoiler=TestInputMediaAnimation.has_spoiler,
     )
 
 
@@ -142,6 +145,7 @@ class TestInputMediaVideo:
     parse_mode = "HTML"
     supports_streaming = True
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
+    has_spoiler = True
 
     def test_slot_behaviour(self, input_media_video, mro_slots):
         inst = input_media_video
@@ -160,6 +164,7 @@ class TestInputMediaVideo:
         assert input_media_video.caption_entities == tuple(self.caption_entities)
         assert input_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_media_video.thumb, InputFile)
+        assert input_media_video.has_spoiler == self.has_spoiler
 
     def test_caption_entities_always_tuple(self):
         input_media_video = InputMediaVideo(self.media)
@@ -178,6 +183,7 @@ class TestInputMediaVideo:
             ce.to_dict() for ce in input_media_video.caption_entities
         ]
         assert input_media_video_dict["supports_streaming"] == input_media_video.supports_streaming
+        assert input_media_video_dict["has_spoiler"] == input_media_video.has_spoiler
 
     def test_with_video(self, video):  # noqa: F811
         # fixture found in test_video
@@ -210,6 +216,7 @@ class TestInputMediaPhoto:
     caption = "My Caption"
     parse_mode = "Markdown"
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
+    has_spoiler = True
 
     def test_slot_behaviour(self, input_media_photo, mro_slots):
         inst = input_media_photo
@@ -223,6 +230,7 @@ class TestInputMediaPhoto:
         assert input_media_photo.caption == self.caption
         assert input_media_photo.parse_mode == self.parse_mode
         assert input_media_photo.caption_entities == tuple(self.caption_entities)
+        assert input_media_photo.has_spoiler == self.has_spoiler
 
     def test_caption_entities_always_tuple(self):
         input_media_photo = InputMediaPhoto(self.media)
@@ -237,6 +245,7 @@ class TestInputMediaPhoto:
         assert input_media_photo_dict["caption_entities"] == [
             ce.to_dict() for ce in input_media_photo.caption_entities
         ]
+        assert input_media_photo_dict["has_spoiler"] == input_media_photo.has_spoiler
 
     def test_with_photo(self, photo):  # noqa: F811
         # fixture found in test_photo
@@ -266,6 +275,7 @@ class TestInputMediaAnimation:
     width = 30
     height = 30
     duration = 1
+    has_spoiler = True
 
     def test_slot_behaviour(self, input_media_animation, mro_slots):
         inst = input_media_animation
@@ -280,6 +290,7 @@ class TestInputMediaAnimation:
         assert input_media_animation.parse_mode == self.parse_mode
         assert input_media_animation.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_animation.thumb, InputFile)
+        assert input_media_animation.has_spoiler == self.has_spoiler
 
     def test_caption_entities_always_tuple(self):
         input_media_animation = InputMediaAnimation(self.media)
@@ -297,6 +308,7 @@ class TestInputMediaAnimation:
         assert input_media_animation_dict["width"] == input_media_animation.width
         assert input_media_animation_dict["height"] == input_media_animation.height
         assert input_media_animation_dict["duration"] == input_media_animation.duration
+        assert input_media_animation_dict["has_spoiler"] == input_media_animation.has_spoiler
 
     def test_with_animation(self, animation):  # noqa: F811
         # fixture found in test_animation
@@ -620,6 +632,22 @@ class TestSendMediaGroup:
                 for mes in messages
             )
             assert all(mes.has_protected_content for mes in messages)
+
+    @pytest.mark.flaky(3, 1)
+    async def test_send_media_group_with_spoiler(
+        self, bot, chat_id, photo_file, video_file  # noqa: F811
+    ):
+        # Media groups can't contain Animations, so that is tested in test_animation.py
+        media = [
+            InputMediaPhoto(photo_file, has_spoiler=True),
+            InputMediaVideo(video_file, has_spoiler=True),
+        ]
+        messages = await bot.send_media_group(chat_id, media)
+        assert isinstance(messages, tuple)
+        assert len(messages) == 2
+        assert all(isinstance(mes, Message) for mes in messages)
+        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
+        assert all(mes.has_media_spoiler for mes in messages)
 
     @pytest.mark.flaky(3, 1)
     async def test_send_media_group_custom_filename(

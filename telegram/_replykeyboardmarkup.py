@@ -68,6 +68,11 @@ class ReplyKeyboardMarkup(TelegramObject):
             characters.
 
             .. versionadded:: 13.7
+        is_persistent (:obj:`bool`, optional): Requests clients to always show the keyboard when
+            the regular keyboard is hidden. Defaults to :obj:`False`, in which case the custom
+            keyboard can be hidden and opened with a keyboard icon.
+
+            .. versionadded:: 20.0
 
     Attributes:
         keyboard (Tuple[Tuple[:class:`telegram.KeyboardButton`]]): Array of button rows,
@@ -97,6 +102,11 @@ class ReplyKeyboardMarkup(TelegramObject):
             characters.
 
             .. versionadded:: 13.7
+        is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard when
+            the regular keyboard is hidden. If :obj:`False`, the custom keyboard can be hidden and
+            opened with a keyboard icon.
+
+            .. versionadded:: 20.0
 
     """
 
@@ -106,6 +116,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         "resize_keyboard",
         "one_time_keyboard",
         "input_field_placeholder",
+        "is_persistent",
     )
 
     def __init__(
@@ -115,6 +126,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         one_time_keyboard: bool = None,
         selective: bool = None,
         input_field_placeholder: str = None,
+        is_persistent: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -136,6 +148,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         self.one_time_keyboard = one_time_keyboard
         self.selective = selective
         self.input_field_placeholder = input_field_placeholder
+        self.is_persistent = is_persistent
 
         self._id_attrs = (self.keyboard,)
 
@@ -149,6 +162,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         one_time_keyboard: bool = False,
         selective: bool = False,
         input_field_placeholder: str = None,
+        is_persistent: bool = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -182,6 +196,11 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
+            is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
+                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
+                custom keyboard can be hidden and opened with a keyboard icon.
+
+                .. versionadded:: 20.0
         """
         return cls(
             [[button]],
@@ -189,6 +208,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
+            is_persistent=is_persistent,
             **kwargs,  # type: ignore[arg-type]
         )
 
@@ -200,6 +220,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         one_time_keyboard: bool = False,
         selective: bool = False,
         input_field_placeholder: str = None,
+        is_persistent: bool = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -236,6 +257,11 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
+            is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
+                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
+                custom keyboard can be hidden and opened with a keyboard icon.
+
+                .. versionadded:: 20.0
 
         """
         return cls(
@@ -244,6 +270,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
+            is_persistent=is_persistent,
             **kwargs,  # type: ignore[arg-type]
         )
 
@@ -255,6 +282,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         one_time_keyboard: bool = False,
         selective: bool = False,
         input_field_placeholder: str = None,
+        is_persistent: bool = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -291,6 +319,11 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
+            is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
+                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
+                custom keyboard can be hidden and opened with a keyboard icon.
+
+                .. versionadded:: 20.0
 
         """
         button_grid = [[button] for button in button_column]
@@ -300,6 +333,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
+            is_persistent=is_persistent,
             **kwargs,  # type: ignore[arg-type]
         )
 

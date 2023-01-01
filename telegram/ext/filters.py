@@ -58,6 +58,7 @@ __all__ = (
     "FORWARDED",
     "ForwardedFrom",
     "GAME",
+    "HAS_MEDIA_SPOILER",
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
     "IS_AUTOMATIC_FORWARD",
@@ -1383,6 +1384,20 @@ GAME = _Game(name="filters.GAME")
 """Messages that contain :attr:`telegram.Message.game`."""
 
 
+class _HasMediaSpoiler(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.has_media_spoiler)
+
+
+HAS_MEDIA_SPOILER = _HasMediaSpoiler(name="filters.HAS_MEDIA_SPOILER")
+"""Messages that contain :attr:`telegram.Message.has_media_spoiler`.
+
+    .. versionadded:: 20.0
+"""
+
+
 class _HasProtectedContent(MessageFilter):
     __slots__ = ()
 
@@ -1721,6 +1736,10 @@ class StatusUpdate:
                 or StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
                 or StatusUpdate.FORUM_TOPIC_CLOSED.check_update(update)
                 or StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
+                or StatusUpdate.FORUM_TOPIC_EDITED.check_update(update)
+                or StatusUpdate.GENERAL_FORUM_TOPIC_HIDDEN.check_update(update)
+                or StatusUpdate.GENERAL_FORUM_TOPIC_UNHIDDEN.check_update(update)
+                or StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -1783,6 +1802,18 @@ class StatusUpdate:
     .. versionadded:: 20.0
     """
 
+    class _ForumTopicEdited(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.forum_topic_edited)
+
+    FORUM_TOPIC_EDITED = _ForumTopicEdited(name="filters.StatusUpdate.FORUM_TOPIC_EDITED")
+    """Messages that contain :attr:`telegram.Message.forum_topic_edited`.
+
+    .. versionadded:: 20.0
+    """
+
     class _ForumTopicReopened(MessageFilter):
         __slots__ = ()
 
@@ -1791,6 +1822,34 @@ class StatusUpdate:
 
     FORUM_TOPIC_REOPENED = _ForumTopicReopened(name="filters.StatusUpdate.FORUM_TOPIC_REOPENED")
     """Messages that contain :attr:`telegram.Message.forum_topic_reopened`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _GeneralForumTopicHidden(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.general_forum_topic_hidden)
+
+    GENERAL_FORUM_TOPIC_HIDDEN = _GeneralForumTopicHidden(
+        name="filters.StatusUpdate.GENERAL_FORUM_TOPIC_HIDDEN"
+    )
+    """Messages that contain :attr:`telegram.Message.general_forum_topic_hidden`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _GeneralForumTopicUnhidden(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.general_forum_topic_unhidden)
+
+    GENERAL_FORUM_TOPIC_UNHIDDEN = _GeneralForumTopicUnhidden(
+        name="filters.StatusUpdate.GENERAL_FORUM_TOPIC_UNHIDDEN"
+    )
+    """Messages that contain :attr:`telegram.Message.general_forum_topic_unhidden`.
 
     .. versionadded:: 20.0
     """
@@ -1941,6 +2000,18 @@ class StatusUpdate:
 
     WEB_APP_DATA = _WebAppData(name="filters.StatusUpdate.WEB_APP_DATA")
     """Messages that contain :attr:`telegram.Message.web_app_data`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _WriteAccessAllowed(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.write_access_allowed)
+
+    WRITE_ACCESS_ALLOWED = _WriteAccessAllowed(name="filters.StatusUpdate.WRITE_ACCESS_ALLOWED")
+    """Messages that contain :attr:`telegram.Message.write_access_allowed`.
 
     .. versionadded:: 20.0
     """

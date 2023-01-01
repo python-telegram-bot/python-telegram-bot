@@ -111,7 +111,7 @@ class _BotAPIVersion(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=3)
+BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=4)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1568,14 +1568,22 @@ class ForumTopicLimit(IntEnum):
     __slots__ = ()
 
     MIN_NAME_LENGTH = 1
-    """:obj:`int`: Minimum length of a :obj:`str` passed as the
-    :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
-    :meth:`telegram.Bot.create_forum_topic` and :paramref:`~telegram.Bot.edit_forum_topic.name`
-    parameter of :meth:`telegram.Bot.edit_forum_topic`.
+    """:obj:`int`: Minimum length of a :obj:`str` passed as:
+
+    * :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
+      :meth:`telegram.Bot.create_forum_topic`
+    * :paramref:`~telegram.Bot.edit_forum_topic.name` parameter of
+      :meth:`telegram.Bot.edit_forum_topic`
+    * :paramref:`~telegram.Bot.edit_general_forum_topic.name` parameter of
+      :meth:`telegram.Bot.edit_general_forum_topic`
     """
     MAX_NAME_LENGTH = 128
-    """:obj:`int`: Maximum length of a :obj:`str` passed as the
-    :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
-    :meth:`telegram.Bot.create_forum_topic` and :paramref:`~telegram.Bot.edit_forum_topic.name`
-    parameter of :meth:`telegram.Bot.edit_forum_topic`.
+    """:obj:`int`: Maximum length of a :obj:`str` passed as:
+
+    * :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
+      :meth:`telegram.Bot.create_forum_topic`
+    * :paramref:`~telegram.Bot.edit_forum_topic.name` parameter of
+      :meth:`telegram.Bot.edit_forum_topic`
+    * :paramref:`~telegram.Bot.edit_general_forum_topic.name` parameter of
+      :meth:`telegram.Bot.edit_general_forum_topic`
     """

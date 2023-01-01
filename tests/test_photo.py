@@ -107,6 +107,7 @@ class TestPhoto:
             disable_notification=False,
             protect_content=True,
             parse_mode="Markdown",
+            has_spoiler=True,
         )
 
         assert isinstance(message.photo[-2], PhotoSize)
@@ -123,6 +124,7 @@ class TestPhoto:
 
         assert message.caption == TestPhoto.caption.replace("*", "")
         assert message.has_protected_content
+        assert message.has_media_spoiler
 
     @pytest.mark.flaky(3, 1)
     async def test_send_photo_custom_filename(self, bot, chat_id, photo_file, monkeypatch):

@@ -142,3 +142,73 @@ class ForumTopicReopened(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()
+
+
+class ForumTopicEdited(TelegramObject):
+    """
+    This object represents a service message about an edited forum topic.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`name` and :attr:`icon_custom_emoji_id` are equal.
+
+    .. versionadded:: 20.0
+
+    Args:
+        name (:obj:`str`, optional): New name of the topic, if it was edited.
+        icon_custom_emoji_id (:obj:`str`, optional): New identifier of the custom emoji shown as
+            the topic icon, if it was edited; an empty string if the icon was removed.
+
+    Attributes:
+        name (:obj:`str`): Optional. New name of the topic, if it was edited.
+        icon_custom_emoji_id (:obj:`str`): Optional. New identifier of the custom emoji shown as
+            the topic icon, if it was edited; an empty string if the icon was removed.
+    """
+
+    __slots__ = ("name", "icon_custom_emoji_id")
+
+    def __init__(
+        self,
+        name: str = None,
+        icon_custom_emoji_id: str = None,
+        *,
+        api_kwargs: JSONDict = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.name = name
+        self.icon_custom_emoji_id = icon_custom_emoji_id
+
+        self._id_attrs = (self.name, self.icon_custom_emoji_id)
+
+        self._freeze()
+
+
+class GeneralForumTopicHidden(TelegramObject):
+    """
+    This object represents a service message about General forum topic hidden in the chat.
+    Currently holds no information.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    def __init__(self, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
+
+        self._freeze()
+
+
+class GeneralForumTopicUnhidden(TelegramObject):
+    """
+    This object represents a service message about General forum topic unhidden in the chat.
+    Currently holds no information.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    def __init__(self, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
+
+        self._freeze()

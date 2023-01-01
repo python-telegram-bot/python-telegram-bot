@@ -36,7 +36,14 @@ from telegram._files.venue import Venue
 from telegram._files.video import Video
 from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
-from telegram._forumtopic import ForumTopicClosed, ForumTopicCreated, ForumTopicReopened
+from telegram._forumtopic import (
+    ForumTopicClosed,
+    ForumTopicCreated,
+    ForumTopicEdited,
+    ForumTopicReopened,
+    GeneralForumTopicHidden,
+    GeneralForumTopicUnhidden,
+)
 from telegram._games.game import Game
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
@@ -59,6 +66,7 @@ from telegram._videochat import (
     VideoChatStarted,
 )
 from telegram._webappdata import WebAppData
+from telegram._writeaccessallowed import WriteAccessAllowed
 from telegram.constants import MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
 
@@ -277,15 +285,35 @@ class Message(TelegramObject):
 
             .. versionadded:: 20.0
         forum_topic_created (:class:`telegram.ForumTopicCreated`, optional): Service message:
-            forum topic created
+            forum topic created.
 
             .. versionadded:: 20.0
         forum_topic_closed (:class:`telegram.ForumTopicClosed`, optional): Service message:
-            forum topic closed
+            forum topic closed.
 
             .. versionadded:: 20.0
         forum_topic_reopened (:class:`telegram.ForumTopicReopened`, optional): Service message:
-            forum topic reopened
+            forum topic reopened.
+
+            .. versionadded:: 20.0
+        forum_topic_edited (:class:`telegram.ForumTopicEdited`, optional): Service message:
+            forum topic edited.
+
+            .. versionadded:: 20.0
+        general_forum_topic_hidden (:class:`telegram.GeneralForumTopicHidden`, optional):
+            Service message: General forum topic hidden.
+
+            .. versionadded:: 20.0
+        general_forum_topic_unhidden (:class:`telegram.GeneralForumTopicUnhidden`, optional):
+            Service message: General forum topic unhidden.
+
+            .. versionadded:: 20.0
+        write_access_allowed (:class:`telegram.WriteAccessAllowed`, optional): Service message:
+            the user allowed the bot added to the attachment menu to write messages.
+
+            .. versionadded:: 20.0
+        has_media_spoiler (:obj:`bool`, optional): :obj:`True`, if the message media is covered
+            by a spoiler animation.
 
             .. versionadded:: 20.0
 
@@ -484,15 +512,35 @@ class Message(TelegramObject):
 
             .. versionadded:: 20.0
         forum_topic_created (:class:`telegram.ForumTopicCreated`): Optional. Service message:
-            forum topic created
+            forum topic created.
 
             .. versionadded:: 20.0
         forum_topic_closed (:class:`telegram.ForumTopicClosed`): Optional. Service message:
-            forum topic closed
+            forum topic closed.
 
             .. versionadded:: 20.0
         forum_topic_reopened (:class:`telegram.ForumTopicReopened`): Optional. Service message:
-            forum topic reopened
+            forum topic reopened.
+
+            .. versionadded:: 20.0
+        forum_topic_edited (:class:`telegram.ForumTopicEdited`): Optional. Service message:
+            forum topic edited.
+
+            .. versionadded:: 20.0
+        general_forum_topic_hidden (:class:`telegram.GeneralForumTopicHidden`): Optional.
+            Service message: General forum topic hidden.
+
+            .. versionadded:: 20.0
+        general_forum_topic_unhidden (:class:`telegram.GeneralForumTopicUnhidden`): Optional.
+            Service message: General forum topic unhidden.
+
+            .. versionadded:: 20.0
+        write_access_allowed (:class:`telegram.WriteAccessAllowed`): Optional. Service message:
+            the user allowed the bot added to the attachment menu to write messages.
+
+            .. versionadded:: 20.0
+        has_media_spoiler (:obj:`bool`): Optional. :obj:`True`, if the message media is covered
+            by a spoiler animation.
 
             .. versionadded:: 20.0
 
@@ -567,6 +615,11 @@ class Message(TelegramObject):
         "forum_topic_created",
         "forum_topic_closed",
         "forum_topic_reopened",
+        "forum_topic_edited",
+        "general_forum_topic_hidden",
+        "general_forum_topic_unhidden",
+        "write_access_allowed",
+        "has_media_spoiler",
     )
 
     def __init__(
@@ -635,6 +688,11 @@ class Message(TelegramObject):
         forum_topic_created: ForumTopicCreated = None,
         forum_topic_closed: ForumTopicClosed = None,
         forum_topic_reopened: ForumTopicReopened = None,
+        forum_topic_edited: ForumTopicEdited = None,
+        general_forum_topic_hidden: GeneralForumTopicHidden = None,
+        general_forum_topic_unhidden: GeneralForumTopicUnhidden = None,
+        write_access_allowed: WriteAccessAllowed = None,
+        has_media_spoiler: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -706,6 +764,11 @@ class Message(TelegramObject):
         self.forum_topic_created = forum_topic_created
         self.forum_topic_closed = forum_topic_closed
         self.forum_topic_reopened = forum_topic_reopened
+        self.forum_topic_edited = forum_topic_edited
+        self.general_forum_topic_hidden = general_forum_topic_hidden
+        self.general_forum_topic_unhidden = general_forum_topic_unhidden
+        self.write_access_allowed = write_access_allowed
+        self.has_media_spoiler = has_media_spoiler
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -804,6 +867,16 @@ class Message(TelegramObject):
         )
         data["forum_topic_reopened"] = ForumTopicReopened.de_json(
             data.get("forum_topic_reopened"), bot
+        )
+        data["forum_topic_edited"] = ForumTopicEdited.de_json(data.get("forum_topic_edited"), bot)
+        data["general_forum_topic_hidden"] = GeneralForumTopicHidden.de_json(
+            data.get("general_forum_topic_hidden"), bot
+        )
+        data["general_forum_topic_unhidden"] = GeneralForumTopicUnhidden.de_json(
+            data.get("general_forum_topic_unhidden"), bot
+        )
+        data["write_access_allowed"] = WriteAccessAllowed.de_json(
+            data.get("write_access_allowed"), bot
         )
 
         return super().de_json(data=data, bot=bot)
@@ -1203,6 +1276,7 @@ class Message(TelegramObject):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1246,6 +1320,7 @@ class Message(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            has_spoiler=has_spoiler,
         )
 
     async def reply_audio(
@@ -1390,6 +1465,7 @@ class Message(TelegramObject):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1438,6 +1514,7 @@ class Message(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            has_spoiler=has_spoiler,
         )
 
     async def reply_sticker(
@@ -1506,6 +1583,7 @@ class Message(TelegramObject):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1554,6 +1632,7 @@ class Message(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            has_spoiler=has_spoiler,
         )
 
     async def reply_video_note(
@@ -1980,6 +2059,7 @@ class Message(TelegramObject):
     async def reply_chat_action(
         self,
         action: str,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2001,6 +2081,7 @@ class Message(TelegramObject):
         """
         return await self.get_bot().send_chat_action(
             chat_id=self.chat_id,
+            message_thread_id=message_thread_id,
             action=action,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2815,8 +2896,8 @@ class Message(TelegramObject):
 
     async def edit_forum_topic(
         self,
-        name: str,
-        icon_custom_emoji_id: str,
+        name: str = None,
+        icon_custom_emoji_id: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,

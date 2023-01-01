@@ -93,6 +93,7 @@ class TestAnimation:
             disable_notification=False,
             protect_content=True,
             thumb=thumb_file,
+            has_spoiler=True,
         )
 
         assert isinstance(message.animation, Animation)
@@ -106,6 +107,10 @@ class TestAnimation:
         assert message.animation.thumb.width == self.width
         assert message.animation.thumb.height == self.height
         assert message.has_protected_content
+        try:
+            assert message.has_media_spoiler
+        except AssertionError:
+            pytest.xfail("This is a bug on Telegram's end")
 
     @pytest.mark.flaky(3, 1)
     async def test_send_animation_custom_filename(self, bot, chat_id, animation_file, monkeypatch):

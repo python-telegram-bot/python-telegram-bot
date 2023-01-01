@@ -919,6 +919,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -973,6 +974,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the photo needs to be covered
+                with a spoiler animation.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the photo, when uploading a
@@ -991,6 +996,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "photo": self._parse_file_input(photo, PhotoSize, filename=filename),
+            "has_spoiler": has_spoiler,
         }
 
         return await self._send_message(
@@ -1363,6 +1369,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1438,6 +1445,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
+            has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the video needs to be covered
+                with a spoiler animation.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video, when uploading a
@@ -1461,6 +1472,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "height": height,
             "supports_streaming": supports_streaming,
             "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
+            "has_spoiler": has_spoiler,
         }
 
         return await self._send_message(
@@ -1617,6 +1629,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1687,6 +1700,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the animation needs to be
+                covered with a spoiler animation.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the animation, when uploading a
@@ -1709,6 +1726,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "width": width,
             "height": height,
             "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
+            "has_spoiler": has_spoiler,
         }
 
         return await self._send_message(
@@ -2553,6 +2571,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         action: str,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2574,6 +2593,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             action(:obj:`str`): Type of action to broadcast. Choose one, depending on what the user
                 is about to receive. For convenience look at the constants in
                 :class:`telegram.constants.ChatAction`.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 20.0
 
         Returns:
             :obj:`bool`:  On success, :obj:`True` is returned.
@@ -2582,7 +2604,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "action": action}
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "action": action,
+            "message_thread_id": message_thread_id,
+        }
         result = await self._post(
             "sendChatAction",
             data,
@@ -3913,7 +3939,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> ChatMember:
-        """Use this method to get information about a member of a chat.
+        """Use this method to get information about a member of a chat. The method is guaranteed
+        to work only if the bot is an administrator in the chat.
 
         .. seealso:: :meth:`telegram.Chat.get_member`
 
@@ -6970,8 +6997,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[str, int],
         message_thread_id: int,
-        name: str,
-        icon_custom_emoji_id: str,
+        name: str = None,
+        icon_custom_emoji_id: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6993,12 +7020,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             message_thread_id (:obj:`int`): |message_thread_id|
-            name (:obj:`str`): New topic name,
+            name (:obj:`str`, optional): New topic name,
                 :tg-const:`telegram.constants.ForumTopicLimit.MIN_NAME_LENGTH`-
-                :tg-const:`telegram.constants.ForumTopicLimit.MAX_NAME_LENGTH` characters.
-            icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
-                the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
-                allowed custom emoji identifiers.
+                :tg-const:`telegram.constants.ForumTopicLimit.MAX_NAME_LENGTH` characters. If
+                not specified or empty, the current name of the topic will be kept.
+            icon_custom_emoji_id (:obj:`str`, optional): New unique identifier of the custom emoji
+                shown as the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers`
+                to get all allowed custom emoji identifiers.Pass an empty string to remove the
+                icon. If not specified, the current icon will be kept.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -7206,6 +7235,222 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         }
         return await self._post(
             "unpinAllForumTopicMessages",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def edit_general_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        name: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to edit the name of the 'General' topic in a forum supergroup chat. The bot
+        must be an administrator in the chat for this to work and must have
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+
+        .. seealso:: :meth:`telegram.Chat.edit_general_forum_topic`
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            name (:obj:`str`): New topic name,
+                :tg-const:`telegram.constants.ForumTopicLimit.MIN_NAME_LENGTH`-
+                :tg-const:`telegram.constants.ForumTopicLimit.MAX_NAME_LENGTH` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id, "name": name}
+
+        return await self._post(
+            "editGeneralForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def close_general_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to close an open 'General' topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+
+        .. seealso:: :meth:`telegram.Chat.close_general_forum_topic`
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id}
+
+        return await self._post(
+            "closeGeneralForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def reopen_general_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to reopen a closed 'General' topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+        The topic will be automatically unhidden if it was hidden.
+
+        .. seealso:: :meth:`telegram.Chat.reopen_general_forum_topic`
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id}
+
+        return await self._post(
+            "reopenGeneralForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def hide_general_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to hide the 'General' topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+        The topic will be automatically closed if it was open.
+
+        .. seealso:: :meth:`telegram.Chat.hide_general_forum_topic`
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id}
+
+        return await self._post(
+            "hideGeneralForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def unhide_general_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to unhide the 'General' topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+
+        .. seealso:: :meth:`telegram.Chat.unhide_general_forum_topic`
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"chat_id": chat_id}
+
+        return await self._post(
+            "unhideGeneralForumTopic",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -7422,3 +7667,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`delete_forum_topic`"""
     unpinAllForumTopicMessages = unpin_all_forum_topic_messages
     """Alias for :meth:`unpin_all_forum_topic_messages`"""
+    editGeneralForumTopic = edit_general_forum_topic
+    """Alias for :meth:`edit_general_forum_topic`"""
+    closeGeneralForumTopic = close_general_forum_topic
+    """Alias for :meth:`close_general_forum_topic`"""
+    reopenGeneralForumTopic = reopen_general_forum_topic
+    """Alias for :meth:`reopen_general_forum_topic`"""
+    hideGeneralForumTopic = hide_general_forum_topic
+    """Alias for :meth:`hide_general_forum_topic`"""
+    unhideGeneralForumTopic = unhide_general_forum_topic
+    """Alias for :meth:`unhide_general_forum_topic`"""
