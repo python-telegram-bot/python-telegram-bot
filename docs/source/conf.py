@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath("../.."))
 # -- General configuration ------------------------------------------------
 # General information about the project.
 project = "python-telegram-bot"
-copyright = "2015-2022, Leandro Toledo"
+copyright = "2015-2023, Leandro Toledo"
 author = "Leandro Toledo"
 
 # The version info for the project you're documenting, acts as replacement for
