@@ -36,6 +36,6 @@ jobs:
           name: built docs
           retention-days: 7
           path: |
-            !.doctrees
-            !.buildinfo
             docs/build/html/*
+            !docs/build/html/.doctrees
+            !docs/build/html/.buildinfo
