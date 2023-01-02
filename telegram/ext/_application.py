@@ -1045,7 +1045,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             try:
                 for handler in handlers:
                     check = handler.check_update(update)  # Should the handler handle this update?
-                    if not (check is None or check is False):  # if yes,
+                    if check:  # if yes,
                         if not context:  # build a context if not already built
                             context = self.context_types.context.from_update(update, self)
                             await context.refresh_data()
