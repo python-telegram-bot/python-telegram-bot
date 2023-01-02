@@ -208,7 +208,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             :meth:`Application.run_polling` and :meth:`Application.run_webhook` after stopping
             the application via :meth:`stop`.
 
-            ..versionadded:: 21.0
+            .. versionadded:: 20.1
 
     """
 
@@ -578,7 +578,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             :meth:`telegram.ext.Updater.stop` or use one of :meth:`run_polling` or
             :meth:`run_webhook`.
 
-        Does *not* call :attr:`post_stop` - that is only done by :meth:`run_polling` and
+        * Does *not* call :attr:`post_stop` - that is only done by :meth:`run_polling` and
         :meth:`run_webhook`.
 
         Raises:
@@ -637,14 +637,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         On unix, the app will also shut down on receiving the signals specified by
         :paramref:`stop_signals`.
 
-        If :attr:`post_init` is set, it will be called between :meth:`initialize` and
-        :meth:`telegram.ext.Updater.start_polling`.
-
-        If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
-        and :meth:`telegram.ext.Updater.shutdown`.
-
-        If :attr:`post_stop` is set, it will be called between :meth:`stop` and
-        :meth:`telegram.ext.Updater.stop`.
+        The order of execution by `run_polling` is roughly as follows:
+        - :meth:`initialize`
+        - *:meth:`post_init`*
+        - :meth:`updater.start_polling`
+        - :meth:`start`
+        ...
+        - :meth:`updater.stop`
+        - :meth:`stop`
+        - *:meth:`post_stop`*
+        - :meth:`shutdown`
+        - *:meth:`post_shutdown`*
 
         .. include:: inclusions/application_run_tip.rst
 
@@ -756,14 +759,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as
         required.
 
-        If :attr:`post_init` is set, it will be called between :meth:`initialize` and
-        :meth:`telegram.ext.Updater.start_webhook`.
-
-        If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
-        and :meth:`telegram.ext.Updater.shutdown`.
-
-        If :attr:`post_stop` is set, it will be called between :meth:`stop` and
-        :meth:`telegram.ext.Updater.stop`.
+        The order of execution by `run_webhook` is roughly as follows:
+        - :meth:`initialize`
+        - *:meth:`post_init`*
+        - :meth:`updater.start_webhook`
+        - :meth:`start`
+        ...
+        - :meth:`updater.stop`
+        - :meth:`stop`
+        - *:meth:`post_stop`*
+        - :meth:`shutdown`
+        - *:meth:`post_shutdown`*
 
         Important:
             If you want to use this method, you must install PTB with the optional requirement

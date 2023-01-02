@@ -1542,6 +1542,11 @@ class TestApplication:
             "stop",
             call_after(app.updater.stop, lambda _: events.append("updater.stop")),
         )
+        monkeypatch.setattr(
+            app.updater,
+            "shutdown",
+            call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
+        )
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1551,6 +1556,7 @@ class TestApplication:
             "updater.stop",
             "stop",
             "post_stop",
+            "updater.shutdown",
         ], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
@@ -1805,6 +1811,10 @@ class TestApplication:
             "post_shutdown",
         ], "Wrong order of events detected!"
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Can't send signals without stopping whole process on windows",
+    )
     def test_run_webhook_post_stop(self, bot, monkeypatch):
         events = []
 
@@ -1842,6 +1852,11 @@ class TestApplication:
             "stop",
             call_after(app.updater.stop, lambda _: events.append("updater.stop")),
         )
+        monkeypatch.setattr(
+            app.updater,
+            "shutdown",
+            call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
+        )
 
         thread = Thread(target=thread_target)
         thread.start()
@@ -1857,7 +1872,12 @@ class TestApplication:
             close_loop=False,
         )
         thread.join()
-        assert events == ["updater.stop", "stop", "post_stop"], "Wrong order of events detected!"
+        assert events == [
+            "updater.stop",
+            "stop",
+            "post_stop",
+            "updater.shutdown",
+        ], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
