@@ -273,6 +273,7 @@ class TestForumMethods:
         try:
             await bot.reopen_general_forum_topic(chat_id=forum_group_id)
         except BadRequest as exc:
+            # If the topic is already open, we get BadRequest: Topic_not_modified
             if "Topic_not_modified" not in exc.message:
                 raise exc
 
@@ -288,7 +289,7 @@ class TestForumMethods:
         )
         assert result is True, "Failed to hide general forum topic"
 
-        # then unhide, bot don't reopen
+        # then unhide, but don't reopen
         result = await bot.unhide_general_forum_topic(
             chat_id=forum_group_id,
         )
