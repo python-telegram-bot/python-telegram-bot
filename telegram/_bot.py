@@ -3940,7 +3940,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         api_kwargs: JSONDict = None,
     ) -> ChatMember:
         """Use this method to get information about a member of a chat. The method is guaranteed
-        to work only if the bot is an administrator in the chat.
+        to work for other users, only if the bot is an administrator in the chat.
 
         .. seealso:: :meth:`telegram.Chat.get_member`
 
