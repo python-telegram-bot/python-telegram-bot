@@ -578,8 +578,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             :meth:`telegram.ext.Updater.stop` or use one of :meth:`run_polling` or
             :meth:`run_webhook`.
 
-        * Does *not* call :attr:`post_stop` - that is only done by :meth:`run_polling` and
-        :meth:`run_webhook`.
+        * Does *not* call :attr:`post_stop` - that is only done by
+            :meth:`run_polling` and
+            :meth:`run_webhook`.
 
         Raises:
             :exc:`RuntimeError`: If the application is not running.
@@ -640,10 +641,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         The order of execution by `run_polling` is roughly as follows:
         - :meth:`initialize`
         - *:meth:`post_init`*
-        - :meth:`updater.start_polling`
+        - :meth:`telegram.ext.Updater.start_polling`
         - :meth:`start`
         ...
-        - :meth:`updater.stop`
+        - :meth:`telegram.ext.Updater.stop`
         - :meth:`stop`
         - *:meth:`post_stop`*
         - :meth:`shutdown`
@@ -762,10 +763,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         The order of execution by `run_webhook` is roughly as follows:
         - :meth:`initialize`
         - *:meth:`post_init`*
-        - :meth:`updater.start_webhook`
+        - :meth:`telegram.ext.Updater.start_webhook`
         - :meth:`start`
         ...
-        - :meth:`updater.stop`
+        - :meth:`telegram.ext.Updater.stop`
         - :meth:`stop`
         - *:meth:`post_stop`*
         - :meth:`shutdown`
