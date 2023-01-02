@@ -30,3 +30,9 @@ jobs:
           python -W ignore -m pip install -r requirements-all.txt
       - name: Build docs
         run: sphinx-build docs/source docs/build/html -W --keep-going -j auto
+      - name: Upload docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: built docs
+          retention-days: 7
+          path: docs/build/html
