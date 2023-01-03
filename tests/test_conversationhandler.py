@@ -1253,7 +1253,7 @@ class TestConversationHandler:
             await app.process_update(Update(update_id=2, message=brew_message))
             assert handler.check_update(Update(0, message=pour_coffee_message))
             # assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
-            await asyncio.sleep(0.7)
+            await asyncio.sleep(0.75)
             assert handler.check_update(Update(0, message=start_message))
             # assert handler.conversations.get((self.group.id, user1.id)) is None
 
