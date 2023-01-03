@@ -33,9 +33,11 @@ jobs:
       - name: Upload docs
         uses: actions/upload-artifact@v3
         with:
-          name: built docs
+          name: HTML Docs
           retention-days: 7
           path: |
+            # Exclude the .doctrees folder and .buildinfo file from the artifact
+            # since they are not needed and add to the size
             docs/build/html/*
             !docs/build/html/.doctrees
             !docs/build/html/.buildinfo
