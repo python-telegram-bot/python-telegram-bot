@@ -574,13 +574,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             :meth:`start`
 
         Note:
-            This does *not* stop :attr:`updater`. You need to either manually call
-            :meth:`telegram.ext.Updater.stop` or use one of :meth:`run_polling` or
+            * This does *not* stop :attr:`updater`. You need to either manually call\
+            :meth:`telegram.ext.Updater.stop` or use one of :meth:`run_polling` or\
             :meth:`run_webhook`.
-
-        * Does *not* call :attr:`post_stop` - that is only done by
-            :meth:`run_polling` and
-            :meth:`run_webhook`.
+            * Does *not* call :attr:`post_stop` - that is only done by\
+            :meth:`run_polling` and :meth:`run_webhook`.
 
         Raises:
             :exc:`RuntimeError`: If the application is not running.
@@ -639,16 +637,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         :paramref:`stop_signals`.
 
         The order of execution by `run_polling` is roughly as follows:
+
         - :meth:`initialize`
-        - *:meth:`post_init`*
+        - :meth:`post_init`
         - :meth:`telegram.ext.Updater.start_polling`
         - :meth:`start`
-        ...
+        - Run the application until the users stops it
         - :meth:`telegram.ext.Updater.stop`
         - :meth:`stop`
-        - *:meth:`post_stop`*
+        - :meth:`post_stop`
         - :meth:`shutdown`
-        - *:meth:`post_shutdown`*
+        - :meth:`post_shutdown`
 
         .. include:: inclusions/application_run_tip.rst
 
@@ -761,16 +760,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         required.
 
         The order of execution by `run_webhook` is roughly as follows:
+
         - :meth:`initialize`
-        - *:meth:`post_init`*
+        - :meth:`post_init`
         - :meth:`telegram.ext.Updater.start_webhook`
         - :meth:`start`
-        ...
+        - Run the application until the users stops it
         - :meth:`telegram.ext.Updater.stop`
         - :meth:`stop`
-        - *:meth:`post_stop`*
+        - :meth:`post_stop`
         - :meth:`shutdown`
-        - *:meth:`post_shutdown`*
+        - :meth:`post_shutdown`
 
         Important:
             If you want to use this method, you must install PTB with the optional requirement
