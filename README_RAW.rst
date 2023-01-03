@@ -14,7 +14,7 @@
    :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-6.3-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-6.4-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -34,7 +34,7 @@
    :target: https://github.com/python-telegram-bot/python-telegram-bot/
    :alt: Github Actions workflow
 
-.. image:: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot
+.. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
    :target: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot
    :alt: Code coverage
 
@@ -89,7 +89,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **6.2** are supported.
+All types and methods of the Telegram Bot API **6.4** are supported.
 
 Installing
 ==========
@@ -115,6 +115,18 @@ Note
 
 Installing the ``.tar.gz`` archive available on PyPi directly via ``pip`` will *not* work as expected, as ``pip`` does not recognize that it should use ``setup-raw.py`` instead of ``setup.py``.
 
+Verifying Releases
+------------------
+
+We sign all the releases with a GPG key.
+The signatures are uploaded to both the `GitHub releases page <https://github.com/python-telegram-bot/python-telegram-bot/releases>`_ and the `PyPI project <https://pypi.org/project/python-telegram-bot/>`_ and end with a suffix ``.asc``.
+Please find the public keys `here <https://github.com/python-telegram-bot/python-telegram-bot/tree/master/public_keys>`_.
+The keys are named in the format ``<first_version>-<last_version>.gpg`` or ``<first_version>-current.gpg`` if the key is currently being used for new releases.
+
+In addition, the GitHub release page also contains the sha1 hashes of the release files in the files with the suffix ``.sha1``.
+
+This allows you to verify that a release file that you downloaded was indeed provided by the ``python-telegram-bot`` team.
+
 Dependencies & Their Versions
 -----------------------------
 
@@ -137,7 +149,7 @@ Optional Dependencies
 PTB can be installed with optional dependencies:
 
 * ``pip install python-telegram-bot-raw[passport]`` installs the `cryptography>=3.0 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
-* ``pip install python-telegram-bot-raw[socks]`` installs ``httpx[socks]``. Use this, if you want to work behind a Socks5 server.
+* ``pip install python-telegram-bot-raw[socks]`` installs `httpx[socks] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to work behind a Socks5 server.
 
 To install multiple optional dependencies, separate them by commas, e.g. ``pip install python-telegram-bot-raw[passport,socks]``.
 

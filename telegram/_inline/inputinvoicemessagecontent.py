@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -115,22 +115,33 @@ class InputInvoiceMessageContent(InputMessageContent):
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
             `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_
         prices (Tuple[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
-            components.
+            components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus,
+            etc.)
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
 
-        max_tip_amount (:obj:`int`): Optional. The maximum accepted amount for tips in the smallest
-            units of the currency (integer, not float/double).
+        max_tip_amount (:obj:`int`): Optional. The maximum accepted amount for tips in the
+            *smallest* units of the currency (integer, **not** float/double). For example, for a
+            maximum tip of US$ 1.45 ``max_tip_amount`` is ``145``. See the ``exp`` parameter in
+            `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
+            shows the number of digits past the decimal point for each currency (2 for the majority
+            of currencies). Defaults to ``0``.
         suggested_tip_amounts (Tuple[:obj:`int`]): Optional. An array of suggested
-            amounts of tip in the smallest units of the currency (integer, not float/double).
+            amounts of tip in the *smallest* units of the currency (integer, **not** float/double).
+            At most 4 suggested tip amounts can be specified. The suggested tip amounts must be
+            positive, passed in a strictly increased order and must not exceed
+            :attr:`max_tip_amount`.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
 
         provider_data (:obj:`str`): Optional. An object for data about the invoice,
-            which will be shared with the payment provider.
-        photo_url (:obj:`str`): Optional. URL of the product photo for the invoice.
+            which will be shared with the payment provider. A detailed description of the required
+            fields should be provided by the payment provider.
+        photo_url (:obj:`str`): Optional. URL of the product photo for the invoice. Can be a photo
+            of the goods or a marketing image for a service. People like it better when they see
+            what they are paying for.
         photo_size (:obj:`int`): Optional. Photo size.
         photo_width (:obj:`int`): Optional. Photo width.
         photo_height (:obj:`int`): Optional. Photo height.
@@ -200,39 +211,38 @@ class InputInvoiceMessageContent(InputMessageContent):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.title = title
-        self.description = description
-        self.payload = payload
-        self.provider_token = provider_token
-        self.currency = currency
-        self.prices = parse_sequence_arg(prices)
-        # Optionals
-        self.max_tip_amount = max_tip_amount
-        self.suggested_tip_amounts = parse_sequence_arg(suggested_tip_amounts)
-        self.provider_data = provider_data
-        self.photo_url = photo_url
-        self.photo_size = photo_size
-        self.photo_width = photo_width
-        self.photo_height = photo_height
-        self.need_name = need_name
-        self.need_phone_number = need_phone_number
-        self.need_email = need_email
-        self.need_shipping_address = need_shipping_address
-        self.send_phone_number_to_provider = send_phone_number_to_provider
-        self.send_email_to_provider = send_email_to_provider
-        self.is_flexible = is_flexible
+        with self._unfrozen():
+            # Required
+            self.title = title
+            self.description = description
+            self.payload = payload
+            self.provider_token = provider_token
+            self.currency = currency
+            self.prices = parse_sequence_arg(prices)
+            # Optionals
+            self.max_tip_amount = max_tip_amount
+            self.suggested_tip_amounts = parse_sequence_arg(suggested_tip_amounts)
+            self.provider_data = provider_data
+            self.photo_url = photo_url
+            self.photo_size = photo_size
+            self.photo_width = photo_width
+            self.photo_height = photo_height
+            self.need_name = need_name
+            self.need_phone_number = need_phone_number
+            self.need_email = need_email
+            self.need_shipping_address = need_shipping_address
+            self.send_phone_number_to_provider = send_phone_number_to_provider
+            self.send_email_to_provider = send_email_to_provider
+            self.is_flexible = is_flexible
 
-        self._id_attrs = (
-            self.title,
-            self.description,
-            self.payload,
-            self.provider_token,
-            self.currency,
-            self.prices,
-        )
-
-        self._freeze()
+            self._id_attrs = (
+                self.title,
+                self.description,
+                self.payload,
+                self.provider_token,
+                self.currency,
+                self.prices,
+            )
 
     @classmethod
     def de_json(

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -250,8 +250,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             2. the value passed to this parameter (if any)
             3. :attr:`telegram.ext.Defaults.block` (if defaults are used)
 
-            .. seealso:: `Concurrency <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+            .. seealso:: :wiki:`Concurrency`
 
             .. versionchanged:: 20.0
                 No longer overrides the handlers settings. Resolution order was changed.

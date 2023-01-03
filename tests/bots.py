@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -27,15 +27,15 @@ import random
 # purposes than testing.
 FALLBACKS = (
     "W3sidG9rZW4iOiAiNTc5Njk0NzE0OkFBRnBLOHc2emtrVXJENHhTZVl3RjNNTzhlLTRHcm1jeTdjIiwgInBheW1lbnRfc"
-    "HJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6TmpRME5qWmxOekk1WWpKaSIsICJjaGF0X2lkIjogIjY3NTY2Nj"
-    "IyNCIsICJzdXBlcl9ncm91cF9pZCI6ICItMTAwMTMxMDkxMTEzNSIsICJmb3J1bV9ncm91cF9pZCI6ICItMTAwMTYxOTE"
-    "1OTQwNCIsICJjaGFubmVsX2lkIjogIk BweXRob250ZWxlZ3JhbWJvdHRlc3RzIiwgIm5hbWUiOiAiUFRCIHRlc3RzIGZ"
-    "hbGxiYWNrIDEiLCAidXNlcm5hbWUiOiAiQHB0Yl9mYWxsYmFja18xX2JvdCJ9LCB7InRva2VuIjogIjU1ODE5NDA2NjpB"
-    "QUZ3RFBJRmx6R1VsQ2FXSHRUT0VYNFJGclg4dTlETXFmbyIsICJwYXltZW50X3Byb3ZpZGVyX3Rva2VuIjogIjI4NDY4N"
-    "TA2MzpURVNUOllqRXdPRFF3TVRGbU5EY3kiLCAiY2hhdF9pZCI6ICI2NzU2NjYyMj QiLCAic3VwZXJfZ3JvdXBfaWQiO"
-    "iAiLTEwMDEyMjEyMTY4MzAiLCAiZm9ydW1fZ3JvdXBfaWQiOiAiLTEwMDE2MTkxNTk0MDQiLCAiY2hhbm5lbF9pZCI6IC"
-    "JAcHl0aG9udGVsZWdyYW1ib3R0ZXN0cyIsICJuYW1lIjogIlBUQiB0ZXN0cyBmYWxsYmFjayAyIiwgInVzZXJuYW1lIjo"
-    "gIkBwdGJfZmFsbGJhY2tfMl9ib3QifV0="
+    "HJvdmlkZXJfdG9rZW4iOiAiMjg0Njg1MDYzOlRFU1Q6TmpRME5qWmxOekk1WWpKaSIsICJjaGF0X2 lkIjogIjY3NTY2N"
+    "jIyNCIsICJzdXBlcl9ncm91cF9pZCI6ICItMTAwMTMxMDkxMTEzNSIsICJmb3J1bV9ncm91cF9pZCI6ICItMTAwMTgzOD"
+    "AwNDU3NyIsICJjaGFubmVsX2lkIjogIkBweXRob250ZWxlZ3JhbWJvdHRlc3RzIi wgIm5hbWUiOiAiUFRCIHRlc3RzIG"
+    "ZhbGxiYWNrIDEiLCAidXNlcm5hbWUiOiAiQHB0Yl9mYWxsYmFja18xX2JvdCJ9LCB7InRva2VuIjogIjU1ODE5NDA2Njp"
+    "BQUZ3RFBJRmx6R1VsQ2FXSHRUT0VYNFJGclg4dTlETXFmbyIsIC JwYXltZW50X3Byb3ZpZGVyX3Rva2VuIjogIjI4NDY"
+    "4NTA2MzpURVNUOllqRXdPRFF3TVRGbU5EY3kiLCAiY2hhdF9pZCI6ICI2NzU2NjYyMjQiLCAic3VwZXJfZ3JvdXBfaWQi"
+    "OiAiLTEwMDEyMjEyMTY4MzAiLCAiZm9ydW1fZ3 JvdXBfaWQiOiAiLTEwMDE4NTc4NDgzMTQiLCAiY2hhbm5lbF9pZCI6"
+    "ICJAcHl0aG9udGVsZWdyYW1ib3R0ZXN0cyIsICJuYW1lIjogIlBUQiB0ZXN0cyBmYWxsYmFjayAyIiwgInVzZXJuYW1lI"
+    "jogIkBwdGJfZmFsbGJhY2tfMl9ib3QifV0="
 )
 
 GITHUB_ACTION = os.getenv("GITHUB_ACTION", None)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -41,8 +41,12 @@ class BotCommand(TelegramObject):
             :tg-const:`telegram.BotCommand.MAX_DESCRIPTION` characters.
 
     Attributes:
-        command (:obj:`str`): Text of the command.
-        description (:obj:`str`): Description of the command.
+        command (:obj:`str`): Text of the command; :tg-const:`telegram.BotCommand.MIN_COMMAND`-
+            :tg-const:`telegram.BotCommand.MAX_COMMAND` characters. Can contain only lowercase
+            English letters, digits and underscores.
+        description (:obj:`str`): Description of the command;
+            :tg-const:`telegram.BotCommand.MIN_DESCRIPTION`-
+            :tg-const:`telegram.BotCommand.MAX_DESCRIPTION` characters.
 
     """
 

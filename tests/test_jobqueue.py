@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -526,10 +526,6 @@ class TestJobQueue:
         assert hash(job) != hash(job_queue)
         assert hash(job) != hash(job_2)
         assert hash(job) == hash(job_3)
-
-        assert not job < job
-        assert not job < job_2
-        assert not job < job_3
 
     async def test_process_error_context(self, job_queue, app):
         app.add_error_handler(self.error_handler_context)

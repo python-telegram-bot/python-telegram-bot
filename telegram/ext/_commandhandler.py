@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -70,7 +70,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
     Args:
         command (:obj:`str` | Collection[:obj:`str`]):
             The command or list of commands this handler should listen for. Case-insensitive.
-            Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
+            Limitations are the same as for :attr:`telegram.BotCommand.command`.
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::
@@ -87,8 +87,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
-            .. seealso:: `Concurrency <https://github.com/\
-                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+            .. seealso:: :wiki:`Concurrency`
 
     Raises:
         :exc:`ValueError`: When the command is too long or has illegal chars.

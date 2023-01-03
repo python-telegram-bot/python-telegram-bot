@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import copy
+from collections.abc import Sequence
 
 import pytest
 
@@ -68,6 +69,7 @@ def input_media_video(class_thumb_file):
         caption_entities=VideoSpace.caption_entities,
         thumb=class_thumb_file,
         supports_streaming=VideoSpace.supports_streaming,
+        has_spoiler=VideoSpace.has_spoiler,
     )
 
 
@@ -78,6 +80,7 @@ def input_media_photo():
         caption=PhotoSpace.caption,
         parse_mode=PhotoSpace.parse_mode,
         caption_entities=PhotoSpace.caption_entities,
+        has_spoiler=PhotoSpace.has_spoiler,
     )
 
 
@@ -92,6 +95,7 @@ def input_media_animation(class_thumb_file):
         height=AnimationSpace.height,
         thumb=class_thumb_file,
         duration=AnimationSpace.duration,
+        has_spoiler=AnimationSpace.has_spoiler,
     )
 
 
@@ -131,6 +135,7 @@ class VideoSpace:
     parse_mode = "HTML"
     supports_streaming = True
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
+    has_spoiler = True
 
 
 class TestInputMediaVideoNoReq:
@@ -151,6 +156,7 @@ class TestInputMediaVideoNoReq:
         assert input_media_video.caption_entities == tuple(VideoSpace.caption_entities)
         assert input_media_video.supports_streaming == VideoSpace.supports_streaming
         assert isinstance(input_media_video.thumb, InputFile)
+        assert input_media_video.has_spoiler == VideoSpace.has_spoiler
 
     def test_caption_entities_always_tuple(self):
         input_media_video = InputMediaVideo(VideoSpace.media)
@@ -169,6 +175,7 @@ class TestInputMediaVideoNoReq:
             ce.to_dict() for ce in input_media_video.caption_entities
         ]
         assert input_media_video_dict["supports_streaming"] == input_media_video.supports_streaming
+        assert input_media_video_dict["has_spoiler"] == input_media_video.has_spoiler
 
     def test_with_video(self, video):  # noqa: F811
         # fixture found in test_video
@@ -201,6 +208,7 @@ class PhotoSpace:
     caption = "My Caption"
     parse_mode = "Markdown"
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
+    has_spoiler = True
 
 
 class TestInputMediaPhotoNoReq:
@@ -216,6 +224,7 @@ class TestInputMediaPhotoNoReq:
         assert input_media_photo.caption == PhotoSpace.caption
         assert input_media_photo.parse_mode == PhotoSpace.parse_mode
         assert input_media_photo.caption_entities == tuple(PhotoSpace.caption_entities)
+        assert input_media_photo.has_spoiler == PhotoSpace.has_spoiler
 
     def test_caption_entities_always_tuple(self):
         input_media_photo = InputMediaPhoto(PhotoSpace.media)
@@ -230,6 +239,7 @@ class TestInputMediaPhotoNoReq:
         assert input_media_photo_dict["caption_entities"] == [
             ce.to_dict() for ce in input_media_photo.caption_entities
         ]
+        assert input_media_photo_dict["has_spoiler"] == input_media_photo.has_spoiler
 
     def test_with_photo(self, photo):  # noqa: F811
         # fixture found in test_photo
@@ -259,6 +269,7 @@ class AnimationSpace:
     width = 30
     height = 30
     duration = 1
+    has_spoiler = True
 
 
 class TestInputMediaAnimationNoReq:
@@ -275,6 +286,7 @@ class TestInputMediaAnimationNoReq:
         assert input_media_animation.parse_mode == AnimationSpace.parse_mode
         assert input_media_animation.caption_entities == tuple(AnimationSpace.caption_entities)
         assert isinstance(input_media_animation.thumb, InputFile)
+        assert input_media_animation.has_spoiler == AnimationSpace.has_spoiler
 
     def test_caption_entities_always_tuple(self):
         input_media_animation = InputMediaAnimation(AnimationSpace.media)
@@ -292,6 +304,7 @@ class TestInputMediaAnimationNoReq:
         assert input_media_animation_dict["width"] == input_media_animation.width
         assert input_media_animation_dict["height"] == input_media_animation.height
         assert input_media_animation_dict["duration"] == input_media_animation.duration
+        assert input_media_animation_dict["has_spoiler"] == input_media_animation.has_spoiler
 
     def test_with_animation(self, animation):  # noqa: F811
         # fixture found in test_animation
@@ -569,6 +582,17 @@ class TestSendMediaGroupNoReq:
             await bot.edit_message_media(chat_id=chat_id, message_id=123, media=input_video)
 
 
+class CustomSequence(Sequence):
+    def __init__(self, items):
+        self.items = items
+
+    def __getitem__(self, index):
+        return self.items[index]
+
+    def __len__(self):
+        return len(self.items)
+
+
 class TestSendMediaGroupReq:
     async def test_send_media_group_photo(self, bot, chat_id, media_group):
         messages = await bot.send_media_group(chat_id, media_group)
@@ -598,6 +622,21 @@ class TestSendMediaGroupReq:
             func, "Type of file mismatch", "Telegram did not accept the file."
         )
 
+        assert isinstance(messages, tuple)
+        assert len(messages) == 3
+        assert all(isinstance(mes, Message) for mes in messages)
+        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
+
+    @pytest.mark.parametrize("sequence_type", [list, tuple, CustomSequence])
+    @pytest.mark.parametrize("bot_class", ["raw_bot", "ext_bot"])
+    async def test_send_media_group_different_sequences(
+        self, bot, chat_id, media_group, sequence_type, bot_class, raw_bot
+    ):
+        """Test that send_media_group accepts different sequence types. This test ensures that
+        Bot._insert_defaults works for arbitrary sequence types."""
+        bot = bot if bot_class == "ext_bot" else raw_bot
+
+        messages = await bot.send_media_group(chat_id, sequence_type(media_group))
         assert isinstance(messages, tuple)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
@@ -702,6 +741,21 @@ class TestSendMediaGroupReq:
                 for mes in messages
             )
             assert all(mes.has_protected_content for mes in messages)
+
+    async def test_send_media_group_with_spoiler(
+        self, bot, chat_id, photo_file, video_file  # noqa: F811
+    ):
+        # Media groups can't contain Animations, so that is tested in test_animation.py
+        media = [
+            InputMediaPhoto(photo_file, has_spoiler=True),
+            InputMediaVideo(video_file, has_spoiler=True),
+        ]
+        messages = await bot.send_media_group(chat_id, media)
+        assert isinstance(messages, tuple)
+        assert len(messages) == 2
+        assert all(isinstance(mes, Message) for mes in messages)
+        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
+        assert all(mes.has_media_spoiler for mes in messages)
 
     async def test_edit_message_media(self, bot, raw_bot, chat_id, media_group):
         ext_bot = bot

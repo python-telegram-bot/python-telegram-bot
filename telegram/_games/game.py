@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -75,9 +75,10 @@ class Game(TelegramObject):
             game message. Can be automatically edited to include current high scores for the game
             when the bot calls :meth:`telegram.Bot.set_game_score`, or manually edited
             using :meth:`telegram.Bot.edit_message_text`.
+            0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         text_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that
             appear in text, such as usernames, URLs, bot commands, etc.
-            This list is empty if the message does not contain text entities.
+            This tuple is empty if the message does not contain text entities.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|

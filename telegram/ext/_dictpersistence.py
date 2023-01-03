@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -43,8 +43,7 @@ class DictPersistence(BasePersistence):
         * This implementation of :class:`BasePersistence` does not handle data that cannot be
           serialized by :func:`json.dumps`.
 
-    .. seealso:: `Making Your Bot Persistent <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Making-your-bot-persistent>`_
+    .. seealso:: :wiki:`Making Your Bot Persistent <Making-your-bot-persistent>`
 
     .. versionchanged:: 20.0
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.

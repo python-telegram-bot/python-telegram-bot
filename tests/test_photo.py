@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -215,6 +215,7 @@ class TestPhotoReq:
             disable_notification=False,
             protect_content=True,
             parse_mode="Markdown",
+            has_spoiler=True,
         )
 
         assert isinstance(message.photo[-2], PhotoSize)
@@ -231,6 +232,7 @@ class TestPhotoReq:
 
         assert message.caption == Space.caption.replace("*", "")
         assert message.has_protected_content
+        assert message.has_media_spoiler
 
     async def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file):
         message = await bot.send_photo(

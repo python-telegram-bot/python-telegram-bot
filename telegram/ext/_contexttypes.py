@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,10 +36,8 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
     Examples:
         :any:`ContextTypes Bot <examples.contexttypesbot>`
 
-    .. seealso:: `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        `Storing Bot, User and Chat Related Data <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-chat-related-data>`_
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
+        :wiki:`Storing Bot, User and Chat Related Data <Storing-bot%2C-user-and-chat-related-data>`
 
     .. versionadded:: 13.6
 

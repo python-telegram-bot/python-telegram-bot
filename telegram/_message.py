@@ -2,7 +2,7 @@
 # pylint: disable=too-many-instance-attributes, too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,14 @@ from telegram._files.venue import Venue
 from telegram._files.video import Video
 from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
-from telegram._forumtopic import ForumTopicClosed, ForumTopicCreated, ForumTopicReopened
+from telegram._forumtopic import (
+    ForumTopicClosed,
+    ForumTopicCreated,
+    ForumTopicEdited,
+    ForumTopicReopened,
+    GeneralForumTopicHidden,
+    GeneralForumTopicUnhidden,
+)
 from telegram._games.game import Game
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
@@ -59,6 +66,7 @@ from telegram._videochat import (
     VideoChatStarted,
 )
 from telegram._webappdata import WebAppData
+from telegram._writeaccessallowed import WriteAccessAllowed
 from telegram.constants import MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
 
@@ -237,8 +245,6 @@ class Message(TelegramObject):
             of the post author if present.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
-        forward_sender_name (:obj:`str`, optional): Sender's name for messages forwarded from
-            users who disallow adding a link to their account in forwarded messages.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
@@ -279,15 +285,35 @@ class Message(TelegramObject):
 
             .. versionadded:: 20.0
         forum_topic_created (:class:`telegram.ForumTopicCreated`, optional): Service message:
-            forum topic created
+            forum topic created.
 
             .. versionadded:: 20.0
         forum_topic_closed (:class:`telegram.ForumTopicClosed`, optional): Service message:
-            forum topic closed
+            forum topic closed.
 
             .. versionadded:: 20.0
         forum_topic_reopened (:class:`telegram.ForumTopicReopened`, optional): Service message:
-            forum topic reopened
+            forum topic reopened.
+
+            .. versionadded:: 20.0
+        forum_topic_edited (:class:`telegram.ForumTopicEdited`, optional): Service message:
+            forum topic edited.
+
+            .. versionadded:: 20.0
+        general_forum_topic_hidden (:class:`telegram.GeneralForumTopicHidden`, optional):
+            Service message: General forum topic hidden.
+
+            .. versionadded:: 20.0
+        general_forum_topic_unhidden (:class:`telegram.GeneralForumTopicUnhidden`, optional):
+            Service message: General forum topic unhidden.
+
+            .. versionadded:: 20.0
+        write_access_allowed (:class:`telegram.WriteAccessAllowed`, optional): Service message:
+            the user allowed the bot added to the attachment menu to write messages.
+
+            .. versionadded:: 20.0
+        has_media_spoiler (:obj:`bool`, optional): :obj:`True`, if the message media is covered
+            by a spoiler animation.
 
             .. versionadded:: 20.0
 
@@ -349,33 +375,48 @@ class Message(TelegramObject):
 
         audio (:class:`telegram.Audio`): Optional. Message is an audio file, information
             about the file.
+
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         document (:class:`telegram.Document`): Optional. Message is a general file, information
             about the file.
+
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         animation (:class:`telegram.Animation`): Optional. Message is an animation, information
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
+
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
         photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
+
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
 
         sticker (:class:`telegram.Sticker`): Optional. Message is a sticker, information
             about the sticker.
+
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         video (:class:`telegram.Video`): Optional. Message is a video, information about the
             video.
+
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         voice (:class:`telegram.Voice`): Optional. Message is a voice message, information about
             the file.
+
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
             about the video message.
+
+            .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         new_chat_members (Tuple[:class:`telegram.User`]): Optional. New members that were added
             to the group or supergroup and information about them (the bot itself may be one of
             these members). This list is empty if the message does not contain new chat members.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
-
         caption (:obj:`str`): Optional. Caption for the animation, audio, document, photo, video
             or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information
@@ -471,15 +512,35 @@ class Message(TelegramObject):
 
             .. versionadded:: 20.0
         forum_topic_created (:class:`telegram.ForumTopicCreated`): Optional. Service message:
-            forum topic created
+            forum topic created.
 
             .. versionadded:: 20.0
         forum_topic_closed (:class:`telegram.ForumTopicClosed`): Optional. Service message:
-            forum topic closed
+            forum topic closed.
 
             .. versionadded:: 20.0
         forum_topic_reopened (:class:`telegram.ForumTopicReopened`): Optional. Service message:
-            forum topic reopened
+            forum topic reopened.
+
+            .. versionadded:: 20.0
+        forum_topic_edited (:class:`telegram.ForumTopicEdited`): Optional. Service message:
+            forum topic edited.
+
+            .. versionadded:: 20.0
+        general_forum_topic_hidden (:class:`telegram.GeneralForumTopicHidden`): Optional.
+            Service message: General forum topic hidden.
+
+            .. versionadded:: 20.0
+        general_forum_topic_unhidden (:class:`telegram.GeneralForumTopicUnhidden`): Optional.
+            Service message: General forum topic unhidden.
+
+            .. versionadded:: 20.0
+        write_access_allowed (:class:`telegram.WriteAccessAllowed`): Optional. Service message:
+            the user allowed the bot added to the attachment menu to write messages.
+
+            .. versionadded:: 20.0
+        has_media_spoiler (:obj:`bool`): Optional. :obj:`True`, if the message media is covered
+            by a spoiler animation.
 
             .. versionadded:: 20.0
 
@@ -554,6 +615,11 @@ class Message(TelegramObject):
         "forum_topic_created",
         "forum_topic_closed",
         "forum_topic_reopened",
+        "forum_topic_edited",
+        "general_forum_topic_hidden",
+        "general_forum_topic_unhidden",
+        "write_access_allowed",
+        "has_media_spoiler",
     )
 
     def __init__(
@@ -622,6 +688,11 @@ class Message(TelegramObject):
         forum_topic_created: ForumTopicCreated = None,
         forum_topic_closed: ForumTopicClosed = None,
         forum_topic_reopened: ForumTopicReopened = None,
+        forum_topic_edited: ForumTopicEdited = None,
+        general_forum_topic_hidden: GeneralForumTopicHidden = None,
+        general_forum_topic_unhidden: GeneralForumTopicUnhidden = None,
+        write_access_allowed: WriteAccessAllowed = None,
+        has_media_spoiler: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -693,6 +764,11 @@ class Message(TelegramObject):
         self.forum_topic_created = forum_topic_created
         self.forum_topic_closed = forum_topic_closed
         self.forum_topic_reopened = forum_topic_reopened
+        self.forum_topic_edited = forum_topic_edited
+        self.general_forum_topic_hidden = general_forum_topic_hidden
+        self.general_forum_topic_unhidden = general_forum_topic_unhidden
+        self.write_access_allowed = write_access_allowed
+        self.has_media_spoiler = has_media_spoiler
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -792,6 +868,16 @@ class Message(TelegramObject):
         data["forum_topic_reopened"] = ForumTopicReopened.de_json(
             data.get("forum_topic_reopened"), bot
         )
+        data["forum_topic_edited"] = ForumTopicEdited.de_json(data.get("forum_topic_edited"), bot)
+        data["general_forum_topic_hidden"] = GeneralForumTopicHidden.de_json(
+            data.get("general_forum_topic_hidden"), bot
+        )
+        data["general_forum_topic_unhidden"] = GeneralForumTopicUnhidden.de_json(
+            data.get("general_forum_topic_unhidden"), bot
+        )
+        data["write_access_allowed"] = WriteAccessAllowed.de_json(
+            data.get("write_access_allowed"), bot
+        )
 
         return super().de_json(data=data, bot=bot)
 
@@ -808,7 +894,7 @@ class Message(TelegramObject):
         Invoice,
         Location,
         PassportData,
-        List[PhotoSize],
+        Sequence[PhotoSize],
         Poll,
         Sticker,
         SuccessfulPayment,
@@ -840,6 +926,8 @@ class Message(TelegramObject):
         * :class:`telegram.Voice`
 
         Otherwise :obj:`None` is returned.
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionchanged:: 20.0
             :attr:`dice`, :attr:`passport_data` and :attr:`poll` are now also considered to be an
@@ -888,7 +976,7 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -942,7 +1030,7 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1006,7 +1094,7 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1066,7 +1154,7 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1120,7 +1208,7 @@ class Message(TelegramObject):
 
     async def reply_media_group(
         self,
-        media: List[
+        media: Sequence[
             Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
@@ -1137,7 +1225,7 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
     ) -> Tuple["Message", ...]:
         """Shortcut for::
 
@@ -1185,9 +1273,10 @@ class Message(TelegramObject):
         reply_markup: ReplyMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1231,6 +1320,7 @@ class Message(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            has_spoiler=has_spoiler,
         )
 
     async def reply_audio(
@@ -1246,7 +1336,7 @@ class Message(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1309,7 +1399,7 @@ class Message(TelegramObject):
         thumb: FileInput = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1372,9 +1462,10 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1423,6 +1514,7 @@ class Message(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            has_spoiler=has_spoiler,
         )
 
     async def reply_sticker(
@@ -1488,9 +1580,10 @@ class Message(TelegramObject):
         supports_streaming: bool = None,
         thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        has_spoiler: bool = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1539,6 +1632,7 @@ class Message(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            has_spoiler=has_spoiler,
         )
 
     async def reply_video_note(
@@ -1609,7 +1703,7 @@ class Message(TelegramObject):
         reply_markup: ReplyMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1845,7 +1939,7 @@ class Message(TelegramObject):
     async def reply_poll(
         self,
         question: str,
-        options: List[str],
+        options: Sequence[str],
         is_anonymous: bool = None,
         type: str = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool = None,
@@ -1859,7 +1953,7 @@ class Message(TelegramObject):
         open_period: int = None,
         close_date: Union[int, datetime.datetime] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        explanation_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -1965,6 +2059,7 @@ class Message(TelegramObject):
     async def reply_chat_action(
         self,
         action: str,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1986,6 +2081,7 @@ class Message(TelegramObject):
         """
         return await self.get_bot().send_chat_action(
             chat_id=self.chat_id,
+            message_thread_id=message_thread_id,
             action=action,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2052,7 +2148,7 @@ class Message(TelegramObject):
         payload: str,
         provider_token: str,
         currency: str,
-        prices: List["LabeledPrice"],
+        prices: Sequence["LabeledPrice"],
         start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
@@ -2071,7 +2167,7 @@ class Message(TelegramObject):
         send_email_to_provider: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         max_tip_amount: int = None,
-        suggested_tip_amounts: List[int] = None,
+        suggested_tip_amounts: Sequence[int] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         *,
@@ -2201,7 +2297,7 @@ class Message(TelegramObject):
         chat_id: Union[int, str],
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
@@ -2257,7 +2353,7 @@ class Message(TelegramObject):
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
@@ -2321,7 +2417,7 @@ class Message(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: InlineKeyboardMarkup = None,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        entities: Sequence["MessageEntity"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2368,7 +2464,7 @@ class Message(TelegramObject):
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption_entities: Sequence["MessageEntity"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2800,8 +2896,8 @@ class Message(TelegramObject):
 
     async def edit_forum_topic(
         self,
-        name: str,
-        icon_custom_emoji_id: str,
+        name: str = None,
+        icon_custom_emoji_id: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,

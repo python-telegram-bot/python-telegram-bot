@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,10 +26,8 @@ from telegram._utils.datetime import UTC
 class Defaults:
     """Convenience Class to gather all parameters with a (user defined) default value
 
-    .. seealso:: `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        `Adding Defaults to Your Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Adding-defaults-to-your-bot>`_
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
+        :wiki:`Adding Defaults to Your Bot <Adding-defaults-to-your-bot>`
 
     .. versionchanged:: 20.0
         Removed the argument and attribute ``timeout``. Specify default timeout behavior for the

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -38,6 +38,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     use :attr:`input_message_content` to send a message with the specified content instead of the
     animation.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
@@ -46,7 +48,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_width (:obj:`int`, optional): Video width.
         mpeg4_height (:obj:`int`, optional): Video height.
         mpeg4_duration (:obj:`int`, optional): Video duration in seconds.
-        thumb_url (:obj:`str`): URL of the static thumbnail (jpeg or gif) for the result.
+        thumb_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for
+            the result.
         thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
             ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
         title (:obj:`str`, optional): Title for the result.
@@ -54,7 +57,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
-        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+            |captionentitiesattr|
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|
@@ -75,7 +79,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_duration (:obj:`int`): Optional. Video duration in seconds.
         thumb_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for
             the result.
-        thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail.
+        thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
+            ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
         title (:obj:`str`): Optional. Title for the result.
         caption (:obj:`str`): Optional. Caption of the MPEG-4 file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters

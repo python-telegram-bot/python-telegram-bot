@@ -14,7 +14,7 @@
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-6.3-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-6.4-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -93,7 +93,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **6.2** are supported.
+All types and methods of the Telegram Bot API **6.4** are supported.
 
 Installing
 ==========
@@ -113,6 +113,18 @@ You can also install ``python-telegram-bot`` from source, though this is usually
     $ git clone https://github.com/python-telegram-bot/python-telegram-bot
     $ cd python-telegram-bot
     $ python setup.py install
+
+Verifying Releases
+------------------
+
+We sign all the releases with a GPG key.
+The signatures are uploaded to both the `GitHub releases page <https://github.com/python-telegram-bot/python-telegram-bot/releases>`_ and the `PyPI project <https://pypi.org/project/python-telegram-bot/>`_ and end with a suffix ``.asc``.
+Please find the public keys `here <https://github.com/python-telegram-bot/python-telegram-bot/tree/master/public_keys>`_.
+The keys are named in the format ``<first_version>-<last_version>.gpg`` or ``<first_version>-current.gpg`` if the key is currently being used for new releases.
+
+In addition, the GitHub release page also contains the sha1 hashes of the release files in the files with the suffix ``.sha1``.
+
+This allows you to verify that a release file that you downloaded was indeed provided by the ``python-telegram-bot`` team.
 
 Dependencies & Their Versions
 -----------------------------
@@ -136,9 +148,9 @@ Optional Dependencies
 PTB can be installed with optional dependencies:
 
 * ``pip install python-telegram-bot[passport]`` installs the `cryptography>=3.0 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
-* ``pip install python-telegram-bot[socks]`` installs ``httpx[socks]``. Use this, if you want to work behind a Socks5 server.
-* ``pip install python-telegram-bot[rate-limiter]`` installs ``aiolimiter~=1.0.0``. Use this, if you want to use ``telegram.ext.AIORateLimiter``.
-* ``pip install python-telegram-bot[webhooks]`` installs the `tornado~=6.2 <https://www.tornadoweb.org/en/stable/>`_ library. Use this, if you want to use ``telegram.ext.Updater.start_webhook``/``telegram.ext.Application.start_webhook``.
+* ``pip install python-telegram-bot[socks]`` installs `httpx[socks] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to work behind a Socks5 server.
+* ``pip install python-telegram-bot[rate-limiter]`` installs `aiolimiter~=1.0.0 <https://aiolimiter.readthedocs.io/en/stable/>`_. Use this, if you want to use ``telegram.ext.AIORateLimiter``.
+* ``pip install python-telegram-bot[webhooks]`` installs the `tornado~=6.2 <https://www.tornadoweb.org/en/stable/>`_ library. Use this, if you want to use ``telegram.ext.Updater.start_webhook``/``telegram.ext.Application.run_webhook``.
 * ``pip install python-telegram-bot[callback-data]`` installs the `cachetools~=5.2.0 <https://cachetools.readthedocs.io/en/latest/>`_ library. Use this, if you want to use `arbitrary callback_data <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_.
 * ``pip install python-telegram-bot[job-queue]`` installs the `APScheduler~=3.9.1 <https://apscheduler.readthedocs.io/en/3.x/>`_ library and enforces `pytz>=2018.6 <https://pypi.org/project/pytz/>`_, where ``pytz`` is a dependency of ``APScheduler``. Use this, if you want to use the ``telegram.ext.JobQueue``.
 

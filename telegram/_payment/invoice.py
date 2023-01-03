@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -48,9 +48,15 @@ class Invoice(TelegramObject):
     Attributes:
         title (:obj:`str`): Product name.
         description (:obj:`str`): Product description.
-        start_parameter (:obj:`str`): Unique bot deep-linking parameter.
+        start_parameter (:obj:`str`): Unique bot deep-linking parameter that can be used to
+            generate this invoice.
         currency (:obj:`str`): Three-letter ISO 4217 currency code.
-        total_amount (:obj:`int`): Total price in the smallest units of the currency.
+        total_amount (:obj:`int`): Total price in the smallest units of the currency (integer, not
+            float/double). For example, for a price of US$ 1.45 ``amount`` is ``145``. See the
+            ``exp`` parameter in
+            `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
+            it shows the number of digits past the decimal point for each currency
+            (2 for the majority of currencies).
 
     """
 
@@ -116,6 +122,11 @@ class Invoice(TelegramObject):
     """
     MAX_PAYLOAD_LENGTH: ClassVar[int] = constants.InvoiceLimit.MAX_PAYLOAD_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MAX_PAYLOAD_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_TIP_AMOUNTS: ClassVar[int] = constants.InvoiceLimit.MAX_TIP_AMOUNTS
+    """:const:`telegram.constants.InvoiceLimit.MAX_TIP_AMOUNTS`
 
     .. versionadded:: 20.0
     """

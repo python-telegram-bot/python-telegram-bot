@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -29,6 +29,7 @@ def reply_keyboard_markup():
         resize_keyboard=Space.resize_keyboard,
         one_time_keyboard=Space.one_time_keyboard,
         selective=Space.selective,
+        is_persistent=Space.is_persistent,
     )
 
 
@@ -37,6 +38,7 @@ class Space:
     resize_keyboard = True
     one_time_keyboard = True
     selective = True
+    is_persistent = True
 
 
 class TestReplyKeyboardMarkupNoReq:
@@ -54,6 +56,7 @@ class TestReplyKeyboardMarkupNoReq:
         assert reply_keyboard_markup.resize_keyboard == Space.resize_keyboard
         assert reply_keyboard_markup.one_time_keyboard == Space.one_time_keyboard
         assert reply_keyboard_markup.selective == Space.selective
+        assert reply_keyboard_markup.is_persistent == Space.is_persistent
 
     def test_to_dict(self, reply_keyboard_markup):
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()
@@ -75,6 +78,7 @@ class TestReplyKeyboardMarkupNoReq:
             == reply_keyboard_markup.one_time_keyboard
         )
         assert reply_keyboard_markup_dict["selective"] == reply_keyboard_markup.selective
+        assert reply_keyboard_markup_dict["is_persistent"] == reply_keyboard_markup.is_persistent
 
     def test_equality(self):
         a = ReplyKeyboardMarkup.from_column(["button1", "button2", "button3"])
