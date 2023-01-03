@@ -351,7 +351,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         if self._job_queue is None:
             warn(
                 "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-                "`pip install python-telegram-bot[job_queue]`.",
+                "`pip install python-telegram-bot[job-queue]`.",
                 stacklevel=2,
             )
         return self._job_queue
