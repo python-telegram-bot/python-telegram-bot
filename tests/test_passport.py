@@ -405,9 +405,10 @@ class TestPassportNoReq:
         assert hash(a) == hash(b)
         assert a is not b
 
-        passport_data.credentials._unfreeze()
-        passport_data.credentials.hash = "NOTAPROPERHASH"
-        c = PassportData(passport_data.data, passport_data.credentials)
+        new_pp_data = deepcopy(passport_data)
+        new_pp_data.credentials._unfreeze()
+        new_pp_data.credentials.hash = "NOTAPROPERHASH"
+        c = PassportData(new_pp_data.data, new_pp_data.credentials)
 
         assert a != c
         assert hash(a) != hash(c)
