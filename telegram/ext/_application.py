@@ -574,11 +574,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             :meth:`start`
 
         Note:
-            * This does *not* stop :attr:`updater`. You need to either manually call\
-            :meth:`telegram.ext.Updater.stop` or use one of :meth:`run_polling` or\
-            :meth:`run_webhook`.
-            * Does *not* call :attr:`post_stop` - that is only done by\
-            :meth:`run_polling` and :meth:`run_webhook`.
+            * This does *not* stop :attr:`updater`. You need to either manually call
+              :meth:`telegram.ext.Updater.stop` or use one of :meth:`run_polling` or
+              :meth:`run_webhook`.
+            * Does *not* call :attr:`post_stop` - that is only done by
+              :meth:`run_polling` and :meth:`run_webhook`.
 
         Raises:
             :exc:`RuntimeError`: If the application is not running.
