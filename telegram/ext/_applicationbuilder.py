@@ -970,6 +970,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
                 application = Application.builder().token("TOKEN").post_init(post_init).build()
 
+        .. seealso:: :meth:`post_stop`, :meth:`post_shutdown`
+
         Args:
             post_init (:term:`coroutine function`): The custom callback. Must be a
                 :term:`coroutine function` and must accept exactly one positional argument, which
@@ -1006,6 +1008,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                                         .post_shutdown(post_shutdown)
                                         .build()
 
+        .. seealso:: :meth:`post_init`, :meth:`post_stop`
+
         Args:
             post_shutdown (:term:`coroutine function`): The custom callback. Must be a
                 :term:`coroutine function` and must accept exactly one positional argument, which
@@ -1027,6 +1031,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         :meth:`Application.run_webhook` *after* executing :meth:`Updater.stop`
         and :meth:`Application.stop`.
 
+        .. versionadded:: 20.1
+
         Tip:
             This can be used for custom stop logic that requires to await coroutines, e.g.
             sending message to a chat before shutting down the bot
@@ -1041,6 +1047,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                                         .token("TOKEN")
                                         .post_stop(post_stop)
                                         .build()
+
+        .. seealso:: :meth:`post_init`, :meth:`post_shutdown`
 
         Args:
             post_stop (:term:`coroutine function`): The custom callback. Must be a
