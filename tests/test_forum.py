@@ -55,7 +55,7 @@ async def forum_topic_object(forum_group_id, emoji_id):
     )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 async def real_topic(bot, emoji_id, forum_group_id):
     result = await bot.create_forum_topic(
         chat_id=forum_group_id,
