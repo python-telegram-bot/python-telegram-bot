@@ -66,6 +66,8 @@ class TestNoJobQueue:
 @pytest.mark.skipif(
     not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
 )
+# needed if we run pytest -n=number > no. of CPUs & since asyncio.Events aren't thread-safe.
+@pytest.mark.flaky(4, 1)
 class TestJobQueue:
     result = 0
     job_time = 0
