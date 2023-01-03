@@ -204,7 +204,7 @@ class TestApplication:
     def test_job_queue(self, bot, app, recwarn):
         expected_warning = (
             "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-            "`pip install python-telegram-bot[job_queue]`."
+            "`pip install python-telegram-bot[job-queue]`."
         )
         assert app.job_queue is app._job_queue
         application = ApplicationBuilder().token(bot.token).job_queue(None).build()
