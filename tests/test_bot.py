@@ -2281,6 +2281,7 @@ class TestBotReq:
     async def test_edit_reply_markup_inline(self):
         pass
 
+    @pytest.mark.xdist_group("getUpdates_and_webhook")
     # TODO: Actually send updates to the test bot so this can be tested properly
     async def test_get_updates(self, bot):
         await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
@@ -2290,6 +2291,7 @@ class TestBotReq:
         if updates:
             assert isinstance(updates[0], Update)
 
+    @pytest.mark.xdist_group("getUpdates_and_webhook")
     @pytest.mark.parametrize("use_ip", [True, False])
     # local file path as file_input is tested below in test_set_webhook_params
     @pytest.mark.parametrize("file_input", ["bytes", "file_handle"])
