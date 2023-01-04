@@ -142,6 +142,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_pool_timeout",
         "_post_init",
         "_post_shutdown",
+        "_post_stop",
         "_private_key",
         "_private_key_password",
         "_proxy_url",
@@ -196,6 +197,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
+        self._post_stop: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._rate_limiter: ODVInput["BaseRateLimiter"] = DEFAULT_NONE
 
     def _build_request(self, get_updates: bool) -> BaseRequest:
@@ -301,6 +303,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             context_types=DefaultValue.get_value(self._context_types),
             post_init=self._post_init,
             post_shutdown=self._post_shutdown,
+            post_stop=self._post_stop,
             **self._application_kwargs,  # For custom Application subclasses
         )
 
@@ -967,6 +970,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
                 application = Application.builder().token("TOKEN").post_init(post_init).build()
 
+        .. seealso:: :meth:`post_stop`, :meth:`post_shutdown`
+
         Args:
             post_init (:term:`coroutine function`): The custom callback. Must be a
                 :term:`coroutine function` and must accept exactly one positional argument, which
@@ -1003,6 +1008,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                                         .post_shutdown(post_shutdown)
                                         .build()
 
+        .. seealso:: :meth:`post_init`, :meth:`post_stop`
+
         Args:
             post_shutdown (:term:`coroutine function`): The custom callback. Must be a
                 :term:`coroutine function` and must accept exactly one positional argument, which
@@ -1014,6 +1021,46 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
         self._post_shutdown = post_shutdown
+        return self
+
+    def post_stop(
+        self: BuilderType, post_stop: Callable[[Application], Coroutine[Any, Any, None]]
+    ) -> BuilderType:
+        """
+        Sets a callback to be executed by :meth:`Application.run_polling` and
+        :meth:`Application.run_webhook` *after* executing :meth:`Updater.stop`
+        and :meth:`Application.stop`.
+
+        .. versionadded:: 20.1
+
+        Tip:
+            This can be used for custom stop logic that requires to await coroutines, e.g.
+            sending message to a chat before shutting down the bot
+
+        Example:
+            .. code::
+
+                async def post_stop(application: Application) -> None:
+                    await application.bot.send_message(123456, "Shutting down...")
+
+                application = Application.builder()
+                                        .token("TOKEN")
+                                        .post_stop(post_stop)
+                                        .build()
+
+        .. seealso:: :meth:`post_init`, :meth:`post_shutdown`
+
+        Args:
+            post_stop (:term:`coroutine function`): The custom callback. Must be a
+                :term:`coroutine function` and must accept exactly one positional argument, which
+                is the :class:`~telegram.ext.Application`::
+
+                    async def post_stop(application: Application) -> None:
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        self._post_stop = post_stop
         return self
 
     def rate_limiter(
