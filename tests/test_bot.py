@@ -2814,6 +2814,7 @@ class TestBotReq:
             bot.unpin_chat_message(chat_id=super_group_id, read_timeout=10),  # unpins most recent
         )
         assert all(await tasks)
+        assert all([i.done() for i in tasks])
         assert await bot.unpin_all_chat_messages(super_group_id, read_timeout=10)
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
@@ -3170,10 +3171,10 @@ class TestBotReq:
             chat = await bot.get_chat(super_group_id)
             assert chat.pinned_message == message
             assert chat.pinned_message.reply_markup == reply_markup
+            assert await message.unpin()  # (not placed in finally block since msg can be unbound)
         finally:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
-            await bot.unpin_all_chat_messages(super_group_id)
 
     async def test_arbitrary_callback_data_get_chat_no_pinned_message(
         self, super_group_id, cdc_bot
