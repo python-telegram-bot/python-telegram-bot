@@ -131,6 +131,7 @@ class TestApplication:
             concurrent_updates=False,
             post_init=None,
             post_shutdown=None,
+            post_stop=None,
         )
         assert len(recwarn) == 1
         assert (
@@ -156,6 +157,9 @@ class TestApplication:
         async def post_shutdown(application: Application) -> None:
             pass
 
+        async def post_stop(application: Application) -> None:
+            pass
+
         app = Application(
             bot=bot,
             update_queue=update_queue,
@@ -166,6 +170,7 @@ class TestApplication:
             concurrent_updates=concurrent_updates,
             post_init=post_init,
             post_shutdown=post_shutdown,
+            post_stop=post_stop,
         )
         assert app.bot is bot
         assert app.update_queue is update_queue
@@ -178,6 +183,7 @@ class TestApplication:
         assert app.concurrent_updates == expected
         assert app.post_init is post_init
         assert app.post_shutdown is post_shutdown
+        assert app.post_stop is post_stop
 
         # These should be done by the builder
         assert app.persistence.bot is None
@@ -199,6 +205,7 @@ class TestApplication:
                 concurrent_updates=-1,
                 post_init=None,
                 post_shutdown=None,
+                post_stop=None,
             )
 
     def test_job_queue(self, bot, app, recwarn):
@@ -1505,6 +1512,57 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
+    def test_run_polling_post_stop(self, bot, monkeypatch):
+        events = []
+
+        async def get_updates(*args, **kwargs):
+            # This makes sure that other coroutines have a chance of running as well
+            await asyncio.sleep(0)
+            return []
+
+        def thread_target():
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
+
+            os.kill(os.getpid(), signal.SIGINT)
+
+        async def post_stop(app: Application) -> None:
+            events.append("post_stop")
+
+        app = Application.builder().token(bot.token).post_stop(post_stop).build()
+        app.bot._unfreeze()
+        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app, "stop", call_after(app.stop, lambda _: events.append("stop")))
+        monkeypatch.setattr(
+            app.updater,
+            "stop",
+            call_after(app.updater.stop, lambda _: events.append("updater.stop")),
+        )
+        monkeypatch.setattr(
+            app.updater,
+            "shutdown",
+            call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
+        )
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        app.run_polling(drop_pending_updates=True, close_loop=False)
+        thread.join()
+        assert events == [
+            "updater.stop",
+            "stop",
+            "post_stop",
+            "updater.shutdown",
+        ], "Wrong order of events detected!"
+
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Can't send signals without stopping whole process on windows",
+    )
     def test_run_polling_parameters_passing(self, app, monkeypatch):
         # First check that the default values match and that we have all arguments there
         updater_signature = inspect.signature(app.updater.start_polling)
@@ -1751,6 +1809,74 @@ class TestApplication:
             "updater.shutdown",
             "shutdown",
             "post_shutdown",
+        ], "Wrong order of events detected!"
+
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Can't send signals without stopping whole process on windows",
+    )
+    def test_run_webhook_post_stop(self, bot, monkeypatch):
+        events = []
+
+        async def delete_webhook(*args, **kwargs):
+            return True
+
+        async def set_webhook(*args, **kwargs):
+            return True
+
+        async def get_updates(*args, **kwargs):
+            # This makes sure that other coroutines have a chance of running as well
+            await asyncio.sleep(0)
+            return []
+
+        def thread_target():
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
+
+            os.kill(os.getpid(), signal.SIGINT)
+
+        async def post_stop(app: Application) -> None:
+            events.append("post_stop")
+
+        app = Application.builder().token(bot.token).post_stop(post_stop).build()
+        app.bot._unfreeze()
+        monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+        monkeypatch.setattr(app, "stop", call_after(app.stop, lambda _: events.append("stop")))
+        monkeypatch.setattr(
+            app.updater,
+            "stop",
+            call_after(app.updater.stop, lambda _: events.append("updater.stop")),
+        )
+        monkeypatch.setattr(
+            app.updater,
+            "shutdown",
+            call_after(app.updater.shutdown, lambda _: events.append("updater.shutdown")),
+        )
+
+        thread = Thread(target=thread_target)
+        thread.start()
+
+        ip = "127.0.0.1"
+        port = randrange(1024, 49152)
+
+        app.run_webhook(
+            ip_address=ip,
+            port=port,
+            url_path="TOKEN",
+            drop_pending_updates=True,
+            close_loop=False,
+        )
+        thread.join()
+        assert events == [
+            "updater.stop",
+            "stop",
+            "post_stop",
+            "updater.shutdown",
         ], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
