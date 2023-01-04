@@ -525,7 +525,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def pool_timeout(self: BuilderType, pool_timeout: Optional[float]) -> BuilderType:
         """Sets the connection pool's connection freeing timeout for the
         :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter of
-        :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
+        :attr:`telegram.Bot.request`. Defaults to ``1.0``.
 
         .. include:: inclusions/pool_size_tip.rst
 
@@ -648,7 +648,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     ) -> BuilderType:
         """Sets the connection pool's connection freeing timeout for the
         :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter which is used for the
-        :meth:`telegram.Bot.get_updates` request. Defaults to :obj:`None`.
+        :meth:`telegram.Bot.get_updates` request. Defaults to ``1.0``.
 
         Args:
             get_updates_pool_timeout (:obj:`float`): See
