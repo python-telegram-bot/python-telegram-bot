@@ -1,5 +1,5 @@
 InlineQueryResultGame
-==============================
+=====================
 
 .. autoclass:: telegram.InlineQueryResultGame
     :members:

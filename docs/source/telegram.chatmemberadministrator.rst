@@ -1,5 +1,5 @@
 ChatMemberAdministrator
-================================
+=======================
 
 .. autoclass:: telegram.ChatMemberAdministrator
     :members:

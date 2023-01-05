@@ -1,5 +1,5 @@
 Dice
-=============
+====
 
 .. autoclass:: telegram.Dice
     :members:

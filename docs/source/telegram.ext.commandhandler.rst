@@ -1,5 +1,5 @@
 CommandHandler
-===========================
+==============
 
 .. autoclass:: telegram.ext.CommandHandler
     :members:

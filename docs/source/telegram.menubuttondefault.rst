@@ -1,5 +1,5 @@
 MenuButtonDefault
-==========================
+=================
 
 .. autoclass:: telegram.MenuButtonDefault
     :members:

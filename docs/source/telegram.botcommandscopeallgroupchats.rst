@@ -1,5 +1,5 @@
 BotCommandScopeAllGroupChats
-=======================================
+============================
 
 .. autoclass:: telegram.BotCommandScopeAllGroupChats
     :members:

@@ -1,5 +1,5 @@
 PollAnswerHandler
-==============================
+=================
 
 .. autoclass:: telegram.ext.PollAnswerHandler
     :members:

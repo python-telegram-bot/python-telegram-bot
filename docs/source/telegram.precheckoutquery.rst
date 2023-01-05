@@ -1,5 +1,5 @@
 PreCheckoutQuery
-=========================
+================
 
 .. autoclass:: telegram.PreCheckoutQuery
     :members:

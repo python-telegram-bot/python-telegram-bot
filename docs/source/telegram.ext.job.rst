@@ -1,5 +1,5 @@
 Job
-=====================
+===
 
 .. autoclass:: telegram.ext.Job
     :members:

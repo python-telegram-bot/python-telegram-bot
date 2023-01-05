@@ -1,5 +1,5 @@
 ChatMemberBanned
-=========================
+================
 
 .. autoclass:: telegram.ChatMemberBanned
     :members:

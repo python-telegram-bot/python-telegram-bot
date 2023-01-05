@@ -1,5 +1,5 @@
 InputMessageContent
-============================
+===================
 
 .. autoclass:: telegram.InputMessageContent
     :members:

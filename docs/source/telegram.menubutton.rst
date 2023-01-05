@@ -1,5 +1,5 @@
 MenuButton
-===================
+==========
 
 .. autoclass:: telegram.MenuButton
     :members:

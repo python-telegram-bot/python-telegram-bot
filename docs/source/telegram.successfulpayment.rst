@@ -1,5 +1,5 @@
 SuccessfulPayment
-==========================
+=================
 
 .. autoclass:: telegram.SuccessfulPayment
     :members:

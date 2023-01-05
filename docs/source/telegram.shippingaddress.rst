@@ -1,5 +1,5 @@
 ShippingAddress
-========================
+===============
 
 .. autoclass:: telegram.ShippingAddress
     :members:

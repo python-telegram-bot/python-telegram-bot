@@ -1,5 +1,5 @@
 ForumTopicCreated
-==========================
+=================
 
 .. autoclass:: telegram.ForumTopicCreated
     :members:

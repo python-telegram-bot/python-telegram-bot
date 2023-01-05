@@ -1,5 +1,5 @@
 Updater
-====================
+=======
 
 .. autoclass:: telegram.ext.Updater
     :members:

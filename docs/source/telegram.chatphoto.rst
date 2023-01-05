@@ -1,5 +1,5 @@
 ChatPhoto
-==================
+=========
 
 .. autoclass:: telegram.ChatPhoto
     :members:

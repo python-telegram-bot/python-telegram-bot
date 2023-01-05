@@ -1,5 +1,5 @@
 InputVenueMessageContent
-=================================
+========================
 
 .. autoclass:: telegram.InputVenueMessageContent
     :members:

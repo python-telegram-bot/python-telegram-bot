@@ -1,5 +1,5 @@
 ChatMemberHandler
-==============================
+=================
 
 .. autoclass:: telegram.ext.ChatMemberHandler
     :members:

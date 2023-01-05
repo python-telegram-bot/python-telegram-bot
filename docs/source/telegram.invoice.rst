@@ -1,5 +1,5 @@
 Invoice
-================
+=======
 
 .. autoclass:: telegram.Invoice
     :members:

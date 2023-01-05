@@ -1,5 +1,5 @@
 InlineQueryResultCachedVideo
-=====================================
+============================
 
 .. autoclass:: telegram.InlineQueryResultCachedVideo
     :members:

@@ -1,5 +1,5 @@
 Update
-===============
+======
 
 .. autoclass:: telegram.Update
     :members:

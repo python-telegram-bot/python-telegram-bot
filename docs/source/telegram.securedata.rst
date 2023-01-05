@@ -1,5 +1,5 @@
 SecureData
-===================
+==========
 
 .. autoclass:: telegram.SecureData
     :members:

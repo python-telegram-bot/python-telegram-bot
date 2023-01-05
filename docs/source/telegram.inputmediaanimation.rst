@@ -1,5 +1,5 @@
 InputMediaAnimation
-============================
+===================
 
 .. autoclass:: telegram.InputMediaAnimation
     :members:

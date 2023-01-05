@@ -1,5 +1,5 @@
 BotCommand
-===================
+==========
 
 .. autoclass:: telegram.BotCommand
     :members:

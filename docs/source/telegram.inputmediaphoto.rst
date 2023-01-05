@@ -1,5 +1,5 @@
 InputMediaPhoto
-========================
+===============
 
 .. autoclass:: telegram.InputMediaPhoto
     :members:

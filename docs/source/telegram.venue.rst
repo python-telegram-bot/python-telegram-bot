@@ -1,5 +1,5 @@
 Venue
-==============
+=====
 
 .. autoclass:: telegram.Venue
     :members:

@@ -1,5 +1,5 @@
 Poll
-=============
+====
 
 .. autoclass:: telegram.Poll
     :members:

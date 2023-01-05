@@ -1,5 +1,5 @@
 MessageId
-==================
+=========
 
 .. autoclass:: telegram.MessageId
     :members:

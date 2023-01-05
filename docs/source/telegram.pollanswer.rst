@@ -1,5 +1,5 @@
 PollAnswer
-===================
+==========
 
 .. autoclass:: telegram.PollAnswer
     :members:

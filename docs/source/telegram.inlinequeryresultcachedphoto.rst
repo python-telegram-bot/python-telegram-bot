@@ -1,5 +1,5 @@
 InlineQueryResultCachedPhoto
-=====================================
+============================
 
 .. autoclass:: telegram.InlineQueryResultCachedPhoto
     :members:

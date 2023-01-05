@@ -1,5 +1,5 @@
 BaseHandler
-========================
+===========
 
 .. autoclass:: telegram.ext.BaseHandler
     :members:

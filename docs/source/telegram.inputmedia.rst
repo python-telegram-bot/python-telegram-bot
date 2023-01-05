@@ -1,5 +1,5 @@
 InputMedia
-===================
+==========
 
 .. autoclass:: telegram.InputMedia
     :members:

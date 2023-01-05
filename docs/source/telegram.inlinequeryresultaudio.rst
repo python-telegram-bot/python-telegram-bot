@@ -1,5 +1,5 @@
 InlineQueryResultAudio
-===============================
+======================
 
 .. autoclass:: telegram.InlineQueryResultAudio
     :members:

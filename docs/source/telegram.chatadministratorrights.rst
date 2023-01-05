@@ -1,5 +1,5 @@
 ChatAdministratorRights
-================================
+=======================
 
 .. versionadded:: 20.0
 

@@ -1,5 +1,5 @@
 ChatMemberOwner
-========================
+===============
 
 .. autoclass:: telegram.ChatMemberOwner
     :members:

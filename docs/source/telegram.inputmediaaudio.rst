@@ -1,5 +1,5 @@
 InputMediaAudio
-========================
+===============
 
 .. autoclass:: telegram.InputMediaAudio
     :members:

@@ -1,5 +1,5 @@
 BaseRateLimiter
-============================
+===============
 
 .. autoclass:: telegram.ext.BaseRateLimiter
     :members:

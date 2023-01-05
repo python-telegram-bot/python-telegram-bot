@@ -1,5 +1,5 @@
 ChatJoinRequest
-========================
+===============
 
 .. autoclass:: telegram.ChatJoinRequest
     :members:

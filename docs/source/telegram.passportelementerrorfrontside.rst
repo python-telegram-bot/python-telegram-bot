@@ -1,5 +1,5 @@
 PassportElementErrorFrontSide
-======================================
+=============================
 
 .. autoclass:: telegram.PassportElementErrorFrontSide
     :members:

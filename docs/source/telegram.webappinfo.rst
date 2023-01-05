@@ -1,5 +1,5 @@
 WebAppInfo
-=========================
+==========
 
 .. autoclass:: telegram.WebAppInfo
     :members:

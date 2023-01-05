@@ -1,5 +1,5 @@
 OrderInfo
-==================
+=========
 
 .. autoclass:: telegram.OrderInfo
     :members:

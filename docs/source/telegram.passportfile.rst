@@ -1,5 +1,5 @@
 PassportFile
-=====================
+============
 
 .. autoclass:: telegram.PassportFile
     :members:

@@ -1,5 +1,5 @@
 LoginUrl
-=================
+========
 
 .. autoclass:: telegram.LoginUrl
     :members:

@@ -1,5 +1,5 @@
 InlineQueryResultVenue
-===============================
+======================
 
 .. autoclass:: telegram.InlineQueryResultVenue
     :members:

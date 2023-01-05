@@ -1,5 +1,5 @@
 ForumTopicClosed
-=========================
+================
 
 .. autoclass:: telegram.ForumTopicClosed
     :members:

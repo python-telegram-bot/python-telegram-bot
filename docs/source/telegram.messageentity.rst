@@ -1,5 +1,5 @@
 MessageEntity
-======================
+=============
 
 .. autoclass:: telegram.MessageEntity
     :members:

@@ -1,5 +1,5 @@
 ChatPermissions
-========================
+===============
 
 .. autoclass:: telegram.ChatPermissions
     :members:

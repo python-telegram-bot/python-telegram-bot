@@ -1,5 +1,5 @@
 Game
-=============
+====
 
 .. autoclass:: telegram.Game
     :members:

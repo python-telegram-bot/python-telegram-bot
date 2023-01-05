@@ -1,5 +1,5 @@
 EncryptedPassportElement
-=================================
+========================
 
 .. autoclass:: telegram.EncryptedPassportElement
     :members:

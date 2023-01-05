@@ -1,5 +1,5 @@
 User
-=============
+====
 
 .. autoclass:: telegram.User
     :members:

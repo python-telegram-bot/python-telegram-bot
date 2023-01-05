@@ -1,5 +1,5 @@
 KeyboardButton
-=======================
+==============
 
 .. autoclass:: telegram.KeyboardButton
     :members:

@@ -1,5 +1,5 @@
 InlineQueryResultVideo
-===============================
+======================
 
 .. autoclass:: telegram.InlineQueryResultVideo
     :members:

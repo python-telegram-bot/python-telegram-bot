@@ -1,5 +1,5 @@
 ForceReply
-===================
+==========
 
 .. autoclass:: telegram.ForceReply
     :members:

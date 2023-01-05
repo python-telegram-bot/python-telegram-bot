@@ -1,5 +1,5 @@
 InlineKeyboardButton
-=============================
+====================
 
 .. autoclass:: telegram.InlineKeyboardButton
     :members:

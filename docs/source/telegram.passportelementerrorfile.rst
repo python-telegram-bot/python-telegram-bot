@@ -1,5 +1,5 @@
 PassportElementErrorFile
-=================================
+========================
 
 .. autoclass:: telegram.PassportElementErrorFile
     :members:

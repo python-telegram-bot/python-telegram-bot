@@ -1,5 +1,5 @@
 StringRegexHandler
-===============================
+==================
 
 .. autoclass:: telegram.ext.StringRegexHandler
     :members:

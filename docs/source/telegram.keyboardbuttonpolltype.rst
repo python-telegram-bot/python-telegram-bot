@@ -1,5 +1,5 @@
 KeyboardButtonPollType
-===============================
+======================
 
 .. autoclass:: telegram.KeyboardButtonPollType
     :members:

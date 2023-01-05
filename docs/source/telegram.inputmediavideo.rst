@@ -1,5 +1,5 @@
 InputMediaVideo
-========================
+===============
 
 .. autoclass:: telegram.InputMediaVideo
     :members:

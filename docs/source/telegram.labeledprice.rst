@@ -1,5 +1,5 @@
 LabeledPrice
-=====================
+============
 
 .. autoclass:: telegram.LabeledPrice
     :members:

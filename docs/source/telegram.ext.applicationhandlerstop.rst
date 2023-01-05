@@ -1,5 +1,5 @@
 ApplicationHandlerStop
-===================================
+======================
 
 .. autoclass:: telegram.ext.ApplicationHandlerStop
     :members:

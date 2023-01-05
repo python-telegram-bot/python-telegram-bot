@@ -1,5 +1,5 @@
 ChatMemberUpdated
-==========================
+=================
 
 .. autoclass:: telegram.ChatMemberUpdated
     :members:

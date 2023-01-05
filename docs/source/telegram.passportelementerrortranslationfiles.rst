@@ -1,5 +1,5 @@
 PassportElementErrorTranslationFiles
-=============================================
+====================================
 
 .. autoclass:: telegram.PassportElementErrorTranslationFiles
     :members:

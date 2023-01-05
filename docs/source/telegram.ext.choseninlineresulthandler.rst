@@ -1,5 +1,5 @@
 ChosenInlineResultHandler
-======================================
+=========================
 
 .. autoclass:: telegram.ext.ChosenInlineResultHandler
     :members:

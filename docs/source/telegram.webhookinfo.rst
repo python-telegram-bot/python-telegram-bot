@@ -1,5 +1,5 @@
 WebhookInfo
-====================
+===========
 
 .. autoclass:: telegram.WebhookInfo
     :members:

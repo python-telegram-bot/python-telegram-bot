@@ -1,5 +1,5 @@
 InlineQueryResultCachedDocument
-========================================
+===============================
 
 .. autoclass:: telegram.InlineQueryResultCachedDocument
     :members:

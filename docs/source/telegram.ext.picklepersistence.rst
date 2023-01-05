@@ -1,5 +1,5 @@
 PicklePersistence
-==============================
+=================
 
 .. autoclass:: telegram.ext.PicklePersistence
     :members:

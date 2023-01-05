@@ -1,5 +1,5 @@
 InputInvoiceMessageContent
-===================================
+==========================
 
 .. autoclass:: telegram.InputInvoiceMessageContent
     :members:

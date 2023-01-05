@@ -1,5 +1,5 @@
 InlineQueryResultCachedVoice
-=====================================
+============================
 
 .. autoclass:: telegram.InlineQueryResultCachedVoice
     :members:

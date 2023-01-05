@@ -1,5 +1,5 @@
 SecureValue
-====================
+===========
 
 .. autoclass:: telegram.SecureValue
     :members:

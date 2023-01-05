@@ -1,5 +1,5 @@
 StickerSet
-===================
+==========
 
 .. autoclass:: telegram.StickerSet
     :members:

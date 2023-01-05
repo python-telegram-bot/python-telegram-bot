@@ -1,5 +1,5 @@
 InlineQueryResultContact
-=================================
+========================
 
 .. autoclass:: telegram.InlineQueryResultContact
     :members:

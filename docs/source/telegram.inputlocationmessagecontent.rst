@@ -1,5 +1,5 @@
 InputLocationMessageContent
-====================================
+===========================
 
 .. autoclass:: telegram.InputLocationMessageContent
     :members:

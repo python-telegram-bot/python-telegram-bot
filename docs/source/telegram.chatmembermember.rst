@@ -1,5 +1,5 @@
 ChatMemberMember
-=========================
+================
 
 .. autoclass:: telegram.ChatMemberMember
     :members:

@@ -1,5 +1,5 @@
 ShippingQuery
-======================
+=============
 
 .. autoclass:: telegram.ShippingQuery
     :members:

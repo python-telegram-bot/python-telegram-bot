@@ -1,5 +1,5 @@
 WriteAccessAllowed
-===========================
+==================
 
 .. autoclass:: telegram.WriteAccessAllowed
     :members:

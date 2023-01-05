@@ -1,5 +1,5 @@
 PrefixHandler
-===========================
+=============
 
 .. autoclass:: telegram.ext.PrefixHandler
     :members:

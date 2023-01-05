@@ -1,5 +1,5 @@
 BotCommandScopeAllPrivateChats
-=======================================
+==============================
 
 .. autoclass:: telegram.BotCommandScopeAllPrivateChats
     :members:

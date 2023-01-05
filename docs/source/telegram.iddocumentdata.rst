@@ -1,5 +1,5 @@
 IdDocumentData
-=======================
+==============
 
 .. autoclass:: telegram.IdDocumentData
     :members:

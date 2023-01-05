@@ -1,5 +1,5 @@
 ChatLocation
-=====================
+============
 
 .. autoclass:: telegram.ChatLocation
     :members:

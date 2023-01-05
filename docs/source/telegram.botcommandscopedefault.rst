@@ -1,5 +1,5 @@
 BotCommandScopeDefault
-===============================
+======================
 
 .. autoclass:: telegram.BotCommandScopeDefault
     :members:

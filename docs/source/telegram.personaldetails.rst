@@ -1,5 +1,5 @@
 PersonalDetails
-========================
+===============
 
 .. autoclass:: telegram.PersonalDetails
     :members:

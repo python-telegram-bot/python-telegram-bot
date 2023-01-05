@@ -1,5 +1,5 @@
 PassportElementErrorSelfie
-========================================
+==========================
 
 .. autoclass:: telegram.PassportElementErrorSelfie
     :members:

@@ -1,5 +1,5 @@
 GeneralForumTopicUnhidden
-==================================
+=========================
 
 .. autoclass:: telegram.GeneralForumTopicUnhidden
     :members:

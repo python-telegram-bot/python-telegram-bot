@@ -1,5 +1,5 @@
 File
-=============
+====
 
 .. autoclass:: telegram.File
     :members:

@@ -1,5 +1,5 @@
 Defaults
-=====================
+========
 
 .. autoclass:: telegram.ext.Defaults
     :members:

@@ -1,5 +1,5 @@
 ShippingOption
-=======================
+==============
 
 .. autoclass:: telegram.ShippingOption
     :members:

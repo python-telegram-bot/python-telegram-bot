@@ -1,5 +1,5 @@
 InlineQueryResultPhoto
-===============================
+======================
 
 .. autoclass:: telegram.InlineQueryResultPhoto
     :members:

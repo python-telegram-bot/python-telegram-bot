@@ -1,5 +1,5 @@
 InputFile
-==================
+=========
 
 .. autoclass:: telegram.InputFile
     :members:

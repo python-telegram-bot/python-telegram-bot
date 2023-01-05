@@ -1,5 +1,5 @@
 MenuButtonWebApp
-=========================
+================
 
 .. autoclass:: telegram.MenuButtonWebApp
     :members:

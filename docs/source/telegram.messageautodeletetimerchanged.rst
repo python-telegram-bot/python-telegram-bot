@@ -1,5 +1,5 @@
 MessageAutoDeleteTimerChanged
-======================================
+=============================
 
 .. autoclass:: telegram.MessageAutoDeleteTimerChanged
     :members:

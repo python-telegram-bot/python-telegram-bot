@@ -1,5 +1,5 @@
 CallbackQuery
-======================
+=============
 
 .. autoclass:: telegram.CallbackQuery
     :members:

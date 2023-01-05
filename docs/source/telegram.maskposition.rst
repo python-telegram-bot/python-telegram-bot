@@ -1,5 +1,5 @@
 MaskPosition
-=====================
+============
 
 .. autoclass:: telegram.MaskPosition
     :members:

@@ -1,5 +1,5 @@
 ResidentialAddress
-===========================
+==================
 
 .. autoclass:: telegram.ResidentialAddress
     :members:
