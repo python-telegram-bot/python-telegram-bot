@@ -1,4 +1,4 @@
-telegram.Dice
+Dice
 =============
 
 .. autoclass:: telegram.Dice

@@ -1,4 +1,4 @@
-telegram.Venue
+Venue
 ==============
 
 .. autoclass:: telegram.Venue

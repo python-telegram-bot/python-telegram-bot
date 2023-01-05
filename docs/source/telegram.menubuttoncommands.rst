@@ -1,4 +1,4 @@
-telegram.MenuButtonCommands
+MenuButtonCommands
 ===========================
 
 .. autoclass:: telegram.MenuButtonCommands

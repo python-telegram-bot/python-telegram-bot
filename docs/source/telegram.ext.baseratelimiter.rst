@@ -1,4 +1,4 @@
-telegram.ext.BaseRateLimiter
+BaseRateLimiter
 ============================
 
 .. autoclass:: telegram.ext.BaseRateLimiter

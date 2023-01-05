@@ -1,4 +1,4 @@
-telegram.Update
+Update
 ===============
 
 .. autoclass:: telegram.Update

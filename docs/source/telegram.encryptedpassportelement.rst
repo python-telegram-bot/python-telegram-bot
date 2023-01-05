@@ -1,4 +1,4 @@
-telegram.EncryptedPassportElement
+EncryptedPassportElement
 =================================
 
 .. autoclass:: telegram.EncryptedPassportElement

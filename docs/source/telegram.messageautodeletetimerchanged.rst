@@ -1,4 +1,4 @@
-telegram.MessageAutoDeleteTimerChanged
+MessageAutoDeleteTimerChanged
 ======================================
 
 .. autoclass:: telegram.MessageAutoDeleteTimerChanged

@@ -1,4 +1,4 @@
-telegram.ShippingOption
+ShippingOption
 =======================
 
 .. autoclass:: telegram.ShippingOption

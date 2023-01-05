@@ -1,4 +1,4 @@
-telegram.InputMediaDocument
+InputMediaDocument
 ===========================
 
 .. autoclass:: telegram.InputMediaDocument

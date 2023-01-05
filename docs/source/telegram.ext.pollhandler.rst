@@ -1,4 +1,4 @@
-telegram.ext.PollHandler
+PollHandler
 ========================
 
 .. autoclass:: telegram.ext.PollHandler

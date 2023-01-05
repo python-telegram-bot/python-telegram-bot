@@ -1,4 +1,4 @@
-telegram.ResidentialAddress
+ResidentialAddress
 ===========================
 
 .. autoclass:: telegram.ResidentialAddress

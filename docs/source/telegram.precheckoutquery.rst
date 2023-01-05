@@ -1,4 +1,4 @@
-telegram.PreCheckoutQuery
+PreCheckoutQuery
 =========================
 
 .. autoclass:: telegram.PreCheckoutQuery

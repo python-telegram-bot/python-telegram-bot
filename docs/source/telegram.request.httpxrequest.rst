@@ -1,4 +1,4 @@
-telegram.request.HTTPXRequest
+HTTPXRequest
 =============================
 
 .. autoclass:: telegram.request.HTTPXRequest

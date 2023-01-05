@@ -1,4 +1,4 @@
-telegram.ForumTopicClosed
+ForumTopicClosed
 =========================
 
 .. autoclass:: telegram.ForumTopicClosed

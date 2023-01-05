@@ -1,4 +1,4 @@
-telegram.Location
+Location
 =================
 
 .. autoclass:: telegram.Location

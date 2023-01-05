@@ -1,4 +1,4 @@
-telegram.ext.MessageHandler
+MessageHandler
 ===========================
 
 .. autoclass:: telegram.ext.MessageHandler

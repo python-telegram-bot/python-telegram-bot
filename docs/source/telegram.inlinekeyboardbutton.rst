@@ -1,4 +1,4 @@
-telegram.InlineKeyboardButton
+InlineKeyboardButton
 =============================
 
 .. autoclass:: telegram.InlineKeyboardButton

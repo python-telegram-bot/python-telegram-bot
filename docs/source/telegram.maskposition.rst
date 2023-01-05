@@ -1,4 +1,4 @@
-telegram.MaskPosition
+MaskPosition
 =====================
 
 .. autoclass:: telegram.MaskPosition

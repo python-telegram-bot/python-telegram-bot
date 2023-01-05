@@ -1,4 +1,4 @@
-telegram.ext.StringRegexHandler
+StringRegexHandler
 ===============================
 
 .. autoclass:: telegram.ext.StringRegexHandler

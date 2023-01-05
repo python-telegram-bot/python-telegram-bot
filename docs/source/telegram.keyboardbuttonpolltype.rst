@@ -1,4 +1,4 @@
-telegram.KeyboardButtonPollType
+KeyboardButtonPollType
 ===============================
 
 .. autoclass:: telegram.KeyboardButtonPollType

@@ -1,4 +1,4 @@
-telegram.MenuButtonDefault
+MenuButtonDefault
 ==========================
 
 .. autoclass:: telegram.MenuButtonDefault

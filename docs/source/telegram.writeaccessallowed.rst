@@ -1,4 +1,4 @@
-telegram.WriteAccessAllowed
+WriteAccessAllowed
 ===========================
 
 .. autoclass:: telegram.WriteAccessAllowed

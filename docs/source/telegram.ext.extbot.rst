@@ -1,4 +1,4 @@
-telegram.ext.ExtBot
+ExtBot
 ===================
 
 .. autoclass:: telegram.ext.ExtBot

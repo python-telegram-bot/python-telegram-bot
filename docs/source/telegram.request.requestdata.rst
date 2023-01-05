@@ -1,4 +1,4 @@
-telegram.request.RequestData
+RequestData
 ============================
 
 .. autoclass:: telegram.request.RequestData

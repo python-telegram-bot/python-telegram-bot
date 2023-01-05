@@ -1,4 +1,4 @@
-telegram.PassportFile
+PassportFile
 =====================
 
 .. autoclass:: telegram.PassportFile

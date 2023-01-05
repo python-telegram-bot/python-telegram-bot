@@ -1,4 +1,4 @@
-telegram.InlineQueryResultContact
+InlineQueryResultContact
 =================================
 
 .. autoclass:: telegram.InlineQueryResultContact

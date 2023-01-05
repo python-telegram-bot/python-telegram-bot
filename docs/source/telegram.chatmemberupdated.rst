@@ -1,4 +1,4 @@
-telegram.ChatMemberUpdated
+ChatMemberUpdated
 ==========================
 
 .. autoclass:: telegram.ChatMemberUpdated

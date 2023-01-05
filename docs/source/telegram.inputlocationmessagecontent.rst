@@ -1,4 +1,4 @@
-telegram.InputLocationMessageContent
+InputLocationMessageContent
 ====================================
 
 .. autoclass:: telegram.InputLocationMessageContent

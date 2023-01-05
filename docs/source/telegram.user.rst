@@ -1,4 +1,4 @@
-telegram.User
+User
 =============
 
 .. autoclass:: telegram.User

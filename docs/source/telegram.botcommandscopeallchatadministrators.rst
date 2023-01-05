@@ -1,4 +1,4 @@
-telegram.BotCommandScopeAllChatAdministrators
+BotCommandScopeAllChatAdministrators
 =============================================
 
 .. autoclass:: telegram.BotCommandScopeAllChatAdministrators

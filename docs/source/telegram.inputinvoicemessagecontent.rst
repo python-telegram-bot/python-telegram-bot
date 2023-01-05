@@ -1,4 +1,4 @@
-telegram.InputInvoiceMessageContent
+InputInvoiceMessageContent
 ===================================
 
 .. autoclass:: telegram.InputInvoiceMessageContent

@@ -1,4 +1,4 @@
-telegram.InlineQueryResultAudio
+InlineQueryResultAudio
 ===============================
 
 .. autoclass:: telegram.InlineQueryResultAudio

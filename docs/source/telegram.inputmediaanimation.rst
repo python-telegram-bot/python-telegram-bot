@@ -1,4 +1,4 @@
-telegram.InputMediaAnimation
+InputMediaAnimation
 ============================
 
 .. autoclass:: telegram.InputMediaAnimation

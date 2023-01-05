@@ -1,4 +1,4 @@
-telegram.VideoChatStarted
+VideoChatStarted
 =========================
 
 .. autoclass:: telegram.VideoChatStarted

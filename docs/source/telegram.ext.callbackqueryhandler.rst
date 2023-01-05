@@ -1,4 +1,4 @@
-telegram.ext.CallbackQueryHandler
+CallbackQueryHandler
 =================================
 
 .. autoclass:: telegram.ext.CallbackQueryHandler

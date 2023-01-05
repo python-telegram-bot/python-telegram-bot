@@ -1,4 +1,4 @@
-telegram.ForceReply
+ForceReply
 ===================
 
 .. autoclass:: telegram.ForceReply

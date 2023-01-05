@@ -1,4 +1,4 @@
-telegram.Poll
+Poll
 =============
 
 .. autoclass:: telegram.Poll

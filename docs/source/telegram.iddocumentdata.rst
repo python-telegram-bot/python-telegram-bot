@@ -1,4 +1,4 @@
-telegram.IdDocumentData
+IdDocumentData
 =======================
 
 .. autoclass:: telegram.IdDocumentData

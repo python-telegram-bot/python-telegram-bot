@@ -1,4 +1,4 @@
-telegram.InputTextMessageContent
+InputTextMessageContent
 ================================
 
 .. autoclass:: telegram.InputTextMessageContent

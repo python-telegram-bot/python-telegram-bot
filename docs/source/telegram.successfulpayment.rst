@@ -1,4 +1,4 @@
-telegram.SuccessfulPayment
+SuccessfulPayment
 ==========================
 
 .. autoclass:: telegram.SuccessfulPayment

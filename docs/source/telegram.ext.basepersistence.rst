@@ -1,4 +1,4 @@
-telegram.ext.BasePersistence
+BasePersistence
 ============================
 
 .. autoclass:: telegram.ext.BasePersistence

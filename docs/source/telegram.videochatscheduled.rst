@@ -1,4 +1,4 @@
-telegram.VideoChatScheduled
+VideoChatScheduled
 ===========================
 
 .. autoclass:: telegram.VideoChatScheduled

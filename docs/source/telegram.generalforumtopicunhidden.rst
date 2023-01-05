@@ -1,4 +1,4 @@
-telegram.GeneralForumTopicUnhidden
+GeneralForumTopicUnhidden
 ==================================
 
 .. autoclass:: telegram.GeneralForumTopicUnhidden

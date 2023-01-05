@@ -1,4 +1,4 @@
-telegram.ReplyKeyboardMarkup
+ReplyKeyboardMarkup
 ============================
 
 .. autoclass:: telegram.ReplyKeyboardMarkup

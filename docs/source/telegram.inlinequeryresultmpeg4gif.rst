@@ -1,4 +1,4 @@
-telegram.InlineQueryResultMpeg4Gif
+InlineQueryResultMpeg4Gif
 ==================================
 
 .. autoclass:: telegram.InlineQueryResultMpeg4Gif

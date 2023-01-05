@@ -1,4 +1,4 @@
-telegram.PassportElementErrorFrontSide
+PassportElementErrorFrontSide
 ======================================
 
 .. autoclass:: telegram.PassportElementErrorFrontSide

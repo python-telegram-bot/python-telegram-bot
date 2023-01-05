@@ -1,4 +1,4 @@
-telegram.InlineQueryResultGame
+InlineQueryResultGame
 ==============================
 
 .. autoclass:: telegram.InlineQueryResultGame

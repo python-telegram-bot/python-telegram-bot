@@ -1,4 +1,4 @@
-telegram.ext.ChatMemberHandler
+ChatMemberHandler
 ==============================
 
 .. autoclass:: telegram.ext.ChatMemberHandler

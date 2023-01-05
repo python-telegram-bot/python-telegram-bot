@@ -1,4 +1,4 @@
-telegram.ext.CallbackContext
+CallbackContext
 ============================
 
 .. autoclass:: telegram.ext.CallbackContext

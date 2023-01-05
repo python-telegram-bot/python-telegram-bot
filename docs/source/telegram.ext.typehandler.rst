@@ -1,4 +1,4 @@
-telegram.ext.TypeHandler
+TypeHandler
 ========================
 
 .. autoclass:: telegram.ext.TypeHandler

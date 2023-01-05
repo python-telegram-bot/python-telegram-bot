@@ -1,4 +1,4 @@
-telegram.ShippingAddress
+ShippingAddress
 ========================
 
 .. autoclass:: telegram.ShippingAddress

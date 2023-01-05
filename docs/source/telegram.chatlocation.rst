@@ -1,4 +1,4 @@
-telegram.ChatLocation
+ChatLocation
 =====================
 
 .. autoclass:: telegram.ChatLocation

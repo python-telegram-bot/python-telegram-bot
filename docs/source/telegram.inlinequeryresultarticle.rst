@@ -1,4 +1,4 @@
-telegram.InlineQueryResultArticle
+InlineQueryResultArticle
 =================================
 
 .. autoclass:: telegram.InlineQueryResultArticle

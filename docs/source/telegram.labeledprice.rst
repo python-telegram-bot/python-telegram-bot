@@ -1,4 +1,4 @@
-telegram.LabeledPrice
+LabeledPrice
 =====================
 
 .. autoclass:: telegram.LabeledPrice

@@ -1,4 +1,4 @@
-telegram.Game
+Game
 =============
 
 .. autoclass:: telegram.Game

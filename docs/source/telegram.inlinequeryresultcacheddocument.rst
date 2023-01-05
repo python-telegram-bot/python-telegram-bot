@@ -1,4 +1,4 @@
-telegram.InlineQueryResultCachedDocument
+InlineQueryResultCachedDocument
 ========================================
 
 .. autoclass:: telegram.InlineQueryResultCachedDocument

@@ -1,4 +1,4 @@
-telegram.InlineQueryResultCachedVoice
+InlineQueryResultCachedVoice
 =====================================
 
 .. autoclass:: telegram.InlineQueryResultCachedVoice

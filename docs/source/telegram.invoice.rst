@@ -1,4 +1,4 @@
-telegram.Invoice
+Invoice
 ================
 
 .. autoclass:: telegram.Invoice

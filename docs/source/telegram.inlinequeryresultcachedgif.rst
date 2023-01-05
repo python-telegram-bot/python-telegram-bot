@@ -1,4 +1,4 @@
-telegram.InlineQueryResultCachedGif
+InlineQueryResultCachedGif
 ===================================
 
 .. autoclass:: telegram.InlineQueryResultCachedGif

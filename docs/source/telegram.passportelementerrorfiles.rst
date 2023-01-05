@@ -1,4 +1,4 @@
-telegram.PassportElementErrorFiles
+PassportElementErrorFiles
 ==================================
 
 .. autoclass:: telegram.PassportElementErrorFiles

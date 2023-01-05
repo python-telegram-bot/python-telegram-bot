@@ -1,4 +1,4 @@
-telegram.BotCommandScopeAllGroupChats
+BotCommandScopeAllGroupChats
 =======================================
 
 .. autoclass:: telegram.BotCommandScopeAllGroupChats

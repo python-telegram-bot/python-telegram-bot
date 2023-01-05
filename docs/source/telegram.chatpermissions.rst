@@ -1,4 +1,4 @@
-telegram.ChatPermissions
+ChatPermissions
 ========================
 
 .. autoclass:: telegram.ChatPermissions

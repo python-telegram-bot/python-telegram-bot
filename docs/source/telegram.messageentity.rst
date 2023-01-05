@@ -1,4 +1,4 @@
-telegram.MessageEntity
+MessageEntity
 ======================
 
 .. autoclass:: telegram.MessageEntity

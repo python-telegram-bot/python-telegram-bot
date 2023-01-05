@@ -1,4 +1,4 @@
-telegram.BotCommandScopeChat
+BotCommandScopeChat
 ============================
 
 .. autoclass:: telegram.BotCommandScopeChat

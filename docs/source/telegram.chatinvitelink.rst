@@ -1,4 +1,4 @@
-telegram.ChatInviteLink
+ChatInviteLink
 =======================
 
 .. autoclass:: telegram.ChatInviteLink

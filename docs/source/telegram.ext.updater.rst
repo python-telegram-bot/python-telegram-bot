@@ -1,4 +1,4 @@
-telegram.ext.Updater
+Updater
 ====================
 
 .. autoclass:: telegram.ext.Updater

@@ -1,4 +1,4 @@
-telegram.InputMediaPhoto
+InputMediaPhoto
 ========================
 
 .. autoclass:: telegram.InputMediaPhoto

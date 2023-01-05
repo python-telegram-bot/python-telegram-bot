@@ -1,4 +1,4 @@
-telegram.Sticker
+Sticker
 ================
 
 .. Also lists methods of _BaseThumbedMedium, but not the ones of TelegramObject

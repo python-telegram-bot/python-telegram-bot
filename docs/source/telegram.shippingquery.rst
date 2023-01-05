@@ -1,4 +1,4 @@
-telegram.ShippingQuery
+ShippingQuery
 ======================
 
 .. autoclass:: telegram.ShippingQuery

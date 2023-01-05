@@ -1,4 +1,4 @@
-telegram.InputFile
+InputFile
 ==================
 
 .. autoclass:: telegram.InputFile

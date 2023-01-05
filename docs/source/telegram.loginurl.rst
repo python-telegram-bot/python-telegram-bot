@@ -1,4 +1,4 @@
-telegram.LoginUrl
+LoginUrl
 =================
 
 .. autoclass:: telegram.LoginUrl

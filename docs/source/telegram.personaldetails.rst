@@ -1,4 +1,4 @@
-telegram.PersonalDetails
+PersonalDetails
 ========================
 
 .. autoclass:: telegram.PersonalDetails

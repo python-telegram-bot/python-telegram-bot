@@ -1,4 +1,4 @@
-telegram.SecureData
+SecureData
 ===================
 
 .. autoclass:: telegram.SecureData

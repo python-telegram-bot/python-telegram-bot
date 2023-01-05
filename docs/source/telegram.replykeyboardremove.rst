@@ -1,4 +1,4 @@
-telegram.ReplyKeyboardRemove
+ReplyKeyboardRemove
 ============================
 
 .. autoclass:: telegram.ReplyKeyboardRemove

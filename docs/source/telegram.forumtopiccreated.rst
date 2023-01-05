@@ -1,4 +1,4 @@
-telegram.ForumTopicCreated
+ForumTopicCreated
 ==========================
 
 .. autoclass:: telegram.ForumTopicCreated

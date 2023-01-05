@@ -1,4 +1,4 @@
-telegram.InlineQueryResultVenue
+InlineQueryResultVenue
 ===============================
 
 .. autoclass:: telegram.InlineQueryResultVenue

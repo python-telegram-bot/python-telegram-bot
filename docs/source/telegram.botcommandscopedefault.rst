@@ -1,4 +1,4 @@
-telegram.BotCommandScopeDefault
+BotCommandScopeDefault
 ===============================
 
 .. autoclass:: telegram.BotCommandScopeDefault

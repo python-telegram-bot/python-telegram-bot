@@ -1,4 +1,4 @@
-telegram.ext.PrefixHandler
+PrefixHandler
 ===========================
 
 .. autoclass:: telegram.ext.PrefixHandler

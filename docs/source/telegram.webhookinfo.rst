@@ -1,4 +1,4 @@
-telegram.WebhookInfo
+WebhookInfo
 ====================
 
 .. autoclass:: telegram.WebhookInfo

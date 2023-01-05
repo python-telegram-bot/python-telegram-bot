@@ -1,4 +1,4 @@
-telegram.ChatMemberAdministrator
+ChatMemberAdministrator
 ================================
 
 .. autoclass:: telegram.ChatMemberAdministrator

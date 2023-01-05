@@ -1,4 +1,4 @@
-telegram.InlineQueryResultPhoto
+InlineQueryResultPhoto
 ===============================
 
 .. autoclass:: telegram.InlineQueryResultPhoto

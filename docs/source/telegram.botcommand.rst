@@ -1,4 +1,4 @@
-telegram.BotCommand
+BotCommand
 ===================
 
 .. autoclass:: telegram.BotCommand

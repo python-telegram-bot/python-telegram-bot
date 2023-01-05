@@ -1,4 +1,4 @@
-telegram.OrderInfo
+OrderInfo
 ==================
 
 .. autoclass:: telegram.OrderInfo

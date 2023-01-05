@@ -1,4 +1,4 @@
-telegram.ext.Defaults
+Defaults
 =====================
 
 .. autoclass:: telegram.ext.Defaults

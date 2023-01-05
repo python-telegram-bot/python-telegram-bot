@@ -1,4 +1,4 @@
-telegram.MessageId
+MessageId
 ==================
 
 .. autoclass:: telegram.MessageId

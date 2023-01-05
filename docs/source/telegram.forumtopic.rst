@@ -1,4 +1,4 @@
-telegram.ForumTopic
+ForumTopic
 ===================
 
 .. autoclass:: telegram.ForumTopic

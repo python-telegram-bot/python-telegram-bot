@@ -1,4 +1,4 @@
-telegram.StickerSet
+StickerSet
 ===================
 
 .. autoclass:: telegram.StickerSet
