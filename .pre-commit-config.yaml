@@ -79,3 +79,9 @@ repos:
         args:
         - --diff
         - --check
+-   repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.212'
+    hooks:
+    -   id: ruff
+        name: ruff
+        files: ^(telegram|examples|tests)/.*\.py$
