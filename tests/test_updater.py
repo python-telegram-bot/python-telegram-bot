@@ -532,7 +532,7 @@ class TestUpdater:
         # that depends on this distinction works
         if ext_bot and not isinstance(updater.bot, ExtBot):
             updater.bot = ExtBot(updater.bot.token)
-        if not ext_bot and not isinstance(updater.bot, Bot):
+        if not ext_bot and not type(updater.bot) is Bot:
             updater.bot = DictBot(updater.bot.token)
 
         async def delete_webhook(*args, **kwargs):

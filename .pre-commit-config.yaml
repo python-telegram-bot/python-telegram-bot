@@ -84,4 +84,10 @@ repos:
     hooks:
     -   id: ruff
         name: ruff
-        files: ^(telegram|examples|tests)/.*\.py$
+        files: ^(telegram|examples)/.*\.py$
+        additional_dependencies:
+          - httpx~=0.23.0
+          - tornado~=6.2
+          - APScheduler~=3.9.1
+          - cachetools~=5.2.0
+          - aiolimiter~=1.0.0
