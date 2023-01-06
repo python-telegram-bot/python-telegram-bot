@@ -79,3 +79,15 @@ repos:
         args:
         - --diff
         - --check
+-   repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.212'
+    hooks:
+    -   id: ruff
+        name: ruff
+        files: ^(telegram|examples)/.*\.py$
+        additional_dependencies:
+          - httpx~=0.23.0
+          - tornado~=6.2
+          - APScheduler~=3.9.1
+          - cachetools~=5.2.0
+          - aiolimiter~=1.0.0
