@@ -498,7 +498,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     async def start(self) -> None:
         """Starts
 
-        * a background task that fetches updates from :attr:`update_queue` and processes them.
+        * a background task that fetches updates from :attr:`update_queue` and processes them via
+          :meth:`process_update`.
         * :attr:`job_queue`, if set.
         * a background task that calls :meth:`update_persistence` in regular intervals, if
           :attr:`persistence` is set.
@@ -1020,7 +1021,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
     async def process_update(self, update: object) -> None:
         """Processes a single update and marks the update to be updated by the persistence later.
-        Exceptions raised by handler callbacks will be processed by :meth:`process_update`.
+        Exceptions raised by handler callbacks will be processed by :meth:`process_error`.
 
         .. seealso:: :wiki:`Concurrency`
 
