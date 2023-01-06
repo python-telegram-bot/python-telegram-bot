@@ -389,9 +389,23 @@ class Chat(TelegramObject):
         self._freeze()
 
     @property
+    def effective_name(self) -> Optional[str]:
+        """
+        :obj:`str`: Convenience property. Gives :attr:`title` if not :obj:`None`,
+        else :attr:`full_name` if not :obj:`None`.
+
+        .. versionadded:: 20.1
+        """
+        if self.title is not None:
+            return self.title
+        if self.full_name is not None:
+            return self.full_name
+        return None
+
+    @property
     def full_name(self) -> Optional[str]:
         """
-        :obj:`str`: Convenience property. If :attr:`first_name` is not :obj:`None` gives,
+        :obj:`str`: Convenience property. If :attr:`first_name` is not :obj:`None`, gives
         :attr:`first_name` followed by (if available) :attr:`last_name`.
 
         Note:
