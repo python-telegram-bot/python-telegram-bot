@@ -46,6 +46,7 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx.ext.extlinks",
     "sphinx_paramlinks",
+    "sphinx_copybutton",
     "sphinxcontrib.mermaid",
     "sphinx_search.extension",
 ]

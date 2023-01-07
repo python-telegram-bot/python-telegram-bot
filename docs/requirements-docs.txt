@@ -4,3 +4,4 @@ furo==2022.12.7
 git+https://github.com/harshil21/furo-sphinx-search@be5cfa221a01f6e259bb2bb1f76d6ede7ffc1f11#egg=furo-sphinx-search
 sphinx-paramlinks==0.5.4
 sphinxcontrib-mermaid==0.7.1
+sphinx-copybutton==0.5.1
