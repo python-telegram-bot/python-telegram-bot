@@ -224,6 +224,7 @@ html_css_files = [
     "style_external_link.css",
     "style_mermaid_diagrams.css",
     "style_sidebar_brand.css",
+    "style_general.css",
 ]
 
 html_permalinks_icon = "¶"  # Furo's default permalink icon is `#` which doesn't look great imo.
