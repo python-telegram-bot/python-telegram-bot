@@ -34,7 +34,7 @@ version = "20.0"  # telegram.__version__[:3]
 release = "20.0"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "5.1.1"
+needs_sphinx = "6.1.2"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -220,12 +220,7 @@ html_favicon = "ptb-logo_1024.ico"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_css_files = [
-    "style_external_link.css",
-    "style_mermaid_diagrams.css",
-    "style_sidebar_brand.css",
-    "style_general.css",
-]
+html_css_files = ["style_external_link.css", "style_mermaid_diagrams.css"]
 
 html_permalinks_icon = "¶"  # Furo's default permalink icon is `#` which doesn't look great imo.
 
@@ -268,7 +263,7 @@ latex_logo = "ptb-logo_1024.png"
 # (source start file, name, description, authors, manual section).
 man_pages = [(master_doc, "python-telegram-bot", "python-telegram-bot Documentation", [author], 1)]
 
-# rtd_sphinx_search_file_type = "un-minified"  # Configuration for furo-sphinx-search
+rtd_sphinx_search_file_type = "un-minified"  # Configuration for furo-sphinx-search
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -349,7 +344,7 @@ class TGConstXRefRole(PyXRefRole):
             return title, target
         except Exception as exc:
             sphinx_logger.exception(
-                f"%s:%d: WARNING: Did not convert reference %s due to an exception.",
+                "%s:%d: WARNING: Did not convert reference %s due to an exception.",
                 refnode.source,
                 refnode.line,
                 refnode.rawsource,
@@ -514,7 +509,7 @@ def _git_branch() -> str:
         return output.decode().strip()
     except Exception as exc:
         sphinx_logger.exception(
-            f"Failed to get a description of the current commit. Falling back to `master`.",
+            "Failed to get a description of the current commit. Falling back to `master`.",
             exc_info=exc,
         )
         return "master"
