@@ -34,7 +34,7 @@ version = "20.0"  # telegram.__version__[:3]
 release = "20.0"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "5.1.1"
+needs_sphinx = "6.1.2"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -268,7 +268,7 @@ latex_logo = "ptb-logo_1024.png"
 # (source start file, name, description, authors, manual section).
 man_pages = [(master_doc, "python-telegram-bot", "python-telegram-bot Documentation", [author], 1)]
 
-# rtd_sphinx_search_file_type = "un-minified"  # Configuration for furo-sphinx-search
+rtd_sphinx_search_file_type = "un-minified"  # Configuration for furo-sphinx-search
 
 # -- Options for Texinfo output -------------------------------------------
 
