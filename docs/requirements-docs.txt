@@ -1,6 +1,6 @@
 sphinx==6.1.2
 sphinx-pypi-upload
 furo==2022.12.7
-git+https://github.com/harshil21/furo-sphinx-search@795c6a340d19a4bfa3a7f5634335f7385e50d065#egg=furo-sphinx-search
+git+https://github.com/harshil21/furo-sphinx-search@bf9c87e170b86d23d5a60384ba6691cbbee6ae0a#egg=furo-sphinx-search
 sphinx-paramlinks==0.5.4
 sphinxcontrib-mermaid==0.7.1
