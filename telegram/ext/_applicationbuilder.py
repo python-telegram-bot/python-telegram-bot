@@ -809,6 +809,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def concurrent_updates(self: BuilderType, concurrent_updates: Union[bool, int]) -> BuilderType:
         """Specifies if and how many updates may be processed concurrently instead of one by one.
+        If not called, updates will be processed one by one.
 
         Warning:
             Processing updates concurrently is not recommended when stateful handlers like
