@@ -1,5 +1,5 @@
-telegram.ext.JobQueue
-=====================
+JobQueue
+========
 
 .. autoclass:: telegram.ext.JobQueue
     :members:

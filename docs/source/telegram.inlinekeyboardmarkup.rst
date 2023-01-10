@@ -1,5 +1,5 @@
-telegram.InlineKeyboardMarkup
-=============================
+InlineKeyboardMarkup
+====================
 
 .. autoclass:: telegram.InlineKeyboardMarkup
     :members:

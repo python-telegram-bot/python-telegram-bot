@@ -1,5 +1,5 @@
-telegram.PassportData
-=====================
+PassportData
+============
 
 .. autoclass:: telegram.PassportData
     :members:

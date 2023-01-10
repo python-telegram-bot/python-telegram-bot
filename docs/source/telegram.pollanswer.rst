@@ -1,5 +1,5 @@
-telegram.PollAnswer
-===================
+PollAnswer
+==========
 
 .. autoclass:: telegram.PollAnswer
     :members:

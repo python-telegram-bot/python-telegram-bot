@@ -1,5 +1,5 @@
-telegram.ext.PreCheckoutQueryHandler
-====================================
+PreCheckoutQueryHandler
+=======================
 
 .. autoclass:: telegram.ext.PreCheckoutQueryHandler
     :members:

@@ -1,5 +1,5 @@
-telegram.GameHighScore
-======================
+GameHighScore
+=============
 
 .. autoclass:: telegram.GameHighScore
     :members:

@@ -1,5 +1,5 @@
-telegram.ext.ShippingQueryHandler
-=================================
+ShippingQueryHandler
+====================
 
 .. autoclass:: telegram.ext.ShippingQueryHandler
     :members:

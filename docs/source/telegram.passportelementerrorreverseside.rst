@@ -1,5 +1,5 @@
-telegram.PassportElementErrorReverseSide
-========================================
+PassportElementErrorReverseSide
+===============================
 
 .. autoclass:: telegram.PassportElementErrorReverseSide
     :members:

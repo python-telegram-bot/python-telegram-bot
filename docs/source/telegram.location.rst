@@ -1,5 +1,5 @@
-telegram.Location
-=================
+Location
+========
 
 .. autoclass:: telegram.Location
     :members:

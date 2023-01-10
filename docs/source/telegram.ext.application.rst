@@ -1,5 +1,5 @@
-telegram.ext.Application
-========================
+Application
+===========
 
 .. autoclass:: telegram.ext.Application
     :members:

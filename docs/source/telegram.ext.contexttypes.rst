@@ -1,5 +1,5 @@
-telegram.ext.ContextTypes
-=========================
+ContextTypes
+============
 
 .. autoclass:: telegram.ext.ContextTypes
     :members:

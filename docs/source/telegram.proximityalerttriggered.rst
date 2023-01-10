@@ -1,5 +1,5 @@
-telegram.ProximityAlertTriggered
-================================
+ProximityAlertTriggered
+=======================
 
 .. autoclass:: telegram.ProximityAlertTriggered
     :members:

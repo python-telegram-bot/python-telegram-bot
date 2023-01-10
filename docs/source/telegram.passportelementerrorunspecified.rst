@@ -1,5 +1,5 @@
-telegram.PassportElementErrorUnspecified
-========================================
+PassportElementErrorUnspecified
+===============================
 
 .. autoclass:: telegram.PassportElementErrorUnspecified
     :members:

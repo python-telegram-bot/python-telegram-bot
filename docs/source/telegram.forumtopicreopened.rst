@@ -1,5 +1,5 @@
-telegram.ForumTopicReopened
-===========================
+ForumTopicReopened
+==================
 
 .. autoclass:: telegram.ForumTopicReopened
     :members:

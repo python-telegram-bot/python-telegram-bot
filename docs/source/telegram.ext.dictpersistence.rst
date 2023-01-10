@@ -1,5 +1,5 @@
-telegram.ext.DictPersistence
-============================
+DictPersistence
+===============
 
 .. autoclass:: telegram.ext.DictPersistence
     :members:
