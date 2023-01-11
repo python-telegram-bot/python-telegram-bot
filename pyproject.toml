@@ -5,3 +5,6 @@ target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
 [tool.isort]  # black config
 profile = "black"
 line_length = 99
+
+[tool.ruff]
+line-length = 99

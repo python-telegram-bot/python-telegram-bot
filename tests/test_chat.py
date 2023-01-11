@@ -212,6 +212,16 @@ class TestChat:
         )
         assert chat.full_name is None
 
+    def test_effective_name(self):
+        chat = Chat(id=1, type=Chat.PRIVATE, first_name="first\u2022name")
+        assert chat.effective_name == "first\u2022name"
+        chat = Chat(id=1, type=Chat.GROUP, title="group")
+        assert chat.effective_name == "group"
+        chat = Chat(id=1, type=Chat.GROUP, first_name="first\u2022name", title="group")
+        assert chat.effective_name == "group"
+        chat = Chat(id=1, type=Chat.GROUP)
+        assert chat.effective_name is None
+
     async def test_send_action(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == chat.id

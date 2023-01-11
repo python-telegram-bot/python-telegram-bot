@@ -61,7 +61,7 @@ class TestCallbackContext:
     def test_job_queue(self, bot, app, recwarn):
         expected_warning = (
             "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-            "`pip install python-telegram-bot[job_queue]`."
+            "`pip install python-telegram-bot[job-queue]`."
         )
 
         callback_context = CallbackContext(app)
