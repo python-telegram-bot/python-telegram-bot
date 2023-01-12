@@ -3151,7 +3151,7 @@ class TestBotReq:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    async def test_get_chat_arbitrary_callback_data(self, super_group_id, cdc_bot):
+    async def test_get_chat_arbitrary_callback_data(self, channel_id, cdc_bot):
         bot = cdc_bot
 
         try:
@@ -3160,7 +3160,7 @@ class TestBotReq:
             )
 
             message = await bot.send_message(
-                super_group_id, text="get_chat_arbitrary_callback_data", reply_markup=reply_markup
+                channel_id, text="get_chat_arbitrary_callback_data", reply_markup=reply_markup
             )
             await message.pin()
 
@@ -3168,7 +3168,7 @@ class TestBotReq:
             data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
             assert data == "callback_data"
 
-            chat = await bot.get_chat(super_group_id)
+            chat = await bot.get_chat(channel_id)
             assert chat.pinned_message == message
             assert chat.pinned_message.reply_markup == reply_markup
             assert await message.unpin()  # (not placed in finally block since msg can be unbound)
