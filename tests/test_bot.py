@@ -193,6 +193,13 @@ class InputMessageContentDWPP(InputMessageContent):
 
 
 class TestBotWithoutRequest:
+    """
+    Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
+
+    Behavior for init of ExtBot with missing optional dependency cachetools (for CallbackDataCache)
+    is tested in `test_callbackdatacache`
+    """
+
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     def test_slot_behaviour(self, bot_class, bot, mro_slots):
         inst = bot_class(bot.token)
