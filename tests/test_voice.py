@@ -46,7 +46,7 @@ async def voice(bot, chat_id):
         return (await bot.send_voice(chat_id, voice=f, read_timeout=50)).voice
 
 
-class Space:
+class TestVoiceBase:
     duration = 3
     mime_type = "audio/ogg"
     file_size = 9199
@@ -56,7 +56,7 @@ class Space:
     voice_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVoiceWithoutRequest:
+class TestVoiceWithoutRequest(TestVoiceBase):
     def test_slot_behaviour(self, voice, mro_slots):
         for attr in voice.__slots__:
             assert getattr(voice, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -71,26 +71,26 @@ class TestVoiceWithoutRequest:
         assert voice.file_unique_id != ""
 
     def test_expected_values(self, voice):
-        assert voice.duration == Space.duration
-        assert voice.mime_type == Space.mime_type
-        assert voice.file_size == Space.file_size
+        assert voice.duration == self.duration
+        assert voice.mime_type == self.mime_type
+        assert voice.file_size == self.file_size
 
     def test_de_json(self, bot):
         json_dict = {
-            "file_id": Space.voice_file_id,
-            "file_unique_id": Space.voice_file_unique_id,
-            "duration": Space.duration,
-            "mime_type": Space.mime_type,
-            "file_size": Space.file_size,
+            "file_id": self.voice_file_id,
+            "file_unique_id": self.voice_file_unique_id,
+            "duration": self.duration,
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
         }
         json_voice = Voice.de_json(json_dict, bot)
         assert json_voice.api_kwargs == {}
 
-        assert json_voice.file_id == Space.voice_file_id
-        assert json_voice.file_unique_id == Space.voice_file_unique_id
-        assert json_voice.duration == Space.duration
-        assert json_voice.mime_type == Space.mime_type
-        assert json_voice.file_size == Space.file_size
+        assert json_voice.file_id == self.voice_file_id
+        assert json_voice.file_unique_id == self.voice_file_unique_id
+        assert json_voice.duration == self.duration
+        assert json_voice.mime_type == self.mime_type
+        assert json_voice.file_size == self.file_size
 
     def test_to_dict(self, voice):
         voice_dict = voice.to_dict()
@@ -103,11 +103,11 @@ class TestVoiceWithoutRequest:
         assert voice_dict["file_size"] == voice.file_size
 
     def test_equality(self, voice):
-        a = Voice(voice.file_id, voice.file_unique_id, Space.duration)
-        b = Voice("", voice.file_unique_id, Space.duration)
+        a = Voice(voice.file_id, voice.file_unique_id, self.duration)
+        b = Voice("", voice.file_unique_id, self.duration)
         c = Voice(voice.file_id, voice.file_unique_id, 0)
-        d = Voice("", "", Space.duration)
-        e = Audio(voice.file_id, voice.file_unique_id, Space.duration)
+        d = Voice("", "", self.duration)
+        e = Audio(voice.file_id, voice.file_unique_id, self.duration)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -175,13 +175,13 @@ class TestVoiceWithoutRequest:
         assert await voice.get_file()
 
 
-class TestVoiceWithRequest:
+class TestVoiceWithRequest(TestVoiceBase):
     async def test_send_all_args(self, bot, chat_id, voice_file, voice):
         message = await bot.send_voice(
             chat_id,
             voice_file,
-            duration=Space.duration,
-            caption=Space.caption,
+            duration=self.duration,
+            caption=self.caption,
             disable_notification=False,
             protect_content=True,
             parse_mode="Markdown",
@@ -195,7 +195,7 @@ class TestVoiceWithRequest:
         assert message.voice.duration == voice.duration
         assert message.voice.mime_type == voice.mime_type
         assert message.voice.file_size == voice.file_size
-        assert message.caption == Space.caption.replace("*", "")
+        assert message.caption == self.caption.replace("*", "")
         assert message.has_protected_content
 
     async def test_get_and_download(self, bot, voice, chat_id):
@@ -216,7 +216,7 @@ class TestVoiceWithRequest:
         assert path.is_file()
 
     async def test_send_ogg_url_file(self, bot, chat_id, voice):
-        message = await bot.sendVoice(chat_id, Space.voice_file_url, duration=Space.duration)
+        message = await bot.sendVoice(chat_id, self.voice_file_url, duration=self.duration)
 
         assert isinstance(message.voice, Voice)
         assert isinstance(message.voice.file_id, str)

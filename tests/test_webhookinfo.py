@@ -28,18 +28,18 @@ from telegram._utils.datetime import from_timestamp
 @pytest.fixture(scope="module")
 def webhook_info():
     return WebhookInfo(
-        url=Space.url,
-        has_custom_certificate=Space.has_custom_certificate,
-        pending_update_count=Space.pending_update_count,
-        ip_address=Space.ip_address,
-        last_error_date=Space.last_error_date,
-        max_connections=Space.max_connections,
-        allowed_updates=Space.allowed_updates,
-        last_synchronization_error_date=Space.last_synchronization_error_date,
+        url=TestWebhookInfoBase.url,
+        has_custom_certificate=TestWebhookInfoBase.has_custom_certificate,
+        pending_update_count=TestWebhookInfoBase.pending_update_count,
+        ip_address=TestWebhookInfoBase.ip_address,
+        last_error_date=TestWebhookInfoBase.last_error_date,
+        max_connections=TestWebhookInfoBase.max_connections,
+        allowed_updates=TestWebhookInfoBase.allowed_updates,
+        last_synchronization_error_date=TestWebhookInfoBase.last_synchronization_error_date,
     )
 
 
-class Space:
+class TestWebhookInfoBase:
     url = "http://www.google.com"
     has_custom_certificate = False
     pending_update_count = 5
@@ -50,7 +50,7 @@ class Space:
     last_synchronization_error_date = time.time()
 
 
-class TestWebhookInfoWithoutRequest:
+class TestWebhookInfoWithoutRequest(TestWebhookInfoBase):
     def test_slot_behaviour(self, webhook_info, mro_slots):
         for attr in webhook_info.__slots__:
             assert getattr(webhook_info, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -60,42 +60,42 @@ class TestWebhookInfoWithoutRequest:
         webhook_info_dict = webhook_info.to_dict()
 
         assert isinstance(webhook_info_dict, dict)
-        assert webhook_info_dict["url"] == Space.url
-        assert webhook_info_dict["pending_update_count"] == Space.pending_update_count
-        assert webhook_info_dict["last_error_date"] == Space.last_error_date
-        assert webhook_info_dict["max_connections"] == Space.max_connections
-        assert webhook_info_dict["allowed_updates"] == Space.allowed_updates
-        assert webhook_info_dict["ip_address"] == Space.ip_address
+        assert webhook_info_dict["url"] == self.url
+        assert webhook_info_dict["pending_update_count"] == self.pending_update_count
+        assert webhook_info_dict["last_error_date"] == self.last_error_date
+        assert webhook_info_dict["max_connections"] == self.max_connections
+        assert webhook_info_dict["allowed_updates"] == self.allowed_updates
+        assert webhook_info_dict["ip_address"] == self.ip_address
         assert (
             webhook_info_dict["last_synchronization_error_date"]
-            == Space.last_synchronization_error_date
+            == self.last_synchronization_error_date
         )
 
     def test_de_json(self, bot):
         json_dict = {
-            "url": Space.url,
-            "has_custom_certificate": Space.has_custom_certificate,
-            "pending_update_count": Space.pending_update_count,
-            "last_error_date": Space.last_error_date,
-            "max_connections": Space.max_connections,
-            "allowed_updates": Space.allowed_updates,
-            "ip_address": Space.ip_address,
-            "last_synchronization_error_date": Space.last_synchronization_error_date,
+            "url": self.url,
+            "has_custom_certificate": self.has_custom_certificate,
+            "pending_update_count": self.pending_update_count,
+            "last_error_date": self.last_error_date,
+            "max_connections": self.max_connections,
+            "allowed_updates": self.allowed_updates,
+            "ip_address": self.ip_address,
+            "last_synchronization_error_date": self.last_synchronization_error_date,
         }
         webhook_info = WebhookInfo.de_json(json_dict, bot)
         assert webhook_info.api_kwargs == {}
 
-        assert webhook_info.url == Space.url
-        assert webhook_info.has_custom_certificate == Space.has_custom_certificate
-        assert webhook_info.pending_update_count == Space.pending_update_count
+        assert webhook_info.url == self.url
+        assert webhook_info.has_custom_certificate == self.has_custom_certificate
+        assert webhook_info.pending_update_count == self.pending_update_count
         assert isinstance(webhook_info.last_error_date, datetime)
-        assert webhook_info.last_error_date == from_timestamp(Space.last_error_date)
-        assert webhook_info.max_connections == Space.max_connections
-        assert webhook_info.allowed_updates == tuple(Space.allowed_updates)
-        assert webhook_info.ip_address == Space.ip_address
+        assert webhook_info.last_error_date == from_timestamp(self.last_error_date)
+        assert webhook_info.max_connections == self.max_connections
+        assert webhook_info.allowed_updates == tuple(self.allowed_updates)
+        assert webhook_info.ip_address == self.ip_address
         assert isinstance(webhook_info.last_synchronization_error_date, datetime)
         assert webhook_info.last_synchronization_error_date == from_timestamp(
-            Space.last_synchronization_error_date
+            self.last_synchronization_error_date
         )
 
         none = WebhookInfo.de_json(None, bot)
@@ -103,24 +103,24 @@ class TestWebhookInfoWithoutRequest:
 
     def test_always_tuple_allowed_updates(self):
         webhook_info = WebhookInfo(
-            Space.url, Space.has_custom_certificate, Space.pending_update_count
+            self.url, self.has_custom_certificate, self.pending_update_count
         )
         assert webhook_info.allowed_updates == ()
 
     def test_equality(self):
         a = WebhookInfo(
-            url=Space.url,
-            has_custom_certificate=Space.has_custom_certificate,
-            pending_update_count=Space.pending_update_count,
-            last_error_date=Space.last_error_date,
-            max_connections=Space.max_connections,
+            url=self.url,
+            has_custom_certificate=self.has_custom_certificate,
+            pending_update_count=self.pending_update_count,
+            last_error_date=self.last_error_date,
+            max_connections=self.max_connections,
         )
         b = WebhookInfo(
-            url=Space.url,
-            has_custom_certificate=Space.has_custom_certificate,
-            pending_update_count=Space.pending_update_count,
-            last_error_date=Space.last_error_date,
-            max_connections=Space.max_connections,
+            url=self.url,
+            has_custom_certificate=self.has_custom_certificate,
+            pending_update_count=self.pending_update_count,
+            last_error_date=self.last_error_date,
+            max_connections=self.max_connections,
         )
         c = WebhookInfo(
             url="http://github.com",

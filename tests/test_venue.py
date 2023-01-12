@@ -28,17 +28,17 @@ from telegram.request import RequestData
 @pytest.fixture(scope="module")
 def venue():
     return Venue(
-        Space.location,
-        Space.title,
-        Space.address,
-        foursquare_id=Space.foursquare_id,
-        foursquare_type=Space.foursquare_type,
-        google_place_id=Space.google_place_id,
-        google_place_type=Space.google_place_type,
+        TestVenueBase.location,
+        TestVenueBase.title,
+        TestVenueBase.address,
+        foursquare_id=TestVenueBase.foursquare_id,
+        foursquare_type=TestVenueBase.foursquare_type,
+        google_place_id=TestVenueBase.google_place_id,
+        google_place_type=TestVenueBase.google_place_type,
     )
 
 
-class Space:
+class TestVenueBase:
     location = Location(longitude=-46.788279, latitude=-23.691288)
     title = "title"
     address = "address"
@@ -48,7 +48,7 @@ class Space:
     google_place_type = "google place type"
 
 
-class TestVenueWithoutRequest:
+class TestVenueWithoutRequest(TestVenueBase):
     def test_slot_behaviour(self, venue, mro_slots):
         for attr in venue.__slots__:
             assert getattr(venue, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -56,24 +56,24 @@ class TestVenueWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "location": Space.location.to_dict(),
-            "title": Space.title,
-            "address": Space.address,
-            "foursquare_id": Space.foursquare_id,
-            "foursquare_type": Space.foursquare_type,
-            "google_place_id": Space.google_place_id,
-            "google_place_type": Space.google_place_type,
+            "location": self.location.to_dict(),
+            "title": self.title,
+            "address": self.address,
+            "foursquare_id": self.foursquare_id,
+            "foursquare_type": self.foursquare_type,
+            "google_place_id": self.google_place_id,
+            "google_place_type": self.google_place_type,
         }
         venue = Venue.de_json(json_dict, bot)
         assert venue.api_kwargs == {}
 
-        assert venue.location == Space.location
-        assert venue.title == Space.title
-        assert venue.address == Space.address
-        assert venue.foursquare_id == Space.foursquare_id
-        assert venue.foursquare_type == Space.foursquare_type
-        assert venue.google_place_id == Space.google_place_id
-        assert venue.google_place_type == Space.google_place_type
+        assert venue.location == self.location
+        assert venue.title == self.title
+        assert venue.address == self.address
+        assert venue.foursquare_id == self.foursquare_id
+        assert venue.foursquare_type == self.foursquare_type
+        assert venue.google_place_id == self.google_place_id
+        assert venue.google_place_type == self.google_place_type
 
     def test_to_dict(self, venue):
         venue_dict = venue.to_dict()
@@ -88,11 +88,11 @@ class TestVenueWithoutRequest:
         assert venue_dict["google_place_type"] == venue.google_place_type
 
     def test_equality(self):
-        a = Venue(Location(0, 0), Space.title, Space.address)
-        b = Venue(Location(0, 0), Space.title, Space.address)
-        c = Venue(Location(0, 0), Space.title, "")
-        d = Venue(Location(0, 1), Space.title, Space.address)
-        d2 = Venue(Location(0, 0), "", Space.address)
+        a = Venue(Location(0, 0), self.title, self.address)
+        b = Venue(Location(0, 0), self.title, self.address)
+        c = Venue(Location(0, 0), self.title, "")
+        d = Venue(Location(0, 1), self.title, self.address)
+        d2 = Venue(Location(0, 0), "", self.address)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -126,14 +126,14 @@ class TestVenueWithoutRequest:
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.json_parameters
             return (
-                data["longitude"] == str(Space.location.longitude)
-                and data["latitude"] == str(Space.location.latitude)
-                and data["title"] == Space.title
-                and data["address"] == Space.address
-                and data["foursquare_id"] == Space.foursquare_id
-                and data["foursquare_type"] == Space.foursquare_type
-                and data["google_place_id"] == Space.google_place_id
-                and data["google_place_type"] == Space.google_place_type
+                data["longitude"] == str(self.location.longitude)
+                and data["latitude"] == str(self.location.latitude)
+                and data["title"] == self.title
+                and data["address"] == self.address
+                and data["foursquare_id"] == self.foursquare_id
+                and data["foursquare_type"] == self.foursquare_type
+                and data["google_place_id"] == self.google_place_id
+                and data["google_place_type"] == self.google_place_type
             )
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
@@ -141,7 +141,7 @@ class TestVenueWithoutRequest:
         assert message
 
 
-class TestVenueWithRequest:
+class TestVenueWithRequest(TestVenueBase):
     @pytest.mark.parametrize(
         "default_bot,custom",
         [

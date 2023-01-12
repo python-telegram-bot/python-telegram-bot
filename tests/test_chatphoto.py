@@ -50,7 +50,7 @@ async def chat_photo(bot, super_group_id):
     )
 
 
-class Space:
+class TestChatPhotoBase:
     chatphoto_small_file_id = "smallCgADAQADngIAAuyVeEez0xRovKi9VAI"
     chatphoto_big_file_id = "bigCgADAQADngIAAuyVeEez0xRovKi9VAI"
     chatphoto_small_file_unique_id = "smalladc3145fd2e84d95b64d68eaa22aa33e"
@@ -58,7 +58,7 @@ class Space:
     chatphoto_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.jpg"
 
 
-class TestChatPhotoWithoutRequest:
+class TestChatPhotoWithoutRequest(TestChatPhotoBase):
     def test_slot_behaviour(self, chat_photo, mro_slots):
         for attr in chat_photo.__slots__:
             assert getattr(chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -66,17 +66,17 @@ class TestChatPhotoWithoutRequest:
 
     def test_de_json(self, bot, chat_photo):
         json_dict = {
-            "small_file_id": Space.chatphoto_small_file_id,
-            "big_file_id": Space.chatphoto_big_file_id,
-            "small_file_unique_id": Space.chatphoto_small_file_unique_id,
-            "big_file_unique_id": Space.chatphoto_big_file_unique_id,
+            "small_file_id": self.chatphoto_small_file_id,
+            "big_file_id": self.chatphoto_big_file_id,
+            "small_file_unique_id": self.chatphoto_small_file_unique_id,
+            "big_file_unique_id": self.chatphoto_big_file_unique_id,
         }
         chat_photo = ChatPhoto.de_json(json_dict, bot)
         assert chat_photo.api_kwargs == {}
-        assert chat_photo.small_file_id == Space.chatphoto_small_file_id
-        assert chat_photo.big_file_id == Space.chatphoto_big_file_id
-        assert chat_photo.small_file_unique_id == Space.chatphoto_small_file_unique_id
-        assert chat_photo.big_file_unique_id == Space.chatphoto_big_file_unique_id
+        assert chat_photo.small_file_id == self.chatphoto_small_file_id
+        assert chat_photo.big_file_id == self.chatphoto_big_file_id
+        assert chat_photo.small_file_unique_id == self.chatphoto_small_file_unique_id
+        assert chat_photo.big_file_unique_id == self.chatphoto_big_file_unique_id
 
     async def test_to_dict(self, chat_photo):
         chat_photo_dict = chat_photo.to_dict()
@@ -89,22 +89,22 @@ class TestChatPhotoWithoutRequest:
 
     def test_equality(self):
         a = ChatPhoto(
-            Space.chatphoto_small_file_id,
-            Space.chatphoto_big_file_id,
-            Space.chatphoto_small_file_unique_id,
-            Space.chatphoto_big_file_unique_id,
+            self.chatphoto_small_file_id,
+            self.chatphoto_big_file_id,
+            self.chatphoto_small_file_unique_id,
+            self.chatphoto_big_file_unique_id,
         )
         b = ChatPhoto(
-            Space.chatphoto_small_file_id,
-            Space.chatphoto_big_file_id,
-            Space.chatphoto_small_file_unique_id,
-            Space.chatphoto_big_file_unique_id,
+            self.chatphoto_small_file_id,
+            self.chatphoto_big_file_id,
+            self.chatphoto_small_file_unique_id,
+            self.chatphoto_big_file_unique_id,
         )
         c = ChatPhoto(
-            "", "", Space.chatphoto_small_file_unique_id, Space.chatphoto_big_file_unique_id
+            "", "", self.chatphoto_small_file_unique_id, self.chatphoto_big_file_unique_id
         )
         d = ChatPhoto("", "", 0, 0)
-        e = Voice(Space.chatphoto_small_file_id, Space.chatphoto_small_file_unique_id, 0)
+        e = Voice(self.chatphoto_small_file_id, self.chatphoto_small_file_unique_id, 0)
 
         assert a == b
         assert hash(a) == hash(b)

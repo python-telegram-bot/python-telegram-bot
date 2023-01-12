@@ -30,41 +30,41 @@ from tests.auxil.bot_method_checks import (
 @pytest.fixture(scope="module")
 def json_dict():
     return {
-        "id": Space.id_,
-        "is_bot": Space.is_bot,
-        "first_name": Space.first_name,
-        "last_name": Space.last_name,
-        "username": Space.username,
-        "language_code": Space.language_code,
-        "can_join_groups": Space.can_join_groups,
-        "can_read_all_group_messages": Space.can_read_all_group_messages,
-        "supports_inline_queries": Space.supports_inline_queries,
-        "is_premium": Space.is_premium,
-        "added_to_attachment_menu": Space.added_to_attachment_menu,
+        "id": TestUserBase.id_,
+        "is_bot": TestUserBase.is_bot,
+        "first_name": TestUserBase.first_name,
+        "last_name": TestUserBase.last_name,
+        "username": TestUserBase.username,
+        "language_code": TestUserBase.language_code,
+        "can_join_groups": TestUserBase.can_join_groups,
+        "can_read_all_group_messages": TestUserBase.can_read_all_group_messages,
+        "supports_inline_queries": TestUserBase.supports_inline_queries,
+        "is_premium": TestUserBase.is_premium,
+        "added_to_attachment_menu": TestUserBase.added_to_attachment_menu,
     }
 
 
 @pytest.fixture(scope="function")
 def user(bot):
     user = User(
-        id=Space.id_,
-        first_name=Space.first_name,
-        is_bot=Space.is_bot,
-        last_name=Space.last_name,
-        username=Space.username,
-        language_code=Space.language_code,
-        can_join_groups=Space.can_join_groups,
-        can_read_all_group_messages=Space.can_read_all_group_messages,
-        supports_inline_queries=Space.supports_inline_queries,
-        is_premium=Space.is_premium,
-        added_to_attachment_menu=Space.added_to_attachment_menu,
+        id=TestUserBase.id_,
+        first_name=TestUserBase.first_name,
+        is_bot=TestUserBase.is_bot,
+        last_name=TestUserBase.last_name,
+        username=TestUserBase.username,
+        language_code=TestUserBase.language_code,
+        can_join_groups=TestUserBase.can_join_groups,
+        can_read_all_group_messages=TestUserBase.can_read_all_group_messages,
+        supports_inline_queries=TestUserBase.supports_inline_queries,
+        is_premium=TestUserBase.is_premium,
+        added_to_attachment_menu=TestUserBase.added_to_attachment_menu,
     )
     user.set_bot(bot)
     user._unfreeze()
     return user
 
 
-class Space:
+class TestUserBase:
     id_ = 1
     is_bot = True
     first_name = "first\u2022name"
@@ -78,7 +78,7 @@ class Space:
     added_to_attachment_menu = False
 
 
-class TestUserWithoutRequest:
+class TestUserWithoutRequest(TestUserBase):
     def test_slot_behaviour(self, user, mro_slots):
         for attr in user.__slots__:
             assert getattr(user, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -88,17 +88,17 @@ class TestUserWithoutRequest:
         user = User.de_json(json_dict, bot)
         assert user.api_kwargs == {}
 
-        assert user.id == Space.id_
-        assert user.is_bot == Space.is_bot
-        assert user.first_name == Space.first_name
-        assert user.last_name == Space.last_name
-        assert user.username == Space.username
-        assert user.language_code == Space.language_code
-        assert user.can_join_groups == Space.can_join_groups
-        assert user.can_read_all_group_messages == Space.can_read_all_group_messages
-        assert user.supports_inline_queries == Space.supports_inline_queries
-        assert user.is_premium == Space.is_premium
-        assert user.added_to_attachment_menu == Space.added_to_attachment_menu
+        assert user.id == self.id_
+        assert user.is_bot == self.is_bot
+        assert user.first_name == self.first_name
+        assert user.last_name == self.last_name
+        assert user.username == self.username
+        assert user.language_code == self.language_code
+        assert user.can_join_groups == self.can_join_groups
+        assert user.can_read_all_group_messages == self.can_read_all_group_messages
+        assert user.supports_inline_queries == self.supports_inline_queries
+        assert user.is_premium == self.is_premium
+        assert user.added_to_attachment_menu == self.added_to_attachment_menu
 
     def test_to_dict(self, user):
         user_dict = user.to_dict()
@@ -117,11 +117,11 @@ class TestUserWithoutRequest:
         assert user_dict["added_to_attachment_menu"] == user.added_to_attachment_menu
 
     def test_equality(self):
-        a = User(Space.id_, Space.first_name, Space.is_bot, Space.last_name)
-        b = User(Space.id_, Space.first_name, Space.is_bot, Space.last_name)
-        c = User(Space.id_, Space.first_name, Space.is_bot)
-        d = User(0, Space.first_name, Space.is_bot, Space.last_name)
-        e = Update(Space.id_)
+        a = User(self.id_, self.first_name, self.is_bot, self.last_name)
+        b = User(self.id_, self.first_name, self.is_bot, self.last_name)
+        c = User(self.id_, self.first_name, self.is_bot)
+        d = User(0, self.first_name, self.is_bot, self.last_name)
+        e = Update(self.id_)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -142,7 +142,7 @@ class TestUserWithoutRequest:
         assert user.name == "first\u2022name last\u2022name"
         user.last_name = None
         assert user.name == "first\u2022name"
-        user.username = Space.username
+        user.username = self.username
         assert user.name == "@username"
 
     def test_full_name(self, user):

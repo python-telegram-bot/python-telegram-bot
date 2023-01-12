@@ -61,7 +61,7 @@ def photo(_photo):
     return _photo[-1]
 
 
-class Space:
+class TestPhotoBase:
     width = 800
     height = 800
     caption = "<b>PhotoTest</b> - *Caption*"
@@ -71,7 +71,7 @@ class Space:
     file_size = [29176, 27662]
 
 
-class TestPhotoWithoutRequest:
+class TestPhotoWithoutRequest(TestPhotoBase):
     def test_slot_behaviour(self, photo, mro_slots):
         for attr in photo.__slots__:
             assert getattr(photo, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -92,9 +92,9 @@ class TestPhotoWithoutRequest:
         assert thumb.file_unique_id != ""
 
     def test_expected_values(self, photo, thumb):
-        assert photo.width == Space.width
-        assert photo.height == Space.height
-        assert photo.file_size in Space.file_size
+        assert photo.width == self.width
+        assert photo.height == self.height
+        assert photo.file_size in self.file_size
         assert thumb.width == 90
         assert thumb.height == 90
         assert thumb.file_size == 1477
@@ -103,18 +103,18 @@ class TestPhotoWithoutRequest:
         json_dict = {
             "file_id": photo.file_id,
             "file_unique_id": photo.file_unique_id,
-            "width": Space.width,
-            "height": Space.height,
-            "file_size": Space.file_size,
+            "width": self.width,
+            "height": self.height,
+            "file_size": self.file_size,
         }
         json_photo = PhotoSize.de_json(json_dict, bot)
         assert json_photo.api_kwargs == {}
 
         assert json_photo.file_id == photo.file_id
         assert json_photo.file_unique_id == photo.file_unique_id
-        assert json_photo.width == Space.width
-        assert json_photo.height == Space.height
-        assert json_photo.file_size == Space.file_size
+        assert json_photo.width == self.width
+        assert json_photo.height == self.height
+        assert json_photo.file_size == self.file_size
 
     def test_to_dict(self, photo):
         photo_dict = photo.to_dict()
@@ -127,15 +127,15 @@ class TestPhotoWithoutRequest:
         assert photo_dict["file_size"] == photo.file_size
 
     def test_equality(self, photo):
-        a = PhotoSize(photo.file_id, photo.file_unique_id, Space.width, Space.height)
-        b = PhotoSize("", photo.file_unique_id, Space.width, Space.height)
+        a = PhotoSize(photo.file_id, photo.file_unique_id, self.width, self.height)
+        b = PhotoSize("", photo.file_unique_id, self.width, self.height)
         c = PhotoSize(photo.file_id, photo.file_unique_id, 0, 0)
-        d = PhotoSize("", "", Space.width, Space.height)
+        d = PhotoSize("", "", self.width, self.height)
         e = Sticker(
             photo.file_id,
             photo.file_unique_id,
-            Space.width,
-            Space.height,
+            self.width,
+            self.height,
             False,
             False,
             Sticker.REGULAR,
@@ -206,12 +206,12 @@ class TestPhotoWithoutRequest:
         assert await photo.get_file()
 
 
-class TestPhotoWithRequest:
+class TestPhotoWithRequest(TestPhotoBase):
     async def test_send_photo_all_args(self, bot, chat_id, photo_file):
         message = await bot.send_photo(
             chat_id,
             photo_file,
-            caption=Space.caption,
+            caption=self.caption,
             disable_notification=False,
             protect_content=True,
             parse_mode="Markdown",
@@ -230,13 +230,13 @@ class TestPhotoWithRequest:
         assert message.photo[-1].file_id != ""
         assert message.photo[-1].file_unique_id != ""
 
-        assert message.caption == Space.caption.replace("*", "")
+        assert message.caption == self.caption.replace("*", "")
         assert message.has_protected_content
         assert message.has_media_spoiler
 
     async def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file):
         message = await bot.send_photo(
-            chat_id, photo_file, caption=Space.caption, parse_mode="Markdown"
+            chat_id, photo_file, caption=self.caption, parse_mode="Markdown"
         )
         assert isinstance(message.photo[-2], PhotoSize)
         assert isinstance(message.photo[-2].file_id, str)
@@ -250,12 +250,12 @@ class TestPhotoWithRequest:
         assert message.photo[-1].file_id != ""
         assert message.photo[-1].file_unique_id != ""
 
-        assert message.caption == Space.caption.replace("*", "")
+        assert message.caption == self.caption.replace("*", "")
         assert len(message.caption_entities) == 1
 
     async def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file):
         message = await bot.send_photo(
-            chat_id, photo_file, caption=Space.caption, parse_mode="HTML"
+            chat_id, photo_file, caption=self.caption, parse_mode="HTML"
         )
         assert isinstance(message.photo[-2], PhotoSize)
         assert isinstance(message.photo[-2].file_id, str)
@@ -269,7 +269,7 @@ class TestPhotoWithRequest:
         assert message.photo[-1].file_id != ""
         assert message.photo[-1].file_unique_id != ""
 
-        assert message.caption == Space.caption.replace("<b>", "").replace("</b>", "")
+        assert message.caption == self.caption.replace("<b>", "").replace("</b>", "")
         assert len(message.caption_entities) == 1
 
     async def test_send_photo_caption_entities(self, bot, chat_id, photo_file):
@@ -374,7 +374,7 @@ class TestPhotoWithRequest:
         assert path.is_file()
 
     async def test_send_url_jpg_file(self, bot, chat_id):
-        message = await bot.send_photo(chat_id, photo=Space.photo_file_url)
+        message = await bot.send_photo(chat_id, photo=self.photo_file_url)
 
         assert isinstance(message.photo[-2], PhotoSize)
         assert isinstance(message.photo[-2].file_id, str)

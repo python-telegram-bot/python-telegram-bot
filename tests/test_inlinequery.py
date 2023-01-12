@@ -30,17 +30,17 @@ from tests.auxil.bot_method_checks import (
 @pytest.fixture(scope="module")
 def inline_query(bot):
     ilq = InlineQuery(
-        Space.id_,
-        Space.from_user,
-        Space.query,
-        Space.offset,
-        location=Space.location,
+        TestInlineQueryBase.id_,
+        TestInlineQueryBase.from_user,
+        TestInlineQueryBase.query,
+        TestInlineQueryBase.offset,
+        location=TestInlineQueryBase.location,
     )
     ilq.set_bot(bot)
     return ilq
 
 
-class Space:
+class TestInlineQueryBase:
     id_ = 1234
     from_user = User(1, "First name", False)
     query = "query text"
@@ -48,7 +48,7 @@ class Space:
     location = Location(8.8, 53.1)
 
 
-class TestInlineQueryWithoutRequest:
+class TestInlineQueryWithoutRequest(TestInlineQueryBase):
     def test_slot_behaviour(self, inline_query, mro_slots):
         for attr in inline_query.__slots__:
             assert getattr(inline_query, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -56,20 +56,20 @@ class TestInlineQueryWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "id": Space.id_,
-            "from": Space.from_user.to_dict(),
-            "query": Space.query,
-            "offset": Space.offset,
-            "location": Space.location.to_dict(),
+            "id": self.id_,
+            "from": self.from_user.to_dict(),
+            "query": self.query,
+            "offset": self.offset,
+            "location": self.location.to_dict(),
         }
         inline_query_json = InlineQuery.de_json(json_dict, bot)
         assert inline_query_json.api_kwargs == {}
 
-        assert inline_query_json.id == Space.id_
-        assert inline_query_json.from_user == Space.from_user
-        assert inline_query_json.location == Space.location
-        assert inline_query_json.query == Space.query
-        assert inline_query_json.offset == Space.offset
+        assert inline_query_json.id == self.id_
+        assert inline_query_json.from_user == self.from_user
+        assert inline_query_json.location == self.location
+        assert inline_query_json.query == self.query
+        assert inline_query_json.offset == self.offset
 
     def test_to_dict(self, inline_query):
         inline_query_dict = inline_query.to_dict()
@@ -82,11 +82,11 @@ class TestInlineQueryWithoutRequest:
         assert inline_query_dict["offset"] == inline_query.offset
 
     def test_equality(self):
-        a = InlineQuery(Space.id_, User(1, "", False), "", "")
-        b = InlineQuery(Space.id_, User(1, "", False), "", "")
-        c = InlineQuery(Space.id_, User(0, "", False), "", "")
+        a = InlineQuery(self.id_, User(1, "", False), "", "")
+        b = InlineQuery(self.id_, User(1, "", False), "", "")
+        c = InlineQuery(self.id_, User(0, "", False), "", "")
         d = InlineQuery(0, User(1, "", False), "", "")
-        e = Update(Space.id_)
+        e = Update(self.id_)
 
         assert a == b
         assert hash(a) == hash(b)

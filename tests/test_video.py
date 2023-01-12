@@ -46,7 +46,7 @@ async def video(bot, chat_id):
         return (await bot.send_video(chat_id, video=f, read_timeout=50)).video
 
 
-class Space:
+class TestVideoBase:
     width = 360
     height = 640
     duration = 5
@@ -63,7 +63,7 @@ class Space:
     video_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVideoWithoutRequest:
+class TestVideoWithoutRequest(TestVideoBase):
     def test_slot_behaviour(self, video, mro_slots):
         for attr in video.__slots__:
             assert getattr(video, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -84,34 +84,34 @@ class TestVideoWithoutRequest:
         assert video.thumb.file_unique_id != ""
 
     def test_expected_values(self, video):
-        assert video.width == Space.width
-        assert video.height == Space.height
-        assert video.duration == Space.duration
-        assert video.file_size == Space.file_size
-        assert video.mime_type == Space.mime_type
+        assert video.width == self.width
+        assert video.height == self.height
+        assert video.duration == self.duration
+        assert video.file_size == self.file_size
+        assert video.mime_type == self.mime_type
 
     def test_de_json(self, bot):
         json_dict = {
-            "file_id": Space.video_file_id,
-            "file_unique_id": Space.video_file_unique_id,
-            "width": Space.width,
-            "height": Space.height,
-            "duration": Space.duration,
-            "mime_type": Space.mime_type,
-            "file_size": Space.file_size,
-            "file_name": Space.file_name,
+            "file_id": self.video_file_id,
+            "file_unique_id": self.video_file_unique_id,
+            "width": self.width,
+            "height": self.height,
+            "duration": self.duration,
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
+            "file_name": self.file_name,
         }
         json_video = Video.de_json(json_dict, bot)
         assert json_video.api_kwargs == {}
 
-        assert json_video.file_id == Space.video_file_id
-        assert json_video.file_unique_id == Space.video_file_unique_id
-        assert json_video.width == Space.width
-        assert json_video.height == Space.height
-        assert json_video.duration == Space.duration
-        assert json_video.mime_type == Space.mime_type
-        assert json_video.file_size == Space.file_size
-        assert json_video.file_name == Space.file_name
+        assert json_video.file_id == self.video_file_id
+        assert json_video.file_unique_id == self.video_file_unique_id
+        assert json_video.width == self.width
+        assert json_video.height == self.height
+        assert json_video.duration == self.duration
+        assert json_video.mime_type == self.mime_type
+        assert json_video.file_size == self.file_size
+        assert json_video.file_name == self.file_name
 
     def test_to_dict(self, video):
         video_dict = video.to_dict()
@@ -127,11 +127,11 @@ class TestVideoWithoutRequest:
         assert video_dict["file_name"] == video.file_name
 
     def test_equality(self, video):
-        a = Video(video.file_id, video.file_unique_id, Space.width, Space.height, Space.duration)
-        b = Video("", video.file_unique_id, Space.width, Space.height, Space.duration)
+        a = Video(video.file_id, video.file_unique_id, self.width, self.height, self.duration)
+        b = Video("", video.file_unique_id, self.width, self.height, self.duration)
         c = Video(video.file_id, video.file_unique_id, 0, 0, 0)
-        d = Video("", "", Space.width, Space.height, Space.duration)
-        e = Voice(video.file_id, video.file_unique_id, Space.duration)
+        d = Video("", "", self.width, self.height, self.duration)
+        e = Voice(video.file_id, video.file_unique_id, self.duration)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -201,14 +201,14 @@ class TestVideoWithoutRequest:
         assert await video.get_file()
 
 
-class TestVideoWithRequest:
+class TestVideoWithRequest(TestVideoBase):
     async def test_send_all_args(self, bot, chat_id, video_file, video, thumb_file):
         message = await bot.send_video(
             chat_id,
             video_file,
-            duration=Space.duration,
-            caption=Space.caption,
-            supports_streaming=Space.supports_streaming,
+            duration=self.duration,
+            caption=self.caption,
+            supports_streaming=self.supports_streaming,
             disable_notification=False,
             protect_content=True,
             width=video.width,
@@ -228,13 +228,13 @@ class TestVideoWithRequest:
         assert message.video.duration == video.duration
         assert message.video.file_size == video.file_size
 
-        assert message.caption == Space.caption.replace("*", "")
+        assert message.caption == self.caption.replace("*", "")
 
-        assert message.video.thumb.file_size == Space.thumb_file_size
-        assert message.video.thumb.width == Space.thumb_width
-        assert message.video.thumb.height == Space.thumb_height
+        assert message.video.thumb.file_size == self.thumb_file_size
+        assert message.video.thumb.width == self.thumb_width
+        assert message.video.thumb.height == self.thumb_height
 
-        assert message.video.file_name == Space.file_name
+        assert message.video.file_name == self.file_name
         assert message.has_protected_content
         assert message.has_media_spoiler
 
@@ -246,7 +246,7 @@ class TestVideoWithRequest:
         video = (await bot.send_video(chat_id, video.file_id, read_timeout=50)).video
         new_file = await bot.get_file(video.file_id)
 
-        assert new_file.file_size == Space.file_size
+        assert new_file.file_size == self.file_size
         assert new_file.file_id == video.file_id
         assert new_file.file_unique_id == video.file_unique_id
         assert new_file.file_path.startswith("https://")
@@ -256,7 +256,7 @@ class TestVideoWithRequest:
         assert path.is_file()
 
     async def test_send_mp4_file_url(self, bot, chat_id, video):
-        message = await bot.send_video(chat_id, Space.video_file_url, caption=Space.caption)
+        message = await bot.send_video(chat_id, self.video_file_url, caption=self.caption)
 
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
@@ -273,11 +273,11 @@ class TestVideoWithRequest:
         assert isinstance(message.video.thumb.file_unique_id, str)
         assert message.video.thumb.file_id != ""
         assert message.video.thumb.file_unique_id != ""
-        assert message.video.thumb.width == 51  # This seems odd that it's not Space.thumb_width
+        assert message.video.thumb.width == 51  # This seems odd that it's not self.thumb_width
         assert message.video.thumb.height == 90  # Ditto
         assert message.video.thumb.file_size == 645  # same
 
-        assert message.caption == Space.caption
+        assert message.caption == self.caption
 
     async def test_send_video_caption_entities(self, bot, chat_id, video):
         test_string = "Italic Bold Code"

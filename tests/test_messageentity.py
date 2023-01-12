@@ -37,14 +37,14 @@ def message_entity(request):
     return MessageEntity(type_, 1, 3, url=url, user=user, language=language)
 
 
-class Space:
+class TestMessageEntityBase:
     type_ = "url"
     offset = 1
     length = 2
     url = "url"
 
 
-class TestMessageEntityWithoutRequest:
+class TestMessageEntityWithoutRequest(TestMessageEntityBase):
     def test_slot_behaviour(self, message_entity, mro_slots):
         inst = message_entity
         for attr in inst.__slots__:
@@ -52,13 +52,13 @@ class TestMessageEntityWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, bot):
-        json_dict = {"type": Space.type_, "offset": Space.offset, "length": Space.length}
+        json_dict = {"type": self.type_, "offset": self.offset, "length": self.length}
         entity = MessageEntity.de_json(json_dict, bot)
         assert entity.api_kwargs == {}
 
-        assert entity.type == Space.type_
-        assert entity.offset == Space.offset
-        assert entity.length == Space.length
+        assert entity.type == self.type_
+        assert entity.offset == self.offset
+        assert entity.length == self.length
 
     def test_to_dict(self, message_entity):
         entity_dict = message_entity.to_dict()

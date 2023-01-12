@@ -23,17 +23,23 @@ from telegram import PassportElementErrorSelfie, PassportElementErrorTranslation
 
 @pytest.fixture(scope="module")
 def passport_element_error_translation_files():
-    return PassportElementErrorTranslationFiles(Space.type_, Space.file_hashes, Space.message)
+    return PassportElementErrorTranslationFiles(
+        TestPassportElementErrorTranslationFilesBase.type_,
+        TestPassportElementErrorTranslationFilesBase.file_hashes,
+        TestPassportElementErrorTranslationFilesBase.message,
+    )
 
 
-class Space:
+class TestPassportElementErrorTranslationFilesBase:
     source = "translation_files"
     type_ = "test_type"
     file_hashes = ["hash1", "hash2"]
     message = "Error message"
 
 
-class TestPassportElementErrorTranslationFilesWithoutRequest:
+class TestPassportElementErrorTranslationFilesWithoutRequest(
+    TestPassportElementErrorTranslationFilesBase
+):
     def test_slot_behaviour(self, passport_element_error_translation_files, mro_slots):
         inst = passport_element_error_translation_files
         for attr in inst.__slots__:
@@ -41,11 +47,11 @@ class TestPassportElementErrorTranslationFilesWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, passport_element_error_translation_files):
-        assert passport_element_error_translation_files.source == Space.source
-        assert passport_element_error_translation_files.type == Space.type_
+        assert passport_element_error_translation_files.source == self.source
+        assert passport_element_error_translation_files.type == self.type_
         assert isinstance(passport_element_error_translation_files.file_hashes, list)
-        assert passport_element_error_translation_files.file_hashes == Space.file_hashes
-        assert passport_element_error_translation_files.message == Space.message
+        assert passport_element_error_translation_files.file_hashes == self.file_hashes
+        assert passport_element_error_translation_files.message == self.message
 
     def test_to_dict(self, passport_element_error_translation_files):
         passport_element_error_translation_files_dict = (
@@ -71,12 +77,12 @@ class TestPassportElementErrorTranslationFilesWithoutRequest:
         )
 
     def test_equality(self):
-        a = PassportElementErrorTranslationFiles(Space.type_, Space.file_hashes, Space.message)
-        b = PassportElementErrorTranslationFiles(Space.type_, Space.file_hashes, Space.message)
-        c = PassportElementErrorTranslationFiles(Space.type_, "", "")
-        d = PassportElementErrorTranslationFiles("", Space.file_hashes, "")
-        e = PassportElementErrorTranslationFiles("", "", Space.message)
-        f = PassportElementErrorSelfie(Space.type_, "", Space.message)
+        a = PassportElementErrorTranslationFiles(self.type_, self.file_hashes, self.message)
+        b = PassportElementErrorTranslationFiles(self.type_, self.file_hashes, self.message)
+        c = PassportElementErrorTranslationFiles(self.type_, "", "")
+        d = PassportElementErrorTranslationFiles("", self.file_hashes, "")
+        e = PassportElementErrorTranslationFiles("", "", self.message)
+        f = PassportElementErrorSelfie(self.type_, "", self.message)
 
         assert a == b
         assert hash(a) == hash(b)

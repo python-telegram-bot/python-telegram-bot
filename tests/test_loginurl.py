@@ -24,21 +24,21 @@ from telegram import LoginUrl
 @pytest.fixture(scope="module")
 def login_url():
     return LoginUrl(
-        url=Space.url,
-        forward_text=Space.forward_text,
-        bot_username=Space.bot_username,
-        request_write_access=Space.request_write_access,
+        url=TestLoginUrlBase.url,
+        forward_text=TestLoginUrlBase.forward_text,
+        bot_username=TestLoginUrlBase.bot_username,
+        request_write_access=TestLoginUrlBase.request_write_access,
     )
 
 
-class Space:
+class TestLoginUrlBase:
     url = "http://www.google.com"
     forward_text = "Send me forward!"
     bot_username = "botname"
     request_write_access = True
 
 
-class TestLoginUrlWithoutRequest:
+class TestLoginUrlWithoutRequest(TestLoginUrlBase):
     def test_slot_behaviour(self, login_url, mro_slots):
         for attr in login_url.__slots__:
             assert getattr(login_url, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -48,18 +48,16 @@ class TestLoginUrlWithoutRequest:
         login_url_dict = login_url.to_dict()
 
         assert isinstance(login_url_dict, dict)
-        assert login_url_dict["url"] == Space.url
-        assert login_url_dict["forward_text"] == Space.forward_text
-        assert login_url_dict["bot_username"] == Space.bot_username
-        assert login_url_dict["request_write_access"] == Space.request_write_access
+        assert login_url_dict["url"] == self.url
+        assert login_url_dict["forward_text"] == self.forward_text
+        assert login_url_dict["bot_username"] == self.bot_username
+        assert login_url_dict["request_write_access"] == self.request_write_access
 
     def test_equality(self):
-        a = LoginUrl(Space.url, Space.forward_text, Space.bot_username, Space.request_write_access)
-        b = LoginUrl(Space.url, Space.forward_text, Space.bot_username, Space.request_write_access)
-        c = LoginUrl(Space.url)
-        d = LoginUrl(
-            "text.com", Space.forward_text, Space.bot_username, Space.request_write_access
-        )
+        a = LoginUrl(self.url, self.forward_text, self.bot_username, self.request_write_access)
+        b = LoginUrl(self.url, self.forward_text, self.bot_username, self.request_write_access)
+        c = LoginUrl(self.url)
+        d = LoginUrl("text.com", self.forward_text, self.bot_username, self.request_write_access)
 
         assert a == b
         assert hash(a) == hash(b)

@@ -23,17 +23,21 @@ from telegram import PassportElementErrorDataField, PassportElementErrorUnspecif
 
 @pytest.fixture(scope="module")
 def passport_element_error_unspecified():
-    return PassportElementErrorUnspecified(Space.type_, Space.element_hash, Space.message)
+    return PassportElementErrorUnspecified(
+        TestPassportElementErrorUnspecifiedBase.type_,
+        TestPassportElementErrorUnspecifiedBase.element_hash,
+        TestPassportElementErrorUnspecifiedBase.message,
+    )
 
 
-class Space:
+class TestPassportElementErrorUnspecifiedBase:
     source = "unspecified"
     type_ = "test_type"
     element_hash = "element_hash"
     message = "Error message"
 
 
-class TestPassportElementErrorUnspecifiedWithoutRequest:
+class TestPassportElementErrorUnspecifiedWithoutRequest(TestPassportElementErrorUnspecifiedBase):
     def test_slot_behaviour(self, passport_element_error_unspecified, mro_slots):
         inst = passport_element_error_unspecified
         for attr in inst.__slots__:
@@ -41,10 +45,10 @@ class TestPassportElementErrorUnspecifiedWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, passport_element_error_unspecified):
-        assert passport_element_error_unspecified.source == Space.source
-        assert passport_element_error_unspecified.type == Space.type_
-        assert passport_element_error_unspecified.element_hash == Space.element_hash
-        assert passport_element_error_unspecified.message == Space.message
+        assert passport_element_error_unspecified.source == self.source
+        assert passport_element_error_unspecified.type == self.type_
+        assert passport_element_error_unspecified.element_hash == self.element_hash
+        assert passport_element_error_unspecified.message == self.message
 
     def test_to_dict(self, passport_element_error_unspecified):
         passport_element_error_unspecified_dict = passport_element_error_unspecified.to_dict()
@@ -68,12 +72,12 @@ class TestPassportElementErrorUnspecifiedWithoutRequest:
         )
 
     def test_equality(self):
-        a = PassportElementErrorUnspecified(Space.type_, Space.element_hash, Space.message)
-        b = PassportElementErrorUnspecified(Space.type_, Space.element_hash, Space.message)
-        c = PassportElementErrorUnspecified(Space.type_, "", "")
-        d = PassportElementErrorUnspecified("", Space.element_hash, "")
-        e = PassportElementErrorUnspecified("", "", Space.message)
-        f = PassportElementErrorDataField(Space.type_, "", "", Space.message)
+        a = PassportElementErrorUnspecified(self.type_, self.element_hash, self.message)
+        b = PassportElementErrorUnspecified(self.type_, self.element_hash, self.message)
+        c = PassportElementErrorUnspecified(self.type_, "", "")
+        d = PassportElementErrorUnspecified("", self.element_hash, "")
+        e = PassportElementErrorUnspecified("", "", self.message)
+        f = PassportElementErrorDataField(self.type_, "", "", self.message)
 
         assert a == b
         assert hash(a) == hash(b)

@@ -60,72 +60,72 @@ from .test_video import video, video_file  # noqa: F401
 @pytest.fixture(scope="module")
 def input_media_video(class_thumb_file):
     return InputMediaVideo(
-        media=VideoSpace.media,
-        caption=VideoSpace.caption,
-        width=VideoSpace.width,
-        height=VideoSpace.height,
-        duration=VideoSpace.duration,
-        parse_mode=VideoSpace.parse_mode,
-        caption_entities=VideoSpace.caption_entities,
+        media=TestInputMediaVideoBase.media,
+        caption=TestInputMediaVideoBase.caption,
+        width=TestInputMediaVideoBase.width,
+        height=TestInputMediaVideoBase.height,
+        duration=TestInputMediaVideoBase.duration,
+        parse_mode=TestInputMediaVideoBase.parse_mode,
+        caption_entities=TestInputMediaVideoBase.caption_entities,
         thumb=class_thumb_file,
-        supports_streaming=VideoSpace.supports_streaming,
-        has_spoiler=VideoSpace.has_spoiler,
+        supports_streaming=TestInputMediaVideoBase.supports_streaming,
+        has_spoiler=TestInputMediaVideoBase.has_spoiler,
     )
 
 
 @pytest.fixture(scope="module")
 def input_media_photo():
     return InputMediaPhoto(
-        media=PhotoSpace.media,
-        caption=PhotoSpace.caption,
-        parse_mode=PhotoSpace.parse_mode,
-        caption_entities=PhotoSpace.caption_entities,
-        has_spoiler=PhotoSpace.has_spoiler,
+        media=TestInputMediaPhotoBase.media,
+        caption=TestInputMediaPhotoBase.caption,
+        parse_mode=TestInputMediaPhotoBase.parse_mode,
+        caption_entities=TestInputMediaPhotoBase.caption_entities,
+        has_spoiler=TestInputMediaPhotoBase.has_spoiler,
     )
 
 
 @pytest.fixture(scope="module")
 def input_media_animation(class_thumb_file):
     return InputMediaAnimation(
-        media=AnimationSpace.media,
-        caption=AnimationSpace.caption,
-        parse_mode=AnimationSpace.parse_mode,
-        caption_entities=AnimationSpace.caption_entities,
-        width=AnimationSpace.width,
-        height=AnimationSpace.height,
+        media=TestInputMediaAnimationBase.media,
+        caption=TestInputMediaAnimationBase.caption,
+        parse_mode=TestInputMediaAnimationBase.parse_mode,
+        caption_entities=TestInputMediaAnimationBase.caption_entities,
+        width=TestInputMediaAnimationBase.width,
+        height=TestInputMediaAnimationBase.height,
         thumb=class_thumb_file,
-        duration=AnimationSpace.duration,
-        has_spoiler=AnimationSpace.has_spoiler,
+        duration=TestInputMediaAnimationBase.duration,
+        has_spoiler=TestInputMediaAnimationBase.has_spoiler,
     )
 
 
 @pytest.fixture(scope="module")
 def input_media_audio(class_thumb_file):
     return InputMediaAudio(
-        media=AudioSpace.media,
-        caption=AudioSpace.caption,
-        duration=AudioSpace.duration,
-        performer=AudioSpace.performer,
-        title=AudioSpace.title,
+        media=TestInputMediaAudioBase.media,
+        caption=TestInputMediaAudioBase.caption,
+        duration=TestInputMediaAudioBase.duration,
+        performer=TestInputMediaAudioBase.performer,
+        title=TestInputMediaAudioBase.title,
         thumb=class_thumb_file,
-        parse_mode=AudioSpace.parse_mode,
-        caption_entities=AudioSpace.caption_entities,
+        parse_mode=TestInputMediaAudioBase.parse_mode,
+        caption_entities=TestInputMediaAudioBase.caption_entities,
     )
 
 
 @pytest.fixture(scope="module")
 def input_media_document(class_thumb_file):
     return InputMediaDocument(
-        media=DocumentSpace.media,
-        caption=DocumentSpace.caption,
+        media=TestInputMediaDocumentBase.media,
+        caption=TestInputMediaDocumentBase.caption,
         thumb=class_thumb_file,
-        parse_mode=DocumentSpace.parse_mode,
-        caption_entities=DocumentSpace.caption_entities,
-        disable_content_type_detection=DocumentSpace.disable_content_type_detection,
+        parse_mode=TestInputMediaDocumentBase.parse_mode,
+        caption_entities=TestInputMediaDocumentBase.caption_entities,
+        disable_content_type_detection=TestInputMediaDocumentBase.disable_content_type_detection,
     )
 
 
-class VideoSpace:
+class TestInputMediaVideoBase:
     type_ = "video"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -138,7 +138,7 @@ class VideoSpace:
     has_spoiler = True
 
 
-class TestInputMediaVideoWithoutRequest:
+class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
     def test_slot_behaviour(self, input_media_video, mro_slots):
         inst = input_media_video
         for attr in inst.__slots__:
@@ -146,20 +146,20 @@ class TestInputMediaVideoWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_media_video):
-        assert input_media_video.type == VideoSpace.type_
-        assert input_media_video.media == VideoSpace.media
-        assert input_media_video.caption == VideoSpace.caption
-        assert input_media_video.width == VideoSpace.width
-        assert input_media_video.height == VideoSpace.height
-        assert input_media_video.duration == VideoSpace.duration
-        assert input_media_video.parse_mode == VideoSpace.parse_mode
-        assert input_media_video.caption_entities == tuple(VideoSpace.caption_entities)
-        assert input_media_video.supports_streaming == VideoSpace.supports_streaming
+        assert input_media_video.type == self.type_
+        assert input_media_video.media == self.media
+        assert input_media_video.caption == self.caption
+        assert input_media_video.width == self.width
+        assert input_media_video.height == self.height
+        assert input_media_video.duration == self.duration
+        assert input_media_video.parse_mode == self.parse_mode
+        assert input_media_video.caption_entities == tuple(self.caption_entities)
+        assert input_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_media_video.thumb, InputFile)
-        assert input_media_video.has_spoiler == VideoSpace.has_spoiler
+        assert input_media_video.has_spoiler == self.has_spoiler
 
     def test_caption_entities_always_tuple(self):
-        input_media_video = InputMediaVideo(VideoSpace.media)
+        input_media_video = InputMediaVideo(self.media)
         assert input_media_video.caption_entities == ()
 
     def test_to_dict(self, input_media_video):
@@ -180,7 +180,7 @@ class TestInputMediaVideoWithoutRequest:
     def test_with_video(self, video):  # noqa: F811
         # fixture found in test_video
         input_media_video = InputMediaVideo(video, caption="test 3")
-        assert input_media_video.type == VideoSpace.type_
+        assert input_media_video.type == self.type_
         assert input_media_video.media == video.file_id
         assert input_media_video.width == video.width
         assert input_media_video.height == video.height
@@ -190,7 +190,7 @@ class TestInputMediaVideoWithoutRequest:
     def test_with_video_file(self, video_file):  # noqa: F811
         # fixture found in test_video
         input_media_video = InputMediaVideo(video_file, caption="test 3")
-        assert input_media_video.type == VideoSpace.type_
+        assert input_media_video.type == self.type_
         assert isinstance(input_media_video.media, InputFile)
         assert input_media_video.caption == "test 3"
 
@@ -202,7 +202,7 @@ class TestInputMediaVideoWithoutRequest:
         assert input_media_video.thumb == data_file("telegram.jpg").as_uri()
 
 
-class PhotoSpace:
+class TestInputMediaPhotoBase:
     type_ = "photo"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -211,7 +211,7 @@ class PhotoSpace:
     has_spoiler = True
 
 
-class TestInputMediaPhotoWithoutRequest:
+class TestInputMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
     def test_slot_behaviour(self, input_media_photo, mro_slots):
         inst = input_media_photo
         for attr in inst.__slots__:
@@ -219,15 +219,15 @@ class TestInputMediaPhotoWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_media_photo):
-        assert input_media_photo.type == PhotoSpace.type_
-        assert input_media_photo.media == PhotoSpace.media
-        assert input_media_photo.caption == PhotoSpace.caption
-        assert input_media_photo.parse_mode == PhotoSpace.parse_mode
-        assert input_media_photo.caption_entities == tuple(PhotoSpace.caption_entities)
-        assert input_media_photo.has_spoiler == PhotoSpace.has_spoiler
+        assert input_media_photo.type == self.type_
+        assert input_media_photo.media == self.media
+        assert input_media_photo.caption == self.caption
+        assert input_media_photo.parse_mode == self.parse_mode
+        assert input_media_photo.caption_entities == tuple(self.caption_entities)
+        assert input_media_photo.has_spoiler == self.has_spoiler
 
     def test_caption_entities_always_tuple(self):
-        input_media_photo = InputMediaPhoto(PhotoSpace.media)
+        input_media_photo = InputMediaPhoto(self.media)
         assert input_media_photo.caption_entities == ()
 
     def test_to_dict(self, input_media_photo):
@@ -244,14 +244,14 @@ class TestInputMediaPhotoWithoutRequest:
     def test_with_photo(self, photo):  # noqa: F811
         # fixture found in test_photo
         input_media_photo = InputMediaPhoto(photo, caption="test 2")
-        assert input_media_photo.type == PhotoSpace.type_
+        assert input_media_photo.type == self.type_
         assert input_media_photo.media == photo.file_id
         assert input_media_photo.caption == "test 2"
 
     def test_with_photo_file(self, photo_file):  # noqa: F811
         # fixture found in test_photo
         input_media_photo = InputMediaPhoto(photo_file, caption="test 2")
-        assert input_media_photo.type == PhotoSpace.type_
+        assert input_media_photo.type == self.type_
         assert isinstance(input_media_photo.media, InputFile)
         assert input_media_photo.caption == "test 2"
 
@@ -260,7 +260,7 @@ class TestInputMediaPhotoWithoutRequest:
         assert input_media_photo.media == data_file("telegram.mp4").as_uri()
 
 
-class AnimationSpace:
+class TestInputMediaAnimationBase:
     type_ = "animation"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -272,7 +272,7 @@ class AnimationSpace:
     has_spoiler = True
 
 
-class TestInputMediaAnimationWithoutRequest:
+class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
     def test_slot_behaviour(self, input_media_animation, mro_slots):
         inst = input_media_animation
         for attr in inst.__slots__:
@@ -280,16 +280,16 @@ class TestInputMediaAnimationWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_media_animation):
-        assert input_media_animation.type == AnimationSpace.type_
-        assert input_media_animation.media == AnimationSpace.media
-        assert input_media_animation.caption == AnimationSpace.caption
-        assert input_media_animation.parse_mode == AnimationSpace.parse_mode
-        assert input_media_animation.caption_entities == tuple(AnimationSpace.caption_entities)
+        assert input_media_animation.type == self.type_
+        assert input_media_animation.media == self.media
+        assert input_media_animation.caption == self.caption
+        assert input_media_animation.parse_mode == self.parse_mode
+        assert input_media_animation.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_animation.thumb, InputFile)
-        assert input_media_animation.has_spoiler == AnimationSpace.has_spoiler
+        assert input_media_animation.has_spoiler == self.has_spoiler
 
     def test_caption_entities_always_tuple(self):
-        input_media_animation = InputMediaAnimation(AnimationSpace.media)
+        input_media_animation = InputMediaAnimation(self.media)
         assert input_media_animation.caption_entities == ()
 
     def test_to_dict(self, input_media_animation):
@@ -309,14 +309,14 @@ class TestInputMediaAnimationWithoutRequest:
     def test_with_animation(self, animation):  # noqa: F811
         # fixture found in test_animation
         input_media_animation = InputMediaAnimation(animation, caption="test 2")
-        assert input_media_animation.type == AnimationSpace.type_
+        assert input_media_animation.type == self.type_
         assert input_media_animation.media == animation.file_id
         assert input_media_animation.caption == "test 2"
 
     def test_with_animation_file(self, animation_file):  # noqa: F811
         # fixture found in test_animation
         input_media_animation = InputMediaAnimation(animation_file, caption="test 2")
-        assert input_media_animation.type == AnimationSpace.type_
+        assert input_media_animation.type == self.type_
         assert isinstance(input_media_animation.media, InputFile)
         assert input_media_animation.caption == "test 2"
 
@@ -328,7 +328,7 @@ class TestInputMediaAnimationWithoutRequest:
         assert input_media_animation.thumb == data_file("telegram.jpg").as_uri()
 
 
-class AudioSpace:
+class TestInputMediaAudioBase:
     type_ = "audio"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -339,7 +339,7 @@ class AudioSpace:
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
 
-class TestInputMediaAudioWithoutRequest:
+class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
     def test_slot_behaviour(self, input_media_audio, mro_slots):
         inst = input_media_audio
         for attr in inst.__slots__:
@@ -347,18 +347,18 @@ class TestInputMediaAudioWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_media_audio):
-        assert input_media_audio.type == AudioSpace.type_
-        assert input_media_audio.media == AudioSpace.media
-        assert input_media_audio.caption == AudioSpace.caption
-        assert input_media_audio.duration == AudioSpace.duration
-        assert input_media_audio.performer == AudioSpace.performer
-        assert input_media_audio.title == AudioSpace.title
-        assert input_media_audio.parse_mode == AudioSpace.parse_mode
-        assert input_media_audio.caption_entities == tuple(AudioSpace.caption_entities)
+        assert input_media_audio.type == self.type_
+        assert input_media_audio.media == self.media
+        assert input_media_audio.caption == self.caption
+        assert input_media_audio.duration == self.duration
+        assert input_media_audio.performer == self.performer
+        assert input_media_audio.title == self.title
+        assert input_media_audio.parse_mode == self.parse_mode
+        assert input_media_audio.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_audio.thumb, InputFile)
 
     def test_caption_entities_always_tuple(self):
-        input_media_audio = InputMediaAudio(AudioSpace.media)
+        input_media_audio = InputMediaAudio(self.media)
         assert input_media_audio.caption_entities == ()
 
     def test_to_dict(self, input_media_audio):
@@ -377,7 +377,7 @@ class TestInputMediaAudioWithoutRequest:
     def test_with_audio(self, audio):  # noqa: F811
         # fixture found in test_audio
         input_media_audio = InputMediaAudio(audio, caption="test 3")
-        assert input_media_audio.type == AudioSpace.type_
+        assert input_media_audio.type == self.type_
         assert input_media_audio.media == audio.file_id
         assert input_media_audio.duration == audio.duration
         assert input_media_audio.performer == audio.performer
@@ -387,7 +387,7 @@ class TestInputMediaAudioWithoutRequest:
     def test_with_audio_file(self, audio_file):  # noqa: F811
         # fixture found in test_audio
         input_media_audio = InputMediaAudio(audio_file, caption="test 3")
-        assert input_media_audio.type == AudioSpace.type_
+        assert input_media_audio.type == self.type_
         assert isinstance(input_media_audio.media, InputFile)
         assert input_media_audio.caption == "test 3"
 
@@ -399,7 +399,7 @@ class TestInputMediaAudioWithoutRequest:
         assert input_media_audio.thumb == data_file("telegram.jpg").as_uri()
 
 
-class DocumentSpace:
+class TestInputMediaDocumentBase:
     type_ = "document"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -408,7 +408,7 @@ class DocumentSpace:
     disable_content_type_detection = True
 
 
-class TestInputMediaDocumentWithoutRequest:
+class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
     def test_slot_behaviour(self, input_media_document, mro_slots):
         inst = input_media_document
         for attr in inst.__slots__:
@@ -416,19 +416,19 @@ class TestInputMediaDocumentWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_media_document):
-        assert input_media_document.type == DocumentSpace.type_
-        assert input_media_document.media == DocumentSpace.media
-        assert input_media_document.caption == DocumentSpace.caption
-        assert input_media_document.parse_mode == DocumentSpace.parse_mode
-        assert input_media_document.caption_entities == tuple(DocumentSpace.caption_entities)
+        assert input_media_document.type == self.type_
+        assert input_media_document.media == self.media
+        assert input_media_document.caption == self.caption
+        assert input_media_document.parse_mode == self.parse_mode
+        assert input_media_document.caption_entities == tuple(self.caption_entities)
         assert (
             input_media_document.disable_content_type_detection
-            == DocumentSpace.disable_content_type_detection
+            == self.disable_content_type_detection
         )
         assert isinstance(input_media_document.thumb, InputFile)
 
     def test_caption_entities_always_tuple(self):
-        input_media_document = InputMediaDocument(DocumentSpace.media)
+        input_media_document = InputMediaDocument(self.media)
         assert input_media_document.caption_entities == ()
 
     def test_to_dict(self, input_media_document):
@@ -448,14 +448,14 @@ class TestInputMediaDocumentWithoutRequest:
     def test_with_document(self, document):  # noqa: F811
         # fixture found in test_document
         input_media_document = InputMediaDocument(document, caption="test 3")
-        assert input_media_document.type == DocumentSpace.type_
+        assert input_media_document.type == self.type_
         assert input_media_document.media == document.file_id
         assert input_media_document.caption == "test 3"
 
     def test_with_document_file(self, document_file):  # noqa: F811
         # fixture found in test_document
         input_media_document = InputMediaDocument(document_file, caption="test 3")
-        assert input_media_document.type == DocumentSpace.type_
+        assert input_media_document.type == self.type_
         assert isinstance(input_media_document.media, InputFile)
         assert input_media_document.caption == "test 3"
 

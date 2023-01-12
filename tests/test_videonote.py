@@ -45,7 +45,7 @@ async def video_note(bot, chat_id):
         return (await bot.send_video_note(chat_id, video_note=f, read_timeout=50)).video_note
 
 
-class Space:
+class TestVideoNoteBase:
     length = 240
     duration = 3
     file_size = 132084
@@ -57,7 +57,7 @@ class Space:
     videonote_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVideoNoteWithoutRequest:
+class TestVideoNoteWithoutRequest(TestVideoNoteBase):
     def test_slot_behaviour(self, video_note, mro_slots):
         for attr in video_note.__slots__:
             assert getattr(video_note, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -78,26 +78,26 @@ class TestVideoNoteWithoutRequest:
         assert video_note.thumb.file_unique_id != ""
 
     def test_expected_values(self, video_note):
-        assert video_note.length == Space.length
-        assert video_note.duration == Space.duration
-        assert video_note.file_size == Space.file_size
+        assert video_note.length == self.length
+        assert video_note.duration == self.duration
+        assert video_note.file_size == self.file_size
 
     def test_de_json(self, bot):
         json_dict = {
-            "file_id": Space.videonote_file_id,
-            "file_unique_id": Space.videonote_file_unique_id,
-            "length": Space.length,
-            "duration": Space.duration,
-            "file_size": Space.file_size,
+            "file_id": self.videonote_file_id,
+            "file_unique_id": self.videonote_file_unique_id,
+            "length": self.length,
+            "duration": self.duration,
+            "file_size": self.file_size,
         }
         json_video_note = VideoNote.de_json(json_dict, bot)
         assert json_video_note.api_kwargs == {}
 
-        assert json_video_note.file_id == Space.videonote_file_id
-        assert json_video_note.file_unique_id == Space.videonote_file_unique_id
-        assert json_video_note.length == Space.length
-        assert json_video_note.duration == Space.duration
-        assert json_video_note.file_size == Space.file_size
+        assert json_video_note.file_id == self.videonote_file_id
+        assert json_video_note.file_unique_id == self.videonote_file_unique_id
+        assert json_video_note.length == self.length
+        assert json_video_note.duration == self.duration
+        assert json_video_note.file_size == self.file_size
 
     def test_to_dict(self, video_note):
         video_note_dict = video_note.to_dict()
@@ -110,11 +110,11 @@ class TestVideoNoteWithoutRequest:
         assert video_note_dict["file_size"] == video_note.file_size
 
     def test_equality(self, video_note):
-        a = VideoNote(video_note.file_id, video_note.file_unique_id, Space.length, Space.duration)
-        b = VideoNote("", video_note.file_unique_id, Space.length, Space.duration)
+        a = VideoNote(video_note.file_id, video_note.file_unique_id, self.length, self.duration)
+        b = VideoNote("", video_note.file_unique_id, self.length, self.duration)
         c = VideoNote(video_note.file_id, video_note.file_unique_id, 0, 0)
-        d = VideoNote("", "", Space.length, Space.duration)
-        e = Voice(video_note.file_id, video_note.file_unique_id, Space.duration)
+        d = VideoNote("", "", self.length, self.duration)
+        e = Voice(video_note.file_id, video_note.file_unique_id, self.duration)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -188,13 +188,13 @@ class TestVideoNoteWithoutRequest:
         assert await video_note.get_file()
 
 
-class TestVideoNoteWithRequest:
+class TestVideoNoteWithRequest(TestVideoNoteBase):
     async def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
         message = await bot.send_video_note(
             chat_id,
             video_note_file,
-            duration=Space.duration,
-            length=Space.length,
+            duration=self.duration,
+            length=self.length,
             disable_notification=False,
             protect_content=True,
             thumb=thumb_file,
@@ -209,9 +209,9 @@ class TestVideoNoteWithRequest:
         assert message.video_note.duration == video_note.duration
         assert message.video_note.file_size == video_note.file_size
 
-        assert message.video_note.thumb.file_size == Space.thumb_file_size
-        assert message.video_note.thumb.width == Space.thumb_width
-        assert message.video_note.thumb.height == Space.thumb_height
+        assert message.video_note.thumb.file_size == self.thumb_file_size
+        assert message.video_note.thumb.width == self.thumb_width
+        assert message.video_note.thumb.height == self.thumb_height
         assert message.has_protected_content
 
     async def test_get_and_download(self, bot, video_note, chat_id):
@@ -222,7 +222,7 @@ class TestVideoNoteWithRequest:
         video_note = (await bot.send_video_note(chat_id, video_note, read_timeout=50)).video_note
         new_file = await bot.get_file(video_note.file_id)
 
-        assert new_file.file_size == Space.file_size
+        assert new_file.file_size == self.file_size
         assert new_file.file_id == video_note.file_id
         assert new_file.file_unique_id == video_note.file_unique_id
         assert new_file.file_path.startswith("https://")

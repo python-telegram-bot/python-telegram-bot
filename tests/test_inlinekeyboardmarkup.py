@@ -30,10 +30,10 @@ from telegram import (
 
 @pytest.fixture(scope="module")
 def inline_keyboard_markup():
-    return InlineKeyboardMarkup(Space.inline_keyboard)
+    return InlineKeyboardMarkup(TestInlineKeyboardMarkupBase.inline_keyboard)
 
 
-class Space:
+class TestInlineKeyboardMarkupBase:
     inline_keyboard = [
         [
             InlineKeyboardButton(text="button1", callback_data="data1"),
@@ -42,7 +42,7 @@ class Space:
     ]
 
 
-class TestInlineKeyboardMarkupWithoutRequest:
+class TestInlineKeyboardMarkupWithoutRequest(TestInlineKeyboardMarkupBase):
     def test_slot_behaviour(self, inline_keyboard_markup, mro_slots):
         inst = inline_keyboard_markup
         for attr in inst.__slots__:
@@ -54,7 +54,7 @@ class TestInlineKeyboardMarkupWithoutRequest:
 
         assert isinstance(inline_keyboard_markup_dict, dict)
         assert inline_keyboard_markup_dict["inline_keyboard"] == [
-            [Space.inline_keyboard[0][0].to_dict(), Space.inline_keyboard[0][1].to_dict()]
+            [self.inline_keyboard[0][0].to_dict(), self.inline_keyboard[0][1].to_dict()]
         ]
 
     def test_de_json(self):
@@ -174,7 +174,7 @@ class TestInlineKeyboardMarkupWithoutRequest:
 
     def test_expected_values(self, inline_keyboard_markup):
         assert inline_keyboard_markup.inline_keyboard == tuple(
-            tuple(row) for row in Space.inline_keyboard
+            tuple(row) for row in self.inline_keyboard
         )
 
     def test_wrong_keyboard_inputs(self):
@@ -225,7 +225,7 @@ class TestInlineKeyboardMarkupWithoutRequest:
         await bot.send_message(123, "test", reply_markup=inline_keyboard_markup)
 
 
-class TestInlineKeyborardMarkupWithRequest:
+class TestInlineKeyborardMarkupWithRequest(TestInlineKeyboardMarkupBase):
     async def test_send_message_with_inline_keyboard_markup(
         self, bot, chat_id, inline_keyboard_markup
     ):

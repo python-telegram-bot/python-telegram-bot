@@ -46,14 +46,14 @@ def chat():
 
 @pytest.fixture(scope="module")
 def old_chat_member(user):
-    return ChatMember(user, Space.old_status)
+    return ChatMember(user, TestChatMemberUpdatedBase.old_status)
 
 
 @pytest.fixture(scope="module")
 def new_chat_member(user):
     return ChatMemberAdministrator(
         user,
-        Space.new_status,
+        TestChatMemberUpdatedBase.new_status,
         True,
         True,
         True,
@@ -81,12 +81,12 @@ def chat_member_updated(user, chat, old_chat_member, new_chat_member, invite_lin
     return ChatMemberUpdated(chat, user, time, old_chat_member, new_chat_member, invite_link)
 
 
-class Space:
+class TestChatMemberUpdatedBase:
     old_status = ChatMember.MEMBER
     new_status = ChatMember.ADMINISTRATOR
 
 
-class TestChatMemberUpdatedWithoutRequest:
+class TestChatMemberUpdatedWithoutRequest(TestChatMemberUpdatedBase):
     def test_slot_behaviour(self, mro_slots, chat_member_updated):
         action = chat_member_updated
         for attr in action.__slots__:

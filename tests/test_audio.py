@@ -46,7 +46,7 @@ async def audio(bot, chat_id):
         return (await bot.send_audio(chat_id, audio=f, read_timeout=50, thumb=thumb)).audio
 
 
-class Space:
+class TestAudioBase:
     caption = "Test *audio*"
     performer = "Leandro Toledo"
     title = "Teste"
@@ -64,7 +64,7 @@ class Space:
     audio_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestAudioWithoutRequest:
+class TestAudioWithoutRequest(TestAudioBase):
     def test_slot_behaviour(self, audio, mro_slots):
         for attr in audio.__slots__:
             assert getattr(audio, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -79,38 +79,38 @@ class TestAudioWithoutRequest:
         assert audio.file_unique_id != ""
 
     def test_expected_values(self, audio):
-        assert audio.duration == Space.duration
+        assert audio.duration == self.duration
         assert audio.performer is None
         assert audio.title is None
-        assert audio.mime_type == Space.mime_type
-        assert audio.file_size == Space.file_size
-        assert audio.thumb.file_size == Space.thumb_file_size
-        assert audio.thumb.width == Space.thumb_width
-        assert audio.thumb.height == Space.thumb_height
+        assert audio.mime_type == self.mime_type
+        assert audio.file_size == self.file_size
+        assert audio.thumb.file_size == self.thumb_file_size
+        assert audio.thumb.width == self.thumb_width
+        assert audio.thumb.height == self.thumb_height
 
     def test_de_json(self, bot, audio):
         json_dict = {
-            "file_id": Space.audio_file_id,
-            "file_unique_id": Space.audio_file_unique_id,
-            "duration": Space.duration,
-            "performer": Space.performer,
-            "title": Space.title,
-            "file_name": Space.file_name,
-            "mime_type": Space.mime_type,
-            "file_size": Space.file_size,
+            "file_id": self.audio_file_id,
+            "file_unique_id": self.audio_file_unique_id,
+            "duration": self.duration,
+            "performer": self.performer,
+            "title": self.title,
+            "file_name": self.file_name,
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
             "thumb": audio.thumb.to_dict(),
         }
         json_audio = Audio.de_json(json_dict, bot)
         assert json_audio.api_kwargs == {}
 
-        assert json_audio.file_id == Space.audio_file_id
-        assert json_audio.file_unique_id == Space.audio_file_unique_id
-        assert json_audio.duration == Space.duration
-        assert json_audio.performer == Space.performer
-        assert json_audio.title == Space.title
-        assert json_audio.file_name == Space.file_name
-        assert json_audio.mime_type == Space.mime_type
-        assert json_audio.file_size == Space.file_size
+        assert json_audio.file_id == self.audio_file_id
+        assert json_audio.file_unique_id == self.audio_file_unique_id
+        assert json_audio.duration == self.duration
+        assert json_audio.performer == self.performer
+        assert json_audio.title == self.title
+        assert json_audio.file_name == self.file_name
+        assert json_audio.mime_type == self.mime_type
+        assert json_audio.file_size == self.file_size
         assert json_audio.thumb == audio.thumb
 
     def test_to_dict(self, audio):
@@ -194,37 +194,37 @@ class TestAudioWithoutRequest:
         assert await audio.get_file()
 
 
-class TestAudioWithRequest:
+class TestAudioWithRequest(TestAudioBase):
     async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
         message = await bot.send_audio(
             chat_id,
             audio=audio_file,
-            caption=Space.caption,
-            duration=Space.duration,
-            performer=Space.performer,
-            title=Space.title,
+            caption=self.caption,
+            duration=self.duration,
+            performer=self.performer,
+            title=self.title,
             disable_notification=False,
             protect_content=True,
             parse_mode="Markdown",
             thumb=thumb_file,
         )
 
-        assert message.caption == Space.caption.replace("*", "")
+        assert message.caption == self.caption.replace("*", "")
 
         assert isinstance(message.audio, Audio)
         assert isinstance(message.audio.file_id, str)
         assert isinstance(message.audio.file_unique_id, str)
         assert message.audio.file_unique_id is not None
         assert message.audio.file_id is not None
-        assert message.audio.duration == Space.duration
-        assert message.audio.performer == Space.performer
-        assert message.audio.title == Space.title
-        assert message.audio.file_name == Space.file_name
-        assert message.audio.mime_type == Space.mime_type
-        assert message.audio.file_size == Space.file_size
-        assert message.audio.thumb.file_size == Space.thumb_file_size
-        assert message.audio.thumb.width == Space.thumb_width
-        assert message.audio.thumb.height == Space.thumb_height
+        assert message.audio.duration == self.duration
+        assert message.audio.performer == self.performer
+        assert message.audio.title == self.title
+        assert message.audio.file_name == self.file_name
+        assert message.audio.mime_type == self.mime_type
+        assert message.audio.file_size == self.file_size
+        assert message.audio.thumb.file_size == self.thumb_file_size
+        assert message.audio.thumb.width == self.thumb_width
+        assert message.audio.thumb.height == self.thumb_height
         assert message.has_protected_content
 
     async def test_get_and_download(self, bot, chat_id, audio):
@@ -235,7 +235,7 @@ class TestAudioWithRequest:
         audio = (await bot.send_audio(chat_id, audio.file_id, read_timeout=50)).audio
         new_file = await bot.get_file(audio.file_id)
 
-        assert new_file.file_size == Space.file_size
+        assert new_file.file_size == self.file_size
         assert new_file.file_id == audio.file_id
         assert new_file.file_unique_id == audio.file_unique_id
         assert str(new_file.file_path).startswith("https://")
@@ -245,10 +245,10 @@ class TestAudioWithRequest:
 
     async def test_send_mp3_url_file(self, bot, chat_id, audio):
         message = await bot.send_audio(
-            chat_id=chat_id, audio=Space.audio_file_url, caption=Space.caption
+            chat_id=chat_id, audio=self.audio_file_url, caption=self.caption
         )
 
-        assert message.caption == Space.caption
+        assert message.caption == self.caption
 
         assert isinstance(message.audio, Audio)
         assert isinstance(message.audio.file_id, str)

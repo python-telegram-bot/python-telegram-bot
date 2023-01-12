@@ -24,15 +24,15 @@ from telegram import InlineKeyboardButton, KeyboardButton, KeyboardButtonPollTyp
 @pytest.fixture(scope="module")
 def keyboard_button():
     return KeyboardButton(
-        Space.text,
-        request_location=Space.request_location,
-        request_contact=Space.request_contact,
-        request_poll=Space.request_poll,
-        web_app=Space.web_app,
+        TestKeyboardButtonBase.text,
+        request_location=TestKeyboardButtonBase.request_location,
+        request_contact=TestKeyboardButtonBase.request_contact,
+        request_poll=TestKeyboardButtonBase.request_poll,
+        web_app=TestKeyboardButtonBase.web_app,
     )
 
 
-class Space:
+class TestKeyboardButtonBase:
     text = "text"
     request_location = True
     request_contact = True
@@ -40,7 +40,7 @@ class Space:
     web_app = WebAppInfo(url="https://example.com")
 
 
-class TestKeyboardButtonWithoutRequest:
+class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
     def test_slot_behaviour(self, keyboard_button, mro_slots):
         inst = keyboard_button
         for attr in inst.__slots__:
@@ -48,11 +48,11 @@ class TestKeyboardButtonWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, keyboard_button):
-        assert keyboard_button.text == Space.text
-        assert keyboard_button.request_location == Space.request_location
-        assert keyboard_button.request_contact == Space.request_contact
-        assert keyboard_button.request_poll == Space.request_poll
-        assert keyboard_button.web_app == Space.web_app
+        assert keyboard_button.text == self.text
+        assert keyboard_button.request_location == self.request_location
+        assert keyboard_button.request_contact == self.request_contact
+        assert keyboard_button.request_poll == self.request_poll
+        assert keyboard_button.web_app == self.web_app
 
     def test_to_dict(self, keyboard_button):
         keyboard_button_dict = keyboard_button.to_dict()
@@ -66,20 +66,20 @@ class TestKeyboardButtonWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "text": Space.text,
-            "request_location": Space.request_location,
-            "request_contact": Space.request_contact,
-            "request_poll": Space.request_poll.to_dict(),
-            "web_app": Space.web_app.to_dict(),
+            "text": self.text,
+            "request_location": self.request_location,
+            "request_contact": self.request_contact,
+            "request_poll": self.request_poll.to_dict(),
+            "web_app": self.web_app.to_dict(),
         }
 
         inline_keyboard_button = KeyboardButton.de_json(json_dict, None)
         assert inline_keyboard_button.api_kwargs == {}
-        assert inline_keyboard_button.text == Space.text
-        assert inline_keyboard_button.request_location == Space.request_location
-        assert inline_keyboard_button.request_contact == Space.request_contact
-        assert inline_keyboard_button.request_poll == Space.request_poll
-        assert inline_keyboard_button.web_app == Space.web_app
+        assert inline_keyboard_button.text == self.text
+        assert inline_keyboard_button.request_location == self.request_location
+        assert inline_keyboard_button.request_contact == self.request_contact
+        assert inline_keyboard_button.request_poll == self.request_poll
+        assert inline_keyboard_button.web_app == self.web_app
 
         none = KeyboardButton.de_json({}, None)
         assert none is None

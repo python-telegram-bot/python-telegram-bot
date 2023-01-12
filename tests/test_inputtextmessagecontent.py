@@ -25,21 +25,21 @@ from telegram.constants import ParseMode
 @pytest.fixture(scope="module")
 def input_text_message_content():
     return InputTextMessageContent(
-        Space.message_text,
-        parse_mode=Space.parse_mode,
-        entities=Space.entities,
-        disable_web_page_preview=Space.disable_web_page_preview,
+        TestInputTextMessageContentBase.message_text,
+        parse_mode=TestInputTextMessageContentBase.parse_mode,
+        entities=TestInputTextMessageContentBase.entities,
+        disable_web_page_preview=TestInputTextMessageContentBase.disable_web_page_preview,
     )
 
 
-class Space:
+class TestInputTextMessageContentBase:
     message_text = "*message text*"
     parse_mode = ParseMode.MARKDOWN
     entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     disable_web_page_preview = True
 
 
-class TestInputTextMessageContentWithoutRequest:
+class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase):
     def test_slot_behaviour(self, input_text_message_content, mro_slots):
         inst = input_text_message_content
         for attr in inst.__slots__:
@@ -47,12 +47,10 @@ class TestInputTextMessageContentWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_text_message_content):
-        assert input_text_message_content.parse_mode == Space.parse_mode
-        assert input_text_message_content.message_text == Space.message_text
-        assert (
-            input_text_message_content.disable_web_page_preview == Space.disable_web_page_preview
-        )
-        assert input_text_message_content.entities == tuple(Space.entities)
+        assert input_text_message_content.parse_mode == self.parse_mode
+        assert input_text_message_content.message_text == self.message_text
+        assert input_text_message_content.disable_web_page_preview == self.disable_web_page_preview
+        assert input_text_message_content.entities == tuple(self.entities)
 
     def test_entities_always_tuple(self):
         input_text_message_content = InputTextMessageContent("text")

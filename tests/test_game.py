@@ -25,18 +25,18 @@ from telegram import Animation, Game, MessageEntity, PhotoSize
 @pytest.fixture(scope="module")
 def game():
     game = Game(
-        Space.title,
-        Space.description,
-        Space.photo,
-        text=Space.text,
-        text_entities=Space.text_entities,
-        animation=Space.animation,
+        TestGameBase.title,
+        TestGameBase.description,
+        TestGameBase.photo,
+        text=TestGameBase.text,
+        text_entities=TestGameBase.text_entities,
+        animation=TestGameBase.animation,
     )
     game._unfreeze()
     return game
 
 
-class Space:
+class TestGameBase:
     title = "Python-telegram-bot Test Game"
     description = "description"
     photo = [PhotoSize("Blah", "ElseBlah", 640, 360, file_size=0)]
@@ -48,7 +48,7 @@ class Space:
     animation = Animation("blah", "unique_id", 320, 180, 1)
 
 
-class TestGameWithoutRequest:
+class TestGameWithoutRequest(TestGameBase):
     def test_slot_behaviour(self, game, mro_slots):
         for attr in game.__slots__:
             assert getattr(game, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -56,35 +56,35 @@ class TestGameWithoutRequest:
 
     def test_de_json_required(self, bot):
         json_dict = {
-            "title": Space.title,
-            "description": Space.description,
-            "photo": [Space.photo[0].to_dict()],
+            "title": self.title,
+            "description": self.description,
+            "photo": [self.photo[0].to_dict()],
         }
         game = Game.de_json(json_dict, bot)
         assert game.api_kwargs == {}
 
-        assert game.title == Space.title
-        assert game.description == Space.description
-        assert game.photo == tuple(Space.photo)
+        assert game.title == self.title
+        assert game.description == self.description
+        assert game.photo == tuple(self.photo)
 
     def test_de_json_all(self, bot):
         json_dict = {
-            "title": Space.title,
-            "description": Space.description,
-            "photo": [Space.photo[0].to_dict()],
-            "text": Space.text,
-            "text_entities": [Space.text_entities[0].to_dict()],
-            "animation": Space.animation.to_dict(),
+            "title": self.title,
+            "description": self.description,
+            "photo": [self.photo[0].to_dict()],
+            "text": self.text,
+            "text_entities": [self.text_entities[0].to_dict()],
+            "animation": self.animation.to_dict(),
         }
         game = Game.de_json(json_dict, bot)
         assert game.api_kwargs == {}
 
-        assert game.title == Space.title
-        assert game.description == Space.description
-        assert game.photo == tuple(Space.photo)
-        assert game.text == Space.text
-        assert game.text_entities == tuple(Space.text_entities)
-        assert game.animation == Space.animation
+        assert game.title == self.title
+        assert game.description == self.description
+        assert game.photo == tuple(self.photo)
+        assert game.text == self.text
+        assert game.text_entities == tuple(self.text_entities)
+        assert game.animation == self.animation
 
     def test_to_dict(self, game):
         game_dict = game.to_dict()

@@ -30,19 +30,19 @@ from tests.auxil.bot_method_checks import (
 @pytest.fixture(scope="module")
 def pre_checkout_query(bot):
     pcq = PreCheckoutQuery(
-        Space.id_,
-        Space.from_user,
-        Space.currency,
-        Space.total_amount,
-        Space.invoice_payload,
-        shipping_option_id=Space.shipping_option_id,
-        order_info=Space.order_info,
+        TestPreCheckoutQueryBase.id_,
+        TestPreCheckoutQueryBase.from_user,
+        TestPreCheckoutQueryBase.currency,
+        TestPreCheckoutQueryBase.total_amount,
+        TestPreCheckoutQueryBase.invoice_payload,
+        shipping_option_id=TestPreCheckoutQueryBase.shipping_option_id,
+        order_info=TestPreCheckoutQueryBase.order_info,
     )
     pcq.set_bot(bot)
     return pcq
 
 
-class Space:
+class TestPreCheckoutQueryBase:
     id_ = 5
     invoice_payload = "invoice_payload"
     shipping_option_id = "shipping_option_id"
@@ -52,7 +52,7 @@ class Space:
     order_info = OrderInfo()
 
 
-class TestPreCheckoutQueryWithoutRequest:
+class TestPreCheckoutQueryWithoutRequest(TestPreCheckoutQueryBase):
     def test_slot_behaviour(self, pre_checkout_query, mro_slots):
         inst = pre_checkout_query
         for attr in inst.__slots__:
@@ -61,24 +61,24 @@ class TestPreCheckoutQueryWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "id": Space.id_,
-            "invoice_payload": Space.invoice_payload,
-            "shipping_option_id": Space.shipping_option_id,
-            "currency": Space.currency,
-            "total_amount": Space.total_amount,
-            "from": Space.from_user.to_dict(),
-            "order_info": Space.order_info.to_dict(),
+            "id": self.id_,
+            "invoice_payload": self.invoice_payload,
+            "shipping_option_id": self.shipping_option_id,
+            "currency": self.currency,
+            "total_amount": self.total_amount,
+            "from": self.from_user.to_dict(),
+            "order_info": self.order_info.to_dict(),
         }
         pre_checkout_query = PreCheckoutQuery.de_json(json_dict, bot)
         assert pre_checkout_query.api_kwargs == {}
 
         assert pre_checkout_query.get_bot() is bot
-        assert pre_checkout_query.id == Space.id_
-        assert pre_checkout_query.invoice_payload == Space.invoice_payload
-        assert pre_checkout_query.shipping_option_id == Space.shipping_option_id
-        assert pre_checkout_query.currency == Space.currency
-        assert pre_checkout_query.from_user == Space.from_user
-        assert pre_checkout_query.order_info == Space.order_info
+        assert pre_checkout_query.id == self.id_
+        assert pre_checkout_query.invoice_payload == self.invoice_payload
+        assert pre_checkout_query.shipping_option_id == self.shipping_option_id
+        assert pre_checkout_query.currency == self.currency
+        assert pre_checkout_query.from_user == self.from_user
+        assert pre_checkout_query.order_info == self.order_info
 
     def test_to_dict(self, pre_checkout_query):
         pre_checkout_query_dict = pre_checkout_query.to_dict()
@@ -95,16 +95,16 @@ class TestPreCheckoutQueryWithoutRequest:
 
     def test_equality(self):
         a = PreCheckoutQuery(
-            Space.id_, Space.from_user, Space.currency, Space.total_amount, Space.invoice_payload
+            self.id_, self.from_user, self.currency, self.total_amount, self.invoice_payload
         )
         b = PreCheckoutQuery(
-            Space.id_, Space.from_user, Space.currency, Space.total_amount, Space.invoice_payload
+            self.id_, self.from_user, self.currency, self.total_amount, self.invoice_payload
         )
-        c = PreCheckoutQuery(Space.id_, None, "", 0, "")
+        c = PreCheckoutQuery(self.id_, None, "", 0, "")
         d = PreCheckoutQuery(
-            0, Space.from_user, Space.currency, Space.total_amount, Space.invoice_payload
+            0, self.from_user, self.currency, self.total_amount, self.invoice_payload
         )
-        e = Update(Space.id_)
+        e = Update(self.id_)
 
         assert a == b
         assert hash(a) == hash(b)

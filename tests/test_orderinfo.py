@@ -23,17 +23,22 @@ from telegram import OrderInfo, ShippingAddress
 
 @pytest.fixture(scope="module")
 def order_info():
-    return OrderInfo(Space.name, Space.phone_number, Space.email, Space.shipping_address)
+    return OrderInfo(
+        TestOrderInfoBase.name,
+        TestOrderInfoBase.phone_number,
+        TestOrderInfoBase.email,
+        TestOrderInfoBase.shipping_address,
+    )
 
 
-class Space:
+class TestOrderInfoBase:
     name = "name"
     phone_number = "phone_number"
     email = "email"
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
 
-class TestOrderInfoWithoutRequest:
+class TestOrderInfoWithoutRequest(TestOrderInfoBase):
     def test_slot_behaviour(self, order_info, mro_slots):
         for attr in order_info.__slots__:
             assert getattr(order_info, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -41,18 +46,18 @@ class TestOrderInfoWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "name": Space.name,
-            "phone_number": Space.phone_number,
-            "email": Space.email,
-            "shipping_address": Space.shipping_address.to_dict(),
+            "name": self.name,
+            "phone_number": self.phone_number,
+            "email": self.email,
+            "shipping_address": self.shipping_address.to_dict(),
         }
         order_info = OrderInfo.de_json(json_dict, bot)
         assert order_info.api_kwargs == {}
 
-        assert order_info.name == Space.name
-        assert order_info.phone_number == Space.phone_number
-        assert order_info.email == Space.email
-        assert order_info.shipping_address == Space.shipping_address
+        assert order_info.name == self.name
+        assert order_info.phone_number == self.phone_number
+        assert order_info.email == self.email
+        assert order_info.shipping_address == self.shipping_address
 
     def test_to_dict(self, order_info):
         order_info_dict = order_info.to_dict()

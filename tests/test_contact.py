@@ -28,44 +28,49 @@ from telegram.request import RequestData
 
 @pytest.fixture(scope="module")
 def contact():
-    return Contact(Space.phone_number, Space.first_name, Space.last_name, Space.user_id)
+    return Contact(
+        TestContactBase.phone_number,
+        TestContactBase.first_name,
+        TestContactBase.last_name,
+        TestContactBase.user_id,
+    )
 
 
-class Space:
+class TestContactBase:
     phone_number = "+11234567890"
     first_name = "Leandro"
     last_name = "Toledo"
     user_id = 23
 
 
-class TestContactWithoutRequest:
+class TestContactWithoutRequest(TestContactBase):
     def test_slot_behaviour(self, contact, mro_slots):
         for attr in contact.__slots__:
             assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(contact)) == len(set(mro_slots(contact))), "duplicate slot"
 
     def test_de_json_required(self, bot):
-        json_dict = {"phone_number": Space.phone_number, "first_name": Space.first_name}
+        json_dict = {"phone_number": self.phone_number, "first_name": self.first_name}
         contact = Contact.de_json(json_dict, bot)
         assert contact.api_kwargs == {}
 
-        assert contact.phone_number == Space.phone_number
-        assert contact.first_name == Space.first_name
+        assert contact.phone_number == self.phone_number
+        assert contact.first_name == self.first_name
 
     def test_de_json_all(self, bot):
         json_dict = {
-            "phone_number": Space.phone_number,
-            "first_name": Space.first_name,
-            "last_name": Space.last_name,
-            "user_id": Space.user_id,
+            "phone_number": self.phone_number,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "user_id": self.user_id,
         }
         contact = Contact.de_json(json_dict, bot)
         assert contact.api_kwargs == {}
 
-        assert contact.phone_number == Space.phone_number
-        assert contact.first_name == Space.first_name
-        assert contact.last_name == Space.last_name
-        assert contact.user_id == Space.user_id
+        assert contact.phone_number == self.phone_number
+        assert contact.first_name == self.first_name
+        assert contact.last_name == self.last_name
+        assert contact.user_id == self.user_id
 
     def test_to_dict(self, contact):
         contact_dict = contact.to_dict()
@@ -77,10 +82,10 @@ class TestContactWithoutRequest:
         assert contact_dict["user_id"] == contact.user_id
 
     def test_equality(self):
-        a = Contact(Space.phone_number, Space.first_name)
-        b = Contact(Space.phone_number, Space.first_name)
-        c = Contact(Space.phone_number, "")
-        d = Contact("", Space.first_name)
+        a = Contact(self.phone_number, self.first_name)
+        b = Contact(self.phone_number, self.first_name)
+        c = Contact(self.phone_number, "")
+        d = Contact("", self.first_name)
         e = Voice("", "unique_id", 0)
 
         assert a == b
@@ -121,7 +126,7 @@ class TestContactWithoutRequest:
         assert await bot.send_contact(contact=contact, chat_id=chat_id)
 
 
-class TestContactWithRequest:
+class TestContactWithRequest(TestContactBase):
     @pytest.mark.parametrize(
         "default_bot,custom",
         [

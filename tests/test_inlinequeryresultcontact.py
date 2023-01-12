@@ -30,19 +30,19 @@ from telegram import (
 @pytest.fixture(scope="module")
 def inline_query_result_contact():
     return InlineQueryResultContact(
-        Space.id_,
-        Space.phone_number,
-        Space.first_name,
-        last_name=Space.last_name,
-        thumb_url=Space.thumb_url,
-        thumb_width=Space.thumb_width,
-        thumb_height=Space.thumb_height,
-        input_message_content=Space.input_message_content,
-        reply_markup=Space.reply_markup,
+        TestInlineQueryResultContactBase.id_,
+        TestInlineQueryResultContactBase.phone_number,
+        TestInlineQueryResultContactBase.first_name,
+        last_name=TestInlineQueryResultContactBase.last_name,
+        thumb_url=TestInlineQueryResultContactBase.thumb_url,
+        thumb_width=TestInlineQueryResultContactBase.thumb_width,
+        thumb_height=TestInlineQueryResultContactBase.thumb_height,
+        input_message_content=TestInlineQueryResultContactBase.input_message_content,
+        reply_markup=TestInlineQueryResultContactBase.reply_markup,
     )
 
 
-class Space:
+class TestInlineQueryResultContactBase:
     id_ = "id"
     type_ = "contact"
     phone_number = "phone_number"
@@ -55,7 +55,7 @@ class Space:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultContactWithoutRequest:
+class TestInlineQueryResultContactWithoutRequest(TestInlineQueryResultContactBase):
     def test_slot_behaviour(self, inline_query_result_contact, mro_slots):
         inst = inline_query_result_contact
         for attr in inst.__slots__:
@@ -63,19 +63,19 @@ class TestInlineQueryResultContactWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_contact):
-        assert inline_query_result_contact.id == Space.id_
-        assert inline_query_result_contact.type == Space.type_
-        assert inline_query_result_contact.phone_number == Space.phone_number
-        assert inline_query_result_contact.first_name == Space.first_name
-        assert inline_query_result_contact.last_name == Space.last_name
-        assert inline_query_result_contact.thumb_url == Space.thumb_url
-        assert inline_query_result_contact.thumb_width == Space.thumb_width
-        assert inline_query_result_contact.thumb_height == Space.thumb_height
+        assert inline_query_result_contact.id == self.id_
+        assert inline_query_result_contact.type == self.type_
+        assert inline_query_result_contact.phone_number == self.phone_number
+        assert inline_query_result_contact.first_name == self.first_name
+        assert inline_query_result_contact.last_name == self.last_name
+        assert inline_query_result_contact.thumb_url == self.thumb_url
+        assert inline_query_result_contact.thumb_width == self.thumb_width
+        assert inline_query_result_contact.thumb_height == self.thumb_height
         assert (
             inline_query_result_contact.input_message_content.to_dict()
-            == Space.input_message_content.to_dict()
+            == self.input_message_content.to_dict()
         )
-        assert inline_query_result_contact.reply_markup.to_dict() == Space.reply_markup.to_dict()
+        assert inline_query_result_contact.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_contact):
         inline_query_result_contact_dict = inline_query_result_contact.to_dict()
@@ -115,11 +115,11 @@ class TestInlineQueryResultContactWithoutRequest:
         )
 
     def test_equality(self):
-        a = InlineQueryResultContact(Space.id_, Space.phone_number, Space.first_name)
-        b = InlineQueryResultContact(Space.id_, Space.phone_number, Space.first_name)
-        c = InlineQueryResultContact(Space.id_, "", Space.first_name)
-        d = InlineQueryResultContact("", Space.phone_number, Space.first_name)
-        e = InlineQueryResultVoice(Space.id_, "", "")
+        a = InlineQueryResultContact(self.id_, self.phone_number, self.first_name)
+        b = InlineQueryResultContact(self.id_, self.phone_number, self.first_name)
+        c = InlineQueryResultContact(self.id_, "", self.first_name)
+        d = InlineQueryResultContact("", self.phone_number, self.first_name)
+        e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

@@ -23,15 +23,15 @@ from telegram import ReplyKeyboardRemove
 
 @pytest.fixture(scope="module")
 def reply_keyboard_remove():
-    return ReplyKeyboardRemove(selective=Space.selective)
+    return ReplyKeyboardRemove(selective=TestReplyKeyboardRemoveBase.selective)
 
 
-class Space:
+class TestReplyKeyboardRemoveBase:
     remove_keyboard = True
     selective = True
 
 
-class TestReplyKeyboardRemoveWithoutRequest:
+class TestReplyKeyboardRemoveWithoutRequest(TestReplyKeyboardRemoveBase):
     def test_slot_behaviour(self, reply_keyboard_remove, mro_slots):
         inst = reply_keyboard_remove
         for attr in inst.__slots__:
@@ -39,8 +39,8 @@ class TestReplyKeyboardRemoveWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, reply_keyboard_remove):
-        assert reply_keyboard_remove.remove_keyboard == Space.remove_keyboard
-        assert reply_keyboard_remove.selective == Space.selective
+        assert reply_keyboard_remove.remove_keyboard == self.remove_keyboard
+        assert reply_keyboard_remove.selective == self.selective
 
     def test_to_dict(self, reply_keyboard_remove):
         reply_keyboard_remove_dict = reply_keyboard_remove.to_dict()
@@ -51,7 +51,7 @@ class TestReplyKeyboardRemoveWithoutRequest:
         assert reply_keyboard_remove_dict["selective"] == reply_keyboard_remove.selective
 
 
-class TestReplyKeyboardRemoveWithRequest:
+class TestReplyKeyboardRemoveWithRequest(TestReplyKeyboardRemoveBase):
     async def test_send_message_with_reply_keyboard_remove(
         self, bot, chat_id, reply_keyboard_remove
     ):

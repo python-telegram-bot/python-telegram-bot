@@ -28,15 +28,15 @@ from telegram.request import RequestData
 @pytest.fixture(scope="module")
 def invoice():
     return Invoice(
-        Space.title,
-        Space.description,
-        Space.start_parameter,
-        Space.currency,
-        Space.total_amount,
+        TestInvoiceBase.title,
+        TestInvoiceBase.description,
+        TestInvoiceBase.start_parameter,
+        TestInvoiceBase.currency,
+        TestInvoiceBase.total_amount,
     )
 
 
-class Space:
+class TestInvoiceBase:
     payload = "payload"
     prices = [LabeledPrice("Fish", 100), LabeledPrice("Fish Tax", 1000)]
     provider_data = """{"test":"test"}"""
@@ -49,7 +49,7 @@ class Space:
     suggested_tip_amounts = [13, 42]
 
 
-class TestInvoiceWithoutRequest:
+class TestInvoiceWithoutRequest(TestInvoiceBase):
     def test_slot_behaviour(self, invoice, mro_slots):
         for attr in invoice.__slots__:
             assert getattr(invoice, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -58,21 +58,21 @@ class TestInvoiceWithoutRequest:
     def test_de_json(self, bot):
         invoice_json = Invoice.de_json(
             {
-                "title": Space.title,
-                "description": Space.description,
-                "start_parameter": Space.start_parameter,
-                "currency": Space.currency,
-                "total_amount": Space.total_amount,
+                "title": self.title,
+                "description": self.description,
+                "start_parameter": self.start_parameter,
+                "currency": self.currency,
+                "total_amount": self.total_amount,
             },
             bot,
         )
         assert invoice_json.api_kwargs == {}
 
-        assert invoice_json.title == Space.title
-        assert invoice_json.description == Space.description
-        assert invoice_json.start_parameter == Space.start_parameter
-        assert invoice_json.currency == Space.currency
-        assert invoice_json.total_amount == Space.total_amount
+        assert invoice_json.title == self.title
+        assert invoice_json.description == self.description
+        assert invoice_json.start_parameter == self.start_parameter
+        assert invoice_json.currency == self.currency
+        assert invoice_json.total_amount == self.total_amount
 
     def test_to_dict(self, invoice):
         invoice_dict = invoice.to_dict()
@@ -156,14 +156,14 @@ class TestInvoiceWithoutRequest:
 
         assert await bot.send_invoice(
             chat_id,
-            Space.title,
-            Space.description,
-            Space.payload,
+            self.title,
+            self.description,
+            self.payload,
             provider_token,
-            Space.currency,
-            Space.prices,
+            self.currency,
+            self.prices,
             provider_data={"test_data": 123456789},
-            start_parameter=Space.start_parameter,
+            start_parameter=self.start_parameter,
         )
 
     def test_equality(self):
@@ -182,36 +182,36 @@ class TestInvoiceWithoutRequest:
         assert hash(a) != hash(d)
 
 
-class TestInvoiceWithRequest:
+class TestInvoiceWithRequest(TestInvoiceBase):
     async def test_send_required_args_only(self, bot, chat_id, provider_token):
         send_inv_task = asyncio.create_task(
             bot.send_invoice(
                 chat_id=chat_id,
-                title=Space.title,
-                description=Space.description,
-                payload=Space.payload,
+                title=self.title,
+                description=self.description,
+                payload=self.payload,
                 provider_token=provider_token,
-                currency=Space.currency,
-                prices=Space.prices,
+                currency=self.currency,
+                prices=self.prices,
             )
         )
         create_inv_link_task = asyncio.create_task(
             bot.create_invoice_link(
-                title=Space.title,
-                description=Space.description,
-                payload=Space.payload,
+                title=self.title,
+                description=self.description,
+                payload=self.payload,
                 provider_token=provider_token,
-                currency=Space.currency,
-                prices=Space.prices,
+                currency=self.currency,
+                prices=self.prices,
             )
         )
 
         message = await send_inv_task
-        assert message.invoice.currency == Space.currency
+        assert message.invoice.currency == self.currency
         assert message.invoice.start_parameter == ""
-        assert message.invoice.description == Space.description
-        assert message.invoice.title == Space.title
-        assert message.invoice.total_amount == Space.total_amount
+        assert message.invoice.description == self.description
+        assert message.invoice.title == self.title
+        assert message.invoice.total_amount == self.total_amount
 
         link = await create_inv_link_task
         assert isinstance(link, str)
@@ -226,12 +226,12 @@ class TestInvoiceWithRequest:
             *(
                 default_bot.send_invoice(
                     chat_id,
-                    Space.title,
-                    Space.description,
-                    Space.payload,
+                    self.title,
+                    self.description,
+                    self.payload,
                     provider_token,
-                    Space.currency,
-                    Space.prices,
+                    self.currency,
+                    self.prices,
                     **i,
                 )
                 for i in ({}, {"protect_content": False})
@@ -258,12 +258,12 @@ class TestInvoiceWithRequest:
         if custom is not None:
             message = await default_bot.send_invoice(
                 chat_id,
-                Space.title,
-                Space.description,
-                Space.payload,
+                self.title,
+                self.description,
+                self.payload,
                 provider_token,
-                Space.currency,
-                Space.prices,
+                self.currency,
+                self.prices,
                 allow_sending_without_reply=custom,
                 reply_to_message_id=reply_to_message.message_id,
             )
@@ -271,12 +271,12 @@ class TestInvoiceWithRequest:
         elif default_bot.defaults.allow_sending_without_reply:
             message = await default_bot.send_invoice(
                 chat_id,
-                Space.title,
-                Space.description,
-                Space.payload,
+                self.title,
+                self.description,
+                self.payload,
                 provider_token,
-                Space.currency,
-                Space.prices,
+                self.currency,
+                self.prices,
                 reply_to_message_id=reply_to_message.message_id,
             )
             assert message.reply_to_message is None
@@ -284,28 +284,28 @@ class TestInvoiceWithRequest:
             with pytest.raises(BadRequest, match="message not found"):
                 await default_bot.send_invoice(
                     chat_id,
-                    Space.title,
-                    Space.description,
-                    Space.payload,
+                    self.title,
+                    self.description,
+                    self.payload,
                     provider_token,
-                    Space.currency,
-                    Space.prices,
+                    self.currency,
+                    self.prices,
                     reply_to_message_id=reply_to_message.message_id,
                 )
 
     async def test_send_all_args_send_invoice(self, bot, chat_id, provider_token):
         message = await bot.send_invoice(
             chat_id,
-            Space.title,
-            Space.description,
-            Space.payload,
+            self.title,
+            self.description,
+            self.payload,
             provider_token,
-            Space.currency,
-            Space.prices,
-            max_tip_amount=Space.max_tip_amount,
-            suggested_tip_amounts=Space.suggested_tip_amounts,
-            start_parameter=Space.start_parameter,
-            provider_data=Space.provider_data,
+            self.currency,
+            self.prices,
+            max_tip_amount=self.max_tip_amount,
+            suggested_tip_amounts=self.suggested_tip_amounts,
+            start_parameter=self.start_parameter,
+            provider_data=self.provider_data,
             photo_url="https://raw.githubusercontent.com/"
             "python-telegram-bot/logos/master/logo/png/ptb-logo_240.png",
             photo_size=240,
@@ -323,5 +323,5 @@ class TestInvoiceWithRequest:
         )
 
         for attr in message.invoice.__slots__:
-            assert getattr(message.invoice, attr) == getattr(Space, attr)
+            assert getattr(message.invoice, attr) == getattr(self, attr)
         assert message.has_protected_content

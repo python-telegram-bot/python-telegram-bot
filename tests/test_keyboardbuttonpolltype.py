@@ -23,14 +23,14 @@ from telegram import KeyboardButtonPollType, Poll
 
 @pytest.fixture(scope="module")
 def keyboard_button_poll_type():
-    return KeyboardButtonPollType(Space.type)
+    return KeyboardButtonPollType(TestKeyboardButtonPollTypeBase.type)
 
 
-class Space:
+class TestKeyboardButtonPollTypeBase:
     type = Poll.QUIZ
 
 
-class TestKeyboardButtonPollTypeWithoutRequest:
+class TestKeyboardButtonPollTypeWithoutRequest(TestKeyboardButtonPollTypeBase):
     def test_slot_behaviour(self, keyboard_button_poll_type, mro_slots):
         inst = keyboard_button_poll_type
         for attr in inst.__slots__:
@@ -40,7 +40,7 @@ class TestKeyboardButtonPollTypeWithoutRequest:
     def test_to_dict(self, keyboard_button_poll_type):
         keyboard_button_poll_type_dict = keyboard_button_poll_type.to_dict()
         assert isinstance(keyboard_button_poll_type_dict, dict)
-        assert keyboard_button_poll_type_dict["type"] == Space.type
+        assert keyboard_button_poll_type_dict["type"] == self.type
 
     def test_equality(self):
         a = KeyboardButtonPollType(Poll.QUIZ)

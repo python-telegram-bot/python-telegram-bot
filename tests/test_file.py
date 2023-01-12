@@ -30,10 +30,10 @@ from tests.conftest import data_file
 @pytest.fixture(scope="module")
 def file(bot):
     file = File(
-        Space.file_id,
-        Space.file_unique_id,
-        file_path=Space.file_path,
-        file_size=Space.file_size,
+        TestFileBase.file_id,
+        TestFileBase.file_unique_id,
+        file_path=TestFileBase.file_path,
+        file_size=TestFileBase.file_size,
     )
     file.set_bot(bot)
     file._unfreeze()
@@ -49,7 +49,12 @@ def encrypted_file(bot):
         "Oq3G4sX+bKZthoyms1YlPqvWou9esb+z0Bi/KqQUG8s=",
         "Pt7fKPgYWKA/7a8E64Ea1X8C+Wf7Ky1tF4ANBl63vl4=",
     )
-    ef = File(Space.file_id, Space.file_unique_id, Space.file_size, Space.file_path)
+    ef = File(
+        TestFileBase.file_id,
+        TestFileBase.file_unique_id,
+        TestFileBase.file_size,
+        TestFileBase.file_path,
+    )
     ef.set_bot(bot)
     ef.set_credentials(fc)
     return ef
@@ -63,9 +68,9 @@ def encrypted_local_file(bot):
         "Pt7fKPgYWKA/7a8E64Ea1X8C+Wf7Ky1tF4ANBl63vl4=",
     )
     ef = File(
-        Space.file_id,
-        Space.file_unique_id,
-        Space.file_size,
+        TestFileBase.file_id,
+        TestFileBase.file_unique_id,
+        TestFileBase.file_size,
         file_path=str(data_file("image_encrypted.jpg")),
     )
     ef.set_bot(bot)
@@ -76,16 +81,16 @@ def encrypted_local_file(bot):
 @pytest.fixture(scope="module")
 def local_file(bot):
     file = File(
-        Space.file_id,
-        Space.file_unique_id,
+        TestFileBase.file_id,
+        TestFileBase.file_unique_id,
         file_path=str(data_file("local_file.txt")),
-        file_size=Space.file_size,
+        file_size=TestFileBase.file_size,
     )
     file.set_bot(bot)
     return file
 
 
-class Space:
+class TestFileBase:
     file_id = "NOTVALIDDOESNOTMATTER"
     file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     file_path = (
@@ -95,7 +100,7 @@ class Space:
     file_content = "Saint-Saëns".encode()  # Intentionally contains unicode chars.
 
 
-class TestFileWithoutRequest:
+class TestFileWithoutRequest(TestFileBase):
     def test_slot_behaviour(self, file, mro_slots):
         for attr in file.__slots__:
             assert getattr(file, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -103,18 +108,18 @@ class TestFileWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "file_id": Space.file_id,
-            "file_unique_id": Space.file_unique_id,
-            "file_path": Space.file_path,
-            "file_size": Space.file_size,
+            "file_id": self.file_id,
+            "file_unique_id": self.file_unique_id,
+            "file_path": self.file_path,
+            "file_size": self.file_size,
         }
         new_file = File.de_json(json_dict, bot)
         assert new_file.api_kwargs == {}
 
-        assert new_file.file_id == Space.file_id
-        assert new_file.file_unique_id == Space.file_unique_id
-        assert new_file.file_path == Space.file_path
-        assert new_file.file_size == Space.file_size
+        assert new_file.file_id == self.file_id
+        assert new_file.file_unique_id == self.file_unique_id
+        assert new_file.file_path == self.file_path
+        assert new_file.file_size == self.file_size
 
     def test_to_dict(self, file):
         file_dict = file.to_dict()
@@ -126,11 +131,11 @@ class TestFileWithoutRequest:
         assert file_dict["file_size"] == file.file_size
 
     def test_equality(self, bot):
-        a = File(Space.file_id, Space.file_unique_id, bot)
-        b = File("", Space.file_unique_id, bot)
-        c = File(Space.file_id, Space.file_unique_id, None)
+        a = File(self.file_id, self.file_unique_id, bot)
+        b = File("", self.file_unique_id, bot)
+        c = File(self.file_id, self.file_unique_id, None)
         d = File("", "", bot)
-        e = Voice(Space.file_id, Space.file_unique_id, 0)
+        e = Voice(self.file_id, self.file_unique_id, 0)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -147,13 +152,13 @@ class TestFileWithoutRequest:
 
     async def test_download(self, monkeypatch, file):
         async def test(*args, **kwargs):
-            return Space.file_content
+            return self.file_content
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
         out_file = await file.download_to_drive()
 
         try:
-            assert out_file.read_bytes() == Space.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
             out_file.unlink()
 
@@ -162,7 +167,7 @@ class TestFileWithoutRequest:
     )
     async def test_download_custom_path(self, monkeypatch, file, custom_path_type):
         async def test(*args, **kwargs):
-            return Space.file_content
+            return self.file_content
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
         file_handle, custom_path = mkstemp()
@@ -170,14 +175,14 @@ class TestFileWithoutRequest:
         try:
             out_file = await file.download_to_drive(custom_path_type(custom_path))
             assert out_file == custom_path
-            assert out_file.read_bytes() == Space.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
             os.close(file_handle)
             custom_path.unlink()
 
     async def test_download_no_filename(self, monkeypatch, file):
         async def test(*args, **kwargs):
-            return Space.file_content
+            return self.file_content
 
         file.file_path = None
 
@@ -186,29 +191,29 @@ class TestFileWithoutRequest:
 
         assert str(out_file)[-len(file.file_id) :] == file.file_id
         try:
-            assert out_file.read_bytes() == Space.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
             out_file.unlink()
 
     async def test_download_file_obj(self, monkeypatch, file):
         async def test(*args, **kwargs):
-            return Space.file_content
+            return self.file_content
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
         with TemporaryFile() as custom_fobj:
             await file.download_to_memory(out=custom_fobj)
             custom_fobj.seek(0)
-            assert custom_fobj.read() == Space.file_content
+            assert custom_fobj.read() == self.file_content
 
     async def test_download_bytearray(self, monkeypatch, file):
         async def test(*args, **kwargs):
-            return Space.file_content
+            return self.file_content
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
 
         # Check that a download to a newly allocated bytearray works.
         buf = await file.download_as_bytearray()
-        assert buf == bytearray(Space.file_content)
+        assert buf == bytearray(self.file_content)
 
         # Check that a download to a given bytearray works (extends the bytearray).
         buf2 = buf[:]
@@ -267,7 +272,7 @@ class TestFileWithoutRequest:
         assert buf2[: len(buf)] == buf
 
 
-class TestFileWithRequest:
+class TestFileWithRequest(TestFileBase):
     async def test_error_get_empty_file_id(self, bot):
         with pytest.raises(TelegramError):
             await bot.get_file(file_id="")
@@ -284,7 +289,7 @@ class TestFileWithRequest:
         try:
             out_file = await local_file.download_to_drive(custom_path_type(custom_path))
             assert out_file == custom_path
-            assert out_file.read_bytes() == Space.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
             os.close(file_handle)
             custom_path.unlink()
@@ -293,7 +298,7 @@ class TestFileWithRequest:
         with TemporaryFile() as custom_fobj:
             await local_file.download_to_memory(out=custom_fobj)
             custom_fobj.seek(0)
-            assert custom_fobj.read() == Space.file_content
+            assert custom_fobj.read() == self.file_content
 
     @pytest.mark.parametrize(
         "custom_path_type", [str, Path], ids=["str custom_path", "pathlib.Path custom_path"]
@@ -321,7 +326,7 @@ class TestFileWithRequest:
     async def test_download_bytearray_local_file(self, local_file):
         # Check that a download to a newly allocated bytearray works.
         buf = await local_file.download_as_bytearray()
-        assert buf == bytearray(Space.file_content)
+        assert buf == bytearray(self.file_content)
 
         # Check that a download to a given bytearray works (extends the bytearray).
         buf2 = buf[:]

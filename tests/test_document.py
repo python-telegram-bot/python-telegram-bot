@@ -46,7 +46,7 @@ async def document(bot, chat_id):
         return (await bot.send_document(chat_id, document=f, read_timeout=50)).document
 
 
-class Space:
+class TestDocumentBase:
     caption = "DocumentTest - *Caption*"
     document_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.gif"
     file_size = 12948
@@ -59,7 +59,7 @@ class Space:
     document_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestDocumentWithoutRequest:
+class TestDocumentWithoutRequest(TestDocumentBase):
     def test_slot_behaviour(self, document, mro_slots):
         for attr in document.__slots__:
             assert getattr(document, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -73,31 +73,31 @@ class TestDocumentWithoutRequest:
         assert document.file_unique_id != ""
 
     def test_expected_values(self, document):
-        assert document.file_size == Space.file_size
-        assert document.mime_type == Space.mime_type
-        assert document.file_name == Space.file_name
-        assert document.thumb.file_size == Space.thumb_file_size
-        assert document.thumb.width == Space.thumb_width
-        assert document.thumb.height == Space.thumb_height
+        assert document.file_size == self.file_size
+        assert document.mime_type == self.mime_type
+        assert document.file_name == self.file_name
+        assert document.thumb.file_size == self.thumb_file_size
+        assert document.thumb.width == self.thumb_width
+        assert document.thumb.height == self.thumb_height
 
     def test_de_json(self, bot, document):
         json_dict = {
-            "file_id": Space.document_file_id,
-            "file_unique_id": Space.document_file_unique_id,
+            "file_id": self.document_file_id,
+            "file_unique_id": self.document_file_unique_id,
             "thumb": document.thumb.to_dict(),
-            "file_name": Space.file_name,
-            "mime_type": Space.mime_type,
-            "file_size": Space.file_size,
+            "file_name": self.file_name,
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
         }
         test_document = Document.de_json(json_dict, bot)
         assert test_document.api_kwargs == {}
 
-        assert test_document.file_id == Space.document_file_id
-        assert test_document.file_unique_id == Space.document_file_unique_id
+        assert test_document.file_id == self.document_file_id
+        assert test_document.file_unique_id == self.document_file_unique_id
         assert test_document.thumb == document.thumb
-        assert test_document.file_name == Space.file_name
-        assert test_document.mime_type == Space.mime_type
-        assert test_document.file_size == Space.file_size
+        assert test_document.file_name == self.file_name
+        assert test_document.mime_type == self.mime_type
+        assert test_document.file_size == self.file_size
 
     def test_to_dict(self, document):
         document_dict = document.to_dict()
@@ -186,7 +186,7 @@ class TestDocumentWithoutRequest:
         assert await document.get_file()
 
 
-class TestDocumentWithRequest:
+class TestDocumentWithRequest(TestDocumentBase):
     async def test_error_send_empty_file(self, bot, chat_id):
         with open(os.devnull, "rb") as f:
             with pytest.raises(TelegramError):
@@ -221,7 +221,7 @@ class TestDocumentWithRequest:
         message = await bot.send_document(
             chat_id,
             document=document_file,
-            caption=Space.caption,
+            caption=self.caption,
             disable_notification=False,
             protect_content=True,
             filename="telegram_custom.png",
@@ -238,13 +238,13 @@ class TestDocumentWithRequest:
         assert message.document.file_name == "telegram_custom.png"
         assert message.document.mime_type == document.mime_type
         assert message.document.file_size == document.file_size
-        assert message.caption == Space.caption.replace("*", "")
-        assert message.document.thumb.width == Space.thumb_width
-        assert message.document.thumb.height == Space.thumb_height
+        assert message.caption == self.caption.replace("*", "")
+        assert message.document.thumb.width == self.thumb_width
+        assert message.document.thumb.height == self.thumb_height
         assert message.has_protected_content
 
     async def test_send_url_gif_file(self, bot, chat_id):
-        message = await bot.send_document(chat_id, Space.document_file_url)
+        message = await bot.send_document(chat_id, self.document_file_url)
 
         document = message.document
 

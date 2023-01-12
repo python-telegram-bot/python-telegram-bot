@@ -24,16 +24,18 @@ from telegram import GameHighScore, User
 
 @pytest.fixture(scope="module")
 def game_highscore():
-    return GameHighScore(Space.position, Space.user, Space.score)
+    return GameHighScore(
+        TestGameHighScoreBase.position, TestGameHighScoreBase.user, TestGameHighScoreBase.score
+    )
 
 
-class Space:
+class TestGameHighScoreBase:
     position = 12
     user = User(2, "test user", False)
     score = 42
 
 
-class TestGameHighScoreWithoutRequest:
+class TestGameHighScoreWithoutRequest(TestGameHighScoreBase):
     def test_slot_behaviour(self, game_highscore, mro_slots):
         for attr in game_highscore.__slots__:
             assert getattr(game_highscore, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -41,16 +43,16 @@ class TestGameHighScoreWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "position": Space.position,
-            "user": Space.user.to_dict(),
-            "score": Space.score,
+            "position": self.position,
+            "user": self.user.to_dict(),
+            "score": self.score,
         }
         highscore = GameHighScore.de_json(json_dict, bot)
         assert highscore.api_kwargs == {}
 
-        assert highscore.position == Space.position
-        assert highscore.user == Space.user
-        assert highscore.score == Space.score
+        assert highscore.position == self.position
+        assert highscore.user == self.user
+        assert highscore.score == self.score
 
         assert GameHighScore.de_json(None, bot) is None
 

@@ -25,19 +25,19 @@ from telegram import EncryptedPassportElement, PassportElementError, PassportFil
 @pytest.fixture(scope="module")
 def encrypted_passport_element():
     return EncryptedPassportElement(
-        Space.type_,
+        TestEncryptedPassportElementBase.type_,
         "this is a hash",
-        data=Space.data,
-        phone_number=Space.phone_number,
-        email=Space.email,
-        files=Space.files,
-        front_side=Space.front_side,
-        reverse_side=Space.reverse_side,
-        selfie=Space.selfie,
+        data=TestEncryptedPassportElementBase.data,
+        phone_number=TestEncryptedPassportElementBase.phone_number,
+        email=TestEncryptedPassportElementBase.email,
+        files=TestEncryptedPassportElementBase.files,
+        front_side=TestEncryptedPassportElementBase.front_side,
+        reverse_side=TestEncryptedPassportElementBase.reverse_side,
+        selfie=TestEncryptedPassportElementBase.selfie,
     )
 
 
-class Space:
+class TestEncryptedPassportElementBase:
     type_ = "type"
     hash = "this is a hash"
     data = "data"
@@ -49,7 +49,7 @@ class Space:
     selfie = PassportFile("file_id", 50, 0, 25)
 
 
-class TestEncryptedPassportElementWithoutRequest:
+class TestEncryptedPassportElementWithoutRequest(TestEncryptedPassportElementBase):
     def test_slot_behaviour(self, encrypted_passport_element, mro_slots):
         inst = encrypted_passport_element
         for attr in inst.__slots__:
@@ -57,15 +57,15 @@ class TestEncryptedPassportElementWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, encrypted_passport_element):
-        assert encrypted_passport_element.type == Space.type_
-        assert encrypted_passport_element.hash == Space.hash
-        assert encrypted_passport_element.data == Space.data
-        assert encrypted_passport_element.phone_number == Space.phone_number
-        assert encrypted_passport_element.email == Space.email
-        assert encrypted_passport_element.files == tuple(Space.files)
-        assert encrypted_passport_element.front_side == Space.front_side
-        assert encrypted_passport_element.reverse_side == Space.reverse_side
-        assert encrypted_passport_element.selfie == Space.selfie
+        assert encrypted_passport_element.type == self.type_
+        assert encrypted_passport_element.hash == self.hash
+        assert encrypted_passport_element.data == self.data
+        assert encrypted_passport_element.phone_number == self.phone_number
+        assert encrypted_passport_element.email == self.email
+        assert encrypted_passport_element.files == tuple(self.files)
+        assert encrypted_passport_element.front_side == self.front_side
+        assert encrypted_passport_element.reverse_side == self.reverse_side
+        assert encrypted_passport_element.selfie == self.selfie
 
     def test_to_dict(self, encrypted_passport_element):
         encrypted_passport_element_dict = encrypted_passport_element.to_dict()
@@ -93,14 +93,14 @@ class TestEncryptedPassportElementWithoutRequest:
         )
 
     def test_attributes_always_tuple(self):
-        element = EncryptedPassportElement(Space.type_, Space.hash)
+        element = EncryptedPassportElement(self.type_, self.hash)
         assert element.files == ()
         assert element.translation == ()
 
     def test_equality(self):
-        a = EncryptedPassportElement(Space.type_, Space.hash, data=Space.data)
-        b = EncryptedPassportElement(Space.type_, Space.hash, data=Space.data)
-        c = EncryptedPassportElement(Space.data, "")
+        a = EncryptedPassportElement(self.type_, self.hash, data=self.data)
+        b = EncryptedPassportElement(self.type_, self.hash, data=self.data)
+        c = EncryptedPassportElement(self.data, "")
         d = PassportElementError("source", "type", "message")
 
         assert a == b

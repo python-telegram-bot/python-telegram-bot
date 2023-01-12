@@ -32,20 +32,20 @@ from telegram import (
 @pytest.fixture(scope="module")
 def inline_query_result_audio():
     return InlineQueryResultAudio(
-        Space.id_,
-        Space.audio_url,
-        Space.title,
-        performer=Space.performer,
-        audio_duration=Space.audio_duration,
-        caption=Space.caption,
-        parse_mode=Space.parse_mode,
-        caption_entities=Space.caption_entities,
-        input_message_content=Space.input_message_content,
-        reply_markup=Space.reply_markup,
+        TestInlineQueryResultAudioBase.id_,
+        TestInlineQueryResultAudioBase.audio_url,
+        TestInlineQueryResultAudioBase.title,
+        performer=TestInlineQueryResultAudioBase.performer,
+        audio_duration=TestInlineQueryResultAudioBase.audio_duration,
+        caption=TestInlineQueryResultAudioBase.caption,
+        parse_mode=TestInlineQueryResultAudioBase.parse_mode,
+        caption_entities=TestInlineQueryResultAudioBase.caption_entities,
+        input_message_content=TestInlineQueryResultAudioBase.input_message_content,
+        reply_markup=TestInlineQueryResultAudioBase.reply_markup,
     )
 
 
-class Space:
+class TestInlineQueryResultAudioBase:
     id_ = "id"
     type_ = "audio"
     audio_url = "audio url"
@@ -59,7 +59,7 @@ class Space:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultAudioWithoutRequest:
+class TestInlineQueryResultAudioWithoutRequest(TestInlineQueryResultAudioBase):
     def test_slot_behaviour(self, inline_query_result_audio, mro_slots):
         inst = inline_query_result_audio
         for attr in inst.__slots__:
@@ -67,20 +67,20 @@ class TestInlineQueryResultAudioWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_audio):
-        assert inline_query_result_audio.type == Space.type_
-        assert inline_query_result_audio.id == Space.id_
-        assert inline_query_result_audio.audio_url == Space.audio_url
-        assert inline_query_result_audio.title == Space.title
-        assert inline_query_result_audio.performer == Space.performer
-        assert inline_query_result_audio.audio_duration == Space.audio_duration
-        assert inline_query_result_audio.caption == Space.caption
-        assert inline_query_result_audio.parse_mode == Space.parse_mode
-        assert inline_query_result_audio.caption_entities == tuple(Space.caption_entities)
+        assert inline_query_result_audio.type == self.type_
+        assert inline_query_result_audio.id == self.id_
+        assert inline_query_result_audio.audio_url == self.audio_url
+        assert inline_query_result_audio.title == self.title
+        assert inline_query_result_audio.performer == self.performer
+        assert inline_query_result_audio.audio_duration == self.audio_duration
+        assert inline_query_result_audio.caption == self.caption
+        assert inline_query_result_audio.parse_mode == self.parse_mode
+        assert inline_query_result_audio.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_audio.input_message_content.to_dict()
-            == Space.input_message_content.to_dict()
+            == self.input_message_content.to_dict()
         )
-        assert inline_query_result_audio.reply_markup.to_dict() == Space.reply_markup.to_dict()
+        assert inline_query_result_audio.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_audio):
         inline_query_result_audio_dict = inline_query_result_audio.to_dict()
@@ -110,15 +110,15 @@ class TestInlineQueryResultAudioWithoutRequest:
         )
 
     def test_caption_entities_always_tuple(self):
-        inline_query_result_audio = InlineQueryResultAudio(Space.id_, Space.audio_url, Space.title)
+        inline_query_result_audio = InlineQueryResultAudio(self.id_, self.audio_url, self.title)
         assert inline_query_result_audio.caption_entities == ()
 
     def test_equality(self):
-        a = InlineQueryResultAudio(Space.id_, Space.audio_url, Space.title)
-        b = InlineQueryResultAudio(Space.id_, Space.title, Space.title)
-        c = InlineQueryResultAudio(Space.id_, "", Space.title)
-        d = InlineQueryResultAudio("", Space.audio_url, Space.title)
-        e = InlineQueryResultVoice(Space.id_, "", "")
+        a = InlineQueryResultAudio(self.id_, self.audio_url, self.title)
+        b = InlineQueryResultAudio(self.id_, self.title, self.title)
+        c = InlineQueryResultAudio(self.id_, "", self.title)
+        d = InlineQueryResultAudio("", self.audio_url, self.title)
+        e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

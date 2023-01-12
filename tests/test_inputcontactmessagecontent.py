@@ -23,16 +23,20 @@ from telegram import InputContactMessageContent, User
 
 @pytest.fixture(scope="module")
 def input_contact_message_content():
-    return InputContactMessageContent(Space.phone_number, Space.first_name, Space.last_name)
+    return InputContactMessageContent(
+        TestInputContactMessageContentBase.phone_number,
+        TestInputContactMessageContentBase.first_name,
+        TestInputContactMessageContentBase.last_name,
+    )
 
 
-class Space:
+class TestInputContactMessageContentBase:
     phone_number = "phone number"
     first_name = "first name"
     last_name = "last name"
 
 
-class TestInputContactMessageContentWithoutRequest:
+class TestInputContactMessageContentWithoutRequest(TestInputContactMessageContentBase):
     def test_slot_behaviour(self, input_contact_message_content, mro_slots):
         inst = input_contact_message_content
         for attr in inst.__slots__:
@@ -40,9 +44,9 @@ class TestInputContactMessageContentWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_contact_message_content):
-        assert input_contact_message_content.first_name == Space.first_name
-        assert input_contact_message_content.phone_number == Space.phone_number
-        assert input_contact_message_content.last_name == Space.last_name
+        assert input_contact_message_content.first_name == self.first_name
+        assert input_contact_message_content.phone_number == self.phone_number
+        assert input_contact_message_content.last_name == self.last_name
 
     def test_to_dict(self, input_contact_message_content):
         input_contact_message_content_dict = input_contact_message_content.to_dict()

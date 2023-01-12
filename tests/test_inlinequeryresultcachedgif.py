@@ -31,18 +31,18 @@ from telegram import (
 @pytest.fixture(scope="module")
 def inline_query_result_cached_gif():
     return InlineQueryResultCachedGif(
-        Space.id_,
-        Space.gif_file_id,
-        title=Space.title,
-        caption=Space.caption,
-        parse_mode=Space.parse_mode,
-        caption_entities=Space.caption_entities,
-        input_message_content=Space.input_message_content,
-        reply_markup=Space.reply_markup,
+        TestInlineQueryResultCachedGifBase.id_,
+        TestInlineQueryResultCachedGifBase.gif_file_id,
+        title=TestInlineQueryResultCachedGifBase.title,
+        caption=TestInlineQueryResultCachedGifBase.caption,
+        parse_mode=TestInlineQueryResultCachedGifBase.parse_mode,
+        caption_entities=TestInlineQueryResultCachedGifBase.caption_entities,
+        input_message_content=TestInlineQueryResultCachedGifBase.input_message_content,
+        reply_markup=TestInlineQueryResultCachedGifBase.reply_markup,
     )
 
 
-class Space:
+class TestInlineQueryResultCachedGifBase:
     id_ = "id"
     type_ = "gif"
     gif_file_id = "gif file id"
@@ -54,7 +54,7 @@ class Space:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultCachedGifWithoutRequest:
+class TestInlineQueryResultCachedGifWithoutRequest(TestInlineQueryResultCachedGifBase):
     def test_slot_behaviour(self, inline_query_result_cached_gif, mro_slots):
         inst = inline_query_result_cached_gif
         for attr in inst.__slots__:
@@ -62,23 +62,21 @@ class TestInlineQueryResultCachedGifWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_cached_gif):
-        assert inline_query_result_cached_gif.type == Space.type_
-        assert inline_query_result_cached_gif.id == Space.id_
-        assert inline_query_result_cached_gif.gif_file_id == Space.gif_file_id
-        assert inline_query_result_cached_gif.title == Space.title
-        assert inline_query_result_cached_gif.caption == Space.caption
-        assert inline_query_result_cached_gif.parse_mode == Space.parse_mode
-        assert inline_query_result_cached_gif.caption_entities == tuple(Space.caption_entities)
+        assert inline_query_result_cached_gif.type == self.type_
+        assert inline_query_result_cached_gif.id == self.id_
+        assert inline_query_result_cached_gif.gif_file_id == self.gif_file_id
+        assert inline_query_result_cached_gif.title == self.title
+        assert inline_query_result_cached_gif.caption == self.caption
+        assert inline_query_result_cached_gif.parse_mode == self.parse_mode
+        assert inline_query_result_cached_gif.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_cached_gif.input_message_content.to_dict()
-            == Space.input_message_content.to_dict()
+            == self.input_message_content.to_dict()
         )
-        assert (
-            inline_query_result_cached_gif.reply_markup.to_dict() == Space.reply_markup.to_dict()
-        )
+        assert inline_query_result_cached_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_caption_entities_always_tuple(self):
-        result = InlineQueryResultCachedGif(Space.id_, Space.gif_file_id)
+        result = InlineQueryResultCachedGif(self.id_, self.gif_file_id)
         assert result.caption_entities == ()
 
     def test_to_dict(self, inline_query_result_cached_gif):
@@ -113,11 +111,11 @@ class TestInlineQueryResultCachedGifWithoutRequest:
         )
 
     def test_equality(self):
-        a = InlineQueryResultCachedGif(Space.id_, Space.gif_file_id)
-        b = InlineQueryResultCachedGif(Space.id_, Space.gif_file_id)
-        c = InlineQueryResultCachedGif(Space.id_, "")
-        d = InlineQueryResultCachedGif("", Space.gif_file_id)
-        e = InlineQueryResultCachedVoice(Space.id_, "", "")
+        a = InlineQueryResultCachedGif(self.id_, self.gif_file_id)
+        b = InlineQueryResultCachedGif(self.id_, self.gif_file_id)
+        c = InlineQueryResultCachedGif(self.id_, "")
+        d = InlineQueryResultCachedGif("", self.gif_file_id)
+        e = InlineQueryResultCachedVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

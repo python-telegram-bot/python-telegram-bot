@@ -32,34 +32,34 @@ from tests.auxil.bot_method_checks import (
 @pytest.fixture(scope="module")
 def chat(bot):
     chat = Chat(
-        Space.id_,
-        title=Space.title,
-        type=Space.type_,
-        username=Space.username,
-        sticker_set_name=Space.sticker_set_name,
-        can_set_sticker_set=Space.can_set_sticker_set,
-        permissions=Space.permissions,
-        slow_mode_delay=Space.slow_mode_delay,
-        bio=Space.bio,
-        linked_chat_id=Space.linked_chat_id,
-        location=Space.location,
+        TestChatBase.id_,
+        title=TestChatBase.title,
+        type=TestChatBase.type_,
+        username=TestChatBase.username,
+        sticker_set_name=TestChatBase.sticker_set_name,
+        can_set_sticker_set=TestChatBase.can_set_sticker_set,
+        permissions=TestChatBase.permissions,
+        slow_mode_delay=TestChatBase.slow_mode_delay,
+        bio=TestChatBase.bio,
+        linked_chat_id=TestChatBase.linked_chat_id,
+        location=TestChatBase.location,
         has_private_forwards=True,
         has_protected_content=True,
         join_to_send_messages=True,
         join_by_request=True,
         has_restricted_voice_and_video_messages=True,
         is_forum=True,
-        active_usernames=Space.active_usernames,
-        emoji_status_custom_emoji_id=Space.emoji_status_custom_emoji_id,
-        has_aggressive_anti_spam_enabled=Space.has_aggressive_anti_spam_enabled,
-        has_hidden_members=Space.has_hidden_members,
+        active_usernames=TestChatBase.active_usernames,
+        emoji_status_custom_emoji_id=TestChatBase.emoji_status_custom_emoji_id,
+        has_aggressive_anti_spam_enabled=TestChatBase.has_aggressive_anti_spam_enabled,
+        has_hidden_members=TestChatBase.has_hidden_members,
     )
     chat.set_bot(bot)
     chat._unfreeze()
     return chat
 
 
-class Space:
+class TestChatBase:
     id_ = -28767330
     title = "ToledosPalaceBot - Group"
     type_ = "group"
@@ -88,7 +88,7 @@ class Space:
     has_hidden_members = True
 
 
-class TestChatWithoutRequest:
+class TestChatWithoutRequest(TestChatBase):
     def test_slot_behaviour(self, chat, mro_slots):
         for attr in chat.__slots__:
             assert getattr(chat, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -96,61 +96,61 @@ class TestChatWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "id": Space.id_,
-            "title": Space.title,
-            "type": Space.type_,
-            "username": Space.username,
-            "all_members_are_administrators": Space.all_members_are_administrators,
-            "sticker_set_name": Space.sticker_set_name,
-            "can_set_sticker_set": Space.can_set_sticker_set,
-            "permissions": Space.permissions.to_dict(),
-            "slow_mode_delay": Space.slow_mode_delay,
-            "bio": Space.bio,
-            "has_protected_content": Space.has_protected_content,
-            "has_private_forwards": Space.has_private_forwards,
-            "linked_chat_id": Space.linked_chat_id,
-            "location": Space.location.to_dict(),
-            "join_to_send_messages": Space.join_to_send_messages,
-            "join_by_request": Space.join_by_request,
+            "id": self.id_,
+            "title": self.title,
+            "type": self.type_,
+            "username": self.username,
+            "all_members_are_administrators": self.all_members_are_administrators,
+            "sticker_set_name": self.sticker_set_name,
+            "can_set_sticker_set": self.can_set_sticker_set,
+            "permissions": self.permissions.to_dict(),
+            "slow_mode_delay": self.slow_mode_delay,
+            "bio": self.bio,
+            "has_protected_content": self.has_protected_content,
+            "has_private_forwards": self.has_private_forwards,
+            "linked_chat_id": self.linked_chat_id,
+            "location": self.location.to_dict(),
+            "join_to_send_messages": self.join_to_send_messages,
+            "join_by_request": self.join_by_request,
             "has_restricted_voice_and_video_messages": (
-                Space.has_restricted_voice_and_video_messages
+                self.has_restricted_voice_and_video_messages
             ),
-            "is_forum": Space.is_forum,
-            "active_usernames": Space.active_usernames,
-            "emoji_status_custom_emoji_id": Space.emoji_status_custom_emoji_id,
-            "has_aggressive_anti_spam_enabled": Space.has_aggressive_anti_spam_enabled,
-            "has_hidden_members": Space.has_hidden_members,
+            "is_forum": self.is_forum,
+            "active_usernames": self.active_usernames,
+            "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id,
+            "has_aggressive_anti_spam_enabled": self.has_aggressive_anti_spam_enabled,
+            "has_hidden_members": self.has_hidden_members,
         }
         chat = Chat.de_json(json_dict, bot)
 
-        assert chat.id == Space.id_
-        assert chat.title == Space.title
-        assert chat.type == Space.type_
-        assert chat.username == Space.username
-        assert chat.sticker_set_name == Space.sticker_set_name
-        assert chat.can_set_sticker_set == Space.can_set_sticker_set
-        assert chat.permissions == Space.permissions
-        assert chat.slow_mode_delay == Space.slow_mode_delay
-        assert chat.bio == Space.bio
-        assert chat.has_protected_content == Space.has_protected_content
-        assert chat.has_private_forwards == Space.has_private_forwards
-        assert chat.linked_chat_id == Space.linked_chat_id
-        assert chat.location.location == Space.location.location
-        assert chat.location.address == Space.location.address
-        assert chat.join_to_send_messages == Space.join_to_send_messages
-        assert chat.join_by_request == Space.join_by_request
+        assert chat.id == self.id_
+        assert chat.title == self.title
+        assert chat.type == self.type_
+        assert chat.username == self.username
+        assert chat.sticker_set_name == self.sticker_set_name
+        assert chat.can_set_sticker_set == self.can_set_sticker_set
+        assert chat.permissions == self.permissions
+        assert chat.slow_mode_delay == self.slow_mode_delay
+        assert chat.bio == self.bio
+        assert chat.has_protected_content == self.has_protected_content
+        assert chat.has_private_forwards == self.has_private_forwards
+        assert chat.linked_chat_id == self.linked_chat_id
+        assert chat.location.location == self.location.location
+        assert chat.location.address == self.location.address
+        assert chat.join_to_send_messages == self.join_to_send_messages
+        assert chat.join_by_request == self.join_by_request
         assert (
             chat.has_restricted_voice_and_video_messages
-            == Space.has_restricted_voice_and_video_messages
+            == self.has_restricted_voice_and_video_messages
         )
         assert chat.api_kwargs == {
-            "all_members_are_administrators": Space.all_members_are_administrators
+            "all_members_are_administrators": self.all_members_are_administrators
         }
-        assert chat.is_forum == Space.is_forum
-        assert chat.active_usernames == tuple(Space.active_usernames)
-        assert chat.emoji_status_custom_emoji_id == Space.emoji_status_custom_emoji_id
-        assert chat.has_aggressive_anti_spam_enabled == Space.has_aggressive_anti_spam_enabled
-        assert chat.has_hidden_members == Space.has_hidden_members
+        assert chat.is_forum == self.is_forum
+        assert chat.active_usernames == tuple(self.active_usernames)
+        assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
+        assert chat.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
+        assert chat.has_hidden_members == self.has_hidden_members
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -197,11 +197,11 @@ class TestChatWithoutRequest:
         assert chat.type is ChatType.PRIVATE
 
     def test_equality(self):
-        a = Chat(Space.id_, Space.title, Space.type_)
-        b = Chat(Space.id_, Space.title, Space.type_)
-        c = Chat(Space.id_, "", "")
-        d = Chat(0, Space.title, Space.type_)
-        e = User(Space.id_, "", False)
+        a = Chat(self.id_, self.title, self.type_)
+        b = Chat(self.id_, self.title, self.type_)
+        c = Chat(self.id_, "", "")
+        d = Chat(0, self.title, self.type_)
+        e = User(self.id_, "", False)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -446,7 +446,7 @@ class TestChatWithoutRequest:
     async def test_set_permissions(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs["chat_id"] == chat.id
-            permissions = kwargs["permissions"] == Space.permissions
+            permissions = kwargs["permissions"] == self.permissions
             return chat_id and permissions
 
         assert check_shortcut_signature(
@@ -458,7 +458,7 @@ class TestChatWithoutRequest:
         assert await check_defaults_handling(chat.set_permissions, chat.get_bot())
 
         monkeypatch.setattr(chat.get_bot(), "set_chat_permissions", make_assertion)
-        assert await chat.set_permissions(permissions=Space.permissions)
+        assert await chat.set_permissions(permissions=self.permissions)
 
     async def test_set_administrator_custom_title(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):

@@ -98,29 +98,29 @@ ids = all_types + ("callback_query_without_message",)
 
 @pytest.fixture(scope="module", params=params, ids=ids)
 def update(request):
-    return Update(update_id=Space.update_id, **request.param)
+    return Update(update_id=TestUpdateBase.update_id, **request.param)
 
 
-class Space:
+class TestUpdateBase:
     update_id = 868573637
 
 
-class TestUpdateWithoutRequest:
+class TestUpdateWithoutRequest(TestUpdateBase):
     def test_slot_behaviour(self, mro_slots):
-        update = Update(Space.update_id)
+        update = Update(self.update_id)
         for attr in update.__slots__:
             assert getattr(update, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"
 
     @pytest.mark.parametrize("paramdict", argvalues=params, ids=ids)
     def test_de_json(self, bot, paramdict):
-        json_dict = {"update_id": Space.update_id}
+        json_dict = {"update_id": self.update_id}
         # Convert the single update 'item' to a dict of that item and apply it to the json_dict
         json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
         update = Update.de_json(json_dict, bot)
         assert update.api_kwargs == {}
 
-        assert update.update_id == Space.update_id
+        assert update.update_id == self.update_id
 
         # Make sure only one thing in the update (other than update_id) is not None
         i = 0
@@ -145,11 +145,11 @@ class TestUpdateWithoutRequest:
                 assert update_dict[_type] == getattr(update, _type).to_dict()
 
     def test_equality(self):
-        a = Update(Space.update_id, message=message)
-        b = Update(Space.update_id, message=message)
-        c = Update(Space.update_id)
+        a = Update(self.update_id, message=message)
+        b = Update(self.update_id, message=message)
+        c = Update(self.update_id)
         d = Update(0, message=message)
-        e = User(Space.update_id, "", False)
+        e = User(self.update_id, "", False)
 
         assert a == b
         assert hash(a) == hash(b)

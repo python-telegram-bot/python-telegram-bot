@@ -69,7 +69,7 @@ def video_sticker(bot, chat_id):
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
-class StickerSpace:
+class TestStickerBase:
     # sticker_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.webp'
     # Serving sticker from gh since our server sends wrong content_type
     sticker_file_url = (
@@ -95,7 +95,7 @@ class StickerSpace:
     premium_animation = File("this_is_an_id", "this_is_an_unique_id")
 
 
-class TestStickerWithoutRequest:
+class TestStickerWithoutRequest(TestStickerBase):
     def test_slot_behaviour(self, sticker, mro_slots):
         for attr in sticker.__slots__:
             assert getattr(sticker, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -115,17 +115,17 @@ class TestStickerWithoutRequest:
         assert sticker.thumb.file_unique_id != ""
 
     def test_expected_values(self, sticker):
-        assert sticker.width == StickerSpace.width
-        assert sticker.height == StickerSpace.height
-        assert sticker.is_animated == StickerSpace.is_animated
-        assert sticker.is_video == StickerSpace.is_video
-        assert sticker.file_size == StickerSpace.file_size
-        assert sticker.thumb.width == StickerSpace.thumb_width
-        assert sticker.thumb.height == StickerSpace.thumb_height
-        assert sticker.thumb.file_size == StickerSpace.thumb_file_size
-        assert sticker.type == StickerSpace.type
+        assert sticker.width == self.width
+        assert sticker.height == self.height
+        assert sticker.is_animated == self.is_animated
+        assert sticker.is_video == self.is_video
+        assert sticker.file_size == self.file_size
+        assert sticker.thumb.width == self.thumb_width
+        assert sticker.thumb.height == self.thumb_height
+        assert sticker.thumb.file_size == self.thumb_file_size
+        assert sticker.type == self.type
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
-        # assert sticker.premium_animation == StickerSpace.premium_animation
+        # assert sticker.premium_animation == self.premium_animation
 
     def test_to_dict(self, sticker):
         sticker_dict = sticker.to_dict()
@@ -143,53 +143,53 @@ class TestStickerWithoutRequest:
 
     def test_de_json(self, bot, sticker):
         json_dict = {
-            "file_id": StickerSpace.sticker_file_id,
-            "file_unique_id": StickerSpace.sticker_file_unique_id,
-            "width": StickerSpace.width,
-            "height": StickerSpace.height,
-            "is_animated": StickerSpace.is_animated,
-            "is_video": StickerSpace.is_video,
+            "file_id": self.sticker_file_id,
+            "file_unique_id": self.sticker_file_unique_id,
+            "width": self.width,
+            "height": self.height,
+            "is_animated": self.is_animated,
+            "is_video": self.is_video,
             "thumb": sticker.thumb.to_dict(),
-            "emoji": StickerSpace.emoji,
-            "file_size": StickerSpace.file_size,
-            "premium_animation": StickerSpace.premium_animation.to_dict(),
-            "type": StickerSpace.type,
-            "custom_emoji_id": StickerSpace.custom_emoji_id,
+            "emoji": self.emoji,
+            "file_size": self.file_size,
+            "premium_animation": self.premium_animation.to_dict(),
+            "type": self.type,
+            "custom_emoji_id": self.custom_emoji_id,
         }
         json_sticker = Sticker.de_json(json_dict, bot)
         assert json_sticker.api_kwargs == {}
 
-        assert json_sticker.file_id == StickerSpace.sticker_file_id
-        assert json_sticker.file_unique_id == StickerSpace.sticker_file_unique_id
-        assert json_sticker.width == StickerSpace.width
-        assert json_sticker.height == StickerSpace.height
-        assert json_sticker.is_animated == StickerSpace.is_animated
-        assert json_sticker.is_video == StickerSpace.is_video
-        assert json_sticker.emoji == StickerSpace.emoji
-        assert json_sticker.file_size == StickerSpace.file_size
+        assert json_sticker.file_id == self.sticker_file_id
+        assert json_sticker.file_unique_id == self.sticker_file_unique_id
+        assert json_sticker.width == self.width
+        assert json_sticker.height == self.height
+        assert json_sticker.is_animated == self.is_animated
+        assert json_sticker.is_video == self.is_video
+        assert json_sticker.emoji == self.emoji
+        assert json_sticker.file_size == self.file_size
         assert json_sticker.thumb == sticker.thumb
-        assert json_sticker.premium_animation == StickerSpace.premium_animation
-        assert json_sticker.type == StickerSpace.type
-        assert json_sticker.custom_emoji_id == StickerSpace.custom_emoji_id
+        assert json_sticker.premium_animation == self.premium_animation
+        assert json_sticker.type == self.type
+        assert json_sticker.custom_emoji_id == self.custom_emoji_id
 
     def test_equality(self, sticker):
         a = Sticker(
             sticker.file_id,
             sticker.file_unique_id,
-            StickerSpace.width,
-            StickerSpace.height,
-            StickerSpace.is_animated,
-            StickerSpace.is_video,
-            StickerSpace.type,
+            self.width,
+            self.height,
+            self.is_animated,
+            self.is_video,
+            self.type,
         )
         b = Sticker(
             "",
             sticker.file_unique_id,
-            StickerSpace.width,
-            StickerSpace.height,
-            StickerSpace.is_animated,
-            StickerSpace.is_video,
-            StickerSpace.type,
+            self.width,
+            self.height,
+            self.is_animated,
+            self.is_video,
+            self.type,
         )
         c = Sticker(
             sticker.file_id,
@@ -198,23 +198,23 @@ class TestStickerWithoutRequest:
             0,
             False,
             True,
-            StickerSpace.type,
+            self.type,
         )
         d = Sticker(
             "",
             "",
-            StickerSpace.width,
-            StickerSpace.height,
-            StickerSpace.is_animated,
-            StickerSpace.is_video,
-            StickerSpace.type,
+            self.width,
+            self.height,
+            self.is_animated,
+            self.is_video,
+            self.type,
         )
         e = PhotoSize(
             sticker.file_id,
             sticker.file_unique_id,
-            StickerSpace.width,
-            StickerSpace.height,
-            StickerSpace.is_animated,
+            self.width,
+            self.height,
+            self.is_animated,
         )
 
         assert a == b
@@ -264,7 +264,7 @@ class TestStickerWithoutRequest:
             bot._local_mode = False
 
 
-class TestStickerWithRequest:
+class TestStickerWithRequest(TestStickerBase):
     async def test_send_all_args(self, bot, chat_id, sticker_file, sticker):
         message = await bot.send_sticker(
             chat_id, sticker=sticker_file, disable_notification=False, protect_content=True
@@ -320,10 +320,10 @@ class TestStickerWithRequest:
         server_file_id = "CAADAQADHAADyIsGAAFZfq1bphjqlgI"
         message = await bot.send_sticker(chat_id=chat_id, sticker=server_file_id)
         sticker = message.sticker
-        assert sticker.emoji == StickerSpace.emoji
+        assert sticker.emoji == self.emoji
 
     async def test_send_from_url(self, bot, chat_id):
-        message = await bot.send_sticker(chat_id=chat_id, sticker=StickerSpace.sticker_file_url)
+        message = await bot.send_sticker(chat_id=chat_id, sticker=self.sticker_file_url)
         sticker = message.sticker
 
         assert isinstance(message.sticker, Sticker)
@@ -491,7 +491,7 @@ def sticker_set_thumb_file():
         yield file
 
 
-class SetSpace:
+class TestStickerSetBase:
     title = "Test stickers"
     is_animated = True
     is_video = True
@@ -501,9 +501,9 @@ class SetSpace:
     contains_masks = True
 
 
-class TestStickerSetWithoutRequest:
+class TestStickerSetWithoutRequest(TestStickerSetBase):
     def test_slot_behaviour(self, mro_slots):
-        inst = StickerSet("this", "is", True, SetSpace.stickers, True, "not")
+        inst = StickerSet("this", "is", True, self.stickers, True, "not")
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -512,24 +512,24 @@ class TestStickerSetWithoutRequest:
         name = f"test_by_{bot.username}"
         json_dict = {
             "name": name,
-            "title": SetSpace.title,
-            "is_animated": SetSpace.is_animated,
-            "is_video": SetSpace.is_video,
-            "stickers": [x.to_dict() for x in SetSpace.stickers],
+            "title": self.title,
+            "is_animated": self.is_animated,
+            "is_video": self.is_video,
+            "stickers": [x.to_dict() for x in self.stickers],
             "thumb": sticker.thumb.to_dict(),
-            "sticker_type": SetSpace.sticker_type,
-            "contains_masks": SetSpace.contains_masks,
+            "sticker_type": self.sticker_type,
+            "contains_masks": self.contains_masks,
         }
         sticker_set = StickerSet.de_json(json_dict, bot)
 
         assert sticker_set.name == name
-        assert sticker_set.title == SetSpace.title
-        assert sticker_set.is_animated == SetSpace.is_animated
-        assert sticker_set.is_video == SetSpace.is_video
-        assert sticker_set.stickers == tuple(SetSpace.stickers)
+        assert sticker_set.title == self.title
+        assert sticker_set.is_animated == self.is_animated
+        assert sticker_set.is_video == self.is_video
+        assert sticker_set.stickers == tuple(self.stickers)
         assert sticker_set.thumb == sticker.thumb
-        assert sticker_set.sticker_type == SetSpace.sticker_type
-        assert sticker_set.api_kwargs == {"contains_masks": SetSpace.contains_masks}
+        assert sticker_set.sticker_type == self.sticker_type
+        assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks}
 
     def test_sticker_set_to_dict(self, sticker_set):
         sticker_set_dict = sticker_set.to_dict()
@@ -545,31 +545,31 @@ class TestStickerSetWithoutRequest:
 
     def test_equality(self):
         a = StickerSet(
-            SetSpace.name,
-            SetSpace.title,
-            SetSpace.is_animated,
-            SetSpace.stickers,
-            SetSpace.is_video,
-            SetSpace.sticker_type,
+            self.name,
+            self.title,
+            self.is_animated,
+            self.stickers,
+            self.is_video,
+            self.sticker_type,
         )
         b = StickerSet(
-            SetSpace.name,
-            SetSpace.title,
-            SetSpace.is_animated,
-            SetSpace.stickers,
-            SetSpace.is_video,
-            SetSpace.sticker_type,
+            self.name,
+            self.title,
+            self.is_animated,
+            self.stickers,
+            self.is_video,
+            self.sticker_type,
         )
-        c = StickerSet(SetSpace.name, "title", False, [], True, Sticker.CUSTOM_EMOJI)
+        c = StickerSet(self.name, "title", False, [], True, Sticker.CUSTOM_EMOJI)
         d = StickerSet(
             "blah",
-            SetSpace.title,
-            SetSpace.is_animated,
-            SetSpace.stickers,
-            SetSpace.is_video,
-            SetSpace.sticker_type,
+            self.title,
+            self.is_animated,
+            self.stickers,
+            self.is_video,
+            self.sticker_type,
         )
-        e = Audio(SetSpace.name, "", 0, None, None)
+        e = Audio(self.name, "", 0, None, None)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -872,17 +872,22 @@ class TestStickerSetWithRequest:
 
 @pytest.fixture(scope="module")
 def mask_position():
-    return MaskPosition(MaskSpace.point, MaskSpace.x_shift, MaskSpace.y_shift, MaskSpace.scale)
+    return MaskPosition(
+        TestMaskPositionBase.point,
+        TestMaskPositionBase.x_shift,
+        TestMaskPositionBase.y_shift,
+        TestMaskPositionBase.scale,
+    )
 
 
-class MaskSpace:
+class TestMaskPositionBase:
     point = MaskPosition.EYES
     x_shift = -1
     y_shift = 1
     scale = 2
 
 
-class TestMaskPositionWithoutRequest:
+class TestMaskPositionWithoutRequest(TestMaskPositionBase):
     def test_slot_behaviour(self, mask_position, mro_slots):
         inst = mask_position
         for attr in inst.__slots__:
@@ -891,18 +896,18 @@ class TestMaskPositionWithoutRequest:
 
     def test_mask_position_de_json(self, bot):
         json_dict = {
-            "point": MaskSpace.point,
-            "x_shift": MaskSpace.x_shift,
-            "y_shift": MaskSpace.y_shift,
-            "scale": MaskSpace.scale,
+            "point": self.point,
+            "x_shift": self.x_shift,
+            "y_shift": self.y_shift,
+            "scale": self.scale,
         }
         mask_position = MaskPosition.de_json(json_dict, bot)
         assert mask_position.api_kwargs == {}
 
-        assert mask_position.point == MaskSpace.point
-        assert mask_position.x_shift == MaskSpace.x_shift
-        assert mask_position.y_shift == MaskSpace.y_shift
-        assert mask_position.scale == MaskSpace.scale
+        assert mask_position.point == self.point
+        assert mask_position.x_shift == self.x_shift
+        assert mask_position.y_shift == self.y_shift
+        assert mask_position.scale == self.scale
 
     def test_mask_position_to_dict(self, mask_position):
         mask_position_dict = mask_position.to_dict()
@@ -914,12 +919,10 @@ class TestMaskPositionWithoutRequest:
         assert mask_position_dict["scale"] == mask_position.scale
 
     def test_equality(self):
-        a = MaskPosition(MaskSpace.point, MaskSpace.x_shift, MaskSpace.y_shift, MaskSpace.scale)
-        b = MaskPosition(MaskSpace.point, MaskSpace.x_shift, MaskSpace.y_shift, MaskSpace.scale)
-        c = MaskPosition(
-            MaskPosition.FOREHEAD, MaskSpace.x_shift, MaskSpace.y_shift, MaskSpace.scale
-        )
-        d = MaskPosition(MaskSpace.point, 0, 0, MaskSpace.scale)
+        a = MaskPosition(self.point, self.x_shift, self.y_shift, self.scale)
+        b = MaskPosition(self.point, self.x_shift, self.y_shift, self.scale)
+        c = MaskPosition(MaskPosition.FOREHEAD, self.x_shift, self.y_shift, self.scale)
+        d = MaskPosition(self.point, 0, 0, self.scale)
         e = Audio("", "", 0, None, None)
 
         assert a == b

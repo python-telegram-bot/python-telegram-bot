@@ -28,16 +28,16 @@ from telegram.request import RequestData
 @pytest.fixture(scope="module")
 def location():
     return Location(
-        latitude=Space.latitude,
-        longitude=Space.longitude,
-        horizontal_accuracy=Space.horizontal_accuracy,
-        live_period=Space.live_period,
-        heading=Space.live_period,
-        proximity_alert_radius=Space.proximity_alert_radius,
+        latitude=TestLocationBase.latitude,
+        longitude=TestLocationBase.longitude,
+        horizontal_accuracy=TestLocationBase.horizontal_accuracy,
+        live_period=TestLocationBase.live_period,
+        heading=TestLocationBase.live_period,
+        proximity_alert_radius=TestLocationBase.proximity_alert_radius,
     )
 
 
-class Space:
+class TestLocationBase:
     latitude = -23.691288
     longitude = -46.788279
     horizontal_accuracy = 999
@@ -46,7 +46,7 @@ class Space:
     proximity_alert_radius = 50
 
 
-class TestLocationWithoutRequest:
+class TestLocationWithoutRequest(TestLocationBase):
     def test_slot_behaviour(self, location, mro_slots):
         for attr in location.__slots__:
             assert getattr(location, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -54,22 +54,22 @@ class TestLocationWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "latitude": Space.latitude,
-            "longitude": Space.longitude,
-            "horizontal_accuracy": Space.horizontal_accuracy,
-            "live_period": Space.live_period,
-            "heading": Space.heading,
-            "proximity_alert_radius": Space.proximity_alert_radius,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "horizontal_accuracy": self.horizontal_accuracy,
+            "live_period": self.live_period,
+            "heading": self.heading,
+            "proximity_alert_radius": self.proximity_alert_radius,
         }
         location = Location.de_json(json_dict, bot)
         assert location.api_kwargs == {}
 
-        assert location.latitude == Space.latitude
-        assert location.longitude == Space.longitude
-        assert location.horizontal_accuracy == Space.horizontal_accuracy
-        assert location.live_period == Space.live_period
-        assert location.heading == Space.heading
-        assert location.proximity_alert_radius == Space.proximity_alert_radius
+        assert location.latitude == self.latitude
+        assert location.longitude == self.longitude
+        assert location.horizontal_accuracy == self.horizontal_accuracy
+        assert location.live_period == self.live_period
+        assert location.heading == self.heading
+        assert location.proximity_alert_radius == self.proximity_alert_radius
 
     def test_to_dict(self, location):
         location_dict = location.to_dict()
@@ -82,9 +82,9 @@ class TestLocationWithoutRequest:
         assert location["proximity_alert_radius"] == location.proximity_alert_radius
 
     def test_equality(self):
-        a = Location(Space.longitude, Space.latitude)
-        b = Location(Space.longitude, Space.latitude)
-        d = Location(0, Space.latitude)
+        a = Location(self.longitude, self.latitude)
+        b = Location(self.longitude, self.latitude)
+        d = Location(0, self.latitude)
 
         assert a == b
         assert hash(a) == hash(b)

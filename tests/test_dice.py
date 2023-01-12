@@ -27,11 +27,11 @@ def dice(request):
     return Dice(value=5, emoji=request.param)
 
 
-class Space:
+class TestDiceBase:
     value = 4
 
 
-class TestDiceWithoutRequest:
+class TestDiceWithoutRequest(TestDiceBase):
     def test_slot_behaviour(self, dice, mro_slots):
         for attr in dice.__slots__:
             assert getattr(dice, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -39,11 +39,11 @@ class TestDiceWithoutRequest:
 
     @pytest.mark.parametrize("emoji", Dice.ALL_EMOJI)
     def test_de_json(self, bot, emoji):
-        json_dict = {"value": Space.value, "emoji": emoji}
+        json_dict = {"value": self.value, "emoji": emoji}
         dice = Dice.de_json(json_dict, bot)
         assert dice.api_kwargs == {}
 
-        assert dice.value == Space.value
+        assert dice.value == self.value
         assert dice.emoji == emoji
         assert Dice.de_json(None, bot) is None
 

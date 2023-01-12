@@ -37,7 +37,7 @@ def chat_permissions():
     )
 
 
-class Space:
+class TestChatPermissionsBase:
     can_send_messages = True
     can_send_media_messages = True
     can_send_polls = True
@@ -49,7 +49,7 @@ class Space:
     can_manage_topics = None
 
 
-class TestChatPermissionsWithoutRequest:
+class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
     def test_slot_behaviour(self, chat_permissions, mro_slots):
         inst = chat_permissions
         for attr in inst.__slots__:
@@ -58,28 +58,28 @@ class TestChatPermissionsWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "can_send_messages": Space.can_send_messages,
-            "can_send_media_messages": Space.can_send_media_messages,
-            "can_send_polls": Space.can_send_polls,
-            "can_send_other_messages": Space.can_send_other_messages,
-            "can_add_web_page_previews": Space.can_add_web_page_previews,
-            "can_change_info": Space.can_change_info,
-            "can_invite_users": Space.can_invite_users,
-            "can_pin_messages": Space.can_pin_messages,
-            "can_manage_topics": Space.can_manage_topics,
+            "can_send_messages": self.can_send_messages,
+            "can_send_media_messages": self.can_send_media_messages,
+            "can_send_polls": self.can_send_polls,
+            "can_send_other_messages": self.can_send_other_messages,
+            "can_add_web_page_previews": self.can_add_web_page_previews,
+            "can_change_info": self.can_change_info,
+            "can_invite_users": self.can_invite_users,
+            "can_pin_messages": self.can_pin_messages,
+            "can_manage_topics": self.can_manage_topics,
         }
         permissions = ChatPermissions.de_json(json_dict, bot)
         assert permissions.api_kwargs == {}
 
-        assert permissions.can_send_messages == Space.can_send_messages
-        assert permissions.can_send_media_messages == Space.can_send_media_messages
-        assert permissions.can_send_polls == Space.can_send_polls
-        assert permissions.can_send_other_messages == Space.can_send_other_messages
-        assert permissions.can_add_web_page_previews == Space.can_add_web_page_previews
-        assert permissions.can_change_info == Space.can_change_info
-        assert permissions.can_invite_users == Space.can_invite_users
-        assert permissions.can_pin_messages == Space.can_pin_messages
-        assert permissions.can_manage_topics == Space.can_manage_topics
+        assert permissions.can_send_messages == self.can_send_messages
+        assert permissions.can_send_media_messages == self.can_send_media_messages
+        assert permissions.can_send_polls == self.can_send_polls
+        assert permissions.can_send_other_messages == self.can_send_other_messages
+        assert permissions.can_add_web_page_previews == self.can_add_web_page_previews
+        assert permissions.can_change_info == self.can_change_info
+        assert permissions.can_invite_users == self.can_invite_users
+        assert permissions.can_pin_messages == self.can_pin_messages
+        assert permissions.can_manage_topics == self.can_manage_topics
 
     def test_to_dict(self, chat_permissions):
         permissions_dict = chat_permissions.to_dict()

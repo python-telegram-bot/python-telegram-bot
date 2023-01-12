@@ -32,23 +32,23 @@ from tests.auxil.bot_method_checks import (
 @pytest.fixture(scope="function", params=["message", "inline"])
 def callback_query(bot, request):
     cbq = CallbackQuery(
-        Space.id_,
-        Space.from_user,
-        Space.chat_instance,
-        data=Space.data,
-        game_short_name=Space.game_short_name,
+        TestCallbackQueryBase.id_,
+        TestCallbackQueryBase.from_user,
+        TestCallbackQueryBase.chat_instance,
+        data=TestCallbackQueryBase.data,
+        game_short_name=TestCallbackQueryBase.game_short_name,
     )
     cbq.set_bot(bot)
     cbq._unfreeze()
     if request.param == "message":
-        cbq.message = Space.message
+        cbq.message = TestCallbackQueryBase.message
         cbq.message.set_bot(bot)
     else:
-        cbq.inline_message_id = Space.inline_message_id
+        cbq.inline_message_id = TestCallbackQueryBase.inline_message_id
     return cbq
 
 
-class Space:
+class TestCallbackQueryBase:
     id_ = "id"
     from_user = User(1, "test_user", False)
     chat_instance = "chat_instance"
@@ -58,7 +58,7 @@ class Space:
     game_short_name = "the_game"
 
 
-class TestCallbackQueryWithoutRequest:
+class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
     @staticmethod
     def skip_params(callback_query: CallbackQuery):
         if callback_query.inline_message_id:
@@ -90,24 +90,24 @@ class TestCallbackQueryWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "id": Space.id_,
-            "from": Space.from_user.to_dict(),
-            "chat_instance": Space.chat_instance,
-            "message": Space.message.to_dict(),
-            "data": Space.data,
-            "inline_message_id": Space.inline_message_id,
-            "game_short_name": Space.game_short_name,
+            "id": self.id_,
+            "from": self.from_user.to_dict(),
+            "chat_instance": self.chat_instance,
+            "message": self.message.to_dict(),
+            "data": self.data,
+            "inline_message_id": self.inline_message_id,
+            "game_short_name": self.game_short_name,
         }
         callback_query = CallbackQuery.de_json(json_dict, bot)
         assert callback_query.api_kwargs == {}
 
-        assert callback_query.id == Space.id_
-        assert callback_query.from_user == Space.from_user
-        assert callback_query.chat_instance == Space.chat_instance
-        assert callback_query.message == Space.message
-        assert callback_query.data == Space.data
-        assert callback_query.inline_message_id == Space.inline_message_id
-        assert callback_query.game_short_name == Space.game_short_name
+        assert callback_query.id == self.id_
+        assert callback_query.from_user == self.from_user
+        assert callback_query.chat_instance == self.chat_instance
+        assert callback_query.message == self.message
+        assert callback_query.data == self.data
+        assert callback_query.inline_message_id == self.inline_message_id
+        assert callback_query.game_short_name == self.game_short_name
 
     def test_to_dict(self, callback_query):
         callback_query_dict = callback_query.to_dict()
@@ -124,11 +124,11 @@ class TestCallbackQueryWithoutRequest:
         assert callback_query_dict["game_short_name"] == callback_query.game_short_name
 
     def test_equality(self):
-        a = CallbackQuery(Space.id_, Space.from_user, "chat")
-        b = CallbackQuery(Space.id_, Space.from_user, "chat")
-        c = CallbackQuery(Space.id_, None, "")
+        a = CallbackQuery(self.id_, self.from_user, "chat")
+        b = CallbackQuery(self.id_, self.from_user, "chat")
+        c = CallbackQuery(self.id_, None, "")
         d = CallbackQuery("", None, "chat")
-        e = Audio(Space.id_, "unique_id", 1)
+        e = Audio(self.id_, "unique_id", 1)
 
         assert a == b
         assert hash(a) == hash(b)

@@ -24,14 +24,14 @@ from telegram import SentWebAppMessage
 
 @pytest.fixture(scope="module")
 def sent_web_app_message():
-    return SentWebAppMessage(inline_message_id=Space.inline_message_id)
+    return SentWebAppMessage(inline_message_id=TestSentWebAppMessageBase.inline_message_id)
 
 
-class Space:
+class TestSentWebAppMessageBase:
     inline_message_id = "123"
 
 
-class TestSentWebAppMessageWithoutRequest:
+class TestSentWebAppMessageWithoutRequest(TestSentWebAppMessageBase):
     def test_slot_behaviour(self, sent_web_app_message, mro_slots):
         inst = sent_web_app_message
         for attr in inst.__slots__:
@@ -42,17 +42,17 @@ class TestSentWebAppMessageWithoutRequest:
         sent_web_app_message_dict = sent_web_app_message.to_dict()
 
         assert isinstance(sent_web_app_message_dict, dict)
-        assert sent_web_app_message_dict["inline_message_id"] == Space.inline_message_id
+        assert sent_web_app_message_dict["inline_message_id"] == self.inline_message_id
 
     def test_de_json(self, bot):
-        data = {"inline_message_id": Space.inline_message_id}
+        data = {"inline_message_id": self.inline_message_id}
         m = SentWebAppMessage.de_json(data, None)
         assert m.api_kwargs == {}
-        assert m.inline_message_id == Space.inline_message_id
+        assert m.inline_message_id == self.inline_message_id
 
     def test_equality(self):
-        a = SentWebAppMessage(Space.inline_message_id)
-        b = SentWebAppMessage(Space.inline_message_id)
+        a = SentWebAppMessage(self.inline_message_id)
+        b = SentWebAppMessage(self.inline_message_id)
         c = SentWebAppMessage("")
         d = SentWebAppMessage("not_inline_message_id")
 

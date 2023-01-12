@@ -48,7 +48,7 @@ async def animation(bot, chat_id):
         ).animation
 
 
-class Space:
+class TestAnimationBase:
     animation_file_id = "CgADAQADngIAAuyVeEez0xRovKi9VAI"
     animation_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     width = 320
@@ -63,7 +63,7 @@ class Space:
     caption = "Test *animation*"
 
 
-class TestAnimationWithoutRequest:
+class TestAnimationWithoutRequest(TestAnimationBase):
     def test_slot_behaviour(self, animation, mro_slots):
         for attr in animation.__slots__:
             assert getattr(animation, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -77,29 +77,29 @@ class TestAnimationWithoutRequest:
         assert animation.file_unique_id != ""
 
     def test_expected_values(self, animation):
-        assert animation.mime_type == Space.mime_type
-        assert animation.file_name.startswith("game.gif") == Space.file_name.startswith("game.gif")
+        assert animation.mime_type == self.mime_type
+        assert animation.file_name.startswith("game.gif") == self.file_name.startswith("game.gif")
         assert isinstance(animation.thumb, PhotoSize)
 
     def test_de_json(self, bot, animation):
         json_dict = {
-            "file_id": Space.animation_file_id,
-            "file_unique_id": Space.animation_file_unique_id,
-            "width": Space.width,
-            "height": Space.height,
-            "duration": Space.duration,
+            "file_id": self.animation_file_id,
+            "file_unique_id": self.animation_file_unique_id,
+            "width": self.width,
+            "height": self.height,
+            "duration": self.duration,
             "thumb": animation.thumb.to_dict(),
-            "file_name": Space.file_name,
-            "mime_type": Space.mime_type,
-            "file_size": Space.file_size,
+            "file_name": self.file_name,
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
         }
         animation = Animation.de_json(json_dict, bot)
         assert animation.api_kwargs == {}
-        assert animation.file_id == Space.animation_file_id
-        assert animation.file_unique_id == Space.animation_file_unique_id
-        assert animation.file_name == Space.file_name
-        assert animation.mime_type == Space.mime_type
-        assert animation.file_size == Space.file_size
+        assert animation.file_id == self.animation_file_id
+        assert animation.file_unique_id == self.animation_file_unique_id
+        assert animation.file_name == self.file_name
+        assert animation.mime_type == self.mime_type
+        assert animation.file_size == self.file_size
 
     def test_to_dict(self, animation):
         animation_dict = animation.to_dict()
@@ -117,17 +117,15 @@ class TestAnimationWithoutRequest:
 
     def test_equality(self):
         a = Animation(
-            Space.animation_file_id,
-            Space.animation_file_unique_id,
-            Space.height,
-            Space.width,
-            Space.duration,
+            self.animation_file_id,
+            self.animation_file_unique_id,
+            self.height,
+            self.width,
+            self.duration,
         )
-        b = Animation(
-            "", Space.animation_file_unique_id, Space.height, Space.width, Space.duration
-        )
+        b = Animation("", self.animation_file_unique_id, self.height, self.width, self.duration)
         d = Animation("", "", 0, 0, 0)
-        e = Voice(Space.animation_file_id, Space.animation_file_unique_id, 0)
+        e = Voice(self.animation_file_id, self.animation_file_unique_id, 0)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -189,15 +187,15 @@ class TestAnimationWithoutRequest:
         assert await animation.get_file()
 
 
-class TestAnimationWithRequest:
+class TestAnimationWithRequest(TestAnimationBase):
     async def test_send_all_args(self, bot, chat_id, animation_file, animation, thumb_file):
         message = await bot.send_animation(
             chat_id,
             animation_file,
-            duration=Space.duration,
-            width=Space.width,
-            height=Space.height,
-            caption=Space.caption,
+            duration=self.duration,
+            width=self.width,
+            height=self.height,
+            caption=self.caption,
             parse_mode="Markdown",
             disable_notification=False,
             protect_content=True,
@@ -213,8 +211,8 @@ class TestAnimationWithRequest:
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
-        assert message.animation.thumb.width == Space.width
-        assert message.animation.thumb.height == Space.height
+        assert message.animation.thumb.width == self.width
+        assert message.animation.thumb.height == self.height
         assert message.has_protected_content
         try:
             assert message.has_media_spoiler
@@ -236,10 +234,10 @@ class TestAnimationWithRequest:
 
     async def test_send_animation_url_file(self, bot, chat_id, animation):
         message = await bot.send_animation(
-            chat_id=chat_id, animation=Space.animation_file_url, caption=Space.caption
+            chat_id=chat_id, animation=self.animation_file_url, caption=self.caption
         )
 
-        assert message.caption == Space.caption
+        assert message.caption == self.caption
 
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)

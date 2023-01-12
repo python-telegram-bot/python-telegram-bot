@@ -31,19 +31,19 @@ from telegram import (
 @pytest.fixture(scope="module")
 def inline_query_result_cached_video():
     return InlineQueryResultCachedVideo(
-        Space.id_,
-        Space.video_file_id,
-        Space.title,
-        caption=Space.caption,
-        parse_mode=Space.parse_mode,
-        caption_entities=Space.caption_entities,
-        description=Space.description,
-        input_message_content=Space.input_message_content,
-        reply_markup=Space.reply_markup,
+        TestInlineQueryResultCachedVideoBase.id_,
+        TestInlineQueryResultCachedVideoBase.video_file_id,
+        TestInlineQueryResultCachedVideoBase.title,
+        caption=TestInlineQueryResultCachedVideoBase.caption,
+        parse_mode=TestInlineQueryResultCachedVideoBase.parse_mode,
+        caption_entities=TestInlineQueryResultCachedVideoBase.caption_entities,
+        description=TestInlineQueryResultCachedVideoBase.description,
+        input_message_content=TestInlineQueryResultCachedVideoBase.input_message_content,
+        reply_markup=TestInlineQueryResultCachedVideoBase.reply_markup,
     )
 
 
-class Space:
+class TestInlineQueryResultCachedVideoBase:
     id_ = "id"
     type_ = "video"
     video_file_id = "video file id"
@@ -56,7 +56,7 @@ class Space:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultCachedVideoWithoutRequest:
+class TestInlineQueryResultCachedVideoWithoutRequest(TestInlineQueryResultCachedVideoBase):
     def test_slot_behaviour(self, inline_query_result_cached_video, mro_slots):
         inst = inline_query_result_cached_video
         for attr in inst.__slots__:
@@ -64,24 +64,24 @@ class TestInlineQueryResultCachedVideoWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_cached_video):
-        assert inline_query_result_cached_video.type == Space.type_
-        assert inline_query_result_cached_video.id == Space.id_
-        assert inline_query_result_cached_video.video_file_id == Space.video_file_id
-        assert inline_query_result_cached_video.title == Space.title
-        assert inline_query_result_cached_video.description == Space.description
-        assert inline_query_result_cached_video.caption == Space.caption
-        assert inline_query_result_cached_video.parse_mode == Space.parse_mode
-        assert inline_query_result_cached_video.caption_entities == tuple(Space.caption_entities)
+        assert inline_query_result_cached_video.type == self.type_
+        assert inline_query_result_cached_video.id == self.id_
+        assert inline_query_result_cached_video.video_file_id == self.video_file_id
+        assert inline_query_result_cached_video.title == self.title
+        assert inline_query_result_cached_video.description == self.description
+        assert inline_query_result_cached_video.caption == self.caption
+        assert inline_query_result_cached_video.parse_mode == self.parse_mode
+        assert inline_query_result_cached_video.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_cached_video.input_message_content.to_dict()
-            == Space.input_message_content.to_dict()
+            == self.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_cached_video.reply_markup.to_dict() == Space.reply_markup.to_dict()
+            inline_query_result_cached_video.reply_markup.to_dict() == self.reply_markup.to_dict()
         )
 
     def test_caption_entities_always_tuple(self):
-        video = InlineQueryResultCachedVideo(Space.id_, Space.video_file_id, Space.title)
+        video = InlineQueryResultCachedVideo(self.id_, self.video_file_id, self.title)
 
         assert video.caption_entities == ()
 
@@ -126,11 +126,11 @@ class TestInlineQueryResultCachedVideoWithoutRequest:
         )
 
     def test_equality(self):
-        a = InlineQueryResultCachedVideo(Space.id_, Space.video_file_id, Space.title)
-        b = InlineQueryResultCachedVideo(Space.id_, Space.video_file_id, Space.title)
-        c = InlineQueryResultCachedVideo(Space.id_, "", Space.title)
-        d = InlineQueryResultCachedVideo("", Space.video_file_id, Space.title)
-        e = InlineQueryResultCachedVoice(Space.id_, "", "")
+        a = InlineQueryResultCachedVideo(self.id_, self.video_file_id, self.title)
+        b = InlineQueryResultCachedVideo(self.id_, self.video_file_id, self.title)
+        c = InlineQueryResultCachedVideo(self.id_, "", self.title)
+        d = InlineQueryResultCachedVideo("", self.video_file_id, self.title)
+        e = InlineQueryResultCachedVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

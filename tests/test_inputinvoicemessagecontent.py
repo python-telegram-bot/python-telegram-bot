@@ -25,30 +25,30 @@ from telegram import InputInvoiceMessageContent, InputTextMessageContent, Labele
 @pytest.fixture(scope="module")
 def input_invoice_message_content():
     return InputInvoiceMessageContent(
-        title=Space.title,
-        description=Space.description,
-        payload=Space.payload,
-        provider_token=Space.provider_token,
-        currency=Space.currency,
-        prices=Space.prices,
-        max_tip_amount=Space.max_tip_amount,
-        suggested_tip_amounts=Space.suggested_tip_amounts,
-        provider_data=Space.provider_data,
-        photo_url=Space.photo_url,
-        photo_size=Space.photo_size,
-        photo_width=Space.photo_width,
-        photo_height=Space.photo_height,
-        need_name=Space.need_name,
-        need_phone_number=Space.need_phone_number,
-        need_email=Space.need_email,
-        need_shipping_address=Space.need_shipping_address,
-        send_phone_number_to_provider=Space.send_phone_number_to_provider,
-        send_email_to_provider=Space.send_email_to_provider,
-        is_flexible=Space.is_flexible,
+        title=TestInputInvoiceMessageContentBase.title,
+        description=TestInputInvoiceMessageContentBase.description,
+        payload=TestInputInvoiceMessageContentBase.payload,
+        provider_token=TestInputInvoiceMessageContentBase.provider_token,
+        currency=TestInputInvoiceMessageContentBase.currency,
+        prices=TestInputInvoiceMessageContentBase.prices,
+        max_tip_amount=TestInputInvoiceMessageContentBase.max_tip_amount,
+        suggested_tip_amounts=TestInputInvoiceMessageContentBase.suggested_tip_amounts,
+        provider_data=TestInputInvoiceMessageContentBase.provider_data,
+        photo_url=TestInputInvoiceMessageContentBase.photo_url,
+        photo_size=TestInputInvoiceMessageContentBase.photo_size,
+        photo_width=TestInputInvoiceMessageContentBase.photo_width,
+        photo_height=TestInputInvoiceMessageContentBase.photo_height,
+        need_name=TestInputInvoiceMessageContentBase.need_name,
+        need_phone_number=TestInputInvoiceMessageContentBase.need_phone_number,
+        need_email=TestInputInvoiceMessageContentBase.need_email,
+        need_shipping_address=TestInputInvoiceMessageContentBase.need_shipping_address,
+        send_phone_number_to_provider=TestInputInvoiceMessageContentBase.send_phone_number_to_provider,  # noqa: E501
+        send_email_to_provider=TestInputInvoiceMessageContentBase.send_email_to_provider,
+        is_flexible=TestInputInvoiceMessageContentBase.is_flexible,
     )
 
 
-class Space:
+class TestInputInvoiceMessageContentBase:
     title = "invoice title"
     description = "invoice description"
     payload = "invoice payload"
@@ -71,7 +71,7 @@ class Space:
     is_flexible = True
 
 
-class TestInputInvoiceMessageContentWithoutRequest:
+class TestInputInvoiceMessageContentWithoutRequest(TestInputInvoiceMessageContentBase):
     def test_slot_behaviour(self, input_invoice_message_content, mro_slots):
         inst = input_invoice_message_content
         for attr in inst.__slots__:
@@ -79,45 +79,45 @@ class TestInputInvoiceMessageContentWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_invoice_message_content):
-        assert input_invoice_message_content.title == Space.title
-        assert input_invoice_message_content.description == Space.description
-        assert input_invoice_message_content.payload == Space.payload
-        assert input_invoice_message_content.provider_token == Space.provider_token
-        assert input_invoice_message_content.currency == Space.currency
-        assert input_invoice_message_content.prices == tuple(Space.prices)
-        assert input_invoice_message_content.max_tip_amount == Space.max_tip_amount
+        assert input_invoice_message_content.title == self.title
+        assert input_invoice_message_content.description == self.description
+        assert input_invoice_message_content.payload == self.payload
+        assert input_invoice_message_content.provider_token == self.provider_token
+        assert input_invoice_message_content.currency == self.currency
+        assert input_invoice_message_content.prices == tuple(self.prices)
+        assert input_invoice_message_content.max_tip_amount == self.max_tip_amount
         assert input_invoice_message_content.suggested_tip_amounts == tuple(
-            int(amount) for amount in Space.suggested_tip_amounts
+            int(amount) for amount in self.suggested_tip_amounts
         )
-        assert input_invoice_message_content.provider_data == Space.provider_data
-        assert input_invoice_message_content.photo_url == Space.photo_url
-        assert input_invoice_message_content.photo_size == int(Space.photo_size)
-        assert input_invoice_message_content.photo_width == int(Space.photo_width)
-        assert input_invoice_message_content.photo_height == int(Space.photo_height)
-        assert input_invoice_message_content.need_name == Space.need_name
-        assert input_invoice_message_content.need_phone_number == Space.need_phone_number
-        assert input_invoice_message_content.need_email == Space.need_email
-        assert input_invoice_message_content.need_shipping_address == Space.need_shipping_address
+        assert input_invoice_message_content.provider_data == self.provider_data
+        assert input_invoice_message_content.photo_url == self.photo_url
+        assert input_invoice_message_content.photo_size == int(self.photo_size)
+        assert input_invoice_message_content.photo_width == int(self.photo_width)
+        assert input_invoice_message_content.photo_height == int(self.photo_height)
+        assert input_invoice_message_content.need_name == self.need_name
+        assert input_invoice_message_content.need_phone_number == self.need_phone_number
+        assert input_invoice_message_content.need_email == self.need_email
+        assert input_invoice_message_content.need_shipping_address == self.need_shipping_address
         assert (
             input_invoice_message_content.send_phone_number_to_provider
-            == Space.send_phone_number_to_provider
+            == self.send_phone_number_to_provider
         )
-        assert input_invoice_message_content.send_email_to_provider == Space.send_email_to_provider
-        assert input_invoice_message_content.is_flexible == Space.is_flexible
+        assert input_invoice_message_content.send_email_to_provider == self.send_email_to_provider
+        assert input_invoice_message_content.is_flexible == self.is_flexible
 
     def test_suggested_tip_amonuts_always_tuple(self, input_invoice_message_content):
         assert isinstance(input_invoice_message_content.suggested_tip_amounts, tuple)
         assert input_invoice_message_content.suggested_tip_amounts == tuple(
-            int(amount) for amount in Space.suggested_tip_amounts
+            int(amount) for amount in self.suggested_tip_amounts
         )
 
         input_invoice_message_content = InputInvoiceMessageContent(
-            title=Space.title,
-            description=Space.description,
-            payload=Space.payload,
-            provider_token=Space.provider_token,
-            currency=Space.currency,
-            prices=Space.prices,
+            title=self.title,
+            description=self.description,
+            payload=self.payload,
+            provider_token=self.provider_token,
+            currency=self.currency,
+            prices=self.prices,
         )
         assert input_invoice_message_content.suggested_tip_amounts == tuple()
 
@@ -204,92 +204,92 @@ class TestInputInvoiceMessageContentWithoutRequest:
         assert InputInvoiceMessageContent.de_json({}, bot=bot) is None
 
         json_dict = {
-            "title": Space.title,
-            "description": Space.description,
-            "payload": Space.payload,
-            "provider_token": Space.provider_token,
-            "currency": Space.currency,
-            "prices": [price.to_dict() for price in Space.prices],
-            "max_tip_amount": Space.max_tip_amount,
-            "suggested_tip_amounts": Space.suggested_tip_amounts,
-            "provider_data": Space.provider_data,
-            "photo_url": Space.photo_url,
-            "photo_size": Space.photo_size,
-            "photo_width": Space.photo_width,
-            "photo_height": Space.photo_height,
-            "need_name": Space.need_name,
-            "need_phone_number": Space.need_phone_number,
-            "need_email": Space.need_email,
-            "need_shipping_address": Space.need_shipping_address,
-            "send_phone_number_to_provider": Space.send_phone_number_to_provider,
-            "send_email_to_provider": Space.send_email_to_provider,
-            "is_flexible": Space.is_flexible,
+            "title": self.title,
+            "description": self.description,
+            "payload": self.payload,
+            "provider_token": self.provider_token,
+            "currency": self.currency,
+            "prices": [price.to_dict() for price in self.prices],
+            "max_tip_amount": self.max_tip_amount,
+            "suggested_tip_amounts": self.suggested_tip_amounts,
+            "provider_data": self.provider_data,
+            "photo_url": self.photo_url,
+            "photo_size": self.photo_size,
+            "photo_width": self.photo_width,
+            "photo_height": self.photo_height,
+            "need_name": self.need_name,
+            "need_phone_number": self.need_phone_number,
+            "need_email": self.need_email,
+            "need_shipping_address": self.need_shipping_address,
+            "send_phone_number_to_provider": self.send_phone_number_to_provider,
+            "send_email_to_provider": self.send_email_to_provider,
+            "is_flexible": self.is_flexible,
         }
 
         input_invoice_message_content = InputInvoiceMessageContent.de_json(json_dict, bot=bot)
         assert input_invoice_message_content.api_kwargs == {}
 
-        assert input_invoice_message_content.title == Space.title
-        assert input_invoice_message_content.description == Space.description
-        assert input_invoice_message_content.payload == Space.payload
-        assert input_invoice_message_content.provider_token == Space.provider_token
-        assert input_invoice_message_content.currency == Space.currency
-        assert input_invoice_message_content.prices == tuple(Space.prices)
-        assert input_invoice_message_content.max_tip_amount == Space.max_tip_amount
+        assert input_invoice_message_content.title == self.title
+        assert input_invoice_message_content.description == self.description
+        assert input_invoice_message_content.payload == self.payload
+        assert input_invoice_message_content.provider_token == self.provider_token
+        assert input_invoice_message_content.currency == self.currency
+        assert input_invoice_message_content.prices == tuple(self.prices)
+        assert input_invoice_message_content.max_tip_amount == self.max_tip_amount
         assert input_invoice_message_content.suggested_tip_amounts == tuple(
-            int(amount) for amount in Space.suggested_tip_amounts
+            int(amount) for amount in self.suggested_tip_amounts
         )
-        assert input_invoice_message_content.provider_data == Space.provider_data
-        assert input_invoice_message_content.photo_url == Space.photo_url
-        assert input_invoice_message_content.photo_size == int(Space.photo_size)
-        assert input_invoice_message_content.photo_width == int(Space.photo_width)
-        assert input_invoice_message_content.photo_height == int(Space.photo_height)
-        assert input_invoice_message_content.need_name == Space.need_name
-        assert input_invoice_message_content.need_phone_number == Space.need_phone_number
-        assert input_invoice_message_content.need_email == Space.need_email
-        assert input_invoice_message_content.need_shipping_address == Space.need_shipping_address
+        assert input_invoice_message_content.provider_data == self.provider_data
+        assert input_invoice_message_content.photo_url == self.photo_url
+        assert input_invoice_message_content.photo_size == int(self.photo_size)
+        assert input_invoice_message_content.photo_width == int(self.photo_width)
+        assert input_invoice_message_content.photo_height == int(self.photo_height)
+        assert input_invoice_message_content.need_name == self.need_name
+        assert input_invoice_message_content.need_phone_number == self.need_phone_number
+        assert input_invoice_message_content.need_email == self.need_email
+        assert input_invoice_message_content.need_shipping_address == self.need_shipping_address
         assert (
             input_invoice_message_content.send_phone_number_to_provider
-            == Space.send_phone_number_to_provider
+            == self.send_phone_number_to_provider
         )
-        assert input_invoice_message_content.send_email_to_provider == Space.send_email_to_provider
-        assert input_invoice_message_content.is_flexible == Space.is_flexible
+        assert input_invoice_message_content.send_email_to_provider == self.send_email_to_provider
+        assert input_invoice_message_content.is_flexible == self.is_flexible
 
     def test_equality(self):
         a = InputInvoiceMessageContent(
-            Space.title,
-            Space.description,
-            Space.payload,
-            Space.provider_token,
-            Space.currency,
-            Space.prices,
+            self.title,
+            self.description,
+            self.payload,
+            self.provider_token,
+            self.currency,
+            self.prices,
         )
         b = InputInvoiceMessageContent(
-            Space.title,
-            Space.description,
-            Space.payload,
-            Space.provider_token,
-            Space.currency,
-            Space.prices,
+            self.title,
+            self.description,
+            self.payload,
+            self.provider_token,
+            self.currency,
+            self.prices,
             max_tip_amount=100,
             provider_data="foobar",
         )
         c = InputInvoiceMessageContent(
-            Space.title,
-            Space.description,
-            Space.payload,
-            Space.provider_token,
-            Space.currency,
+            self.title,
+            self.description,
+            self.payload,
+            self.provider_token,
+            self.currency,
             # the first prices amount & the second lebal changed
             [LabeledPrice("label1", 24), LabeledPrice("label22", 314)],
         )
         d = InputInvoiceMessageContent(
-            Space.title,
-            Space.description,
+            self.title,
+            self.description,
             "different_payload",
-            Space.provider_token,
-            Space.currency,
-            Space.prices,
+            self.provider_token,
+            self.currency,
+            self.prices,
         )
         e = InputTextMessageContent("text")
 

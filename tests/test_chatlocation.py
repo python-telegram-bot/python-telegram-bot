@@ -24,15 +24,15 @@ from telegram import ChatLocation, Location, User
 
 @pytest.fixture(scope="module")
 def chat_location():
-    return ChatLocation(Space.location, Space.address)
+    return ChatLocation(TestChatLocationBase.location, TestChatLocationBase.address)
 
 
-class Space:
+class TestChatLocationBase:
     location = Location(123, 456)
     address = "The Shire"
 
 
-class TestChatLocationWithoutRequest:
+class TestChatLocationWithoutRequest(TestChatLocationBase):
     def test_slot_behaviour(self, chat_location, mro_slots):
         inst = chat_location
         for attr in inst.__slots__:
@@ -41,14 +41,14 @@ class TestChatLocationWithoutRequest:
 
     def test_de_json(self, bot):
         json_dict = {
-            "location": Space.location.to_dict(),
-            "address": Space.address,
+            "location": self.location.to_dict(),
+            "address": self.address,
         }
         chat_location = ChatLocation.de_json(json_dict, bot)
         assert chat_location.api_kwargs == {}
 
-        assert chat_location.location == Space.location
-        assert chat_location.address == Space.address
+        assert chat_location.location == self.location
+        assert chat_location.address == self.address
 
     def test_to_dict(self, chat_location):
         chat_location_dict = chat_location.to_dict()
@@ -59,9 +59,9 @@ class TestChatLocationWithoutRequest:
 
     def test_equality(self, chat_location):
         a = chat_location
-        b = ChatLocation(Space.location, Space.address)
-        c = ChatLocation(Space.location, "Mordor")
-        d = ChatLocation(Location(456, 132), Space.address)
+        b = ChatLocation(self.location, self.address)
+        c = ChatLocation(self.location, "Mordor")
+        d = ChatLocation(Location(456, 132), self.address)
         e = User(456, "", False)
 
         assert a == b

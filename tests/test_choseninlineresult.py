@@ -31,15 +31,17 @@ def user():
 
 @pytest.fixture(scope="module")
 def chosen_inline_result(user):
-    return ChosenInlineResult(Space.result_id, user, Space.query)
+    return ChosenInlineResult(
+        TestChosenInlineResultBase.result_id, user, TestChosenInlineResultBase.query
+    )
 
 
-class Space:
+class TestChosenInlineResultBase:
     result_id = "result id"
     query = "query text"
 
 
-class TestChosenInlineResultWithoutRequest:
+class TestChosenInlineResultWithoutRequest(TestChosenInlineResultBase):
     def test_slot_behaviour(self, chosen_inline_result, mro_slots):
         inst = chosen_inline_result
         for attr in inst.__slots__:
@@ -47,29 +49,29 @@ class TestChosenInlineResultWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json_required(self, bot, user):
-        json_dict = {"result_id": Space.result_id, "from": user.to_dict(), "query": Space.query}
+        json_dict = {"result_id": self.result_id, "from": user.to_dict(), "query": self.query}
         result = ChosenInlineResult.de_json(json_dict, bot)
         assert result.api_kwargs == {}
 
-        assert result.result_id == Space.result_id
+        assert result.result_id == self.result_id
         assert result.from_user == user
-        assert result.query == Space.query
+        assert result.query == self.query
 
     def test_de_json_all(self, bot, user):
         loc = Location(-42.003, 34.004)
         json_dict = {
-            "result_id": Space.result_id,
+            "result_id": self.result_id,
             "from": user.to_dict(),
-            "query": Space.query,
+            "query": self.query,
             "location": loc.to_dict(),
             "inline_message_id": "a random id",
         }
         result = ChosenInlineResult.de_json(json_dict, bot)
         assert result.api_kwargs == {}
 
-        assert result.result_id == Space.result_id
+        assert result.result_id == self.result_id
         assert result.from_user == user
-        assert result.query == Space.query
+        assert result.query == self.query
         assert result.location == loc
         assert result.inline_message_id == "a random id"
 
@@ -82,11 +84,11 @@ class TestChosenInlineResultWithoutRequest:
         assert chosen_inline_result_dict["query"] == chosen_inline_result.query
 
     def test_equality(self, user):
-        a = ChosenInlineResult(Space.result_id, user, "Query", "")
-        b = ChosenInlineResult(Space.result_id, user, "Query", "")
-        c = ChosenInlineResult(Space.result_id, user, "", "")
+        a = ChosenInlineResult(self.result_id, user, "Query", "")
+        b = ChosenInlineResult(self.result_id, user, "Query", "")
+        c = ChosenInlineResult(self.result_id, user, "", "")
         d = ChosenInlineResult("", user, "Query", "")
-        e = Voice(Space.result_id, "unique_id", 0)
+        e = Voice(self.result_id, "unique_id", 0)
 
         assert a == b
         assert hash(a) == hash(b)

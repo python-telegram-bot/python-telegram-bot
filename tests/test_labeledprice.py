@@ -23,15 +23,15 @@ from telegram import LabeledPrice, Location
 
 @pytest.fixture(scope="module")
 def labeled_price():
-    return LabeledPrice(Space.label, Space.amount)
+    return LabeledPrice(TestLabeledPriceBase.label, TestLabeledPriceBase.amount)
 
 
-class Space:
+class TestLabeledPriceBase:
     label = "label"
     amount = 100
 
 
-class TestLabeledPriceWithoutRequest:
+class TestLabeledPriceWithoutRequest(TestLabeledPriceBase):
     def test_slot_behaviour(self, labeled_price, mro_slots):
         inst = labeled_price
         for attr in inst.__slots__:
@@ -39,8 +39,8 @@ class TestLabeledPriceWithoutRequest:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, labeled_price):
-        assert labeled_price.label == Space.label
-        assert labeled_price.amount == Space.amount
+        assert labeled_price.label == self.label
+        assert labeled_price.amount == self.amount
 
     def test_to_dict(self, labeled_price):
         labeled_price_dict = labeled_price.to_dict()
