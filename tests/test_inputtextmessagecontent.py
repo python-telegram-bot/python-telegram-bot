@@ -39,7 +39,7 @@ class Space:
     disable_web_page_preview = True
 
 
-class TestInputTextMessageContentNoReq:
+class TestInputTextMessageContentWithoutRequest:
     def test_slot_behaviour(self, input_text_message_content, mro_slots):
         inst = input_text_message_content
         for attr in inst.__slots__:

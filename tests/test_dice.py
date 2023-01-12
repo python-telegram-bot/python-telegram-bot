@@ -31,7 +31,7 @@ class Space:
     value = 4
 
 
-class TestDiceNoReq:
+class TestDiceWithoutRequest:
     def test_slot_behaviour(self, dice, mro_slots):
         for attr in dice.__slots__:
             assert getattr(dice, attr, "err") != "err", f"got extra slot '{attr}'"

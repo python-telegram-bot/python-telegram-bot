@@ -88,7 +88,7 @@ class Space:
     has_hidden_members = True
 
 
-class TestChatNoReq:
+class TestChatWithoutRequest:
     def test_slot_behaviour(self, chat, mro_slots):
         for attr in chat.__slots__:
             assert getattr(chat, attr, "err") != "err", f"got extra slot '{attr}'"

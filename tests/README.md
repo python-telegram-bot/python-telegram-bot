@@ -31,7 +31,7 @@ the failed tests in isolation, you can use the `--lf` flag:
 PTB has a separate test file for every file in the `telegram.*` namespace. Further, the tests for
 the `telegram` module are split into two classes, based on whether the test methods in them make a
 request or not. When writing tests, make sure to split them into these two classes, and make sure
-to name the test class as: `TestXXXNoReq` for tests that don't make a request, and `TestXXXReq` for
+to name the test class as: `TestXXXWithoutRequest` for tests that don't make a request, and `TestXXXReq` for
 tests that do.
 
 Writing tests is a creative process, where you can design your test however you'd like, but there

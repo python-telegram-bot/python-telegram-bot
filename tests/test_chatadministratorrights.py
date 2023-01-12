@@ -39,7 +39,7 @@ def chat_admin_rights():
     )
 
 
-class TestChatAdministratorRightsNoReq:
+class TestChatAdministratorRightsWithoutRequest:
     def test_slot_behaviour(self, chat_admin_rights, mro_slots):
         inst = chat_admin_rights
         for attr in inst.__slots__:

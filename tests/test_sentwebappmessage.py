@@ -31,7 +31,7 @@ class Space:
     inline_message_id = "123"
 
 
-class TestSentWebAppMessageNoReq:
+class TestSentWebAppMessageWithoutRequest:
     def test_slot_behaviour(self, sent_web_app_message, mro_slots):
         inst = sent_web_app_message
         for attr in inst.__slots__:

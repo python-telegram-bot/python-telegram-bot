@@ -22,10 +22,10 @@ from telegram import MessageId, User
 
 @pytest.fixture(scope="module")
 def message_id():
-    return MessageId(message_id=TestMessageIdNoReq.m_id)
+    return MessageId(message_id=TestMessageIdWithoutRequest.m_id)
 
 
-class TestMessageIdNoReq:
+class TestMessageIdWithoutRequest:
     m_id = 1234
 
     def test_slot_behaviour(self, message_id, mro_slots):

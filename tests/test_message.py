@@ -342,7 +342,7 @@ class Space:
     )
 
 
-class TestMessageNoReq:
+class TestMessageWithoutRequest:
     def test_slot_behaviour(self, message, mro_slots):
         for attr in message.__slots__:
             assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"

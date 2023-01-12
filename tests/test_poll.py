@@ -36,7 +36,7 @@ class PollOptionSpace:
     voter_count = 3
 
 
-class TestPollOptionNoReq:
+class TestPollOptionWithoutRequest:
     def test_slot_behaviour(self, poll_option, mro_slots):
         for attr in poll_option.__slots__:
             assert getattr(poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -88,7 +88,7 @@ class PollAnswerSpace:
     option_ids = [2]
 
 
-class TestPollAnswerNoReq:
+class TestPollAnswerWithoutRequest:
     def test_de_json(self):
         json_dict = {
             "poll_id": PollAnswerSpace.poll_id,
@@ -168,7 +168,7 @@ class PollSpace:
     close_date = datetime.now(timezone.utc)
 
 
-class TestPollNoReq:
+class TestPollWithoutRequest:
     def test_de_json(self, bot):
         json_dict = {
             "id": PollSpace.id_,

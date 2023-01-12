@@ -52,7 +52,7 @@ class Space:
     order_info = OrderInfo()
 
 
-class TestPreCheckoutQueryNoReq:
+class TestPreCheckoutQueryWithoutRequest:
     def test_slot_behaviour(self, pre_checkout_query, mro_slots):
         inst = pre_checkout_query
         for attr in inst.__slots__:

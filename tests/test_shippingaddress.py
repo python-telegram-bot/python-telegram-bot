@@ -42,7 +42,7 @@ class Space:
     post_code = "WC1"
 
 
-class TestShippingAddressNoReq:
+class TestShippingAddressWithoutRequest:
     def test_slot_behaviour(self, shipping_address, mro_slots):
         inst = shipping_address
         for attr in inst.__slots__:

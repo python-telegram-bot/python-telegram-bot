@@ -71,7 +71,7 @@ class Space:
     file_size = [29176, 27662]
 
 
-class TestPhotoNoReq:
+class TestPhotoWithoutRequest:
     def test_slot_behaviour(self, photo, mro_slots):
         for attr in photo.__slots__:
             assert getattr(photo, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -206,7 +206,7 @@ class TestPhotoNoReq:
         assert await photo.get_file()
 
 
-class TestPhotoReq:
+class TestPhotoWithRequest:
     async def test_send_photo_all_args(self, bot, chat_id, photo_file):
         message = await bot.send_photo(
             chat_id,

@@ -40,7 +40,7 @@ def user2():
     return User(first_name="Mister Test", id=124, is_bot=False)
 
 
-class TestVideoChatStartedNoReq:
+class TestVideoChatStartedWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         action = VideoChatStarted()
         for attr in action.__slots__:
@@ -58,7 +58,7 @@ class TestVideoChatStartedNoReq:
         assert video_chat_dict == {}
 
 
-class TestVideoChatEndedNoReq:
+class TestVideoChatEndedWithoutRequest:
     duration = 100
 
     def test_slot_behaviour(self, mro_slots):
@@ -97,7 +97,7 @@ class TestVideoChatEndedNoReq:
         assert hash(a) != hash(d)
 
 
-class TestVideoChatParticipantsInvitedNoReq:
+class TestVideoChatParticipantsInvitedWithoutRequest:
     def test_slot_behaviour(self, mro_slots, user1):
         action = VideoChatParticipantsInvited([user1])
         for attr in action.__slots__:
@@ -148,7 +148,7 @@ class TestVideoChatParticipantsInvitedNoReq:
         assert hash(a) != hash(e)
 
 
-class TestVideoChatScheduledNoReq:
+class TestVideoChatScheduledWithoutRequest:
     start_date = dtm.datetime.now(dtm.timezone.utc)
 
     def test_slot_behaviour(self, mro_slots):

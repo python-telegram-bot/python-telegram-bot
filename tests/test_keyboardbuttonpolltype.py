@@ -30,7 +30,7 @@ class Space:
     type = Poll.QUIZ
 
 
-class TestKeyboardButtonPollTypeNoReq:
+class TestKeyboardButtonPollTypeWithoutRequest:
     def test_slot_behaviour(self, keyboard_button_poll_type, mro_slots):
         inst = keyboard_button_poll_type
         for attr in inst.__slots__:

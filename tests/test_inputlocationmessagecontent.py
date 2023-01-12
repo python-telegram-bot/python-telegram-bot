@@ -42,7 +42,7 @@ class Space:
     proximity_alert_radius = 999
 
 
-class TestInputLocationMessageContentNoReq:
+class TestInputLocationMessageContentWithoutRequest:
     def test_slot_behaviour(self, input_location_message_content, mro_slots):
         inst = input_location_message_content
         for attr in inst.__slots__:

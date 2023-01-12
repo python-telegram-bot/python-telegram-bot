@@ -61,7 +61,7 @@ class Space:
     )
 
 
-class TestChatJoinRequestNoReq:
+class TestChatJoinRequestWithoutRequest:
     def test_slot_behaviour(self, chat_join_request, mro_slots):
         inst = chat_join_request
         for attr in inst.__slots__:

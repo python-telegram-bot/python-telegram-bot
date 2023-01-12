@@ -86,7 +86,7 @@ class Space:
     new_status = ChatMember.ADMINISTRATOR
 
 
-class TestChatMemberUpdatedNoReq:
+class TestChatMemberUpdatedWithoutRequest:
     def test_slot_behaviour(self, mro_slots, chat_member_updated):
         action = chat_member_updated
         for attr in action.__slots__:

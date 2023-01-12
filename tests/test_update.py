@@ -105,7 +105,7 @@ class Space:
     update_id = 868573637
 
 
-class TestUpdateNoReq:
+class TestUpdateWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         update = Update(Space.update_id)
         for attr in update.__slots__:

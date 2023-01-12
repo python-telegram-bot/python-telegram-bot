@@ -59,7 +59,7 @@ class Space:
     document_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestDocumentNoReq:
+class TestDocumentWithoutRequest:
     def test_slot_behaviour(self, document, mro_slots):
         for attr in document.__slots__:
             assert getattr(document, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -186,7 +186,7 @@ class TestDocumentNoReq:
         assert await document.get_file()
 
 
-class TestDocumentReq:
+class TestDocumentWithRequest:
     async def test_error_send_empty_file(self, bot, chat_id):
         with open(os.devnull, "rb") as f:
             with pytest.raises(TelegramError):

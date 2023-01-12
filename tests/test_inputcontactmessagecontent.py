@@ -32,7 +32,7 @@ class Space:
     last_name = "last name"
 
 
-class TestInputContactMessageContentNoReq:
+class TestInputContactMessageContentWithoutRequest:
     def test_slot_behaviour(self, input_contact_message_content, mro_slots):
         inst = input_contact_message_content
         for attr in inst.__slots__:

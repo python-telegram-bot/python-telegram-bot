@@ -33,7 +33,7 @@ class Space:
     message = "Error message"
 
 
-class TestPassportElementErrorFilesNoReq:
+class TestPassportElementErrorFilesWithoutRequest:
     def test_slot_behaviour(self, passport_element_error_files, mro_slots):
         inst = passport_element_error_files
         for attr in inst.__slots__:

@@ -35,7 +35,7 @@ class IntEnumTest(IntEnum):
     BAR = 2
 
 
-class TestConstantsNoReq:
+class TestConstantsWithoutRequest:
     """Also test _utils.enum.StringEnum on the fly because tg.constants is currently the only
     place where that class is used."""
 
@@ -128,7 +128,7 @@ class TestConstantsNoReq:
         assert vi[1] == vi.minor
 
 
-class TestConstantsReq:
+class TestConstantsWithRequest:
     async def test_max_message_length(self, bot, chat_id):
         tasks = asyncio.gather(
             bot.send_message(chat_id, text="a" * constants.MessageLimit.MAX_TEXT_LENGTH),

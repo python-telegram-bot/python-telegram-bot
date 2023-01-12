@@ -46,7 +46,7 @@ class Space:
     google_place_type = "google place type"
 
 
-class TestInputVenueMessageContentNoReq:
+class TestInputVenueMessageContentWithoutRequest:
     def test_slot_behaviour(self, input_venue_message_content, mro_slots):
         inst = input_venue_message_content
         for attr in inst.__slots__:

@@ -33,7 +33,7 @@ class Space:
     secret = "secret"
 
 
-class TestEncryptedCredentialsNoReq:
+class TestEncryptedCredentialsWithoutRequest:
     def test_slot_behaviour(self, encrypted_credentials, mro_slots):
         inst = encrypted_credentials
         for attr in inst.__slots__:

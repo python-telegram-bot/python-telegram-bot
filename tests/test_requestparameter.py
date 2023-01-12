@@ -27,7 +27,7 @@ from telegram.request._requestparameter import RequestParameter
 from tests.conftest import data_file
 
 
-class TestRequestParameterNoReq:
+class TestRequestParameterWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         inst = RequestParameter("name", "value", [1, 2])
         for attr in inst.__slots__:

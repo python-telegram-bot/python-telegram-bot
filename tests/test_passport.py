@@ -242,7 +242,7 @@ class Space:
     driver_license_selfie_credentials_secret = "tivdId6RNYNsvXYPppdzrbxOBuBOr9wXRPDcCvnXU7E="
 
 
-class TestPassportNoReq:
+class TestPassportWithoutRequest:
     def test_slot_behaviour(self, passport_data, mro_slots):
         inst = passport_data
         for attr in inst.__slots__:

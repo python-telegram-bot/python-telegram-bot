@@ -49,7 +49,7 @@ class Space:
     selfie = PassportFile("file_id", 50, 0, 25)
 
 
-class TestEncryptedPassportElementNoReq:
+class TestEncryptedPassportElementWithoutRequest:
     def test_slot_behaviour(self, encrypted_passport_element, mro_slots):
         inst = encrypted_passport_element
         for attr in inst.__slots__:

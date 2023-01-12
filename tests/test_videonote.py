@@ -57,7 +57,7 @@ class Space:
     videonote_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVideoNoteNoReq:
+class TestVideoNoteWithoutRequest:
     def test_slot_behaviour(self, video_note, mro_slots):
         for attr in video_note.__slots__:
             assert getattr(video_note, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -188,7 +188,7 @@ class TestVideoNoteNoReq:
         assert await video_note.get_file()
 
 
-class TestVideoNoteReq:
+class TestVideoNoteWithRequest:
     async def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
         message = await bot.send_video_note(
             chat_id,

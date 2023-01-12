@@ -48,7 +48,7 @@ class Space:
     google_place_type = "google place type"
 
 
-class TestVenueNoReq:
+class TestVenueWithoutRequest:
     def test_slot_behaviour(self, venue, mro_slots):
         for attr in venue.__slots__:
             assert getattr(venue, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -141,7 +141,7 @@ class TestVenueNoReq:
         assert message
 
 
-class TestVenueReq:
+class TestVenueWithRequest:
     @pytest.mark.parametrize(
         "default_bot,custom",
         [

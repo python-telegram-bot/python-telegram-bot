@@ -33,7 +33,7 @@ class Space:
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
 
-class TestOrderInfoNoReq:
+class TestOrderInfoWithoutRequest:
     def test_slot_behaviour(self, order_info, mro_slots):
         for attr in order_info.__slots__:
             assert getattr(order_info, attr, "err") != "err", f"got extra slot '{attr}'"

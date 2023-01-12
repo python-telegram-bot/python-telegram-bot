@@ -65,7 +65,7 @@ class Space:
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
 
-class TestInlineQueryResultVenueNoReq:
+class TestInlineQueryResultVenueWithoutRequest:
     def test_slot_behaviour(self, inline_query_result_venue, mro_slots):
         inst = inline_query_result_venue
         for attr in inst.__slots__:

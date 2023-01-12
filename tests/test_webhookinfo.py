@@ -50,7 +50,7 @@ class Space:
     last_synchronization_error_date = time.time()
 
 
-class TestWebhookInfoNoReq:
+class TestWebhookInfoWithoutRequest:
     def test_slot_behaviour(self, webhook_info, mro_slots):
         for attr in webhook_info.__slots__:
             assert getattr(webhook_info, attr, "err") != "err", f"got extra slot '{attr}'"

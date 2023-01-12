@@ -95,7 +95,7 @@ class StickerSpace:
     premium_animation = File("this_is_an_id", "this_is_an_unique_id")
 
 
-class TestStickerNoReq:
+class TestStickerWithoutRequest:
     def test_slot_behaviour(self, sticker, mro_slots):
         for attr in sticker.__slots__:
             assert getattr(sticker, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -264,7 +264,7 @@ class TestStickerNoReq:
             bot._local_mode = False
 
 
-class TestStickerReq:
+class TestStickerWithRequest:
     async def test_send_all_args(self, bot, chat_id, sticker_file, sticker):
         message = await bot.send_sticker(
             chat_id, sticker=sticker_file, disable_notification=False, protect_content=True
@@ -501,7 +501,7 @@ class SetSpace:
     contains_masks = True
 
 
-class TestStickerSetNoReq:
+class TestStickerSetWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         inst = StickerSet("this", "is", True, SetSpace.stickers, True, "not")
         for attr in inst.__slots__:
@@ -732,7 +732,7 @@ class TestStickerSetNoReq:
 
 
 @pytest.mark.xdist_group("stickerset")
-class TestStickerSetReq:
+class TestStickerSetWithRequest:
     async def test_create_sticker_set(
         self, bot, chat_id, sticker_file, animated_sticker_file, video_sticker_file
     ):
@@ -882,7 +882,7 @@ class MaskSpace:
     scale = 2
 
 
-class TestMaskPositionNoReq:
+class TestMaskPositionWithoutRequest:
     def test_slot_behaviour(self, mask_position, mro_slots):
         inst = mask_position
         for attr in inst.__slots__:

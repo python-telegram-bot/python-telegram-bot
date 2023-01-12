@@ -32,7 +32,7 @@ class Space:
     address = "The Shire"
 
 
-class TestChatLocationNoReq:
+class TestChatLocationWithoutRequest:
     def test_slot_behaviour(self, chat_location, mro_slots):
         inst = chat_location
         for attr in inst.__slots__:

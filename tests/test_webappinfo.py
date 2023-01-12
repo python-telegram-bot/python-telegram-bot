@@ -31,7 +31,7 @@ class Space:
     url = "https://www.example.com"
 
 
-class TestWebAppInfoNoReq:
+class TestWebAppInfoWithoutRequest:
     def test_slot_behaviour(self, web_app_info, mro_slots):
         for attr in web_app_info.__slots__:
             assert getattr(web_app_info, attr, "err") != "err", f"got extra slot '{attr}'"

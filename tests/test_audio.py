@@ -64,7 +64,7 @@ class Space:
     audio_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestAudioNoReq:
+class TestAudioWithoutRequest:
     def test_slot_behaviour(self, audio, mro_slots):
         for attr in audio.__slots__:
             assert getattr(audio, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -194,7 +194,7 @@ class TestAudioNoReq:
         assert await audio.get_file()
 
 
-class TestAudioReq:
+class TestAudioWithRequest:
     async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
         message = await bot.send_audio(
             chat_id,

@@ -32,7 +32,7 @@ class Space:
     prices = [LabeledPrice("Fish Container", 100), LabeledPrice("Premium Fish Container", 1000)]
 
 
-class TestShippingOptionNoReq:
+class TestShippingOptionWithoutRequest:
     def test_slot_behaviour(self, shipping_option, mro_slots):
         inst = shipping_option
         for attr in inst.__slots__:

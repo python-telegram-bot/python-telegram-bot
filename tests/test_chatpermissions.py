@@ -49,7 +49,7 @@ class Space:
     can_manage_topics = None
 
 
-class TestChatPermissionsNoReq:
+class TestChatPermissionsWithoutRequest:
     def test_slot_behaviour(self, chat_permissions, mro_slots):
         inst = chat_permissions
         for attr in inst.__slots__:

@@ -72,7 +72,7 @@ async def real_topic(bot, emoji_id, forum_group_id):
     assert result is True, "Topic was not deleted"
 
 
-class TestForumTopicNoReq:
+class TestForumTopicWithoutRequest:
     def test_slot_behaviour(self, mro_slots, forum_topic_object):
         inst = forum_topic_object
         for attr in inst.__slots__:
@@ -152,7 +152,7 @@ class TestForumTopicNoReq:
         assert hash(a) != hash(e)
 
 
-class TestForumMethodsReq:
+class TestForumMethodsWithRequest:
     async def test_create_forum_topic(self, real_topic):
         result = real_topic
         assert isinstance(result, ForumTopic)
@@ -306,7 +306,7 @@ def topic_created():
     return ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
 
 
-class TestForumTopicCreatedNoReq:
+class TestForumTopicCreatedWithoutRequest:
     def test_slot_behaviour(self, topic_created, mro_slots):
         for attr in topic_created.__slots__:
             assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -355,7 +355,7 @@ class TestForumTopicCreatedNoReq:
         assert hash(a) != hash(d)
 
 
-class TestForumTopicClosedNoReq:
+class TestForumTopicClosedWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         action = ForumTopicClosed()
         for attr in action.__slots__:
@@ -373,7 +373,7 @@ class TestForumTopicClosedNoReq:
         assert action_dict == {}
 
 
-class TestForumTopicReopenedNoReq:
+class TestForumTopicReopenedWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         action = ForumTopicReopened()
         for attr in action.__slots__:

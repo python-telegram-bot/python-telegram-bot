@@ -41,7 +41,7 @@ class Space:
     is_persistent = True
 
 
-class TestReplyKeyboardMarkupNoReq:
+class TestReplyKeyboardMarkupWithoutRequest:
     def test_slot_behaviour(self, reply_keyboard_markup, mro_slots):
         inst = reply_keyboard_markup
         for attr in inst.__slots__:
@@ -151,7 +151,7 @@ class TestReplyKeyboardMarkupNoReq:
         assert len(reply_keyboard_markup[1]) == 1
 
 
-class TestReplyKeyboardMarkupReq:
+class TestReplyKeyboardMarkupWithRequest:
     async def test_send_message_with_reply_keyboard_markup(
         self, bot, chat_id, reply_keyboard_markup
     ):

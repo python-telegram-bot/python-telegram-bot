@@ -40,7 +40,7 @@ class Space:
     web_app = WebAppInfo(url="https://example.com")
 
 
-class TestKeyboardButtonNoReq:
+class TestKeyboardButtonWithoutRequest:
     def test_slot_behaviour(self, keyboard_button, mro_slots):
         inst = keyboard_button
         for attr in inst.__slots__:

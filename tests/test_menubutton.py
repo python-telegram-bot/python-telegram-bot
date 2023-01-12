@@ -95,7 +95,7 @@ class Space:
 
 
 # All the scope types are very similar, so we test everything via parametrization
-class TestMenuButtonNoReq:
+class TestMenuButtonWithoutRequest:
     def test_slot_behaviour(self, menu_button, mro_slots):
         for attr in menu_button.__slots__:
             assert getattr(menu_button, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -63,7 +63,7 @@ class Space:
     caption = "Test *animation*"
 
 
-class TestAnimationNoReq:
+class TestAnimationWithoutRequest:
     def test_slot_behaviour(self, animation, mro_slots):
         for attr in animation.__slots__:
             assert getattr(animation, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -189,7 +189,7 @@ class TestAnimationNoReq:
         assert await animation.get_file()
 
 
-class TestAnimationReq:
+class TestAnimationWithRequest:
     async def test_send_all_args(self, bot, chat_id, animation_file, animation, thumb_file):
         message = await bot.send_animation(
             chat_id,

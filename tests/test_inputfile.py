@@ -31,7 +31,7 @@ def png_file():
     return data_file("game.png")
 
 
-class TestInputFileNoReq:
+class TestInputFileWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         inst = InputFile(BytesIO(b"blah"), filename="tg.jpg")
         for attr in inst.__slots__:
@@ -140,7 +140,7 @@ class TestInputFileNoReq:
         )
 
 
-class TestInputFileReq:
+class TestInputFileWithRequest:
     async def test_send_bytes(self, bot, chat_id):
         # We test this here and not at the respective test modules because it's not worth
         # duplicating the test for the different methods

@@ -95,7 +95,7 @@ class Space:
     file_content = "Saint-Saëns".encode()  # Intentionally contains unicode chars.
 
 
-class TestFileNoReq:
+class TestFileWithoutRequest:
     def test_slot_behaviour(self, file, mro_slots):
         for attr in file.__slots__:
             assert getattr(file, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -267,7 +267,7 @@ class TestFileNoReq:
         assert buf2[: len(buf)] == buf
 
 
-class TestFileReq:
+class TestFileWithRequest:
     async def test_error_get_empty_file_id(self, bot):
         with pytest.raises(TelegramError):
             await bot.get_file(file_id="")

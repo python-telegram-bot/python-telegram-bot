@@ -38,7 +38,7 @@ class Space:
     user_id = 23
 
 
-class TestContactNoReq:
+class TestContactWithoutRequest:
     def test_slot_behaviour(self, contact, mro_slots):
         for attr in contact.__slots__:
             assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -121,7 +121,7 @@ class TestContactNoReq:
         assert await bot.send_contact(contact=contact, chat_id=chat_id)
 
 
-class TestContactReq:
+class TestContactWithRequest:
     @pytest.mark.parametrize(
         "default_bot,custom",
         [

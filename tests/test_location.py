@@ -46,7 +46,7 @@ class Space:
     proximity_alert_radius = 50
 
 
-class TestLocationNoReq:
+class TestLocationWithoutRequest:
     def test_slot_behaviour(self, location, mro_slots):
         for attr in location.__slots__:
             assert getattr(location, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -160,7 +160,7 @@ class TestLocationNoReq:
         assert await bot.edit_message_live_location(None, None, location=location)
 
 
-class TestLocationReq:
+class TestLocationWithRequest:
     @pytest.mark.parametrize(
         "default_bot,custom",
         [

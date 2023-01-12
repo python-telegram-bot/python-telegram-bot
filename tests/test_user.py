@@ -78,7 +78,7 @@ class Space:
     added_to_attachment_menu = False
 
 
-class TestUserNoReq:
+class TestUserWithoutRequest:
     def test_slot_behaviour(self, user, mro_slots):
         for attr in user.__slots__:
             assert getattr(user, attr, "err") != "err", f"got extra slot '{attr}'"

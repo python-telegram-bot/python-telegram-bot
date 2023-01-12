@@ -31,7 +31,7 @@ class Space:
     selective = True
 
 
-class TestReplyKeyboardRemoveNoReq:
+class TestReplyKeyboardRemoveWithoutRequest:
     def test_slot_behaviour(self, reply_keyboard_remove, mro_slots):
         inst = reply_keyboard_remove
         for attr in inst.__slots__:
@@ -51,7 +51,7 @@ class TestReplyKeyboardRemoveNoReq:
         assert reply_keyboard_remove_dict["selective"] == reply_keyboard_remove.selective
 
 
-class TestReplyKeyboardRemoveReq:
+class TestReplyKeyboardRemoveWithRequest:
     async def test_send_message_with_reply_keyboard_remove(
         self, bot, chat_id, reply_keyboard_remove
     ):

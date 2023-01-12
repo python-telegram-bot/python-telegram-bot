@@ -44,7 +44,7 @@ class Space:
     url = "url"
 
 
-class TestMessageEntityNoReq:
+class TestMessageEntityWithoutRequest:
     def test_slot_behaviour(self, message_entity, mro_slots):
         inst = message_entity
         for attr in inst.__slots__:

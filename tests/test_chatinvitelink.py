@@ -55,7 +55,7 @@ class Space:
     pending_join_request_count = 42
 
 
-class TestChatInviteLinkNoReq:
+class TestChatInviteLinkWithoutRequest:
     def test_slot_behaviour(self, mro_slots, invite_link):
         for attr in invite_link.__slots__:
             assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"

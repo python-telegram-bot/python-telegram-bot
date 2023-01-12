@@ -33,7 +33,7 @@ class Space:
     message = "Error message"
 
 
-class TestPassportElementErrorUnspecifiedNoReq:
+class TestPassportElementErrorUnspecifiedWithoutRequest:
     def test_slot_behaviour(self, passport_element_error_unspecified, mro_slots):
         inst = passport_element_error_unspecified
         for attr in inst.__slots__:

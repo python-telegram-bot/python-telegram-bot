@@ -31,7 +31,7 @@ class Space:
     amount = 100
 
 
-class TestLabeledPriceNoReq:
+class TestLabeledPriceWithoutRequest:
     def test_slot_behaviour(self, labeled_price, mro_slots):
         inst = labeled_price
         for attr in inst.__slots__:

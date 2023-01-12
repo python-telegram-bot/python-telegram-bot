@@ -129,7 +129,7 @@ def mixed_rqs(mixed_params) -> RequestData:
     )
 
 
-class TestRequestDataNoReq:
+class TestRequestDataWithoutRequest:
     def test_slot_behaviour(self, simple_rqs, mro_slots):
         for attr in simple_rqs.__slots__:
             assert getattr(simple_rqs, attr, "err") != "err", f"got extra slot '{attr}'"

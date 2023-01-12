@@ -33,7 +33,7 @@ class Space:
     score = 42
 
 
-class TestGameHighScoreNoReq:
+class TestGameHighScoreWithoutRequest:
     def test_slot_behaviour(self, game_highscore, mro_slots):
         for attr in game_highscore.__slots__:
             assert getattr(game_highscore, attr, "err") != "err", f"got extra slot '{attr}'"

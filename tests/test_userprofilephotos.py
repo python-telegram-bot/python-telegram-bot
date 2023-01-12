@@ -33,7 +33,7 @@ class Space:
     ]
 
 
-class TestUserProfilePhotosNoReq:
+class TestUserProfilePhotosWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         inst = UserProfilePhotos(Space.total_count, Space.photos)
         for attr in inst.__slots__:

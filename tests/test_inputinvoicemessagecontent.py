@@ -71,7 +71,7 @@ class Space:
     is_flexible = True
 
 
-class TestInputInvoiceMessageContentNoReq:
+class TestInputInvoiceMessageContentWithoutRequest:
     def test_slot_behaviour(self, input_invoice_message_content, mro_slots):
         inst = input_invoice_message_content
         for attr in inst.__slots__:

@@ -42,7 +42,7 @@ class Space:
     ]
 
 
-class TestInlineKeyboardMarkupNoReq:
+class TestInlineKeyboardMarkupWithoutRequest:
     def test_slot_behaviour(self, inline_keyboard_markup, mro_slots):
         inst = inline_keyboard_markup
         for attr in inst.__slots__:
@@ -225,7 +225,7 @@ class TestInlineKeyboardMarkupNoReq:
         await bot.send_message(123, "test", reply_markup=inline_keyboard_markup)
 
 
-class TestInlineKeyborardMarkupReq:
+class TestInlineKeyborardMarkupWithRequest:
     async def test_send_message_with_inline_keyboard_markup(
         self, bot, chat_id, inline_keyboard_markup
     ):

@@ -58,7 +58,7 @@ class Space:
     thumb_width = 15
 
 
-class TestInlineQueryResultArticleNoReq:
+class TestInlineQueryResultArticleWithoutRequest:
     def test_slot_behaviour(self, inline_query_result_article, mro_slots, recwarn):
         inst = inline_query_result_article
         for attr in inst.__slots__:

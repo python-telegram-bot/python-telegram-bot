@@ -36,7 +36,7 @@ from tests.conftest import TEST_WITH_OPT_DEPS
 @pytest.mark.skipif(
     TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
-class TestNoPassportNoReq:
+class TestNoPassportWithoutRequest:
     def test_bot_init(self, bot_info):
         with pytest.raises(RuntimeError, match="passport"):
             bot.Bot(bot_info["token"], private_key=1, private_key_password=2)

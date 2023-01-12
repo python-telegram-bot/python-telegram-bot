@@ -58,7 +58,7 @@ class Space:
     chatphoto_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.jpg"
 
 
-class TestChatPhotoNoReq:
+class TestChatPhotoWithoutRequest:
     def test_slot_behaviour(self, chat_photo, mro_slots):
         for attr in chat_photo.__slots__:
             assert getattr(chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -152,7 +152,7 @@ class TestChatPhotoNoReq:
         assert await chat_photo.get_big_file()
 
 
-class TestChatPhotoReq:
+class TestChatPhotoWithRequest:
     async def test_get_and_download(self, bot, chat_photo):
         jpg_file = Path("telegram.jpg")
         if jpg_file.is_file():

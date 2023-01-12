@@ -27,7 +27,7 @@ def bot_command():
     return BotCommand(command="start", description="A command")
 
 
-class TestBotCommandNoReq:
+class TestBotCommandWithoutRequest:
     command = "start"
     description = "A command"
 

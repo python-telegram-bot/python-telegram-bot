@@ -41,7 +41,7 @@ class Space:
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
 
-class TestShippingQueryNoReq:
+class TestShippingQueryWithoutRequest:
     def test_slot_behaviour(self, shipping_query, mro_slots):
         inst = shipping_query
         for attr in inst.__slots__:

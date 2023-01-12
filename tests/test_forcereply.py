@@ -33,7 +33,7 @@ class Space:
     input_field_placeholder = "force replies can be annoying if not used properly"
 
 
-class TestForceReplyNoReq:
+class TestForceReplyWithoutRequest:
     def test_slot_behaviour(self, force_reply, mro_slots):
         for attr in force_reply.__slots__:
             assert getattr(force_reply, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -68,7 +68,7 @@ class TestForceReplyNoReq:
         assert hash(a) != hash(d)
 
 
-class TestForceReplyReq:
+class TestForceReplyWithRequest:
     async def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
         message = await bot.send_message(chat_id, "text", reply_markup=force_reply)
         assert message.text == "text"

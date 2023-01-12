@@ -48,7 +48,7 @@ class Space:
     animation = Animation("blah", "unique_id", 320, 180, 1)
 
 
-class TestGameNoReq:
+class TestGameWithoutRequest:
     def test_slot_behaviour(self, game, mro_slots):
         for attr in game.__slots__:
             assert getattr(game, attr, "err") != "err", f"got extra slot '{attr}'"

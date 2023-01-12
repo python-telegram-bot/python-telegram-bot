@@ -36,7 +36,7 @@ class Space:
     distance = 42
 
 
-class TestProximityAlertTriggeredNoReq:
+class TestProximityAlertTriggeredWithoutRequest:
     def test_slot_behaviour(self, proximity_alert_triggered, mro_slots):
         inst = proximity_alert_triggered
         for attr in inst.__slots__:

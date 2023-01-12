@@ -32,7 +32,7 @@ class Space:
     button_text = "button_text"
 
 
-class TestWebAppDataNoReq:
+class TestWebAppDataWithoutRequest:
     def test_slot_behaviour(self, web_app_data, mro_slots):
         for attr in web_app_data.__slots__:
             assert getattr(web_app_data, attr, "err") != "err", f"got extra slot '{attr}'"

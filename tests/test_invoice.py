@@ -49,7 +49,7 @@ class Space:
     suggested_tip_amounts = [13, 42]
 
 
-class TestInvoiceNoReq:
+class TestInvoiceWithoutRequest:
     def test_slot_behaviour(self, invoice, mro_slots):
         for attr in invoice.__slots__:
             assert getattr(invoice, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -182,7 +182,7 @@ class TestInvoiceNoReq:
         assert hash(a) != hash(d)
 
 
-class TestInvoiceReq:
+class TestInvoiceWithRequest:
     async def test_send_required_args_only(self, bot, chat_id, provider_token):
         send_inv_task = asyncio.create_task(
             bot.send_invoice(

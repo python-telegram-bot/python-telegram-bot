@@ -38,7 +38,7 @@ class Space:
     request_write_access = True
 
 
-class TestLoginUrlNoReq:
+class TestLoginUrlWithoutRequest:
     def test_slot_behaviour(self, login_url, mro_slots):
         for attr in login_url.__slots__:
             assert getattr(login_url, attr, "err") != "err", f"got extra slot '{attr}'"

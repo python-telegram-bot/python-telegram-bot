@@ -39,7 +39,7 @@ class Space:
     query = "query text"
 
 
-class TestChosenInlineResultNoReq:
+class TestChosenInlineResultWithoutRequest:
     def test_slot_behaviour(self, chosen_inline_result, mro_slots):
         inst = chosen_inline_result
         for attr in inst.__slots__:

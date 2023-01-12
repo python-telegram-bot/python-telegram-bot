@@ -138,7 +138,7 @@ class VideoSpace:
     has_spoiler = True
 
 
-class TestInputMediaVideoNoReq:
+class TestInputMediaVideoWithoutRequest:
     def test_slot_behaviour(self, input_media_video, mro_slots):
         inst = input_media_video
         for attr in inst.__slots__:
@@ -211,7 +211,7 @@ class PhotoSpace:
     has_spoiler = True
 
 
-class TestInputMediaPhotoNoReq:
+class TestInputMediaPhotoWithoutRequest:
     def test_slot_behaviour(self, input_media_photo, mro_slots):
         inst = input_media_photo
         for attr in inst.__slots__:
@@ -272,7 +272,7 @@ class AnimationSpace:
     has_spoiler = True
 
 
-class TestInputMediaAnimationNoReq:
+class TestInputMediaAnimationWithoutRequest:
     def test_slot_behaviour(self, input_media_animation, mro_slots):
         inst = input_media_animation
         for attr in inst.__slots__:
@@ -339,7 +339,7 @@ class AudioSpace:
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
 
-class TestInputMediaAudioNoReq:
+class TestInputMediaAudioWithoutRequest:
     def test_slot_behaviour(self, input_media_audio, mro_slots):
         inst = input_media_audio
         for attr in inst.__slots__:
@@ -408,7 +408,7 @@ class DocumentSpace:
     disable_content_type_detection = True
 
 
-class TestInputMediaDocumentNoReq:
+class TestInputMediaDocumentWithoutRequest:
     def test_slot_behaviour(self, input_media_document, mro_slots):
         inst = input_media_document
         for attr in inst.__slots__:
@@ -499,7 +499,7 @@ def media_group_no_caption_only_parse_mode(photo, thumb):  # noqa: F811
     ]
 
 
-class TestSendMediaGroupNoReq:
+class TestSendMediaGroupWithoutRequest:
     async def test_send_media_group_throws_error_with_group_caption_and_individual_captions(
         self,
         bot,
@@ -594,7 +594,7 @@ class CustomSequence(Sequence):
         return len(self.items)
 
 
-class TestSendMediaGroupReq:
+class TestSendMediaGroupWithRequest:
     async def test_send_media_group_photo(self, bot, chat_id, media_group):
         messages = await bot.send_media_group(chat_id, media_group)
         assert isinstance(messages, tuple)

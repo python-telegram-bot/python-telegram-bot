@@ -115,7 +115,7 @@ def bot_command_scope(scope_class_and_type, chat_id):
 
 
 # All the scope types are very similar, so we test everything via parametrization
-class TestBotCommandScopeNoReq:
+class TestBotCommandScopeWithoutRequest:
     def test_slot_behaviour(self, bot_command_scope, mro_slots):
         for attr in bot_command_scope.__slots__:
             assert getattr(bot_command_scope, attr, "err") != "err", f"got extra slot '{attr}'"

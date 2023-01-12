@@ -56,7 +56,7 @@ class Space:
     voice_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVoiceNoReq:
+class TestVoiceWithoutRequest:
     def test_slot_behaviour(self, voice, mro_slots):
         for attr in voice.__slots__:
             assert getattr(voice, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -175,7 +175,7 @@ class TestVoiceNoReq:
         assert await voice.get_file()
 
 
-class TestVoiceReq:
+class TestVoiceWithRequest:
     async def test_send_all_args(self, bot, chat_id, voice_file, voice):
         message = await bot.send_voice(
             chat_id,

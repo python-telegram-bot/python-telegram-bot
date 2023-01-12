@@ -45,7 +45,7 @@ class Space:
     file_date = 1532879128
 
 
-class TestPassportFileNoReq:
+class TestPassportFileWithoutRequest:
     def test_slot_behaviour(self, passport_file, mro_slots):
         inst = passport_file
         for attr in inst.__slots__:

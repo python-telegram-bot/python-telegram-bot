@@ -44,7 +44,7 @@ class Space:
     provider_payment_charge_id = "provider_payment_charge_id"
 
 
-class TestSuccessfulPaymentNoReq:
+class TestSuccessfulPaymentWithoutRequest:
     def test_slot_behaviour(self, successful_payment, mro_slots):
         inst = successful_payment
         for attr in inst.__slots__:

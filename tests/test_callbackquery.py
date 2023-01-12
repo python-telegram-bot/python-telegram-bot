@@ -58,7 +58,7 @@ class Space:
     game_short_name = "the_game"
 
 
-class TestCallbackQueryNoReq:
+class TestCallbackQueryWithoutRequest:
     @staticmethod
     def skip_params(callback_query: CallbackQuery):
         if callback_query.inline_message_id:

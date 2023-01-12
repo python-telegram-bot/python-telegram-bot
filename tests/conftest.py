@@ -59,18 +59,24 @@ def pytest_runtestloop(session: pytest.Session):
 
 
 def pytest_collection_modifyitems(items: List[pytest.Item]):
-    """Here we add a flaky marker to all request making tests and the no_req marker to the rest."""
-    for item in items:
-        parent = item.parent
-        if parent is None:
+    """Here we add a flaky marker to all request making tests and a (no_)req marker to the rest."""
+    for item in items:  # items are the test methods
+        parent = item.parent  # Get the parent of the item (class, or module if defined outside)
+        if parent is None:  # should never happen, but just in case
             return
-        if (
-            "NoReq" not in parent.name
-            and parent.name.endswith("Req")
-            and not parent.get_closest_marker(name="flaky")
-        ):
+        if (  # Check if the class name ends with 'WithRequest' and if it has no flaky marker
+            parent.name.endswith("WithRequest")
+            and not parent.get_closest_marker(  # get_closest_marker gets pytest.marks with `name`
+                name="flaky"
+            )  # don't add/override any previously set markers
+            and not parent.get_closest_marker(name="req")
+        ):  # Add the flaky marker with a rerun filter to the class
             parent.add_marker(pytest.mark.flaky(3, 1, rerun_filter=no_rerun_after_xfail_or_flood))
-        elif parent.name.endswith("NoReq") and not parent.get_closest_marker(name="no_req"):
+            parent.add_marker(pytest.mark.req)
+        # Add the no_req marker to all classes that end with 'WithoutRequest' and don't have it
+        elif parent.name.endswith("WithoutRequest") and not parent.get_closest_marker(
+            name="no_req"
+        ):
             parent.add_marker(pytest.mark.no_req)
 
 

@@ -48,7 +48,7 @@ class Space:
     location = Location(8.8, 53.1)
 
 
-class TestInlineQueryNoReq:
+class TestInlineQueryWithoutRequest:
     def test_slot_behaviour(self, inline_query, mro_slots):
         for attr in inline_query.__slots__:
             assert getattr(inline_query, attr, "err") != "err", f"got extra slot '{attr}'"

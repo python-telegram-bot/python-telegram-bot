@@ -192,7 +192,7 @@ class InputMessageContentDWPP(InputMessageContent):
         self.disable_web_page_preview = disable_web_page_preview
 
 
-class TestBotNoReq:
+class TestBotWithoutRequest:
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     def test_slot_behaviour(self, bot_class, bot, mro_slots):
         inst = bot_class(bot.token)
@@ -1636,7 +1636,7 @@ class TestBotNoReq:
             bot.callback_data_cache.clear_callback_queries()
 
 
-class TestBotReq:
+class TestBotWithRequest:
     """
     Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
 
