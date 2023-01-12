@@ -351,16 +351,11 @@ class TestBotWithoutRequest:
             await bot.shutdown()
 
     async def test_get_me_and_properties(self, bot):
-        mocked = "mocked"
-        with bot._bot_user._unfrozen():
-            bot._bot_user.username = mocked  # set the attribute to a mocked value
-        assert bot.username == mocked  # To test we are using the mocked bot
-        # call the parent class get_me method instead of the overriden get_me method
-        get_me_bot = await super(bot.__class__, bot).get_me()
+        get_me_bot = await ExtBot(bot.token).get_me()
 
         assert isinstance(get_me_bot, User)
         assert get_me_bot.id == bot.id
-        assert get_me_bot.username == bot.username != mocked  # will be the real bot
+        assert get_me_bot.username == bot.username
         assert get_me_bot.first_name == bot.first_name
         assert get_me_bot.last_name == bot.last_name
         assert get_me_bot.name == bot.name
@@ -392,7 +387,7 @@ class TestBotWithoutRequest:
     async def test_log_decorator(self, bot: DictExtBot, caplog):
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
-            await super(bot.__class__, bot).get_me()  # call original get_me instead of overriden
+            await ExtBot(bot.token).get_me()
             # Only for stabilizing this test-
             if len(caplog.records) == 4:
                 for idx, record in enumerate(caplog.records):

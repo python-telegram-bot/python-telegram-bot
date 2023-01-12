@@ -158,9 +158,7 @@ class DictExtBot(ExtBot):
 
     # Here we override get_me for caching because we don't want to call the API repeatedly in tests
     async def get_me(self, *args, **kwargs):
-        if self._bot_user is None:
-            self._bot_user = make_mock_user(self.token)
-        return self._bot_user
+        return await mocked_get_me(self)
 
 
 class DictBot(Bot):
@@ -171,21 +169,25 @@ class DictBot(Bot):
 
     # Here we override get_me for caching because we don't want to call the API repeatedly in tests
     async def get_me(self, *args, **kwargs):
-        if self._bot_user is None:
-            self._bot_user = make_mock_user(self.token)
-        return self._bot_user
+        return await mocked_get_me(self)
 
 
 class DictApplication(Application):
     pass
 
 
-def make_mock_user(token: str) -> User:
+async def mocked_get_me(self):
+    if self._bot_user is None:
+        self._bot_user = get_bot_user(self.token)
+    return self._bot_user
+
+
+def get_bot_user(token: str) -> User:
     """Used to return a mock user in bot.get_me(). This saves API calls on every init."""
     bot_info = get_bot()
-    user_id = int(token.split(":")[0] or bot_info["token"].split(":")[0])
-    first_name = bot_info.get("bot_name") or bot_info.get("name")
-    username = (bot_info.get("bot_username") or bot_info.get("username")).strip("@")
+    user_id = int(token.split(":")[0])
+    first_name = bot_info.get("name")
+    username = bot_info.get("username").strip("@")
     return User(
         user_id,
         first_name,
