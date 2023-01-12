@@ -240,17 +240,15 @@ async def default_bot(request, bot_info):
     return default_bot
 
 
-tz_bots = {}
-
-
 @pytest.fixture(scope="session")
 async def tz_bot(timezone, bot_info):
+    defaults = Defaults(tzinfo=timezone)
     try:  # If the bot is already created, return it. Saves time since get_me is not called again.
-        return tz_bots[timezone]
+        return default_bots[defaults]
     except KeyError:
-        default_bot = make_bot(bot_info, defaults=Defaults(tzinfo=timezone))
+        default_bot = make_bot(bot_info, defaults=defaults)
         await default_bot.initialize()
-        tz_bots[timezone] = default_bot
+        default_bots[defaults] = default_bot
         return default_bot
 
 
