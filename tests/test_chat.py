@@ -196,24 +196,6 @@ class TestChatNoReq:
         chat = Chat(id=1, type="private")
         assert chat.type is ChatType.PRIVATE
 
-    def test_link(self, chat):
-        assert chat.link == f"https://t.me/{chat.username}"
-        chat.username = None
-        assert chat.link is None
-
-    def test_full_name(self):
-        chat = Chat(
-            id=1, type=Chat.PRIVATE, first_name="first\u2022name", last_name="last\u2022name"
-        )
-        assert chat.full_name == "first\u2022name last\u2022name"
-        chat = Chat(id=1, type=Chat.PRIVATE, first_name="first\u2022name")
-        assert chat.full_name == "first\u2022name"
-        chat = Chat(
-            id=1,
-            type=Chat.PRIVATE,
-        )
-        assert chat.full_name is None
-
     def test_equality(self):
         a = Chat(Space.id_, Space.title, Space.type_)
         b = Chat(Space.id_, Space.title, Space.type_)
@@ -233,6 +215,34 @@ class TestChatNoReq:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    def test_link(self, chat):
+        assert chat.link == f"https://t.me/{chat.username}"
+        chat.username = None
+        assert chat.link is None
+
+    def test_full_name(self):
+        chat = Chat(
+            id=1, type=Chat.PRIVATE, first_name="first\u2022name", last_name="last\u2022name"
+        )
+        assert chat.full_name == "first\u2022name last\u2022name"
+        chat = Chat(id=1, type=Chat.PRIVATE, first_name="first\u2022name")
+        assert chat.full_name == "first\u2022name"
+        chat = Chat(
+            id=1,
+            type=Chat.PRIVATE,
+        )
+        assert chat.full_name is None
+
+    def test_effective_name(self):
+        chat = Chat(id=1, type=Chat.PRIVATE, first_name="first\u2022name")
+        assert chat.effective_name == "first\u2022name"
+        chat = Chat(id=1, type=Chat.GROUP, title="group")
+        assert chat.effective_name == "group"
+        chat = Chat(id=1, type=Chat.GROUP, first_name="first\u2022name", title="group")
+        assert chat.effective_name == "group"
+        chat = Chat(id=1, type=Chat.GROUP)
+        assert chat.effective_name is None
 
     async def test_send_action(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
