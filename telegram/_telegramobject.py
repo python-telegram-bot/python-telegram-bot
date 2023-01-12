@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -92,6 +92,10 @@ class TelegramObject:
     __INIT_PARAMS_CHECK: Optional[Type["TelegramObject"]] = None
 
     def __init__(self, *, api_kwargs: JSONDict = None) -> None:
+        # Setting _frozen to `False` here means that classes without arguments still need to
+        # implement __init__. However, with `True` would mean increased usage of
+        # `with self._unfrozen()` in the `__init__` of subclasses and we have fewer empty
+        # classes than classes with arguments.
         self._frozen: bool = False
         self._id_attrs: Tuple[object, ...] = ()
         self._bot: Optional["Bot"] = None

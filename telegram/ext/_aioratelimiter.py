@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2022
+#  Copyright (C) 2015-2023
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -90,8 +90,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
         welcome you to implement your own subclass of :class:`~telegram.ext.BaseRateLimiter`.
         Feel free to check out the source code of this class for inspiration.
 
-    .. seealso:: `Avoiding Flood Limits <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Avoiding-flood-limits>`_
+    .. seealso:: :wiki:`Avoiding Flood Limits <Avoiding-flood-limits>`
 
     .. versionadded:: 20.0
 

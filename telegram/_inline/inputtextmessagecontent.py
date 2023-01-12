@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -52,10 +52,11 @@ class InputTextMessageContent(InputMessageContent):
 
     Attributes:
         message_text (:obj:`str`): Text of the message to be sent,
-            1-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
+            :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
+            :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 
@@ -78,13 +79,12 @@ class InputTextMessageContent(InputMessageContent):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.message_text = message_text
-        # Optionals
-        self.parse_mode = parse_mode
-        self.entities = parse_sequence_arg(entities)
-        self.disable_web_page_preview = disable_web_page_preview
+        with self._unfrozen():
+            # Required
+            self.message_text = message_text
+            # Optionals
+            self.parse_mode = parse_mode
+            self.entities = parse_sequence_arg(entities)
+            self.disable_web_page_preview = disable_web_page_preview
 
-        self._id_attrs = (self.message_text,)
-
-        self._freeze()
+            self._id_attrs = (self.message_text,)

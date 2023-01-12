@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -37,6 +37,8 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
     message will be sent by the user. Alternatively, you can use :attr:`input_message_content` to
     send a message with the specified content instead of the voice message.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
@@ -47,7 +49,8 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
-        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional):
+            |captionentitiesattr|
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|

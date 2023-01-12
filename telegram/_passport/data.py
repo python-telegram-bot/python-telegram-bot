@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,22 @@ from telegram._utils.types import JSONDict
 class PersonalDetails(TelegramObject):
     """
     This object represents personal details.
+
+    Args:
+        first_name (:obj:`str`): First Name.
+        middle_name (:obj:`str`): Optional. First Name.
+        last_name (:obj:`str`): Last Name.
+        birth_date (:obj:`str`): Date of birth in DD.MM.YYYY format.
+        gender (:obj:`str`): Gender, male or female.
+        country_code (:obj:`str`): Citizenship (ISO 3166-1 alpha-2 country code).
+        residence_country_code (:obj:`str`): Country of residence (ISO 3166-1 alpha-2 country
+            code).
+        first_name_native (:obj:`str`): First Name in the language of the user's country of
+            residence.
+        middle_name_native (:obj:`str`): Optional. Middle Name in the language of the user's
+            country of residence.
+        last_name_native (:obj:`str`): Last Name in the language of the user's country of
+            residence.
 
     Attributes:
         first_name (:obj:`str`): First Name.
@@ -91,6 +107,14 @@ class ResidentialAddress(TelegramObject):
     """
     This object represents a residential address.
 
+    Args:
+        street_line1 (:obj:`str`): First line for the address.
+        street_line2 (:obj:`str`): Optional. Second line for the address.
+        city (:obj:`str`): City.
+        state (:obj:`str`): Optional. State.
+        country_code (:obj:`str`): ISO 3166-1 alpha-2 country code.
+        post_code (:obj:`str`): Address post code.
+
     Attributes:
         street_line1 (:obj:`str`): First line for the address.
         street_line2 (:obj:`str`): Optional. Second line for the address.
@@ -135,6 +159,10 @@ class ResidentialAddress(TelegramObject):
 class IdDocumentData(TelegramObject):
     """
     This object represents the data of an identity document.
+
+    Args:
+        document_no (:obj:`str`): Document number.
+        expiry_date (:obj:`str`): Optional. Date of expiry, in DD.MM.YYYY format.
 
     Attributes:
         document_no (:obj:`str`): Document number.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -38,12 +38,14 @@ class InlineQueryResultCachedGif(InlineQueryResult):
     use :attr:`input_message_content` to send a message with specified content instead of
     the animation.
 
+    .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
             :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         gif_file_id (:obj:`str`): A valid file identifier for the GIF file.
-        title (:obj:`str`, optional): Title for the result.caption (:obj:`str`, optional):
+        title (:obj:`str`, optional): Title for the result.
         caption (:obj:`str`, optional): Caption of the GIF file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
@@ -69,7 +71,7 @@ class InlineQueryResultCachedGif(InlineQueryResult):
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
 
             .. versionchanged:: 20.0
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -111,10 +111,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
        type of the argument of :meth:`refresh_bot_data` and the return value of
        :meth:`get_bot_data`.
 
-    .. seealso:: `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        `Making Your Bot Persistent <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Making-your-bot-persistent>`_
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
+        :wiki:`Making Your Bot Persistent <Making-your-bot-persistent>`
 
     .. versionchanged:: 20.0
 

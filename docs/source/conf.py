@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath("../.."))
 # -- General configuration ------------------------------------------------
 # General information about the project.
 project = "python-telegram-bot"
-copyright = "2015-2022, Leandro Toledo"
+copyright = "2015-2023, Leandro Toledo"
 author = "Leandro Toledo"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -29,9 +29,9 @@ author = "Leandro Toledo"
 # built documents.
 #
 # The short X.Y version.
-version = "20.0b0"  # telegram.__version__[:3]
+version = "20.0"  # telegram.__version__[:3]
 # The full version, including alpha/beta/rc tags.
-release = "20.0b0"  # telegram.__version__
+release = "20.0"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "5.1.1"
@@ -44,10 +44,14 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinx.ext.linkcode",
+    "sphinx.ext.extlinks",
     "sphinx_paramlinks",
     "sphinxcontrib.mermaid",
     "sphinx_search.extension",
 ]
+
+# For shorter links to Wiki in docstrings
+extlinks = {"wiki": ("https://github.com/python-telegram-bot/python-telegram-bot/wiki/%s", "%s")}
 
 # Use intersphinx to reference the python builtin library docs
 intersphinx_mapping = {
@@ -340,7 +344,7 @@ class TGConstXRefRole(PyXRefRole):
             return title, target
         except Exception as exc:
             sphinx_logger.exception(
-                f"%s:%d: WARNING: Did not convert reference %s due to an exception.",
+                "%s:%d: WARNING: Did not convert reference %s due to an exception.",
                 refnode.source,
                 refnode.line,
                 refnode.rawsource,
@@ -505,7 +509,7 @@ def _git_branch() -> str:
         return output.decode().strip()
     except Exception as exc:
         sphinx_logger.exception(
-            f"Failed to get a description of the current commit. Falling back to `master`.",
+            "Failed to get a description of the current commit. Falling back to `master`.",
             exc_info=exc,
         )
         return "master"

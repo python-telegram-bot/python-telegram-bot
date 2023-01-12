@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2022
+#  Copyright (C) 2015-2023
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -47,8 +47,7 @@ class InvalidCallbackData(TelegramError):
     Examples:
         :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
 
-    .. seealso:: `Arbitrary callback_data <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
+    .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
     .. versionadded:: 13.6
 
@@ -118,10 +117,8 @@ class CallbackDataCache:
         :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
 
     .. seealso:: :attr:`telegram.ext.ExtBot.callback_data_cache`,
-        `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        `Arbitrary callback_data <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
+        :wiki:`Architecture Overview <Architecture>`,
+        :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
     .. versionadded:: 13.6
 

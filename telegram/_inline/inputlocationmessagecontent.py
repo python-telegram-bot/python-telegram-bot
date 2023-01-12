@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -57,13 +57,21 @@ class InputLocationMessageContent(InputMessageContent):
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
         horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
-            measured in meters.
-        live_period	(:obj:`int`): Optional. Period in seconds for which the location can be
-            updated.
+            measured in meters; 0-
+            :tg-const:`telegram.InputLocationMessageContent.HORIZONTAL_ACCURACY`.
+        live_period (:obj:`int`): Optional. Period in seconds for which the location can be
+            updated, should be between
+            :tg-const:`telegram.InputLocationMessageContent.MIN_LIVE_PERIOD` and
+            :tg-const:`telegram.InputLocationMessageContent.MAX_LIVE_PERIOD`.
         heading (:obj:`int`): Optional. For live locations, a direction in which the user is
-            moving, in degrees.
-        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance for
-            proximity alerts about approaching another chat member, in meters.
+            moving, in degrees. Must be between
+            :tg-const:`telegram.InputLocationMessageContent.MIN_HEADING` and
+            :tg-const:`telegram.InputLocationMessageContent.MAX_HEADING` if specified.
+        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance
+            for proximity alerts about approaching another chat member, in meters. Must be
+            between :tg-const:`telegram.InputLocationMessageContent.MIN_PROXIMITY_ALERT_RADIUS`
+            and :tg-const:`telegram.InputLocationMessageContent.MAX_PROXIMITY_ALERT_RADIUS`
+            if specified.
 
     """
 
@@ -83,21 +91,20 @@ class InputLocationMessageContent(InputMessageContent):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.latitude = latitude
-        self.longitude = longitude
+        with self._unfrozen():
+            # Required
+            self.latitude = latitude
+            self.longitude = longitude
 
-        # Optionals
-        self.live_period = live_period
-        self.horizontal_accuracy = horizontal_accuracy
-        self.heading = heading
-        self.proximity_alert_radius = (
-            int(proximity_alert_radius) if proximity_alert_radius else None
-        )
+            # Optionals
+            self.live_period = live_period
+            self.horizontal_accuracy = horizontal_accuracy
+            self.heading = heading
+            self.proximity_alert_radius = (
+                int(proximity_alert_radius) if proximity_alert_radius else None
+            )
 
-        self._id_attrs = (self.latitude, self.longitude)
-
-        self._freeze()
+            self._id_attrs = (self.latitude, self.longitude)
 
     HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`

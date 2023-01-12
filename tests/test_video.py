@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -105,6 +105,7 @@ class TestVideo:
             height=video.height,
             parse_mode="Markdown",
             thumb=thumb_file,
+            has_spoiler=True,
         )
 
         assert isinstance(message.video, Video)
@@ -125,6 +126,7 @@ class TestVideo:
 
         assert message.video.file_name == self.file_name
         assert message.has_protected_content
+        assert message.has_media_spoiler
 
     @pytest.mark.flaky(3, 1)
     async def test_send_video_custom_filename(self, bot, chat_id, video_file, monkeypatch):

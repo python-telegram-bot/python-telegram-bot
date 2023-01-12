@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -112,10 +112,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
           use :class:`telegram.ext.ExtBot` for the bot.
 
-    .. seealso:: `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
-        `Builder Pattern for Application <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+        :wiki:`Builder Pattern <Builder-Pattern>`
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern
     """
@@ -144,6 +142,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_pool_timeout",
         "_post_init",
         "_post_shutdown",
+        "_post_stop",
         "_private_key",
         "_private_key_password",
         "_proxy_url",
@@ -198,6 +197,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
+        self._post_stop: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._rate_limiter: ODVInput["BaseRateLimiter"] = DEFAULT_NONE
 
     def _build_request(self, get_updates: bool) -> BaseRequest:
@@ -303,6 +303,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             context_types=DefaultValue.get_value(self._context_types),
             post_init=self._post_init,
             post_shutdown=self._post_shutdown,
+            post_stop=self._post_stop,
             **self._application_kwargs,  # For custom Application subclasses
         )
 
@@ -359,9 +360,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the base URL for :attr:`telegram.ext.Application.bot`. If not called,
         will default to ``'https://api.telegram.org/bot'``.
 
-        .. seealso:: :paramref:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
-            :meth:`base_file_url`
+        .. seealso:: :paramref:`telegram.Bot.base_url`,
+            :wiki:`Local Bot API Server <Local-Bot-API-Server>`, :meth:`base_file_url`
 
         Args:
             base_url (:obj:`str`): The URL.
@@ -378,9 +378,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the base file URL for :attr:`telegram.ext.Application.bot`. If not
         called, will default to ``'https://api.telegram.org/file/bot'``.
 
-        .. seealso:: :paramref:`telegram.Bot.base_file_url`, `Local Bot API Server <https://\
-            github.com/python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
-            :meth:`base_url`
+        .. seealso:: :paramref:`telegram.Bot.base_file_url`,
+            :wiki:`Local Bot API Server <Local-Bot-API-Server>`, :meth:`base_url`
 
         Args:
             base_file_url (:obj:`str`): The URL.
@@ -673,8 +672,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the private key and corresponding password for decryption of telegram passport data
         for :attr:`telegram.ext.Application.bot`.
 
-        .. seealso:: :any:`examples.passportbot`, `Telegram Passports
-            <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Telegram-Passport>`_
+        Examples:
+            :any:`Passport Bot <examples.passportbot>`
+
+        .. seealso:: :wiki:`Telegram Passports <Telegram-Passport>`
 
         Args:
             private_key (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): The private key or the
@@ -704,8 +705,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the :class:`telegram.ext.Defaults` instance for
         :attr:`telegram.ext.Application.bot`.
 
-        .. seealso:: `Adding Defaults <https://github.com/python-telegram-bot/python-telegram-bot\
-            /wiki/Adding-defaults-to-your-bot>`_
+        .. seealso:: :wiki:`Adding Defaults to Your Bot <Adding-defaults-to-your-bot>`
 
         Args:
             defaults (:class:`telegram.ext.Defaults`): The defaults instance.
@@ -734,9 +734,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
                pip install python-telegram-bot[callback-data]
 
-        .. seealso:: `Arbitrary callback_data <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_,
-            :any:`examples.arbitrarycallbackdatabot`
+        Examples:
+            :any:`Arbitrary callback_data Bot <examples.arbitrarycallbackdatabot>`
+
+        .. seealso:: :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
         Args:
             arbitrary_callback_data (:obj:`bool` | :obj:`int`): If :obj:`True` is passed, the
@@ -756,8 +757,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
          :attr:`telegram.ext.Application.bot`.
          If not called, will default to :obj:`False`.
 
-        .. seealso:: `Local Bot API Server <https://github.com/python-telegram-bot/\
-            python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+        .. seealso:: :wiki:`Local Bot API Server <Local-Bot-API-Server>`
 
         Args:
             local_mode (:obj:`bool`): Whether the bot should run in local mode.
@@ -842,8 +842,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         :attr:`telegram.ext.Application.job_queue`. If not called, a job queue will be
         instantiated if the requirements of :class:`telegram.ext.JobQueue` are installed.
 
-        .. seealso:: `JobQueue <https://github.com/python-telegram-bot/python-telegram-bot/wiki\
-            /Extensions-%E2%80%93-JobQueue>`_, :any:`examples.timerbot`
+        Examples:
+            :any:`Timer Bot <examples.timerbot>`
+
+        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
 
         Note:
             * :meth:`telegram.ext.JobQueue.set_application` will be called automatically by
@@ -878,9 +880,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :func:`copy.deepcopy`. This is due to the data being deep copied before handing it over
             to the persistence in order to avoid race conditions.
 
-        .. seealso:: `Making your bot persistent <https://github.com/python-telegram-bot\
-            /python-telegram-bot/wiki/Making-your-bot-persistent>`_,
-            :any:`examples.persistentconversationbot`
+        Examples:
+            :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
+
+        .. seealso:: :wiki:`Making Your Bot Persistent <Making-your-bot-persistent>`
 
         Warning:
             If a :class:`telegram.ext.ContextTypes` instance is set via :meth:`context_types`,
@@ -902,7 +905,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets a :class:`telegram.ext.ContextTypes` instance for
         :attr:`telegram.ext.Application.context_types`.
 
-        .. seealso:: :any:`examples.contexttypesbot`
+        Examples:
+            :any:`Context Types Bot <examples.contexttypesbot>`
 
         Args:
             context_types (:class:`telegram.ext.ContextTypes`): The context types.
@@ -966,6 +970,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
                 application = Application.builder().token("TOKEN").post_init(post_init).build()
 
+        .. seealso:: :meth:`post_stop`, :meth:`post_shutdown`
+
         Args:
             post_init (:term:`coroutine function`): The custom callback. Must be a
                 :term:`coroutine function` and must accept exactly one positional argument, which
@@ -1002,6 +1008,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                                         .post_shutdown(post_shutdown)
                                         .build()
 
+        .. seealso:: :meth:`post_init`, :meth:`post_stop`
+
         Args:
             post_shutdown (:term:`coroutine function`): The custom callback. Must be a
                 :term:`coroutine function` and must accept exactly one positional argument, which
@@ -1013,6 +1021,46 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
         self._post_shutdown = post_shutdown
+        return self
+
+    def post_stop(
+        self: BuilderType, post_stop: Callable[[Application], Coroutine[Any, Any, None]]
+    ) -> BuilderType:
+        """
+        Sets a callback to be executed by :meth:`Application.run_polling` and
+        :meth:`Application.run_webhook` *after* executing :meth:`Updater.stop`
+        and :meth:`Application.stop`.
+
+        .. versionadded:: 20.1
+
+        Tip:
+            This can be used for custom stop logic that requires to await coroutines, e.g.
+            sending message to a chat before shutting down the bot
+
+        Example:
+            .. code::
+
+                async def post_stop(application: Application) -> None:
+                    await application.bot.send_message(123456, "Shutting down...")
+
+                application = Application.builder()
+                                        .token("TOKEN")
+                                        .post_stop(post_stop)
+                                        .build()
+
+        .. seealso:: :meth:`post_init`, :meth:`post_shutdown`
+
+        Args:
+            post_stop (:term:`coroutine function`): The custom callback. Must be a
+                :term:`coroutine function` and must accept exactly one positional argument, which
+                is the :class:`~telegram.ext.Application`::
+
+                    async def post_stop(application: Application) -> None:
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        self._post_stop = post_stop
         return self
 
     def rate_limiter(

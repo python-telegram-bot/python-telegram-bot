@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -48,10 +48,11 @@ class Location(TelegramObject):
         longitude (:obj:`float`): Longitude as defined by sender.
         latitude (:obj:`float`): Latitude as defined by sender.
         horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
-            measured in meters.
+            measured in meters; 0-:tg-const:`telegram.Location.HORIZONTAL_ACCURACY`.
         live_period (:obj:`int`): Optional. Time relative to the message sending date, during which
             the location can be updated, in seconds. For active live locations only.
-        heading (:obj:`int`): Optional. The direction in which user is moving, in degrees.
+        heading (:obj:`int`): Optional. The direction in which user is moving, in degrees;
+            :tg-const:`telegram.Location.MIN_HEADING`-:tg-const:`telegram.Location.MAX_HEADING`.
             For active live locations only.
         proximity_alert_radius (:obj:`int`): Optional. Maximum distance for proximity alerts about
             approaching another chat member, in meters. For sent live locations only.

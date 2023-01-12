@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -136,10 +136,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     Examples:
         :any:`Echo Bot <examples.echobot>`
 
-    .. seealso:: `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
-        `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_
+    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+        :wiki:`Architecture Overview <Architecture>`
 
     .. versionchanged:: 20.0
 
@@ -206,6 +204,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         post_shutdown (:term:`coroutine function`): Optional. A callback that will be executed by
             :meth:`Application.run_polling` and :meth:`Application.run_webhook` after shutting down
             the application via :meth:`shutdown`.
+        post_stop (:term:`coroutine function`): Optional. A callback that will be executed by
+            :meth:`Application.run_polling` and :meth:`Application.run_webhook` after stopping
+            the application via :meth:`stop`.
+
+            .. versionadded:: 20.1
 
     """
 
@@ -238,6 +241,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         "persistence",
         "post_init",
         "post_shutdown",
+        "post_stop",
         "update_queue",
         "updater",
         "user_data",
@@ -259,6 +263,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         post_shutdown: Optional[
             Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
         ],
+        post_stop: Optional[
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+        ],
     ):
         if not was_called_by(
             inspect.currentframe(), Path(__file__).parent.resolve() / "_applicationbuilder.py"
@@ -276,6 +283,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
         self.post_init = post_init
         self.post_shutdown = post_shutdown
+        self.post_stop = post_stop
 
         if isinstance(concurrent_updates, int) and concurrent_updates < 0:
             raise ValueError("`concurrent_updates` must be a non-negative integer!")
@@ -338,8 +346,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         """:obj:`int`: The number of concurrent updates that will be processed in parallel. A
         value of ``0`` indicates updates are *not* being processed concurrently.
 
-        .. seealso:: `Concurrency <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+        .. seealso:: :wiki:`Concurrency`
         """
         return self._concurrent_updates
 
@@ -349,13 +356,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.
 
-        .. seealso:: `Job Queue <https://github.com/python-telegram-bot/
-            python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
         """
         if self._job_queue is None:
             warn(
                 "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-                "`pip install python-telegram-bot[job_queue]`.",
+                "`pip install python-telegram-bot[job-queue]`.",
                 stacklevel=2,
             )
         return self._job_queue
@@ -568,9 +574,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             :meth:`start`
 
         Note:
-            This does *not* stop :attr:`updater`. You need to either manually call
-            :meth:`telegram.ext.Updater.stop` or use one of :meth:`run_polling` or
-            :meth:`run_webhook`.
+            * This does *not* stop :attr:`updater`. You need to either manually call
+              :meth:`telegram.ext.Updater.stop` or use one of :meth:`run_polling` or
+              :meth:`run_webhook`.
+            * Does *not* call :attr:`post_stop` - that is only done by
+              :meth:`run_polling` and :meth:`run_webhook`.
 
         Raises:
             :exc:`RuntimeError`: If the application is not running.
@@ -628,11 +636,18 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         On unix, the app will also shut down on receiving the signals specified by
         :paramref:`stop_signals`.
 
-        If :attr:`post_init` is set, it will be called between :meth:`initialize` and
-        :meth:`telegram.ext.Updater.start_polling`.
+        The order of execution by `run_polling` is roughly as follows:
 
-        If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
-        and :meth:`telegram.ext.Updater.shutdown`.
+        - :meth:`initialize`
+        - :meth:`post_init`
+        - :meth:`telegram.ext.Updater.start_polling`
+        - :meth:`start`
+        - Run the application until the users stops it
+        - :meth:`telegram.ext.Updater.stop`
+        - :meth:`stop`
+        - :meth:`post_stop`
+        - :meth:`shutdown`
+        - :meth:`post_shutdown`
 
         .. include:: inclusions/application_run_tip.rst
 
@@ -744,11 +759,18 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as
         required.
 
-        If :attr:`post_init` is set, it will be called between :meth:`initialize` and
-        :meth:`telegram.ext.Updater.start_webhook`.
+        The order of execution by `run_webhook` is roughly as follows:
 
-        If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
-        and :meth:`telegram.ext.Updater.shutdown`.
+        - :meth:`initialize`
+        - :meth:`post_init`
+        - :meth:`telegram.ext.Updater.start_webhook`
+        - :meth:`start`
+        - Run the application until the users stops it
+        - :meth:`telegram.ext.Updater.stop`
+        - :meth:`stop`
+        - :meth:`post_stop`
+        - :meth:`shutdown`
+        - :meth:`post_shutdown`
 
         Important:
             If you want to use this method, you must install PTB with the optional requirement
@@ -763,8 +785,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
             :meth:`telegram.ext.Updater.start_webhook`, :meth:`telegram.ext.Updater.stop`,
-            :meth:`run_polling`,
-            `Webhooks <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_
+            :meth:`run_polling`, :wiki:`Webhooks`
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Defaults to
@@ -892,6 +913,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                     loop.run_until_complete(self.updater.stop())  # type: ignore[union-attr]
                 if self.running:
                     loop.run_until_complete(self.stop())
+                if self.post_stop:
+                    loop.run_until_complete(self.post_stop(self))
                 loop.run_until_complete(self.shutdown())
                 if self.post_shutdown:
                     loop.run_until_complete(self.post_shutdown(self))
@@ -909,8 +932,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             * If the application is currently running, tasks created by this method will be
               awaited with :meth:`stop`.
 
-        .. seealso:: `Concurrency <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+        .. seealso:: :wiki:`Concurrency`
 
         Args:
             coroutine (:term:`coroutine function`): The coroutine to run as task.
@@ -1028,8 +1050,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         """Processes a single update and marks the update to be updated by the persistence later.
         Exceptions raised by handler callbacks will be processed by :meth:`process_update`.
 
-        .. seealso:: `Concurrency <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+        .. seealso:: :wiki:`Concurrency`
 
         .. versionchanged:: 20.0
             Persistence is now updated in an interval set by
@@ -1270,9 +1291,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             to the asynchronous nature of these features. Please make sure that your program can
             avoid or handle such situations.
 
-        .. seealso:: `Storing Bot, User and Chat Related Data <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-\
-            chat-related-data>`_,
+        .. seealso:: :wiki:`Storing Bot, User and Chat Related Data\
+            <Storing-bot%2C-user-and-chat-related-data>`
 
         Args:
             message (:class:`telegram.Message`, optional): A message with either
@@ -1495,8 +1515,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         Examples:
             :any:`Errorhandler Bot <examples.errorhandlerbot>`
 
-        .. seealso:: `Exceptions, Warnings and Logging <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Exceptions%2C-Warnings-and-Logging>`_
+        .. seealso:: :wiki:`Exceptions, Warnings and Logging <Exceptions%2C-Warnings-and-Logging>`
 
         Args:
             callback (:term:`coroutine function`): The callback function for this error handler.

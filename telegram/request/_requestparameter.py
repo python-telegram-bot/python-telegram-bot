@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2022
+#  Copyright (C) 2015-2023
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 import json
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 from telegram._files.inputfile import InputFile
 from telegram._files.inputmedia import InputMedia
@@ -143,7 +143,7 @@ class RequestParameter:
         """Builds an instance of this class for a given key-value pair that represents the raw
         input as passed along from a method of :class:`telegram.Bot`.
         """
-        if isinstance(value, list):
+        if not isinstance(value, (str, bytes)) and isinstance(value, Sequence):
             param_values = []
             input_files = []
             for obj in value:

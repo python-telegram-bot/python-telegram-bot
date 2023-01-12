@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -61,7 +61,7 @@ class TestCallbackContext:
     def test_job_queue(self, bot, app, recwarn):
         expected_warning = (
             "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-            "`pip install python-telegram-bot[job_queue]`."
+            "`pip install python-telegram-bot[job-queue]`."
         )
 
         callback_context = CallbackContext(app)

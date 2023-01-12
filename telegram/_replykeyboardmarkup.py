@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import ClassVar, List, Sequence, Union
+from typing import ClassVar, Sequence, Union
 
 from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
@@ -68,18 +68,45 @@ class ReplyKeyboardMarkup(TelegramObject):
             characters.
 
             .. versionadded:: 13.7
+        is_persistent (:obj:`bool`, optional): Requests clients to always show the keyboard when
+            the regular keyboard is hidden. Defaults to :obj:`False`, in which case the custom
+            keyboard can be hidden and opened with a keyboard icon.
+
+            .. versionadded:: 20.0
 
     Attributes:
-        keyboard (Tuple[Tuple[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button
-            rows.
-        resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
+        keyboard (Tuple[Tuple[:class:`telegram.KeyboardButton`]]): Array of button rows,
+            each represented by an Array of :class:`telegram.KeyboardButton` objects.
+        resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard vertically
+            for optimal fit (e.g., make the keyboard smaller if there are just two rows of
+            buttons). Defaults to :obj:`False`, in which case the custom keyboard is always of the
+            same height as the app's standard keyboard.
         one_time_keyboard (:obj:`bool`): Optional. Requests clients to hide the keyboard as soon as
-            it's been used.
+            it's been used. The keyboard will still be available, but clients will automatically
+            display the usual letter-keyboard in the chat - the user can press a special button in
+            the input field to see the custom keyboard again. Defaults to :obj:`False`.
         selective (:obj:`bool`): Optional. Show the keyboard to specific users only.
-        input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
-            field when the reply is active.
+            Targets:
+
+            1) Users that are @mentioned in the :attr:`~telegram.Message.text` of the
+               :class:`telegram.Message` object.
+            2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+               original message.
+
+            Defaults to :obj:`False`.
+
+        input_field_placeholder (:obj:`str`): Optional. The placeholder to be shown in the input
+            field when the keyboard is active;
+            :tg-const:`telegram.ReplyKeyboardMarkup.MIN_INPUT_FIELD_PLACEHOLDER`-
+            :tg-const:`telegram.ReplyKeyboardMarkup.MAX_INPUT_FIELD_PLACEHOLDER`
+            characters.
 
             .. versionadded:: 13.7
+        is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard when
+            the regular keyboard is hidden. If :obj:`False`, the custom keyboard can be hidden and
+            opened with a keyboard icon.
+
+            .. versionadded:: 20.0
 
     """
 
@@ -89,6 +116,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         "resize_keyboard",
         "one_time_keyboard",
         "input_field_placeholder",
+        "is_persistent",
     )
 
     def __init__(
@@ -98,6 +126,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         one_time_keyboard: bool = None,
         selective: bool = None,
         input_field_placeholder: str = None,
+        is_persistent: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -119,6 +148,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         self.one_time_keyboard = one_time_keyboard
         self.selective = selective
         self.input_field_placeholder = input_field_placeholder
+        self.is_persistent = is_persistent
 
         self._id_attrs = (self.keyboard,)
 
@@ -132,6 +162,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         one_time_keyboard: bool = False,
         selective: bool = False,
         input_field_placeholder: str = None,
+        is_persistent: bool = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -165,6 +196,11 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
+            is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
+                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
+                custom keyboard can be hidden and opened with a keyboard icon.
+
+                .. versionadded:: 20.0
         """
         return cls(
             [[button]],
@@ -172,17 +208,19 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
+            is_persistent=is_persistent,
             **kwargs,  # type: ignore[arg-type]
         )
 
     @classmethod
     def from_row(
         cls,
-        button_row: List[Union[str, KeyboardButton]],
+        button_row: Sequence[Union[str, KeyboardButton]],
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
         input_field_placeholder: str = None,
+        is_persistent: bool = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -192,8 +230,11 @@ class ReplyKeyboardMarkup(TelegramObject):
         Return a ReplyKeyboardMarkup from a single row of KeyboardButtons.
 
         Args:
-            button_row (List[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to use in
-                the markup.
+            button_row (Sequence[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to
+                use in the markup.
+
+                .. versionchanged:: 20.0
+                    |sequenceargs|
             resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
                 vertically for optimal fit (e.g., make the keyboard smaller if there are just two
                 rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
@@ -216,6 +257,11 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
+            is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
+                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
+                custom keyboard can be hidden and opened with a keyboard icon.
+
+                .. versionadded:: 20.0
 
         """
         return cls(
@@ -224,17 +270,19 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
+            is_persistent=is_persistent,
             **kwargs,  # type: ignore[arg-type]
         )
 
     @classmethod
     def from_column(
         cls,
-        button_column: List[Union[str, KeyboardButton]],
+        button_column: Sequence[Union[str, KeyboardButton]],
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
         input_field_placeholder: str = None,
+        is_persistent: bool = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -244,8 +292,11 @@ class ReplyKeyboardMarkup(TelegramObject):
         Return a ReplyKeyboardMarkup from a single column of KeyboardButtons.
 
         Args:
-            button_column (List[:class:`telegram.KeyboardButton` | :obj:`str`]): The button to use
-                in the markup.
+            button_column (Sequence[:class:`telegram.KeyboardButton` | :obj:`str`]): The button
+                to use in the markup.
+
+                .. versionchanged:: 20.0
+                    |sequenceargs|
             resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard
                 vertically for optimal fit (e.g., make the keyboard smaller if there are just two
                 rows of buttons). Defaults to :obj:`False`, in which case the custom keyboard is
@@ -268,6 +319,11 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
+            is_persistent (:obj:`bool`): Optional. Requests clients to always show the keyboard
+                when the regular keyboard is hidden. Defaults to :obj:`False`, in which case the
+                custom keyboard can be hidden and opened with a keyboard icon.
+
+                .. versionadded:: 20.0
 
         """
         button_grid = [[button] for button in button_column]
@@ -277,6 +333,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
+            is_persistent=is_persistent,
             **kwargs,  # type: ignore[arg-type]
         )
 

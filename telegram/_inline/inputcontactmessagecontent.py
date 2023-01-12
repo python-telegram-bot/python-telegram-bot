@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2022
+# Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -56,14 +56,12 @@ class InputContactMessageContent(InputMessageContent):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
+        with self._unfrozen():
+            # Required
+            self.phone_number = phone_number
+            self.first_name = first_name
+            # Optionals
+            self.last_name = last_name
+            self.vcard = vcard
 
-        # Required
-        self.phone_number = phone_number
-        self.first_name = first_name
-        # Optionals
-        self.last_name = last_name
-        self.vcard = vcard
-
-        self._id_attrs = (self.phone_number,)
-
-        self._freeze()
+            self._id_attrs = (self.phone_number,)
