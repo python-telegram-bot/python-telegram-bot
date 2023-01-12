@@ -80,7 +80,10 @@ async def track_chats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     chat = update.effective_chat
     if chat.type == Chat.PRIVATE:
         if not was_member and is_member:
-            logger.info("%s started the bot", cause_name)
+            # This is not really needed in this particular case because /start command will run
+            # after the user unblocks the bot, and the start function will add the user to
+            # "user_ids".  We're including this here for the sake of the example.
+            logger.info("%s unblocked the bot", cause_name)
             context.bot_data.setdefault("user_ids", set()).add(chat.id)
         elif was_member and not is_member:
             logger.info("%s blocked the bot", cause_name)
@@ -136,10 +139,28 @@ async def greet_chat_members(update: Update, context: ContextTypes.DEFAULT_TYPE)
         )
 
 
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Greets the user and records that they started a chat with the bot
+    if it's a private chat. Since no automatic update is issued when a user starts a private chat
+    with the bot, we have to track it explicitly here, when handling the /start command.
+    """
+    cause_name = update.effective_user.full_name
+    chat = update.effective_chat
+    if chat.type == Chat.PRIVATE:
+        logger.info("%s started a private chat with the bot", cause_name)
+        context.bot_data.setdefault("user_ids", set()).add(chat.id)
+
+    await update.effective_message.reply_text(
+        rf"Welcome {cause_name}. Use /show_chats command to see what chats I'm in."
+    )
+
+
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
     application = Application.builder().token("TOKEN").build()
+
+    application.add_handler(CommandHandler("start", start))
 
     # Keep track of which chats the bot is in
     application.add_handler(ChatMemberHandler(track_chats, ChatMemberHandler.MY_CHAT_MEMBER))
