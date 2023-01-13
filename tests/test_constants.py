@@ -130,14 +130,16 @@ class TestConstantsWithoutRequest:
 
 class TestConstantsWithRequest:
     async def test_max_message_length(self, bot, chat_id):
+        good_text = "a" * constants.MessageLimit.MAX_TEXT_LENGTH
+        bad_text = good_text + "Z"
         tasks = asyncio.gather(
-            bot.send_message(chat_id, text="a" * constants.MessageLimit.MAX_TEXT_LENGTH),
-            bot.send_message(chat_id, text="a" * (constants.MessageLimit.MAX_TEXT_LENGTH + 1)),
+            bot.send_message(chat_id, text=good_text),
+            bot.send_message(chat_id, text=bad_text),
             return_exceptions=True,
         )
-        results = await tasks
-        assert len(results) == 2
-        assert isinstance(results[1], BadRequest) and "Message is too long" in str(results[1])
+        good_msg, bad_msg = await tasks
+        assert good_msg.text == good_text
+        assert isinstance(bad_msg, BadRequest) and "Message is too long" in str(bad_msg)
 
     async def test_max_caption_length(self, bot, chat_id):
         good_caption = "a" * constants.MessageLimit.CAPTION_LENGTH

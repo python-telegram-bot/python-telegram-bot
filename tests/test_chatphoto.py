@@ -159,17 +159,20 @@ class TestChatPhotoWithRequest:
             jpg_file.unlink()
 
         tasks = {bot.get_file(chat_photo.small_file_id), bot.get_file(chat_photo.big_file_id)}
+        asserts = []
 
         for task in asyncio.as_completed(tasks):
             file = await task
-            assert file.file_unique_id in (
-                chat_photo.small_file_unique_id,
-                chat_photo.big_file_unique_id,
-            )
+            if file.file_unique_id == chat_photo.small_file_unique_id:
+                asserts.append("small")
+            elif file.file_unique_id == chat_photo.big_file_unique_id:
+                asserts.append("big")
             assert file.file_path.startswith("https://")
 
             await file.download_to_drive(jpg_file)
             assert jpg_file.is_file()
+
+        assert "small" in asserts and "big" in asserts
 
     async def test_send_all_args(self, bot, super_group_id, chatphoto_file):
         async def func():

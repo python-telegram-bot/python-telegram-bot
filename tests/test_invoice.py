@@ -184,39 +184,33 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
 
 class TestInvoiceWithRequest(TestInvoiceBase):
     async def test_send_required_args_only(self, bot, chat_id, provider_token):
-        send_inv_task = asyncio.create_task(
-            bot.send_invoice(
-                chat_id=chat_id,
-                title=self.title,
-                description=self.description,
-                payload=self.payload,
-                provider_token=provider_token,
-                currency=self.currency,
-                prices=self.prices,
-            )
-        )
-        create_inv_link_task = asyncio.create_task(
-            bot.create_invoice_link(
-                title=self.title,
-                description=self.description,
-                payload=self.payload,
-                provider_token=provider_token,
-                currency=self.currency,
-                prices=self.prices,
-            )
+        message = await bot.send_invoice(
+            chat_id=chat_id,
+            title=self.title,
+            description=self.description,
+            payload=self.payload,
+            provider_token=provider_token,
+            currency=self.currency,
+            prices=self.prices,
         )
 
-        message = await send_inv_task
         assert message.invoice.currency == self.currency
         assert message.invoice.start_parameter == ""
         assert message.invoice.description == self.description
         assert message.invoice.title == self.title
         assert message.invoice.total_amount == self.total_amount
 
-        link = await create_inv_link_task
+        link = await bot.create_invoice_link(
+            title=self.title,
+            description=self.description,
+            payload=self.payload,
+            provider_token=provider_token,
+            currency=self.currency,
+            prices=self.prices,
+        )
+
         assert isinstance(link, str)
         assert link != ""
-        assert send_inv_task.done() and create_inv_link_task.done()
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_invoice_default_protect_content(
@@ -232,9 +226,9 @@ class TestInvoiceWithRequest(TestInvoiceBase):
                     provider_token,
                     self.currency,
                     self.prices,
-                    **i,
+                    **kwargs,
                 )
-                for i in ({}, {"protect_content": False})
+                for kwargs in ({}, {"protect_content": False})
             )
         )
         protected, unprotected = await tasks
