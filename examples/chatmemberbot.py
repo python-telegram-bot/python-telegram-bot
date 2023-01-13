@@ -144,14 +144,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if it's a private chat. Since no automatic update is issued when a user starts a private chat
     with the bot, we have to track it explicitly here, when handling the /start command.
     """
-    cause_name = update.effective_user.full_name
+    user_name = update.effective_user.full_name
     chat = update.effective_chat
     if chat.type == Chat.PRIVATE:
-        logger.info("%s started a private chat with the bot", cause_name)
+        logger.info("%s started a private chat with the bot", user_name)
         context.bot_data.setdefault("user_ids", set()).add(chat.id)
 
     await update.effective_message.reply_text(
-        f"Welcome {cause_name}. Use /show_chats command to see what chats I'm in."
+        f"Welcome {user_name}. Use /show_chats command to see what chats I'm in."
     )
 
 
