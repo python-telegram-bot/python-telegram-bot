@@ -695,16 +695,16 @@ class TestApplication:
 
     async def test_flow_stop_by_error_handler(self, app):
         passed = []
-        exception = Exception("General excepition")
+        exception = Exception("General exception")
 
-        async def start1(b, u):
+        async def start1(u, c):
             passed.append("start1")
             raise exception
 
-        async def start2(b, u):
+        async def start2(u, c):
             passed.append("start2")
 
-        async def start3(b, u):
+        async def start3(u, c):
             passed.append("start3")
 
         async def error(u, c):
@@ -986,7 +986,7 @@ class TestApplication:
         ), "incorrect stacklevel!"
 
     async def test_non_blocking_no_error_handler(self, app, caplog):
-        app.add_handler(TypeHandler(object, self.callback_raise_error, block=False))
+        app.add_handler(TypeHandler(object, self.callback_raise_error("Test error"), block=False))
 
         with caplog.at_level(logging.ERROR):
             async with app:
@@ -1012,7 +1012,7 @@ class TestApplication:
 
         app.add_error_handler(async_error_handler, block=False)
         app.add_error_handler(normal_error_handler)
-        app.add_handler(TypeHandler(object, self.callback_raise_error, block=handler_block))
+        app.add_handler(TypeHandler(object, self.callback_raise_error("err"), block=handler_block))
 
         async with app:
             await app.start()
@@ -1064,7 +1064,7 @@ class TestApplication:
         bot = make_bot(bot_info, defaults=Defaults(block=block))
         app = Application.builder().bot(bot).build()
         async with app:
-            app.add_handler(TypeHandler(object, self.callback_raise_error))
+            app.add_handler(TypeHandler(object, self.callback_raise_error("error")))
             app.add_error_handler(error_handler)
             await app.process_update(1)
             await asyncio.sleep(0.05)
@@ -1089,7 +1089,7 @@ class TestApplication:
     async def test_nonblocking_handler_raises_and_non_blocking_error_handler_raises(
         self, app, caplog, handler_block, error_handler_block
     ):
-        handler = TypeHandler(object, self.callback_raise_error, block=handler_block)
+        handler = TypeHandler(object, self.callback_raise_error("error"), block=handler_block)
         app.add_handler(handler)
         app.add_error_handler(self.error_handler_raise_error, block=error_handler_block)
 
