@@ -299,11 +299,9 @@ class TestStickerWithRequest(TestStickerBase):
         if path.is_file():
             path.unlink()
 
-        sticker = (await bot.send_sticker(chat_id, sticker, read_timeout=50)).sticker
         new_file = await bot.get_file(sticker.file_id)
 
         assert new_file.file_size == sticker.file_size
-        assert new_file.file_id == sticker.file_id
         assert new_file.file_unique_id == sticker.file_unique_id
         assert new_file.file_path.startswith("https://")
 

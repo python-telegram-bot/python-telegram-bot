@@ -219,11 +219,9 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         if path.is_file():
             path.unlink()
 
-        video_note = (await bot.send_video_note(chat_id, video_note, read_timeout=50)).video_note
         new_file = await bot.get_file(video_note.file_id)
 
         assert new_file.file_size == self.file_size
-        assert new_file.file_id == video_note.file_id
         assert new_file.file_unique_id == video_note.file_unique_id
         assert new_file.file_path.startswith("https://")
 

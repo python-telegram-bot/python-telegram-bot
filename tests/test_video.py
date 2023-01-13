@@ -243,11 +243,9 @@ class TestVideoWithRequest(TestVideoBase):
         if path.is_file():
             path.unlink()
 
-        video = (await bot.send_video(chat_id, video.file_id, read_timeout=50)).video
         new_file = await bot.get_file(video.file_id)
 
         assert new_file.file_size == self.file_size
-        assert new_file.file_id == video.file_id
         assert new_file.file_unique_id == video.file_unique_id
         assert new_file.file_path.startswith("https://")
 

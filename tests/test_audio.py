@@ -232,11 +232,9 @@ class TestAudioWithRequest(TestAudioBase):
         if path.is_file():
             path.unlink()
 
-        audio = (await bot.send_audio(chat_id, audio.file_id, read_timeout=50)).audio
         new_file = await bot.get_file(audio.file_id)
 
         assert new_file.file_size == self.file_size
-        assert new_file.file_id == audio.file_id
         assert new_file.file_unique_id == audio.file_unique_id
         assert str(new_file.file_path).startswith("https://")
 

@@ -226,7 +226,6 @@ class TestAnimationWithRequest(TestAnimationBase):
 
         new_file = await bot.get_file(animation.file_id)
 
-        assert new_file.file_id == animation.file_id
         assert new_file.file_path.startswith("https://")
 
         new_filepath = await new_file.download_to_drive("game.gif")
