@@ -33,6 +33,7 @@
    Telegram Channel <https://t.me/pythontelegrambotchannel/>
    Telegram User Group <https://t.me/pythontelegrambotgroup/>
    contributing
+   testing
    coc
 
 
