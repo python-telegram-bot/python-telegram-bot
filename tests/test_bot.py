@@ -2638,7 +2638,7 @@ class TestBotWithRequest:
         )
         assert revoked_link.is_revoked
 
-    @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="requires pytz")
+    @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="This test's implementation requires pytz")
     @pytest.mark.parametrize("datetime", argvalues=[True, False], ids=["datetime", "integer"])
     async def test_advanced_chat_invite_links(self, bot, channel_id, datetime):
         # we are testing this all in one function in order to save api calls
