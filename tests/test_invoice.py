@@ -89,7 +89,7 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
         # parameters correctly because #2526 went unnoticed for 3 years …
         async def make_assertion(*args, **_):
             kwargs = args[1]
-            return all([kwargs[i] == i for i in kwargs])
+            return all([kwargs[key] == key for key in kwargs])
 
         monkeypatch.setattr(bot, "_send_message", make_assertion)
         assert await bot.send_invoice(
