@@ -47,7 +47,9 @@ if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
 
 FALLBACKS = json.loads(base64.b64decode(FALLBACKS).decode("utf-8"))  # type: list[dict[str, str]]
 
-chosen_bot = {}
+
+class BotInfoProvider:
+    chosen_bot = {}
 
 
 def get(key, fallback):
@@ -63,8 +65,7 @@ def get(key, fallback):
 
 
 def get_bot():
-    global chosen_bot
-    if chosen_bot:
-        return chosen_bot
-    chosen_bot = {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}
-    return chosen_bot
+    if BotInfoProvider.chosen_bot:
+        return BotInfoProvider.chosen_bot
+    BotInfoProvider.chosen_bot = {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}
+    return BotInfoProvider.chosen_bot
