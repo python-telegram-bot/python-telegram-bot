@@ -151,7 +151,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         context.bot_data.setdefault("user_ids", set()).add(chat.id)
 
     await update.effective_message.reply_text(
-        rf"Welcome {cause_name}. Use /show_chats command to see what chats I'm in."
+        f"Welcome {cause_name}. Use /show_chats command to see what chats I'm in."
     )
 
 
