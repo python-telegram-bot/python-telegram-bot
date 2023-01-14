@@ -461,10 +461,6 @@ class JobQueue:
                 .. versionchanged:: 20.0
                     Changed day of the week mapping of 0-6 from monday-sunday to sunday-saturday.
 
-                .. versionchanged:: 20.1
-                    The warning about the change of day of week mapping is now only shown if this
-                    parameter was passed.
-
             data (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
