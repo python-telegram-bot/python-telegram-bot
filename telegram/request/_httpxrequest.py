@@ -201,6 +201,6 @@ class HTTPXRequest(BaseRequest):
         except httpx.HTTPError as err:
             # HTTPError must come last as its the base httpx exception class
             # TODO p4: do something smart here; for now just raise NetworkError
-            raise NetworkError(f"httpx HTTPError: {err}") from err
+            raise NetworkError(f"httpx.{err.__class__.__name__}: {err}") from err
 
         return res.status_code, res.content
