@@ -39,7 +39,7 @@ class ChosenInlineResult(TelegramObject):
     considered equal, if their :attr:`result_id` is equal.
 
     Note:
-        * In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
+        * In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
         * It is necessary to enable inline feedback via `@Botfather <https://t.me/BotFather>`_ in
           order to receive these objects in updates.
 
