@@ -1,5 +1,6 @@
 :root {
   --icon--shortcuts: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-signpost' viewBox='0 0 16 16'%3E%3Cpath d='M7 1.414V4H2a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h5v6h2v-6h3.532a1 1 0 0 0 .768-.36l1.933-2.32a.5.5 0 0 0 0-.64L13.3 4.36a1 1 0 0 0-.768-.36H9V1.414a1 1 0 0 0-2 0zM12.532 5l1.666 2-1.666 2H2V5h10.532z'/%3E%3C/svg%3E");
+  --icon--returned-in: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-arrow-return-right' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.5 1.5A.5.5 0 0 0 1 2v4.8a2.5 2.5 0 0 0 2.5 2.5h9.793l-3.347 3.346a.5.5 0 0 0 .708.708l4.2-4.2a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 8.3H3.5A1.5 1.5 0 0 1 2 6.8V2a.5.5 0 0 0-.5-.5z'/%3E%3C/svg%3E");
 }
 .admonition.shortcuts {
   border-color: rgb(43, 155, 70);
@@ -12,4 +13,17 @@
   background-color: rgb(43, 155, 70);
   -webkit-mask-image: var(--icon--shortcuts);
   mask-image: var(--icon--shortcuts);
+}
+
+.admonition.returned-in {
+  border-color: rgb(230, 109, 15);
+}
+.admonition.returned-in > .admonition-title {
+  background-color: rgba(177, 108, 51, 0.1);
+  border-color: rgb(230, 109, 15);
+}
+.admonition.returned-in > .admonition-title::before {
+  background-color: rgb(230, 109, 15);
+  -webkit-mask-image: var(--icon--returned-in);
+  mask-image: var(--icon--returned-in);
 }

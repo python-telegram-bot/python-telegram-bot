@@ -3,6 +3,7 @@ import os
 import re
 import subprocess
 import sys
+from collections import defaultdict
 from enum import Enum
 from pathlib import Path
 from typing import List, Tuple
@@ -411,7 +412,16 @@ read_timeout_sub = [
 read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
 
 
-def find_insert_pos(lines: List[str]) -> int:
+def find_insert_pos_for_admonition(lines: List[str]) -> int:
+    """Finds the correct position to insert the admonition and returns the index."""
+    for idx, value in list(enumerate(lines)):
+        if value.startswith(".. version") or value.startswith(":param"):
+            return idx
+    else:
+        return False
+
+
+def find_insert_pos_for_kwargs(lines: List[str]) -> int:
     """Finds the correct position to insert the keyword arguments and returns the index."""
     for idx, value in reversed(list(enumerate(lines))):  # reversed since :returns: is at the end
         if value.startswith(":returns:"):
@@ -442,13 +452,67 @@ def check_timeout_and_api_kwargs_presence(obj: object) -> int:
     )
 
 
+def create_return_admonitions() -> dict[str, str]:
+    """Creates 'Returned in' admonitions for classes that are returned in Bot's methods."""
+
+    methods_for_class = defaultdict(list)
+
+    # checking for islower() to avoid camelCase methods
+    for method in [m for m in dir(telegram.Bot) if not m.startswith("_") and m.islower()]:
+        try:
+            sig = inspect.Signature.from_callable(getattr(telegram.Bot, method))
+        except TypeError:  # not a method
+            continue
+
+        class_name = str(sig.return_annotation)
+        if "telegram" not in class_name:
+            continue
+
+        class_name = (
+            class_name.replace("typing.Union[", "")
+            .replace("typing.Tuple[", "")
+            .replace("]", "")
+            .split(", ")[0]  # Union and Tuple give relevant class before the comma
+            .removeprefix("<class '")
+            .removesuffix("'>")
+            .split(".")[-1]  # telegram._botcommand.BotCommand -> BotCommand
+        )
+
+        methods_for_class[class_name].append(method)
+
+    admonition_for_class_name = dict()
+
+    for cls in methods_for_class:
+        admonition = """
+
+.. admonition:: Returned in
+    :class: returned-in
+"""
+        if len(methods_for_class[cls]) > 1:
+            for method in sorted(methods_for_class[cls]):
+                admonition += "\n    * " + f":meth:`telegram.Bot.{method}`"
+        else:
+            admonition += f"\n    :meth:`telegram.Bot.{methods_for_class[cls][0]}`"
+
+        admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
+        admonition_for_class_name[cls] = admonition
+
+    return admonition_for_class_name
+
+
+RETURN_ADMONITION_FOR_CLASS_NAME = create_return_admonitions()
+
+
 def autodoc_process_docstring(
     app: Sphinx, what, name: str, obj: object, options, lines: List[str]
 ):
     """We do two things:
     1) Use this method to automatically insert the Keyword Args for the Bot methods.
 
-    2) Misuse this autodoc hook to get the file names & line numbers because we have access
+    2) Use this method to automatically insert "Returned in" admonition into classes
+       that are returned from the Bot methods
+
+    3) Misuse this autodoc hook to get the file names & line numbers because we have access
        to the actual object here.
     """
     # 1) Insert the Keyword Args for the Bot methods
@@ -459,7 +523,7 @@ def autodoc_process_docstring(
         and method_name.islower()
         and check_timeout_and_api_kwargs_presence(obj)
     ):
-        insert_index = find_insert_pos(lines)
+        insert_index = find_insert_pos_for_kwargs(lines)
         if not insert_index:
             raise ValueError(
                 f"Couldn't find the correct position to insert the keyword args for {obj}."
@@ -479,7 +543,29 @@ def autodoc_process_docstring(
                 ),
             )
 
-    # 2) Get the file names & line numbers
+    # 2) Insert "Returned in" admonition into classes that are returned from the Bot methods
+    try:
+        class_name = name.split(".")[-2]
+    except IndexError:
+        class_name = ""
+
+    # check for "__init__" ensures we generate "Returned in" admonition only once per class
+    if (
+        class_name in RETURN_ADMONITION_FOR_CLASS_NAME
+        and name.endswith("__init__")
+        and "slot wrapper" not in str(obj)  # filter out some side effects of __init__ check
+    ):
+        insert_index = find_insert_pos_for_admonition(lines)
+        if not insert_index:
+            raise ValueError(
+                f"Couldn't find the position to insert the 'Returned in' admonition for {obj}."
+                f"(class {class_name})."
+            )
+        admonition_lines = RETURN_ADMONITION_FOR_CLASS_NAME[class_name].splitlines()
+        for i in range(insert_index, insert_index + len(admonition_lines)):
+            lines.insert(i, admonition_lines[i - insert_index])
+
+    # 3) Get the file names & line numbers
     # We can't properly handle ordinary attributes.
     # In linkcode_resolve we'll resolve to the `__init__` or module instead
     if what == "attribute":
