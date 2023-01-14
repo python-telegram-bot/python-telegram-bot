@@ -460,7 +460,7 @@ def create_return_admonitions() -> dict[str, str]:
     # checking for islower() to avoid camelCase methods
     for method in [m for m in dir(telegram.Bot) if not m.startswith("_") and m.islower()]:
         try:
-            sig = inspect.Signature.from_callable(getattr(telegram.Bot, method))
+            sig = inspect.signature(getattr(telegram.Bot, method))
         except TypeError:  # not a method
             continue
 
@@ -506,7 +506,7 @@ RETURN_ADMONITION_FOR_CLASS_NAME = create_return_admonitions()
 def autodoc_process_docstring(
     app: Sphinx, what, name: str, obj: object, options, lines: List[str]
 ):
-    """We do two things:
+    """We do three things:
     1) Use this method to automatically insert the Keyword Args for the Bot methods.
 
     2) Use this method to automatically insert "Returned in" admonition into classes
