@@ -109,6 +109,7 @@ class HTTPXRequest(BaseRequest):
             timeout=timeout,
             proxies=proxy_url,
             limits=limits,
+            http2=True,
         )
 
         try:

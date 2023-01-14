@@ -90,6 +90,7 @@ class TestApplicationBuilder:
             timeout: object
             proxies: object
             limits: object
+            http2: object
 
         monkeypatch.setattr(httpx, "AsyncClient", Client)
 
@@ -308,6 +309,7 @@ class TestApplicationBuilder:
             timeout: object
             proxies: object
             limits: object
+            http2: object
 
         monkeypatch.setattr(httpx, "AsyncClient", Client)
 
