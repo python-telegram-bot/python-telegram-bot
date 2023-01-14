@@ -457,13 +457,12 @@ def create_return_admonitions() -> dict[str, str]:
 
     methods_for_class = defaultdict(list)
 
-    # checking for islower() to avoid camelCase methods
-    for method in [m for m in dir(telegram.Bot) if not m.startswith("_") and m.islower()]:
-        try:
-            sig = inspect.signature(getattr(telegram.Bot, method))
-        except TypeError:  # not a method
-            continue
-
+    for method in [
+        m[0]
+        for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
+        if not m[0].startswith("_") and m[0].islower()  # islower() to avoid camelCase methods
+    ]:
+        sig = inspect.signature(getattr(telegram.Bot, method))
         return_type_string = str(sig.return_annotation)
         if "telegram" not in return_type_string:
             continue
@@ -491,8 +490,8 @@ def create_return_admonitions() -> dict[str, str]:
     :class: returned-in
 """
         if len(methods_for_class[cls]) > 1:
-            for method in sorted(methods_for_class[cls]):
-                admonition += "\n    * " + f":meth:`telegram.Bot.{method}`"
+            for method_name in sorted(methods_for_class[cls]):
+                admonition += "\n    * " + f":meth:`telegram.Bot.{method_name}`"
         else:
             admonition += f"\n    :meth:`telegram.Bot.{methods_for_class[cls][0]}`"
 
