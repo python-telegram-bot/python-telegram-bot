@@ -464,21 +464,23 @@ def create_return_admonitions() -> dict[str, str]:
         except TypeError:  # not a method
             continue
 
-        class_name = str(sig.return_annotation)
-        if "telegram" not in class_name:
+        return_type_string = str(sig.return_annotation)
+        if "telegram" not in return_type_string:
             continue
 
-        class_name = (
-            class_name.replace("typing.Union[", "")
-            .replace("typing.Tuple[", "")
-            .replace("]", "")
-            .split(", ")[0]  # Union and Tuple give relevant class before the comma
+        class_names = (
+            return_type_string.removeprefix("typing.Union[")
+            .removeprefix("typing.Tuple[")
             .removeprefix("<class '")
             .removesuffix("'>")
-            .split(".")[-1]  # telegram._botcommand.BotCommand -> BotCommand
+            .removesuffix("]")
+            .split(", ")  # for the cases like Union[telegram.Something, telegram.SomethingElse]
         )
-
-        methods_for_class[class_name].append(method)
+        for class_name in class_names:
+            if "telegram" not in class_name:
+                continue
+            class_name = class_name.split(".")[-1]  # telegram._botcommand.BotCommand -> BotCommand
+            methods_for_class[class_name].append(method)
 
     admonition_for_class_name = dict()
 
