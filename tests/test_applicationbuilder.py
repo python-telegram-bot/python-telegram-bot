@@ -135,6 +135,7 @@ class TestApplicationBuilder:
         assert app.persistence is None
         assert app.post_init is None
         assert app.post_shutdown is None
+        assert app.post_stop is None
 
     @pytest.mark.parametrize(
         "method, description", _BOT_CHECKS, ids=[entry[0] for entry in _BOT_CHECKS]
@@ -361,6 +362,9 @@ class TestApplicationBuilder:
         async def post_shutdown(app: Application) -> None:
             pass
 
+        async def post_stop(app: Application) -> None:
+            pass
+
         app = (
             builder.token(bot.token)
             .job_queue(job_queue)
@@ -370,6 +374,7 @@ class TestApplicationBuilder:
             .concurrent_updates(concurrent_updates)
             .post_init(post_init)
             .post_shutdown(post_shutdown)
+            .post_stop(post_stop)
             .arbitrary_callback_data(True)
         ).build()
         assert app.job_queue is job_queue
@@ -383,6 +388,7 @@ class TestApplicationBuilder:
         assert app.concurrent_updates == concurrent_updates
         assert app.post_init is post_init
         assert app.post_shutdown is post_shutdown
+        assert app.post_stop is post_stop
         assert isinstance(app.bot.callback_data_cache, CallbackDataCache)
 
         updater = Updater(bot=bot, update_queue=update_queue)

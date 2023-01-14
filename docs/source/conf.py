@@ -46,6 +46,7 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx.ext.extlinks",
     "sphinx_paramlinks",
+    "sphinx_copybutton",
     "sphinxcontrib.mermaid",
     "sphinx_search.extension",
 ]
@@ -349,7 +350,7 @@ class TGConstXRefRole(PyXRefRole):
             return title, target
         except Exception as exc:
             sphinx_logger.exception(
-                f"%s:%d: WARNING: Did not convert reference %s due to an exception.",
+                "%s:%d: WARNING: Did not convert reference %s due to an exception.",
                 refnode.source,
                 refnode.line,
                 refnode.rawsource,
@@ -514,7 +515,7 @@ def _git_branch() -> str:
         return output.decode().strip()
     except Exception as exc:
         sphinx_logger.exception(
-            f"Failed to get a description of the current commit. Falling back to `master`.",
+            "Failed to get a description of the current commit. Falling back to `master`.",
             exc_info=exc,
         )
         return "master"

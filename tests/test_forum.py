@@ -30,6 +30,7 @@ from telegram import (
     GeneralForumTopicUnhidden,
     Sticker,
 )
+from telegram.error import BadRequest
 
 TEST_MSG_TEXT = "Topics are forever"
 TEST_TOPIC_ICON_COLOR = 0x6FB9F0
@@ -262,30 +263,41 @@ class TestForumMethods:
         assert result is True, "Failed to edit general forum topic"
         # no way of checking the edited name, just the boolean result
 
-    async def test_close_and_reopen_general_forum_topic(self, bot, forum_group_id):
+    async def test_close_reopen_hide_unhide_general_forum_topic(self, bot, forum_group_id):
+        """Since reopening also unhides and hiding also closes, testing (un)hiding and
+        closing/reopening in different tests would mean that the tests have to be executed in
+        a specific order. For stability, we instead test all of them in one test."""
+
+        # We first ensure that the topic is open and visible
+        # Otherwise the tests below will fail
+        try:
+            await bot.reopen_general_forum_topic(chat_id=forum_group_id)
+        except BadRequest as exc:
+            # If the topic is already open, we get BadRequest: Topic_not_modified
+            if "Topic_not_modified" not in exc.message:
+                raise exc
+
+        # first just close, bot don't hide
         result = await bot.close_general_forum_topic(
             chat_id=forum_group_id,
         )
         assert result is True, "Failed to close general forum topic"
 
-        result = await bot.reopen_general_forum_topic(
-            chat_id=forum_group_id,
-        )
-        assert result is True, "Failed to reopen general forum topic"
-
-    async def test_hide_and_unhide_general_forum_topic(self, bot, forum_group_id):
-
+        # then hide
         result = await bot.hide_general_forum_topic(
             chat_id=forum_group_id,
         )
         assert result is True, "Failed to hide general forum topic"
 
+        # then unhide, but don't reopen
         result = await bot.unhide_general_forum_topic(
             chat_id=forum_group_id,
         )
         assert result is True, "Failed to unhide general forum topic"
 
-        # hiding the general topic also closes it, so we reopen it
+        # finally, reopen
+        # as this also unhides, this should ensure that the topic is open and visible
+        # for the next test run
         result = await bot.reopen_general_forum_topic(
             chat_id=forum_group_id,
         )
