@@ -545,26 +545,19 @@ def autodoc_process_docstring(
             )
 
     # 2) Insert "Returned in" admonition into classes that are returned from the Bot methods
-    try:
-        class_name = name.split(".")[-2]
-    except IndexError:
-        class_name = ""
 
-    # check for "__init__" ensures we generate "Returned in" admonition only once per class
-    if (
-        class_name in RETURN_ADMONITION_FOR_CLASS_NAME
-        and name.endswith("__init__")
-        and "slot wrapper" not in str(obj)  # filter out some side effects of __init__ check
-    ):
-        insert_index = find_insert_pos_for_admonition(lines)
-        if not insert_index:
-            raise ValueError(
-                f"Couldn't find the position to insert the 'Returned in' admonition for {obj}."
-                f"(class {class_name})."
-            )
-        admonition_lines = RETURN_ADMONITION_FOR_CLASS_NAME[class_name].splitlines()
-        for i in range(insert_index, insert_index + len(admonition_lines)):
-            lines.insert(i, admonition_lines[i - insert_index])
+    if what == "class" and name.split(".")[-2] != "filters":
+        class_name = name.split(".")[-1]
+        if class_name in RETURN_ADMONITION_FOR_CLASS_NAME:
+            insert_index = find_insert_pos_for_admonition(lines)
+            if not insert_index:
+                raise ValueError(
+                    f"Couldn't find the position to insert the 'Returned in' admonition for {obj}."
+                    f"(class {class_name})."
+                )
+            admonition_lines = RETURN_ADMONITION_FOR_CLASS_NAME[class_name].splitlines()
+            for i in range(insert_index, insert_index + len(admonition_lines)):
+                lines.insert(i, admonition_lines[i - insert_index])
 
     # 3) Get the file names & line numbers
     # We can't properly handle ordinary attributes.
