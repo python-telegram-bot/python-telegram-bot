@@ -455,6 +455,8 @@ def check_timeout_and_api_kwargs_presence(obj: object) -> int:
 def create_return_admonitions() -> dict[str, str]:
     """Creates 'Returned in' admonitions for classes that are returned in Bot's methods."""
 
+    # First, generate a mapping of class names to the methods which return it,
+    # i.e. {Message: [send_message, ...]}
     methods_for_class = defaultdict(list)
 
     for method in [
@@ -481,7 +483,9 @@ def create_return_admonitions() -> dict[str, str]:
             class_name = class_name.split(".")[-1]  # telegram._botcommand.BotCommand -> BotCommand
             methods_for_class[class_name].append(method)
 
-    admonition_for_class_name = dict()
+    # Now, let's use this mapping to start generating a new mapping of class names to admonitions,
+    # i.e. {Message: ".. admonition: Returned in ..."}
+    admonition_for_class_name = {}
 
     for cls in methods_for_class:
         admonition = """
