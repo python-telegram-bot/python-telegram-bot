@@ -544,7 +544,15 @@ def create_return_admonitions() -> dict[str, str]:
         if not m[0].startswith("_") and m[0].islower()  # islower() to avoid camelCase methods
     ]:
         sig = inspect.signature(getattr(telegram.Bot, method))
-        classes = get_args(sig.return_annotation)
+        ret_annot = sig.return_annotation
+        classes = get_args(ret_annot)
+
+        # If we do get_args() when return annotation has one single class
+        # (e.g. <class 'telegram._message.Message'>), get_args() returns an empty tuple.
+        # We use this workaround to fix this.
+        if not classes and isinstance(ret_annot, type) and "telegram" in str(ret_annot):
+            methods_for_class_name[str(ret_annot)].append(method)
+            continue
 
         for klass in classes:
             if "telegram" not in str(klass):
