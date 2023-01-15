@@ -6,7 +6,7 @@ import sys
 from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import List, Tuple, get_args
+from typing import Dict, List, Tuple, get_args
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -413,12 +413,13 @@ read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
 
 
 def find_insert_pos_for_admonition(lines: List[str]) -> int:
-    """Finds the correct position to insert the admonition and returns the index."""
+    """Finds the correct position to insert the admonition and returns the index.
+    If no key phrases are found, the admonition will be inserted at the very end.
+    """
     for idx, value in list(enumerate(lines)):
         if value.startswith(".. version") or value.startswith(":param"):
             return idx
-    else:
-        return False
+    return len(lines) - 1
 
 
 def find_insert_pos_for_kwargs(lines: List[str]) -> int:
@@ -450,6 +451,84 @@ def check_timeout_and_api_kwargs_presence(obj: object) -> int:
         param in sig.parameters and sig.parameters[param].kind == inspect.Parameter.KEYWORD_ONLY
         for param in params_to_check
     )
+
+
+def create_available_in_admonitions() -> dict[str, str]:
+    """Creates a dictionary for 'Available in' admonitions for classes that are available
+    in attributes of other classes.
+    """
+
+    # First, generate a mapping of class names to the attributes in other classes that correspond
+    # to instances of a given class
+    # i.e. {"telegram.Sticker": ["telegram.Message.sticker", ...]}
+    attrs_for_class_name = defaultdict(list)
+    admonition_for_class_name = {}
+
+    # The colon after the closing parenthesis is important because it makes sure
+    # this is the 1st line of attribute description.
+    # So far there seem to be no attribute docstrings in which the list of classes
+    # takes up more than one line.
+    pattern = re.compile(r"^\s*(?P<attr_name>[a-z_]+)\s?\(.*:class:`.+`.*\):\s.*$")
+    single_class_name_pattern = re.compile(r":class:`~?(?P<class_name>[\w.]*)`")
+
+    for _, inspected_class in inspect.getmembers(telegram, inspect.isclass) + inspect.getmembers(
+        telegram.ext, inspect.isclass
+    ):
+        name_of_inspected_class_to_look_in_attrs = (
+            str(inspected_class).removeprefix("<class '").removesuffix("'>")
+        )
+        # We need to make "<class 'telegram._files.sticker.StickerSet'>" into "telegram.StickerSet"
+        # because that's the way the classes are mentioned in docstrings...
+        name_of_inspected_class_to_look_in_attrs = ".".join(
+            n
+            for n in name_of_inspected_class_to_look_in_attrs.split(".")
+            if n in ("telegram", "ext") or not n.islower()  # removing things like "_files.sticker"
+        )
+
+        docstring_lines = inspect.getdoc(inspected_class).splitlines()
+        lines_with_attrs = []
+        for idx, line in enumerate(docstring_lines):
+            if line.strip() == "Attributes:":
+                lines_with_attrs = docstring_lines[idx + 1 :]
+
+        for line in lines_with_attrs:
+            line_match = pattern.match(line)
+            if pattern.match(line):
+                target_attr = line_match.group("attr_name")
+                # a typing description of one attribute can contain multiple classes
+                for match in single_class_name_pattern.finditer(line):
+                    name_of_class_in_attr = match.group("class_name")
+                    if "telegram" not in name_of_class_in_attr:
+                        continue
+
+                    # note that the keys are not the likes of "telegram.StickerSet"
+                    # but the likes of "<class 'telegram._files.sticker.StickerSet'>"
+                    full_class_name = str(eval(name_of_class_in_attr))
+                    attrs_for_class_name[full_class_name].append(
+                        f":attr:`{name_of_inspected_class_to_look_in_attrs}.{target_attr}`"
+                    )
+
+    # Now, let's use this mapping to start generating a new mapping of class names to admonitions,
+    # i.e. {"<class 'telegram._files.sticker.StickerSet'>": ".. admonition: Available in ..."}
+    for class_name, attrs in attrs_for_class_name.items():
+        admonition = """
+
+.. admonition:: Available in
+    :class: available-in
+"""
+        if len(attrs) > 1:
+            for target_attr in sorted(attrs):
+                admonition += "\n    * " + target_attr
+        else:
+            admonition += f"\n    {attrs[0]}"
+
+        admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
+        admonition_for_class_name[class_name] = admonition
+
+    return admonition_for_class_name
+
+
+AVAILABLE_IN_ADMONITION_FOR_CLASS_NAME = create_available_in_admonitions()
 
 
 def create_return_admonitions() -> dict[str, str]:
@@ -500,15 +579,30 @@ RETURN_ADMONITION_FOR_CLASS_NAME = create_return_admonitions()
 def autodoc_process_docstring(
     app: Sphinx, what, name: str, obj: object, options, lines: List[str]
 ):
-    """We do three things:
+    """We do the following things:
     1) Use this method to automatically insert the Keyword Args for the Bot methods.
 
     2) Use this method to automatically insert "Returned in" admonition into classes
        that are returned from the Bot methods
 
-    3) Misuse this autodoc hook to get the file names & line numbers because we have access
+    3) Use this method to automatically insert "Available in" admonition into classes
+       whose instances are available as attributes of other classes
+
+    4) Misuse this autodoc hook to get the file names & line numbers because we have access
        to the actual object here.
     """
+
+    def insert_admonition(admonition_for_class_name: Dict[str, str]):
+        """Inserts admonition based on a dictionary with class names and admonitions."""
+
+        if class_name not in admonition_for_class_name:
+            return
+
+        insert_idx = find_insert_pos_for_admonition(lines)
+        admonition_lines = admonition_for_class_name[class_name].splitlines()
+        for idx in range(insert_idx, insert_idx + len(admonition_lines)):
+            lines.insert(idx, admonition_lines[idx - insert_idx])
+
     # 1) Insert the Keyword Args for the Bot methods
     method_name = name.split(".")[-1]
     if (
@@ -537,20 +631,11 @@ def autodoc_process_docstring(
                 ),
             )
 
-    # 2) Insert "Returned in" admonition into classes that are returned from the Bot methods
-
+    # 2-3) Insert "Returned in" and "Available in" admonitions into classes (where applicable)
     if what == "class":
         class_name = str(obj)
-        if class_name in RETURN_ADMONITION_FOR_CLASS_NAME:
-            insert_index = find_insert_pos_for_admonition(lines)
-            if not insert_index:
-                raise ValueError(
-                    f"Couldn't find the position to insert the 'Returned in' admonition for {obj}."
-                    f"(class {class_name})."
-                )
-            admonition_lines = RETURN_ADMONITION_FOR_CLASS_NAME[class_name].splitlines()
-            for i in range(insert_index, insert_index + len(admonition_lines)):
-                lines.insert(i, admonition_lines[i - insert_index])
+        for dict_ in (AVAILABLE_IN_ADMONITION_FOR_CLASS_NAME, RETURN_ADMONITION_FOR_CLASS_NAME):
+            insert_admonition(dict_)
 
     # 3) Get the file names & line numbers
     # We can't properly handle ordinary attributes.
