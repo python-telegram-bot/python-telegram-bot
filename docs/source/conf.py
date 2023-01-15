@@ -457,7 +457,7 @@ def create_return_admonitions() -> dict[str, str]:
 
     # First, generate a mapping of class names to the methods which return it,
     # i.e. {Message: [send_message, ...]}
-    methods_for_class = defaultdict(list)
+    methods_for_class_name = defaultdict(list)
 
     for method in [
         m[0]
@@ -470,23 +470,23 @@ def create_return_admonitions() -> dict[str, str]:
         for klass in classes:
             if "telegram" not in str(klass):
                 continue
-            methods_for_class[str(klass)].append(method)
+            methods_for_class_name[str(klass)].append(method)
 
     # Now, let's use this mapping to start generating a new mapping of class names to admonitions,
     # i.e. {Message: ".. admonition: Returned in ..."}
     admonition_for_class_name = {}
 
-    for cls in methods_for_class:
+    for cls, methods in methods_for_class_name.items():
         admonition = """
 
 .. admonition:: Returned in
     :class: returned-in
 """
-        if len(methods_for_class[cls]) > 1:
-            for method_name in sorted(methods_for_class[cls]):
+        if len(methods) > 1:
+            for method_name in sorted(methods):
                 admonition += "\n    * " + f":meth:`telegram.Bot.{method_name}`"
         else:
-            admonition += f"\n    :meth:`telegram.Bot.{methods_for_class[cls][0]}`"
+            admonition += f"\n    :meth:`telegram.Bot.{methods[0]}`"
 
         admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
         admonition_for_class_name[cls] = admonition
