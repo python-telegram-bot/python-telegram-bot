@@ -17,8 +17,6 @@
 
 .admonition.returned-in {
   border-color: rgb(230, 109, 15);
-  max-height: 200px;
-  overflow-y: scroll;
 }
 .admonition.returned-in:hover {
   cursor: move;
@@ -26,6 +24,12 @@
 .admonition.returned-in > .admonition-title {
   background-color: rgba(177, 108, 51, 0.1);
   border-color: rgb(230, 109, 15);
+  position: sticky;
+  top: 0;
+}
+.admonition.returned-in > ul {
+  max-height: 200px;
+  overflow-y: scroll;
 }
 .admonition.returned-in > .admonition-title::before {
   background-color: rgb(230, 109, 15);
