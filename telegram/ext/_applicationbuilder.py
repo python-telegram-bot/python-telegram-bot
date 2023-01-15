@@ -564,11 +564,13 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         :paramref:`~telegram.request.HTTPXRequest.http_version` parameter of
         :attr:`telegram.Bot.request`. By default, HTTP/2 is used.
 
+        .. seealso:: :meth:`get_updates_http_version`
+
         .. versionadded:: 20.1
 
         Args:
-            http_version (:obj:`str`): Pass `1.1` if you'd like to use HTTP/1.1 for making requests
-                to Telegram. Defaults to `2`, in which case HTTP/2 is used.
+            http_version (:obj:`str`): Pass ``"1.1"`` if you'd like to use HTTP/1.1 for making
+                requests to Telegram. Defaults to ``"2"``, in which case HTTP/2 is used.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
@@ -703,11 +705,13 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         :paramref:`~telegram.request.HTTPXRequest.http_version` parameter which is used in the
         :meth:`telegram.Bot.get_updates` request. By default, HTTP/2 is used.
 
+        .. seealso:: :meth:`http_version`
+
         .. versionadded:: 20.1
 
         Args:
-            get_updates_http_version (:obj:`str`): Pass `1.1` if you'd like to use HTTP/1.1 for
-                making requests to Telegram. Defaults to `2`, in which case HTTP/2 is used.
+            get_updates_http_version (:obj:`str`): Pass ``"1.1"`` if you'd like to use HTTP/1.1 for
+                making requests to Telegram. Defaults to ``"2"``, in which case HTTP/2 is used.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
