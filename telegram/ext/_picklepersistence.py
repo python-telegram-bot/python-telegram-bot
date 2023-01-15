@@ -147,9 +147,9 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     Args:
         filepath (:obj:`str` | :obj:`pathlib.Path`): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.
-        store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
-            saved by this persistence instance. By default, all available kinds of data will be
-            saved.
+        store_data (:class:`~telegram.ext.PersistenceInput`, optional): Specifies which kinds of
+            data will be saved by this persistence instance. By default, all available kinds of
+            data will be saved.
         single_file (:obj:`bool`, optional): When :obj:`False` will store 5 separate files of
             `filename_user_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
@@ -172,8 +172,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     Attributes:
         filepath (:obj:`str` | :obj:`pathlib.Path`): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.
-        store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
-            persistence instance.
+        store_data (:class:`~telegram.ext.PersistenceInput`): Specifies which kinds of data will
+            be saved by this persistence instance.
         single_file (:obj:`bool`): Optional. When :obj:`False` will store 5 separate files of
             `filename_user_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
