@@ -80,7 +80,7 @@ repos:
         - --diff
         - --check
 -   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.212'
+    rev: 'v0.0.222'
     hooks:
     -   id: ruff
         name: ruff
