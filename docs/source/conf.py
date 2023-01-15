@@ -6,7 +6,7 @@ import sys
 from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, get_args
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -465,23 +465,12 @@ def create_return_admonitions() -> dict[str, str]:
         if not m[0].startswith("_") and m[0].islower()  # islower() to avoid camelCase methods
     ]:
         sig = inspect.signature(getattr(telegram.Bot, method))
-        return_type_string = str(sig.return_annotation)
-        if "telegram" not in return_type_string:
-            continue
+        classes = get_args(sig.return_annotation)
 
-        class_names = (
-            return_type_string.removeprefix("typing.Union[")
-            .removeprefix("typing.Tuple[")
-            .removeprefix("<class '")
-            .removesuffix("'>")
-            .removesuffix("]")
-            .split(", ")  # for the cases like Union[telegram.Something, telegram.SomethingElse]
-        )
-        for class_name in class_names:
-            if "telegram" not in class_name:
+        for klass in classes:
+            if "telegram" not in str(klass):
                 continue
-            class_name = class_name.split(".")[-1]  # telegram._botcommand.BotCommand -> BotCommand
-            methods_for_class[class_name].append(method)
+            methods_for_class[str(klass)].append(method)
 
     # Now, let's use this mapping to start generating a new mapping of class names to admonitions,
     # i.e. {Message: ".. admonition: Returned in ..."}
@@ -550,8 +539,8 @@ def autodoc_process_docstring(
 
     # 2) Insert "Returned in" admonition into classes that are returned from the Bot methods
 
-    if what == "class" and name.split(".")[-2] != "filters":
-        class_name = name.split(".")[-1]
+    if what == "class":
+        class_name = str(obj)
         if class_name in RETURN_ADMONITION_FOR_CLASS_NAME:
             insert_index = find_insert_pos_for_admonition(lines)
             if not insert_index:
