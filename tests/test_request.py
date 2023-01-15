@@ -533,18 +533,21 @@ class TestHTTPXRequest:
         assert content == b"content"
 
     @pytest.mark.parametrize(
-        ["raised_class", "expected_class"],
-        [(httpx.TimeoutException, TimedOut), (httpx.HTTPError, NetworkError)],
+        ["raised_class", "expected_class", "expected_message"],
+        [
+            (httpx.TimeoutException, TimedOut, "Timed out"),
+            (httpx.ReadError, NetworkError, "httpx.ReadError: message"),
+        ],
     )
     async def test_do_request_exceptions(
-        self, monkeypatch, httpx_request, raised_class, expected_class
+        self, monkeypatch, httpx_request, raised_class, expected_class, expected_message
     ):
         async def make_assertion(self, method, url, headers, timeout, files, data):
             raise raised_class("message")
 
         monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
 
-        with pytest.raises(expected_class):
+        with pytest.raises(expected_class, match=expected_message):
             await httpx_request.do_request(
                 "method",
                 "url",
