@@ -642,6 +642,7 @@ def create_use_in_admonitions() -> dict[str, str]:
     methods_for_class_name = defaultdict(set)  # using set here because there can be repetitions
 
     forward_ref_pattern = re.compile(r"ForwardRef\('(?P<class_name>.+?)'\)")  # non-greedy
+    telegram_pattern = re.compile(r"telegram\.(?P<class_name>[a-zA-Z_.]+)")
     skip_pattern = re.compile(
         r"^typing.Union\[ForwardRef\('DefaultValue\[DVType]'\), ((float)|(bool)|(int)|(str))"
         r"(, NoneType)?]$"
@@ -670,7 +671,11 @@ def create_use_in_admonitions() -> dict[str, str]:
 
             # this is a _UnionGenericAlias
             elif "telegram" in annotation_text or "ForwardRef" in annotation_text:
-                for match in forward_ref_pattern.finditer(annotation_text):
+                matches = [m for m in forward_ref_pattern.finditer(annotation_text)] + [
+                    m for m in telegram_pattern.finditer(annotation_text)
+                ]
+
+                for match in matches:
                     # resolving class
                     try:
                         klass = eval(f"telegram.{match.group('class_name')}")
