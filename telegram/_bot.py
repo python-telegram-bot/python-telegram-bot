@@ -147,10 +147,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
 
-    .. seealso:: :attr:`telegram.ext.Application.bot`,
-        :attr:`telegram.ext.CallbackContext.bot`,
-        :attr:`telegram.ext.Updater.bot`,
-        :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
 
     .. versionadded:: 13.2

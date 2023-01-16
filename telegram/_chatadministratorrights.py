@@ -32,12 +32,11 @@ class ChatAdministratorRights(TelegramObject):
     :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages`,
     :attr:`can_manage_topics` are equal.
 
+    .. seealso:: :meth:`Bot.set_my_default_administrator_rights`
+
     .. versionchanged:: 20.0
         :attr:`can_manage_topics` is considered as well when comparing objects of
         this type in terms of equality.
-
-    .. seealso: :meth:`Bot.set_my_default_administrator_rights`,
-        :meth:`Bot.get_my_default_administrator_rights`
 
     .. versionadded:: 20.0
 
