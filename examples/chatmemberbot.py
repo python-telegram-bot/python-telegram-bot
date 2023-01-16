@@ -149,8 +149,8 @@ async def greet_chat_members(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 async def start_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Greets the user and records that they started a chat with the bot if it's a private chat.
-    Since no `my_chat_member` update is issued when a user starts a private chat with the bot,
-    we have to track it explicitly here, when handling the /start command.
+    Since no `my_chat_member` update is issued when a user starts a private chat with the bot
+    for the first time, we have to track it explicitly here.
     """
     user_name = update.effective_user.full_name
     chat = update.effective_chat
