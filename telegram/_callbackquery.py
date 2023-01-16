@@ -51,7 +51,7 @@ class CallbackQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        * In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
+        * In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
         * Exactly one of the fields :attr:`data` or :attr:`game_short_name` will be present.
         * After the user presses an inline button, Telegram clients will display a progress bar
           until you call :attr:`answer`. It is, therefore, necessary to react
