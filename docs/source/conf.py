@@ -632,6 +632,78 @@ def create_return_admonitions() -> dict[str, str]:
 RETURN_ADMONITION_FOR_CLASS_NAME = create_return_admonitions()
 
 
+def create_use_in_admonitions() -> dict[str, str]:
+    """Creates 'Use in' admonitions for classes whose instances that are accepted as arguments for
+    Bot's methods.
+    """
+
+    # First, generate a mapping of class names to the methods which accept them as arguments,
+    # i.e. {InlineQueryResult: [answer_inline_query, ...]}
+    methods_for_class_name = defaultdict(set)  # using set here because there can be repetitions
+
+    forward_ref_pattern = re.compile(r"ForwardRef\('(?P<class_name>.+?)'\)")  # non-greedy
+    skip_pattern = re.compile(
+        r"^typing.Union\[ForwardRef\('DefaultValue\[DVType]'\), ((float)|(bool)|(int)|(str))"
+        r"(, NoneType)?]$"
+    )
+
+    for method in [
+        m[0]
+        for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
+        if not m[0].startswith("_")
+        and m[0].islower()  # islower() to avoid camelCase methods
+        and m[0] in telegram.Bot.__dict__  # method is not inherited from TelegramObject
+    ]:
+
+        sig = inspect.signature(getattr(telegram.Bot, method))
+        parameters = sig.parameters
+
+        for type_annotation in parameters.values():
+            annotation = type_annotation.annotation
+            annotation_text = str(annotation)
+
+            if skip_pattern.match(annotation_text):
+                continue
+
+            if isinstance(annotation, type) and "telegram" in annotation_text:
+                methods_for_class_name[str(annotation)].add(method)
+
+            # this is a _UnionGenericAlias
+            elif "telegram" in annotation_text or "ForwardRef" in annotation_text:
+                for match in forward_ref_pattern.finditer(annotation_text):
+                    # resolving class
+                    try:
+                        klass = eval(f"telegram.{match.group('class_name')}")
+                    except AttributeError:
+                        klass = eval(f"telegram.ext.{match.group('class_name')}")
+
+                    methods_for_class_name[str(klass)].add(method)
+
+    # Now, let's use this mapping to start generating a new mapping of class names to admonitions,
+    # i.e. {InlineQueryResult: ".. admonition: Use in ..."}
+    admonition_for_class_name = {}
+
+    for cls, methods in methods_for_class_name.items():
+        admonition = """
+
+.. admonition:: Use in
+    :class: use-in
+"""
+        if len(methods) > 1:
+            for method_name in sorted(list(methods)):
+                admonition += "\n    * " + f":meth:`telegram.Bot.{method_name}`"
+        else:
+            admonition += f"\n    :meth:`telegram.Bot.{list(methods)[0]}`"
+
+        admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
+        admonition_for_class_name[cls] = admonition
+
+    return admonition_for_class_name
+
+
+USE_IN_ADMONITION_FOR_CLASS_NAME = create_use_in_admonitions()
+
+
 def autodoc_process_docstring(
     app: Sphinx, what, name: str, obj: object, options, lines: List[str]
 ):
@@ -690,7 +762,11 @@ def autodoc_process_docstring(
     # 2-3) Insert "Returned in" and "Available in" admonitions into classes (where applicable)
     if what == "class":
         class_name = str(obj)
-        for dict_ in (AVAILABLE_IN_ADMONITION_FOR_CLASS_NAME, RETURN_ADMONITION_FOR_CLASS_NAME):
+        for dict_ in (
+            USE_IN_ADMONITION_FOR_CLASS_NAME,
+            AVAILABLE_IN_ADMONITION_FOR_CLASS_NAME,
+            RETURN_ADMONITION_FOR_CLASS_NAME,
+        ):
             insert_admonition(dict_)
 
     # 3) Get the file names & line numbers
