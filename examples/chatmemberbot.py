@@ -154,9 +154,11 @@ async def start_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
     """
     user_name = update.effective_user.full_name
     chat = update.effective_chat
-    if chat.type == Chat.PRIVATE:
-        logger.info("%s started a private chat with the bot", user_name)
-        context.bot_data.setdefault("user_ids", set()).add(chat.id)
+    if chat.type != Chat.PRIVATE or chat.id in context.bot_data.get("user_ids", set()):
+        return
+
+    logger.info("%s started a private chat with the bot", user_name)
+    context.bot_data.setdefault("user_ids", set()).add(chat.id)
 
     await update.effective_message.reply_text(
         f"Welcome {user_name}. Use /show_chats to see what chats I'm in."
