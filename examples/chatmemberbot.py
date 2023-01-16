@@ -87,9 +87,10 @@ async def track_chats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     chat = update.effective_chat
     if chat.type == Chat.PRIVATE:
         if not was_member and is_member:
-            # This is not really needed in this particular case because /start command will run
-            # after the user unblocks the bot, and the start function will add the user to
-            # "user_ids".  We're including this here for the sake of the example.
+            # This may not be really needed in practice because most clients will automatically
+            # send a /start command after the user unblocks the bot, and start_private_chat()
+            # will add the user to "user_ids".
+            # We're including this here for the sake of the example.
             logger.info("%s unblocked the bot", cause_name)
             context.bot_data.setdefault("user_ids", set()).add(chat.id)
         elif was_member and not is_member:
