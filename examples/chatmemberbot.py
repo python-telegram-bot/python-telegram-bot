@@ -29,7 +29,14 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
     )
 from telegram import Chat, ChatMember, ChatMemberUpdated, Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, ChatMemberHandler, CommandHandler, ContextTypes
+from telegram.ext import (
+    Application,
+    ChatMemberHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 
 # Enable logging
 
@@ -139,7 +146,7 @@ async def greet_chat_members(update: Update, context: ContextTypes.DEFAULT_TYPE)
         )
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def start_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Greets the user and records that they started a chat with the bot if it's a private chat.
     Since no `my_chat_member` update is issued when a user starts a private chat with the bot,
     we have to track it explicitly here, when handling the /start command.
@@ -160,14 +167,16 @@ def main() -> None:
     # Create the Application and pass it your bot's token.
     application = Application.builder().token("TOKEN").build()
 
-    application.add_handler(CommandHandler("start", start))
-
     # Keep track of which chats the bot is in
     application.add_handler(ChatMemberHandler(track_chats, ChatMemberHandler.MY_CHAT_MEMBER))
     application.add_handler(CommandHandler("show_chats", show_chats))
 
     # Handle members joining/leaving chats.
     application.add_handler(ChatMemberHandler(greet_chat_members, ChatMemberHandler.CHAT_MEMBER))
+
+    # Interpret any other command or text message as a start of a private chat.
+    # This will record the user as being in a private chat with bot.
+    application.add_handler(MessageHandler(filters.ALL, start_private_chat))
 
     # Run the bot until the user presses Ctrl-C
     # We pass 'allowed_updates' handle *all* updates including `chat_member` updates
