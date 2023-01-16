@@ -458,6 +458,13 @@ def create_available_in_admonitions() -> dict[str, str]:
     in attributes of other classes.
     """
 
+    def build_full_class_name(short_class_name: str) -> str:
+        """The keys in the dictionary are not the likes of "telegram.StickerSet"
+        but the likes of "<class 'telegram._files.sticker.StickerSet'>".
+        This function takes a short class name and produces the full name.
+        """
+        return str(eval(short_class_name))
+
     # First, generate a mapping of class names to the attributes in other classes that correspond
     # to instances of a given class
     # i.e. {"telegram.Sticker": ["telegram.Message.sticker", ...]}
@@ -465,26 +472,29 @@ def create_available_in_admonitions() -> dict[str, str]:
     admonition_for_class_name = {}
 
     # The colon after the closing parenthesis is important because it makes sure
-    # this is the 1st line of attribute description.
+    # that the class is mentioned in the attribute description, not in free text.
     # So far there seem to be no attribute docstrings in which the list of classes
     # takes up more than one line.
-    pattern = re.compile(r"^\s*(?P<attr_name>[a-z_]+)\s?\(.*:class:`.+`.*\):\s.*$")
+    attr_docstr_pattern = re.compile(r"^\s*(?P<attr_name>[a-z_]+)\s?\(.*:class:`.+`.*\):\s.*$")
+    prop_docst_pattern = re.compile(r":class:`.+`.*:")
+
     single_class_name_pattern = re.compile(r":class:`~?(?P<class_name>[\w.]*)`")
 
     for _, inspected_class in inspect.getmembers(telegram, inspect.isclass) + inspect.getmembers(
         telegram.ext, inspect.isclass
     ):
-        name_of_inspected_class_to_look_in_attrs = (
-            str(inspected_class).removeprefix("<class '").removesuffix("'>")
-        )
         # We need to make "<class 'telegram._files.sticker.StickerSet'>" into "telegram.StickerSet"
         # because that's the way the classes are mentioned in docstrings...
-        name_of_inspected_class_to_look_in_attrs = ".".join(
+        name_of_inspected_class_in_docstr = (
+            str(inspected_class).removeprefix("<class '").removesuffix("'>")
+        )
+        name_of_inspected_class_in_docstr = ".".join(
             n
-            for n in name_of_inspected_class_to_look_in_attrs.split(".")
+            for n in name_of_inspected_class_in_docstr.split(".")
             if n in ("telegram", "ext") or not n.islower()  # removing things like "_files.sticker"
         )
 
+        # Parsing part of the docstring with attributes (parsing of properties follows later)
         docstring_lines = inspect.getdoc(inspected_class).splitlines()
         lines_with_attrs = []
         for idx, line in enumerate(docstring_lines):
@@ -492,21 +502,59 @@ def create_available_in_admonitions() -> dict[str, str]:
                 lines_with_attrs = docstring_lines[idx + 1 :]
 
         for line in lines_with_attrs:
-            line_match = pattern.match(line)
-            if pattern.match(line):
-                target_attr = line_match.group("attr_name")
-                # a typing description of one attribute can contain multiple classes
-                for match in single_class_name_pattern.finditer(line):
-                    name_of_class_in_attr = match.group("class_name")
-                    if "telegram" not in name_of_class_in_attr:
-                        continue
+            line_match = attr_docstr_pattern.match(line)
+            if not line_match:
+                continue
 
-                    # note that the keys are not the likes of "telegram.StickerSet"
-                    # but the likes of "<class 'telegram._files.sticker.StickerSet'>"
-                    full_class_name = str(eval(name_of_class_in_attr))
-                    attrs_for_class_name[full_class_name].append(
-                        f":attr:`{name_of_inspected_class_to_look_in_attrs}.{target_attr}`"
-                    )
+            target_attr = line_match.group("attr_name")
+            # a typing description of one attribute can contain multiple classes
+            for match in single_class_name_pattern.finditer(line):
+                name_of_class_in_attr = match.group("class_name")
+                if "telegram" not in name_of_class_in_attr:
+                    continue
+
+                # Writing to dictionary: matching the class found in the docstring to the
+                # attribute of the class being inspected.
+                # The class in the attribute docstring is the key, and the attribute of the
+                # class currently being inspected is the value.
+                attrs_for_class_name[build_full_class_name(name_of_class_in_attr)].append(
+                    f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
+                )
+
+        # Properties need to be parsed separately because they act like attributes but not listed
+        # as attributes.
+        properties = inspect.getmembers(inspected_class, lambda o: isinstance(o, property))
+        for prop_name, _ in properties:
+            # Make sure this property is really defined in the class being inspected.
+            # A property can be inherited from a parent class, then a link to it will not work.
+            if prop_name not in inspected_class.__dict__:
+                continue
+
+            # 1. Can't use typing.get_type_hints because double-quoted type hints
+            #    (like "Application") will throw a NameError
+            # 2. Can't use inspect.signature because return annotations of properties can be
+            #    hard to parse (like "(self) -> BD").
+            # 3. fget is used to access the actual function under the property wrapper
+            docstring = inspect.getdoc(getattr(inspected_class, prop_name).fget)
+            if docstring is None:
+                continue
+
+            first_line = docstring.splitlines()[0]
+            if not prop_docst_pattern.match(first_line):
+                continue
+
+            for match in single_class_name_pattern.finditer(first_line):
+                name_of_class_in_prop = match.group("class_name")
+                if "telegram" not in name_of_class_in_prop:
+                    continue
+
+                # Writing to dictionary: matching the class found in the docstring to the
+                # property of the class being inspected.
+                # The class in the property docstring is the key, and the property of the
+                # class currently being inspected is the value.
+                attrs_for_class_name[build_full_class_name(name_of_class_in_prop)].append(
+                    f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`"
+                )
 
     # Now, let's use this mapping to start generating a new mapping of class names to admonitions,
     # i.e. {"<class 'telegram._files.sticker.StickerSet'>": ".. admonition: Available in ..."}
