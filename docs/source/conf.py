@@ -1,13 +1,14 @@
+import collections.abc
 import inspect
 import os
 import re
 import subprocess
 import sys
 import typing
-from collections import defaultdict
+from collections import Sequence, defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Iterator, List, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple, Union
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -647,44 +648,80 @@ class AdmonitionInserter:
         # {:meth:`telegram.Bot.answer_inline_query`, ...}}
         methods_for_class_name = defaultdict(set)  # using set because there can be repetitions
 
-        forward_ref_pattern = re.compile(r"ForwardRef\('(?P<class_name>.+?)'\)")  # non-greedy
-        telegram_pattern = re.compile(r"telegram\.(?P<class_name>[a-zA-Z_.]+)")
-        skip_pattern = re.compile(
-            r"^typing.Union\[ForwardRef\('DefaultValue\[DVType]'\), ((float)|(bool)|(int)|(str))"
-            r"(, NoneType)?]$"
-        )
+        # Note that since we're analyzing argument by argument, the pattern can be strict, with
+        # start and end markers
+        forward_ref_pattern = re.compile(r"^ForwardRef\('(?P<class_name>\w+)'\)$")
+
+        def process_one_argument(argument: Any, link_to_method: str) -> None:
+            """Analyzes one argument and adds link to Bot method to the dictionary."""
+
+            origin = typing.get_origin(argument)
+
+            if (
+                origin in (collections.abc.Callable, typing.IO)
+                # no other check available (by type or origin) for this one:
+                or str(type(argument)) == "<class 'typing._SpecialForm'>"
+            ):
+                return
+
+            # recursion for cases like Union[Sequence....
+            if typing.get_origin(argument) in (dict, tuple, Union, typing.Sequence, Sequence):
+                for sub_arg in typing.get_args(argument):
+                    process_one_argument(sub_arg, link_to_method)
+                return
+
+            if isinstance(argument, type):
+                if "telegram" in str(argument):
+                    methods_for_class_name[str(argument)].add(link_to_method)
+                return
+
+            if type(argument) is typing.ForwardRef:
+                m = forward_ref_pattern.match(str(argument))
+                # We're sure it's a ForwardRef, so the class name must be resolved.
+                # If it isn't, we'll let the program throw an exception to be sure.
+                try:
+                    class_name = self._resolve_full_class_name(m.group("class_name"))
+                except AttributeError:
+                    if str(argument) == "ForwardRef('DefaultValue[DVType]')":
+                        # this is a known ForwardRef that needs not be resolved to a Telegram class
+                        return
+                    else:
+                        raise NotImplementedError(f"Could not process ForwardRef: {argument}")
+                methods_for_class_name[class_name].add(link_to_method)
+                return
+
+            # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
+            # as ForwardRefs and are identified as plain strings.
+            if isinstance(argument, str):
+                class_name = self._resolve_full_class_name(annotation)
+                # Here we don't want an exception to be thrown since we're not sure it's ForwardRef
+                if class_name is not None:
+                    methods_for_class_name[class_name].add(link_to_method)
+                return
+
+            raise NotImplementedError(
+                f"Cannot process argument {argument} of type {type(argument)} (origin {origin})"
+            )
 
         for method in self.BOT_METHODS:
+            method_link = self._generate_link_to_bot_method(method)
 
             sig = inspect.signature(getattr(telegram.Bot, method))
             parameters = sig.parameters
 
             for type_annotation in parameters.values():
                 annotation = type_annotation.annotation
-                annotation_text = str(annotation)
 
-                if skip_pattern.match(annotation_text):
-                    continue
-
-                if isinstance(annotation, type) and "telegram" in annotation_text:
-                    methods_for_class_name[str(annotation)].add(method)
-
-                # this is a _UnionGenericAlias
-                elif "telegram" in annotation_text or "ForwardRef" in annotation_text:
-                    matches = [m for m in forward_ref_pattern.finditer(annotation_text)] + [
-                        m for m in telegram_pattern.finditer(annotation_text)
-                    ]
-
-                    for match in matches:
-                        # resolving class
-                        try:
-                            klass = eval(f"telegram.{match.group('class_name')}")
-                        except AttributeError:
-                            klass = eval(f"telegram.ext.{match.group('class_name')}")
-
-                        methods_for_class_name[str(klass)].add(
-                            self._generate_link_to_bot_method(method)
-                        )
+                if isinstance(annotation, (type, str)):
+                    process_one_argument(annotation, method_link)
+                elif typing.get_origin(annotation) in (dict, Union, Sequence):
+                    for arg in typing.get_args(annotation):
+                        process_one_argument(arg, method_link)
+                else:
+                    raise NotImplementedError(
+                        f"Unable to process annotation {annotation} of type {type(annotation)} "
+                        f"(origin: {typing.get_origin(annotation)})."
+                    )
 
         return self._generate_admonitions(methods_for_class_name, admonition_type="use_in")
 
@@ -753,12 +790,22 @@ class AdmonitionInserter:
         return f":meth:`telegram.Bot.{method_name}`"
 
     @staticmethod
-    def _resolve_full_class_name(short_class_name: str) -> str:
-        """The keys in the dictionary are not the likes of "telegram.StickerSet"
+    def _resolve_full_class_name(name: str) -> Union[str, None]:
+        """The keys in the admonitions dictionary are not the likes of "telegram.StickerSet"
         but the likes of "<class 'telegram._files.sticker.StickerSet'>".
-        This function takes a short class name and produces the full name.
+
+        This method attempts to produce a full class name from a name that does or does not
+        contain the word 'telegram', e.g.
+        "<class 'telegram._files.sticker.StickerSet'>" from "telegram.StickerSet" or "StickerSet".
+
+        Returns :obj:`str` on success, :obj:`None` if nothing could be resolved.
         """
-        return str(eval(short_class_name))
+
+        for option in (name, f"telegram.{name}", f"telegram.ext.{name}"):
+            try:
+                return str(eval(option))
+            except (NameError, AttributeError):
+                continue
 
 
 def autodoc_process_docstring(
