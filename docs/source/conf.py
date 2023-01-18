@@ -479,7 +479,7 @@ class AdmonitionInserter:
             for admonition_type in self.ADMONITION_TYPES
         }
 
-    def insert_for_class(
+    def insert_admonitions_for_class(
         self,
         name: str,
         docstring_lines: List[str],
@@ -808,7 +808,7 @@ def autodoc_process_docstring(
     # 2-4) Insert "Returned in", "Available in", "Use in" admonitions into classes
     # (where applicable)
     if what == "class":
-        AdmonitionInserter().insert_for_class(
+        AdmonitionInserter().insert_admonitions_for_class(
             name=str(obj),
             docstring_lines=lines,
         )
