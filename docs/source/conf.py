@@ -454,9 +454,21 @@ class AdmonitionInserter:
     ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
 
     def __init__(self):
-        self.available_in_admonition_for_class_name = self._create_available_in()
-        self.returned_in_admonition_for_class_name = self._create_returned_in()
-        self.use_in_admonition_for_class_name = self._create_use_in()
+        """Initializes dictionaries with admonitions. Creates attribute `self.admonitions`
+        that is a dictionary looking like this (class names are simplified for the example):
+
+        {
+        "use_in": {"telegram.ChatInviteLink": <"Use in" admonition for ChatInviteLink>, ...},
+        "available_in": {"telegram.ChatInviteLink": <"Available in" admonition">, ...},
+        "return_in": {...}
+        }
+        """
+
+        self.admonitions: Dict[str, Dict[str, str]] = {
+            # dynamically determine which method creates which dictionary
+            admonition_type: getattr(self, f"_create_{admonition_type}")()
+            for admonition_type in self.ADMONITION_TYPES
+        }
 
     def insert_for_class(
         self,
@@ -467,24 +479,19 @@ class AdmonitionInserter:
 
         **Modifies lines in place**.
         """
-
         # A better way would be to copy the lines and return them, but that will not work with
         # autodoc_process_docstring()
 
         for admonition_type in self.ADMONITION_TYPES:
 
-            # Get the relevant dictionary
-            admonition_for_class_name: dict[str, str] = getattr(
-                self, f"{admonition_type}_admonition_for_class_name"
-            )
-
             # If there is no admonition of the given type for the given class,
             # continue to the next admonition type, maybe the class is listed there.
-            if name not in admonition_for_class_name:
+            if name not in self.admonitions[admonition_type]:
                 continue
 
             insert_idx = self._find_insert_pos_for_admonition(docstring_lines)
-            admonition_lines = admonition_for_class_name[name].splitlines()
+            admonition_lines = self.admonitions[admonition_type][name].splitlines()
+
             for idx in range(insert_idx, insert_idx + len(admonition_lines)):
                 docstring_lines.insert(idx, admonition_lines[idx - insert_idx])
 
