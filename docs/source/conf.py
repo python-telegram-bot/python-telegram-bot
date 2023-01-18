@@ -444,20 +444,52 @@ def check_timeout_and_api_kwargs_presence(obj: object) -> int:
     )
 
 
-class AdmonitionDictCreator:
-    """Class for creating admonition dictionaries for docs of Telegram classes.
-    Each dictionary has class name as key and admonition text as value.
-
-    All methods are either static or class methods or static, so no object of this class
-    should be instantiated.
-    """
+class AdmonitionInserter:
+    """Class for inserting admonitions into docs of Telegram classes."""
 
     # We cannot move this code to a separate module within docs because there is no way
     # to import it.  A class is simply a way of encapsulating the code and providing a better
     # overview of conf.py.
 
+    ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
+
+    def __init__(self):
+        self.available_in_admonition_for_class_name = self._create_available_in()
+        self.returned_in_admonition_for_class_name = self._create_returned_in()
+        self.use_in_admonition_for_class_name = self._create_use_in()
+
+    def insert_for_class(
+        self,
+        name: str,
+        docstring_lines: List[str],
+    ):
+        """Inserts admonitions into docstring lines for a class with the given name.
+
+        **Modifies lines in place**.
+        """
+
+        # A better way would be to copy the lines and return them, but that will not work with
+        # autodoc_process_docstring()
+
+        for admonition_type in self.ADMONITION_TYPES:
+
+            # Get the relevant dictionary
+            admonition_for_class_name: dict[str, str] = getattr(
+                self, f"{admonition_type}_admonition_for_class_name"
+            )
+
+            # If there is no admonition of the given type for the given class,
+            # continue to the next admonition type, maybe the class is listed there.
+            if name not in admonition_for_class_name:
+                continue
+
+            insert_idx = self._find_insert_pos_for_admonition(docstring_lines)
+            admonition_lines = admonition_for_class_name[name].splitlines()
+            for idx in range(insert_idx, insert_idx + len(admonition_lines)):
+                docstring_lines.insert(idx, admonition_lines[idx - insert_idx])
+
     @classmethod
-    def available_in(cls) -> dict[str, str]:
+    def _create_available_in(cls) -> Dict[str, str]:
         """Creates a dictionary for 'Available in' admonitions for classes that are available
         in attributes of other classes.
         """
@@ -516,9 +548,9 @@ class AdmonitionDictCreator:
                     # attribute of the class being inspected.
                     # The class in the attribute docstring is the key, and the attribute of the
                     # class currently being inspected is the value.
-                    attrs_for_class_name[cls._build_full_class_name(name_of_class_in_attr)].append(
-                        f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
-                    )
+                    attrs_for_class_name[
+                        cls._resolve_full_class_name(name_of_class_in_attr)
+                    ].append(f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`")
 
             # Properties need to be parsed separately because they act like attributes but not
             # listed as attributes.
@@ -551,9 +583,9 @@ class AdmonitionDictCreator:
                     # property of the class being inspected.
                     # The class in the property docstring is the key, and the property of the
                     # class currently being inspected is the value.
-                    attrs_for_class_name[cls._build_full_class_name(name_of_class_in_prop)].append(
-                        f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`"
-                    )
+                    attrs_for_class_name[
+                        cls._resolve_full_class_name(name_of_class_in_prop)
+                    ].append(f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`")
 
         # Now, let's use this mapping to start generating a new mapping of class names
         # to admonitions, i.e.
@@ -576,7 +608,7 @@ class AdmonitionDictCreator:
         return admonition_for_class_name
 
     @staticmethod
-    def returned_in() -> dict[str, str]:
+    def _create_returned_in() -> Dict[str, str]:
         """Creates 'Returned in' admonitions for classes that are returned in Bot's methods."""
 
         # First, generate a mapping of class names to the methods which return it,
@@ -626,7 +658,7 @@ class AdmonitionDictCreator:
         return admonition_for_class_name
 
     @staticmethod
-    def use_in() -> dict[str, str]:
+    def _create_use_in() -> Dict[str, str]:
         """Creates 'Use in' admonitions for classes whose instances that are accepted as arguments
         for Bot's methods.
         """
@@ -700,7 +732,7 @@ class AdmonitionDictCreator:
         return admonition_for_class_name
 
     @staticmethod
-    def find_insert_pos_for_admonition(lines: List[str]) -> int:
+    def _find_insert_pos_for_admonition(lines: List[str]) -> int:
         """Finds the correct position to insert the admonition and returns the index.
         If no key phrases are found, the admonition will be inserted at the very end.
         """
@@ -710,7 +742,7 @@ class AdmonitionDictCreator:
         return len(lines) - 1
 
     @staticmethod
-    def _build_full_class_name(short_class_name: str) -> str:
+    def _resolve_full_class_name(short_class_name: str) -> str:
         """The keys in the dictionary are not the likes of "telegram.StickerSet"
         but the likes of "<class 'telegram._files.sticker.StickerSet'>".
         This function takes a short class name and produces the full name.
@@ -736,19 +768,6 @@ def autodoc_process_docstring(
     5) Misuse this autodoc hook to get the file names & line numbers because we have access
        to the actual object here.
     """
-
-    # This function is here instead of admonitions.py because it changes `lines`
-    # (from outside its scope) in place
-    def insert_admonition(admonition_for_class_name: Dict[str, str]):
-        """Inserts admonition based on a dictionary with class names and admonitions."""
-
-        if class_name not in admonition_for_class_name:
-            return
-
-        insert_idx = AdmonitionDictCreator.find_insert_pos_for_admonition(lines)
-        admonition_lines = admonition_for_class_name[class_name].splitlines()
-        for idx in range(insert_idx, insert_idx + len(admonition_lines)):
-            lines.insert(idx, admonition_lines[idx - insert_idx])
 
     # 1) Insert the Keyword Args for the Bot methods
     method_name = name.split(".")[-1]
@@ -781,13 +800,10 @@ def autodoc_process_docstring(
     # 2-4) Insert "Returned in", "Available in", "Use in" admonitions into classes
     # (where applicable)
     if what == "class":
-        class_name = str(obj)
-        for dict_ in (
-            AdmonitionDictCreator.use_in(),
-            AdmonitionDictCreator.available_in(),
-            AdmonitionDictCreator.returned_in(),
-        ):
-            insert_admonition(dict_)
+        AdmonitionInserter().insert_for_class(
+            name=str(obj),
+            docstring_lines=lines,
+        )
 
     # 5) Get the file names & line numbers
     # We can't properly handle ordinary attributes.
