@@ -7,7 +7,7 @@ import typing
 from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import Dict, Iterator, List, Set, Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -453,6 +453,15 @@ class AdmonitionInserter:
 
     ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
 
+    BOT_METHODS = tuple(
+        m[0]
+        for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
+        if not m[0].startswith("_")
+        and m[0].islower()  # islower() to avoid camelCase methods
+        and m[0] in telegram.Bot.__dict__  # method is not inherited from TelegramObject
+    )
+    """Relevant Bot methods(public, not aliases, not inherited from TelegramObject)."""
+
     def __init__(self):
         """Initializes dictionaries with admonitions. Creates attribute `self.admonitions`
         that is a dictionary looking like this (class names are simplified for the example):
@@ -603,11 +612,8 @@ class AdmonitionInserter:
         # i.e. {Message: {send_message, ...}}
         methods_for_class_name = defaultdict(set)
 
-        for method in [
-            m[0]
-            for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
-            if not m[0].startswith("_") and m[0].islower()  # islower() to avoid camelCase methods
-        ]:
+        for method in self.BOT_METHODS:
+
             sig = inspect.signature(getattr(telegram.Bot, method))
             ret_annot = sig.return_annotation
             classes = typing.get_args(ret_annot)
@@ -644,13 +650,7 @@ class AdmonitionInserter:
             r"(, NoneType)?]$"
         )
 
-        for method in [
-            m[0]
-            for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
-            if not m[0].startswith("_")
-            and m[0].islower()  # islower() to avoid camelCase methods
-            and m[0] in telegram.Bot.__dict__  # method is not inherited from TelegramObject
-        ]:
+        for method in self.BOT_METHODS:
 
             sig = inspect.signature(getattr(telegram.Bot, method))
             parameters = sig.parameters
