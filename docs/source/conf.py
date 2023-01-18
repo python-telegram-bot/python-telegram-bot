@@ -3,10 +3,11 @@ import os
 import re
 import subprocess
 import sys
+import typing
 from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Tuple, get_args
+from typing import Dict, List, Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -412,16 +413,6 @@ read_timeout_sub = [
 read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
 
 
-def find_insert_pos_for_admonition(lines: List[str]) -> int:
-    """Finds the correct position to insert the admonition and returns the index.
-    If no key phrases are found, the admonition will be inserted at the very end.
-    """
-    for idx, value in list(enumerate(lines)):
-        if value.startswith(".. version") or value.startswith(":param"):
-            return idx
-    return len(lines) - 1
-
-
 def find_insert_pos_for_kwargs(lines: List[str]) -> int:
     """Finds the correct position to insert the keyword arguments and returns the index."""
     for idx, value in reversed(list(enumerate(lines))):  # reversed since :returns: is at the end
@@ -453,11 +444,29 @@ def check_timeout_and_api_kwargs_presence(obj: object) -> int:
     )
 
 
-def create_available_in_admonitions() -> dict[str, str]:
-    """Creates a dictionary for 'Available in' admonitions for classes that are available
-    in attributes of other classes.
+class AdmonitionDictCreator:
+    """Class for creating admonition dictionaries for docs of Telegram classes.
+    Each dictionary has class name as key and admonition text as value.
+
+    All methods are either static or class methods or static, so no object of this class
+    should be instantiated.
     """
 
+    # We cannot move this code to a separate module within docs because there is no way
+    # to import it.  A class is simply a way of encapsulating the code and providing a better
+    # overview of conf.py.
+
+    @staticmethod
+    def find_insert_pos_for_admonition(lines: List[str]) -> int:
+        """Finds the correct position to insert the admonition and returns the index.
+        If no key phrases are found, the admonition will be inserted at the very end.
+        """
+        for idx, value in list(enumerate(lines)):
+            if value.startswith(".. version") or value.startswith(":param"):
+                return idx
+        return len(lines) - 1
+
+    @staticmethod
     def build_full_class_name(short_class_name: str) -> str:
         """The keys in the dictionary are not the likes of "telegram.StickerSet"
         but the likes of "<class 'telegram._files.sticker.StickerSet'>".
@@ -465,248 +474,248 @@ def create_available_in_admonitions() -> dict[str, str]:
         """
         return str(eval(short_class_name))
 
-    # First, generate a mapping of class names to the attributes in other classes that correspond
-    # to instances of a given class
-    # i.e. {"telegram.Sticker": ["telegram.Message.sticker", ...]}
-    attrs_for_class_name = defaultdict(list)
-    admonition_for_class_name = {}
+    @classmethod
+    def create_available_in_admonitions(cls) -> dict[str, str]:
+        """Creates a dictionary for 'Available in' admonitions for classes that are available
+        in attributes of other classes.
+        """
 
-    # The colon after the closing parenthesis is important because it makes sure
-    # that the class is mentioned in the attribute description, not in free text.
-    # So far there seem to be no attribute docstrings in which the list of classes
-    # takes up more than one line.
-    attr_docstr_pattern = re.compile(r"^\s*(?P<attr_name>[a-z_]+)\s?\(.*:class:`.+`.*\):\s.*$")
-    prop_docst_pattern = re.compile(r":class:`.+`.*:")
+        # First, generate a mapping of class names to the attributes in other classes that
+        # correspond to instances of a given class
+        # i.e. {"telegram.Sticker": ["telegram.Message.sticker", ...]}
+        attrs_for_class_name = defaultdict(list)
+        admonition_for_class_name = {}
 
-    single_class_name_pattern = re.compile(r":class:`~?(?P<class_name>[\w.]*)`")
+        # The colon after the closing parenthesis is important because it makes sure
+        # that the class is mentioned in the attribute description, not in free text.
+        # So far there seem to be no attribute docstrings in which the list of classes
+        # takes up more than one line.
+        attr_docstr_pattern = re.compile(r"^\s*(?P<attr_name>[a-z_]+)\s?\(.*:class:`.+`.*\):\s.*$")
+        prop_docst_pattern = re.compile(r":class:`.+`.*:")
 
-    for _, inspected_class in inspect.getmembers(telegram, inspect.isclass) + inspect.getmembers(
-        telegram.ext, inspect.isclass
-    ):
-        # We need to make "<class 'telegram._files.sticker.StickerSet'>" into "telegram.StickerSet"
-        # because that's the way the classes are mentioned in docstrings...
-        name_of_inspected_class_in_docstr = (
-            str(inspected_class).removeprefix("<class '").removesuffix("'>")
-        )
-        name_of_inspected_class_in_docstr = ".".join(
-            n
-            for n in name_of_inspected_class_in_docstr.split(".")
-            if n in ("telegram", "ext") or not n.islower()  # removing things like "_files.sticker"
-        )
+        single_class_name_pattern = re.compile(r":class:`~?(?P<class_name>[\w.]*)`")
 
-        # Parsing part of the docstring with attributes (parsing of properties follows later)
-        docstring_lines = inspect.getdoc(inspected_class).splitlines()
-        lines_with_attrs = []
-        for idx, line in enumerate(docstring_lines):
-            if line.strip() == "Attributes:":
-                lines_with_attrs = docstring_lines[idx + 1 :]
+        for _, inspected_class in inspect.getmembers(
+            telegram, inspect.isclass
+        ) + inspect.getmembers(telegram.ext, inspect.isclass):
+            # We need to make "<class 'telegram._files.sticker.StickerSet'>" into
+            # "telegram.StickerSet" because that's the way the classes are mentioned in
+            # docstrings
+            name_of_inspected_class_in_docstr = (
+                str(inspected_class).removeprefix("<class '").removesuffix("'>")
+            )
+            name_of_inspected_class_in_docstr = ".".join(
+                n
+                for n in name_of_inspected_class_in_docstr.split(".")
+                # removing things like "_files.sticker"
+                if n in ("telegram", "ext") or not n.islower()
+            )
 
-        for line in lines_with_attrs:
-            line_match = attr_docstr_pattern.match(line)
-            if not line_match:
-                continue
+            # Parsing part of the docstring with attributes (parsing of properties follows later)
+            docstring_lines = inspect.getdoc(inspected_class).splitlines()
+            lines_with_attrs = []
+            for idx, line in enumerate(docstring_lines):
+                if line.strip() == "Attributes:":
+                    lines_with_attrs = docstring_lines[idx + 1 :]
 
-            target_attr = line_match.group("attr_name")
-            # a typing description of one attribute can contain multiple classes
-            for match in single_class_name_pattern.finditer(line):
-                name_of_class_in_attr = match.group("class_name")
-                if "telegram" not in name_of_class_in_attr:
+            for line in lines_with_attrs:
+                line_match = attr_docstr_pattern.match(line)
+                if not line_match:
                     continue
 
-                # Writing to dictionary: matching the class found in the docstring to the
-                # attribute of the class being inspected.
-                # The class in the attribute docstring is the key, and the attribute of the
-                # class currently being inspected is the value.
-                attrs_for_class_name[build_full_class_name(name_of_class_in_attr)].append(
-                    f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
-                )
+                target_attr = line_match.group("attr_name")
+                # a typing description of one attribute can contain multiple classes
+                for match in single_class_name_pattern.finditer(line):
+                    name_of_class_in_attr = match.group("class_name")
+                    if "telegram" not in name_of_class_in_attr:
+                        continue
 
-        # Properties need to be parsed separately because they act like attributes but not listed
-        # as attributes.
-        properties = inspect.getmembers(inspected_class, lambda o: isinstance(o, property))
-        for prop_name, _ in properties:
-            # Make sure this property is really defined in the class being inspected.
-            # A property can be inherited from a parent class, then a link to it will not work.
-            if prop_name not in inspected_class.__dict__:
-                continue
+                    # Writing to dictionary: matching the class found in the docstring to the
+                    # attribute of the class being inspected.
+                    # The class in the attribute docstring is the key, and the attribute of the
+                    # class currently being inspected is the value.
+                    attrs_for_class_name[cls.build_full_class_name(name_of_class_in_attr)].append(
+                        f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
+                    )
 
-            # 1. Can't use typing.get_type_hints because double-quoted type hints
-            #    (like "Application") will throw a NameError
-            # 2. Can't use inspect.signature because return annotations of properties can be
-            #    hard to parse (like "(self) -> BD").
-            # 3. fget is used to access the actual function under the property wrapper
-            docstring = inspect.getdoc(getattr(inspected_class, prop_name).fget)
-            if docstring is None:
-                continue
-
-            first_line = docstring.splitlines()[0]
-            if not prop_docst_pattern.match(first_line):
-                continue
-
-            for match in single_class_name_pattern.finditer(first_line):
-                name_of_class_in_prop = match.group("class_name")
-                if "telegram" not in name_of_class_in_prop:
+            # Properties need to be parsed separately because they act like attributes but not
+            # listed as attributes.
+            properties = inspect.getmembers(inspected_class, lambda o: isinstance(o, property))
+            for prop_name, _ in properties:
+                # Make sure this property is really defined in the class being inspected.
+                # A property can be inherited from a parent class, then a link to it will not work.
+                if prop_name not in inspected_class.__dict__:
                     continue
 
-                # Writing to dictionary: matching the class found in the docstring to the
-                # property of the class being inspected.
-                # The class in the property docstring is the key, and the property of the
-                # class currently being inspected is the value.
-                attrs_for_class_name[build_full_class_name(name_of_class_in_prop)].append(
-                    f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`"
-                )
+                # 1. Can't use typing.get_type_hints because double-quoted type hints
+                #    (like "Application") will throw a NameError
+                # 2. Can't use inspect.signature because return annotations of properties can be
+                #    hard to parse (like "(self) -> BD").
+                # 3. fget is used to access the actual function under the property wrapper
+                docstring = inspect.getdoc(getattr(inspected_class, prop_name).fget)
+                if docstring is None:
+                    continue
 
-    # Now, let's use this mapping to start generating a new mapping of class names to admonitions,
-    # i.e. {"<class 'telegram._files.sticker.StickerSet'>": ".. admonition: Available in ..."}
-    for class_name, attrs in attrs_for_class_name.items():
-        admonition = """
+                first_line = docstring.splitlines()[0]
+                if not prop_docst_pattern.match(first_line):
+                    continue
+
+                for match in single_class_name_pattern.finditer(first_line):
+                    name_of_class_in_prop = match.group("class_name")
+                    if "telegram" not in name_of_class_in_prop:
+                        continue
+
+                    # Writing to dictionary: matching the class found in the docstring to the
+                    # property of the class being inspected.
+                    # The class in the property docstring is the key, and the property of the
+                    # class currently being inspected is the value.
+                    attrs_for_class_name[cls.build_full_class_name(name_of_class_in_prop)].append(
+                        f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`"
+                    )
+
+        # Now, let's use this mapping to start generating a new mapping of class names
+        # to admonitions, i.e.
+        # {"<class 'telegram._files.sticker.StickerSet'>": ".. admonition: Available in ..."}
+        for class_name, attrs in attrs_for_class_name.items():
+            admonition = """
 
 .. admonition:: Available in
     :class: available-in
-"""
-        if len(attrs) > 1:
-            for target_attr in sorted(attrs):
-                admonition += "\n    * " + target_attr
-        else:
-            admonition += f"\n    {attrs[0]}"
+    """
+            if len(attrs) > 1:
+                for target_attr in sorted(attrs):
+                    admonition += "\n    * " + target_attr
+            else:
+                admonition += f"\n    {attrs[0]}"
 
-        admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
-        admonition_for_class_name[class_name] = admonition
+            admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
+            admonition_for_class_name[class_name] = admonition
 
-    return admonition_for_class_name
+        return admonition_for_class_name
 
+    @staticmethod
+    def create_return_admonitions() -> dict[str, str]:
+        """Creates 'Returned in' admonitions for classes that are returned in Bot's methods."""
 
-AVAILABLE_IN_ADMONITION_FOR_CLASS_NAME = create_available_in_admonitions()
+        # First, generate a mapping of class names to the methods which return it,
+        # i.e. {Message: [send_message, ...]}
+        methods_for_class_name = defaultdict(list)
 
+        for method in [
+            m[0]
+            for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
+            if not m[0].startswith("_") and m[0].islower()  # islower() to avoid camelCase methods
+        ]:
+            sig = inspect.signature(getattr(telegram.Bot, method))
+            ret_annot = sig.return_annotation
+            classes = typing.get_args(ret_annot)
 
-def create_return_admonitions() -> dict[str, str]:
-    """Creates 'Returned in' admonitions for classes that are returned in Bot's methods."""
-
-    # First, generate a mapping of class names to the methods which return it,
-    # i.e. {Message: [send_message, ...]}
-    methods_for_class_name = defaultdict(list)
-
-    for method in [
-        m[0]
-        for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
-        if not m[0].startswith("_") and m[0].islower()  # islower() to avoid camelCase methods
-    ]:
-        sig = inspect.signature(getattr(telegram.Bot, method))
-        ret_annot = sig.return_annotation
-        classes = get_args(ret_annot)
-
-        # If we do get_args() when return annotation has one single class
-        # (e.g. <class 'telegram._message.Message'>), get_args() returns an empty tuple.
-        # We use this workaround to fix this.
-        if not classes and isinstance(ret_annot, type) and "telegram" in str(ret_annot):
-            methods_for_class_name[str(ret_annot)].append(method)
-            continue
-
-        for klass in classes:
-            if "telegram" not in str(klass):
+            # If we do get_args() when return annotation has one single class
+            # (e.g. <class 'telegram._message.Message'>), get_args() returns an empty tuple.
+            # We use this workaround to fix this.
+            if not classes and isinstance(ret_annot, type) and "telegram" in str(ret_annot):
+                methods_for_class_name[str(ret_annot)].append(method)
                 continue
-            methods_for_class_name[str(klass)].append(method)
 
-    # Now, let's use this mapping to start generating a new mapping of class names to admonitions,
-    # i.e. {Message: ".. admonition: Returned in ..."}
-    admonition_for_class_name = {}
+            for klass in classes:
+                if "telegram" not in str(klass):
+                    continue
+                methods_for_class_name[str(klass)].append(method)
 
-    for cls, methods in methods_for_class_name.items():
-        admonition = """
+        # Now, let's use this mapping to start generating a new mapping of class names to
+        # admonitions, i.e. {Message: ".. admonition: Returned in ..."}
+        admonition_for_class_name = {}
+
+        for cls, methods in methods_for_class_name.items():
+            admonition = """
 
 .. admonition:: Returned in
     :class: returned-in
-"""
-        if len(methods) > 1:
-            for method_name in sorted(methods):
-                admonition += "\n    * " + f":meth:`telegram.Bot.{method_name}`"
-        else:
-            admonition += f"\n    :meth:`telegram.Bot.{methods[0]}`"
-
-        admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
-        admonition_for_class_name[cls] = admonition
-
-    return admonition_for_class_name
-
-
-RETURN_ADMONITION_FOR_CLASS_NAME = create_return_admonitions()
-
-
-def create_use_in_admonitions() -> dict[str, str]:
-    """Creates 'Use in' admonitions for classes whose instances that are accepted as arguments for
-    Bot's methods.
     """
+            if len(methods) > 1:
+                for method_name in sorted(methods):
+                    admonition += "\n    * " + f":meth:`telegram.Bot.{method_name}`"
+            else:
+                admonition += f"\n    :meth:`telegram.Bot.{methods[0]}`"
 
-    # First, generate a mapping of class names to the methods which accept them as arguments,
-    # i.e. {InlineQueryResult: [answer_inline_query, ...]}
-    methods_for_class_name = defaultdict(set)  # using set here because there can be repetitions
+            admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
+            admonition_for_class_name[cls] = admonition
 
-    forward_ref_pattern = re.compile(r"ForwardRef\('(?P<class_name>.+?)'\)")  # non-greedy
-    telegram_pattern = re.compile(r"telegram\.(?P<class_name>[a-zA-Z_.]+)")
-    skip_pattern = re.compile(
-        r"^typing.Union\[ForwardRef\('DefaultValue\[DVType]'\), ((float)|(bool)|(int)|(str))"
-        r"(, NoneType)?]$"
-    )
+        return admonition_for_class_name
 
-    for method in [
-        m[0]
-        for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
-        if not m[0].startswith("_")
-        and m[0].islower()  # islower() to avoid camelCase methods
-        and m[0] in telegram.Bot.__dict__  # method is not inherited from TelegramObject
-    ]:
+    @staticmethod
+    def create_use_in_admonitions() -> dict[str, str]:
+        """Creates 'Use in' admonitions for classes whose instances that are accepted as arguments
+        for Bot's methods.
+        """
 
-        sig = inspect.signature(getattr(telegram.Bot, method))
-        parameters = sig.parameters
+        # First, generate a mapping of class names to the methods which accept them as arguments,
+        # i.e. {InlineQueryResult: [answer_inline_query, ...]}
+        methods_for_class_name = defaultdict(set)  # using set because there can be repetitions
 
-        for type_annotation in parameters.values():
-            annotation = type_annotation.annotation
-            annotation_text = str(annotation)
+        forward_ref_pattern = re.compile(r"ForwardRef\('(?P<class_name>.+?)'\)")  # non-greedy
+        telegram_pattern = re.compile(r"telegram\.(?P<class_name>[a-zA-Z_.]+)")
+        skip_pattern = re.compile(
+            r"^typing.Union\[ForwardRef\('DefaultValue\[DVType]'\), ((float)|(bool)|(int)|(str))"
+            r"(, NoneType)?]$"
+        )
 
-            if skip_pattern.match(annotation_text):
-                continue
+        for method in [
+            m[0]
+            for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
+            if not m[0].startswith("_")
+            and m[0].islower()  # islower() to avoid camelCase methods
+            and m[0] in telegram.Bot.__dict__  # method is not inherited from TelegramObject
+        ]:
 
-            if isinstance(annotation, type) and "telegram" in annotation_text:
-                methods_for_class_name[str(annotation)].add(method)
+            sig = inspect.signature(getattr(telegram.Bot, method))
+            parameters = sig.parameters
 
-            # this is a _UnionGenericAlias
-            elif "telegram" in annotation_text or "ForwardRef" in annotation_text:
-                matches = [m for m in forward_ref_pattern.finditer(annotation_text)] + [
-                    m for m in telegram_pattern.finditer(annotation_text)
-                ]
+            for type_annotation in parameters.values():
+                annotation = type_annotation.annotation
+                annotation_text = str(annotation)
 
-                for match in matches:
-                    # resolving class
-                    try:
-                        klass = eval(f"telegram.{match.group('class_name')}")
-                    except AttributeError:
-                        klass = eval(f"telegram.ext.{match.group('class_name')}")
+                if skip_pattern.match(annotation_text):
+                    continue
 
-                    methods_for_class_name[str(klass)].add(method)
+                if isinstance(annotation, type) and "telegram" in annotation_text:
+                    methods_for_class_name[str(annotation)].add(method)
 
-    # Now, let's use this mapping to start generating a new mapping of class names to admonitions,
-    # i.e. {InlineQueryResult: ".. admonition: Use in ..."}
-    admonition_for_class_name = {}
+                # this is a _UnionGenericAlias
+                elif "telegram" in annotation_text or "ForwardRef" in annotation_text:
+                    matches = [m for m in forward_ref_pattern.finditer(annotation_text)] + [
+                        m for m in telegram_pattern.finditer(annotation_text)
+                    ]
 
-    for cls, methods in methods_for_class_name.items():
-        admonition = """
+                    for match in matches:
+                        # resolving class
+                        try:
+                            klass = eval(f"telegram.{match.group('class_name')}")
+                        except AttributeError:
+                            klass = eval(f"telegram.ext.{match.group('class_name')}")
+
+                        methods_for_class_name[str(klass)].add(method)
+
+        # Now, let's use this mapping to start generating a new mapping of class names
+        # to admonitions, i.e. {InlineQueryResult: ".. admonition: Use in ..."}
+        admonition_for_class_name = {}
+
+        for cls, methods in methods_for_class_name.items():
+            admonition = """
 
 .. admonition:: Use in
     :class: use-in
-"""
-        if len(methods) > 1:
-            for method_name in sorted(list(methods)):
-                admonition += "\n    * " + f":meth:`telegram.Bot.{method_name}`"
-        else:
-            admonition += f"\n    :meth:`telegram.Bot.{list(methods)[0]}`"
+    """
+            if len(methods) > 1:
+                for method_name in sorted(list(methods)):
+                    admonition += "\n    * " + f":meth:`telegram.Bot.{method_name}`"
+            else:
+                admonition += f"\n    :meth:`telegram.Bot.{list(methods)[0]}`"
 
-        admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
-        admonition_for_class_name[cls] = admonition
+            admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
+            admonition_for_class_name[cls] = admonition
 
-    return admonition_for_class_name
-
-
-USE_IN_ADMONITION_FOR_CLASS_NAME = create_use_in_admonitions()
+        return admonition_for_class_name
 
 
 def autodoc_process_docstring(
@@ -721,17 +730,22 @@ def autodoc_process_docstring(
     3) Use this method to automatically insert "Available in" admonition into classes
        whose instances are available as attributes of other classes
 
-    4) Misuse this autodoc hook to get the file names & line numbers because we have access
+    4) Use this method to automatically insert "Use in" admonition into classes
+       whose instances can be used as arguments of the Bot methods
+
+    5) Misuse this autodoc hook to get the file names & line numbers because we have access
        to the actual object here.
     """
 
+    # This function is here instead of admonitions.py because it changes `lines`
+    # (from outside its scope) in place
     def insert_admonition(admonition_for_class_name: Dict[str, str]):
         """Inserts admonition based on a dictionary with class names and admonitions."""
 
         if class_name not in admonition_for_class_name:
             return
 
-        insert_idx = find_insert_pos_for_admonition(lines)
+        insert_idx = AdmonitionDictCreator.find_insert_pos_for_admonition(lines)
         admonition_lines = admonition_for_class_name[class_name].splitlines()
         for idx in range(insert_idx, insert_idx + len(admonition_lines)):
             lines.insert(idx, admonition_lines[idx - insert_idx])
@@ -764,17 +778,18 @@ def autodoc_process_docstring(
                 ),
             )
 
-    # 2-3) Insert "Returned in" and "Available in" admonitions into classes (where applicable)
+    # 2-4) Insert "Returned in", "Available in", "Use in" admonitions into classes
+    # (where applicable)
     if what == "class":
         class_name = str(obj)
         for dict_ in (
-            USE_IN_ADMONITION_FOR_CLASS_NAME,
-            AVAILABLE_IN_ADMONITION_FOR_CLASS_NAME,
-            RETURN_ADMONITION_FOR_CLASS_NAME,
+            AdmonitionDictCreator.create_use_in_admonitions(),
+            AdmonitionDictCreator.create_available_in_admonitions(),
+            AdmonitionDictCreator.create_return_admonitions(),
         ):
             insert_admonition(dict_)
 
-    # 3) Get the file names & line numbers
+    # 5) Get the file names & line numbers
     # We can't properly handle ordinary attributes.
     # In linkcode_resolve we'll resolve to the `__init__` or module instead
     if what == "attribute":
