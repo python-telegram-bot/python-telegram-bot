@@ -7,7 +7,7 @@ import typing
 from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Set, Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -495,8 +495,7 @@ class AdmonitionInserter:
             for idx in range(insert_idx, insert_idx + len(admonition_lines)):
                 docstring_lines.insert(idx, admonition_lines[idx - insert_idx])
 
-    @classmethod
-    def _create_available_in(cls) -> Dict[str, str]:
+    def _create_available_in(self) -> Dict[str, str]:
         """Creates a dictionary with 'Available in' admonitions for classes that are available
         in attributes of other classes.
         """
@@ -504,8 +503,7 @@ class AdmonitionInserter:
         # First, generate a mapping of class names to the attributes in other classes that
         # correspond to instances of a given class
         # i.e. {"telegram.Sticker": ["telegram.Message.sticker", ...]}
-        attrs_for_class_name = defaultdict(list)
-        admonition_for_class_name = {}
+        attrs_for_class_name = defaultdict(set)
 
         # The colon after the closing parenthesis is important because it makes sure
         # that the class is mentioned in the attribute description, not in free text.
@@ -555,9 +553,9 @@ class AdmonitionInserter:
                     # attribute of the class being inspected.
                     # The class in the attribute docstring is the key, and the attribute of the
                     # class currently being inspected is the value.
-                    attrs_for_class_name[
-                        cls._resolve_full_class_name(name_of_class_in_attr)
-                    ].append(f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`")
+                    attrs_for_class_name[self._resolve_full_class_name(name_of_class_in_attr)].add(
+                        f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
+                    )
 
             # Properties need to be parsed separately because they act like attributes but not
             # listed as attributes.
@@ -590,39 +588,20 @@ class AdmonitionInserter:
                     # property of the class being inspected.
                     # The class in the property docstring is the key, and the property of the
                     # class currently being inspected is the value.
-                    attrs_for_class_name[
-                        cls._resolve_full_class_name(name_of_class_in_prop)
-                    ].append(f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`")
+                    attrs_for_class_name[self._resolve_full_class_name(name_of_class_in_prop)].add(
+                        f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`"
+                    )
 
-        # Now, let's use this mapping to start generating a new mapping of class names
-        # to admonitions, i.e.
-        # {"<class 'telegram._files.sticker.StickerSet'>": ".. admonition: Available in ..."}
-        for class_name, attrs in attrs_for_class_name.items():
-            admonition = """
+        return self._generate_admonitions(attrs_for_class_name, admonition_type="available_in")
 
-.. admonition:: Available in
-    :class: available-in
-    """
-            if len(attrs) > 1:
-                for target_attr in sorted(attrs):
-                    admonition += "\n    * " + target_attr
-            else:
-                admonition += f"\n    {attrs[0]}"
-
-            admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
-            admonition_for_class_name[class_name] = admonition
-
-        return admonition_for_class_name
-
-    @staticmethod
-    def _create_returned_in() -> Dict[str, str]:
+    def _create_returned_in(self) -> Dict[str, str]:
         """Creates a dictionary with 'Returned in' admonitions for classes that are returned
         in Bot's methods.
         """
 
         # First, generate a mapping of class names to the methods which return it,
-        # i.e. {Message: [send_message, ...]}
-        methods_for_class_name = defaultdict(list)
+        # i.e. {Message: {send_message, ...}}
+        methods_for_class_name = defaultdict(set)
 
         for method in [
             m[0]
@@ -637,37 +616,19 @@ class AdmonitionInserter:
             # (e.g. <class 'telegram._message.Message'>), get_args() returns an empty tuple.
             # We use this workaround to fix this.
             if not classes and isinstance(ret_annot, type) and "telegram" in str(ret_annot):
-                methods_for_class_name[str(ret_annot)].append(method)
+                methods_for_class_name[str(ret_annot)].add(
+                    self._generate_link_to_bot_method(method)
+                )
                 continue
 
             for klass in classes:
                 if "telegram" not in str(klass):
                     continue
-                methods_for_class_name[str(klass)].append(method)
+                methods_for_class_name[str(klass)].add(self._generate_link_to_bot_method(method))
 
-        # Now, let's use this mapping to start generating a new mapping of class names to
-        # admonitions, i.e. {Message: ".. admonition: Returned in ..."}
-        admonition_for_class_name = {}
+        return self._generate_admonitions(methods_for_class_name, admonition_type="returned_in")
 
-        for cls, methods in methods_for_class_name.items():
-            admonition = """
-
-.. admonition:: Returned in
-    :class: returned-in
-    """
-            if len(methods) > 1:
-                for method_name in sorted(methods):
-                    admonition += "\n    * " + f":meth:`telegram.Bot.{method_name}`"
-            else:
-                admonition += f"\n    :meth:`telegram.Bot.{methods[0]}`"
-
-            admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
-            admonition_for_class_name[cls] = admonition
-
-        return admonition_for_class_name
-
-    @staticmethod
-    def _create_use_in() -> Dict[str, str]:
+    def _create_use_in(self) -> Dict[str, str]:
         """Creates a dictionary with 'Use in' admonitions for classes whose instances are
         accepted as arguments for Bot's methods.
         """
@@ -717,28 +678,11 @@ class AdmonitionInserter:
                         except AttributeError:
                             klass = eval(f"telegram.ext.{match.group('class_name')}")
 
-                        methods_for_class_name[str(klass)].add(method)
+                        methods_for_class_name[str(klass)].add(
+                            self._generate_link_to_bot_method(method)
+                        )
 
-        # Now, let's use this mapping to start generating a new mapping of class names
-        # to admonitions, i.e. {InlineQueryResult: ".. admonition: Use in ..."}
-        admonition_for_class_name = {}
-
-        for cls, methods in methods_for_class_name.items():
-            admonition = """
-
-.. admonition:: Use in
-    :class: use-in
-    """
-            if len(methods) > 1:
-                for method_name in sorted(list(methods)):
-                    admonition += "\n    * " + f":meth:`telegram.Bot.{method_name}`"
-            else:
-                admonition += f"\n    :meth:`telegram.Bot.{list(methods)[0]}`"
-
-            admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
-            admonition_for_class_name[cls] = admonition
-
-        return admonition_for_class_name
+        return self._generate_admonitions(methods_for_class_name, admonition_type="use_in")
 
     @staticmethod
     def _find_insert_pos_for_admonition(lines: List[str]) -> int:
@@ -749,6 +693,60 @@ class AdmonitionInserter:
             if value.startswith(".. version") or value.startswith(":param"):
                 return idx
         return len(lines) - 1
+
+    def _generate_admonitions(
+        self,
+        attrs_or_methods_for_class_name: Dict[str, Set[str]],
+        admonition_type: str,
+    ) -> Dict[str, str]:
+        """Generates admonitions of a given type.
+        Takes a dictionary of class names matched to ReST links to methods or attributes, e.g.:
+
+        ```
+        {"<class 'telegram._files.sticker.StickerSet'>":
+        [":meth: `telegram.Bot.get_sticker_set`", ...]}.
+        ```
+
+        Returns a dictionary of class names matched to full admonitions, e.g.
+        for `admonition_type` "returned_in" (note that title and CSS class are generated
+        automatically):
+
+        ```
+        {"<class 'telegram._files.sticker.StickerSet'>":
+        ".. admonition:: Returned in: :class: returned-in :meth: `telegram.Bot.get_sticker_set`"}.
+        ```
+        """
+        #
+
+        if admonition_type not in self.ADMONITION_TYPES:
+            raise TypeError(f"Admonition type {admonition_type} not supported.")
+
+        admonition_for_class_name = {}
+
+        for class_name, attrs in attrs_or_methods_for_class_name.items():
+            attrs = sorted(attrs)
+
+            # for admonition type "use_in" the title will be "Use in" and CSS class "use-in".
+            admonition = f"""
+
+.. admonition:: {admonition_type.title().replace("_", " ")}
+    :class: {admonition_type.replace("_", "-")}
+    """
+            if len(attrs) > 1:
+                for target_attr in attrs:
+                    admonition += "\n    * " + target_attr
+            else:
+                admonition += f"\n    {attrs[0]}"
+
+            admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
+            admonition_for_class_name[class_name] = admonition
+
+        return admonition_for_class_name
+
+    @staticmethod
+    def _generate_link_to_bot_method(method_name: str):
+        """Generates a ReST link to a Bot method."""
+        return f":meth:`telegram.Bot.{method_name}`"
 
     @staticmethod
     def _resolve_full_class_name(short_class_name: str) -> str:
