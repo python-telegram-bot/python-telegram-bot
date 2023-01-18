@@ -456,26 +456,8 @@ class AdmonitionDictCreator:
     # to import it.  A class is simply a way of encapsulating the code and providing a better
     # overview of conf.py.
 
-    @staticmethod
-    def find_insert_pos_for_admonition(lines: List[str]) -> int:
-        """Finds the correct position to insert the admonition and returns the index.
-        If no key phrases are found, the admonition will be inserted at the very end.
-        """
-        for idx, value in list(enumerate(lines)):
-            if value.startswith(".. version") or value.startswith(":param"):
-                return idx
-        return len(lines) - 1
-
-    @staticmethod
-    def build_full_class_name(short_class_name: str) -> str:
-        """The keys in the dictionary are not the likes of "telegram.StickerSet"
-        but the likes of "<class 'telegram._files.sticker.StickerSet'>".
-        This function takes a short class name and produces the full name.
-        """
-        return str(eval(short_class_name))
-
     @classmethod
-    def create_available_in_admonitions(cls) -> dict[str, str]:
+    def available_in(cls) -> dict[str, str]:
         """Creates a dictionary for 'Available in' admonitions for classes that are available
         in attributes of other classes.
         """
@@ -534,7 +516,7 @@ class AdmonitionDictCreator:
                     # attribute of the class being inspected.
                     # The class in the attribute docstring is the key, and the attribute of the
                     # class currently being inspected is the value.
-                    attrs_for_class_name[cls.build_full_class_name(name_of_class_in_attr)].append(
+                    attrs_for_class_name[cls._build_full_class_name(name_of_class_in_attr)].append(
                         f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
                     )
 
@@ -569,7 +551,7 @@ class AdmonitionDictCreator:
                     # property of the class being inspected.
                     # The class in the property docstring is the key, and the property of the
                     # class currently being inspected is the value.
-                    attrs_for_class_name[cls.build_full_class_name(name_of_class_in_prop)].append(
+                    attrs_for_class_name[cls._build_full_class_name(name_of_class_in_prop)].append(
                         f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`"
                     )
 
@@ -594,7 +576,7 @@ class AdmonitionDictCreator:
         return admonition_for_class_name
 
     @staticmethod
-    def create_return_admonitions() -> dict[str, str]:
+    def returned_in() -> dict[str, str]:
         """Creates 'Returned in' admonitions for classes that are returned in Bot's methods."""
 
         # First, generate a mapping of class names to the methods which return it,
@@ -644,7 +626,7 @@ class AdmonitionDictCreator:
         return admonition_for_class_name
 
     @staticmethod
-    def create_use_in_admonitions() -> dict[str, str]:
+    def use_in() -> dict[str, str]:
         """Creates 'Use in' admonitions for classes whose instances that are accepted as arguments
         for Bot's methods.
         """
@@ -717,6 +699,24 @@ class AdmonitionDictCreator:
 
         return admonition_for_class_name
 
+    @staticmethod
+    def find_insert_pos_for_admonition(lines: List[str]) -> int:
+        """Finds the correct position to insert the admonition and returns the index.
+        If no key phrases are found, the admonition will be inserted at the very end.
+        """
+        for idx, value in list(enumerate(lines)):
+            if value.startswith(".. version") or value.startswith(":param"):
+                return idx
+        return len(lines) - 1
+
+    @staticmethod
+    def _build_full_class_name(short_class_name: str) -> str:
+        """The keys in the dictionary are not the likes of "telegram.StickerSet"
+        but the likes of "<class 'telegram._files.sticker.StickerSet'>".
+        This function takes a short class name and produces the full name.
+        """
+        return str(eval(short_class_name))
+
 
 def autodoc_process_docstring(
     app: Sphinx, what, name: str, obj: object, options, lines: List[str]
@@ -783,9 +783,9 @@ def autodoc_process_docstring(
     if what == "class":
         class_name = str(obj)
         for dict_ in (
-            AdmonitionDictCreator.create_use_in_admonitions(),
-            AdmonitionDictCreator.create_available_in_admonitions(),
-            AdmonitionDictCreator.create_return_admonitions(),
+            AdmonitionDictCreator.use_in(),
+            AdmonitionDictCreator.available_in(),
+            AdmonitionDictCreator.returned_in(),
         ):
             insert_admonition(dict_)
 
