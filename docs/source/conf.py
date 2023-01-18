@@ -448,7 +448,7 @@ class AdmonitionInserter:
     """Class for inserting admonitions into docs of Telegram classes."""
 
     # We cannot move this code to a separate module within docs because there is no way
-    # to import it.  A class is simply a way of encapsulating the code and providing a better
+    # to import it.  This class is simply a way of encapsulating the code and providing a better
     # overview of conf.py.
 
     ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
@@ -463,21 +463,24 @@ class AdmonitionInserter:
     """Relevant Bot methods(public, not aliases, not inherited from TelegramObject)."""
 
     def __init__(self):
-        """Initializes dictionaries with admonitions. Creates attribute `self.admonitions`
-        that is a dictionary looking like this (class names are simplified for the example):
-
-        {
-        "use_in": {"telegram.ChatInviteLink": <"Use in" admonition for ChatInviteLink>, ...},
-        "available_in": {"telegram.ChatInviteLink": <"Available in" admonition">, ...},
-        "return_in": {...}
-        }
-        """
 
         self.admonitions: Dict[str, Dict[str, str]] = {
-            # dynamically determine which method creates which dictionary
+            # dynamically determine which method to use to create a sub dictionary
             admonition_type: getattr(self, f"_create_{admonition_type}")()
             for admonition_type in self.ADMONITION_TYPES
         }
+        """Dictionary with admonitions. Contains sub-dictionaries, one per admonition type. 
+        Each sub-dictionary matches class names to texts of admonitions, e.g.:
+        ```
+        {
+        "use_in": {"<class 'telegram._chatinvitelink.ChatInviteLink'": 
+        <"Use in" admonition for ChatInviteLink>, ...},
+        "available_in": {"<class 'telegram._chatinvitelink.ChatInviteLink'": 
+        <"Available in" admonition">, ...},
+        "returned_in": {...}
+        }
+        ```
+        """
 
     def insert_admonitions_for_class(
         self,
