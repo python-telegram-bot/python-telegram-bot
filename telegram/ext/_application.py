@@ -1276,17 +1276,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     def migrate_chat_data(
         self, message: "Message" = None, old_chat_id: int = None, new_chat_id: int = None
     ) -> None:
-        """Moves the contents of :attr:`chat_data` at key old_chat_id to the key new_chat_id.
-        Also marks the entries to be updated accordingly in the next run of
-        :meth:`update_persistence`.
+        """Moves the contents of :attr:`chat_data` at key :paramref:`old_chat_id` to the key
+        :paramref:`new_chat_id`. Also marks the entries to be updated accordingly in the next run
+        of :meth:`update_persistence`.
 
         Warning:
-            * Any data stored in :attr:`chat_data` at key ``new_chat_id`` will be overridden
-            * The key `old_chat_id` of :attr:`chat_data` will be deleted
+            * Any data stored in :attr:`chat_data` at key :paramref:`new_chat_id` will be
+              overridden
+            * The key :paramref:`old_chat_id` of :attr:`chat_data` will be deleted
             * This does not update the :attr:`~telegram.ext.Job.chat_id` attribute of any scheduled
               :class:`telegram.ext.Job`.
 
-        Warning:
             When using :attr:`concurrent_updates` or the :attr:`job_queue`,
             :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create the old entry due
             to the asynchronous nature of these features. Please make sure that your program can
