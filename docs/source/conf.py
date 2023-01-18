@@ -509,9 +509,9 @@ class AdmonitionInserter:
         in attributes of other classes.
         """
 
-        # First, generate a mapping of class names to the attributes in other classes that
+        # Generate a mapping of class names to ReST links to attributes in other classes that
         # correspond to instances of a given class
-        # i.e. {"telegram.Sticker": ["telegram.Message.sticker", ...]}
+        # i.e. {"telegram._files.sticker.Sticker": {":attr:`telegram.Message.sticker`", ...}}
         attrs_for_class_name = defaultdict(set)
 
         # The colon after the closing parenthesis is important because it makes sure
@@ -608,8 +608,8 @@ class AdmonitionInserter:
         in Bot's methods.
         """
 
-        # First, generate a mapping of class names to the methods which return it,
-        # i.e. {Message: {send_message, ...}}
+        # Generate a mapping of class names to ReST links to Bot methods which return it,
+        # i.e. {"<class 'telegram._message.Message'>": {:meth:`telegram.Bot.send_message`, ...}}
         methods_for_class_name = defaultdict(set)
 
         for method in self.BOT_METHODS:
@@ -639,8 +639,9 @@ class AdmonitionInserter:
         accepted as arguments for Bot's methods.
         """
 
-        # First, generate a mapping of class names to the methods which accept them as arguments,
-        # i.e. {InlineQueryResult: [answer_inline_query, ...]}
+        # Generate a mapping of class names to links to Bot methods which accept them as arguments,
+        # i.e. {"<class 'telegram._inline.inlinequeryresult.InlineQueryResult'>":
+        # {:meth:`telegram.Bot.answer_inline_query`, ...}}
         methods_for_class_name = defaultdict(set)  # using set because there can be repetitions
 
         forward_ref_pattern = re.compile(r"ForwardRef\('(?P<class_name>.+?)'\)")  # non-greedy
