@@ -536,10 +536,10 @@ class AdmonitionInserter:
             name_of_inspected_class_in_docstr = (
                 str(inspected_class).removeprefix("<class '").removesuffix("'>")
             )
+            # removing things like "_files.sticker"
             name_of_inspected_class_in_docstr = ".".join(
                 n
                 for n in name_of_inspected_class_in_docstr.split(".")
-                # removing things like "_files.sticker"
                 if n in ("telegram", "ext") or not n.islower()
             )
 
@@ -648,8 +648,10 @@ class AdmonitionInserter:
         # {:meth:`telegram.Bot.answer_inline_query`, ...}}
         methods_for_class_name = defaultdict(set)  # using set because there can be repetitions
 
+        # A pattern to find a class name in a ForwardRef typing annotation.
+        # Class name (in a named group) is surrounded by parentheses and single quotes.
         # Note that since we're analyzing argument by argument, the pattern can be strict, with
-        # start and end markers
+        # start and end markers.
         forward_ref_pattern = re.compile(r"^ForwardRef\('(?P<class_name>\w+)'\)$")
 
         def process_one_argument(argument: Any, link_to_method: str) -> None:
