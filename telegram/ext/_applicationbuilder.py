@@ -754,8 +754,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def local_mode(self: BuilderType, local_mode: bool) -> BuilderType:
         """Specifies the value for :paramref:`~telegram.Bot.local_mode` for the
-         :attr:`telegram.ext.Application.bot`.
-         If not called, will default to :obj:`False`.
+        :attr:`telegram.ext.Application.bot`.
+        If not called, will default to :obj:`False`.
 
         .. seealso:: :wiki:`Local Bot API Server <Local-Bot-API-Server>`
 
