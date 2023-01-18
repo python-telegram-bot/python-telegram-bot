@@ -497,7 +497,7 @@ class AdmonitionInserter:
 
     @classmethod
     def _create_available_in(cls) -> Dict[str, str]:
-        """Creates a dictionary for 'Available in' admonitions for classes that are available
+        """Creates a dictionary with 'Available in' admonitions for classes that are available
         in attributes of other classes.
         """
 
@@ -616,7 +616,9 @@ class AdmonitionInserter:
 
     @staticmethod
     def _create_returned_in() -> Dict[str, str]:
-        """Creates 'Returned in' admonitions for classes that are returned in Bot's methods."""
+        """Creates a dictionary with 'Returned in' admonitions for classes that are returned
+        in Bot's methods.
+        """
 
         # First, generate a mapping of class names to the methods which return it,
         # i.e. {Message: [send_message, ...]}
@@ -666,8 +668,8 @@ class AdmonitionInserter:
 
     @staticmethod
     def _create_use_in() -> Dict[str, str]:
-        """Creates 'Use in' admonitions for classes whose instances that are accepted as arguments
-        for Bot's methods.
+        """Creates a dictionary with 'Use in' admonitions for classes whose instances are
+        accepted as arguments for Bot's methods.
         """
 
         # First, generate a mapping of class names to the methods which accept them as arguments,
