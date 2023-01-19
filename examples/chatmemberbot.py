@@ -29,7 +29,14 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
     )
 from telegram import Chat, ChatMember, ChatMemberUpdated, Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, ChatMemberHandler, CommandHandler, ContextTypes
+from telegram.ext import (
+    Application,
+    ChatMemberHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 
 # Enable logging
 
@@ -80,7 +87,11 @@ async def track_chats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     chat = update.effective_chat
     if chat.type == Chat.PRIVATE:
         if not was_member and is_member:
-            logger.info("%s started the bot", cause_name)
+            # This may not be really needed in practice because most clients will automatically
+            # send a /start command after the user unblocks the bot, and start_private_chat()
+            # will add the user to "user_ids".
+            # We're including this here for the sake of the example.
+            logger.info("%s unblocked the bot", cause_name)
             context.bot_data.setdefault("user_ids", set()).add(chat.id)
         elif was_member and not is_member:
             logger.info("%s blocked the bot", cause_name)
@@ -136,6 +147,24 @@ async def greet_chat_members(update: Update, context: ContextTypes.DEFAULT_TYPE)
         )
 
 
+async def start_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Greets the user and records that they started a chat with the bot if it's a private chat.
+    Since no `my_chat_member` update is issued when a user starts a private chat with the bot
+    for the first time, we have to track it explicitly here.
+    """
+    user_name = update.effective_user.full_name
+    chat = update.effective_chat
+    if chat.type != Chat.PRIVATE or chat.id in context.bot_data.get("user_ids", set()):
+        return
+
+    logger.info("%s started a private chat with the bot", user_name)
+    context.bot_data.setdefault("user_ids", set()).add(chat.id)
+
+    await update.effective_message.reply_text(
+        f"Welcome {user_name}. Use /show_chats to see what chats I'm in."
+    )
+
+
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
@@ -147,6 +176,10 @@ def main() -> None:
 
     # Handle members joining/leaving chats.
     application.add_handler(ChatMemberHandler(greet_chat_members, ChatMemberHandler.CHAT_MEMBER))
+
+    # Interpret any other command or text message as a start of a private chat.
+    # This will record the user as being in a private chat with bot.
+    application.add_handler(MessageHandler(filters.ALL, start_private_chat))
 
     # Run the bot until the user presses Ctrl-C
     # We pass 'allowed_updates' handle *all* updates including `chat_member` updates
