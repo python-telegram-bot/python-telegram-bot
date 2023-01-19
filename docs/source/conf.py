@@ -5,7 +5,7 @@ import re
 import subprocess
 import sys
 import typing
-from collections import Sequence, defaultdict
+from collections import defaultdict
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple, Union
@@ -454,17 +454,26 @@ class AdmonitionInserter:
 
     ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
 
-    BOT_METHODS = tuple(
-        m[0]
-        for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
-        if not m[0].startswith("_")
-        and m[0].islower()  # islower() to avoid camelCase methods
-        and m[0] in telegram.Bot.__dict__  # method is not inherited from TelegramObject
-    )
-    """Relevant Bot methods(public, not aliases, not inherited from TelegramObject)."""
+    METHODS_FOR_BOT_AND_APPBUILDER = {
+        telegram.Bot: tuple(
+            m[0]
+            for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
+            if not m[0].startswith("_")
+            and m[0].islower()  # islower() to avoid camelCase methods
+            and m[0] in telegram.Bot.__dict__  # method is not inherited from TelegramObject
+        ),
+        telegram.ext.ApplicationBuilder: tuple(
+            m[0]
+            for m in inspect.getmembers(telegram.ext.ApplicationBuilder, inspect.isfunction)
+            if not m[0].startswith("_") and m[0] in telegram.ext.ApplicationBuilder.__dict__
+        ),
+    }
+    """Relevant methods to be mentioned in 'Returned in' and 'Use in' admonitions:
+    Bot methods(public, not aliases, not inherited from TelegramObject) and ApplicationBuilder
+    methods.
+    """
 
     def __init__(self):
-
         self.admonitions: Dict[str, Dict[str, str]] = {
             # dynamically determine which method to use to create a sub dictionary
             admonition_type: getattr(self, f"_create_{admonition_type}")()
@@ -527,9 +536,11 @@ class AdmonitionInserter:
 
         single_class_name_pattern = re.compile(r":class:`~?(?P<class_name>[\w.]*)`")
 
-        for _, inspected_class in inspect.getmembers(
-            telegram, inspect.isclass
-        ) + inspect.getmembers(telegram.ext, inspect.isclass):
+        classes_to_inspect = inspect.getmembers(telegram, inspect.isclass) + inspect.getmembers(
+            telegram.ext, inspect.isclass
+        )
+
+        for _, inspected_class in classes_to_inspect:
             # We need to make "<class 'telegram._files.sticker.StickerSet'>" into
             # "telegram.StickerSet" because that's the way the classes are mentioned in
             # docstrings
@@ -564,8 +575,8 @@ class AdmonitionInserter:
 
                     # Writing to dictionary: matching the class found in the docstring to the
                     # attribute of the class being inspected.
-                    # The class in the attribute docstring is the key, and the attribute of the
-                    # class currently being inspected is the value.
+                    # Key is the class in the attribute docstring, value is the attribute of the
+                    # class currently being inspected.
                     attrs_for_class_name[self._resolve_full_class_name(name_of_class_in_attr)].add(
                         f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
                     )
@@ -609,38 +620,43 @@ class AdmonitionInserter:
 
     def _create_returned_in(self) -> Dict[str, str]:
         """Creates a dictionary with 'Returned in' admonitions for classes that are returned
-        in Bot's methods.
+        in Bot's and AppBuilder's methods.
         """
 
         # Generate a mapping of class names to ReST links to Bot methods which return it,
         # i.e. {"<class 'telegram._message.Message'>": {:meth:`telegram.Bot.send_message`, ...}}
         methods_for_class_name = defaultdict(set)
 
-        for method in self.BOT_METHODS:
+        for klass, methods in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
+            for method in methods:
 
-            sig = inspect.signature(getattr(telegram.Bot, method))
-            ret_annot = sig.return_annotation
-            classes = typing.get_args(ret_annot)
+                sig = inspect.signature(getattr(klass, method))
+                ret_annot = sig.return_annotation
+                classes = typing.get_args(ret_annot)
 
-            # If we do get_args() when return annotation has one single class
-            # (e.g. <class 'telegram._message.Message'>), get_args() returns an empty tuple.
-            # We use this workaround to fix this.
-            if not classes and isinstance(ret_annot, type) and "telegram" in str(ret_annot):
-                methods_for_class_name[str(ret_annot)].add(
-                    self._generate_link_to_bot_method(method)
-                )
-                continue
-
-            for klass in classes:
-                if "telegram" not in str(klass):
+                # TODO this doesn't work with ApplicationBuilder
+                # If we do get_args() when return annotation has one single class
+                # (e.g. <class 'telegram._message.Message'>), get_args() returns an empty tuple.
+                # We use this workaround to fix this.
+                if not classes and isinstance(ret_annot, type) and "telegram" in str(ret_annot):
+                    methods_for_class_name[str(ret_annot)].add(
+                        self._generate_link_to_method(method, klass)
+                    )
                     continue
-                methods_for_class_name[str(klass)].add(self._generate_link_to_bot_method(method))
+
+                for returned_class in classes:
+                    class_as_str = str(returned_class)
+                    if "telegram" not in class_as_str:
+                        continue
+                    methods_for_class_name[class_as_str].add(
+                        self._generate_link_to_method(method, klass)
+                    )
 
         return self._generate_admonitions(methods_for_class_name, admonition_type="returned_in")
 
     def _create_use_in(self) -> Dict[str, str]:
         """Creates a dictionary with 'Use in' admonitions for classes whose instances are
-        accepted as arguments for Bot's methods.
+        accepted as arguments for Bot's and ApplicationBuilder's methods.
         """
 
         # Generate a mapping of class names to links to Bot methods which accept them as arguments,
@@ -654,76 +670,102 @@ class AdmonitionInserter:
         # start and end markers.
         forward_ref_pattern = re.compile(r"^ForwardRef\('(?P<class_name>\w+)'\)$")
 
-        def process_one_argument(argument: Any, link_to_method: str) -> None:
-            """Analyzes one argument and adds link to Bot method to the dictionary."""
+        def process_one_arg(arg_: Any, link_to_method: str) -> None:
+            """Analyzes one argument and adds entry to the dictionary:
+            the key is the ReST link to the given method of Bot or ApplicationBuilder,
+            the value is the class that the argument belongs to, if it can be resolved to a
+            telegram or telegram.ext class.
+            """
 
-            origin = typing.get_origin(argument)
+            origin = typing.get_origin(arg_)
 
             if (
-                origin in (collections.abc.Callable, typing.IO)
+                origin in (collections.Callable, typing.IO)
                 # no other check available (by type or origin) for this one:
-                or str(type(argument)) == "<class 'typing._SpecialForm'>"
+                or str(type(arg_)) == "<class 'typing._SpecialForm'>"
             ):
-                return
+                pass
 
             # recursion for cases like Union[Sequence....
-            if typing.get_origin(argument) in (dict, tuple, Union, typing.Sequence, Sequence):
-                for sub_arg in typing.get_args(argument):
-                    process_one_argument(sub_arg, link_to_method)
-                return
+            elif typing.get_origin(arg_) in (
+                dict,
+                tuple,
+                Union,
+                collections.Coroutine,
+                collections.Sequence,
+                typing.Sequence,
+            ):
+                for sub_arg in typing.get_args(arg_):
+                    process_one_arg(sub_arg, link_to_method)
 
-            if isinstance(argument, type):
-                if "telegram" in str(argument):
-                    methods_for_class_name[str(argument)].add(link_to_method)
-                return
+            # recursion for lists
+            elif isinstance(arg_, list):
+                for item in arg_:
+                    process_one_arg(item, link_to_method)
 
-            if type(argument) is typing.ForwardRef:
-                m = forward_ref_pattern.match(str(argument))
-                # We're sure it's a ForwardRef, so the class name must be resolved.
-                # If it isn't, we'll let the program throw an exception to be sure.
+            elif isinstance(arg_, type):
+                if "telegram" in str(arg_):
+                    methods_for_class_name[str(arg_)].add(link_to_method)
+
+            elif isinstance(arg_, typing.ForwardRef):
+                m = forward_ref_pattern.match(str(arg_))
+                # We're sure it's a ForwardRef, so, unless it belongs to known exceptions,
+                # the class name must be resolved.
+                # If it isn't resolved, we'll have the program throw an exception to be sure.
                 try:
                     class_name = self._resolve_full_class_name(m.group("class_name"))
                 except AttributeError:
-                    if str(argument) == "ForwardRef('DefaultValue[DVType]')":
+                    if str(arg_) == "ForwardRef('DefaultValue[DVType]')":
                         # this is a known ForwardRef that needs not be resolved to a Telegram class
                         return
                     else:
-                        raise NotImplementedError(f"Could not process ForwardRef: {argument}")
+                        raise NotImplementedError(f"Could not process ForwardRef: {arg_}")
                 methods_for_class_name[class_name].add(link_to_method)
-                return
 
             # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
             # as ForwardRefs and are identified as plain strings.
-            if isinstance(argument, str):
+            elif isinstance(arg_, str):
                 class_name = self._resolve_full_class_name(annotation)
                 # Here we don't want an exception to be thrown since we're not sure it's ForwardRef
                 if class_name is not None:
                     methods_for_class_name[class_name].add(link_to_method)
-                return
+            else:
+                raise NotImplementedError(
+                    f"Cannot process argument {arg_} of type {type(arg_)} (origin {origin})"
+                )
 
-            raise NotImplementedError(
-                f"Cannot process argument {argument} of type {type(argument)} (origin {origin})"
-            )
+        for klass, relevant_methods_for_class in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
+            for method in relevant_methods_for_class:
+                method_link = self._generate_link_to_method(method, klass)
 
-        for method in self.BOT_METHODS:
-            method_link = self._generate_link_to_bot_method(method)
+                sig = inspect.signature(getattr(klass, method))
+                parameters = sig.parameters
 
-            sig = inspect.signature(getattr(telegram.Bot, method))
-            parameters = sig.parameters
+                for param in parameters.values():
+                    annotation = param.annotation
 
-            for type_annotation in parameters.values():
-                annotation = type_annotation.annotation
+                    if isinstance(annotation, (type, str)):
+                        process_one_arg(annotation, method_link)
 
-                if isinstance(annotation, (type, str)):
-                    process_one_argument(annotation, method_link)
-                elif typing.get_origin(annotation) in (dict, Union, Sequence):
-                    for arg in typing.get_args(annotation):
-                        process_one_argument(arg, method_link)
-                else:
-                    raise NotImplementedError(
-                        f"Unable to process annotation {annotation} of type {type(annotation)} "
-                        f"(origin: {typing.get_origin(annotation)})."
-                    )
+                    elif isinstance(annotation, typing.TypeVar):
+                        # gets access to the "bound=..." parameter
+                        process_one_arg(annotation.__bound__, method_link)
+
+                    elif typing.get_origin(annotation) in (
+                        dict,
+                        type,
+                        collections.Sequence,
+                        collections.Callable,
+                        Union,
+                    ):
+                        for arg in typing.get_args(annotation):
+                            process_one_arg(arg, method_link)
+                    else:
+                        raise NotImplementedError(
+                            f"Unable to process annotation {annotation} of type {type(annotation)}"
+                            f" (origin {typing.get_origin(annotation)}, attrs {vars(annotation)}, "
+                            f"get_args {typing.get_args(annotation)})."
+                        )
 
         return self._generate_admonitions(methods_for_class_name, admonition_type="use_in")
 
@@ -787,9 +829,14 @@ class AdmonitionInserter:
         return admonition_for_class_name
 
     @staticmethod
-    def _generate_link_to_bot_method(method_name: str):
+    def _generate_link_to_method(method_name: str, base_class: type):
         """Generates a ReST link to a Bot method."""
-        return f":meth:`telegram.Bot.{method_name}`"
+        if base_class == telegram.Bot:
+            return f":meth:`telegram.Bot.{method_name}`"
+        elif base_class == telegram.ext.ApplicationBuilder:
+            return f":meth:`telegram.ext.ApplicationBuilder.{method_name}`"
+        else:
+            raise NotImplementedError(f"Base class {base_class} not supported")
 
     @staticmethod
     def _resolve_full_class_name(name: str) -> Union[str, None]:
