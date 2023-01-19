@@ -454,6 +454,13 @@ class AdmonitionInserter:
 
     ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
 
+    FORWARD_REF_PATTERN = re.compile(r"^ForwardRef\('(?P<class_name>\w+)'\)$")
+    """ A pattern to find a class name in a ForwardRef typing annotation.
+    Class name (in a named group) is surrounded by parentheses and single quotes.
+    Note that since we're analyzing argument by argument, the pattern can be strict, with
+    start and end markers.
+    """
+
     METHODS_FOR_BOT_AND_APPBUILDER = {
         telegram.Bot: tuple(
             m[0]
@@ -664,76 +671,6 @@ class AdmonitionInserter:
         # {:meth:`telegram.Bot.answer_inline_query`, ...}}
         methods_for_class_name = defaultdict(set)  # using set because there can be repetitions
 
-        # A pattern to find a class name in a ForwardRef typing annotation.
-        # Class name (in a named group) is surrounded by parentheses and single quotes.
-        # Note that since we're analyzing argument by argument, the pattern can be strict, with
-        # start and end markers.
-        forward_ref_pattern = re.compile(r"^ForwardRef\('(?P<class_name>\w+)'\)$")
-
-        def process_one_arg(arg_: Any, link_to_method: str) -> None:
-            """Analyzes one argument and adds entry to the dictionary:
-            the key is the ReST link to the given method of Bot or ApplicationBuilder,
-            the value is the class that the argument belongs to, if it can be resolved to a
-            telegram or telegram.ext class.
-            """
-
-            origin = typing.get_origin(arg_)
-
-            if (
-                origin in (collections.Callable, typing.IO)
-                # no other check available (by type or origin) for this one:
-                or str(type(arg_)) == "<class 'typing._SpecialForm'>"
-            ):
-                pass
-
-            # recursion for cases like Union[Sequence....
-            elif typing.get_origin(arg_) in (
-                dict,
-                tuple,
-                Union,
-                collections.Coroutine,
-                collections.Sequence,
-                typing.Sequence,
-            ):
-                for sub_arg in typing.get_args(arg_):
-                    process_one_arg(sub_arg, link_to_method)
-
-            # recursion for lists
-            elif isinstance(arg_, list):
-                for item in arg_:
-                    process_one_arg(item, link_to_method)
-
-            elif isinstance(arg_, type):
-                if "telegram" in str(arg_):
-                    methods_for_class_name[str(arg_)].add(link_to_method)
-
-            elif isinstance(arg_, typing.ForwardRef):
-                m = forward_ref_pattern.match(str(arg_))
-                # We're sure it's a ForwardRef, so, unless it belongs to known exceptions,
-                # the class name must be resolved.
-                # If it isn't resolved, we'll have the program throw an exception to be sure.
-                try:
-                    class_name = self._resolve_full_class_name(m.group("class_name"))
-                except AttributeError:
-                    if str(arg_) == "ForwardRef('DefaultValue[DVType]')":
-                        # this is a known ForwardRef that needs not be resolved to a Telegram class
-                        return
-                    else:
-                        raise NotImplementedError(f"Could not process ForwardRef: {arg_}")
-                methods_for_class_name[class_name].add(link_to_method)
-
-            # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
-            # as ForwardRefs and are identified as plain strings.
-            elif isinstance(arg_, str):
-                class_name = self._resolve_full_class_name(annotation)
-                # Here we don't want an exception to be thrown since we're not sure it's ForwardRef
-                if class_name is not None:
-                    methods_for_class_name[class_name].add(link_to_method)
-            else:
-                raise NotImplementedError(
-                    f"Cannot process argument {arg_} of type {type(arg_)} (origin {origin})"
-                )
-
         for klass, relevant_methods_for_class in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
             for method in relevant_methods_for_class:
                 method_link = self._generate_link_to_method(method, klass)
@@ -745,11 +682,11 @@ class AdmonitionInserter:
                     annotation = param.annotation
 
                     if isinstance(annotation, (type, str)):
-                        process_one_arg(annotation, method_link)
+                        methods_for_class_name[self._process_one_arg(annotation)].add(method_link)
 
                     elif isinstance(annotation, typing.TypeVar):
-                        # gets access to the "bound=..." parameter
-                        process_one_arg(annotation.__bound__, method_link)
+                        bound = annotation.__bound__  # gets access to the "bound=..." parameter
+                        methods_for_class_name[self._process_one_arg(bound)].add(method_link)
 
                     elif typing.get_origin(annotation) in (
                         dict,
@@ -759,7 +696,7 @@ class AdmonitionInserter:
                         Union,
                     ):
                         for arg in typing.get_args(annotation):
-                            process_one_arg(arg, method_link)
+                            methods_for_class_name[self._process_one_arg(arg)].add(method_link)
                     else:
                         raise NotImplementedError(
                             f"Unable to process annotation {annotation} of type {type(annotation)}"
@@ -837,6 +774,69 @@ class AdmonitionInserter:
             return f":meth:`telegram.ext.ApplicationBuilder.{method_name}`"
         else:
             raise NotImplementedError(f"Base class {base_class} not supported")
+
+    def _process_one_arg(self, arg: Any) -> Union[str, None]:
+        """Analyzes an argument of a method (separate argument or an element of typing.get_args())
+        and returns full name of class that the argument belongs to, if it can be resolved
+        to a telegram or telegram.ext class.
+        """
+
+        origin = typing.get_origin(arg)
+
+        if (
+            origin in (collections.Callable, typing.IO)
+            # no other check available (by type or origin) for this one:
+            or str(type(arg)) == "<class 'typing._SpecialForm'>"
+        ):
+            pass
+
+        # recursion for cases like Union[Sequence....
+        elif typing.get_origin(arg) in (
+            dict,
+            tuple,
+            Union,
+            collections.Coroutine,
+            collections.Sequence,
+            typing.Sequence,
+        ):
+            for sub_arg in typing.get_args(arg):
+                return self._process_one_arg(sub_arg)
+
+        # recursion for lists
+        elif isinstance(arg, list):
+            for item in arg:
+                return self._process_one_arg(item)
+
+        elif isinstance(arg, type):
+            if "telegram" in str(arg):
+                return str(arg)
+
+        elif isinstance(arg, typing.ForwardRef):
+            m = self.FORWARD_REF_PATTERN.match(str(arg))
+            # We're sure it's a ForwardRef, so, unless it belongs to known exceptions,
+            # the class name must be resolved.
+            # If it isn't resolved, we'll have the program throw an exception to be sure.
+            try:
+                class_name = self._resolve_full_class_name(m.group("class_name"))
+            except AttributeError:
+                if str(arg) == "ForwardRef('DefaultValue[DVType]')":
+                    # this is a known ForwardRef that needs not be resolved to a Telegram class
+                    return
+                else:
+                    raise NotImplementedError(f"Could not process ForwardRef: {arg}")
+            return class_name
+
+        # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
+        # as ForwardRefs and are identified as plain strings.
+        elif isinstance(arg, str):
+            class_name = self._resolve_full_class_name(arg)
+            # Here we don't want an exception to be thrown since we're not sure it's ForwardRef
+            if class_name is not None:
+                return class_name
+        else:
+            raise NotImplementedError(
+                f"Cannot process argument {arg} of type {type(arg)} (origin {origin})"
+            )
 
     @staticmethod
     def _resolve_full_class_name(name: str) -> Union[str, None]:
