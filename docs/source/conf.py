@@ -588,14 +588,15 @@ class AdmonitionInserter:
                 # a typing description of one attribute can contain multiple classes
                 for match in single_class_name_pattern.finditer(line):
                     name_of_class_in_attr = match.group("class_name")
-                    if "telegram" not in name_of_class_in_attr:
+                    full_class_name = self._resolve_full_class_name(name_of_class_in_attr)
+                    if full_class_name is None:
                         continue
 
                     # Writing to dictionary: matching the class found in the docstring to the
                     # attribute of the class being inspected.
                     # Key is the class in the attribute docstring, value is the attribute of the
                     # class currently being inspected.
-                    attrs_for_class_name[self._resolve_full_class_name(name_of_class_in_attr)].add(
+                    attrs_for_class_name[full_class_name].add(
                         f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
                     )
 
