@@ -534,11 +534,22 @@ class AdmonitionInserter:
         # i.e. {"telegram._files.sticker.Sticker": {":attr:`telegram.Message.sticker`", ...}}
         attrs_for_class_name = defaultdict(set)
 
-        # The colon after the closing parenthesis is important because it makes sure
-        # that the class is mentioned in the attribute description, not in free text.
-        # So far there seem to be no attribute docstrings in which the list of classes
-        # takes up more than one line.
-        attr_docstr_pattern = re.compile(r"^\s*(?P<attr_name>[a-z_]+)\s?\(.*:class:`.+`.*\):\s.*$")
+        # The following regex is supposed to capture a class name in a line like this:
+        # media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
+
+        attr_docstr_pattern = re.compile(
+            r"^\s*(?P<attr_name>[a-z_]+)"  # Any number of spaces, named group for attribute
+            r"\s?\("  # Optional whitespace, opening parenthesis
+            r".*"  # Any number of characters (that could denote a built-in type)
+            r":class:`.+`"  # Marker of a classref, class name in backticks
+            r".*\):"  # Any number of characters, closing parenthesis, colon.
+            # The ^ colon above is important because it makes sure that the class is mentioned in
+            # the attribute description, not in free text.
+            r"\s.*$",  # Whitespace, any number of characters, end of string (end of line)
+            re.VERBOSE,
+        )
+
+        # for properties: there is no attr name in docstring.  Just check if there's a class name.
         prop_docst_pattern = re.compile(r":class:`.+`.*:")
 
         single_class_name_pattern = re.compile(r":class:`~?(?P<class_name>[\w.]*)`")
