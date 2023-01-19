@@ -865,7 +865,12 @@ class AdmonitionInserter:
         Returns :obj:`str` on success, :obj:`None` if nothing could be resolved.
         """
 
-        for option in (name, f"telegram.{name}", f"telegram.ext.{name}"):
+        for option in (
+            name,
+            f"telegram.{name}",
+            f"telegram.ext.{name}",
+            f"telegram.ext.filters.{name}",
+        ):
             try:
                 return str(eval(option))
             # NameError will be raised if trying to eval just name and it doesn't work, e.g.
