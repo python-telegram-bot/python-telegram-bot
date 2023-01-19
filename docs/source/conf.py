@@ -868,6 +868,12 @@ class AdmonitionInserter:
         for option in (name, f"telegram.{name}", f"telegram.ext.{name}"):
             try:
                 return str(eval(option))
+            # NameError will be raised if trying to eval just name and it doesn't work, e.g.
+            # "Name 'ApplicationBuilder' is not defined".
+            # AttributeError will be raised if trying to e.g. eval f"telegram.{name}" when the
+            # class denoted by `name` actually belongs to `telegram.ext`:
+            # "module 'telegram' has no attribute 'ApplicationBuilder'".
+            # If neither option works, this is not a PTB class.
             except (NameError, AttributeError):
                 continue
 
