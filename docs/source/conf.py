@@ -701,11 +701,13 @@ class AdmonitionInserter:
 
     @staticmethod
     def _find_insert_pos_for_admonition(lines: List[str]) -> int:
-        """Finds the correct position to insert the admonition and returns the index.
+        """Finds the correct position to insert the class admonition and returns the index.
         If no key phrases are found, the admonition will be inserted at the very end.
         """
         for idx, value in list(enumerate(lines)):
-            if value.startswith(".. version") or value.startswith(":param"):
+            # The space after ":param" is important because a docstring can contain ":paramref:"
+            # in its plain text in the beginning of a line (e.g. ExtBot)
+            if value.startswith(".. version") or value.startswith(":param "):
                 return idx
         return len(lines) - 1
 
