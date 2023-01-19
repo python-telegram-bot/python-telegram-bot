@@ -627,7 +627,7 @@ class AdmonitionInserter:
 
     def _create_returned_in(self) -> Dict[str, str]:
         """Creates a dictionary with 'Returned in' admonitions for classes that are returned
-        in Bot's and AppBuilder's methods.
+        in Bot's and ApplicationBuilder's methods.
         """
 
         # Generate a mapping of class names to ReST links to Bot methods which return it,
@@ -639,25 +639,18 @@ class AdmonitionInserter:
 
                 sig = inspect.signature(getattr(klass, method))
                 ret_annot = sig.return_annotation
-                classes = typing.get_args(ret_annot)
+                returned_classes = typing.get_args(ret_annot)
 
-                # TODO this doesn't work with ApplicationBuilder
+                method_link = self._generate_link_to_method(method, klass)
+
                 # If we do get_args() when return annotation has one single class
                 # (e.g. <class 'telegram._message.Message'>), get_args() returns an empty tuple.
-                # We use this workaround to fix this.
-                if not classes and isinstance(ret_annot, type) and "telegram" in str(ret_annot):
-                    methods_for_class_name[str(ret_annot)].add(
-                        self._generate_link_to_method(method, klass)
-                    )
+                if not returned_classes:
+                    methods_for_class_name[self._resolve_arg(ret_annot)].add(method_link)
                     continue
 
-                for returned_class in classes:
-                    class_as_str = str(returned_class)
-                    if "telegram" not in class_as_str:
-                        continue
-                    methods_for_class_name[class_as_str].add(
-                        self._generate_link_to_method(method, klass)
-                    )
+                for ret_cls in returned_classes:
+                    methods_for_class_name[self._resolve_arg(ret_cls)].add(method_link)
 
         return self._generate_admonitions(methods_for_class_name, admonition_type="returned_in")
 
@@ -682,11 +675,11 @@ class AdmonitionInserter:
                     annotation = param.annotation
 
                     if isinstance(annotation, (type, str)):
-                        methods_for_class_name[self._process_one_arg(annotation)].add(method_link)
+                        methods_for_class_name[self._resolve_arg(annotation)].add(method_link)
 
                     elif isinstance(annotation, typing.TypeVar):
                         bound = annotation.__bound__  # gets access to the "bound=..." parameter
-                        methods_for_class_name[self._process_one_arg(bound)].add(method_link)
+                        methods_for_class_name[self._resolve_arg(bound)].add(method_link)
 
                     elif typing.get_origin(annotation) in (
                         dict,
@@ -696,7 +689,7 @@ class AdmonitionInserter:
                         Union,
                     ):
                         for arg in typing.get_args(annotation):
-                            methods_for_class_name[self._process_one_arg(arg)].add(method_link)
+                            methods_for_class_name[self._resolve_arg(arg)].add(method_link)
                     else:
                         raise NotImplementedError(
                             f"Unable to process annotation {annotation} of type {type(annotation)}"
@@ -775,7 +768,7 @@ class AdmonitionInserter:
         else:
             raise NotImplementedError(f"Base class {base_class} not supported")
 
-    def _process_one_arg(self, arg: Any) -> Union[str, None]:
+    def _resolve_arg(self, arg: Any) -> Union[str, None]:
         """Analyzes an argument of a method (separate argument or an element of typing.get_args())
         and returns full name of class that the argument belongs to, if it can be resolved
         to a telegram or telegram.ext class.
@@ -785,12 +778,14 @@ class AdmonitionInserter:
 
         if (
             origin in (collections.Callable, typing.IO)
-            # no other check available (by type or origin) for this one:
-            or str(type(arg)) == "<class 'typing._SpecialForm'>"
+            or arg is None
+            # no other check available (by type or origin) for these:
+            or str(type(arg)) in ("<class 'typing._SpecialForm'>", "<class 'ellipsis'>")
         ):
             pass
 
-        # recursion for cases like Union[Sequence....
+        # RECURSIVE CALLS
+        # for cases like Union[Sequence....
         elif typing.get_origin(arg) in (
             dict,
             tuple,
@@ -800,12 +795,17 @@ class AdmonitionInserter:
             typing.Sequence,
         ):
             for sub_arg in typing.get_args(arg):
-                return self._process_one_arg(sub_arg)
+                return self._resolve_arg(sub_arg)
 
-        # recursion for lists
         elif isinstance(arg, list):
             for item in arg:
-                return self._process_one_arg(item)
+                return self._resolve_arg(item)
+
+        elif isinstance(arg, typing.TypeVar):
+            # gets access to the "bound=..." parameter
+            return self._resolve_arg(arg.__bound__)
+
+        # END RECURSIVE CALLS
 
         elif isinstance(arg, type):
             if "telegram" in str(arg):
@@ -833,6 +833,7 @@ class AdmonitionInserter:
             # Here we don't want an exception to be thrown since we're not sure it's ForwardRef
             if class_name is not None:
                 return class_name
+
         else:
             raise NotImplementedError(
                 f"Cannot process argument {arg} of type {type(arg)} (origin {origin})"
