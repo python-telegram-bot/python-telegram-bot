@@ -232,15 +232,17 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         context_types: ContextTypes[Any, UD, CD, BD] = None,
     ):
         super().__init__(store_data=store_data, update_interval=update_interval)
-        self.filepath = Path(filepath)
-        self.single_file = single_file
-        self.on_flush = on_flush
+        self.filepath: Path = Path(filepath)
+        self.single_file: Optional[bool] = single_file
+        self.on_flush: Optional[bool] = on_flush
         self.user_data: Optional[Dict[int, UD]] = None
         self.chat_data: Optional[Dict[int, CD]] = None
         self.bot_data: Optional[BD] = None
         self.callback_data: Optional[CDCData] = None
         self.conversations: Optional[Dict[str, Dict[Tuple, object]]] = None
-        self.context_types = cast(ContextTypes[Any, UD, CD, BD], context_types or ContextTypes())
+        self.context_types: ContextTypes[Any, UD, CD, BD] = cast(
+            ContextTypes[Any, UD, CD, BD], context_types or ContextTypes()
+        )
 
     def _load_singlefile(self) -> None:
         try:

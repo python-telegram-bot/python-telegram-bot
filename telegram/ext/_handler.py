@@ -92,8 +92,8 @@ class BaseHandler(Generic[UT, CCT], ABC):
         callback: HandlerCallback[UT, CCT, RT],
         block: DVInput[bool] = DEFAULT_TRUE,
     ):
-        self.callback = callback
-        self.block = block
+        self.callback: HandlerCallback[UT, CCT, RT] = callback
+        self.block: Optional[DVInput[bool]] = block
 
     @abstractmethod
     def check_update(self, update: object) -> Optional[Union[bool, object]]:

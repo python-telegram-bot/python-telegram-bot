@@ -86,7 +86,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern = pattern
+        self.pattern: Optional[Union[str, Pattern]] = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.

@@ -102,8 +102,8 @@ class Updater(AbstractAsyncContextManager):
         bot: "Bot",
         update_queue: asyncio.Queue,
     ):
-        self.bot = bot
-        self.update_queue = update_queue
+        self.bot: Bot = bot
+        self.update_queue: asyncio.queues.Queue = update_queue
 
         self._last_update_id = 0
         self._running = False

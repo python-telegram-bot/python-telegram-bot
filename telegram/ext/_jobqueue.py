@@ -707,11 +707,11 @@ class Job:
                 "python-telegram-bot[job-queue]`."
             )
 
-        self.callback = callback
-        self.data = data
-        self.name = name or callback.__name__
-        self.chat_id = chat_id
-        self.user_id = user_id
+        self.callback: JobCallback = callback
+        self.data: Optional[object] = data
+        self.name: Optional[str] = name or callback.__name__
+        self.chat_id: Optional[int] = chat_id
+        self.user_id: Optional[int] = user_id
 
         self._removed = False
         self._enabled = False

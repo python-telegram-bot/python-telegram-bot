@@ -229,13 +229,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         super().__init__(api_kwargs=None)
         if not token:
             raise InvalidToken("You must pass the token you received from https://t.me/Botfather!")
-        self._token = token
+        self._token: str = token
 
-        self._base_url = base_url + self._token
-        self._base_file_url = base_file_url + self._token
-        self._local_mode = local_mode
+        self._base_url: str = base_url + self._token
+        self._base_file_url: str = base_file_url + self._token
+        self._local_mode: bool = local_mode
         self._bot_user: Optional[User] = None
-        self._private_key = None
+        self._private_key: Optional[bytes] = None
         self._logger = logging.getLogger(__name__)
         self._initialized = False
 

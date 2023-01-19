@@ -44,7 +44,7 @@ class RequestData:
     __slots__ = ("_parameters", "contains_files")
 
     def __init__(self, parameters: List[RequestParameter] = None):
-        self._parameters = parameters or []
+        self._parameters: List[RequestParameter] = parameters or []
         self.contains_files = any(param.input_files for param in self._parameters)
 
     @property

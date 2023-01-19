@@ -98,8 +98,8 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern = pattern
-        self.chat_types = chat_types
+        self.pattern: Optional[Union[str, Pattern]] = pattern
+        self.chat_types: Optional[List[str]] = chat_types
 
     def check_update(self, update: object) -> Optional[Union[bool, Match]]:
         """

@@ -699,76 +699,86 @@ class Message(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
-        self.message_id = message_id
+        self.message_id: int = message_id
         # Optionals
-        self.from_user = from_user
-        self.sender_chat = sender_chat
-        self.date = date
-        self.chat = chat
-        self.forward_from = forward_from
-        self.forward_from_chat = forward_from_chat
-        self.forward_date = forward_date
-        self.is_automatic_forward = is_automatic_forward
-        self.reply_to_message = reply_to_message
-        self.edit_date = edit_date
-        self.has_protected_content = has_protected_content
-        self.text = text
-        self.entities = parse_sequence_arg(entities)
-        self.caption_entities = parse_sequence_arg(caption_entities)
-        self.audio = audio
-        self.game = game
-        self.document = document
-        self.photo = parse_sequence_arg(photo)
-        self.sticker = sticker
-        self.video = video
-        self.voice = voice
-        self.video_note = video_note
-        self.caption = caption
-        self.contact = contact
-        self.location = location
-        self.venue = venue
-        self.new_chat_members = parse_sequence_arg(new_chat_members)
-        self.left_chat_member = left_chat_member
-        self.new_chat_title = new_chat_title
-        self.new_chat_photo = parse_sequence_arg(new_chat_photo)
-        self.delete_chat_photo = bool(delete_chat_photo)
-        self.group_chat_created = bool(group_chat_created)
-        self.supergroup_chat_created = bool(supergroup_chat_created)
-        self.migrate_to_chat_id = migrate_to_chat_id
-        self.migrate_from_chat_id = migrate_from_chat_id
-        self.channel_chat_created = bool(channel_chat_created)
-        self.message_auto_delete_timer_changed = message_auto_delete_timer_changed
-        self.pinned_message = pinned_message
-        self.forward_from_message_id = forward_from_message_id
-        self.invoice = invoice
-        self.successful_payment = successful_payment
-        self.connected_website = connected_website
-        self.forward_signature = forward_signature
-        self.forward_sender_name = forward_sender_name
-        self.author_signature = author_signature
-        self.media_group_id = media_group_id
-        self.animation = animation
-        self.passport_data = passport_data
-        self.poll = poll
-        self.dice = dice
-        self.via_bot = via_bot
-        self.proximity_alert_triggered = proximity_alert_triggered
-        self.video_chat_scheduled = video_chat_scheduled
-        self.video_chat_started = video_chat_started
-        self.video_chat_ended = video_chat_ended
-        self.video_chat_participants_invited = video_chat_participants_invited
-        self.reply_markup = reply_markup
-        self.web_app_data = web_app_data
-        self.is_topic_message = is_topic_message
-        self.message_thread_id = message_thread_id
-        self.forum_topic_created = forum_topic_created
-        self.forum_topic_closed = forum_topic_closed
-        self.forum_topic_reopened = forum_topic_reopened
-        self.forum_topic_edited = forum_topic_edited
-        self.general_forum_topic_hidden = general_forum_topic_hidden
-        self.general_forum_topic_unhidden = general_forum_topic_unhidden
-        self.write_access_allowed = write_access_allowed
-        self.has_media_spoiler = has_media_spoiler
+        self.from_user: Optional[User] = from_user
+        self.sender_chat: Optional[Chat] = sender_chat
+        self.date: datetime.datetime = date
+        self.chat: Chat = chat
+        self.forward_from: Optional[User] = forward_from
+        self.forward_from_chat: Optional[Chat] = forward_from_chat
+        self.forward_date: Optional[datetime.datetime] = forward_date
+        self.is_automatic_forward: Optional[bool] = is_automatic_forward
+        self.reply_to_message: Optional[Message] = reply_to_message
+        self.edit_date: Optional[datetime.datetime] = edit_date
+        self.has_protected_content: Optional[bool] = has_protected_content
+        self.text: Optional[str] = text
+        self.entities: Tuple["MessageEntity", ...] = parse_sequence_arg(entities)
+        self.caption_entities: Tuple["MessageEntity", ...] = parse_sequence_arg(caption_entities)
+        self.audio: Optional[Audio] = audio
+        self.game: Optional[Game] = game
+        self.document: Optional[Document] = document
+        self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
+        self.sticker: Optional[Sticker] = sticker
+        self.video: Optional[Video] = video
+        self.voice: Optional[Voice] = voice
+        self.video_note: Optional[VideoNote] = video_note
+        self.caption: Optional[str] = caption
+        self.contact: Optional[Contact] = contact
+        self.location: Optional[Location] = location
+        self.venue: Optional[Venue] = venue
+        self.new_chat_members: Tuple[User, ...] = parse_sequence_arg(new_chat_members)
+        self.left_chat_member: Optional[User] = left_chat_member
+        self.new_chat_title: Optional[str] = new_chat_title
+        self.new_chat_photo: Tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
+        self.delete_chat_photo: Optional[bool] = bool(delete_chat_photo)
+        self.group_chat_created: Optional[bool] = bool(group_chat_created)
+        self.supergroup_chat_created: Optional[bool] = bool(supergroup_chat_created)
+        self.migrate_to_chat_id: Optional[int] = migrate_to_chat_id
+        self.migrate_from_chat_id: Optional[int] = migrate_from_chat_id
+        self.channel_chat_created: Optional[bool] = bool(channel_chat_created)
+        self.message_auto_delete_timer_changed: Optional[
+            MessageAutoDeleteTimerChanged
+        ] = message_auto_delete_timer_changed
+        self.pinned_message: Optional[Message] = pinned_message
+        self.forward_from_message_id: Optional[int] = forward_from_message_id
+        self.invoice: Optional[Invoice] = invoice
+        self.successful_payment: Optional[SuccessfulPayment] = successful_payment
+        self.connected_website: Optional[str] = connected_website
+        self.forward_signature: Optional[str] = forward_signature
+        self.forward_sender_name: Optional[str] = forward_sender_name
+        self.author_signature: Optional[str] = author_signature
+        self.media_group_id: Optional[str] = media_group_id
+        self.animation: Optional[Animation] = animation
+        self.passport_data: Optional[PassportData] = passport_data
+        self.poll: Optional[Poll] = poll
+        self.dice: Optional[Dice] = dice
+        self.via_bot: Optional[User] = via_bot
+        self.proximity_alert_triggered: Optional[
+            ProximityAlertTriggered
+        ] = proximity_alert_triggered
+        self.video_chat_scheduled: Optional[VideoChatScheduled] = video_chat_scheduled
+        self.video_chat_started: Optional[VideoChatStarted] = video_chat_started
+        self.video_chat_ended: Optional[VideoChatEnded] = video_chat_ended
+        self.video_chat_participants_invited: Optional[
+            VideoChatParticipantsInvited
+        ] = video_chat_participants_invited
+        self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+        self.web_app_data: Optional[WebAppData] = web_app_data
+        self.is_topic_message: Optional[bool] = is_topic_message
+        self.message_thread_id: Optional[int] = message_thread_id
+        self.forum_topic_created: Optional[ForumTopicCreated] = forum_topic_created
+        self.forum_topic_closed: Optional[ForumTopicClosed] = forum_topic_closed
+        self.forum_topic_reopened: Optional[ForumTopicReopened] = forum_topic_reopened
+        self.forum_topic_edited: Optional[ForumTopicEdited] = forum_topic_edited
+        self.general_forum_topic_hidden: Optional[
+            GeneralForumTopicHidden
+        ] = general_forum_topic_hidden
+        self.general_forum_topic_unhidden: Optional[
+            GeneralForumTopicUnhidden
+        ] = general_forum_topic_unhidden
+        self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
+        self.has_media_spoiler: Optional[bool] = has_media_spoiler
 
         self._effective_attachment = DEFAULT_NONE
 

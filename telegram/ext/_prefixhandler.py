@@ -144,7 +144,9 @@ class PrefixHandler(BaseHandler[Update, CCT]):
             commands = {x.lower() for x in command}
 
         self.commands = frozenset(p + c for p, c in itertools.product(prefixes, commands))
-        self.filters = filters if filters is not None else filters_module.UpdateType.MESSAGES
+        self.filters: filters_module.BaseFilter = (
+            filters if filters is not None else filters_module.UpdateType.MESSAGES
+        )
 
     def check_update(
         self, update: object

@@ -67,7 +67,7 @@ class InvalidCallbackData(TelegramError):
             "The object belonging to this callback_data was deleted or the callback_data was "
             "manipulated."
         )
-        self.callback_data = callback_data
+        self.callback_data: Optional[str] = callback_data
 
     def __reduce__(self) -> Tuple[type, Tuple[Optional[str]]]:  # type: ignore[override]
         return self.__class__, (self.callback_data,)
@@ -157,8 +157,8 @@ class CallbackDataCache:
 
         self.logger = logging.getLogger(__name__)
 
-        self.bot = bot
-        self._maxsize = maxsize
+        self.bot: ExtBot = bot
+        self._maxsize: int = maxsize
         self._keyboard_data: MutableMapping[str, _KeyboardData] = LRUCache(maxsize=maxsize)
         self._callback_queries: MutableMapping[str, str] = LRUCache(maxsize=maxsize)
 

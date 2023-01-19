@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CommandHandler class."""
 import re
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, FrozenSet, List, Optional, Tuple, TypeVar, Union
 
 from telegram import MessageEntity, Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -120,9 +120,11 @@ class CommandHandler(BaseHandler[Update, CCT]):
         for comm in commands:
             if not re.match(r"^[\da-z_]{1,32}$", comm):
                 raise ValueError(f"Command `{comm}` is not a valid bot command")
-        self.commands = commands
+        self.commands: FrozenSet[str] = commands
 
-        self.filters = filters if filters is not None else filters_module.UpdateType.MESSAGES
+        self.filters: filters_module.BaseFilter = (
+            filters if filters is not None else filters_module.UpdateType.MESSAGES
+        )
 
     def check_update(
         self, update: object

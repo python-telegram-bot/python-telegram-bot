@@ -84,7 +84,7 @@ class StringRegexHandler(BaseHandler[str, CCT]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern = pattern
+        self.pattern: Union[str, Pattern] = pattern
 
     def check_update(self, update: object) -> Optional[Match]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.

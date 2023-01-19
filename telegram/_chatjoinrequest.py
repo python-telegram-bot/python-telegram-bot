@@ -78,13 +78,13 @@ class ChatJoinRequest(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.chat = chat
-        self.from_user = from_user
-        self.date = date
+        self.chat: Chat = chat
+        self.from_user: User = from_user
+        self.date: datetime.datetime = date
 
         # Optionals
-        self.bio = bio
-        self.invite_link = invite_link
+        self.bio: Optional[str] = bio
+        self.invite_link: Optional[ChatInviteLink] = invite_link
 
         self._id_attrs = (self.chat, self.from_user, self.date)
 

@@ -319,21 +319,23 @@ class ConversationHandler(BaseHandler[Update, CCT]):
 
         # self.block is what the Application checks and we want it to always run CH in a blocking
         # way so that CH can take care of any non-blocking logic internally
-        self.block = True
+        self.block: Optional[DVInput[bool]] = True
         # Store the actual setting in a protected variable instead
-        self._block = block
+        self._block: Optional[DVInput[bool]] = block
 
-        self._entry_points = entry_points
-        self._states = states
-        self._fallbacks = fallbacks
+        self._entry_points: List[BaseHandler[Update, CCT]] = entry_points
+        self._states: Dict[object, List[BaseHandler[Update, CCT]]] = states
+        self._fallbacks: List[BaseHandler[Update, CCT]] = fallbacks
 
-        self._allow_reentry = allow_reentry
-        self._per_user = per_user
-        self._per_chat = per_chat
-        self._per_message = per_message
-        self._conversation_timeout = conversation_timeout
-        self._name = name
-        self._map_to_parent = map_to_parent
+        self._allow_reentry: bool = allow_reentry
+        self._per_user: bool = per_user
+        self._per_chat: bool = per_chat
+        self._per_message: bool = per_message
+        self._conversation_timeout: Optional[
+            Union[float, datetime.timedelta]
+        ] = conversation_timeout
+        self._name: Optional[str] = name
+        self._map_to_parent: Optional[Dict[object, object]] = map_to_parent
 
         # if conversation_timeout is used, this dict is used to schedule a job which runs when the
         # conv has timed out.

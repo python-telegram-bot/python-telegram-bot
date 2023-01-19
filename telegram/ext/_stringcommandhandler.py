@@ -77,7 +77,7 @@ class StringCommandHandler(BaseHandler[str, CCT]):
         block: DVInput[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
-        self.command = command
+        self.command: str = command
 
     def check_update(self, update: object) -> Optional[List[str]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.

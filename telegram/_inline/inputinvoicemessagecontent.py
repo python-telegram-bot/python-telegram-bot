@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that represents a Telegram InputInvoiceMessageContent."""
-from typing import TYPE_CHECKING, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._payment.labeledprice import LabeledPrice
@@ -213,27 +213,27 @@ class InputInvoiceMessageContent(InputMessageContent):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
             # Required
-            self.title = title
-            self.description = description
-            self.payload = payload
-            self.provider_token = provider_token
-            self.currency = currency
-            self.prices = parse_sequence_arg(prices)
+            self.title: str = title
+            self.description: str = description
+            self.payload: str = payload
+            self.provider_token: str = provider_token
+            self.currency: str = currency
+            self.prices: Tuple[LabeledPrice, ...] = parse_sequence_arg(prices)
             # Optionals
-            self.max_tip_amount = max_tip_amount
-            self.suggested_tip_amounts = parse_sequence_arg(suggested_tip_amounts)
-            self.provider_data = provider_data
-            self.photo_url = photo_url
-            self.photo_size = photo_size
-            self.photo_width = photo_width
-            self.photo_height = photo_height
-            self.need_name = need_name
-            self.need_phone_number = need_phone_number
-            self.need_email = need_email
-            self.need_shipping_address = need_shipping_address
-            self.send_phone_number_to_provider = send_phone_number_to_provider
-            self.send_email_to_provider = send_email_to_provider
-            self.is_flexible = is_flexible
+            self.max_tip_amount: Optional[int] = max_tip_amount
+            self.suggested_tip_amounts: Tuple[int, ...] = parse_sequence_arg(suggested_tip_amounts)
+            self.provider_data: Optional[str] = provider_data
+            self.photo_url: Optional[str] = photo_url
+            self.photo_size: Optional[int] = photo_size
+            self.photo_width: Optional[int] = photo_width
+            self.photo_height: Optional[int] = photo_height
+            self.need_name: Optional[bool] = need_name
+            self.need_phone_number: Optional[bool] = need_phone_number
+            self.need_email: Optional[bool] = need_email
+            self.need_shipping_address: Optional[bool] = need_shipping_address
+            self.send_phone_number_to_provider: Optional[bool] = send_phone_number_to_provider
+            self.send_email_to_provider: Optional[bool] = send_email_to_provider
+            self.is_flexible: Optional[bool] = is_flexible
 
             self._id_attrs = (
                 self.title,

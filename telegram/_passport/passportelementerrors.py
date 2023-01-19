@@ -49,9 +49,9 @@ class PassportElementError(TelegramObject):
     def __init__(self, source: str, type: str, message: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.source = str(source)
-        self.type = str(type)
-        self.message = str(message)
+        self.source: str = str(source)
+        self.type: str = str(type)
+        self.message: str = str(message)
 
         self._id_attrs = (self.source, self.type)
 
@@ -99,8 +99,8 @@ class PassportElementErrorDataField(PassportElementError):
         # Required
         super().__init__("data", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.field_name = field_name
-            self.data_hash = data_hash
+            self.field_name: str = field_name
+            self.data_hash: str = data_hash
 
             self._id_attrs = (
                 self.source,
@@ -142,7 +142,7 @@ class PassportElementErrorFile(PassportElementError):
         # Required
         super().__init__("file", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hash = file_hash
+            self.file_hash: str = file_hash
 
             self._id_attrs = (self.source, self.type, self.file_hash, self.message)
 
@@ -178,7 +178,7 @@ class PassportElementErrorFiles(PassportElementError):
         # Required
         super().__init__("files", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hashes = file_hashes
+            self.file_hashes: str = file_hashes
 
             self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
 
@@ -214,7 +214,7 @@ class PassportElementErrorFrontSide(PassportElementError):
         # Required
         super().__init__("front_side", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hash = file_hash
+            self.file_hash: str = file_hash
 
             self._id_attrs = (self.source, self.type, self.file_hash, self.message)
 
@@ -250,7 +250,7 @@ class PassportElementErrorReverseSide(PassportElementError):
         # Required
         super().__init__("reverse_side", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hash = file_hash
+            self.file_hash: str = file_hash
 
             self._id_attrs = (self.source, self.type, self.file_hash, self.message)
 
@@ -284,7 +284,7 @@ class PassportElementErrorSelfie(PassportElementError):
         # Required
         super().__init__("selfie", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hash = file_hash
+            self.file_hash: str = file_hash
 
             self._id_attrs = (self.source, self.type, self.file_hash, self.message)
 
@@ -322,7 +322,7 @@ class PassportElementErrorTranslationFile(PassportElementError):
         # Required
         super().__init__("translation_file", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hash = file_hash
+            self.file_hash: str = file_hash
 
             self._id_attrs = (self.source, self.type, self.file_hash, self.message)
 
@@ -360,7 +360,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
         # Required
         super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hashes = file_hashes
+            self.file_hashes: str = file_hashes
 
             self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
 
@@ -392,6 +392,6 @@ class PassportElementErrorUnspecified(PassportElementError):
         # Required
         super().__init__("unspecified", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.element_hash = element_hash
+            self.element_hash: str = element_hash
 
             self._id_attrs = (self.source, self.type, self.element_hash, self.message)

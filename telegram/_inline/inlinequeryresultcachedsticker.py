@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultCachedSticker."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -74,8 +74,8 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         # Required
         super().__init__(InlineQueryResultType.STICKER, id, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.sticker_file_id = sticker_file_id
+            self.sticker_file_id: str = sticker_file_id
 
             # Optionals
-            self.reply_markup = reply_markup
-            self.input_message_content = input_message_content
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.input_message_content: Optional[InputMessageContent] = input_message_content

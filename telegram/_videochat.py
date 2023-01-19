@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram video chats."""
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -78,7 +78,7 @@ class VideoChatEnded(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.duration = duration
+        self.duration: int = duration
         self._id_attrs = (self.duration,)
 
         self._freeze()
@@ -118,7 +118,7 @@ class VideoChatParticipantsInvited(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.users = parse_sequence_arg(users)
+        self.users: Tuple[User, ...] = parse_sequence_arg(users)
         self._id_attrs = (self.users,)
 
         self._freeze()
@@ -164,7 +164,7 @@ class VideoChatScheduled(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.start_date = start_date
+        self.start_date: dtm.datetime = start_date
 
         self._id_attrs = (self.start_date,)
 

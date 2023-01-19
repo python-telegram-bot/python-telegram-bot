@@ -73,7 +73,7 @@ class TelegramError(Exception):
         if msg != message:
             # api_error - capitalize the msg...
             msg = msg.capitalize()
-        self.message = msg
+        self.message: str = msg
 
     def __str__(self) -> str:
         return self.message
@@ -163,7 +163,7 @@ class ChatMigrated(TelegramError):
 
     def __init__(self, new_chat_id: int):
         super().__init__(f"Group migrated to supergroup. New chat id: {new_chat_id}")
-        self.new_chat_id = new_chat_id
+        self.new_chat_id: int = new_chat_id
 
     def __reduce__(self) -> Tuple[type, Tuple[int]]:  # type: ignore[override]
         return self.__class__, (self.new_chat_id,)
@@ -188,7 +188,7 @@ class RetryAfter(TelegramError):
 
     def __init__(self, retry_after: int):
         super().__init__(f"Flood control exceeded. Retry in {retry_after} seconds")
-        self.retry_after = retry_after
+        self.retry_after: int = retry_after
 
     def __reduce__(self) -> Tuple[type, Tuple[float]]:  # type: ignore[override]
         return self.__class__, (self.retry_after,)

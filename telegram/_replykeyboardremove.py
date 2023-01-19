@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardRemove."""
+from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -66,6 +67,6 @@ class ReplyKeyboardRemove(TelegramObject):
         # Required
         self.remove_keyboard = True
         # Optionals
-        self.selective = selective
+        self.selective: Optional[bool] = selective
 
         self._freeze()

@@ -352,37 +352,39 @@ class Chat(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.id = id  # pylint: disable=invalid-name
-        self.type = enum.get_member(constants.ChatType, type, type)
+        self.id: int = id  # pylint: disable=invalid-name
+        self.type: str = enum.get_member(constants.ChatType, type, type)
         # Optionals
-        self.title = title
-        self.username = username
-        self.first_name = first_name
-        self.last_name = last_name
-        self.photo = photo
-        self.bio = bio
-        self.has_private_forwards = has_private_forwards
-        self.description = description
-        self.invite_link = invite_link
-        self.pinned_message = pinned_message
-        self.permissions = permissions
-        self.slow_mode_delay = slow_mode_delay
-        self.message_auto_delete_time = (
+        self.title: Optional[str] = title
+        self.username: Optional[str] = username
+        self.first_name: Optional[str] = first_name
+        self.last_name: Optional[str] = last_name
+        self.photo: Optional[ChatPhoto] = photo
+        self.bio: Optional[str] = bio
+        self.has_private_forwards: Optional[bool] = has_private_forwards
+        self.description: Optional[str] = description
+        self.invite_link: Optional[str] = invite_link
+        self.pinned_message: Optional[Message] = pinned_message
+        self.permissions: Optional[ChatPermissions] = permissions
+        self.slow_mode_delay: Optional[int] = slow_mode_delay
+        self.message_auto_delete_time: Optional[int] = (
             int(message_auto_delete_time) if message_auto_delete_time is not None else None
         )
-        self.has_protected_content = has_protected_content
-        self.sticker_set_name = sticker_set_name
-        self.can_set_sticker_set = can_set_sticker_set
-        self.linked_chat_id = linked_chat_id
-        self.location = location
-        self.join_to_send_messages = join_to_send_messages
-        self.join_by_request = join_by_request
-        self.has_restricted_voice_and_video_messages = has_restricted_voice_and_video_messages
-        self.is_forum = is_forum
-        self.active_usernames = parse_sequence_arg(active_usernames)
-        self.emoji_status_custom_emoji_id = emoji_status_custom_emoji_id
-        self.has_aggressive_anti_spam_enabled = has_aggressive_anti_spam_enabled
-        self.has_hidden_members = has_hidden_members
+        self.has_protected_content: Optional[bool] = has_protected_content
+        self.sticker_set_name: Optional[str] = sticker_set_name
+        self.can_set_sticker_set: Optional[bool] = can_set_sticker_set
+        self.linked_chat_id: Optional[int] = linked_chat_id
+        self.location: Optional[ChatLocation] = location
+        self.join_to_send_messages: Optional[bool] = join_to_send_messages
+        self.join_by_request: Optional[bool] = join_by_request
+        self.has_restricted_voice_and_video_messages: Optional[
+            bool
+        ] = has_restricted_voice_and_video_messages
+        self.is_forum: Optional[bool] = is_forum
+        self.active_usernames: Tuple[str, ...] = parse_sequence_arg(active_usernames)
+        self.emoji_status_custom_emoji_id: Optional[str] = emoji_status_custom_emoji_id
+        self.has_aggressive_anti_spam_enabled: Optional[bool] = has_aggressive_anti_spam_enabled
+        self.has_hidden_members: Optional[bool] = has_hidden_members
 
         self._id_attrs = (self.id,)
 

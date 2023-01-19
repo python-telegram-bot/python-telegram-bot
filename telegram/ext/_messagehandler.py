@@ -82,7 +82,9 @@ class MessageHandler(BaseHandler[Update, CCT]):
     ):
 
         super().__init__(callback, block=block)
-        self.filters = filters if filters is not None else filters_module.ALL
+        self.filters: filters_module.BaseFilter = (
+            filters if filters is not None else filters_module.ALL
+        )
 
     def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.

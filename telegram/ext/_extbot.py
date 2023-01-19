@@ -211,8 +211,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             local_mode=local_mode,
         )
         with self._unfrozen():
-            self._defaults = defaults
-            self._rate_limiter = rate_limiter
+            self._defaults: Optional[Defaults] = defaults
+            self._rate_limiter: Optional[BaseRateLimiter] = rate_limiter
             self._callback_data_cache: Optional[CallbackDataCache] = None
 
             # set up callback_data

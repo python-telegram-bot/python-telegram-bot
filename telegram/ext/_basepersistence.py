@@ -148,8 +148,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         store_data: PersistenceInput = None,
         update_interval: float = 60,
     ):
-        self.store_data = store_data or PersistenceInput()
-        self._update_interval = update_interval
+        self.store_data: PersistenceInput = store_data or PersistenceInput()
+        self._update_interval: float = update_interval
 
         self.bot: Bot = None  # type: ignore[assignment]
 

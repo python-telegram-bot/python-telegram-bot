@@ -126,9 +126,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         chat_id: int = None,
         user_id: int = None,
     ):
-        self._application = application
-        self._chat_id = chat_id
-        self._user_id = user_id
+        self._application: Application[BT, CCT, UD, CD, BD, Any] = application
+        self._chat_id: Optional[int] = chat_id
+        self._user_id: Optional[int] = user_id
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match]] = None
         self.error: Optional[Exception] = None

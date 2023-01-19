@@ -104,11 +104,11 @@ class DictPersistence(BasePersistence):
         self._bot_data = None
         self._callback_data = None
         self._conversations = None
-        self._user_data_json = None
-        self._chat_data_json = None
-        self._bot_data_json = None
-        self._callback_data_json = None
-        self._conversations_json = None
+        self._user_data_json: Optional[str] = None
+        self._chat_data_json: Optional[str] = None
+        self._bot_data_json: Optional[str] = None
+        self._callback_data_json: Optional[str] = None
+        self._conversations_json: Optional[str] = None
         if user_data_json:
             try:
                 self._user_data = self._decode_user_chat_data_from_json(user_data_json)

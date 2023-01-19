@@ -122,7 +122,9 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern = pattern
+        self.pattern: Optional[
+            Union[str, Pattern, type, Callable[[object], Optional[bool]]]
+        ] = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.

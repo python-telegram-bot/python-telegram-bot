@@ -105,7 +105,7 @@ class ApplicationHandlerStop(Exception):
 
     def __init__(self, state: object = None) -> None:
         super().__init__()
-        self.state = state
+        self.state: Optional[object] = state
 
 
 class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager):
@@ -275,15 +275,21 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 stacklevel=2,
             )
 
-        self.bot = bot
-        self.update_queue = update_queue
-        self.context_types = context_types
-        self.updater = updater
+        self.bot: BT = bot
+        self.update_queue: asyncio.queues.Queue = update_queue
+        self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
+        self.updater: Optional[Updater] = updater
         self.handlers: Dict[int, List[BaseHandler]] = {}
         self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
-        self.post_init = post_init
-        self.post_shutdown = post_shutdown
-        self.post_stop = post_stop
+        self.post_init: Optional[
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+        ] = post_init
+        self.post_shutdown: Optional[
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+        ] = post_shutdown
+        self.post_stop: Optional[
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+        ] = post_stop
 
         if isinstance(concurrent_updates, int) and concurrent_updates < 0:
             raise ValueError("`concurrent_updates` must be a non-negative integer!")
@@ -319,7 +325,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         # A number of low-level helpers for the internal logic
         self._initialized = False
         self._running = False
-        self._job_queue = job_queue
+        self._job_queue: JQ = job_queue
         self.__update_fetcher_task: Optional[asyncio.Task] = None
         self.__update_persistence_task: Optional[asyncio.Task] = None
         self.__update_persistence_event = asyncio.Event()
