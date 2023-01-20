@@ -712,37 +712,13 @@ class AdmonitionInserter:
                 parameters = sig.parameters
 
                 for param in parameters.values():
-                    resolve_and_add = partial(
-                        self._resolve_arg_and_add_link_to_method,
+                    self._resolve_arg_and_add_link_to_method(
+                        arg=param.annotation,
                         dict_of_methods_for_class=methods_for_class,
                         link_to_method=method_link,
                         # we will also add "Use in" admonitions to subclasses (if applicable)
                         include_subclasses_if_applicable=True,
                     )
-                    annotation = param.annotation
-
-                    if isinstance(annotation, (type, str)):
-                        resolve_and_add(arg=annotation)
-
-                    elif isinstance(annotation, typing.TypeVar):
-                        # gets access to the "bound=..." parameter
-                        resolve_and_add(arg=annotation.__bound__)
-
-                    elif typing.get_origin(annotation) in (
-                        dict,
-                        type,
-                        collections.abc.Sequence,
-                        collections.abc.Callable,
-                        Union,
-                    ):
-                        for arg in typing.get_args(annotation):
-                            resolve_and_add(arg=arg)
-                    else:
-                        raise NotImplementedError(
-                            f"Unable to process annotation {annotation} of type {type(annotation)}"
-                            f" (origin {typing.get_origin(annotation)}, attrs {vars(annotation)}, "
-                            f"get_args {typing.get_args(annotation)})."
-                        )
 
         return self._generate_admonitions(methods_for_class, admonition_type="use_in")
 
@@ -898,6 +874,7 @@ class AdmonitionInserter:
         elif typing.get_origin(arg) in (
             dict,
             tuple,
+            type,
             Union,
             collections.abc.Coroutine,
             collections.abc.Sequence,
