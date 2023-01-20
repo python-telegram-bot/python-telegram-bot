@@ -82,6 +82,11 @@ class HTTPXRequest(BaseRequest):
                 With a finite pool timeout, you must expect :exc:`telegram.error.TimedOut`
                 exceptions to be thrown when more requests are made simultaneously than there are
                 connections in the connection pool!
+        http_version (:obj:`str`, optional): If ``"1.1"``, HTTP/1.1 will be used instead of HTTP/2.
+            Defaults to ``"2"``.
+
+            .. versionadded:: 20.1
+
     """
 
     __slots__ = ("_client", "_client_kwargs")
@@ -94,6 +99,7 @@ class HTTPXRequest(BaseRequest):
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
+        http_version: str = "2",
     ):
         timeout = httpx.Timeout(
             connect=connect_timeout,
@@ -105,10 +111,18 @@ class HTTPXRequest(BaseRequest):
             max_connections=connection_pool_size,
             max_keepalive_connections=connection_pool_size,
         )
+
+        if http_version not in ("1.1", "2"):
+            raise ValueError("`http_version` must be either '1.1' or '2'.")
+
+        http1 = http_version == "1.1"
+
         self._client_kwargs = dict(
             timeout=timeout,
             proxies=proxy_url,
             limits=limits,
+            http1=http1,
+            http2=not http1,
         )
 
         try:

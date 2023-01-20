@@ -70,12 +70,14 @@ _BOT_CHECKS = [
     ("connect_timeout", "connect_timeout"),
     ("read_timeout", "read_timeout"),
     ("write_timeout", "write_timeout"),
+    ("http_version", "http_version"),
     ("get_updates_connection_pool_size", "get_updates_connection_pool_size"),
     ("get_updates_proxy_url", "get_updates_proxy_url"),
     ("get_updates_pool_timeout", "get_updates_pool_timeout"),
     ("get_updates_connect_timeout", "get_updates_connect_timeout"),
     ("get_updates_read_timeout", "get_updates_read_timeout"),
     ("get_updates_write_timeout", "get_updates_write_timeout"),
+    ("get_updates_http_version", "get_updates_http_version"),
     ("base_file_url", "base_file_url"),
     ("base_url", "base_url"),
     ("token", "token"),
@@ -137,6 +139,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_get_updates_read_timeout",
         "_get_updates_request",
         "_get_updates_write_timeout",
+        "_get_updates_http_version",
         "_job_queue",
         "_persistence",
         "_pool_timeout",
@@ -154,6 +157,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_updater",
         "_write_timeout",
         "_local_mode",
+        "_http_version",
     )
 
     def __init__(self: "InitApplicationBuilder"):
@@ -174,6 +178,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._get_updates_write_timeout: ODVInput[float] = DEFAULT_NONE
         self._get_updates_pool_timeout: ODVInput[float] = DEFAULT_NONE
         self._get_updates_request: DVInput["BaseRequest"] = DEFAULT_NONE
+        self._get_updates_http_version: DVInput[str] = DefaultValue("2")
         self._private_key: ODVInput[bytes] = DEFAULT_NONE
         self._private_key_password: ODVInput[bytes] = DEFAULT_NONE
         self._defaults: ODVInput["Defaults"] = DEFAULT_NONE
@@ -199,6 +204,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_stop: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._rate_limiter: ODVInput["BaseRateLimiter"] = DEFAULT_NONE
+        self._http_version: DVInput[str] = DefaultValue("2")
 
     def _build_request(self, get_updates: bool) -> BaseRequest:
         prefix = "_get_updates_" if get_updates else "_"
@@ -226,9 +232,12 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             key: value for key, value in timeouts.items() if not isinstance(value, DefaultValue)
         }
 
+        http_version = DefaultValue.get_value(getattr(self, f"{prefix}http_version")) or "2"
+
         return HTTPXRequest(
             connection_pool_size=connection_pool_size,
             proxy_url=proxy_url,
+            http_version=http_version,
             **effective_timeouts,
         )
 
@@ -401,11 +410,18 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         for attr in ("connect_timeout", "read_timeout", "write_timeout", "pool_timeout"):
             if not isinstance(getattr(self, f"_{prefix}{attr}"), DefaultValue):
                 raise RuntimeError(_TWO_ARGS_REQ.format(name, attr))
+
         if not isinstance(getattr(self, f"_{prefix}connection_pool_size"), DefaultValue):
             raise RuntimeError(_TWO_ARGS_REQ.format(name, "connection_pool_size"))
+
         if not isinstance(getattr(self, f"_{prefix}proxy_url"), DefaultValue):
             raise RuntimeError(_TWO_ARGS_REQ.format(name, "proxy_url"))
+
+        if not isinstance(getattr(self, f"_{prefix}http_version"), DefaultValue):
+            raise RuntimeError(_TWO_ARGS_REQ.format(name, "http_version"))
+
         self._bot_check(name)
+
         if self._updater not in (DEFAULT_NONE, None):
             raise RuntimeError(_TWO_ARGS_REQ.format(name, "updater instance"))
 
@@ -543,6 +559,26 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._pool_timeout = pool_timeout
         return self
 
+    def http_version(self: BuilderType, http_version: str) -> BuilderType:
+        """Sets the HTTP protocol version which is used for the
+        :paramref:`~telegram.request.HTTPXRequest.http_version` parameter of
+        :attr:`telegram.Bot.request`. By default, HTTP/2 is used.
+
+        .. seealso:: :meth:`get_updates_http_version`
+
+        .. versionadded:: 20.1
+
+        Args:
+            http_version (:obj:`str`): Pass ``"1.1"`` if you'd like to use HTTP/1.1 for making
+                requests to Telegram. Defaults to ``"2"``, in which case HTTP/2 is used.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        self._request_param_check(name="http_version", get_updates=False)
+        self._http_version = http_version
+        return self
+
     def get_updates_request(self: BuilderType, get_updates_request: BaseRequest) -> BuilderType:
         """Sets a :class:`telegram.request.BaseRequest` instance for the
         :paramref:`~telegram.Bot.get_updates_request` parameter of
@@ -662,6 +698,26 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         self._request_param_check(name="pool_timeout", get_updates=True)
         self._get_updates_pool_timeout = get_updates_pool_timeout
+        return self
+
+    def get_updates_http_version(self: BuilderType, get_updates_http_version: str) -> BuilderType:
+        """Sets the HTTP protocol version which is used for the
+        :paramref:`~telegram.request.HTTPXRequest.http_version` parameter which is used in the
+        :meth:`telegram.Bot.get_updates` request. By default, HTTP/2 is used.
+
+        .. seealso:: :meth:`http_version`
+
+        .. versionadded:: 20.1
+
+        Args:
+            get_updates_http_version (:obj:`str`): Pass ``"1.1"`` if you'd like to use HTTP/1.1 for
+                making requests to Telegram. Defaults to ``"2"``, in which case HTTP/2 is used.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        self._request_param_check(name="http_version", get_updates=True)
+        self._get_updates_http_version = get_updates_http_version
         return self
 
     def private_key(
