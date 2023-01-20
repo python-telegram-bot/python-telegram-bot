@@ -7,6 +7,7 @@ import sys
 import typing
 from collections import defaultdict
 from enum import Enum
+from functools import partial
 from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple, Union
 
@@ -454,6 +455,16 @@ class AdmonitionInserter:
 
     ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
 
+    # In some cases it is useful that some admonitions are displayed not only for base classes
+    # but also for their subclasses.
+    CLASSES_WHOSE_SUBCLASSES_NEED_ADMONITIONS = (
+        telegram.BotCommandScope,
+        telegram.InlineQueryResult,
+        telegram.InputMedia,
+        telegram.MenuButton,
+        telegram.request.BaseRequest,
+    )
+
     FORWARD_REF_PATTERN = re.compile(r"^ForwardRef\('(?P<class_name>\w+)'\)$")
     """ A pattern to find a class name in a ForwardRef typing annotation.
     Class name (in a named group) is surrounded by parentheses and single quotes.
@@ -688,7 +699,7 @@ class AdmonitionInserter:
         # Generate a mapping of classes to links to Bot methods which accept them as arguments,
         # i.e. {<class 'telegram._inline.inlinequeryresult.InlineQueryResult'>:
         # {:meth:`telegram.Bot.answer_inline_query`, ...}}
-        methods_for_class_name = defaultdict(set)  # using set because there can be repetitions
+        methods_for_class = defaultdict(set)  # using set because there can be repetitions
 
         for klass, relevant_methods_for_class in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
             for method in relevant_methods_for_class:
@@ -698,21 +709,21 @@ class AdmonitionInserter:
                 parameters = sig.parameters
 
                 for param in parameters.values():
+                    resolve_and_add = partial(
+                        self._resolve_arg_and_add_link_to_method,
+                        dict_of_methods_for_class=methods_for_class,
+                        link_to_method=method_link,
+                        # we will also add "Use in" admonitions to subclasses (if applicable)
+                        include_subclasses_if_applicable=True,
+                    )
                     annotation = param.annotation
 
                     if isinstance(annotation, (type, str)):
-                        self._resolve_arg_and_add_link_to_method(
-                            arg=annotation,
-                            dict_of_methods_for_class=methods_for_class_name,
-                            link_to_method=method_link,
-                        )
+                        resolve_and_add(arg=annotation)
 
                     elif isinstance(annotation, typing.TypeVar):
-                        self._resolve_arg_and_add_link_to_method(
-                            arg=annotation.__bound__,  # gets access to the "bound=..." parameter
-                            dict_of_methods_for_class=methods_for_class_name,
-                            link_to_method=method_link,
-                        )
+                        # gets access to the "bound=..." parameter
+                        resolve_and_add(arg=annotation.__bound__)
 
                     elif typing.get_origin(annotation) in (
                         dict,
@@ -722,11 +733,7 @@ class AdmonitionInserter:
                         Union,
                     ):
                         for arg in typing.get_args(annotation):
-                            self._resolve_arg_and_add_link_to_method(
-                                arg=arg,
-                                dict_of_methods_for_class=methods_for_class_name,
-                                link_to_method=method_link,
-                            )
+                            resolve_and_add(arg=arg)
                     else:
                         raise NotImplementedError(
                             f"Unable to process annotation {annotation} of type {type(annotation)}"
@@ -734,7 +741,7 @@ class AdmonitionInserter:
                             f"get_args {typing.get_args(annotation)})."
                         )
 
-        return self._generate_admonitions(methods_for_class_name, admonition_type="use_in")
+        return self._generate_admonitions(methods_for_class, admonition_type="use_in")
 
     @staticmethod
     def _find_insert_pos_for_admonition(lines: List[str]) -> int:
@@ -821,19 +828,49 @@ class AdmonitionInserter:
             raise NotImplementedError(f"Base class {base_class} not supported")
 
     def _resolve_arg_and_add_link_to_method(
-        self, arg: Any, dict_of_methods_for_class: defaultdict, link_to_method: str
-    ):
+        self,
+        arg: Any,
+        dict_of_methods_for_class: defaultdict,
+        link_to_method: str,
+        include_subclasses_if_applicable: bool = False,
+    ) -> None:
         """A helper method for "Returned in" and "Use in admonition.
         Tries to resolve the arg to a valid class. In case of success, adds the link to
-        Bot's or ApplicationBuilder's method to the set of methods for that class.
+        Bot's or ApplicationBuilder's method to the set of methods for that class in the dictionary
+        of admonitions.
+
+        If `include_subclasses_if_applicable` is set to `True`, the method will check
+        if the resolved class is included in the list of classes whose subclasses can be
+        included in the same admonition. If it is on that list, dictionary entries for its
+        subclasses are added/updated too.
 
         **Modifies dictionary in place.**
         """
-        resolved_arg = self._resolve_arg(arg)
+        klass = self._resolve_arg(arg)
         # When trying to resolve an argument from args or return annotation,
         # the method _resolve_arg returns None if nothing could be resolved.
-        if resolved_arg is not None:
-            dict_of_methods_for_class[resolved_arg].add(link_to_method)
+        if klass is None:
+            return
+
+        dict_of_methods_for_class[klass].add(link_to_method)
+
+        # Only process subclasses if:
+        # 1. The calling method asks to (which allows to choose which types admonitions get this
+        # functionality at all;
+        # 2. The class is included in the list of approved classes.
+        if not (
+            include_subclasses_if_applicable
+            and klass in self.CLASSES_WHOSE_SUBCLASSES_NEED_ADMONITIONS
+        ):
+            return
+
+        for subclass in [
+            # exclude private classes
+            p
+            for p in klass.__subclasses__()
+            if not str(p).split(".")[-1].startswith("_")
+        ]:
+            dict_of_methods_for_class[subclass].add(link_to_method)
 
     def _resolve_arg(self, arg: Any) -> Union[type, None]:
         """Analyzes an argument of a method (separate argument or an element of typing.get_args())
