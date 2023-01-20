@@ -762,6 +762,8 @@ class AdmonitionInserter:
                 # The space after ":param" is important because docstring can contain ":paramref:"
                 # in its plain text in the beginning of a line (e.g. ExtBot)
                 or value.startswith(":param ")
+                # some classes (like "Credentials") have no params, so insert before attrs:
+                or value.startswith(".. attribute::")
             ):
                 return idx
         return len(lines) - 1
