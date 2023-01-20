@@ -975,6 +975,9 @@ class AdmonitionInserter:
                 continue
 
 
+ADMONITION_INSERTER = AdmonitionInserter()
+
+
 def autodoc_process_docstring(
     app: Sphinx, what, name: str, obj: object, options, lines: List[str]
 ):
@@ -1025,7 +1028,7 @@ def autodoc_process_docstring(
     # 2-4) Insert "Returned in", "Available in", "Use in" admonitions into classes
     # (where applicable)
     if what == "class":
-        AdmonitionInserter().insert_admonitions_for_class(
+        ADMONITION_INSERTER.insert_admonitions_for_class(
             klass=typing.cast(type, obj),  # since "what" == class, we know it's not just object
             docstring_lines=lines,
         )
