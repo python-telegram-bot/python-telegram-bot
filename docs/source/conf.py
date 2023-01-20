@@ -9,7 +9,7 @@ from collections import defaultdict
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple, Union
+from typing import Any, Dict, Iterator, List, Set, Tuple, Union
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -827,36 +827,37 @@ class AdmonitionInserter:
 
         **Modifies dictionary in place.**
         """
-        cls = self._resolve_arg(arg)
-        # When trying to resolve an argument from args or return annotation,
-        # the method _resolve_arg returns None if nothing could be resolved.
-        if cls is None:
-            return
+        for cls in self._resolve_arg(arg):
 
-        dict_of_methods_for_class[cls].add(link_to_method)
+            # When trying to resolve an argument from args or return annotation,
+            # the method _resolve_arg returns None if nothing could be resolved.
+            if cls is None:
+                continue
 
-        # Only process subclasses if:
-        # 1. The calling method asks to (which allows to choose which types admonitions get this
-        # functionality at all;
-        # 2. The class is included in the list of approved classes.
-        if not (
-            include_subclasses_if_applicable
-            and cls in self.CLASSES_WHOSE_SUBCLASSES_NEED_ADMONITIONS
-        ):
-            return
+            dict_of_methods_for_class[cls].add(link_to_method)
 
-        for subclass in [
-            # exclude private classes
-            p
-            for p in cls.__subclasses__()
-            if not str(p).split(".")[-1].startswith("_")
-        ]:
-            dict_of_methods_for_class[subclass].add(link_to_method)
+            # Only process subclasses if:
+            # 1. The calling method asks to (which allows to choose which types admonitions get
+            # this functionality at all;
+            # 2. The class is included in the list of approved classes.
+            if not (
+                include_subclasses_if_applicable
+                and cls in self.CLASSES_WHOSE_SUBCLASSES_NEED_ADMONITIONS
+            ):
+                continue
 
-    def _resolve_arg(self, arg: Any) -> Union[type, None]:
-        """Analyzes an argument of a method (separate argument or an element of typing.get_args())
-        and returns full name of class that the argument belongs to, if it can be resolved
-        to a telegram or telegram.ext class.
+            for subclass in [
+                # exclude private classes
+                p
+                for p in cls.__subclasses__()
+                if not str(p).split(".")[-1].startswith("_")
+            ]:
+                dict_of_methods_for_class[subclass].add(link_to_method)
+
+    def _resolve_arg(self, arg: Any) -> Iterator[Union[type, None]]:
+        """Analyzes an argument of a method and recursively yields classes that the argument
+        or its sub-arguments (in cases like Union[...]) belong to, if they can be resolved to
+        telegram or telegram.ext classes.
         """
 
         origin = typing.get_origin(arg)
@@ -881,21 +882,21 @@ class AdmonitionInserter:
             typing.Sequence,
         ):
             for sub_arg in typing.get_args(arg):
-                return self._resolve_arg(sub_arg)
+                yield from self._resolve_arg(sub_arg)
 
         elif isinstance(arg, list):
             for item in arg:
-                return self._resolve_arg(item)
+                yield from self._resolve_arg(item)
 
         elif isinstance(arg, typing.TypeVar):
             # gets access to the "bound=..." parameter
-            return self._resolve_arg(arg.__bound__)
+            yield from self._resolve_arg(arg.__bound__)
 
         # END RECURSIVE CALLS
 
         elif isinstance(arg, type):
             if "telegram" in str(arg):
-                return arg
+                yield arg
 
         elif isinstance(arg, typing.ForwardRef):
             m = self.FORWARD_REF_PATTERN.match(str(arg))
@@ -907,10 +908,11 @@ class AdmonitionInserter:
             except AttributeError:
                 if str(arg) == "ForwardRef('DefaultValue[DVType]')":
                     # this is a known ForwardRef that needs not be resolved to a Telegram class
-                    return
+                    pass
                 else:
                     raise NotImplementedError(f"Could not process ForwardRef: {arg}")
-            return cls
+            else:
+                yield cls
 
         # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
         # as ForwardRefs and are identified as plain strings.
@@ -918,7 +920,7 @@ class AdmonitionInserter:
             cls = self._resolve_class(arg)
             # Here we don't want an exception to be thrown since we're not sure it's ForwardRef
             if cls is not None:
-                return cls
+                yield cls
 
         else:
             raise NotImplementedError(
