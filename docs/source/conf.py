@@ -658,11 +658,19 @@ class AdmonitionInserter:
                 # If we do get_args() when return annotation has one single class
                 # (e.g. <class 'telegram._message.Message'>), get_args() returns an empty tuple.
                 if not returned_classes:
-                    methods_for_class_name[self._resolve_arg(ret_annot)].add(method_link)
+                    self._resolve_arg_and_add_link_to_method(
+                        arg=ret_annot,
+                        dict_of_methods_for_class=methods_for_class_name,
+                        link_to_method=method_link,
+                    )
                     continue
 
                 for ret_cls in returned_classes:
-                    methods_for_class_name[self._resolve_arg(ret_cls)].add(method_link)
+                    self._resolve_arg_and_add_link_to_method(
+                        arg=ret_cls,
+                        dict_of_methods_for_class=methods_for_class_name,
+                        link_to_method=method_link,
+                    )
 
         return self._generate_admonitions(methods_for_class_name, admonition_type="returned_in")
 
@@ -687,11 +695,18 @@ class AdmonitionInserter:
                     annotation = param.annotation
 
                     if isinstance(annotation, (type, str)):
-                        methods_for_class_name[self._resolve_arg(annotation)].add(method_link)
+                        self._resolve_arg_and_add_link_to_method(
+                            arg=annotation,
+                            dict_of_methods_for_class=methods_for_class_name,
+                            link_to_method=method_link,
+                        )
 
                     elif isinstance(annotation, typing.TypeVar):
-                        bound = annotation.__bound__  # gets access to the "bound=..." parameter
-                        methods_for_class_name[self._resolve_arg(bound)].add(method_link)
+                        self._resolve_arg_and_add_link_to_method(
+                            arg=annotation.__bound__,  # gets access to the "bound=..." parameter
+                            dict_of_methods_for_class=methods_for_class_name,
+                            link_to_method=method_link,
+                        )
 
                     elif typing.get_origin(annotation) in (
                         dict,
@@ -701,7 +716,11 @@ class AdmonitionInserter:
                         Union,
                     ):
                         for arg in typing.get_args(annotation):
-                            methods_for_class_name[self._resolve_arg(arg)].add(method_link)
+                            self._resolve_arg_and_add_link_to_method(
+                                arg=arg,
+                                dict_of_methods_for_class=methods_for_class_name,
+                                link_to_method=method_link,
+                            )
                     else:
                         raise NotImplementedError(
                             f"Unable to process annotation {annotation} of type {type(annotation)}"
@@ -794,6 +813,21 @@ class AdmonitionInserter:
             return f":meth:`telegram.ext.ApplicationBuilder.{method_name}`"
         else:
             raise NotImplementedError(f"Base class {base_class} not supported")
+
+    def _resolve_arg_and_add_link_to_method(
+        self, arg: Any, dict_of_methods_for_class: defaultdict, link_to_method: str
+    ):
+        """A helper method for "Returned in" and "Use in admonition.
+        Tries to resolve the arg to a valid class. In case of success, adds the link to
+        Bot's or ApplicationBuilder's method to the set of methods for that class.
+
+        **Modifies dictionary in place.**
+        """
+        resolved_arg = self._resolve_arg(arg)
+        # When trying to resolve an argument from args or return annotation,
+        # the method _resolve_arg returns None if nothing could be resolved.
+        if resolved_arg is not None:
+            dict_of_methods_for_class[resolved_arg].add(link_to_method)
 
     def _resolve_arg(self, arg: Any) -> Union[str, None]:
         """Analyzes an argument of a method (separate argument or an element of typing.get_args())
