@@ -597,6 +597,7 @@ class AdmonitionInserter:
             for idx, line in enumerate(docstring_lines):
                 if line.strip() == "Attributes:":
                     lines_with_attrs = docstring_lines[idx + 1 :]
+                    break
 
             for line in lines_with_attrs:
                 line_match = attr_docstr_pattern.match(line)
