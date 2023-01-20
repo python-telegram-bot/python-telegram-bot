@@ -536,6 +536,12 @@ class AdmonitionInserter:
 
         # The following regex is supposed to capture a class name in a line like this:
         # media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
+        #
+        # Note that even if such typing description spans over multiple lines but each line ends
+        # with a backslash (otherwise Sphinx will throw an error)
+        # (e.g. EncryptedPassportElement.data), then Sphinx will combine these lines into a single
+        # line automatically, and it will contain no backslash (only some extra many whitespaces
+        # from the indentation).
 
         attr_docstr_pattern = re.compile(
             r"^\s*(?P<attr_name>[a-z_]+)"  # Any number of spaces, named group for attribute
@@ -543,9 +549,9 @@ class AdmonitionInserter:
             r".*"  # Any number of characters (that could denote a built-in type)
             r":class:`.+`"  # Marker of a classref, class name in backticks
             r".*\):"  # Any number of characters, closing parenthesis, colon.
-            # The ^ colon above is important because it makes sure that the class is mentioned in
-            # the attribute description, not in free text.
-            r"\s.*$",  # Whitespace, any number of characters, end of string (end of line)
+            # The ^ colon above along with parenthesis is important because it makes sure that
+            # the class is mentioned in the attribute description, not in free text.
+            r".*$",  # Any number of characters, end of string (end of line)
             re.VERBOSE,
         )
 
