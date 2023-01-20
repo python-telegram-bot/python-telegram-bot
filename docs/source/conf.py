@@ -731,8 +731,8 @@ class AdmonitionInserter:
                     elif typing.get_origin(annotation) in (
                         dict,
                         type,
-                        collections.Sequence,
-                        collections.Callable,
+                        collections.abc.Sequence,
+                        collections.abc.Callable,
                         Union,
                     ):
                         for arg in typing.get_args(annotation):
@@ -886,7 +886,7 @@ class AdmonitionInserter:
         origin = typing.get_origin(arg)
 
         if (
-            origin in (collections.Callable, typing.IO)
+            origin in (collections.abc.Callable, typing.IO)
             or arg is None
             # no other check available (by type or origin) for these:
             or str(type(arg)) in ("<class 'typing._SpecialForm'>", "<class 'ellipsis'>")
@@ -899,8 +899,8 @@ class AdmonitionInserter:
             dict,
             tuple,
             Union,
-            collections.Coroutine,
-            collections.Sequence,
+            collections.abc.Coroutine,
+            collections.abc.Sequence,
             typing.Sequence,
         ):
             for sub_arg in typing.get_args(arg):
