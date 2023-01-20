@@ -569,6 +569,8 @@ class AdmonitionInserter:
         # for properties: there is no attr name in docstring.  Just check if there's a class name.
         prop_docst_pattern = re.compile(r":class:`.+`.*:")
 
+        # pattern for iterating over potentially many class names in docstring for one attribute.
+        # Tilde is optional (sometimes it is in the docstring, sometimes not).
         single_class_name_pattern = re.compile(r":class:`~?(?P<class_name>[\w.]*)`")
 
         classes_to_inspect = inspect.getmembers(telegram, inspect.isclass) + inspect.getmembers(
