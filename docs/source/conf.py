@@ -512,7 +512,7 @@ class AdmonitionInserter:
 
     def insert_admonitions_for_class(
         self,
-        klass: type,
+        cls: type,
         docstring_lines: List[str],
     ):
         """Inserts admonitions into docstring lines for a given class.
@@ -526,11 +526,11 @@ class AdmonitionInserter:
 
             # If there is no admonition of the given type for the given class,
             # continue to the next admonition type, maybe the class is listed there.
-            if klass not in self.admonitions[admonition_type]:
+            if cls not in self.admonitions[admonition_type]:
                 continue
 
             insert_idx = self._find_insert_pos_for_admonition(docstring_lines)
-            admonition_lines = self.admonitions[admonition_type][klass].splitlines()
+            admonition_lines = self.admonitions[admonition_type][cls].splitlines()
 
             for idx in range(insert_idx, insert_idx + len(admonition_lines)):
                 docstring_lines.insert(idx, admonition_lines[idx - insert_idx])
@@ -666,14 +666,14 @@ class AdmonitionInserter:
         # i.e. {<class 'telegram._message.Message'>: {:meth:`telegram.Bot.send_message`, ...}}
         methods_for_class = defaultdict(set)
 
-        for klass, methods in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
+        for cls, methods in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
             for method in methods:
 
-                sig = inspect.signature(getattr(klass, method))
+                sig = inspect.signature(getattr(cls, method))
                 ret_annot = sig.return_annotation
                 returned_classes = typing.get_args(ret_annot)
 
-                method_link = self._generate_link_to_method(method, klass)
+                method_link = self._generate_link_to_method(method, cls)
 
                 # If we do get_args() when return annotation has one single class
                 # (e.g. <class 'telegram._message.Message'>), get_args() returns an empty tuple.
@@ -704,11 +704,11 @@ class AdmonitionInserter:
         # {:meth:`telegram.Bot.answer_inline_query`, ...}}
         methods_for_class = defaultdict(set)  # using set because there can be repetitions
 
-        for klass, relevant_methods_for_class in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
+        for cls, relevant_methods_for_class in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
             for method in relevant_methods_for_class:
-                method_link = self._generate_link_to_method(method, klass)
+                method_link = self._generate_link_to_method(method, cls)
 
-                sig = inspect.signature(getattr(klass, method))
+                sig = inspect.signature(getattr(cls, method))
                 parameters = sig.parameters
 
                 for param in parameters.values():
@@ -802,7 +802,7 @@ class AdmonitionInserter:
 
         admonition_for_class = {}
 
-        for klass, attrs in attrs_or_methods_for_class.items():
+        for cls, attrs in attrs_or_methods_for_class.items():
             attrs = sorted(attrs)
 
             # for admonition type "use_in" the title will be "Use in" and CSS class "use-in".
@@ -818,7 +818,7 @@ class AdmonitionInserter:
                 admonition += f"\n    {attrs[0]}"
 
             admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
-            admonition_for_class[klass] = admonition
+            admonition_for_class[cls] = admonition
 
         return admonition_for_class
 
@@ -839,7 +839,7 @@ class AdmonitionInserter:
         link_to_method: str,
         include_subclasses_if_applicable: bool = False,
     ) -> None:
-        """A helper method for "Returned in" and "Use in admonition.
+        """A helper method for "Returned in" and "Use in" admonition.
         Tries to resolve the arg to a valid class. In case of success, adds the link to
         Bot's or ApplicationBuilder's method to the set of methods for that class in the dictionary
         of admonitions.
@@ -851,13 +851,13 @@ class AdmonitionInserter:
 
         **Modifies dictionary in place.**
         """
-        klass = self._resolve_arg(arg)
+        cls = self._resolve_arg(arg)
         # When trying to resolve an argument from args or return annotation,
         # the method _resolve_arg returns None if nothing could be resolved.
-        if klass is None:
+        if cls is None:
             return
 
-        dict_of_methods_for_class[klass].add(link_to_method)
+        dict_of_methods_for_class[cls].add(link_to_method)
 
         # Only process subclasses if:
         # 1. The calling method asks to (which allows to choose which types admonitions get this
@@ -865,14 +865,14 @@ class AdmonitionInserter:
         # 2. The class is included in the list of approved classes.
         if not (
             include_subclasses_if_applicable
-            and klass in self.CLASSES_WHOSE_SUBCLASSES_NEED_ADMONITIONS
+            and cls in self.CLASSES_WHOSE_SUBCLASSES_NEED_ADMONITIONS
         ):
             return
 
         for subclass in [
             # exclude private classes
             p
-            for p in klass.__subclasses__()
+            for p in cls.__subclasses__()
             if not str(p).split(".")[-1].startswith("_")
         ]:
             dict_of_methods_for_class[subclass].add(link_to_method)
@@ -926,22 +926,22 @@ class AdmonitionInserter:
             # the class must be resolved.
             # If it isn't resolved, we'll have the program throw an exception to be sure.
             try:
-                klass = self._resolve_class(m.group("class_name"))
+                cls = self._resolve_class(m.group("class_name"))
             except AttributeError:
                 if str(arg) == "ForwardRef('DefaultValue[DVType]')":
                     # this is a known ForwardRef that needs not be resolved to a Telegram class
                     return
                 else:
                     raise NotImplementedError(f"Could not process ForwardRef: {arg}")
-            return klass
+            return cls
 
         # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
         # as ForwardRefs and are identified as plain strings.
         elif isinstance(arg, str):
-            klass = self._resolve_class(arg)
+            cls = self._resolve_class(arg)
             # Here we don't want an exception to be thrown since we're not sure it's ForwardRef
-            if klass is not None:
-                return klass
+            if cls is not None:
+                return cls
 
         else:
             raise NotImplementedError(
@@ -1032,7 +1032,7 @@ def autodoc_process_docstring(
     # (where applicable)
     if what == "class":
         ADMONITION_INSERTER.insert_admonitions_for_class(
-            klass=typing.cast(type, obj),  # since "what" == class, we know it's not just object
+            cls=typing.cast(type, obj),  # since "what" == class, we know it's not just object
             docstring_lines=lines,
         )
 
