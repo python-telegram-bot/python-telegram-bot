@@ -105,7 +105,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
             to groups and channels per :paramref:`group_time_period`.  When set to 0, no rate
             limiting will be applied. Defaults to 20.
         group_time_period (:obj:`float`): The time period (in seconds) during which the
-            :paramref:`group_time_period` is enforced.  When set to 0, no rate limiting will be
+            :paramref:`group_max_rate` is enforced.  When set to 0, no rate limiting will be
             applied. Defaults to 60.
         max_retries (:obj:`int`): The maximum number of retries to be made in case of a
             :exc:`~telegram.error.RetryAfter` exception.
