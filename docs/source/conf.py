@@ -481,18 +481,18 @@ class AdmonitionInserter:
     """
 
     def __init__(self):
-        self.admonitions: Dict[str, Dict[str, str]] = {
+        self.admonitions: Dict[str, Dict[type, str]] = {
             # dynamically determine which method to use to create a sub-dictionary
             admonition_type: getattr(self, f"_create_{admonition_type}")()
             for admonition_type in self.ADMONITION_TYPES
         }
         """Dictionary with admonitions. Contains sub-dictionaries, one per admonition type. 
-        Each sub-dictionary matches class names to texts of admonitions, e.g.:
+        Each sub-dictionary matches classes to texts of admonitions, e.g.:
         ```
         {
-        "use_in": {"<class 'telegram._chatinvitelink.ChatInviteLink'": 
+        "use_in": {<class 'telegram._chatinvitelink.ChatInviteLink'>: 
         <"Use in" admonition for ChatInviteLink>, ...},
-        "available_in": {"<class 'telegram._chatinvitelink.ChatInviteLink'": 
+        "available_in": {<class 'telegram._chatinvitelink.ChatInviteLink'>: 
         <"Available in" admonition">, ...},
         "returned_in": {...}
         }
@@ -501,10 +501,10 @@ class AdmonitionInserter:
 
     def insert_admonitions_for_class(
         self,
-        name: str,
+        klass: type,
         docstring_lines: List[str],
     ):
-        """Inserts admonitions into docstring lines for a class with the given name.
+        """Inserts admonitions into docstring lines for a given class.
 
         **Modifies lines in place**.
         """
@@ -515,24 +515,24 @@ class AdmonitionInserter:
 
             # If there is no admonition of the given type for the given class,
             # continue to the next admonition type, maybe the class is listed there.
-            if name not in self.admonitions[admonition_type]:
+            if klass not in self.admonitions[admonition_type]:
                 continue
 
             insert_idx = self._find_insert_pos_for_admonition(docstring_lines)
-            admonition_lines = self.admonitions[admonition_type][name].splitlines()
+            admonition_lines = self.admonitions[admonition_type][klass].splitlines()
 
             for idx in range(insert_idx, insert_idx + len(admonition_lines)):
                 docstring_lines.insert(idx, admonition_lines[idx - insert_idx])
 
-    def _create_available_in(self) -> Dict[str, str]:
+    def _create_available_in(self) -> Dict[type, str]:
         """Creates a dictionary with 'Available in' admonitions for classes that are available
         in attributes of other classes.
         """
 
-        # Generate a mapping of class names to ReST links to attributes in other classes that
+        # Generate a mapping of classes to ReST links to attributes in other classes that
         # correspond to instances of a given class
-        # i.e. {"telegram._files.sticker.Sticker": {":attr:`telegram.Message.sticker`", ...}}
-        attrs_for_class_name = defaultdict(set)
+        # i.e. {telegram._files.sticker.Sticker: {":attr:`telegram.Message.sticker`", ...}}
+        attrs_for_class = defaultdict(set)
 
         # The following regex is supposed to capture a class name in a line like this:
         # media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
@@ -588,15 +588,15 @@ class AdmonitionInserter:
                 # a typing description of one attribute can contain multiple classes
                 for match in single_class_name_pattern.finditer(line):
                     name_of_class_in_attr = match.group("class_name")
-                    full_class_name = self._resolve_full_class_name(name_of_class_in_attr)
-                    if full_class_name is None:
+                    resolved_class = self._resolve_class(name_of_class_in_attr)
+                    if resolved_class is None:
                         continue
 
                     # Writing to dictionary: matching the class found in the docstring to the
                     # attribute of the class being inspected.
                     # Key is the class in the attribute docstring, value is the attribute of the
                     # class currently being inspected.
-                    attrs_for_class_name[full_class_name].add(
+                    attrs_for_class[resolved_class].add(
                         f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
                     )
 
@@ -631,20 +631,20 @@ class AdmonitionInserter:
                     # property of the class being inspected.
                     # The class in the property docstring is the key, and the property of the
                     # class currently being inspected is the value.
-                    attrs_for_class_name[self._resolve_full_class_name(name_of_class_in_prop)].add(
+                    attrs_for_class[self._resolve_class(name_of_class_in_prop)].add(
                         f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`"
                     )
 
-        return self._generate_admonitions(attrs_for_class_name, admonition_type="available_in")
+        return self._generate_admonitions(attrs_for_class, admonition_type="available_in")
 
-    def _create_returned_in(self) -> Dict[str, str]:
+    def _create_returned_in(self) -> Dict[type, str]:
         """Creates a dictionary with 'Returned in' admonitions for classes that are returned
         in Bot's and ApplicationBuilder's methods.
         """
 
-        # Generate a mapping of class names to ReST links to Bot methods which return it,
-        # i.e. {"<class 'telegram._message.Message'>": {:meth:`telegram.Bot.send_message`, ...}}
-        methods_for_class_name = defaultdict(set)
+        # Generate a mapping of classes to ReST links to Bot methods which return it,
+        # i.e. {<class 'telegram._message.Message'>: {:meth:`telegram.Bot.send_message`, ...}}
+        methods_for_class = defaultdict(set)
 
         for klass, methods in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
             for method in methods:
@@ -660,7 +660,7 @@ class AdmonitionInserter:
                 if not returned_classes:
                     self._resolve_arg_and_add_link_to_method(
                         arg=ret_annot,
-                        dict_of_methods_for_class=methods_for_class_name,
+                        dict_of_methods_for_class=methods_for_class,
                         link_to_method=method_link,
                     )
                     continue
@@ -668,19 +668,19 @@ class AdmonitionInserter:
                 for ret_cls in returned_classes:
                     self._resolve_arg_and_add_link_to_method(
                         arg=ret_cls,
-                        dict_of_methods_for_class=methods_for_class_name,
+                        dict_of_methods_for_class=methods_for_class,
                         link_to_method=method_link,
                     )
 
-        return self._generate_admonitions(methods_for_class_name, admonition_type="returned_in")
+        return self._generate_admonitions(methods_for_class, admonition_type="returned_in")
 
-    def _create_use_in(self) -> Dict[str, str]:
+    def _create_use_in(self) -> Dict[type, str]:
         """Creates a dictionary with 'Use in' admonitions for classes whose instances are
         accepted as arguments for Bot's and ApplicationBuilder's methods.
         """
 
-        # Generate a mapping of class names to links to Bot methods which accept them as arguments,
-        # i.e. {"<class 'telegram._inline.inlinequeryresult.InlineQueryResult'>":
+        # Generate a mapping of classes to links to Bot methods which accept them as arguments,
+        # i.e. {<class 'telegram._inline.inlinequeryresult.InlineQueryResult'>:
         # {:meth:`telegram.Bot.answer_inline_query`, ...}}
         methods_for_class_name = defaultdict(set)  # using set because there can be repetitions
 
@@ -755,18 +755,18 @@ class AdmonitionInserter:
 
     def _generate_admonitions(
         self,
-        attrs_or_methods_for_class_name: Dict[str, Set[str]],
+        attrs_or_methods_for_class: Dict[type, Set[str]],
         admonition_type: str,
-    ) -> Dict[str, str]:
+    ) -> Dict[type, str]:
         """Generates admonitions of a given type.
-        Takes a dictionary of class names matched to ReST links to methods or attributes, e.g.:
+        Takes a dictionary of classes matched to ReST links to methods or attributes, e.g.:
 
         ```
-        {"<class 'telegram._files.sticker.StickerSet'>":
+        {<class 'telegram._files.sticker.StickerSet'>:
         [":meth: `telegram.Bot.get_sticker_set`", ...]}.
         ```
 
-        Returns a dictionary of class names matched to full admonitions, e.g.
+        Returns a dictionary of class **names** matched to full admonitions, e.g.
         for `admonition_type` "returned_in" (note that title and CSS class are generated
         automatically):
 
@@ -782,9 +782,9 @@ class AdmonitionInserter:
         if admonition_type not in self.ADMONITION_TYPES:
             raise TypeError(f"Admonition type {admonition_type} not supported.")
 
-        admonition_for_class_name = {}
+        admonition_for_class = {}
 
-        for class_name, attrs in attrs_or_methods_for_class_name.items():
+        for klass, attrs in attrs_or_methods_for_class.items():
             attrs = sorted(attrs)
 
             # for admonition type "use_in" the title will be "Use in" and CSS class "use-in".
@@ -800,9 +800,9 @@ class AdmonitionInserter:
                 admonition += f"\n    {attrs[0]}"
 
             admonition += "\n    "  # otherwise an unexpected unindent warning will be issued
-            admonition_for_class_name[class_name] = admonition
+            admonition_for_class[klass] = admonition
 
-        return admonition_for_class_name
+        return admonition_for_class
 
     @staticmethod
     def _generate_link_to_method(method_name: str, base_class: type):
@@ -829,7 +829,7 @@ class AdmonitionInserter:
         if resolved_arg is not None:
             dict_of_methods_for_class[resolved_arg].add(link_to_method)
 
-    def _resolve_arg(self, arg: Any) -> Union[str, None]:
+    def _resolve_arg(self, arg: Any) -> Union[type, None]:
         """Analyzes an argument of a method (separate argument or an element of typing.get_args())
         and returns full name of class that the argument belongs to, if it can be resolved
         to a telegram or telegram.ext class.
@@ -870,30 +870,30 @@ class AdmonitionInserter:
 
         elif isinstance(arg, type):
             if "telegram" in str(arg):
-                return str(arg)
+                return arg
 
         elif isinstance(arg, typing.ForwardRef):
             m = self.FORWARD_REF_PATTERN.match(str(arg))
             # We're sure it's a ForwardRef, so, unless it belongs to known exceptions,
-            # the class name must be resolved.
+            # the class must be resolved.
             # If it isn't resolved, we'll have the program throw an exception to be sure.
             try:
-                class_name = self._resolve_full_class_name(m.group("class_name"))
+                klass = self._resolve_class(m.group("class_name"))
             except AttributeError:
                 if str(arg) == "ForwardRef('DefaultValue[DVType]')":
                     # this is a known ForwardRef that needs not be resolved to a Telegram class
                     return
                 else:
                     raise NotImplementedError(f"Could not process ForwardRef: {arg}")
-            return class_name
+            return klass
 
         # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
         # as ForwardRefs and are identified as plain strings.
         elif isinstance(arg, str):
-            class_name = self._resolve_full_class_name(arg)
+            klass = self._resolve_class(arg)
             # Here we don't want an exception to be thrown since we're not sure it's ForwardRef
-            if class_name is not None:
-                return class_name
+            if klass is not None:
+                return klass
 
         else:
             raise NotImplementedError(
@@ -901,15 +901,15 @@ class AdmonitionInserter:
             )
 
     @staticmethod
-    def _resolve_full_class_name(name: str) -> Union[str, None]:
-        """The keys in the admonitions dictionary are not the likes of "telegram.StickerSet"
-        but the likes of "<class 'telegram._files.sticker.StickerSet'>".
+    def _resolve_class(name: str) -> Union[type, None]:
+        """The keys in the admonitions dictionary are not strings like "telegram.StickerSet"
+        but classes like <class 'telegram._files.sticker.StickerSet'>.
 
-        This method attempts to produce a full class name from a name that does or does not
+        This method attempts to resolve a PTB class from a name that does or does not
         contain the word 'telegram', e.g.
-        "<class 'telegram._files.sticker.StickerSet'>" from "telegram.StickerSet" or "StickerSet".
+        <class 'telegram._files.sticker.StickerSet'> from "telegram.StickerSet" or "StickerSet".
 
-        Returns :obj:`str` on success, :obj:`None` if nothing could be resolved.
+        Returns a class on success, :obj:`None` if nothing could be resolved.
         """
 
         for option in (
@@ -919,7 +919,7 @@ class AdmonitionInserter:
             f"telegram.ext.filters.{name}",
         ):
             try:
-                return str(eval(option))
+                return eval(option)
             # NameError will be raised if trying to eval just name and it doesn't work, e.g.
             # "Name 'ApplicationBuilder' is not defined".
             # AttributeError will be raised if trying to e.g. eval f"telegram.{name}" when the
@@ -981,7 +981,7 @@ def autodoc_process_docstring(
     # (where applicable)
     if what == "class":
         AdmonitionInserter().insert_admonitions_for_class(
-            name=str(obj),
+            klass=typing.cast(type, obj),  # since "what" == class, we know it's not just object
             docstring_lines=lines,
         )
 
