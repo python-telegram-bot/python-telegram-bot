@@ -482,7 +482,7 @@ class AdmonitionInserter:
 
     def __init__(self):
         self.admonitions: Dict[str, Dict[str, str]] = {
-            # dynamically determine which method to use to create a sub dictionary
+            # dynamically determine which method to use to create a sub-dictionary
             admonition_type: getattr(self, f"_create_{admonition_type}")()
             for admonition_type in self.ADMONITION_TYPES
         }
@@ -753,10 +753,12 @@ class AdmonitionInserter:
 
         ```
         {"<class 'telegram._files.sticker.StickerSet'>":
-        ".. admonition:: Returned in: :class: returned-in :meth: `telegram.Bot.get_sticker_set`"}.
+        ".. admonition:: Returned in:
+            :class: returned-in
+
+            :meth: `telegram.Bot.get_sticker_set`"}.
         ```
         """
-        #
 
         if admonition_type not in self.ADMONITION_TYPES:
             raise TypeError(f"Admonition type {admonition_type} not supported.")
