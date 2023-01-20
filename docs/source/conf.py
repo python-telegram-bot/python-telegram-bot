@@ -714,12 +714,23 @@ class AdmonitionInserter:
     @staticmethod
     def _find_insert_pos_for_admonition(lines: List[str]) -> int:
         """Finds the correct position to insert the class admonition and returns the index.
+
+        The admonition will be insert above "See also", "Examples:", version added/changed notes
+        and args, whatever comes first.
+
         If no key phrases are found, the admonition will be inserted at the very end.
         """
         for idx, value in list(enumerate(lines)):
-            # The space after ":param" is important because a docstring can contain ":paramref:"
-            # in its plain text in the beginning of a line (e.g. ExtBot)
-            if value.startswith(".. version") or value.startswith(":param "):
+            if (
+                value.startswith(".. seealso:")
+                # The docstring contains heading "Examples:", but Sphinx will have it converted
+                # to ".. admonition: Examples".
+                or value.startswith(".. admonition:: Examples")
+                or value.startswith(".. version")
+                # The space after ":param" is important because docstring can contain ":paramref:"
+                # in its plain text in the beginning of a line (e.g. ExtBot)
+                or value.startswith(":param ")
+            ):
                 return idx
         return len(lines) - 1
 
