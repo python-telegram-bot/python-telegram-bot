@@ -576,19 +576,13 @@ class AdmonitionInserter:
             telegram.ext, inspect.isclass
         )
 
-        for _, inspected_class in classes_to_inspect:
+        for class_name, inspected_class in classes_to_inspect:
             # We need to make "<class 'telegram._files.sticker.StickerSet'>" into
             # "telegram.StickerSet" because that's the way the classes are mentioned in
-            # docstrings
-            name_of_inspected_class_in_docstr = (
-                str(inspected_class).removeprefix("<class '").removesuffix("'>")
-            )
-            # removing things like "_files.sticker"
-            name_of_inspected_class_in_docstr = ".".join(
-                n
-                for n in name_of_inspected_class_in_docstr.split(".")
-                if n in ("telegram", "ext") or not n.islower()
-            )
+            # docstrings.
+            # Check for potential presence of ".ext.", we will need to keep it.
+            ext = ".ext" if ".ext." in str(inspected_class) else ""
+            name_of_inspected_class_in_docstr = f"telegram{ext}.{class_name}"
 
             # Parsing part of the docstring with attributes (parsing of properties follows later)
             docstring_lines = inspect.getdoc(inspected_class).splitlines()
