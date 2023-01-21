@@ -448,14 +448,14 @@ class AdmonitionInserter:
                 yield arg
 
         # for custom generics like telegram.ext._application.Application[~BT, ~CCT, ~UD...]
-        elif str(type(arg) == "<class 'typing._GenericAlias'>"):
+        elif str(type(arg)) == "<class 'typing._GenericAlias'>":
             if "telegram" in str(arg):
                 # get_origin() of telegram.ext._application.Application[~BT, ~CCT, ~UD...]
                 # will produce <class 'telegram.ext._application.Application'>
                 yield origin
 
-        # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
-        # as ForwardRefs and are identified as plain strings.
+        # For some reason "InlineQueryResult", "InputMedia" & some others are currently not
+        # recognized as ForwardRefs and are identified as plain strings.
         elif isinstance(arg, str):
 
             # args like "ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]" can be recognized as strings.
