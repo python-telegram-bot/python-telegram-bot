@@ -455,6 +455,11 @@ class AdmonitionInserter:
         # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
         # as ForwardRefs and are identified as plain strings.
         elif isinstance(arg, str):
+
+            # args like "ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]" are recognized as strings.
+            # Remove whatever is in the square brackets because it doesn't need to be parsed.
+            arg = re.sub(r"\[.+]", "", arg)
+
             cls = self._resolve_class(arg)
             # Here we don't want an exception to be thrown since we're not sure it's ForwardRef
             if cls is not None:
