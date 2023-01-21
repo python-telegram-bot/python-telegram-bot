@@ -1,5 +1,5 @@
-telegram.ext.PersistenceInput
-=============================
+PersistenceInput
+================
 
 .. autoclass:: telegram.ext.PersistenceInput
     :show-inheritance:

@@ -1,5 +1,5 @@
-telegram.BotCommandScopeChatMember
-==================================
+BotCommandScopeChatMember
+=========================
 
 .. autoclass:: telegram.BotCommandScopeChatMember
     :members:

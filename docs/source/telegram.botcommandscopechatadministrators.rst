@@ -1,5 +1,5 @@
-telegram.BotCommandScopeChatAdministrators
-==========================================
+BotCommandScopeChatAdministrators
+=================================
 
 .. autoclass:: telegram.BotCommandScopeChatAdministrators
     :members:

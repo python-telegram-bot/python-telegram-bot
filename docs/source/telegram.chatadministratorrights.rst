@@ -1,5 +1,5 @@
-telegram.ChatAdministratorRights
-================================
+ChatAdministratorRights
+=======================
 
 .. versionadded:: 20.0
 

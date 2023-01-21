@@ -1,5 +1,5 @@
-telegram.Message
-================
+Message
+=======
 
 .. autoclass:: telegram.Message
     :members:

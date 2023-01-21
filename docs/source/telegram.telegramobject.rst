@@ -1,5 +1,5 @@
-telegram.TelegramObject
-=======================
+TelegramObject
+==============
 
 .. autoclass:: telegram.TelegramObject
     :members:

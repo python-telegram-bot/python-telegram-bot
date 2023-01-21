@@ -1,5 +1,5 @@
-telegram.DataCredentials
-========================
+DataCredentials
+===============
 
 .. autoclass:: telegram.DataCredentials
     :members:

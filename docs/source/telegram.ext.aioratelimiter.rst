@@ -1,5 +1,5 @@
-telegram.ext.AIORateLimiter
-============================
+AIORateLimiter
+==============
 
 .. autoclass:: telegram.ext.AIORateLimiter
     :members:

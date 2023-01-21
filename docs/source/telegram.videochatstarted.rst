@@ -1,5 +1,5 @@
-telegram.VideoChatStarted
-=========================
+VideoChatStarted
+================
 
 .. autoclass:: telegram.VideoChatStarted
     :members:

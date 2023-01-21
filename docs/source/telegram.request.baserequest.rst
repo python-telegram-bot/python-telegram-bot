@@ -1,5 +1,5 @@
-telegram.request.BaseRequest
-============================
+BaseRequest
+===========
 
 .. autoclass:: telegram.request.BaseRequest
     :members:

@@ -1,5 +1,5 @@
-telegram.VideoChatParticipantsInvited
-=====================================
+VideoChatParticipantsInvited
+============================
 
 .. autoclass:: telegram.VideoChatParticipantsInvited
     :members:

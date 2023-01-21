@@ -1,5 +1,5 @@
-telegram.PassportElementErrorTranslationFiles
-=============================================
+PassportElementErrorTranslationFiles
+====================================
 
 .. autoclass:: telegram.PassportElementErrorTranslationFiles
     :members:

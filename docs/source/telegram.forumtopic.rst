@@ -1,5 +1,5 @@
-telegram.ForumTopic
-===================
+ForumTopic
+==========
 
 .. autoclass:: telegram.ForumTopic
     :members:

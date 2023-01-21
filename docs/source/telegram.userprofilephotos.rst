@@ -1,5 +1,5 @@
-telegram.UserProfilePhotos
-==========================
+UserProfilePhotos
+=================
 
 .. autoclass:: telegram.UserProfilePhotos
     :members:

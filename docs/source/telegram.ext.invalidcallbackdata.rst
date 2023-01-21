@@ -1,5 +1,5 @@
-telegram.ext.InvalidCallbackData
-================================
+InvalidCallbackData
+===================
 
 .. autoclass:: telegram.ext.InvalidCallbackData
     :members:

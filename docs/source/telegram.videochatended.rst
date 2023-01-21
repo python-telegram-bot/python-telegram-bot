@@ -1,5 +1,5 @@
-telegram.VideoChatEnded
-=======================
+VideoChatEnded
+==============
 
 .. autoclass:: telegram.VideoChatEnded
     :members:
