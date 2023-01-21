@@ -454,16 +454,6 @@ class AdmonitionInserter:
 
     ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
 
-    # In some cases it is useful that some admonitions are displayed not only for base classes
-    # but also for their subclasses.
-    CLASSES_WHOSE_SUBCLASSES_NEED_ADMONITIONS = (
-        telegram.BotCommandScope,
-        telegram.InlineQueryResult,
-        telegram.InputMedia,
-        telegram.MenuButton,
-        telegram.request.BaseRequest,
-    )
-
     FORWARD_REF_PATTERN = re.compile(r"^ForwardRef\('(?P<class_name>\w+)'\)$")
     """ A pattern to find a class name in a ForwardRef typing annotation.
     Class name (in a named group) is surrounded by parentheses and single quotes.
@@ -709,8 +699,6 @@ class AdmonitionInserter:
                         arg=param.annotation,
                         dict_of_methods_for_class=methods_for_class,
                         link_to_method=method_link,
-                        # we will also add "Use in" admonitions to subclasses (if applicable)
-                        include_subclasses_if_applicable=True,
                     )
 
         return self._generate_admonitions(methods_for_class, admonition_type="use_in")
@@ -806,7 +794,7 @@ class AdmonitionInserter:
         arg: Any,
         dict_of_methods_for_class: defaultdict,
         link_to_method: str,
-        include_subclasses_if_applicable: bool = False,
+        include_subclasses: bool = True,
     ) -> None:
         """A helper method for "Returned in" and "Use in" admonition.
         Tries to resolve the arg to a valid class. In case of success, adds the link to
@@ -829,14 +817,7 @@ class AdmonitionInserter:
 
             dict_of_methods_for_class[cls].add(link_to_method)
 
-            # Only process subclasses if:
-            # 1. The calling method asks to (which allows to choose which types admonitions get
-            # this functionality at all;
-            # 2. The class is included in the list of approved classes.
-            if not (
-                include_subclasses_if_applicable
-                and cls in self.CLASSES_WHOSE_SUBCLASSES_NEED_ADMONITIONS
-            ):
+            if not include_subclasses:
                 continue
 
             for subclass in [
