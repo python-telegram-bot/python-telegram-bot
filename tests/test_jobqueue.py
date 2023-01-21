@@ -80,6 +80,11 @@ class TestJobQueue:
     job_time = 0
     received_error = None
 
+    expected_warning = (
+        "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
+        " We recommend double checking if the passed value is correct."
+    )
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.result = 0
@@ -334,11 +339,7 @@ class TestJobQueue:
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_time)
 
-    async def test_run_daily(self, job_queue, recwarn):
-        expected_warning = (
-            "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
-            "We recommend double checking if the passed value is correct."
-        )
+    async def test_run_daily(self, job_queue):
         delta, now = 1, dtm.datetime.now(UTC)
         time_of_day = (now + dtm.timedelta(seconds=delta)).time()
         expected_reschedule_time = (now + dtm.timedelta(seconds=delta, days=1)).timestamp()
@@ -348,16 +349,20 @@ class TestJobQueue:
         assert self.result == 1
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
+
+    async def test_run_daily_warning(self, job_queue, recwarn):
+        delta, now = 1, dtm.datetime.now(UTC)
+        time_of_day = (now + dtm.timedelta(seconds=delta)).time()
+
+        job_queue.run_daily(self.job_run_once, time_of_day)
+        assert len(recwarn) == 0
+        job_queue.run_daily(self.job_run_once, time_of_day, days=(0, 1, 2, 3))
         assert len(recwarn) == 1
-        assert str(recwarn[0].message) == expected_warning
+        assert str(recwarn[0].message) == self.expected_warning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     @pytest.mark.parametrize("weekday", (0, 1, 2, 3, 4, 5, 6))
     async def test_run_daily_days_of_week(self, job_queue, recwarn, weekday):
-        expected_warning = (
-            "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
-            "We recommend double checking if the passed value is correct."
-        )
         delta, now = 1, dtm.datetime.now(UTC)
         time_of_day = (now + dtm.timedelta(seconds=delta)).time()
         # offset in days until next weekday
@@ -370,7 +375,7 @@ class TestJobQueue:
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
         assert len(recwarn) == 1
-        assert str(recwarn[0].message) == expected_warning
+        assert str(recwarn[0].message) == self.expected_warning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     async def test_run_monthly(self, job_queue, timezone):
