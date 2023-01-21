@@ -31,7 +31,7 @@ from collections.abc import Sequence
 
 
 def check_keyboard_type(keyboard: object) -> bool:
-    """Checks if the keyboard provided is of the correct type - A list of lists.
+    """Checks if the keyboard provided is of the correct type - A sequence of sequences.
     Implicitly tested in the init-tests of `{Inline, Reply}KeyboardMarkup`
     """
     # string and bytes may actually be used for ReplyKeyboardMarkup in which case each button
@@ -39,6 +39,11 @@ def check_keyboard_type(keyboard: object) -> bool:
     # allow it here.
     if not isinstance(keyboard, Sequence) or isinstance(keyboard, (str, bytes)):
         return False
+
+    # check whether the keyboard has more than two dimensions.
+    if isinstance(keyboard[0][0], Sequence) and not isinstance(keyboard[0][0], (str, bytes)):
+        return False
+
     for row in keyboard:
         if not isinstance(row, Sequence) or isinstance(row, (str, bytes)):
             return False
