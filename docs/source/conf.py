@@ -7,9 +7,8 @@ import sys
 import typing
 from collections import defaultdict
 from enum import Enum
-from functools import partial
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Set, Tuple, Union
+from typing import Any, Iterator, Union
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -321,7 +320,7 @@ class TGConstXRefRole(PyXRefRole):
         has_explicit_title: bool,
         title: str,
         target: str,
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         title, target = super().process_link(env, refnode, has_explicit_title, title, target)
         try:
             # We use `eval` to get the value of the expression. Maybe there are better ways to
@@ -415,7 +414,7 @@ read_timeout_sub = [
 read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
 
 
-def find_insert_pos_for_kwargs(lines: List[str]) -> int:
+def find_insert_pos_for_kwargs(lines: list[str]) -> int:
     """Finds the correct position to insert the keyword arguments and returns the index."""
     for idx, value in reversed(list(enumerate(lines))):  # reversed since :returns: is at the end
         if value.startswith(":returns:"):
@@ -492,7 +491,7 @@ class AdmonitionInserter:
     """
 
     def __init__(self):
-        self.admonitions: Dict[str, Dict[type, str]] = {
+        self.admonitions: dict[str, dict[type, str]] = {
             # dynamically determine which method to use to create a sub-dictionary
             admonition_type: getattr(self, f"_create_{admonition_type}")()
             for admonition_type in self.ADMONITION_TYPES
@@ -513,7 +512,7 @@ class AdmonitionInserter:
     def insert_admonitions_for_class(
         self,
         cls: type,
-        docstring_lines: List[str],
+        docstring_lines: list[str],
     ):
         """Inserts admonitions into docstring lines for a given class.
 
@@ -535,7 +534,7 @@ class AdmonitionInserter:
             for idx in range(insert_idx, insert_idx + len(admonition_lines)):
                 docstring_lines.insert(idx, admonition_lines[idx - insert_idx])
 
-    def _create_available_in(self) -> Dict[type, str]:
+    def _create_available_in(self) -> dict[type, str]:
         """Creates a dictionary with 'Available in' admonitions for classes that are available
         in attributes of other classes.
         """
@@ -657,7 +656,7 @@ class AdmonitionInserter:
 
         return self._generate_admonitions(attrs_for_class, admonition_type="available_in")
 
-    def _create_returned_in(self) -> Dict[type, str]:
+    def _create_returned_in(self) -> dict[type, str]:
         """Creates a dictionary with 'Returned in' admonitions for classes that are returned
         in Bot's and ApplicationBuilder's methods.
         """
@@ -694,7 +693,7 @@ class AdmonitionInserter:
 
         return self._generate_admonitions(methods_for_class, admonition_type="returned_in")
 
-    def _create_use_in(self) -> Dict[type, str]:
+    def _create_use_in(self) -> dict[type, str]:
         """Creates a dictionary with 'Use in' admonitions for classes whose instances are
         accepted as arguments for Bot's and ApplicationBuilder's methods.
         """
@@ -723,7 +722,7 @@ class AdmonitionInserter:
         return self._generate_admonitions(methods_for_class, admonition_type="use_in")
 
     @staticmethod
-    def _find_insert_pos_for_admonition(lines: List[str]) -> int:
+    def _find_insert_pos_for_admonition(lines: list[str]) -> int:
         """Finds the correct position to insert the class admonition and returns the index.
 
         The admonition will be insert above "See also", "Examples:", version added/changed notes
@@ -749,9 +748,9 @@ class AdmonitionInserter:
 
     def _generate_admonitions(
         self,
-        attrs_or_methods_for_class: Dict[type, Set[str]],
+        attrs_or_methods_for_class: dict[type, set[str]],
         admonition_type: str,
-    ) -> Dict[type, str]:
+    ) -> dict[type, str]:
         """Generates admonitions of a given type.
         Takes a dictionary of classes matched to ReST links to methods or attributes, e.g.:
 
@@ -961,7 +960,7 @@ ADMONITION_INSERTER = AdmonitionInserter()
 
 
 def autodoc_process_docstring(
-    app: Sphinx, what, name: str, obj: object, options, lines: List[str]
+    app: Sphinx, what, name: str, obj: object, options, lines: list[str]
 ):
     """We do the following things:
     1) Use this method to automatically insert the Keyword Args for the Bot methods.
