@@ -132,7 +132,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             await bot.initialize()
             # code
         finally:
-            await request_object.shutdown()
+            await bot.shutdown()
 
     Note:
         * Most bot methods have the argument ``api_kwargs`` which allows passing arbitrary keywords

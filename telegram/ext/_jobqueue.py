@@ -458,6 +458,7 @@ class JobQueue:
 
                 .. versionchanged:: 20.0
                     Changed day of the week mapping of 0-6 from monday-sunday to sunday-saturday.
+
             data (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
@@ -485,12 +486,13 @@ class JobQueue:
             queue.
 
         """
-        # TODO: After v20.0, we should remove the this warning.
-        warn(
-            "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
-            "We recommend double checking if the passed value is correct.",
-            stacklevel=2,
-        )
+        # TODO: After v20.0, we should remove this warning.
+        if days != tuple(range(7)):  # checks if user passed a custom value
+            warn(
+                "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday "
+                "scheme. We recommend double checking if the passed value is correct.",
+                stacklevel=2,
+            )
         if not job_kwargs:
             job_kwargs = {}
 
@@ -655,8 +657,9 @@ class Job:
 
                 async def callback(context: CallbackContext)
 
-        data (:obj:`object`, optional): Additional data needed for the callback function. Can be
-            accessed through :attr:`Job.data` in the callback. Defaults to :obj:`None`.
+        data (:obj:`object`, optional): Additional data needed for the :paramref:`callback`
+            function. Can be accessed through :attr:`Job.data` in the callback. Defaults to
+            :obj:`None`.
         name (:obj:`str`, optional): The name of the new job. Defaults to
             :external:obj:`callback.__name__ <definition.__name__>`.
         chat_id (:obj:`int`, optional): Chat id of the chat that this job is associated with.
@@ -668,7 +671,7 @@ class Job:
     Attributes:
         callback (:term:`coroutine function`): The callback function that should be executed by the
             new job.
-        data (:obj:`object`): Optional. Additional data needed for the callback function.
+        data (:obj:`object`): Optional. Additional data needed for the :attr:`callback` function.
         name (:obj:`str`): Optional. The name of the new job.
         chat_id (:obj:`int`): Optional. Chat id of the chat that this job is associated with.
 
