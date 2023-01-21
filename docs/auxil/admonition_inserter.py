@@ -220,6 +220,20 @@ class AdmonitionInserter:
                 ret_annot = sig.return_annotation
                 returned_classes = typing.get_args(ret_annot)
 
+                # There are custom generics in return annotations, e.g.:
+                # telegram.ext._application.Application[~BT, ~CCT, ~UD, ~CD, ~BD, ~JQ]
+                # For them, the typing.get_args() above will produce a tuple like so:
+                # (~BT, ~CCT, ~UD, ~CD, ~BD, ~JQ).
+                # That will lead to all these classes being resolved and "Returned in"
+                # admonitions created for them, which would be wrong in this case.
+                # Hence, if we encounter a custom generic, we reset returned_classes
+                # to only resolve the main arg.
+                if (
+                    str(ret_annot).startswith("telegram")
+                    and str(type(ret_annot)) == "<class 'typing._GenericAlias'>"
+                ):
+                    returned_classes = ()
+
                 method_link = self._generate_link_to_method(method, cls)
 
                 # If we do get_args() when return annotation has one single class
@@ -432,10 +446,6 @@ class AdmonitionInserter:
 
         # END RECURSIVE CALLS
 
-        elif isinstance(arg, type):
-            if "telegram" in str(arg):
-                yield arg
-
         elif isinstance(arg, typing.ForwardRef):
             m = self.FORWARD_REF_PATTERN.match(str(arg))
             # We're sure it's a ForwardRef, so, unless it belongs to known exceptions,
@@ -452,11 +462,22 @@ class AdmonitionInserter:
             else:
                 yield cls
 
+        elif isinstance(arg, type):
+            if "telegram" in str(arg):
+                yield arg
+
+        # for custom generics like telegram.ext._application.Application[~BT, ~CCT, ~UD...]
+        elif str(type(arg) == "<class 'typing._GenericAlias'>"):
+            if "telegram" in str(arg):
+                # get_origin() of telegram.ext._application.Application[~BT, ~CCT, ~UD...]
+                # will produce <class 'telegram.ext._application.Application'>
+                yield typing.get_origin(arg)
+
         # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
         # as ForwardRefs and are identified as plain strings.
         elif isinstance(arg, str):
 
-            # args like "ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]" are recognized as strings.
+            # args like "ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]" can be recognized as strings.
             # Remove whatever is in the square brackets because it doesn't need to be parsed.
             arg = re.sub(r"\[.+]", "", arg)
 
