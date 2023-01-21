@@ -218,40 +218,15 @@ class AdmonitionInserter:
 
                 sig = inspect.signature(getattr(cls, method))
                 ret_annot = sig.return_annotation
-                returned_classes = typing.get_args(ret_annot)
-
-                # There are custom generics in return annotations, e.g.:
-                # telegram.ext._application.Application[~BT, ~CCT, ~UD, ~CD, ~BD, ~JQ]
-                # For them, the typing.get_args() above will produce a tuple like so:
-                # (~BT, ~CCT, ~UD, ~CD, ~BD, ~JQ).
-                # That will lead to all these classes being resolved and "Returned in"
-                # admonitions created for them, which would be wrong in this case.
-                # Hence, if we encounter a custom generic, we reset returned_classes
-                # to only resolve the main arg.
-                if (
-                    str(ret_annot).startswith("telegram")
-                    and str(type(ret_annot)) == "<class 'typing._GenericAlias'>"
-                ):
-                    returned_classes = ()
 
                 method_link = self._generate_link_to_method(method, cls)
 
-                # If we do get_args() when return annotation has one single class
-                # (e.g. <class 'telegram._message.Message'>), get_args() returns an empty tuple.
-                if not returned_classes:
-                    self._resolve_arg_and_add_link_to_method(
-                        arg=ret_annot,
-                        dict_of_methods_for_class=methods_for_class,
-                        link_to_method=method_link,
-                    )
-                    continue
-
-                for ret_cls in returned_classes:
-                    self._resolve_arg_and_add_link_to_method(
-                        arg=ret_cls,
-                        dict_of_methods_for_class=methods_for_class,
-                        link_to_method=method_link,
-                    )
+                self._resolve_arg_and_add_link_to_method(
+                    arg=ret_annot,
+                    dict_of_methods_for_class=methods_for_class,
+                    link_to_method=method_link,
+                )
+                continue
 
         return self._generate_admonitions(methods_for_class, admonition_type="returned_in")
 
