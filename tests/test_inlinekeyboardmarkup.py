@@ -102,7 +102,7 @@ class TestInlineKeyboardMarkup:
         with pytest.raises(ValueError):
             InlineKeyboardMarkup(InlineKeyboardButton("b1", "1"))
         with pytest.raises(ValueError):
-            InlineKeyboardMarkup([[[[InlineKeyboardButton("only_2d_array_is_allowed", "1")]]]])
+            InlineKeyboardMarkup([[[InlineKeyboardButton("only_2d_array_is_allowed", "1")]]])
 
     async def test_expected_values_empty_switch(self, inline_keyboard_markup, bot, monkeypatch):
         async def make_assertion(
