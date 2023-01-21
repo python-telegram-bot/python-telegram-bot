@@ -160,11 +160,19 @@ class AdmonitionInserter:
                     # and its subclasses to the attribute of the class being inspected.
                     # The class in the attribute docstring (or its subclass) is the key,
                     # the attribute of the class currently being inspected is the value.
-                    self._resolve_arg_and_add_link(
-                        arg=name_of_class_in_attr,
-                        dict_of_methods_for_class=attrs_for_class,
-                        link=f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`",
-                    )
+                    try:
+                        self._resolve_arg_and_add_link(
+                            arg=name_of_class_in_attr,
+                            dict_of_methods_for_class=attrs_for_class,
+                            link=f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`",
+                        )
+                    except NotImplementedError as e:
+                        raise NotImplementedError(
+                            f"Error generating Sphinx 'Available in' admonition "
+                            f"(admonition_inserter.py). Class {name_of_class_in_attr} present in "
+                            f"attribute {target_attr} of class {name_of_inspected_class_in_docstr}"
+                            f" could not be resolved. {str(e)}"
+                        )
 
             # Properties need to be parsed separately because they act like attributes but not
             # listed as attributes.
@@ -195,11 +203,19 @@ class AdmonitionInserter:
                     # subclasses to the property of the class being inspected.
                     # The class in the property docstring (or its subclass) is the key,
                     # and the property of the class currently being inspected is the value.
-                    self._resolve_arg_and_add_link(
-                        arg=name_of_class_in_prop,
-                        dict_of_methods_for_class=attrs_for_class,
-                        link=f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`",
-                    )
+                    try:
+                        self._resolve_arg_and_add_link(
+                            arg=name_of_class_in_prop,
+                            dict_of_methods_for_class=attrs_for_class,
+                            link=f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`",
+                        )
+                    except NotImplementedError as e:
+                        raise NotImplementedError(
+                            f"Error generating Sphinx 'Available in' admonition "
+                            f"(admonition_inserter.py). Class {name_of_class_in_prop} present in "
+                            f"property {prop_name} of class {name_of_inspected_class_in_docstr}"
+                            f" could not be resolved. {str(e)}"
+                        )
 
         return self._generate_admonitions(attrs_for_class, admonition_type="available_in")
 
@@ -220,12 +236,18 @@ class AdmonitionInserter:
 
                 method_link = self._generate_link_to_method(method, cls)
 
-                self._resolve_arg_and_add_link(
-                    arg=ret_annot,
-                    dict_of_methods_for_class=methods_for_class,
-                    link=method_link,
-                )
-                continue
+                try:
+                    self._resolve_arg_and_add_link(
+                        arg=ret_annot,
+                        dict_of_methods_for_class=methods_for_class,
+                        link=method_link,
+                    )
+                except NotImplementedError as e:
+                    raise NotImplementedError(
+                        f"Error generating Sphinx 'Returned in' admonition "
+                        f"(admonition_inserter.py). {cls}, method {method}. "
+                        f"Couldn't resolve type hint in return annotation {ret_annot}. {str(e)}"
+                    )
 
         return self._generate_admonitions(methods_for_class, admonition_type="returned_in")
 
@@ -247,11 +269,18 @@ class AdmonitionInserter:
                 parameters = sig.parameters
 
                 for param in parameters.values():
-                    self._resolve_arg_and_add_link(
-                        arg=param.annotation,
-                        dict_of_methods_for_class=methods_for_class,
-                        link=method_link,
-                    )
+                    try:
+                        self._resolve_arg_and_add_link(
+                            arg=param.annotation,
+                            dict_of_methods_for_class=methods_for_class,
+                            link=method_link,
+                        )
+                    except NotImplementedError as e:
+                        raise NotImplementedError(
+                            f"Error generating Sphinx 'Use in' admonition "
+                            f"(admonition_inserter.py). {cls}, method {method}, parameter "
+                            f"{param}: Couldn't resolve type hint {param.annotation}. {str(e)}"
+                        )
 
         return self._generate_admonitions(methods_for_class, admonition_type="use_in")
 
