@@ -313,6 +313,12 @@ class AdmonitionInserter:
         admonition_for_class = {}
 
         for cls, attrs in attrs_or_methods_for_class.items():
+
+            if cls is telegram.ext.ApplicationBuilder:
+                # ApplicationBuilder is only used in and returned from its own methods,
+                # so its page needs no admonitions.
+                continue
+
             attrs = sorted(attrs)
 
             # for admonition type "use_in" the title will be "Use in" and CSS class "use-in".
