@@ -385,6 +385,8 @@ class AdmonitionInserter:
         """Analyzes an argument of a method and recursively yields classes that the argument
         or its sub-arguments (in cases like Union[...]) belong to, if they can be resolved to
         telegram or telegram.ext classes.
+
+        Raises `NotImplementedError`.
         """
 
         origin = typing.get_origin(arg)
@@ -400,25 +402,16 @@ class AdmonitionInserter:
         # RECURSIVE CALLS
         # for cases like Union[Sequence....
         elif origin in (
-            dict,
-            tuple,
-            type,
             Union,
             collections.abc.Coroutine,
             collections.abc.Sequence,
-            typing.Sequence,
         ):
             for sub_arg in typing.get_args(arg):
                 yield from self._resolve_arg(sub_arg)
 
-        elif isinstance(arg, list):
-            for item in arg:
-                yield from self._resolve_arg(item)
-
         elif isinstance(arg, typing.TypeVar):
             # gets access to the "bound=..." parameter
             yield from self._resolve_arg(arg.__bound__)
-
         # END RECURSIVE CALLS
 
         elif isinstance(arg, typing.ForwardRef):
