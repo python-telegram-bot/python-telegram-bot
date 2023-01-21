@@ -155,19 +155,16 @@ class AdmonitionInserter:
                 # a typing description of one attribute can contain multiple classes
                 for match in single_class_name_pattern.finditer(line):
                     name_of_class_in_attr = match.group("class_name")
-                    resolved_class = self._resolve_class(name_of_class_in_attr)
-                    if resolved_class is None or "telegram" not in str(resolved_class):
-                        continue
 
                     # Writing to dictionary: matching the class found in the docstring
                     # and its subclasses to the attribute of the class being inspected.
                     # The class in the attribute docstring (or its subclass) is the key,
                     # the attribute of the class currently being inspected is the value.
-                    link_to_attr = f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
-                    attrs_for_class[resolved_class].add(link_to_attr)
-
-                    for subclass in self._iter_subclasses(resolved_class):
-                        attrs_for_class[subclass].add(link_to_attr)
+                    self._resolve_arg_and_add_link(
+                        arg=name_of_class_in_attr,
+                        dict_of_methods_for_class=attrs_for_class,
+                        link=f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`",
+                    )
 
             # Properties need to be parsed separately because they act like attributes but not
             # listed as attributes.
@@ -193,19 +190,16 @@ class AdmonitionInserter:
 
                 for match in single_class_name_pattern.finditer(first_line):
                     name_of_class_in_prop = match.group("class_name")
-                    if "telegram" not in name_of_class_in_prop:
-                        continue
 
                     # Writing to dictionary: matching the class found in the docstring and its
                     # subclasses to the property of the class being inspected.
                     # The class in the property docstring (or its subclass) is the key,
                     # and the property of the class currently being inspected is the value.
-                    cls = self._resolve_class(name_of_class_in_prop)
-                    link_to_prop = f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`"
-                    attrs_for_class[cls].add(link_to_prop)
-
-                    for subclass in self._iter_subclasses(cls):
-                        attrs_for_class[subclass].add(link_to_prop)
+                    self._resolve_arg_and_add_link(
+                        arg=name_of_class_in_prop,
+                        dict_of_methods_for_class=attrs_for_class,
+                        link=f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`",
+                    )
 
         return self._generate_admonitions(attrs_for_class, admonition_type="available_in")
 
@@ -226,10 +220,10 @@ class AdmonitionInserter:
 
                 method_link = self._generate_link_to_method(method, cls)
 
-                self._resolve_arg_and_add_link_to_method(
+                self._resolve_arg_and_add_link(
                     arg=ret_annot,
                     dict_of_methods_for_class=methods_for_class,
-                    link_to_method=method_link,
+                    link=method_link,
                 )
                 continue
 
@@ -253,10 +247,10 @@ class AdmonitionInserter:
                 parameters = sig.parameters
 
                 for param in parameters.values():
-                    self._resolve_arg_and_add_link_to_method(
+                    self._resolve_arg_and_add_link(
                         arg=param.annotation,
                         dict_of_methods_for_class=methods_for_class,
-                        link_to_method=method_link,
+                        link=method_link,
                     )
 
         return self._generate_admonitions(methods_for_class, admonition_type="use_in")
@@ -362,21 +356,15 @@ class AdmonitionInserter:
             if not str(c).split(".")[-1].startswith("_")
         )
 
-    def _resolve_arg_and_add_link_to_method(
+    def _resolve_arg_and_add_link(
         self,
         arg: Any,
         dict_of_methods_for_class: defaultdict,
-        link_to_method: str,
+        link: str,
     ) -> None:
-        """A helper method for "Returned in" and "Use in" admonition.
-        Tries to resolve the arg to a valid class. In case of success, adds the link to
-        Bot's or ApplicationBuilder's method to the set of methods for that class in the dictionary
-        of admonitions.
-
-        If `include_subclasses_if_applicable` is set to `True`, the method will check
-        if the resolved class is included in the list of classes whose subclasses can be
-        included in the same admonition. If it is on that list, dictionary entries for its
-        subclasses are added/updated too.
+        """A helper method. Tries to resolve the arg to a valid class. In case of success,
+        adds the link (to a method, attribute, or property) for that class' and its subclasses'
+        sets of links in the dictionary of admonitions.
 
         **Modifies dictionary in place.**
         """
@@ -384,13 +372,14 @@ class AdmonitionInserter:
 
             # When trying to resolve an argument from args or return annotation,
             # the method _resolve_arg returns None if nothing could be resolved.
-            if cls is None:
+            # Also, if class was resolved correctly, "telegram" will definitely be in its str().
+            if cls is None or "telegram" not in str(cls):
                 continue
 
-            dict_of_methods_for_class[cls].add(link_to_method)
+            dict_of_methods_for_class[cls].add(link)
 
             for subclass in self._iter_subclasses(cls):
-                dict_of_methods_for_class[subclass].add(link_to_method)
+                dict_of_methods_for_class[subclass].add(link)
 
     def _resolve_arg(self, arg: Any) -> Iterator[Union[type, None]]:
         """Analyzes an argument of a method and recursively yields classes that the argument
