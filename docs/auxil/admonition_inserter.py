@@ -405,7 +405,7 @@ class AdmonitionInserter:
 
         # RECURSIVE CALLS
         # for cases like Union[Sequence....
-        elif typing.get_origin(arg) in (
+        elif origin in (
             dict,
             tuple,
             type,
@@ -452,7 +452,7 @@ class AdmonitionInserter:
             if "telegram" in str(arg):
                 # get_origin() of telegram.ext._application.Application[~BT, ~CCT, ~UD...]
                 # will produce <class 'telegram.ext._application.Application'>
-                yield typing.get_origin(arg)
+                yield origin
 
         # For some reason "InlineQueryResult" and "InputMedia" are currently not recognized
         # as ForwardRefs and are identified as plain strings.
