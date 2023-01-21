@@ -156,16 +156,18 @@ class AdmonitionInserter:
                 for match in single_class_name_pattern.finditer(line):
                     name_of_class_in_attr = match.group("class_name")
                     resolved_class = self._resolve_class(name_of_class_in_attr)
-                    if resolved_class is None:
+                    if resolved_class is None or "telegram" not in str(resolved_class):
                         continue
 
-                    # Writing to dictionary: matching the class found in the docstring to the
-                    # attribute of the class being inspected.
-                    # Key is the class in the attribute docstring, value is the attribute of the
-                    # class currently being inspected.
-                    attrs_for_class[resolved_class].add(
-                        f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
-                    )
+                    # Writing to dictionary: matching the class found in the docstring
+                    # and its subclasses to the attribute of the class being inspected.
+                    # The class in the attribute docstring (or its subclass) is the key,
+                    # the attribute of the class currently being inspected is the value.
+                    link_to_attr = f":attr:`{name_of_inspected_class_in_docstr}.{target_attr}`"
+                    attrs_for_class[resolved_class].add(link_to_attr)
+
+                    for subclass in self._iter_subclasses(resolved_class):
+                        attrs_for_class[subclass].add(link_to_attr)
 
             # Properties need to be parsed separately because they act like attributes but not
             # listed as attributes.
@@ -194,13 +196,16 @@ class AdmonitionInserter:
                     if "telegram" not in name_of_class_in_prop:
                         continue
 
-                    # Writing to dictionary: matching the class found in the docstring to the
-                    # property of the class being inspected.
-                    # The class in the property docstring is the key, and the property of the
-                    # class currently being inspected is the value.
-                    attrs_for_class[self._resolve_class(name_of_class_in_prop)].add(
-                        f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`"
-                    )
+                    # Writing to dictionary: matching the class found in the docstring and its
+                    # subclasses to the property of the class being inspected.
+                    # The class in the property docstring (or its subclass) is the key,
+                    # and the property of the class currently being inspected is the value.
+                    cls = self._resolve_class(name_of_class_in_prop)
+                    link_to_prop = f":attr:`{name_of_inspected_class_in_docstr}.{prop_name}`"
+                    attrs_for_class[cls].add(link_to_prop)
+
+                    for subclass in self._iter_subclasses(cls):
+                        attrs_for_class[subclass].add(link_to_prop)
 
         return self._generate_admonitions(attrs_for_class, admonition_type="available_in")
 
@@ -348,12 +353,20 @@ class AdmonitionInserter:
         else:
             raise NotImplementedError(f"Base class {base_class} not supported")
 
+    @staticmethod
+    def _iter_subclasses(cls: type) -> Iterator:
+        return (
+            # exclude private classes
+            c
+            for c in cls.__subclasses__()
+            if not str(c).split(".")[-1].startswith("_")
+        )
+
     def _resolve_arg_and_add_link_to_method(
         self,
         arg: Any,
         dict_of_methods_for_class: defaultdict,
         link_to_method: str,
-        include_subclasses: bool = True,
     ) -> None:
         """A helper method for "Returned in" and "Use in" admonition.
         Tries to resolve the arg to a valid class. In case of success, adds the link to
@@ -376,15 +389,7 @@ class AdmonitionInserter:
 
             dict_of_methods_for_class[cls].add(link_to_method)
 
-            if not include_subclasses:
-                continue
-
-            for subclass in [
-                # exclude private classes
-                p
-                for p in cls.__subclasses__()
-                if not str(p).split(".")[-1].startswith("_")
-            ]:
+            for subclass in self._iter_subclasses(cls):
                 dict_of_methods_for_class[subclass].add(link_to_method)
 
     def _resolve_arg(self, arg: Any) -> Iterator[Union[type, None]]:
