@@ -86,7 +86,7 @@ class AdmonitionInserter:
         **Modifies lines in place**.
         """
         # A better way would be to copy the lines and return them, but that will not work with
-        # autodoc_process_docstring()
+        # docs.auxil.sphinx_hooks.autodoc_process_docstring()
 
         for admonition_type in self.ADMONITION_TYPES:
 
