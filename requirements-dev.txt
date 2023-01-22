@@ -1,6 +1,6 @@
 pre-commit
 
-pytest==7.2.0
+pytest==7.2.1
 pytest-asyncio==0.20.3
 pytest-timeout==2.1.0 # used to timeout tests
 pytest-xdist==3.1.0  # xdist runs tests in parallel
