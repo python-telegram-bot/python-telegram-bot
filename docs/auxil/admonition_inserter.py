@@ -116,7 +116,7 @@ class AdmonitionInserter:
         )
 
         # for properties: there is no attr name in docstring.  Just check if there's a class name.
-        prop_docst_pattern = re.compile(r":class:`.+`.*:")
+        prop_docstring_pattern = re.compile(r":class:`.+`.*:")
 
         # pattern for iterating over potentially many class names in docstring for one attribute.
         # Tilde is optional (sometimes it is in the docstring, sometimes not).
@@ -155,7 +155,7 @@ class AdmonitionInserter:
                     # Writing to dictionary: matching the class found in the docstring
                     # and its subclasses to the attribute of the class being inspected.
                     # The class in the attribute docstring (or its subclass) is the key,
-                    # the attribute of the class currently being inspected is the value.
+                    # ReST link to attribute of the class currently being inspected is the value.
                     try:
                         self._resolve_arg_and_add_link(
                             arg=name_of_class_in_attr,
@@ -189,7 +189,7 @@ class AdmonitionInserter:
                     continue
 
                 first_line = docstring.splitlines()[0]
-                if not prop_docst_pattern.match(first_line):
+                if not prop_docstring_pattern.match(first_line):
                     continue
 
                 for match in single_class_name_pattern.finditer(first_line):
@@ -198,7 +198,7 @@ class AdmonitionInserter:
                     # Writing to dictionary: matching the class found in the docstring and its
                     # subclasses to the property of the class being inspected.
                     # The class in the property docstring (or its subclass) is the key,
-                    # and the property of the class currently being inspected is the value.
+                    # ReST link to property of the class currently being inspected is the value.
                     try:
                         self._resolve_arg_and_add_link(
                             arg=name_of_class_in_prop,
@@ -255,7 +255,7 @@ class AdmonitionInserter:
         # Generate a mapping of classes to links to Bot methods which accept them as arguments,
         # i.e. {<class 'telegram._inline.inlinequeryresult.InlineQueryResult'>:
         # {:meth:`telegram.Bot.answer_inline_query`, ...}}
-        methods_for_class = defaultdict(set)  # using set because there can be repetitions
+        methods_for_class = defaultdict(set)
 
         for cls, relevant_methods_for_class in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
             for method in relevant_methods_for_class:
@@ -293,11 +293,11 @@ class AdmonitionInserter:
             if (
                 value.startswith(".. seealso:")
                 # The docstring contains heading "Examples:", but Sphinx will have it converted
-                # to ".. admonition: Examples".
+                # to ".. admonition: Examples":
                 or value.startswith(".. admonition:: Examples")
                 or value.startswith(".. version")
                 # The space after ":param" is important because docstring can contain ":paramref:"
-                # in its plain text in the beginning of a line (e.g. ExtBot)
+                # in its plain text in the beginning of a line (e.g. ExtBot):
                 or value.startswith(":param ")
                 # some classes (like "Credentials") have no params, so insert before attrs:
                 or value.startswith(".. attribute::")
@@ -318,12 +318,12 @@ class AdmonitionInserter:
         [":meth: `telegram.Bot.get_sticker_set`", ...]}.
         ```
 
-        Returns a dictionary of class **names** matched to full admonitions, e.g.
+        Returns a dictionary of classes matched to full admonitions, e.g.
         for `admonition_type` "returned_in" (note that title and CSS class are generated
         automatically):
 
         ```
-        {"<class 'telegram._files.sticker.StickerSet'>":
+        {<class 'telegram._files.sticker.StickerSet'>:
         ".. admonition:: Returned in:
             :class: returned-in
 
@@ -345,7 +345,7 @@ class AdmonitionInserter:
 
             attrs = sorted(attrs)
 
-            # for admonition type "use_in" the title will be "Use in" and CSS class "use-in".
+            # e.g. for admonition type "use_in" the title will be "Use in" and CSS class "use-in".
             admonition = f"""
 
 .. admonition:: {admonition_type.title().replace("_", " ")}
@@ -387,7 +387,7 @@ class AdmonitionInserter:
         dict_of_methods_for_class: defaultdict,
         link: str,
     ) -> None:
-        """A helper method. Tries to resolve the arg to a valid class. In case of success,
+        """A helper method. Tries to resolve the arg into a valid class. In case of success,
         adds the link (to a method, attribute, or property) for that class' and its subclasses'
         sets of links in the dictionary of admonitions.
 
