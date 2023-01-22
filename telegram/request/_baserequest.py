@@ -20,10 +20,9 @@
 import abc
 import asyncio
 import json
-from contextlib import AbstractAsyncContextManager
 from http import HTTPStatus
 from types import TracebackType
-from typing import ClassVar, List, Optional, Tuple, Type, TypeVar, Union
+from typing import AsyncContextManager, ClassVar, List, Optional, Tuple, Type, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
@@ -44,7 +43,7 @@ RT = TypeVar("RT", bound="BaseRequest")
 
 
 class BaseRequest(
-    AbstractAsyncContextManager,
+    AsyncContextManager["BaseRequest"],
     abc.ABC,
 ):
     """Abstract interface class that allows python-telegram-bot to make requests to the Bot API.

@@ -24,13 +24,13 @@ import logging
 import platform
 import signal
 from collections import defaultdict
-from contextlib import AbstractAsyncContextManager
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType, TracebackType
 from typing import (
     TYPE_CHECKING,
     Any,
+    AsyncContextManager,
     Callable,
     Coroutine,
     DefaultDict,
@@ -108,7 +108,7 @@ class ApplicationHandlerStop(Exception):
         self.state: Optional[object] = state
 
 
-class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager):
+class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Application"]):
     """This class dispatches all kinds of updates to its registered handlers, and is the entry
     point to a PTB application.
 

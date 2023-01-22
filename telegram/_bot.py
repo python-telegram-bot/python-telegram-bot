@@ -23,12 +23,12 @@ import copy
 import functools
 import logging
 import pickle
-from contextlib import AbstractAsyncContextManager
 from datetime import datetime
 from types import TracebackType
 from typing import (
     TYPE_CHECKING,
     Any,
+    AsyncContextManager,
     Callable,
     Dict,
     List,
@@ -114,7 +114,7 @@ if TYPE_CHECKING:
 BT = TypeVar("BT", bound="Bot")
 
 
-class Bot(TelegramObject, AbstractAsyncContextManager):
+class Bot(TelegramObject, AsyncContextManager["Bot"]):
     """This object represents a Telegram Bot.
 
     Instances of this class can be used as asyncio context managers, where

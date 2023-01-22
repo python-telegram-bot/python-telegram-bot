@@ -20,10 +20,19 @@
 import asyncio
 import logging
 import ssl
-from contextlib import AbstractAsyncContextManager
 from pathlib import Path
 from types import TracebackType
-from typing import TYPE_CHECKING, Callable, Coroutine, List, Optional, Type, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    AsyncContextManager,
+    Callable,
+    Coroutine,
+    List,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -43,7 +52,7 @@ if TYPE_CHECKING:
 _UpdaterType = TypeVar("_UpdaterType", bound="Updater")  # pylint: disable=invalid-name
 
 
-class Updater(AbstractAsyncContextManager):
+class Updater(AsyncContextManager["Updater"]):
     """This class fetches updates for the bot either via long polling or by starting a webhook
     server. Received updates are enqueued into the :attr:`update_queue` and may be fetched from
     there to handle them appropriately.
