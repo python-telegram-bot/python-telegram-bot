@@ -40,17 +40,10 @@ def check_keyboard_type(keyboard: object) -> bool:
     if not isinstance(keyboard, Sequence) or isinstance(keyboard, (str, bytes)):
         return False
 
-    # Determine the dimension of the keyboard.
-    def dim(keyboard: Sequence, current_dim: int = 0) -> int:
-        if isinstance(keyboard, Sequence) and not isinstance(keyboard, (str, bytes)):
-            current_dim += 1
-            return dim(keyboard[0], current_dim)
-        return current_dim
-
-    if dim(keyboard) >= 3:
-        return False
-
     for row in keyboard:
         if not isinstance(row, Sequence) or isinstance(row, (str, bytes)):
             return False
+        for inner in row:
+            if isinstance(inner, Sequence):
+                return False
     return True
