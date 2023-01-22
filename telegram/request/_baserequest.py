@@ -25,6 +25,7 @@ from types import TracebackType
 from typing import AsyncContextManager, ClassVar, List, Optional, Tuple, Type, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
+from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import JSONDict, ODVInput
 from telegram._version import __version__ as ptb_ver
 from telegram.error import (
@@ -83,7 +84,7 @@ class BaseRequest(
     USER_AGENT: ClassVar[str] = f"python-telegram-bot v{ptb_ver} (https://python-telegram-bot.org)"
     """:obj:`str`: A description that can be used as user agent for requests made to the Bot API.
     """
-    DEFAULT_NONE: ClassVar = _DEFAULT_NONE
+    DEFAULT_NONE: ClassVar[DefaultValue[None]] = _DEFAULT_NONE
     """:class:`object`: A special object that indicates that an argument of a function was not
     explicitly passed. Used for the timeout parameters of :meth:`post` and :meth:`do_request`.
 

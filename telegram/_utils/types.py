@@ -50,12 +50,12 @@ JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
 
 DVType = TypeVar("DVType")  # pylint: disable=invalid-name
-ODVInput = Optional[Union["DefaultValue[DVType]", DVType]]
+ODVInput = Optional[Union["DefaultValue[DVType]", DVType, "DefaultValue[None]"]]
 """Generic type for bot method parameters which can have defaults. ``ODVInput[type]`` is the same
-as ``Optional[Union[DefaultValue, type]]``."""
-DVInput = Union["DefaultValue[DVType]", DVType]
+as ``Optional[Union[DefaultValue[type], type, DefaultValue[None]]``."""
+DVInput = Union["DefaultValue[DVType]", DVType, "DefaultValue[None]"]
 """Generic type for bot method parameters which can have defaults. ``DVInput[type]`` is the same
-as ``Union[DefaultValue, type]``."""
+as ``Union[DefaultValue[type], type, DefaultValue[None]]``."""
 
 RT = TypeVar("RT")
 SCT = Union[RT, Collection[RT]]
