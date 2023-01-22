@@ -12,10 +12,6 @@ import telegram.ext
 class AdmonitionInserter:
     """Class for inserting admonitions into docs of Telegram classes."""
 
-    # We cannot move this code to a separate module within docs because there is no way
-    # to import it.  This class is simply a way of encapsulating the code and providing a better
-    # overview of conf.py.
-
     ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
 
     FORWARD_REF_PATTERN = re.compile(r"^ForwardRef\('(?P<class_name>\w+)'\)$")
