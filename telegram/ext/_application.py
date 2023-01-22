@@ -212,14 +212,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     """
 
-    # Allowing '__weakref__' creation here since we need it for the JobQueue
     __slots__ = (
         "__create_task_tasks",
         "__update_fetcher_task",
         "__update_persistence_event",
         "__update_persistence_lock",
         "__update_persistence_task",
-        "__weakref__",
+        # Allowing '__weakref__' creation here since we need it for the JobQueue
+        # Uncomment if necessary - currently the __weakref__ slot is already created
+        # in the AsyncContextManager base class
+        # "__weakref__",
         "_chat_data",
         "_chat_ids_to_be_deleted_in_persistence",
         "_chat_ids_to_be_updated_in_persistence",
