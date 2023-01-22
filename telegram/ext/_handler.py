@@ -21,7 +21,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
@@ -90,10 +90,10 @@ class BaseHandler(Generic[UT, CCT], ABC):
     def __init__(
         self,
         callback: HandlerCallback[UT, CCT, RT],
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         self.callback: HandlerCallback[UT, CCT, RT] = callback
-        self.block: Optional[DVInput[bool]] = block
+        self.block: DVType[bool] = block
 
     @abstractmethod
     def check_update(self, update: object) -> Optional[Union[bool, object]]:

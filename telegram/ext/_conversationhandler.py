@@ -38,7 +38,7 @@ from typing import (
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram._utils.warnings import warn
 from telegram.ext._application import ApplicationHandlerStop
 from telegram.ext._callbackcontext import CallbackContext
@@ -307,7 +307,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         name: str = None,
         persistent: bool = False,
         map_to_parent: Dict[object, object] = None,
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         # these imports need to be here because of circular import error otherwise
         from telegram.ext import (  # pylint: disable=import-outside-toplevel
@@ -319,9 +319,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
 
         # self.block is what the Application checks and we want it to always run CH in a blocking
         # way so that CH can take care of any non-blocking logic internally
-        self.block: Optional[DVInput[bool]] = True
+        self.block: DVType[bool] = True
         # Store the actual setting in a protected variable instead
-        self._block: Optional[DVInput[bool]] = block
+        self._block: DVType[bool] = block
 
         self._entry_points: List[BaseHandler[Update, CCT]] = entry_points
         self._states: Dict[object, List[BaseHandler[Update, CCT]]] = states

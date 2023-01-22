@@ -312,7 +312,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         raise pickle.PicklingError("Bot objects cannot be pickled!")
 
-    def __deepcopy__(self, memodict: dict) -> NoReturn:
+    def __deepcopy__(self, memodict: Dict[int, object]) -> NoReturn:
         """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
         be deepcopied and this method will always raise an exception.
 

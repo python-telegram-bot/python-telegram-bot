@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Match, Optional, Pattern, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
@@ -78,7 +78,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
         pattern: Union[str, Pattern] = None,
     ):
         super().__init__(callback, block=block)

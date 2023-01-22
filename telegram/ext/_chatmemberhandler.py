@@ -21,7 +21,7 @@ from typing import ClassVar, Optional, TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
@@ -83,7 +83,7 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         self,
         callback: HandlerCallback[Update, CCT, RT],
         chat_member_types: int = MY_CHAT_MEMBER,
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
 

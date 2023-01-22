@@ -21,7 +21,7 @@
 from typing import Optional, Type, TypeVar
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
@@ -74,7 +74,7 @@ class TypeHandler(BaseHandler[UT, CCT]):
         type: Type[UT],  # pylint: disable=redefined-builtin
         callback: HandlerCallback[UT, CCT, RT],
         strict: bool = False,
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
         self.type: Type[UT] = type

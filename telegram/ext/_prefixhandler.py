@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, TypeVar, Union
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import SCT, DVInput
+from telegram._utils.types import SCT, DVType
 from telegram.ext import filters as filters_module
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
@@ -128,7 +128,7 @@ class PrefixHandler(BaseHandler[Update, CCT]):
         command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],
         filters: filters_module.BaseFilter = None,
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
 
         super().__init__(callback=callback, block=block)

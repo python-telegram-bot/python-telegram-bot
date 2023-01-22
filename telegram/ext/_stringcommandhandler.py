@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, List, Optional
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, RT, HandlerCallback
 
@@ -74,7 +74,7 @@ class StringCommandHandler(BaseHandler[str, CCT]):
         self,
         command: str,
         callback: HandlerCallback[str, CCT, RT],
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
         self.command: str = command

@@ -95,6 +95,7 @@ import mimetypes
 import re
 from abc import ABC, abstractmethod
 from typing import (
+    Any,
     Dict,
     FrozenSet,
     List,
@@ -114,7 +115,7 @@ from telegram import User as TGUser
 from telegram._utils.types import SCT
 from telegram.constants import DiceEmoji as DiceEmojiEnum
 
-DataDict = Dict[str, list]
+DataDict = Dict[str, List[Any]]
 
 
 class BaseFilter:

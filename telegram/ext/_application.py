@@ -50,7 +50,7 @@ from typing import (
 
 from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
-from telegram._utils.types import DVInput, ODVInput
+from telegram._utils.types import DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
@@ -1182,7 +1182,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             Union[List[BaseHandler], Tuple[BaseHandler]],
             Dict[int, Union[List[BaseHandler], Tuple[BaseHandler]]],
         ],
-        group: DVInput[int] = DefaultValue(0),
+        group: Union[int, DefaultValue[int]] = DefaultValue(0),
     ) -> None:
         """Registers multiple handlers at once. The order of the handlers in the passed
         sequence(s) matters. See :meth:`add_handler` for details.
@@ -1509,7 +1509,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     def add_error_handler(
         self,
         callback: HandlerCallback[object, CCT, None],
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ) -> None:
         """Registers an error handler in the Application. This handler will receive every error
         which happens in your bot. See the docs of :meth:`process_error` for more details on how

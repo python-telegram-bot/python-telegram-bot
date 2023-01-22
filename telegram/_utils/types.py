@@ -49,11 +49,13 @@ a local file path as string, :class:`pathlib.Path` or the file contents as :obj:
 JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
 
-DVType = TypeVar("DVType")  # pylint: disable=invalid-name
-ODVInput = Optional[Union["DefaultValue[DVType]", DVType, "DefaultValue[None]"]]
+DVValueType = TypeVar("DVValueType")  # pylint: disable=invalid-name
+DVType = Union[DVValueType, "DefaultValue[DVValueType]"]
+"""Generic type for a variable which can be either `type` or `DefaultVaule[type]`."""
+ODVInput = Optional[Union["DefaultValue[DVValueType]", DVValueType, "DefaultValue[None]"]]
 """Generic type for bot method parameters which can have defaults. ``ODVInput[type]`` is the same
 as ``Optional[Union[DefaultValue[type], type, DefaultValue[None]]``."""
-DVInput = Union["DefaultValue[DVType]", DVType, "DefaultValue[None]"]
+DVInput = Union["DefaultValue[DVValueType]", DVValueType, "DefaultValue[None]"]
 """Generic type for bot method parameters which can have defaults. ``DVInput[type]`` is the same
 as ``Union[DefaultValue[type], type, DefaultValue[None]]``."""
 
