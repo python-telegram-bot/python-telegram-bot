@@ -116,8 +116,7 @@ class CallbackDataCache:
     Examples:
         :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
 
-    .. seealso:: :attr:`telegram.ext.ExtBot.callback_data_cache`,
-        :wiki:`Architecture Overview <Architecture>`,
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
         :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
     .. versionadded:: 13.6

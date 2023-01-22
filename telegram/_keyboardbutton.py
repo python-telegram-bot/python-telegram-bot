@@ -58,10 +58,10 @@ class KeyboardButton(TelegramObject):
             sent as a contact when the button is pressed. Available in private chats only.
         request_location (:obj:`bool`, optional): If :obj:`True`, the user's current location will
             be sent when the button is pressed. Available in private chats only.
-        request_poll (:class:`KeyboardButtonPollType`, optional): If specified, the user will be
-            asked to create a poll and send it to the bot when the button is pressed. Available in
-            private chats only.
-        web_app (:class:`WebAppInfo`, optional): If specified, the described `Web App
+        request_poll (:class:`~telegram.KeyboardButtonPollType`, optional): If specified, the user
+            will be asked to create a poll and send it to the bot when the button is pressed.
+            Available in private chats only.
+        web_app (:class:`~telegram.WebAppInfo`, optional): If specified, the described `Web App
             <https://core.telegram.org/bots/webapps>`_ will be launched when the button is pressed.
             The Web App will be able to send a :attr:`Message.web_app_data` service message.
             Available in private chats only.
@@ -74,10 +74,10 @@ class KeyboardButton(TelegramObject):
             sent as a contact when the button is pressed. Available in private chats only.
         request_location (:obj:`bool`): Optional. If :obj:`True`, the user's current location will
             be sent when the button is pressed. Available in private chats only.
-        request_poll (:class:`KeyboardButtonPollType`): Optional. If specified, the user will be
-            asked to create a poll and send it to the bot when the button is pressed. Available in
-            private chats only.
-        web_app (:class:`WebAppInfo`): Optional. If specified, the described `Web App
+        request_poll (:class:`~telegram.KeyboardButtonPollType`): Optional. If specified,
+            the user will be asked to create a poll and send it to the bot when the button is
+            pressed. Available in private chats only.
+        web_app (:class:`~telegram.WebAppInfo`): Optional. If specified, the described `Web App
             <https://core.telegram.org/bots/webapps>`_ will be launched when the button is pressed.
             The Web App will be able to send a :attr:`Message.web_app_data` service message.
             Available in private chats only.

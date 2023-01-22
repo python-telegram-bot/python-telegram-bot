@@ -56,9 +56,7 @@ class JobQueue:
     Examples:
         :any:`Timer Bot <examples.timerbot>`
 
-    .. seealso:: :attr:`telegram.ext.Application.job_queue`,
-        :attr:`telegram.ext.CallbackContext.job_queue`,
-        :wiki:`Architecture Overview <Architecture>`,
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
         :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
 
     .. versionchanged:: 20.0

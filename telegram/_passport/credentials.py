@@ -114,14 +114,14 @@ class EncryptedCredentials(TelegramObject):
         :obj:`telegram.PassportData.decrypted_credentials`.
 
     Args:
-        data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
+        data (:class:`telegram.Credentials` | :obj:`str`): Decrypted data with unique user's
             nonce, data hashes and secrets used for EncryptedPassportElement decryption and
             authentication or base64 encrypted data.
         hash (:obj:`str`): Base64-encoded data hash for data authentication.
         secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
 
     Attributes:
-        data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
+        data (:class:`telegram.Credentials` | :obj:`str`): Decrypted data with unique user's
             nonce, data hashes and secrets used for EncryptedPassportElement decryption and
             authentication or base64 encrypted data.
         hash (:obj:`str`): Base64-encoded data hash for data authentication.

@@ -3,9 +3,9 @@ import os
 import re
 import subprocess
 import sys
+import typing
 from enum import Enum
 from pathlib import Path
-from typing import List, Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -226,6 +226,7 @@ html_css_files = [
     "style_mermaid_diagrams.css",
     "style_sidebar_brand.css",
     "style_general.css",
+    "style_admonitions.css",
 ]
 
 html_permalinks_icon = "¶"  # Furo's default permalink icon is `#` which doesn't look great imo.
@@ -295,7 +296,9 @@ texinfo_documents = [
 sphinx_logger = logging.getLogger(__name__)
 
 CONSTANTS_ROLE = "tg-const"
+# Due to Sphinx behaviour, these imports only work when imported here, not at top of module.
 import telegram  # We need this so that the `eval` below works
+from docs.auxil.admonition_inserter import AdmonitionInserter
 
 
 class TGConstXRefRole(PyXRefRole):
@@ -316,7 +319,7 @@ class TGConstXRefRole(PyXRefRole):
         has_explicit_title: bool,
         title: str,
         target: str,
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         title, target = super().process_link(env, refnode, has_explicit_title, title, target)
         try:
             # We use `eval` to get the value of the expression. Maybe there are better ways to
@@ -410,7 +413,7 @@ read_timeout_sub = [
 read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
 
 
-def find_insert_pos(lines: List[str]) -> int:
+def find_insert_pos_for_kwargs(lines: list[str]) -> int:
     """Finds the correct position to insert the keyword arguments and returns the index."""
     for idx, value in reversed(list(enumerate(lines))):  # reversed since :returns: is at the end
         if value.startswith(":returns:"):
@@ -441,15 +444,28 @@ def check_timeout_and_api_kwargs_presence(obj: object) -> int:
     )
 
 
+ADMONITION_INSERTER = AdmonitionInserter()
+
+
 def autodoc_process_docstring(
-    app: Sphinx, what, name: str, obj: object, options, lines: List[str]
+    app: Sphinx, what, name: str, obj: object, options, lines: list[str]
 ):
-    """We do two things:
+    """We do the following things:
     1) Use this method to automatically insert the Keyword Args for the Bot methods.
 
-    2) Misuse this autodoc hook to get the file names & line numbers because we have access
+    2) Use this method to automatically insert "Returned in" admonition into classes
+       that are returned from the Bot methods
+
+    3) Use this method to automatically insert "Available in" admonition into classes
+       whose instances are available as attributes of other classes
+
+    4) Use this method to automatically insert "Use in" admonition into classes
+       whose instances can be used as arguments of the Bot methods
+
+    5) Misuse this autodoc hook to get the file names & line numbers because we have access
        to the actual object here.
     """
+
     # 1) Insert the Keyword Args for the Bot methods
     method_name = name.split(".")[-1]
     if (
@@ -458,7 +474,7 @@ def autodoc_process_docstring(
         and method_name.islower()
         and check_timeout_and_api_kwargs_presence(obj)
     ):
-        insert_index = find_insert_pos(lines)
+        insert_index = find_insert_pos_for_kwargs(lines)
         if not insert_index:
             raise ValueError(
                 f"Couldn't find the correct position to insert the keyword args for {obj}."
@@ -478,7 +494,15 @@ def autodoc_process_docstring(
                 ),
             )
 
-    # 2) Get the file names & line numbers
+    # 2-4) Insert "Returned in", "Available in", "Use in" admonitions into classes
+    # (where applicable)
+    if what == "class":
+        ADMONITION_INSERTER.insert_admonitions_for_class(
+            cls=typing.cast(type, obj),  # since "what" == class, we know it's not just object
+            docstring_lines=lines,
+        )
+
+    # 5) Get the file names & line numbers
     # We can't properly handle ordinary attributes.
     # In linkcode_resolve we'll resolve to the `__init__` or module instead
     if what == "attribute":
