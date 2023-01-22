@@ -338,6 +338,8 @@ class TestHTTPXRequest:
             timeout: object
             proxies: object
             limits: object
+            http1: object
+            http2: object
 
         monkeypatch.setattr(httpx, "AsyncClient", Client)
 
@@ -347,6 +349,7 @@ class TestHTTPXRequest:
         assert request._client.limits == httpx.Limits(
             max_connections=1, max_keepalive_connections=1
         )
+        assert request._client.http2 is True
 
         request = HTTPXRequest(
             connection_pool_size=42,
@@ -399,6 +402,30 @@ class TestHTTPXRequest:
             await httpx_request.do_request(url="https://python-telegram-bot.org", method="GET")
         async with httpx_request:
             await httpx_request.do_request(url="https://python-telegram-bot.org", method="GET")
+
+    async def test_http_version_error(self):
+        with pytest.raises(ValueError, match="`http_version` must be either"):
+            HTTPXRequest(http_version="1.0")
+
+    async def test_http_1_response(self):
+        httpx_request = HTTPXRequest(http_version="1.1")
+        async with httpx_request:
+            resp = await httpx_request._client.request(
+                url="https://python-telegram-bot.org",
+                method="GET",
+                headers={"User-Agent": httpx_request.USER_AGENT},
+            )
+            assert resp.http_version == "HTTP/1.1"
+
+    async def test_http_2_response(self):
+        httpx_request = HTTPXRequest()
+        async with httpx_request:
+            resp = await httpx_request._client.request(
+                url="https://python-telegram-bot.org",
+                method="GET",
+                headers={"User-Agent": httpx_request.USER_AGENT},
+            )
+            assert resp.http_version == "HTTP/2"
 
     async def test_do_request_after_shutdown(self, httpx_request):
         await httpx_request.shutdown()

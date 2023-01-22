@@ -135,7 +135,9 @@ As these features are *optional*, the corresponding 3rd party dependencies are n
 Instead, they are listed as optional dependencies.
 This allows to avoid unnecessary dependency conflicts for users who don't need the optional features.
 
-The only required dependency is `httpx ~= 0.23.3 <https://www.python-httpx.org>`_ for ``telegram.request.HTTPXRequest``, the default networking backend.
+The only required dependency is `httpx[http2] ~= 0.23.3 <https://www.python-httpx.org>`_ for
+``telegram.request.HTTPXRequest``, the default networking backend. By default, HTTP/2 is used, as it
+provides greater performance and stability, specially for concurrent requests.
 
 ``python-telegram-bot`` is most useful when used along with additional libraries.
 To minimize dependency conflicts, we try to be liberal in terms of version requirements on the (optional) dependencies.
