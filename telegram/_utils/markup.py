@@ -44,6 +44,6 @@ def check_keyboard_type(keyboard: object) -> bool:
         if not isinstance(row, Sequence) or isinstance(row, (str, bytes)):
             return False
         for inner in row:
-            if isinstance(inner, Sequence):
+            if isinstance(inner, Sequence) and not isinstance(inner, str):
                 return False
     return True
