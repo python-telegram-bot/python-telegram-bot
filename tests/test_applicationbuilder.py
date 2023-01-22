@@ -90,6 +90,8 @@ class TestApplicationBuilder:
             timeout: object
             proxies: object
             limits: object
+            http1: object
+            http2: object
 
         monkeypatch.setattr(httpx, "AsyncClient", Client)
 
@@ -118,11 +120,15 @@ class TestApplicationBuilder:
         assert get_updates_client.timeout == httpx.Timeout(
             connect=5.0, read=5.0, write=5.0, pool=1.0
         )
+        assert not get_updates_client.http1
+        assert get_updates_client.http2 is True
 
         client = app.bot.request._client
         assert client.limits == httpx.Limits(max_connections=256, max_keepalive_connections=256)
         assert client.proxies is None
         assert client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
+        assert not client.http1
+        assert client.http2 is True
 
         assert isinstance(app.update_queue, asyncio.Queue)
         assert isinstance(app.updater, Updater)
@@ -165,6 +171,7 @@ class TestApplicationBuilder:
             "proxy_url",
             "bot",
             "updater",
+            "http_version",
         ),
     )
     def test_mutually_exclusive_for_request(self, builder, method):
@@ -189,6 +196,7 @@ class TestApplicationBuilder:
             "get_updates_read_timeout",
             "get_updates_write_timeout",
             "get_updates_proxy_url",
+            "get_updates_http_version",
             "bot",
             "updater",
         ),
@@ -216,12 +224,14 @@ class TestApplicationBuilder:
             "get_updates_read_timeout",
             "get_updates_write_timeout",
             "get_updates_proxy_url",
+            "get_updates_http_version",
             "connection_pool_size",
             "connect_timeout",
             "pool_timeout",
             "read_timeout",
             "write_timeout",
             "proxy_url",
+            "http_version",
             "bot",
             "update_queue",
             "rate_limiter",
@@ -251,6 +261,7 @@ class TestApplicationBuilder:
             "get_updates_read_timeout",
             "get_updates_write_timeout",
             "get_updates_proxy_url",
+            "get_updates_http_version",
             "connection_pool_size",
             "connect_timeout",
             "pool_timeout",
@@ -258,6 +269,7 @@ class TestApplicationBuilder:
             "write_timeout",
             "proxy_url",
             "bot",
+            "http_version",
         ]
         + [entry[0] for entry in _BOT_CHECKS],
     )
@@ -308,19 +320,23 @@ class TestApplicationBuilder:
             timeout: object
             proxies: object
             limits: object
+            http1: object
+            http2: object
 
         monkeypatch.setattr(httpx, "AsyncClient", Client)
 
         builder = ApplicationBuilder().token(bot.token)
         builder.connection_pool_size(1).connect_timeout(2).pool_timeout(3).read_timeout(
             4
-        ).write_timeout(5).proxy_url("proxy_url")
+        ).write_timeout(5).proxy_url("proxy_url").http_version("1.1")
         app = builder.build()
         client = app.bot.request._client
 
         assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
         assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
         assert client.proxies == "proxy_url"
+        assert client.http1 is True
+        assert client.http2 is False
 
         builder = ApplicationBuilder().token(bot.token)
         builder.get_updates_connection_pool_size(1).get_updates_connect_timeout(
@@ -329,6 +345,8 @@ class TestApplicationBuilder:
             5
         ).get_updates_proxy_url(
             "proxy_url"
+        ).get_updates_http_version(
+            "1.1"
         )
         app = builder.build()
         client = app.bot._request[0]._client
@@ -336,6 +354,8 @@ class TestApplicationBuilder:
         assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
         assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
         assert client.proxies == "proxy_url"
+        assert client.http1 is True
+        assert client.http2 is False
 
     def test_custom_application_class(self, bot, builder):
         class CustomApplication(Application):
