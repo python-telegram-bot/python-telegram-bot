@@ -89,7 +89,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        pattern: Union[str, Pattern] = None,
+        pattern: Union[str, Pattern[str]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
         chat_types: List[str] = None,
     ):
@@ -98,10 +98,10 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern: Optional[Union[str, Pattern]] = pattern
+        self.pattern: Optional[Union[str, Pattern[str]]] = pattern
         self.chat_types: Optional[List[str]] = chat_types
 
-    def check_update(self, update: object) -> Optional[Union[bool, Match]]:
+    def check_update(self, update: object) -> Optional[Union[bool, Match[str]]]:
         """
         Determines whether an update should be passed to this handler's :attr:`callback`.
 
@@ -131,7 +131,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
         context: CCT,
         update: Update,  # skipcq: BAN-B301
         application: "Application",  # skipcq: BAN-B301
-        check_result: Optional[Union[bool, Match]],
+        check_result: Optional[Union[bool, Match[str]]],
     ) -> None:
         """Add the result of ``re.match(pattern, update.inline_query.query)`` to
         :attr:`CallbackContext.matches` as list with one element.

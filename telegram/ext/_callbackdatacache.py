@@ -19,7 +19,7 @@
 """This module contains the CallbackDataCache class."""
 import time
 from datetime import datetime
-from typing import TYPE_CHECKING, Dict, MutableMapping, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, MutableMapping, Optional, Tuple, Union, cast
 from uuid import uuid4
 
 try:
@@ -144,7 +144,7 @@ class CallbackDataCache:
 
     def __init__(
         self,
-        bot: "ExtBot",
+        bot: "ExtBot[Any]",
         maxsize: int = 1024,
         persistent_data: CDCData = None,
     ):
@@ -154,7 +154,7 @@ class CallbackDataCache:
                 "python-telegram-bot[callback-data]`."
             )
 
-        self.bot: ExtBot = bot
+        self.bot: ExtBot[Any] = bot
         self._maxsize: int = maxsize
         self._keyboard_data: MutableMapping[str, _KeyboardData] = LRUCache(maxsize=maxsize)
         self._callback_queries: MutableMapping[str, str] = LRUCache(maxsize=maxsize)

@@ -86,7 +86,7 @@ class StringRegexHandler(BaseHandler[str, CCT]):
 
         self.pattern: Union[str, Pattern] = pattern
 
-    def check_update(self, update: object) -> Optional[Match]:
+    def check_update(self, update: object) -> Optional[Match[str]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -107,7 +107,7 @@ class StringRegexHandler(BaseHandler[str, CCT]):
         context: CCT,
         update: str,  # skipcq: BAN-B301
         application: "Application",  # skipcq: BAN-B301
-        check_result: Optional[Match],
+        check_result: Optional[Match[str]],
     ) -> None:
         """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as
         list with one element.

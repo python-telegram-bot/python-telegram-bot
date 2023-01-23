@@ -130,10 +130,10 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self._chat_id: Optional[int] = chat_id
         self._user_id: Optional[int] = user_id
         self.args: Optional[List[str]] = None
-        self.matches: Optional[List[Match]] = None
+        self.matches: Optional[List[Match[str]]] = None
         self.error: Optional[Exception] = None
         self.job: Optional["Job"] = None
-        self.coroutine: Optional[Coroutine] = None
+        self.coroutine: Optional[Coroutine[Any, Any, Any]] = None
 
     @property
     def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":
@@ -222,11 +222,11 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 await self.application.persistence.refresh_bot_data(self.bot_data)
             if self.application.persistence.store_data.chat_data and self._chat_id is not None:
                 await self.application.persistence.refresh_chat_data(
-                    chat_id=self._chat_id, chat_data=self.chat_data
+                    chat_id=self._chat_id, chat_data=self.chat_data  # type: ignore[arg-type]
                 )
             if self.application.persistence.store_data.user_data and self._user_id is not None:
                 await self.application.persistence.refresh_user_data(
-                    user_id=self._user_id, user_data=self.user_data
+                    user_id=self._user_id, user_data=self.user_data  # type: ignore[arg-type]
                 )
 
     def drop_callback_data(self, callback_query: CallbackQuery) -> None:

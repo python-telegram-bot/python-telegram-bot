@@ -578,7 +578,7 @@ class CaptionRegex(MessageFilter):
         self.pattern: Pattern = pattern
         super().__init__(name=f"filters.CaptionRegex({self.pattern})", data_filter=True)
 
-    def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
+    def filter(self, message: Message) -> Optional[Dict[str, List[Match[str]]]]:
         if message.caption:
             match = self.pattern.search(message.caption)
             if match:
@@ -1576,7 +1576,7 @@ class Regex(MessageFilter):
         self.pattern: Pattern = pattern
         super().__init__(name=f"filters.Regex({self.pattern})", data_filter=True)
 
-    def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
+    def filter(self, message: Message) -> Optional[Dict[str, List[Match[str]]]]:
         if message.text:
             match = self.pattern.search(message.text)
             if match:

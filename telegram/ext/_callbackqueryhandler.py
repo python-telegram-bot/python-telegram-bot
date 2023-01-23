@@ -109,7 +109,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        pattern: Union[str, Pattern, type, Callable[[object], Optional[bool]]] = None,
+        pattern: Union[str, Pattern[str], type, Callable[[object], Optional[bool]]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
@@ -123,7 +123,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             pattern = re.compile(pattern)
 
         self.pattern: Optional[
-            Union[str, Pattern, type, Callable[[object], Optional[bool]]]
+            Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
         ] = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
@@ -160,7 +160,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
         context: CCT,
         update: Update,  # skipcq: BAN-B301
         application: "Application",  # skipcq: BAN-B301
-        check_result: Union[bool, Match],
+        check_result: Union[bool, Match[str]],
     ) -> None:
         """Add the result of ``re.match(pattern, update.callback_query.data)`` to
         :attr:`CallbackContext.matches` as list with one element.

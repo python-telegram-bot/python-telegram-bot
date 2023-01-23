@@ -19,14 +19,14 @@
 """This module contains the DictPersistence class."""
 import json
 from copy import deepcopy
-from typing import Dict, Optional, cast
+from typing import Any, Dict, Optional, cast
 
 from telegram._utils.types import JSONDict
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext._utils.types import CDCData, ConversationDict, ConversationKey
 
 
-class DictPersistence(BasePersistence):
+class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, Any]]):
     """Using Python's :obj:`dict` and :mod:`json` for making your bot persistent.
 
     Attention:
@@ -309,7 +309,7 @@ class DictPersistence(BasePersistence):
         self._conversations[name][key] = new_state
         self._conversations_json = None
 
-    async def update_user_data(self, user_id: int, data: Dict) -> None:
+    async def update_user_data(self, user_id: int, data: Dict[Any, Any]) -> None:
         """Will update the user_data (if changed).
 
         Args:
@@ -323,7 +323,7 @@ class DictPersistence(BasePersistence):
         self._user_data[user_id] = data
         self._user_data_json = None
 
-    async def update_chat_data(self, chat_id: int, data: Dict) -> None:
+    async def update_chat_data(self, chat_id: int, data: Dict[Any, Any]) -> None:
         """Will update the chat_data (if changed).
 
         Args:
@@ -337,7 +337,7 @@ class DictPersistence(BasePersistence):
         self._chat_data[chat_id] = data
         self._chat_data_json = None
 
-    async def update_bot_data(self, data: Dict) -> None:
+    async def update_bot_data(self, data: Dict[Any, Any]) -> None:
         """Will update the bot_data (if changed).
 
         Args:
@@ -389,21 +389,21 @@ class DictPersistence(BasePersistence):
         self._user_data.pop(user_id, None)
         self._user_data_json = None
 
-    async def refresh_user_data(self, user_id: int, user_data: Dict) -> None:
+    async def refresh_user_data(self, user_id: int, user_data: Dict[Any, Any]) -> None:
         """Does nothing.
 
         .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_user_data`
         """
 
-    async def refresh_chat_data(self, chat_id: int, chat_data: Dict) -> None:
+    async def refresh_chat_data(self, chat_id: int, chat_data: Dict[Any, Any]) -> None:
         """Does nothing.
 
         .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_chat_data`
         """
 
-    async def refresh_bot_data(self, bot_data: Dict) -> None:
+    async def refresh_bot_data(self, bot_data: Dict[Any, Any]) -> None:
         """Does nothing.
 
         .. versionadded:: 13.6

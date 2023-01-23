@@ -79,14 +79,14 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
         self,
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
-        pattern: Union[str, Pattern] = None,
+        pattern: Union[str, Pattern[str]] = None,
     ):
         super().__init__(callback, block=block)
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern: Optional[Union[str, Pattern]] = pattern
+        self.pattern: Optional[Union[str, Pattern[str]]] = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -112,7 +112,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
         context: CCT,
         update: Update,  # skipcq: BAN-B301
         application: "Application",  # skipcq: BAN-B301
-        check_result: Union[bool, Match],
+        check_result: Union[bool, Match[str]],
     ) -> None:
         """This function adds the matched regex pattern result to
         :attr:`telegram.ext.CallbackContext.matches`.

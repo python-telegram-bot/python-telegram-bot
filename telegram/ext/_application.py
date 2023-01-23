@@ -307,7 +307,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.user_data: Mapping[int, UD] = MappingProxyType(self._user_data)
         self.chat_data: Mapping[int, CD] = MappingProxyType(self._chat_data)
 
-        self.persistence: Optional[BasePersistence] = None
+        self.persistence: Optional[BasePersistence[UD, CD, BD]] = None
         if persistence and not isinstance(persistence, BasePersistence):
             raise TypeError("persistence must be based on telegram.ext.BasePersistence")
         self.persistence = persistence
@@ -930,7 +930,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 if close_loop:
                     loop.close()
 
-    def create_task(self, coroutine: Coroutine, update: object = None) -> asyncio.Task:
+    def create_task(
+        self, coroutine: Coroutine[Any, Any, Any], update: object = None
+    ) -> asyncio.Task:
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
         the :paramref:`coroutine` with :meth:`process_error`.
 

@@ -65,7 +65,7 @@ class ReplyKeyboardRemove(TelegramObject):
     def __init__(self, selective: bool = None, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.remove_keyboard = True
+        self.remove_keyboard: bool = True
         # Optionals
         self.selective: Optional[bool] = selective
 
