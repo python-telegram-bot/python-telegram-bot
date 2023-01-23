@@ -60,7 +60,7 @@ from telegram.ext._handler import BaseHandler
 from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
-from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD, ConversationKey, HandlerCallback
+from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, RT, UD, ConversationKey, HandlerCallback
 
 if TYPE_CHECKING:
     from telegram import Message
@@ -253,7 +253,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self: "Application[BT, CCT, UD, CD, BD, JQ]",
         *,
         bot: BT,
-        update_queue: asyncio.Queue,
+        update_queue: "asyncio.Queue[object]",
         updater: Optional[Updater],
         job_queue: JQ,
         concurrent_updates: Union[bool, int],
@@ -278,7 +278,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             )
 
         self.bot: BT = bot
-        self.update_queue: asyncio.queues.Queue = update_queue
+        self.update_queue: "asyncio.Queue[object]" = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
         self.updater: Optional[Updater] = updater
         self.handlers: Dict[int, List[BaseHandler]] = {}
@@ -931,8 +931,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     loop.close()
 
     def create_task(
-        self, coroutine: Coroutine[Any, Any, Any], update: object = None
-    ) -> asyncio.Task:
+        self, coroutine: Coroutine[Any, Any, RT], update: object = None
+    ) -> asyncio.Task[RT]:
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
         the :paramref:`coroutine` with :meth:`process_error`.
 

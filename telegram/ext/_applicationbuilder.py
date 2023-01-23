@@ -923,7 +923,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._job_queue = job_queue
         return self  # type: ignore[return-value]
 
-    def persistence(self: BuilderType, persistence: "BasePersistence") -> BuilderType:
+    def persistence(
+        self: BuilderType, persistence: "BasePersistence[Any, Any, Any]"
+    ) -> BuilderType:
         """Sets a :class:`telegram.ext.BasePersistence` instance for
         :attr:`telegram.ext.Application.persistence`.
 

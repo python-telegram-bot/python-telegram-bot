@@ -175,10 +175,6 @@ class BaseFilter:
             return a dict with lists. The dict will be merged with
             :class:`telegram.ext.CallbackContext`'s internal dict in most cases
             (depends on the handler).
-
-    Attributes:
-        name (:obj:`str`): Name for this filter.
-        data_filter (:obj:`bool`): Whether this filter is a data filter.
     """
 
     __slots__ = ("_name", "_data_filter")
@@ -188,7 +184,17 @@ class BaseFilter:
         self._data_filter = data_filter
 
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:  # skipcq: PYL-R0201
-        """Checks if the specified update is a message."""
+        """Checks if the specified update should be handled by this filter.
+
+        Args:
+            update (:class:`telegram.Update`): The update to check.
+
+        Returns:
+            :obj:`bool`: :obj:`True` if the update contains one of
+            :attr:`~telegram.Update.channel_post`, :attr:`~telegram.Update.message`,
+            :attr:`~telegram.Update.edited_channel_post` or
+            :attr:`~telegram.Update.edited_message`, :obj:`False` otherwise.
+        """
         if (  # Only message updates should be handled.
             update.channel_post
             or update.message
@@ -212,6 +218,7 @@ class BaseFilter:
 
     @property
     def data_filter(self) -> bool:
+        """:obj:`bool`: Whether this filter is a data filter."""
         return self._data_filter
 
     @data_filter.setter
@@ -220,6 +227,7 @@ class BaseFilter:
 
     @property
     def name(self) -> str:
+        """:obj:`str`: Name for this filter."""
         return self._name
 
     @name.setter
@@ -238,18 +246,23 @@ class MessageFilter(BaseFilter):
 
     .. seealso:: :wiki:`Advanced Filters <Extensions-–-Advanced-Filters>`
 
-    Attributes:
-        name (:obj:`str`): Name for this filter. Defaults to the type of filter.
-        data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should
-            return a dict with lists. The dict will be merged with
-            :class:`telegram.ext.CallbackContext`'s internal dict in most cases
-            (depends on the handler).
-
     """
 
     __slots__ = ()
 
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+        """Checks if the specified update should be handled by this filter by passing
+        :attr:`~telegram.Update.effective_message` to :meth:`filter`.
+
+        Args:
+            update (:class:`telegram.Update`): The update to check.
+
+        Returns:
+            :obj:`bool` | Dict[:obj:`str`, :obj:`list`] | :obj:`None`: If the update should be
+            handled by this filter, returns :obj:`True` or a dict with lists, in case the filter
+            is a data filter. If the update should not be handled by this filter, :obj:`False` or
+            :obj:`None`.
+        """
         if super().check_update(update):
             return self.filter(update.effective_message)  # type: ignore[arg-type]
         return False
@@ -275,18 +288,22 @@ class UpdateFilter(BaseFilter):
     Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
     filters.
 
-    Attributes:
-        name (:obj:`str`): Name for this filter. Defaults to the type of filter.
-        data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should
-            return a dict with lists. The dict will be merged with
-            :class:`telegram.ext.CallbackContext`'s internal dict in most cases
-            (depends on the handler).
-
     """
 
     __slots__ = ()
 
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+        """Checks if the specified update should be handled by this filter.
+
+        Args:
+            update (:class:`telegram.Update`): The update to check.
+
+        Returns:
+            :obj:`bool` | Dict[:obj:`str`, :obj:`list`] | :obj:`None`: If the update should be
+            handled by this filter, returns :obj:`True` or a dict with lists, in case the filter
+            is a data filter. If the update should not be handled by this filter, :obj:`False` or
+            :obj:`None`.
+        """
         return self.filter(update) if super().check_update(update) else False
 
     @abstractmethod
@@ -613,7 +630,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         self._set_usernames(username)
 
     @abstractmethod
-    def get_chat_or_user(self, message: Message) -> Union[TGChat, TGUser, None]:
+    def _get_chat_or_user(self, message: Message) -> Union[TGChat, TGUser, None]:
         ...
 
     @staticmethod
@@ -731,7 +748,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         self._chat_ids -= parsed_chat_id
 
     def filter(self, message: Message) -> bool:
-        chat_or_user = self.get_chat_or_user(message)
+        chat_or_user = self._get_chat_or_user(message)
         if chat_or_user:
             if self.chat_ids:
                 return chat_or_user.id in self.chat_ids
@@ -785,7 +802,7 @@ class Chat(_ChatUserBaseFilter):
 
     __slots__ = ()
 
-    def get_chat_or_user(self, message: Message) -> Optional[TGChat]:
+    def _get_chat_or_user(self, message: Message) -> Optional[TGChat]:
         return message.chat
 
     def add_chat_ids(self, chat_id: SCT[int]) -> None:
@@ -1352,7 +1369,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
 
     __slots__ = ()
 
-    def get_chat_or_user(self, message: Message) -> Union[TGUser, TGChat, None]:
+    def _get_chat_or_user(self, message: Message) -> Union[TGUser, TGChat, None]:
         return message.forward_from or message.forward_from_chat
 
     def add_chat_ids(self, chat_id: SCT[int]) -> None:
@@ -1688,7 +1705,7 @@ class SenderChat(_ChatUserBaseFilter):
         """
         return super()._add_chat_ids(chat_id)
 
-    def get_chat_or_user(self, message: Message) -> Optional[TGChat]:
+    def _get_chat_or_user(self, message: Message) -> Optional[TGChat]:
         return message.sender_chat
 
     def remove_chat_ids(self, chat_id: SCT[int]) -> None:
@@ -2280,7 +2297,7 @@ class User(_ChatUserBaseFilter):
         super().__init__(chat_id=user_id, username=username, allow_empty=allow_empty)
         self._chat_id_name = "user_id"
 
-    def get_chat_or_user(self, message: Message) -> Optional[TGUser]:
+    def _get_chat_or_user(self, message: Message) -> Optional[TGUser]:
         return message.from_user
 
     @property
@@ -2416,7 +2433,7 @@ class ViaBot(_ChatUserBaseFilter):
         super().__init__(chat_id=bot_id, username=username, allow_empty=allow_empty)
         self._chat_id_name = "bot_id"
 
-    def get_chat_or_user(self, message: Message) -> Optional[TGUser]:
+    def _get_chat_or_user(self, message: Message) -> Optional[TGUser]:
         return message.via_bot
 
     @property

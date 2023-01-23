@@ -265,7 +265,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         error: Exception,
         application: "Application[BT, CCT, UD, CD, BD, Any]",
         job: "Job" = None,
-        coroutine: Coroutine = None,
+        coroutine: Coroutine[Any, Any, Any] = None,
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
