@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PrefixHandler class."""
 import itertools
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, FrozenSet, List, Optional, Tuple, TypeVar, Union
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -143,7 +143,9 @@ class PrefixHandler(BaseHandler[Update, CCT]):
         else:
             commands = {x.lower() for x in command}
 
-        self.commands = frozenset(p + c for p, c in itertools.product(prefixes, commands))
+        self.commands: FrozenSet[str] = frozenset(
+            p + c for p, c in itertools.product(prefixes, commands)
+        )
         self.filters: filters_module.BaseFilter = (
             filters if filters is not None else filters_module.UpdateType.MESSAGES
         )

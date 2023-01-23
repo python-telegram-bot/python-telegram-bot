@@ -17,7 +17,6 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackDataCache class."""
-import logging
 import time
 from datetime import datetime
 from typing import TYPE_CHECKING, Dict, MutableMapping, Optional, Tuple, Union, cast
@@ -141,7 +140,7 @@ class CallbackDataCache:
 
     """
 
-    __slots__ = ("bot", "_maxsize", "_keyboard_data", "_callback_queries", "logger")
+    __slots__ = ("bot", "_maxsize", "_keyboard_data", "_callback_queries")
 
     def __init__(
         self,
@@ -154,8 +153,6 @@ class CallbackDataCache:
                 "To use `CallbackDataCache`, PTB must be installed via `pip install "
                 "python-telegram-bot[callback-data]`."
             )
-
-        self.logger = logging.getLogger(__name__)
 
         self.bot: ExtBot = bot
         self._maxsize: int = maxsize

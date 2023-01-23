@@ -81,7 +81,9 @@ class InputFile:
         self.attach_name: Optional[str] = "attached" + uuid4().hex if attach else None
 
         if filename:
-            self.mimetype = mimetypes.guess_type(filename, strict=False)[0] or _DEFAULT_MIME_TYPE
+            self.mimetype: str = (
+                mimetypes.guess_type(filename, strict=False)[0] or _DEFAULT_MIME_TYPE
+            )
         else:
             self.mimetype = _DEFAULT_MIME_TYPE
 

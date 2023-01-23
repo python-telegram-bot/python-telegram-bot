@@ -475,12 +475,12 @@ class _CredentialsBase(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.hash = hash
-            self.secret = secret
+            self.hash: str = hash
+            self.secret: str = secret
 
             # Aliases just to be sure
-            self.file_hash = self.hash
-            self.data_hash = self.hash
+            self.file_hash: str = self.hash
+            self.data_hash: str = self.hash
 
 
 class DataCredentials(_CredentialsBase):

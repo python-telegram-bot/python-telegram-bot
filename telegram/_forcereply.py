@@ -85,7 +85,7 @@ class ForceReply(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.force_reply = True
+        self.force_reply: bool = True
         self.selective: Optional[bool] = selective
         self.input_field_placeholder: Optional[str] = input_field_placeholder
 

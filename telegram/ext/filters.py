@@ -96,6 +96,7 @@ import re
 from abc import ABC, abstractmethod
 from typing import (
     Any,
+    Collection,
     Dict,
     FrozenSet,
     List,
@@ -103,6 +104,7 @@ from typing import (
     NoReturn,
     Optional,
     Pattern,
+    Sequence,
     Set,
     Tuple,
     Union,
@@ -508,7 +510,7 @@ class Caption(MessageFilter):
     __slots__ = ("strings",)
 
     def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
-        self.strings = strings
+        self.strings: Optional[Sequence[str]] = strings
         super().__init__(name=f"filters.Caption({strings})" if strings else "filters.CAPTION")
 
     def filter(self, message: Message) -> bool:
@@ -542,7 +544,7 @@ class CaptionEntity(MessageFilter):
     __slots__ = ("entity_type",)
 
     def __init__(self, entity_type: str):
-        self.entity_type = entity_type
+        self.entity_type: str = entity_type
         super().__init__(name=f"filters.CaptionEntity({self.entity_type})")
 
     def filter(self, message: Message) -> bool:
@@ -600,9 +602,9 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         allow_empty: bool = False,
     ):
         super().__init__()
-        self._chat_id_name = "chat_id"
-        self._username_name = "username"
-        self.allow_empty = allow_empty
+        self._chat_id_name: str = "chat_id"
+        self._username_name: str = "username"
+        self.allow_empty: bool = allow_empty
 
         self._chat_ids: Set[int] = set()
         self._usernames: Set[str] = set()
@@ -900,7 +902,7 @@ class Command(MessageFilter):
     __slots__ = ("only_start",)
 
     def __init__(self, only_start: bool = True):
-        self.only_start = only_start
+        self.only_start: bool = only_start
         super().__init__(f"filters.Command({only_start})" if not only_start else "filters.COMMAND")
 
     def filter(self, message: Message) -> bool:
@@ -939,8 +941,8 @@ class _Dice(MessageFilter):
 
     def __init__(self, values: SCT[int] = None, emoji: DiceEmojiEnum = None):
         super().__init__()
-        self.emoji = emoji
-        self.values = [values] if isinstance(values, int) else values
+        self.emoji: Optional[DiceEmojiEnum] = emoji
+        self.values: Optional[Collection[int]] = [values] if isinstance(values, int) else values
 
         if emoji:  # for filters.Dice.BASKETBALL
             self.name = f"filters.Dice.{emoji.name}"
@@ -1187,7 +1189,7 @@ class Document:
 
         def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
             super().__init__()
-            self.is_case_sensitive = case_sensitive
+            self.is_case_sensitive: bool = case_sensitive
             if file_extension is None:
                 self._file_extension = None
                 self.name = "filters.Document.FileExtension(None)"
@@ -1229,7 +1231,7 @@ class Document:
         __slots__ = ("mimetype",)
 
         def __init__(self, mimetype: str):
-            self.mimetype = mimetype  # skipcq: PTC-W0052
+            self.mimetype: str = mimetype  # skipcq: PTC-W0052
             super().__init__(name=f"filters.Document.MimeType('{self.mimetype}')")
 
         def filter(self, message: Message) -> bool:
@@ -1288,7 +1290,7 @@ class Entity(MessageFilter):
     __slots__ = ("entity_type",)
 
     def __init__(self, entity_type: str):
-        self.entity_type = entity_type
+        self.entity_type: str = entity_type
         super().__init__(name=f"filters.Entity({self.entity_type})")
 
     def filter(self, message: Message) -> bool:
@@ -1475,7 +1477,7 @@ class Language(MessageFilter):
     def __init__(self, lang: SCT[str]):
         if isinstance(lang, str):
             lang = cast(str, lang)
-            self.lang = [lang]
+            self.lang: Sequence[str] = [lang]
         else:
             lang = cast(List[str], lang)
             self.lang = lang
@@ -2142,7 +2144,7 @@ class Text(MessageFilter):
     __slots__ = ("strings",)
 
     def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
-        self.strings = strings
+        self.strings: Optional[Sequence[str]] = strings
         super().__init__(name=f"filters.Text({strings})" if strings else "filters.TEXT")
 
     def filter(self, message: Message) -> bool:
