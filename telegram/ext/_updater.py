@@ -109,10 +109,10 @@ class Updater(AsyncContextManager["Updater"]):
     def __init__(
         self,
         bot: "Bot",
-        update_queue: asyncio.Queue,
+        update_queue: "asyncio.Queue[object]",
     ):
         self.bot: Bot = bot
-        self.update_queue: asyncio.queues.Queue = update_queue
+        self.update_queue: "asyncio.Queue[object]" = update_queue
 
         self._last_update_id = 0
         self._running = False
@@ -193,7 +193,7 @@ class Updater(AsyncContextManager["Updater"]):
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
         error_callback: Callable[[TelegramError], None] = None,
-    ) -> asyncio.Queue:
+    ) -> "asyncio.Queue[object]":
         """Starts polling updates from Telegram.
 
         .. versionchanged:: 20.0
@@ -388,7 +388,7 @@ class Updater(AsyncContextManager["Updater"]):
         ip_address: str = None,
         max_connections: int = 40,
         secret_token: str = None,
-    ) -> asyncio.Queue:
+    ) -> "asyncio.Queue[object]":
         """
         Starts a small http server to listen for updates via webhook. If :paramref:`cert`
         and :paramref:`key` are not provided, the webhook will be started directly on

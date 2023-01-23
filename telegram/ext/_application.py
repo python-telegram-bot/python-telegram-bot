@@ -257,7 +257,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         updater: Optional[Updater],
         job_queue: JQ,
         concurrent_updates: Union[bool, int],
-        persistence: Optional[BasePersistence],
+        persistence: Optional[BasePersistence[UD, CD, BD]],
         context_types: ContextTypes[CCT, UD, CD, BD],
         post_init: Optional[
             Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]

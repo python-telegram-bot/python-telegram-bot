@@ -572,10 +572,10 @@ class CaptionRegex(MessageFilter):
 
     __slots__ = ("pattern",)
 
-    def __init__(self, pattern: Union[str, Pattern]):
+    def __init__(self, pattern: Union[str, Pattern[str]]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
-        self.pattern: Pattern = pattern
+        self.pattern: Pattern[str] = pattern
         super().__init__(name=f"filters.CaptionRegex({self.pattern})", data_filter=True)
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match[str]]]]:
@@ -1570,10 +1570,10 @@ class Regex(MessageFilter):
 
     __slots__ = ("pattern",)
 
-    def __init__(self, pattern: Union[str, Pattern]):
+    def __init__(self, pattern: Union[str, Pattern[str]]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
-        self.pattern: Pattern = pattern
+        self.pattern: Pattern[str] = pattern
         super().__init__(name=f"filters.Regex({self.pattern})", data_filter=True)
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match[str]]]]:
