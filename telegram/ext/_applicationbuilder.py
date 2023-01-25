@@ -317,7 +317,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         )
 
         if job_queue is not None:
-            job_queue.set_application(application)
+            job_queue.set_application(application)  # type: ignore[arg-type]
 
         if persistence is not None:
             # This raises an exception if persistence.store_data.callback_data is True
