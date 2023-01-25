@@ -20,9 +20,13 @@ from enum import Enum
 from docutils.nodes import Element
 from sphinx.domains.python import PyXRefRole
 from sphinx.environment import BuildEnvironment
+from sphinx.util import logging
 
 import telegram
-from docs.auxil.sphinx_logging import sphinx_logger
+
+# get the sphinx(!) logger
+# Makes sure logs render in red and also plays nicely with e.g. the `nitpicky` option.
+sphinx_logger = logging.getLogger(__name__)
 
 CONSTANTS_ROLE = "tg-const"
 

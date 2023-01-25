@@ -21,7 +21,12 @@ https://github.com/sphinx-doc/sphinx/issues/1556 is closed
 """
 import subprocess
 
-from docs.auxil.sphinx_logging import sphinx_logger
+from sphinx.util import logging
+
+# get the sphinx(!) logger
+# Makes sure logs render in red and also plays nicely with e.g. the `nitpicky` option.
+sphinx_logger = logging.getLogger(__name__)
+
 
 # must be a module-level variable so that it can be written to by the `autodoc-process-docstring`
 # event handler in `sphinx_hooks.py`
