@@ -565,6 +565,11 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
         # let's use a string representation of the object
         base = str(base)
 
+        # Special case for abstract context managers which are wrongly resoled for some reason
+        if base.startswith("typing.AbstractAsyncContextManager"):
+            bases[idx] = ":class:`contextlib.AbstractAsyncContextManager`"
+            continue
+
         # Special case because base classes are in std lib:
         if "StringEnum" in base == "<enum 'StringEnum'>":
             bases[idx] = ":class:`enum.Enum`"
