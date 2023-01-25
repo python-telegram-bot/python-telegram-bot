@@ -17,7 +17,18 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackContext class."""
-from typing import TYPE_CHECKING, Coroutine, Dict, Generic, List, Match, NoReturn, Optional, Type
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Coroutine,
+    Dict,
+    Generic,
+    List,
+    Match,
+    NoReturn,
+    Optional,
+    Type,
+)
 
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
@@ -27,7 +38,6 @@ from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
     from asyncio import Queue
-    from typing import Any
 
     from telegram.ext import Application, Job, JobQueue  # noqa: F401
     from telegram.ext._utils.types import CCT

@@ -932,7 +932,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     def create_task(
         self, coroutine: Coroutine[Any, Any, RT], update: object = None
-    ) -> asyncio.Task[RT]:
+    ) -> "asyncio.Task[RT]":
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
         the :paramref:`coroutine` with :meth:`process_error`.
 
