@@ -23,7 +23,6 @@ from dataclasses import dataclass
 import httpx
 import pytest
 
-import docs.auxil.link_code
 from telegram.ext import (
     AIORateLimiter,
     Application,
@@ -306,7 +305,7 @@ class TestApplicationBuilder:
         # other means that the parameters are passed correctly
 
         assert built_bot.token == bot.token
-        assert docs.auxil.link_code.base_url == "base_url" + bot.token
+        assert built_bot.base_url == "base_url" + bot.token
         assert built_bot.base_file_url == "base_file_url" + bot.token
         assert built_bot.defaults is defaults
         assert built_bot.request is request
