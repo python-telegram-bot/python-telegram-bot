@@ -41,7 +41,6 @@ from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
 from telegram._utils.types import DVType
 from telegram._utils.warnings import warn
 from telegram.ext._application import ApplicationHandlerStop
-from telegram.ext._callbackcontext import CallbackContext
 from telegram.ext._callbackqueryhandler import CallbackQueryHandler
 from telegram.ext._choseninlineresulthandler import ChosenInlineResultHandler
 from telegram.ext._extbot import ExtBot
@@ -55,7 +54,7 @@ from telegram.ext._utils.types import CCT, ConversationDict, ConversationKey
 
 if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
-_CheckUpdateType = Tuple[object, ConversationKey, BaseHandler, object]
+_CheckUpdateType = Tuple[object, ConversationKey, BaseHandler[Update, CCT], object]
 
 _logger = logging.getLogger(__name__)
 
@@ -71,7 +70,7 @@ class _ConversationTimeoutContext(Generic[CCT]):
     conversation_key: ConversationKey
     update: Update
     application: "Application[Any, CCT, Any, Any, Any, JobQueue]"
-    callback_context: CallbackContext
+    callback_context: CCT
 
 
 @dataclass
@@ -339,7 +338,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
 
         # if conversation_timeout is used, this dict is used to schedule a job which runs when the
         # conv has timed out.
-        self.timeout_jobs: Dict[ConversationKey, "Job"] = {}
+        self.timeout_jobs: Dict[ConversationKey, "Job[Any]"] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
         self._child_conversations: Set["ConversationHandler"] = set()
@@ -358,7 +357,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 stacklevel=2,
             )
 
-        all_handlers: List[BaseHandler] = []
+        all_handlers: List[BaseHandler[Update, CCT]] = []
         all_handlers.extend(entry_points)
         all_handlers.extend(fallbacks)
 
@@ -441,7 +440,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 )
 
     @property
-    def entry_points(self) -> List[BaseHandler]:
+    def entry_points(self) -> List[BaseHandler[Update, CCT]]:
         """List[:class:`telegram.ext.BaseHandler`]: A list of :obj:`BaseHandler` objects that can
         trigger the start of the conversation.
         """
@@ -454,7 +453,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         )
 
     @property
-    def states(self) -> Dict[object, List[BaseHandler]]:
+    def states(self) -> Dict[object, List[BaseHandler[Update, CCT]]]:
         """Dict[:obj:`object`, List[:class:`telegram.ext.BaseHandler`]]: A :obj:`dict` that
         defines the different states of conversation a user can be in and one or more
         associated :obj:`BaseHandler` objects that should be used in that state.
@@ -466,7 +465,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         raise AttributeError("You can not assign a new value to states after initialization.")
 
     @property
-    def fallbacks(self) -> List[BaseHandler]:
+    def fallbacks(self) -> List[BaseHandler[Update, CCT]]:
         """List[:class:`telegram.ext.BaseHandler`]: A list of handlers that might be used if
         the user is in a conversation, but every handler for their current state returned
         :obj:`False` on :meth:`check_update`.
@@ -643,7 +642,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         new_state: asyncio.Task,
         application: "Application[Any, CCT, Any, Any, Any, JobQueue]",
         update: Update,
-        context: CallbackContext,
+        context: CCT,
         conversation_key: ConversationKey,
     ) -> None:
         try:
@@ -668,7 +667,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         new_state: object,
         application: "Application[Any, CCT, Any, Any, Any, JobQueue]",
         update: Update,
-        context: CallbackContext,
+        context: CCT,
         conversation_key: ConversationKey,
     ) -> None:
         """Schedules a job which executes :meth:`_trigger_timeout` upon conversation timeout."""
@@ -687,7 +686,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             _logger.exception("Failed to schedule timeout.", exc_info=exc)
 
     # pylint: disable=too-many-return-statements
-    def check_update(self, update: object) -> Optional[_CheckUpdateType]:
+    def check_update(self, update: object) -> Optional[_CheckUpdateType[CCT]]:
         """
         Determines whether an update should be handled by this conversation handler, and if so in
         which state the conversation currently is.
@@ -781,9 +780,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
     async def handle_update(  # type: ignore[override]
         self,
         update: Update,
-        application: "Application",
-        check_result: _CheckUpdateType,
-        context: CallbackContext,
+        application: "Application[Any, CCT, Any, Any, Any, Any]",
+        check_result: _CheckUpdateType[CCT],
+        context: CCT,
     ) -> Optional[object]:
         """Send the update to the callback for the current state and BaseHandler
 
@@ -901,7 +900,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 )
             self._conversations[key] = new_state
 
-    async def _trigger_timeout(self, context: CallbackContext) -> None:
+    async def _trigger_timeout(self, context: CCT) -> None:
         """This is run whenever a conversation has timed out. Also makes sure that all handlers
         which are in the :attr:`TIMEOUT` state and whose :meth:`BaseHandler.check_update` returns
         :obj:`True` is handled.

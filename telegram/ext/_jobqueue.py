@@ -90,7 +90,9 @@ class JobQueue(Generic[CCT]):
 
         self._application: "Optional[weakref.ReferenceType[Application]]" = None
         self._executor = AsyncIOExecutor()
-        self.scheduler = AsyncIOScheduler(timezone=pytz.utc, executors={"default": self._executor})
+        self.scheduler: AsyncIOScheduler = AsyncIOScheduler(
+            timezone=pytz.utc, executors={"default": self._executor}
+        )
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -164,7 +166,7 @@ class JobQueue(Generic[CCT]):
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> "Job":
+    ) -> "Job[CCT]":
         """Creates a new :class:`Job` instance that runs once and adds it to the queue.
 
         Args:
@@ -250,7 +252,7 @@ class JobQueue(Generic[CCT]):
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> "Job":
+    ) -> "Job[CCT]":
         """Creates a new :class:`Job` instance that runs at specified intervals and adds it to the
         queue.
 
@@ -364,7 +366,7 @@ class JobQueue(Generic[CCT]):
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> "Job":
+    ) -> "Job[CCT]":
         """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
 
         .. versionchanged:: 20.0
@@ -442,7 +444,7 @@ class JobQueue(Generic[CCT]):
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> "Job":
+    ) -> "Job[CCT]":
         """Creates a new :class:`Job` that runs on a daily basis and adds it to the queue.
 
         Note:
@@ -531,7 +533,7 @@ class JobQueue(Generic[CCT]):
         name: str = None,
         chat_id: int = None,
         user_id: int = None,
-    ) -> "Job":
+    ) -> "Job[CCT]":
         """Creates a new custom defined :class:`Job`.
 
         Args:
@@ -604,7 +606,7 @@ class JobQueue(Generic[CCT]):
             # so give it a tiny bit of time to actually shut down.
             await asyncio.sleep(0.01)
 
-    def jobs(self) -> Tuple["Job", ...]:
+    def jobs(self) -> Tuple["Job[CCT]", ...]:
         """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`.
 
         Returns:
@@ -615,7 +617,7 @@ class JobQueue(Generic[CCT]):
             for job in self.scheduler.get_jobs()
         )
 
-    def get_jobs_by_name(self, name: str) -> Tuple["Job", ...]:
+    def get_jobs_by_name(self, name: str) -> Tuple["Job[CCT]", ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
         in the :class:`JobQueue`.
 
@@ -736,7 +738,9 @@ class Job(Generic[CCT]):
         """
         return self._job
 
-    async def run(self, application: "Application[Any, CCT, Any, Any, Any, JobQueue]") -> None:
+    async def run(
+        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
+    ) -> None:
         """Executes the callback function independently of the jobs schedule. Also calls
         :meth:`telegram.ext.Application.update_persistence`.
 
@@ -750,7 +754,9 @@ class Job(Generic[CCT]):
         # We shield the task such that the job isn't cancelled mid-run
         await asyncio.shield(self._run(application))
 
-    async def _run(self, application: "Application[Any, CCT, Any, Any, Any, JobQueue]") -> None:
+    async def _run(
+        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
+    ) -> None:
         try:
             context = application.context_types.context.from_job(self, application)
             await context.refresh_data()
@@ -801,7 +807,7 @@ class Job(Generic[CCT]):
         return self.job.next_run_time
 
     @classmethod
-    def _from_aps_job(cls, job: "APSJob") -> "Job":
+    def _from_aps_job(cls, job: "APSJob") -> "Job[CCT]":
         return job.func.__self__
 
     def __getattr__(self, item: str) -> object:

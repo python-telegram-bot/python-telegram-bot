@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the MessageHandler class."""
-from typing import TYPE_CHECKING, Dict, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypeVar, Union
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -86,7 +86,7 @@ class MessageHandler(BaseHandler[Update, CCT]):
             filters if filters is not None else filters_module.ALL
         )
 
-    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
+    def check_update(self, update: object) -> Optional[Union[bool, Dict[str, List[Any]]]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -104,7 +104,7 @@ class MessageHandler(BaseHandler[Update, CCT]):
         self,
         context: CCT,
         update: Update,  # skipcq: BAN-B301
-        application: "Application",  # skipcq: BAN-B301
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
         check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
         """Adds possible output of data filters to the :class:`CallbackContext`."""

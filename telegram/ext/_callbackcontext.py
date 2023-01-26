@@ -142,7 +142,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match[str]]] = None
         self.error: Optional[Exception] = None
-        self.job: Optional["Job"] = None
+        self.job: Optional["Job[CCT]"] = None
         self.coroutine: Optional[Coroutine[Any, Any, Any]] = None
 
     @property
@@ -274,7 +274,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         update: object,
         error: Exception,
         application: "Application[BT, CCT, UD, CD, BD, Any]",
-        job: "Job" = None,
+        job: "Job[Any]" = None,
         coroutine: Coroutine[Any, Any, Any] = None,
     ) -> "CCT":
         """
@@ -350,7 +350,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     @classmethod
     def from_job(
         cls: Type["CCT"],
-        job: "Job",
+        job: "Job[CCT]",
         application: "Application[Any, CCT, Any, Any, Any, Any]",
     ) -> "CCT":
         """
@@ -386,7 +386,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self._application.bot
 
     @property
-    def job_queue(self) -> Optional["JobQueue"]:
+    def job_queue(self) -> Optional["JobQueue[CCT]"]:
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.

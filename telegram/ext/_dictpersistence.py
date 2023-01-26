@@ -168,7 +168,7 @@ class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, 
                 ) from exc
 
     @property
-    def user_data(self) -> Optional[Dict[int, Dict]]:
+    def user_data(self) -> Optional[Dict[int, Dict[Any, Any]]]:
         """:obj:`dict`: The user_data as a dict."""
         return self._user_data
 
@@ -180,7 +180,7 @@ class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, 
         return json.dumps(self.user_data)
 
     @property
-    def chat_data(self) -> Optional[Dict[int, Dict]]:
+    def chat_data(self) -> Optional[Dict[int, Dict[Any, Any]]]:
         """:obj:`dict`: The chat_data as a dict."""
         return self._chat_data
 
@@ -192,7 +192,7 @@ class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, 
         return json.dumps(self.chat_data)
 
     @property
-    def bot_data(self) -> Optional[Dict]:
+    def bot_data(self) -> Optional[Dict[Any, Any]]:
         """:obj:`dict`: The bot_data as a dict."""
         return self._bot_data
 

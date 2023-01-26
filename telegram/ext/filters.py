@@ -95,7 +95,6 @@ import mimetypes
 import re
 from abc import ABC, abstractmethod
 from typing import (
-    Any,
     Collection,
     Dict,
     FrozenSet,
@@ -116,8 +115,7 @@ from telegram import Message, MessageEntity, Update
 from telegram import User as TGUser
 from telegram._utils.types import SCT
 from telegram.constants import DiceEmoji as DiceEmojiEnum
-
-DataDict = Dict[str, List[Any]]
+from telegram.ext._utils.types import FilterDataDict
 
 
 class BaseFilter:
@@ -183,7 +181,9 @@ class BaseFilter:
         self._name = self.__class__.__name__ if name is None else name
         self._data_filter = data_filter
 
-    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:  # skipcq: PYL-R0201
+    def check_update(
+        self, update: Update
+    ) -> Optional[Union[bool, FilterDataDict]]:  # skipcq: PYL-R0201
         """Checks if the specified update should be handled by this filter.
 
         Args:
@@ -250,7 +250,7 @@ class MessageFilter(BaseFilter):
 
     __slots__ = ()
 
-    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    def check_update(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
         """Checks if the specified update should be handled by this filter by passing
         :attr:`~telegram.Update.effective_message` to :meth:`filter`.
 
@@ -268,7 +268,7 @@ class MessageFilter(BaseFilter):
         return False
 
     @abstractmethod
-    def filter(self, message: Message) -> Optional[Union[bool, DataDict]]:
+    def filter(self, message: Message) -> Optional[Union[bool, FilterDataDict]]:
         """This method must be overwritten.
 
         Args:
@@ -292,7 +292,7 @@ class UpdateFilter(BaseFilter):
 
     __slots__ = ()
 
-    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    def check_update(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
         """Checks if the specified update should be handled by this filter.
 
         Args:
@@ -307,7 +307,7 @@ class UpdateFilter(BaseFilter):
         return self.filter(update) if super().check_update(update) else False
 
     @abstractmethod
-    def filter(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    def filter(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
         """This method must be overwritten.
 
         Args:
@@ -376,7 +376,7 @@ class _MergedFilter(UpdateFilter):
             self.data_filter = True
 
     @staticmethod
-    def _merge(base_output: Union[bool, Dict], comp_output: Union[bool, Dict]) -> DataDict:
+    def _merge(base_output: Union[bool, Dict], comp_output: Union[bool, Dict]) -> FilterDataDict:
         base = base_output if isinstance(base_output, dict) else {}
         comp = comp_output if isinstance(comp_output, dict) else {}
         for k in comp.keys():
@@ -393,7 +393,7 @@ class _MergedFilter(UpdateFilter):
         return base
 
     # pylint: disable=too-many-return-statements
-    def filter(self, update: Update) -> Union[bool, DataDict]:
+    def filter(self, update: Update) -> Union[bool, FilterDataDict]:
         base_output = self.base_filter.check_update(update)
         # We need to check if the filters are data filters and if so return the merged data.
         # If it's not a data filter or an or_filter but no matches return bool
@@ -451,7 +451,7 @@ class _XORFilter(UpdateFilter):
         self.xor_filter = xor_filter
         self.merged_filter = (base_filter & ~xor_filter) | (~base_filter & xor_filter)
 
-    def filter(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    def filter(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
         return self.merged_filter.check_update(update)
 
     @property

@@ -327,7 +327,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return application
 
     def application_class(
-        self: BuilderType, application_class: Type[Application], kwargs: Dict[str, object] = None
+        self: BuilderType,
+        application_class: Type[Application[Any, Any, Any, Any, Any, Any]],
+        kwargs: Dict[str, object] = None,
     ) -> BuilderType:
         """Sets a custom subclass instead of :class:`telegram.ext.Application`. The
         subclass's ``__init__`` should look like this
@@ -847,7 +849,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._bot = bot
         return self  # type: ignore[return-value]
 
-    def update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
+    def update_queue(self: BuilderType, update_queue: "Queue[object]") -> BuilderType:
         """Sets a :class:`asyncio.Queue` instance for
         :attr:`telegram.ext.Application.update_queue`, i.e. the queue that the application will
         fetch updates from. Will also be used for the :attr:`telegram.ext.Application.updater`.
@@ -1145,9 +1147,9 @@ InitApplicationBuilder = (  # This is defined all the way down here so that its 
     ApplicationBuilder[  # by Pylance correctly.
         ExtBot[None],
         ContextTypes.DEFAULT_TYPE,
-        Dict,
-        Dict,
-        Dict,
-        JobQueue,
+        Dict[Any, Any],
+        Dict[Any, Any],
+        Dict[Any, Any],
+        JobQueue[ContextTypes.DEFAULT_TYPE],
     ]
 )

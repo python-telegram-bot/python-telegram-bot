@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChosenInlineResultHandler class."""
 import re
-from typing import TYPE_CHECKING, Match, Optional, Pattern, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -111,7 +111,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
         self,
         context: CCT,
         update: Update,  # skipcq: BAN-B301
-        application: "Application",  # skipcq: BAN-B301
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
         check_result: Union[bool, Match[str]],
     ) -> None:
         """This function adds the matched regex pattern result to

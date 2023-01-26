@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the InlineQueryHandler class."""
 import re
-from typing import TYPE_CHECKING, List, Match, Optional, Pattern, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, List, Match, Optional, Pattern, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -130,7 +130,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
         self,
         context: CCT,
         update: Update,  # skipcq: BAN-B301
-        application: "Application",  # skipcq: BAN-B301
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
         check_result: Optional[Union[bool, Match[str]]],
     ) -> None:
         """Add the result of ``re.match(pattern, update.inline_query.query)`` to

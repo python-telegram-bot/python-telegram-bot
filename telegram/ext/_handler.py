@@ -118,7 +118,7 @@ class BaseHandler(Generic[UT, CCT], ABC):
     async def handle_update(
         self,
         update: UT,
-        application: "Application",
+        application: "Application[Any, CCT, Any, Any, Any, Any]",
         check_result: object,
         context: CCT,
     ) -> RT:
@@ -144,7 +144,7 @@ class BaseHandler(Generic[UT, CCT], ABC):
         self,
         context: CCT,
         update: UT,
-        application: "Application",
+        application: "Application[Any, CCT, Any, Any, Any, Any]",
         check_result: Any,
     ) -> None:
         """Prepares additional arguments for the context. Override if needed.

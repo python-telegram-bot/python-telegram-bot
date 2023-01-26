@@ -281,8 +281,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.update_queue: "asyncio.Queue[object]" = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
         self.updater: Optional[Updater] = updater
-        self.handlers: Dict[int, List[BaseHandler]] = {}
-        self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
+        self.handlers: Dict[int, List[BaseHandler[Any, CCT]]] = {}
+        self.error_handlers: Dict[
+            HandlerCallback[object, CCT, None], Union[bool, DefaultValue[bool]]
+        ] = {}
         self.post_init: Optional[
             Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
         ] = post_init
@@ -359,7 +361,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         return self._concurrent_updates
 
     @property
-    def job_queue(self) -> Optional["JobQueue"]:
+    def job_queue(self) -> Optional["JobQueue[CCT]"]:
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.
@@ -1183,8 +1185,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     def add_handlers(
         self,
         handlers: Union[
-            Union[List[BaseHandler], Tuple[BaseHandler]],
-            Dict[int, Union[List[BaseHandler], Tuple[BaseHandler]]],
+            Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]],
+            Dict[int, Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]]],
         ],
         group: Union[int, DefaultValue[int]] = DefaultValue(0),
     ) -> None:
@@ -1230,7 +1232,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 "dictionary where the keys are groups and values are sequences of handlers."
             )
 
-    def remove_handler(self, handler: BaseHandler, group: int = DEFAULT_GROUP) -> None:
+    def remove_handler(self, handler: BaseHandler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
         """Remove a handler from the specified group.
 
         Args:
@@ -1545,7 +1547,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         self.error_handlers[callback] = block
 
-    def remove_error_handler(self, callback: Callable[[object, CCT], None]) -> None:
+    def remove_error_handler(self, callback: HandlerCallback[object, CCT, None]) -> None:
         """Removes an error handler.
 
         Args:
@@ -1558,8 +1560,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self,
         update: Optional[object],
         error: Exception,
-        job: "Job" = None,
-        coroutine: Coroutine = None,
+        job: "Job[CCT]" = None,
+        coroutine: Coroutine[Any, Any, Any] = None,
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises
