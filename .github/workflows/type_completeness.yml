@@ -35,13 +35,13 @@ jobs:
       - name: Compare Completeness
         uses: jannekem/run-python-script-action@v1
         with:
-          script:
+          script: | 
             import json
             base = float(
-                json.load(open("base.json", "rb"))["typeCompleteness"]["completenessScore"]
+              json.load(open("base.json", "rb"))["typeCompleteness"]["completenessScore"]
             )
             pr = float(
-                json.loads(open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
+              json.load(open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
             )
             if pr < (base - 0.1):
                 error(f"This PR decreases type completeness by {base - pr} ❌")
