@@ -3,11 +3,9 @@ on:
   pull_request:
     branches:
       - master
-      - doc-fixes
   push:
     branches:
       - master
-      - doc-fixes
 
 jobs:
   test-type-completeness:
@@ -43,12 +41,12 @@ jobs:
                 json.load(open("base.json", "rb"))["typeCompleteness"]["completenessScore"]
             )
             pr = float(
-                json.loads"open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
+                json.loads(open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
             )
-            if pr < base - 0.1
+            if pr < (base - 0.1):
                 error(f"This PR decreases type completeness by {base - pr} ❌")
                 exit(1)
-            elif pr > base + 0.1
+            elif pr > (base + 0.1):
                 print(f"This PR increases type completeness by {pr - base} ✨")
             else:
                 print(f"This PR does not change type completeness by more than 0.1")
