@@ -1,0 +1,54 @@
+name: Check Type Completeness
+on:
+  pull_request:
+    branches:
+      - master
+      - doc-fixes
+  push:
+    branches:
+      - master
+      - doc-fixes
+
+jobs:
+  test-type-completeness:
+    name:   test-type-completeness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: 'pip'
+          cache-dependency-path: '**/requirements*.txt'
+      - name: Install Pyright
+        run: |
+          python -W ignore -m pip install pyright~=1.1.291
+      - name: Get Base Completeness
+        run: |
+          git checkout ${{ github.base_ref }}
+          pip install . -U
+          pyright --verifytypes telegram --ignoreexternal --outputjson > base.json
+      - name: Get PR Completeness
+        run: |
+          git checkout ${{ github.head_ref }}
+          pip install . -U
+          pyright --verifytypes telegram --ignoreexternal --outputjson > pr.json
+      - name: Compare Completeness
+        uses: jannekem/run-python-script-action@v1
+        with:
+          script:
+            import json
+            base = float(
+                json.load(open("base.json", "rb"))["typeCompleteness"]["completenessScore"]
+            )
+            pr = float(
+                json.loads"open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
+            )
+            if pr < base - 0.1
+                error(f"This PR decreases type completeness by {base - pr} ❌")
+                exit(1)
+            elif pr > base + 0.1
+                print(f"This PR increases type completeness by {pr - base} ✨")
+            else:
+                print(f"This PR does not change type completeness by more than 0.1")
