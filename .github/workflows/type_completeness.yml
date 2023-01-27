@@ -26,13 +26,13 @@ jobs:
       - name: Get Base Completeness
         run: |
           git checkout ${{ github.base_ref }}
-          pip install . -U || true
-          pyright --verifytypes telegram --ignoreexternal --outputjson
+          pip install . -U
+          pyright --verifytypes telegram --ignoreexternal --outputjson > base.json || true
       - name: Get PR Completeness
         run: |
           git checkout ${{ github.head_ref }}
-          pip install . -U || true
-          pyright --verifytypes telegram --ignoreexternal --outputjson
+          pip install . -U
+          pyright --verifytypes telegram --ignoreexternal --outputjson > pr.json || true
       - name: Compare Completeness
         uses: jannekem/run-python-script-action@v1
         with:
