@@ -181,9 +181,9 @@ class BaseFilter:
         self._name = self.__class__.__name__ if name is None else name
         self._data_filter = data_filter
 
-    def check_update(
+    def check_update(  # skipcq: PYL-R0201
         self, update: Update
-    ) -> Optional[Union[bool, FilterDataDict]]:  # skipcq: PYL-R0201
+    ) -> Optional[Union[bool, FilterDataDict]]:
         """Checks if the specified update should be handled by this filter.
 
         Args:
