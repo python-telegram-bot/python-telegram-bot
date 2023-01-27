@@ -38,6 +38,12 @@ jobs:
         with:
           script: | 
             import json
+            import os
+            
+            def set_summary(text: str) -> None:
+                with open(os.getenv("GITHUB_STEP_SUMMARY"), "a") as env:
+                    print(f"summary-title={text}", file=env)
+
             base = float(
               json.load(open("base.json", "rb"))["typeCompleteness"]["completenessScore"]
             )
@@ -45,9 +51,15 @@ jobs:
               json.load(open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
             )
             if pr < (base - 0.1):
-                error(f"This PR decreases type completeness by {base - pr} ❌")
+                text = f"This PR decreases type completeness by {base - pr} ❌"
+                set_summary(text)
+                error(text)
                 exit(1)
             elif pr > (base + 0.1):
-                print(f"This PR increases type completeness by {pr - base} ✨")
+                text = f"This PR increases type completeness by {pr - base} ✨"
+                set_summary(text)
+                print(text)
             else:
-                print(f"This PR does not change type completeness by more than 0.1")
+                text = f"This PR does not change type completeness by more than 0.1"
+                set_summary(text)
+                print(text)
