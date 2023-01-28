@@ -34,7 +34,7 @@ repos:
           - httpx~=0.23.3
           - tornado~=6.2
           - APScheduler~=3.9.1
-          - cachetools~=5.2.1
+          - cachetools~=5.3.0
           - aiolimiter~=1.0.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
@@ -50,7 +50,7 @@ repos:
           - httpx~=0.23.3
           - tornado~=6.2
           - APScheduler~=3.9.1
-          - cachetools~=5.2.1
+          - cachetools~=5.3.0
           - aiolimiter~=1.0.0
           - . # this basically does `pip install -e .`
     - id: mypy
@@ -62,7 +62,7 @@ repos:
       additional_dependencies:
         - tornado~=6.2
         - APScheduler~=3.9.1
-        - cachetools~=5.2.1
+        - cachetools~=5.3.0
         - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
     rev: v3.3.1
@@ -89,5 +89,5 @@ repos:
           - httpx~=0.23.3
           - tornado~=6.2
           - APScheduler~=3.9.1
-          - cachetools~=5.2.1
+          - cachetools~=5.3.0
           - aiolimiter~=1.0.0
