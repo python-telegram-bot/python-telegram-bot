@@ -39,10 +39,6 @@ jobs:
           script: | 
             import json
             import os
-            
-            def set_summary(text: str) -> None:
-                with open(os.getenv("GITHUB_STEP_SUMMARY"), "a") as env:
-                    print(text, file=env)
 
             base = float(
               json.load(open("base.json", "rb"))["typeCompleteness"]["completenessScore"]
