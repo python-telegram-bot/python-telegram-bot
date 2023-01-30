@@ -176,8 +176,6 @@ class TestAdmonitionInserter:
         """
         admonitions = admonition_inserter.admonitions
 
-        # Either the class has no admonition at all, or if it does, the admonition does not
-        # contain the link
         assert not (
             cls in admonitions[admonition_type]
             and [
