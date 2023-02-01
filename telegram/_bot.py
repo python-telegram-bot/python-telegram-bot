@@ -3771,7 +3771,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.WebhookLimit.MAX_CONNECTIONS_LIMIT`.
                 Defaults to ``40``. Use lower values to limit the load on your bot's server,
                 and higher values to increase your bot's throughput.
-            allowed_updates (Sequence[:obj:`str`], optional): A sequence the types of
+            allowed_updates (Sequence[:obj:`str`], optional): A sequence of the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
