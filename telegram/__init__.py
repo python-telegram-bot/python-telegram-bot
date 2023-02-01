@@ -54,6 +54,7 @@ __all__ = (  # Keep this alphabetically ordered
     "ChatMemberUpdated",
     "ChatPermissions",
     "ChatPhoto",
+    "ChatShared",
     "ChosenInlineResult",
     "constants",
     "Contact",
@@ -118,6 +119,8 @@ __all__ = (  # Keep this alphabetically ordered
     "Invoice",
     "KeyboardButton",
     "KeyboardButtonPollType",
+    "KeyboardButtonRequestUser",
+    "KeyboardButtonRequestChat",
     "LabeledPrice",
     "Location",
     "LoginUrl",
@@ -167,6 +170,7 @@ __all__ = (  # Keep this alphabetically ordered
     "Update",
     "User",
     "UserProfilePhotos",
+    "UserShared",
     "Venue",
     "Video",
     "VideoChatEnded",
@@ -282,6 +286,12 @@ from ._inline.inputtextmessagecontent import InputTextMessageContent
 from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
+from ._keyboardbuttonrequest import (
+    ChatShared,
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestUser,
+    UserShared,
+)
 from ._loginurl import LoginUrl
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._message import Message

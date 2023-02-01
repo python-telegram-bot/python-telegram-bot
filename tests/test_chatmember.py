@@ -61,6 +61,12 @@ class CMDefaults:
     can_manage_chat: bool = True
     can_manage_video_chats: bool = True
     can_manage_topics: bool = True
+    can_send_audios: bool = True
+    can_send_documents: bool = True
+    can_send_photos: bool = True
+    can_send_videos: bool = True
+    can_send_video_notes: bool = True
+    can_send_voice_notes: bool = True
 
 
 def chat_member_owner():
@@ -105,6 +111,12 @@ def chat_member_restricted():
         CMDefaults.can_add_web_page_previews,
         CMDefaults.can_manage_topics,
         CMDefaults.until_date,
+        CMDefaults.can_send_audios,
+        CMDefaults.can_send_documents,
+        CMDefaults.can_send_photos,
+        CMDefaults.can_send_videos,
+        CMDefaults.can_send_video_notes,
+        CMDefaults.can_send_voice_notes,
     )
 
 

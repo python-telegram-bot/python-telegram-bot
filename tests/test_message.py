@@ -26,6 +26,7 @@ from telegram import (
     Audio,
     Bot,
     Chat,
+    ChatShared,
     Contact,
     Dice,
     Document,
@@ -44,6 +45,7 @@ from telegram import (
     SuccessfulPayment,
     Update,
     User,
+    UserShared,
     Venue,
     Video,
     VideoChatEnded,
@@ -207,6 +209,8 @@ def message(bot):
         },
         {"web_app_data": WebAppData("some_data", "some_button_text")},
         {"message_thread_id": 123},
+        {"user_shared": UserShared(1, 2)},
+        {"chat_shared": ChatShared(3, 4)},
     ],
     ids=[
         "forwarded_user",
@@ -261,6 +265,8 @@ def message(bot):
         "entities",
         "web_app_data",
         "message_thread_id",
+        "user_shared",
+        "chat_shared",
     ],
 )
 def message_params(bot, request):

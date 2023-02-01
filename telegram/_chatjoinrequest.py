@@ -45,11 +45,21 @@ class ChatJoinRequest(TelegramObject):
         the user never interacted with the bot before.
 
     .. versionadded:: 13.8
+    .. versionchanged:: 20.0
+       The argument :paramref:`user_chat_id` was added, which changes the position of the
+       optional arguments :paramref:`bio` and :paramref:`invite_link`.
 
     Args:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
         from_user (:class:`telegram.User`): User that sent the join request.
         date (:class:`datetime.datetime`): Date the request was sent.
+        user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
+            request. This number may have more than 32 significant bits and some programming
+            languages may have difficulty/silent defects in interpreting it. But it has at most 52
+            significant bits, so a 64-bit integer or double-precision float type are safe for
+            storing this identifier. The bot can use this identifier for 24 hours to send messages
+            until the join request is processed, assuming no other administrator contacted the
+            user.
         bio (:obj:`str`, optional): Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link that was used
             by the user to send the join request.
@@ -58,19 +68,27 @@ class ChatJoinRequest(TelegramObject):
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
         from_user (:class:`telegram.User`): User that sent the join request.
         date (:class:`datetime.datetime`): Date the request was sent.
+        user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
+            request. This number may have more than 32 significant bits and some programming
+            languages may have difficulty/silent defects in interpreting it. But it has at most 52
+            significant bits, so a 64-bit integer or double-precision float type are safe for
+            storing this identifier. The bot can use this identifier for 24 hours to send messages
+            until the join request is processed, assuming no other administrator contacted the
+            user.
         bio (:obj:`str`): Optional. Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link that was used
             by the user to send the join request.
 
     """
 
-    __slots__ = ("chat", "from_user", "date", "bio", "invite_link")
+    __slots__ = ("chat", "from_user", "date", "bio", "invite_link", "user_chat_id")
 
     def __init__(
         self,
         chat: Chat,
         from_user: User,
         date: datetime.datetime,
+        user_chat_id: int,
         bio: str = None,
         invite_link: ChatInviteLink = None,
         *,
@@ -81,6 +99,7 @@ class ChatJoinRequest(TelegramObject):
         self.chat = chat
         self.from_user = from_user
         self.date = date
+        self.user_chat_id = user_chat_id
 
         # Optionals
         self.bio = bio

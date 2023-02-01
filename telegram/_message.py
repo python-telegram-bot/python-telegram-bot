@@ -46,6 +46,7 @@ from telegram._forumtopic import (
 )
 from telegram._games.game import Game
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._keyboardbuttonrequest import ChatShared, UserShared
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._passport.passportdata import PassportData
@@ -316,6 +317,14 @@ class Message(TelegramObject):
             by a spoiler animation.
 
             .. versionadded:: 20.0
+        user_shared (:class:`telegram.UserShared`, optional): Service message: a user was shared
+            with the bot.
+
+            .. versionadded:: 20.1
+        chat_shared (:class:`telegram.ChatShared`, optional):Service message: a chat was shared
+            with the bot.
+
+            .. versionadded:: 20.1
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -543,6 +552,14 @@ class Message(TelegramObject):
             by a spoiler animation.
 
             .. versionadded:: 20.0
+        user_shared (:class:`telegram.UserShared`): Optional. Service message: a user was shared
+            with the bot.
+
+            .. versionadded:: 20.1
+        chat_shared (:class:`telegram.ChatShared`): Optional. Service message: a chat was shared
+            with the bot.
+
+            .. versionadded:: 20.1
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
         by this function. Instead, the supplied replacement for the emoji will be used.
@@ -620,6 +637,8 @@ class Message(TelegramObject):
         "general_forum_topic_unhidden",
         "write_access_allowed",
         "has_media_spoiler",
+        "user_shared",
+        "chat_shared",
     )
 
     def __init__(
@@ -693,6 +712,8 @@ class Message(TelegramObject):
         general_forum_topic_unhidden: GeneralForumTopicUnhidden = None,
         write_access_allowed: WriteAccessAllowed = None,
         has_media_spoiler: bool = None,
+        user_shared: UserShared = None,
+        chat_shared: ChatShared = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -769,6 +790,8 @@ class Message(TelegramObject):
         self.general_forum_topic_unhidden = general_forum_topic_unhidden
         self.write_access_allowed = write_access_allowed
         self.has_media_spoiler = has_media_spoiler
+        self.user_shared = user_shared
+        self.chat_shared = chat_shared
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -878,6 +901,8 @@ class Message(TelegramObject):
         data["write_access_allowed"] = WriteAccessAllowed.de_json(
             data.get("write_access_allowed"), bot
         )
+        data["user_shared"] = UserShared.de_json(data.get("user_shared"), bot)
+        data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
 
         return super().de_json(data=data, bot=bot)
 
