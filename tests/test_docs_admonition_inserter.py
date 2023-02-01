@@ -29,6 +29,14 @@ def admonition_inserter():
 
 
 class TestAdmonitionInserter:
+    """This is a minimal-effort test to ensure that the `AdmonitionInserter`
+    used for automatically inserting references in the docs works as expected.
+
+    It does not aim to cover all links in the documentation, but rather checks that several special
+    cases (which where discovered during the implementation of `AdmonitionInserter`) are handled
+    correctly.
+    """
+
     def test_admonitions_dict(self, admonition_inserter):
         # there are keys for every type of admonition
         assert len(admonition_inserter.admonitions) == len(admonition_inserter.ADMONITION_TYPES)
@@ -45,7 +53,7 @@ class TestAdmonitionInserter:
                     continue
 
                 assert isinstance(cls, type)
-                assert "telegram" in str(cls), (
+                assert str(cls).startswith("<class 'telegram."), (
                     rf"Class {cls} does not belong to Telegram classes. Admonition:\n"
                     rf"{admonition_inserter.admonitions[admonition_type][cls]}"
                 )
