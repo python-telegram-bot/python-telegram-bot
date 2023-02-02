@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultLocation."""
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, Optional
 
 from telegram import constants
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
@@ -136,20 +136,20 @@ class InlineQueryResultLocation(InlineQueryResult):
         # Required
         super().__init__(constants.InlineQueryResultType.LOCATION, id, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.latitude = latitude
-            self.longitude = longitude
-            self.title = title
+            self.latitude: float = latitude
+            self.longitude: float = longitude
+            self.title: str = title
 
             # Optionals
-            self.live_period = live_period
-            self.reply_markup = reply_markup
-            self.input_message_content = input_message_content
-            self.thumb_url = thumb_url
-            self.thumb_width = thumb_width
-            self.thumb_height = thumb_height
-            self.horizontal_accuracy = horizontal_accuracy
-            self.heading = heading
-            self.proximity_alert_radius = (
+            self.live_period: Optional[int] = live_period
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.input_message_content: Optional[InputMessageContent] = input_message_content
+            self.thumb_url: Optional[str] = thumb_url
+            self.thumb_width: Optional[int] = thumb_width
+            self.thumb_height: Optional[int] = thumb_height
+            self.horizontal_accuracy: Optional[float] = horizontal_accuracy
+            self.heading: Optional[int] = heading
+            self.proximity_alert_radius: Optional[int] = (
                 int(proximity_alert_radius) if proximity_alert_radius else None
             )
 

@@ -78,13 +78,13 @@ class PassportFile(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
-        self.file_id = file_id
-        self.file_unique_id = file_unique_id
-        self.file_size = file_size
-        self.file_date = file_date
+        self.file_id: str = file_id
+        self.file_unique_id: str = file_unique_id
+        self.file_size: int = file_size
+        self.file_date: int = file_date
         # Optionals
 
-        self._credentials = credentials
+        self._credentials: Optional[FileCredentials] = credentials
 
         self._id_attrs = (self.file_unique_id,)
 

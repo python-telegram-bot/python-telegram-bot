@@ -74,7 +74,7 @@ class _BaseThumbedMedium(_BaseMedium):
             file_size=file_size,
             api_kwargs=api_kwargs,
         )
-        self.thumb = thumb
+        self.thumb: Optional[PhotoSize] = thumb
 
     @classmethod
     def de_json(

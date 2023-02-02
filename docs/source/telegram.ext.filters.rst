@@ -5,7 +5,7 @@ telegram.ext.filters Module
    The classes in `filters.py` are sorted alphabetically such that :bysource: still is readable
 
 .. automodule:: telegram.ext.filters
-    :inherited-members:
+    :inherited-members: BaseFilter, MessageFilter, UpdateFilter
     :members:
     :show-inheritance:
     :member-order: bysource

@@ -18,11 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChosenInlineResultHandler class."""
 import re
-from typing import TYPE_CHECKING, Match, Optional, Pattern, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
@@ -78,15 +78,15 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        block: DVInput[bool] = DEFAULT_TRUE,
-        pattern: Union[str, Pattern] = None,
+        block: DVType[bool] = DEFAULT_TRUE,
+        pattern: Union[str, Pattern[str]] = None,
     ):
         super().__init__(callback, block=block)
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern = pattern
+        self.pattern: Optional[Union[str, Pattern[str]]] = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -111,8 +111,8 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
         self,
         context: CCT,
         update: Update,  # skipcq: BAN-B301
-        application: "Application",  # skipcq: BAN-B301
-        check_result: Union[bool, Match],
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
+        check_result: Union[bool, Match[str]],
     ) -> None:
         """This function adds the matched regex pattern result to
         :attr:`telegram.ext.CallbackContext.matches`.

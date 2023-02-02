@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatMemberHandler class."""
-from typing import ClassVar, TypeVar
+from typing import ClassVar, Optional, TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
@@ -83,11 +83,11 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         self,
         callback: HandlerCallback[Update, CCT, RT],
         chat_member_types: int = MY_CHAT_MEMBER,
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
 
-        self.chat_member_types = chat_member_types
+        self.chat_member_types: Optional[int] = chat_member_types
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.

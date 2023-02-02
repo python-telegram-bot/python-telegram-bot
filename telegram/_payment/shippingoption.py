@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingOption."""
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Sequence, Tuple
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -66,9 +66,9 @@ class ShippingOption(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
 
-        self.id = id  # pylint: disable=invalid-name
-        self.title = title
-        self.prices = parse_sequence_arg(prices)
+        self.id: str = id  # pylint: disable=invalid-name
+        self.title: str = title
+        self.prices: Tuple["LabeledPrice", ...] = parse_sequence_arg(prices)
 
         self._id_attrs = (self.id,)
 
