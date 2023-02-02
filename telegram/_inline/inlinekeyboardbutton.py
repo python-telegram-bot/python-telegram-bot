@@ -196,17 +196,17 @@ class InlineKeyboardButton(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.text = text
+        self.text: str = text
 
         # Optionals
-        self.url = url
-        self.login_url = login_url
-        self.callback_data = callback_data
-        self.switch_inline_query = switch_inline_query
-        self.switch_inline_query_current_chat = switch_inline_query_current_chat
-        self.callback_game = callback_game
-        self.pay = pay
-        self.web_app = web_app
+        self.url: Optional[str] = url
+        self.login_url: Optional[LoginUrl] = login_url
+        self.callback_data: Optional[Union[str, object]] = callback_data
+        self.switch_inline_query: Optional[str] = switch_inline_query
+        self.switch_inline_query_current_chat: Optional[str] = switch_inline_query_current_chat
+        self.callback_game: Optional[CallbackGame] = callback_game
+        self.pay: Optional[bool] = pay
+        self.web_app: Optional[WebAppInfo] = web_app
         self._id_attrs = ()
         self._set_id_attrs()
 

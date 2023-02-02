@@ -59,8 +59,8 @@ class InlineQueryResult(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
-        self.type = type
-        self.id = str(id)  # pylint: disable=invalid-name
+        self.type: str = type
+        self.id: str = str(id)  # pylint: disable=invalid-name
 
         self._id_attrs = (self.id,)
 

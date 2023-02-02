@@ -80,12 +80,12 @@ class ChosenInlineResult(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
-        self.result_id = result_id
-        self.from_user = from_user
-        self.query = query
+        self.result_id: str = result_id
+        self.from_user: User = from_user
+        self.query: str = query
         # Optionals
-        self.location = location
-        self.inline_message_id = inline_message_id
+        self.location: Optional[Location] = location
+        self.inline_message_id: Optional[str] = inline_message_id
 
         self._id_attrs = (self.result_id,)
 

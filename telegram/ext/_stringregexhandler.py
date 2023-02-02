@@ -19,10 +19,10 @@
 """This module contains the StringRegexHandler class."""
 
 import re
-from typing import TYPE_CHECKING, Match, Optional, Pattern, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
@@ -75,18 +75,18 @@ class StringRegexHandler(BaseHandler[str, CCT]):
 
     def __init__(
         self,
-        pattern: Union[str, Pattern],
+        pattern: Union[str, Pattern[str]],
         callback: HandlerCallback[str, CCT, RT],
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern = pattern
+        self.pattern: Union[str, Pattern[str]] = pattern
 
-    def check_update(self, update: object) -> Optional[Match]:
+    def check_update(self, update: object) -> Optional[Match[str]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -106,8 +106,8 @@ class StringRegexHandler(BaseHandler[str, CCT]):
         self,
         context: CCT,
         update: str,  # skipcq: BAN-B301
-        application: "Application",  # skipcq: BAN-B301
-        check_result: Optional[Match],
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
+        check_result: Optional[Match[str]],
     ) -> None:
         """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as
         list with one element.

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
+from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -89,16 +90,16 @@ class PersonalDetails(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.first_name = first_name
-        self.last_name = last_name
-        self.middle_name = middle_name
-        self.birth_date = birth_date
-        self.gender = gender
-        self.country_code = country_code
-        self.residence_country_code = residence_country_code
-        self.first_name_native = first_name_native
-        self.last_name_native = last_name_native
-        self.middle_name_native = middle_name_native
+        self.first_name: str = first_name
+        self.last_name: str = last_name
+        self.middle_name: Optional[str] = middle_name
+        self.birth_date: str = birth_date
+        self.gender: str = gender
+        self.country_code: str = country_code
+        self.residence_country_code: str = residence_country_code
+        self.first_name_native: Optional[str] = first_name_native
+        self.last_name_native: Optional[str] = last_name_native
+        self.middle_name_native: Optional[str] = middle_name_native
 
         self._freeze()
 
@@ -146,12 +147,12 @@ class ResidentialAddress(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.street_line1 = street_line1
-        self.street_line2 = street_line2
-        self.city = city
-        self.state = state
-        self.country_code = country_code
-        self.post_code = post_code
+        self.street_line1: str = street_line1
+        self.street_line2: str = street_line2
+        self.city: str = city
+        self.state: str = state
+        self.country_code: str = country_code
+        self.post_code: str = post_code
 
         self._freeze()
 
@@ -179,7 +180,7 @@ class IdDocumentData(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.document_no = document_no
-        self.expiry_date = expiry_date
+        self.document_no: str = document_no
+        self.expiry_date: str = expiry_date
 
         self._freeze()

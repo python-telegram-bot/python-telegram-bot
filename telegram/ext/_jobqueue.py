@@ -20,7 +20,7 @@
 import asyncio
 import datetime
 import weakref
-from typing import TYPE_CHECKING, Optional, Tuple, Union, cast, overload
+from typing import TYPE_CHECKING, Any, Generic, Optional, Tuple, Union, cast, overload
 
 try:
     import pytz
@@ -35,15 +35,19 @@ except ImportError:
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 from telegram.ext._extbot import ExtBot
-from telegram.ext._utils.types import JobCallback
+from telegram.ext._utils.types import CCT, JobCallback
 
 if TYPE_CHECKING:
     from telegram.ext import Application
 
 
-class JobQueue:
+class JobQueue(Generic[CCT]):
     """This class allows you to periodically perform tasks with the bot. It is a convenience
     wrapper for the APScheduler library.
+
+    This class is a :class:`~typing.Generic` class and accepts one type variable that specifies
+    the type of the argument ``context`` of the job callbacks (:paramref:`~run_once.callback`) of
+    :meth:`run_once` and the other scheduling methods.
 
     Important:
         If you want to use this class, you must install PTB with the optional requirement
@@ -84,7 +88,9 @@ class JobQueue:
 
         self._application: "Optional[weakref.ReferenceType[Application]]" = None
         self._executor = AsyncIOExecutor()
-        self.scheduler = AsyncIOScheduler(timezone=pytz.utc, executors={"default": self._executor})
+        self.scheduler: AsyncIOScheduler = AsyncIOScheduler(
+            timezone=pytz.utc, executors={"default": self._executor}
+        )
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -123,7 +129,9 @@ class JobQueue:
             return date_time
         return time
 
-    def set_application(self, application: "Application") -> None:
+    def set_application(
+        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
+    ) -> None:
         """Set the application to be used by this JobQueue.
 
         Args:
@@ -138,7 +146,7 @@ class JobQueue:
             )
 
     @property
-    def application(self) -> "Application":
+    def application(self) -> "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]":
         """The application this JobQueue is associated with."""
         if self._application is None:
             raise RuntimeError("No application was set for this JobQueue.")
@@ -149,14 +157,14 @@ class JobQueue:
 
     def run_once(
         self,
-        callback: JobCallback,
+        callback: JobCallback[CCT],
         when: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
         data: object = None,
         name: str = None,
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> "Job":
+    ) -> "Job[CCT]":
         """Creates a new :class:`Job` instance that runs once and adds it to the queue.
 
         Args:
@@ -233,7 +241,7 @@ class JobQueue:
 
     def run_repeating(
         self,
-        callback: JobCallback,
+        callback: JobCallback[CCT],
         interval: Union[float, datetime.timedelta],
         first: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
         last: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
@@ -242,7 +250,7 @@ class JobQueue:
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> "Job":
+    ) -> "Job[CCT]":
         """Creates a new :class:`Job` instance that runs at specified intervals and adds it to the
         queue.
 
@@ -348,7 +356,7 @@ class JobQueue:
 
     def run_monthly(
         self,
-        callback: JobCallback,
+        callback: JobCallback[CCT],
         when: datetime.time,
         day: int,
         data: object = None,
@@ -356,7 +364,7 @@ class JobQueue:
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> "Job":
+    ) -> "Job[CCT]":
         """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
 
         .. versionchanged:: 20.0
@@ -426,7 +434,7 @@ class JobQueue:
 
     def run_daily(
         self,
-        callback: JobCallback,
+        callback: JobCallback[CCT],
         time: datetime.time,
         days: Tuple[int, ...] = tuple(range(7)),
         data: object = None,
@@ -434,7 +442,7 @@ class JobQueue:
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> "Job":
+    ) -> "Job[CCT]":
         """Creates a new :class:`Job` that runs on a daily basis and adds it to the queue.
 
         Note:
@@ -517,13 +525,13 @@ class JobQueue:
 
     def run_custom(
         self,
-        callback: JobCallback,
+        callback: JobCallback[CCT],
         job_kwargs: JSONDict,
         data: object = None,
         name: str = None,
         chat_id: int = None,
         user_id: int = None,
-    ) -> "Job":
+    ) -> "Job[CCT]":
         """Creates a new custom defined :class:`Job`.
 
         Args:
@@ -596,7 +604,7 @@ class JobQueue:
             # so give it a tiny bit of time to actually shut down.
             await asyncio.sleep(0.01)
 
-    def jobs(self) -> Tuple["Job", ...]:
+    def jobs(self) -> Tuple["Job[CCT]", ...]:
         """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`.
 
         Returns:
@@ -607,7 +615,7 @@ class JobQueue:
             for job in self.scheduler.get_jobs()
         )
 
-    def get_jobs_by_name(self, name: str) -> Tuple["Job", ...]:
+    def get_jobs_by_name(self, name: str) -> Tuple["Job[CCT]", ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
         in the :class:`JobQueue`.
 
@@ -617,13 +625,16 @@ class JobQueue:
         return tuple(job for job in self.jobs() if job.name == name)
 
 
-class Job:
+class Job(Generic[CCT]):
     """This class is a convenience wrapper for the jobs held in a :class:`telegram.ext.JobQueue`.
     With the current backend APScheduler, :attr:`job` holds a :class:`apscheduler.job.Job`
     instance.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :class:`id <apscheduler.job.Job>` is equal.
+
+    This class is a :class:`~typing.Generic` class and accepts one type variable that specifies
+    the type of the argument ``context`` of :paramref:`callback`.
 
     Important:
         If you want to use this class, you must install PTB with the optional requirement
@@ -694,7 +705,7 @@ class Job:
 
     def __init__(
         self,
-        callback: JobCallback,
+        callback: JobCallback[CCT],
         data: object = None,
         name: str = None,
         chat_id: int = None,
@@ -706,11 +717,11 @@ class Job:
                 "python-telegram-bot[job-queue]`."
             )
 
-        self.callback = callback
-        self.data = data
-        self.name = name or callback.__name__
-        self.chat_id = chat_id
-        self.user_id = user_id
+        self.callback: JobCallback[CCT] = callback
+        self.data: Optional[object] = data
+        self.name: Optional[str] = name or callback.__name__
+        self.chat_id: Optional[int] = chat_id
+        self.user_id: Optional[int] = user_id
 
         self._removed = False
         self._enabled = False
@@ -726,7 +737,9 @@ class Job:
         """
         return self._job
 
-    async def run(self, application: "Application") -> None:
+    async def run(
+        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
+    ) -> None:
         """Executes the callback function independently of the jobs schedule. Also calls
         :meth:`telegram.ext.Application.update_persistence`.
 
@@ -740,7 +753,9 @@ class Job:
         # We shield the task such that the job isn't cancelled mid-run
         await asyncio.shield(self._run(application))
 
-    async def _run(self, application: "Application") -> None:
+    async def _run(
+        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
+    ) -> None:
         try:
             context = application.context_types.context.from_job(self, application)
             await context.refresh_data()
@@ -791,7 +806,7 @@ class Job:
         return self.job.next_run_time
 
     @classmethod
-    def _from_aps_job(cls, job: "APSJob") -> "Job":
+    def _from_aps_job(cls, job: "APSJob") -> "Job[CCT]":
         return job.func.__self__
 
     def __getattr__(self, item: str) -> object:

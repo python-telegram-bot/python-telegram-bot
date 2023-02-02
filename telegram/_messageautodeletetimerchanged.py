@@ -51,7 +51,7 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.message_auto_delete_time = message_auto_delete_time
+        self.message_auto_delete_time: int = message_auto_delete_time
 
         self._id_attrs = (self.message_auto_delete_time,)
 

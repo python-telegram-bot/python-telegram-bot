@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultDocument"""
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -132,17 +132,17 @@ class InlineQueryResultDocument(InlineQueryResult):
         # Required
         super().__init__(InlineQueryResultType.DOCUMENT, id, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.document_url = document_url
-            self.title = title
-            self.mime_type = mime_type
+            self.document_url: str = document_url
+            self.title: str = title
+            self.mime_type: str = mime_type
 
             # Optionals
-            self.caption = caption
-            self.parse_mode = parse_mode
-            self.caption_entities = parse_sequence_arg(caption_entities)
-            self.description = description
-            self.reply_markup = reply_markup
-            self.input_message_content = input_message_content
-            self.thumb_url = thumb_url
-            self.thumb_width = thumb_width
-            self.thumb_height = thumb_height
+            self.caption: Optional[str] = caption
+            self.parse_mode: ODVInput[str] = parse_mode
+            self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+            self.description: Optional[str] = description
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.input_message_content: Optional[InputMessageContent] = input_message_content
+            self.thumb_url: Optional[str] = thumb_url
+            self.thumb_width: Optional[int] = thumb_width
+            self.thumb_height: Optional[int] = thumb_height

@@ -143,18 +143,18 @@ class User(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.id = id  # pylint: disable=invalid-name
-        self.first_name = first_name
-        self.is_bot = is_bot
+        self.id: int = id  # pylint: disable=invalid-name
+        self.first_name: str = first_name
+        self.is_bot: bool = is_bot
         # Optionals
-        self.last_name = last_name
-        self.username = username
-        self.language_code = language_code
-        self.can_join_groups = can_join_groups
-        self.can_read_all_group_messages = can_read_all_group_messages
-        self.supports_inline_queries = supports_inline_queries
-        self.is_premium = is_premium
-        self.added_to_attachment_menu = added_to_attachment_menu
+        self.last_name: Optional[str] = last_name
+        self.username: Optional[str] = username
+        self.language_code: Optional[str] = language_code
+        self.can_join_groups: Optional[bool] = can_join_groups
+        self.can_read_all_group_messages: Optional[bool] = can_read_all_group_messages
+        self.supports_inline_queries: Optional[bool] = supports_inline_queries
+        self.is_premium: Optional[bool] = is_premium
+        self.added_to_attachment_menu: Optional[bool] = added_to_attachment_menu
 
         self._id_attrs = (self.id,)
 

@@ -44,11 +44,11 @@ class RequestData:
     __slots__ = ("_parameters", "contains_files")
 
     def __init__(self, parameters: List[RequestParameter] = None):
-        self._parameters = parameters or []
-        self.contains_files = any(param.input_files for param in self._parameters)
+        self._parameters: List[RequestParameter] = parameters or []
+        self.contains_files: bool = any(param.input_files for param in self._parameters)
 
     @property
-    def parameters(self) -> Dict[str, Union[str, int, List, Dict]]:
+    def parameters(self) -> Dict[str, Union[str, int, List[Any], Dict[Any, Any]]]:
         """Gives the parameters as mapping of parameter name to the parameter value, which can be
         a single object of type :obj:`int`, :obj:`float`, :obj:`str` or :obj:`bool` or any
         (possibly nested) composition of lists, tuples and dictionaries, where each entry, key

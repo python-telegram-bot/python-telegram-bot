@@ -19,7 +19,7 @@
 # pylint: disable=missing-module-docstring,  redefined-builtin
 import json
 from base64 import b64decode
-from typing import TYPE_CHECKING, Optional, Sequence, no_type_check
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple, no_type_check
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -147,9 +147,9 @@ class EncryptedCredentials(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.data = data
-        self.hash = hash
-        self.secret = secret
+        self.data: str = data
+        self.hash: str = hash
+        self.secret: str = secret
 
         self._id_attrs = (self.data, self.hash, self.secret)
 
@@ -226,8 +226,8 @@ class Credentials(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.secure_data = secure_data
-        self.nonce = nonce
+        self.secure_data: SecureData = secure_data
+        self.nonce: str = nonce
 
         self._freeze()
 
@@ -327,17 +327,17 @@ class SecureData(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         # Optionals
-        self.temporary_registration = temporary_registration
-        self.passport_registration = passport_registration
-        self.rental_agreement = rental_agreement
-        self.bank_statement = bank_statement
-        self.utility_bill = utility_bill
-        self.address = address
-        self.identity_card = identity_card
-        self.driver_license = driver_license
-        self.internal_passport = internal_passport
-        self.passport = passport
-        self.personal_details = personal_details
+        self.temporary_registration: Optional[SecureValue] = temporary_registration
+        self.passport_registration: Optional[SecureValue] = passport_registration
+        self.rental_agreement: Optional[SecureValue] = rental_agreement
+        self.bank_statement: Optional[SecureValue] = bank_statement
+        self.utility_bill: Optional[SecureValue] = utility_bill
+        self.address: Optional[SecureValue] = address
+        self.identity_card: Optional[SecureValue] = identity_card
+        self.driver_license: Optional[SecureValue] = driver_license
+        self.internal_passport: Optional[SecureValue] = internal_passport
+        self.passport: Optional[SecureValue] = passport
+        self.personal_details: Optional[SecureValue] = personal_details
 
         self._freeze()
 
@@ -438,12 +438,12 @@ class SecureValue(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.data = data
-        self.front_side = front_side
-        self.reverse_side = reverse_side
-        self.selfie = selfie
-        self.files = parse_sequence_arg(files)
-        self.translation = parse_sequence_arg(translation)
+        self.data: Optional[DataCredentials] = data
+        self.front_side: Optional[FileCredentials] = front_side
+        self.reverse_side: Optional[FileCredentials] = reverse_side
+        self.selfie: Optional[FileCredentials] = selfie
+        self.files: Tuple["FileCredentials", ...] = parse_sequence_arg(files)
+        self.translation: Tuple["FileCredentials", ...] = parse_sequence_arg(translation)
 
         self._freeze()
 
@@ -475,12 +475,12 @@ class _CredentialsBase(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.hash = hash
-            self.secret = secret
+            self.hash: str = hash
+            self.secret: str = secret
 
             # Aliases just to be sure
-            self.file_hash = self.hash
-            self.data_hash = self.hash
+            self.file_hash: str = self.hash
+            self.data_hash: str = self.hash
 
 
 class DataCredentials(_CredentialsBase):

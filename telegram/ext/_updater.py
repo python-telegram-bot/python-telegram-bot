@@ -20,10 +20,19 @@
 import asyncio
 import logging
 import ssl
-from contextlib import AbstractAsyncContextManager
 from pathlib import Path
 from types import TracebackType
-from typing import TYPE_CHECKING, Callable, Coroutine, List, Optional, Type, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    AsyncContextManager,
+    Callable,
+    Coroutine,
+    List,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -43,7 +52,7 @@ if TYPE_CHECKING:
 _UpdaterType = TypeVar("_UpdaterType", bound="Updater")  # pylint: disable=invalid-name
 
 
-class Updater(AbstractAsyncContextManager):
+class Updater(AsyncContextManager["Updater"]):
     """This class fetches updates for the bot either via long polling or by starting a webhook
     server. Received updates are enqueued into the :attr:`update_queue` and may be fetched from
     there to handle them appropriately.
@@ -100,10 +109,10 @@ class Updater(AbstractAsyncContextManager):
     def __init__(
         self,
         bot: "Bot",
-        update_queue: asyncio.Queue,
+        update_queue: "asyncio.Queue[object]",
     ):
-        self.bot = bot
-        self.update_queue = update_queue
+        self.bot: Bot = bot
+        self.update_queue: "asyncio.Queue[object]" = update_queue
 
         self._last_update_id = 0
         self._running = False
@@ -184,7 +193,7 @@ class Updater(AbstractAsyncContextManager):
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
         error_callback: Callable[[TelegramError], None] = None,
-    ) -> asyncio.Queue:
+    ) -> "asyncio.Queue[object]":
         """Starts polling updates from Telegram.
 
         .. versionchanged:: 20.0
@@ -379,7 +388,7 @@ class Updater(AbstractAsyncContextManager):
         ip_address: str = None,
         max_connections: int = 40,
         secret_token: str = None,
-    ) -> asyncio.Queue:
+    ) -> "asyncio.Queue[object]":
         """
         Starts a small http server to listen for updates via webhook. If :paramref:`cert`
         and :paramref:`key` are not provided, the webhook will be started directly on

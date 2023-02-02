@@ -343,7 +343,7 @@ from ._writeaccessallowed import WriteAccessAllowed
 #: :obj:`str`: The version of the `python-telegram-bot` library as string.
 #: To get detailed information about the version number, please use :data:`__version_info__`
 #: instead.
-__version__ = _version.__version__
+__version__: str = _version.__version__
 #:  :class:`typing.NamedTuple`: A tuple containing the five components of the version number:
 #:  `major`, `minor`, `micro`, `releaselevel`, and `serial`.
 #:  All values except `releaselevel` are integers.
@@ -352,13 +352,13 @@ __version__ = _version.__version__
 #:  ``__version_info__.major`` and so on.
 #:
 #:  .. versionadded:: 20.0
-__version_info__ = _version.__version_info__
+__version_info__: _version.Version = _version.__version_info__
 #: :obj:`str`: Shortcut for :const:`telegram.constants.BOT_API_VERSION`.
 #:
 #: .. versionchanged:: 20.0
 #:    This constant was previously named ``bot_api_version``.
-__bot_api_version__ = _version.__bot_api_version__
+__bot_api_version__: str = _version.__bot_api_version__
 #: :class:`typing.NamedTuple`: Shortcut for :const:`telegram.constants.BOT_API_VERSION_INFO`.
 #:
 #: .. versionadded:: 20.0
-__bot_api_version_info__ = _version.__bot_api_version_info__
+__bot_api_version_info__: constants._BotAPIVersion = _version.__bot_api_version_info__
