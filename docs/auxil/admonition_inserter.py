@@ -38,6 +38,13 @@ class AdmonitionInserter:
     start and end markers.
     """
 
+    FORWARD_REF_SKIP_PATTERN = re.compile(r"^ForwardRef\('DefaultValue\[\w+]'\)$")
+    """A pattern that will be used to skip known ForwardRef's that need not be resolved
+    to a Telegram class, e.g.:
+    ForwardRef('DefaultValue[None]')
+    ForwardRef('DefaultValue[DVValueType]')
+    """
+
     METHODS_FOR_BOT_AND_APPBUILDER = {
         telegram.Bot: tuple(
             m[0]
@@ -464,8 +471,8 @@ class AdmonitionInserter:
             try:
                 cls = self._resolve_class(m.group("class_name"))
             except AttributeError:
-                if str(arg) == "ForwardRef('DefaultValue[DVType]')":
-                    # this is a known ForwardRef that needs not be resolved to a Telegram class
+                # skip known ForwardRef's that need not be resolved to a Telegram class
+                if self.FORWARD_REF_SKIP_PATTERN.match(str(arg)):
                     pass
                 else:
                     raise NotImplementedError(f"Could not process ForwardRef: {arg}")
