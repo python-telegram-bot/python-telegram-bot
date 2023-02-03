@@ -810,10 +810,14 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         - If the bot has :attr:`~telegram.ChatMemberAdministrator.can_delete_messages`
           permission in a supergroup or a channel, it can delete any message there.
 
-        .. admonition:: Shortcuts
-            :class: shortcuts
+        ..
+            The method CallbackQuery.delete_message() will not be found when automatically
+            generating "Shortcuts" admonitions for Bot methods because it has no calls
+            to Bot methods in its return statement(s). So it is manually included in "See also".
 
-            :meth:`telegram.Message.delete`, :meth:`telegram.CallbackQuery.delete_message`
+        .. seealso::
+            :meth:`telegram.CallbackQuery.delete_message` (calls :meth:`delete_message`
+            indirectly, via :meth:`telegram.Message.delete`)
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|

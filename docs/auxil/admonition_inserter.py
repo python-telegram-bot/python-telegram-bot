@@ -29,7 +29,9 @@ import telegram.ext
 class AdmonitionInserter:
     """Class for inserting admonitions into docs of Telegram classes."""
 
-    ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
+    CLASS_ADMONITION_TYPES = ("use_in", "available_in", "returned_in")
+    METHOD_ADMONITION_TYPES = ("shortcuts",)
+    ALL_ADMONITION_TYPES = CLASS_ADMONITION_TYPES + METHOD_ADMONITION_TYPES
 
     FORWARD_REF_PATTERN = re.compile(r"^ForwardRef\('(?P<class_name>\w+)'\)$")
     """ A pattern to find a class name in a ForwardRef typing annotation.
@@ -65,13 +67,14 @@ class AdmonitionInserter:
     """
 
     def __init__(self):
-        self.admonitions: dict[str, dict[type, str]] = {
+        self.admonitions: dict[str, dict[Union[type, collections.abc.Callable], str]] = {
             # dynamically determine which method to use to create a sub-dictionary
             admonition_type: getattr(self, f"_create_{admonition_type}")()
-            for admonition_type in self.ADMONITION_TYPES
+            for admonition_type in self.ALL_ADMONITION_TYPES
         }
         """Dictionary with admonitions. Contains sub-dictionaries, one per admonition type.
-        Each sub-dictionary matches classes to texts of admonitions, e.g.:
+        Each sub-dictionary matches bot methods (for "Shortcuts") or telegram classes (for other
+        admonition types) to texts of admonitions, e.g.:
         ```
         {
         "use_in": {<class 'telegram._chatinvitelink.ChatInviteLink'>:
@@ -95,15 +98,42 @@ class AdmonitionInserter:
         # A better way would be to copy the lines and return them, but that will not work with
         # docs.auxil.sphinx_hooks.autodoc_process_docstring()
 
-        for admonition_type in self.ADMONITION_TYPES:
+        for admonition_type in self.CLASS_ADMONITION_TYPES:
 
             # If there is no admonition of the given type for the given class,
             # continue to the next admonition type, maybe the class is listed there.
             if cls not in self.admonitions[admonition_type]:
                 continue
 
+            # TODO repetition?
             insert_idx = self._find_insert_pos_for_admonition(docstring_lines)
             admonition_lines = self.admonitions[admonition_type][cls].splitlines()
+
+            for idx in range(insert_idx, insert_idx + len(admonition_lines)):
+                docstring_lines.insert(idx, admonition_lines[idx - insert_idx])
+
+    def insert_admonitions_for_bot_method(
+        self,
+        method: collections.abc.Callable,
+        docstring_lines: list[str],
+    ):
+        """Inserts admonitions into docstring lines for a given Bot method.
+
+        **Modifies lines in place**.
+        """
+        # A better way would be to copy the lines and return them, but that will not work with
+        # docs.auxil.sphinx_hooks.autodoc_process_docstring()
+
+        for admonition_type in self.METHOD_ADMONITION_TYPES:
+
+            # If there is no admonition of the given type for the given class,
+            # continue to the next admonition type, maybe the class is listed there.
+            if method not in self.admonitions[admonition_type]:
+                continue
+
+            # TODO repetition?
+            insert_idx = self._find_insert_pos_for_admonition(docstring_lines)
+            admonition_lines = self.admonitions[admonition_type][method].splitlines()
 
             for idx in range(insert_idx, insert_idx + len(admonition_lines)):
                 docstring_lines.insert(idx, admonition_lines[idx - insert_idx])
@@ -155,7 +185,7 @@ class AdmonitionInserter:
             # "telegram.StickerSet" because that's the way the classes are mentioned in
             # docstrings.
             # Check for potential presence of ".ext.", we will need to keep it.
-            ext = ".ext" if ".ext." in str(inspected_class) else ""
+            ext = ".ext" if ".ext." in str(inspected_class) else ""  # TODO repetition?
             name_of_inspected_class_in_docstr = f"telegram{ext}.{class_name}"
 
             # Parsing part of the docstring with attributes (parsing of properties follows later)
@@ -271,6 +301,48 @@ class AdmonitionInserter:
 
         return self._generate_admonitions(methods_for_class, admonition_type="returned_in")
 
+    def _create_shortcuts(self) -> dict[collections.abc.Callable, str]:
+        """Creates a dictionary with 'Shortcuts' admonitions for Bot methods that
+        have shortcuts in other classes.
+        """
+
+        # pattern for looking for calls to Bot methods only
+        bot_method_pattern = re.compile(
+            r"""\s*  # any number of whitespaces
+            (?<=return\sawait\sself\.get_bot\(\)\.)  # lookbehind
+            .+  # the method name we are looking for
+            (?=\() # lookahead: closing bracket
+            """,
+            re.VERBOSE,
+        )
+
+        # Generate a mapping of methods of classes to links to Bot methods which they are shortcuts
+        # for, i.e. {<function Bot.send_voice at ...>: {:meth:`telegram.User.send_voice`, ...}
+        shortcuts_for_bot_method = defaultdict(set)
+
+        # inspect methods of all telegram classes for return statements that indicate
+        # that this given method is a shortcut for a Bot method
+        for class_name, cls in inspect.getmembers(telegram, predicate=inspect.isclass):
+
+            for method_name, method in inspect.getmembers(cls, predicate=inspect.isfunction):
+
+                # .getsourcelines() returns a tuple. Item [1] is an int (length of line?)
+                relevant_return_lines = [
+                    line
+                    for line in inspect.getsourcelines(method)[0]
+                    if bot_method_pattern.search(line)
+                ]
+
+                for line in relevant_return_lines:
+                    bot_method_name = bot_method_pattern.search(line).group()
+                    bot_method = eval(f"telegram.Bot.{bot_method_name}")
+
+                    link_to_shortcut_method = self._generate_link_to_method(method_name, cls)
+
+                    shortcuts_for_bot_method[bot_method].add(link_to_shortcut_method)
+
+        return self._generate_admonitions(shortcuts_for_bot_method, admonition_type="shortcuts")
+
     def _create_use_in(self) -> dict[type, str]:
         """Creates a dictionary with 'Use in' admonitions for classes whose instances are
         accepted as arguments for Bot's and ApplicationBuilder's methods.
@@ -355,7 +427,7 @@ class AdmonitionInserter:
         ```
         """
 
-        if admonition_type not in self.ADMONITION_TYPES:
+        if admonition_type not in self.ALL_ADMONITION_TYPES:
             raise TypeError(f"Admonition type {admonition_type} not supported.")
 
         admonition_for_class = {}
@@ -388,13 +460,12 @@ class AdmonitionInserter:
 
     @staticmethod
     def _generate_link_to_method(method_name: str, base_class: type):
-        """Generates a ReST link to a Bot method."""
-        if base_class == telegram.Bot:
-            return f":meth:`telegram.Bot.{method_name}`"
-        elif base_class == telegram.ext.ApplicationBuilder:
-            return f":meth:`telegram.ext.ApplicationBuilder.{method_name}`"
-        else:
-            raise NotImplementedError(f"Base class {base_class} not supported")
+        """Generates a ReST link to a method of a telegram class."""
+
+        # Check for potential presence of ".ext.", we will need to keep it.
+        ext = ".ext" if ".ext." in str(base_class) else ""
+        class_name = f"telegram{ext}.{base_class.__name__}"
+        return f":meth:`{class_name}.{method_name}`"
 
     @staticmethod
     def _iter_subclasses(cls: type) -> Iterator:

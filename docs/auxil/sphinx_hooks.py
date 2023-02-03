@@ -15,6 +15,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+import collections.abc
 import inspect
 import re
 import typing
@@ -76,7 +77,8 @@ def autodoc_process_docstring(
     app: Sphinx, what, name: str, obj: object, options, lines: list[str]
 ):
     """We do the following things:
-    1) Use this method to automatically insert the Keyword Args for the Bot methods.
+    1) Use this method to automatically insert the Keyword Args and "Shortcuts" admonitions
+       for the Bot methods.
 
     2) Use this method to automatically insert "Returned in" admonition into classes
        that are returned from the Bot methods
@@ -91,7 +93,7 @@ def autodoc_process_docstring(
        to the actual object here.
     """
 
-    # 1) Insert the Keyword Args for the Bot methods
+    # 1) Insert the Keyword Args and "Shortcuts" admonitions for the Bot methods
     method_name = name.split(".")[-1]
     if (
         name.startswith("telegram.Bot.")
@@ -118,6 +120,11 @@ def autodoc_process_docstring(
                     read_timeout_type=read_timeout_type[get_updates_sub],
                 ),
             )
+
+        ADMONITION_INSERTER.insert_admonitions_for_bot_method(
+            method=typing.cast(collections.abc.Callable, obj),
+            docstring_lines=lines,
+        )
 
     # 2-4) Insert "Returned in", "Available in", "Use in" admonitions into classes
     # (where applicable)
