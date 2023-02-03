@@ -133,7 +133,7 @@ class KeyboardButtonRequestChat(TelegramObject):
 
     Args:
         request_id (:obj:`int`): Signed 32-bit identifier of the request.
-        chat_is_channel (:obj:`bool`, optional): Pass :obj:`True` to request a channel chat, pass
+        chat_is_channel (:obj:`bool`): Pass :obj:`True` to request a channel chat, pass
             :obj:`False` to request a group or a supergroup chat.
         chat_is_forum (:obj:`bool`, optional): Pass :obj:`True` to request a forum supergroup, pass
             :obj:`False` to request a non-forum chat. If not specified, no additional
@@ -154,7 +154,7 @@ class KeyboardButtonRequestChat(TelegramObject):
             as a member. Otherwise, no additional restrictions are applied.
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
-        chat_is_channel (:obj:`bool`): Optional. Pass :obj:`True` to request a channel chat, pass
+        chat_is_channel (:obj:`bool`): Pass :obj:`True` to request a channel chat, pass
             :obj:`False` to request a group or a supergroup chat.
         chat_is_forum (:obj:`bool`): Optional. Pass :obj:`True` to request a forum supergroup, pass
             :obj:`False` to request a non-forum chat. If not specified, no additional
@@ -189,7 +189,7 @@ class KeyboardButtonRequestChat(TelegramObject):
     def __init__(
         self,
         request_id: int,
-        chat_is_channel: bool = None,
+        chat_is_channel: bool,
         chat_is_forum: bool = None,
         chat_has_username: bool = None,
         chat_is_created: bool = None,
@@ -200,8 +200,11 @@ class KeyboardButtonRequestChat(TelegramObject):
         api_kwargs: JSONDict = None,  # skipcq: PYL-W0622
     ):
         super().__init__(api_kwargs=api_kwargs)
+        # required
         self.request_id = request_id
         self.chat_is_channel = chat_is_channel
+
+        # optional
         self.chat_is_forum = chat_is_forum
         self.chat_has_username = chat_has_username
         self.chat_is_created = chat_is_created
