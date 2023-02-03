@@ -302,7 +302,7 @@ class AdmonitionInserter:
         # that this given method is a shortcut for a Bot method
         for class_name, cls in inspect.getmembers(telegram, predicate=inspect.isclass):
 
-            # no need to inspect Bot's own methods, as Bot can't have shortcuts in But
+            # no need to inspect Bot's own methods, as Bot can't have shortcuts in Bot
             if cls is telegram.Bot:
                 continue
 
