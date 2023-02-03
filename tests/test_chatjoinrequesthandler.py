@@ -89,6 +89,7 @@ def chat_join_request(time, bot):
             is_revoked=False,
             is_primary=False,
         ),
+        user_chat_id=2,
     )
     cjr.set_bot(bot)
     return cjr

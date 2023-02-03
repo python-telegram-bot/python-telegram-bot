@@ -154,9 +154,9 @@ class TestKeyboardButtonRequestChat:
         assert request_chat.bot_is_member == self.bot_is_member
 
     def test_equality(self):
-        a = KeyboardButtonRequestChat(self.request_id)
-        b = KeyboardButtonRequestChat(self.request_id)
-        c = KeyboardButtonRequestChat(1)
+        a = KeyboardButtonRequestChat(self.request_id, True)
+        b = KeyboardButtonRequestChat(self.request_id, True)
+        c = KeyboardButtonRequestChat(1, True)
 
         assert a == b
         assert hash(a) == hash(b)
