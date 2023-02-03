@@ -70,9 +70,10 @@ class KeyboardButtonRequestUser(TelegramObject):
         api_kwargs: JSONDict = None,  # skipcq: PYL-W0622
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.request_id = request_id
-        self.user_is_bot = user_is_bot
-        self.user_is_premium = user_is_premium
+        self.request_id: int = request_id
+
+        self.user_is_bot: Optional[bool] = user_is_bot
+        self.user_is_premium: Optional[bool] = user_is_premium
 
         self._id_attrs = (self.request_id,)
 
@@ -114,8 +115,8 @@ class UserShared(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.request_id = request_id
-        self.user_id = user_id
+        self.request_id: int = request_id
+        self.user_id: int = user_id
 
         self._id_attrs = (self.request_id, self.user_id)
 
@@ -201,16 +202,18 @@ class KeyboardButtonRequestChat(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # required
-        self.request_id = request_id
-        self.chat_is_channel = chat_is_channel
+        self.request_id: int = request_id
+        self.chat_is_channel: bool = chat_is_channel
 
         # optional
-        self.chat_is_forum = chat_is_forum
-        self.chat_has_username = chat_has_username
-        self.chat_is_created = chat_is_created
-        self.user_administrator_rights = user_administrator_rights
-        self.bot_administrator_rights = bot_administrator_rights
-        self.bot_is_member = bot_is_member
+        self.chat_is_forum: Optional[bool] = chat_is_forum
+        self.chat_has_username: Optional[bool] = chat_has_username
+        self.chat_is_created: Optional[bool] = chat_is_created
+        self.user_administrator_rights: Optional[
+            ChatAdministratorRights
+        ] = user_administrator_rights
+        self.bot_administrator_rights: Optional[ChatAdministratorRights] = bot_administrator_rights
+        self.bot_is_member: Optional[bool] = bot_is_member
 
         self._id_attrs = (self.request_id,)
 
@@ -271,8 +274,8 @@ class ChatShared(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.request_id = request_id
-        self.chat_id = chat_id
+        self.request_id: int = request_id
+        self.chat_id: int = chat_id
 
         self._id_attrs = (self.request_id, self.chat_id)
 
