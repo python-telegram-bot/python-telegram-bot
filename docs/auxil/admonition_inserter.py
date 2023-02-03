@@ -295,6 +295,10 @@ class AdmonitionInserter:
         # that this given method is a shortcut for a Bot method
         for class_name, cls in inspect.getmembers(telegram, predicate=inspect.isclass):
 
+            # no need to inspect Bot's own methods, as Bot can't have shortcuts in But
+            if cls is telegram.Bot:
+                continue
+
             for method_name, method in inspect.getmembers(cls, predicate=inspect.isfunction):
 
                 # .getsourcelines() returns a tuple. Item [1] is an int (length of line?)
