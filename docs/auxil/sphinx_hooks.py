@@ -121,16 +121,16 @@ def autodoc_process_docstring(
                 ),
             )
 
-        ADMONITION_INSERTER.insert_admonitions_for_bot_method(
-            method=typing.cast(collections.abc.Callable, obj),
+        ADMONITION_INSERTER.insert_admonitions(
+            obj=typing.cast(collections.abc.Callable, obj),
             docstring_lines=lines,
         )
 
     # 2-4) Insert "Returned in", "Available in", "Use in" admonitions into classes
     # (where applicable)
     if what == "class":
-        ADMONITION_INSERTER.insert_admonitions_for_class(
-            cls=typing.cast(type, obj),  # since "what" == class, we know it's not just object
+        ADMONITION_INSERTER.insert_admonitions(
+            obj=typing.cast(type, obj),  # since "what" == class, we know it's not just object
             docstring_lines=lines,
         )
 

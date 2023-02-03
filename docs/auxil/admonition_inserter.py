@@ -86,54 +86,27 @@ class AdmonitionInserter:
         ```
         """
 
-    def insert_admonitions_for_class(
+    def insert_admonitions(
         self,
-        cls: type,
+        obj: Union[type, collections.abc.Callable],
         docstring_lines: list[str],
     ):
-        """Inserts admonitions into docstring lines for a given class.
+        """Inserts admonitions into docstring lines for a given class or method.
 
         **Modifies lines in place**.
         """
         # A better way would be to copy the lines and return them, but that will not work with
         # docs.auxil.sphinx_hooks.autodoc_process_docstring()
 
-        for admonition_type in self.CLASS_ADMONITION_TYPES:
+        for admonition_type in self.ALL_ADMONITION_TYPES:
 
-            # If there is no admonition of the given type for the given class,
-            # continue to the next admonition type, maybe the class is listed there.
-            if cls not in self.admonitions[admonition_type]:
+            # If there is no admonition of the given type for the given class or method,
+            # continue to the next admonition type, maybe the class/method is listed there.
+            if obj not in self.admonitions[admonition_type]:
                 continue
 
-            # TODO repetition?
             insert_idx = self._find_insert_pos_for_admonition(docstring_lines)
-            admonition_lines = self.admonitions[admonition_type][cls].splitlines()
-
-            for idx in range(insert_idx, insert_idx + len(admonition_lines)):
-                docstring_lines.insert(idx, admonition_lines[idx - insert_idx])
-
-    def insert_admonitions_for_bot_method(
-        self,
-        method: collections.abc.Callable,
-        docstring_lines: list[str],
-    ):
-        """Inserts admonitions into docstring lines for a given Bot method.
-
-        **Modifies lines in place**.
-        """
-        # A better way would be to copy the lines and return them, but that will not work with
-        # docs.auxil.sphinx_hooks.autodoc_process_docstring()
-
-        for admonition_type in self.METHOD_ADMONITION_TYPES:
-
-            # If there is no admonition of the given type for the given class,
-            # continue to the next admonition type, maybe the class is listed there.
-            if method not in self.admonitions[admonition_type]:
-                continue
-
-            # TODO repetition?
-            insert_idx = self._find_insert_pos_for_admonition(docstring_lines)
-            admonition_lines = self.admonitions[admonition_type][method].splitlines()
+            admonition_lines = self.admonitions[admonition_type][obj].splitlines()
 
             for idx in range(insert_idx, insert_idx + len(admonition_lines)):
                 docstring_lines.insert(idx, admonition_lines[idx - insert_idx])
@@ -184,9 +157,7 @@ class AdmonitionInserter:
             # We need to make "<class 'telegram._files.sticker.StickerSet'>" into
             # "telegram.StickerSet" because that's the way the classes are mentioned in
             # docstrings.
-            # Check for potential presence of ".ext.", we will need to keep it.
-            ext = ".ext" if ".ext." in str(inspected_class) else ""  # TODO repetition?
-            name_of_inspected_class_in_docstr = f"telegram{ext}.{class_name}"
+            name_of_inspected_class_in_docstr = self._generate_class_name_for_link(inspected_class)
 
             # Parsing part of the docstring with attributes (parsing of properties follows later)
             docstring_lines = inspect.getdoc(inspected_class).splitlines()
@@ -279,12 +250,12 @@ class AdmonitionInserter:
         methods_for_class = defaultdict(set)
 
         for cls, methods in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
-            for method in methods:
+            for method_name in methods:
 
-                sig = inspect.signature(getattr(cls, method))
+                sig = inspect.signature(getattr(cls, method_name))
                 ret_annot = sig.return_annotation
 
-                method_link = self._generate_link_to_method(method, cls)
+                method_link = self._generate_link_to_method(method_name, cls)
 
                 try:
                     self._resolve_arg_and_add_link(
@@ -295,7 +266,7 @@ class AdmonitionInserter:
                 except NotImplementedError as e:
                     raise NotImplementedError(
                         f"Error generating Sphinx 'Returned in' admonition "
-                        f"(admonition_inserter.py). {cls}, method {method}. "
+                        f"(admonition_inserter.py). {cls}, method {method_name}. "
                         f"Couldn't resolve type hint in return annotation {ret_annot}. {str(e)}"
                     )
 
@@ -354,10 +325,10 @@ class AdmonitionInserter:
         methods_for_class = defaultdict(set)
 
         for cls, relevant_methods_for_class in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
-            for method in relevant_methods_for_class:
-                method_link = self._generate_link_to_method(method, cls)
+            for method_name in relevant_methods_for_class:
+                method_link = self._generate_link_to_method(method_name, cls)
 
-                sig = inspect.signature(getattr(cls, method))
+                sig = inspect.signature(getattr(cls, method_name))
                 parameters = sig.parameters
 
                 for param in parameters.values():
@@ -370,7 +341,7 @@ class AdmonitionInserter:
                     except NotImplementedError as e:
                         raise NotImplementedError(
                             f"Error generating Sphinx 'Use in' admonition "
-                            f"(admonition_inserter.py). {cls}, method {method}, parameter "
+                            f"(admonition_inserter.py). {cls}, method {method_name}, parameter "
                             f"{param}: Couldn't resolve type hint {param.annotation}. {str(e)}"
                         )
 
@@ -459,13 +430,17 @@ class AdmonitionInserter:
         return admonition_for_class
 
     @staticmethod
-    def _generate_link_to_method(method_name: str, base_class: type):
-        """Generates a ReST link to a method of a telegram class."""
+    def _generate_class_name_for_link(cls: type) -> str:
+        """Generates class name that can be used in a ReST link."""
 
         # Check for potential presence of ".ext.", we will need to keep it.
-        ext = ".ext" if ".ext." in str(base_class) else ""
-        class_name = f"telegram{ext}.{base_class.__name__}"
-        return f":meth:`{class_name}.{method_name}`"
+        ext = ".ext" if ".ext." in str(cls) else ""
+        return f"telegram{ext}.{cls.__name__}"
+
+    def _generate_link_to_method(self, method_name: str, cls: type) -> str:
+        """Generates a ReST link to a method of a telegram class."""
+
+        return f":meth:`{self._generate_class_name_for_link(cls)}.{method_name}`"
 
     @staticmethod
     def _iter_subclasses(cls: type) -> Iterator:
