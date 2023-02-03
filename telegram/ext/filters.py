@@ -1760,6 +1760,8 @@ class StatusUpdate:
                 or StatusUpdate.GENERAL_FORUM_TOPIC_HIDDEN.check_update(update)
                 or StatusUpdate.GENERAL_FORUM_TOPIC_UNHIDDEN.check_update(update)
                 or StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
+                or StatusUpdate.USER_SHARED.check_update(update)
+                or StatusUpdate.CHAT_SHARED.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -2034,6 +2036,30 @@ class StatusUpdate:
     """Messages that contain :attr:`telegram.Message.write_access_allowed`.
 
     .. versionadded:: 20.0
+    """
+
+    class _UserShared(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.user_shared)
+
+    USER_SHARED = _UserShared(name="filters.StatusUpdate.USER_SHARED")
+    """Messages that contain :attr:`telegram.Message.user_shared`.
+
+    .. versionadded:: 20.1
+    """
+
+    class _ChatShared(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.chat_shared)
+
+    CHAT_SHARED = _ChatShared(name="filters.StatusUpdate.CHAT_SHARED")
+    """Messages that contain :attr:`telegram.Message.chat_shared`.
+
+    .. versionadded:: 20.1
     """
 
 
