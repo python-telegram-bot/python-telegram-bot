@@ -34,7 +34,7 @@ from typing import (
 
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
-from telegram._utils.types import DVInput, FilePathInput, ODVInput
+from telegram._utils.types import DVInput, DVType, FilePathInput, ODVInput
 from telegram.ext._application import Application
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
@@ -161,9 +161,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     )
 
     def __init__(self: "InitApplicationBuilder"):
-        self._token: DVInput[str] = DefaultValue("")
-        self._base_url: DVInput[str] = DefaultValue("https://api.telegram.org/bot")
-        self._base_file_url: DVInput[str] = DefaultValue("https://api.telegram.org/file/bot")
+        self._token: DVType[str] = DefaultValue("")
+        self._base_url: DVType[str] = DefaultValue("https://api.telegram.org/bot")
+        self._base_file_url: DVType[str] = DefaultValue("https://api.telegram.org/file/bot")
         self._connection_pool_size: DVInput[int] = DEFAULT_NONE
         self._proxy_url: DVInput[str] = DEFAULT_NONE
         self._connect_timeout: ODVInput[float] = DEFAULT_NONE
@@ -182,10 +182,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._private_key: ODVInput[bytes] = DEFAULT_NONE
         self._private_key_password: ODVInput[bytes] = DEFAULT_NONE
         self._defaults: ODVInput["Defaults"] = DEFAULT_NONE
-        self._arbitrary_callback_data: DVInput[Union[bool, int]] = DEFAULT_FALSE
-        self._local_mode: DVInput[bool] = DEFAULT_FALSE
+        self._arbitrary_callback_data: Union[DefaultValue[bool], int] = DEFAULT_FALSE
+        self._local_mode: DVType[bool] = DEFAULT_FALSE
         self._bot: DVInput[Bot] = DEFAULT_NONE
-        self._update_queue: DVInput[Queue] = DefaultValue(Queue())
+        self._update_queue: DVType[Queue] = DefaultValue(Queue())
 
         try:
             self._job_queue: ODVInput["JobQueue"] = DefaultValue(JobQueue())
@@ -195,10 +195,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             self._job_queue = DEFAULT_NONE
 
         self._persistence: ODVInput["BasePersistence"] = DEFAULT_NONE
-        self._context_types: DVInput[ContextTypes] = DefaultValue(ContextTypes())
-        self._application_class: DVInput[Type[Application]] = DefaultValue(Application)
+        self._context_types: DVType[ContextTypes] = DefaultValue(ContextTypes())
+        self._application_class: DVType[Type[Application]] = DefaultValue(Application)
         self._application_kwargs: Dict[str, object] = {}
-        self._concurrent_updates: DVInput[Union[int, bool]] = DEFAULT_FALSE
+        self._concurrent_updates: Union[int, DefaultValue[bool]] = DEFAULT_FALSE
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
@@ -317,7 +317,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         )
 
         if job_queue is not None:
-            job_queue.set_application(application)
+            job_queue.set_application(application)  # type: ignore[arg-type]
 
         if persistence is not None:
             # This raises an exception if persistence.store_data.callback_data is True
@@ -327,7 +327,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return application
 
     def application_class(
-        self: BuilderType, application_class: Type[Application], kwargs: Dict[str, object] = None
+        self: BuilderType,
+        application_class: Type[Application[Any, Any, Any, Any, Any, Any]],
+        kwargs: Dict[str, object] = None,
     ) -> BuilderType:
         """Sets a custom subclass instead of :class:`telegram.ext.Application`. The
         subclass's ``__init__`` should look like this
@@ -847,7 +849,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._bot = bot
         return self  # type: ignore[return-value]
 
-    def update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
+    def update_queue(self: BuilderType, update_queue: "Queue[object]") -> BuilderType:
         """Sets a :class:`asyncio.Queue` instance for
         :attr:`telegram.ext.Application.update_queue`, i.e. the queue that the application will
         fetch updates from. Will also be used for the :attr:`telegram.ext.Application.updater`.
@@ -923,7 +925,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._job_queue = job_queue
         return self  # type: ignore[return-value]
 
-    def persistence(self: BuilderType, persistence: "BasePersistence") -> BuilderType:
+    def persistence(
+        self: BuilderType, persistence: "BasePersistence[Any, Any, Any]"
+    ) -> BuilderType:
         """Sets a :class:`telegram.ext.BasePersistence` instance for
         :attr:`telegram.ext.Application.persistence`.
 
@@ -1143,9 +1147,9 @@ InitApplicationBuilder = (  # This is defined all the way down here so that its 
     ApplicationBuilder[  # by Pylance correctly.
         ExtBot[None],
         ContextTypes.DEFAULT_TYPE,
-        Dict,
-        Dict,
-        Dict,
-        JobQueue,
+        Dict[Any, Any],
+        Dict[Any, Any],
+        Dict[Any, Any],
+        JobQueue[ContextTypes.DEFAULT_TYPE],
     ]
 )

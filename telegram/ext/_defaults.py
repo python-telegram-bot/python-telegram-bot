@@ -80,14 +80,14 @@ class Defaults:
         allow_sending_without_reply: bool = None,
         protect_content: bool = None,
     ):
-        self._parse_mode = parse_mode
-        self._disable_notification = disable_notification
-        self._disable_web_page_preview = disable_web_page_preview
-        self._allow_sending_without_reply = allow_sending_without_reply
-        self._quote = quote
-        self._tzinfo = tzinfo
-        self._block = block
-        self._protect_content = protect_content
+        self._parse_mode: Optional[str] = parse_mode
+        self._disable_notification: Optional[bool] = disable_notification
+        self._disable_web_page_preview: Optional[bool] = disable_web_page_preview
+        self._allow_sending_without_reply: Optional[bool] = allow_sending_without_reply
+        self._quote: Optional[bool] = quote
+        self._tzinfo: datetime.tzinfo = tzinfo
+        self._block: bool = block
+        self._protect_content: Optional[bool] = protect_content
 
         # Gather all defaults that actually have a default value
         self._api_defaults = {}

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputVenueMessageContent."""
+from typing import Optional
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._utils.types import JSONDict
@@ -90,15 +91,15 @@ class InputVenueMessageContent(InputMessageContent):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
             # Required
-            self.latitude = latitude
-            self.longitude = longitude
-            self.title = title
-            self.address = address
+            self.latitude: float = latitude
+            self.longitude: float = longitude
+            self.title: str = title
+            self.address: str = address
             # Optionals
-            self.foursquare_id = foursquare_id
-            self.foursquare_type = foursquare_type
-            self.google_place_id = google_place_id
-            self.google_place_type = google_place_type
+            self.foursquare_id: Optional[str] = foursquare_id
+            self.foursquare_type: Optional[str] = foursquare_type
+            self.google_place_id: Optional[str] = google_place_id
+            self.google_place_type: Optional[str] = google_place_type
 
             self._id_attrs = (
                 self.latitude,

@@ -77,5 +77,5 @@ class VideoNote(_BaseThumbedMedium):
         )
         with self._unfrozen():
             # Required
-            self.length = length
-            self.duration = duration
+            self.length: int = length
+            self.duration: int = duration

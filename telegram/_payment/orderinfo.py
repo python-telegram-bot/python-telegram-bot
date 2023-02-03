@@ -61,10 +61,10 @@ class OrderInfo(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.name = name
-        self.phone_number = phone_number
-        self.email = email
-        self.shipping_address = shipping_address
+        self.name: Optional[str] = name
+        self.phone_number: Optional[str] = phone_number
+        self.email: Optional[str] = email
+        self.shipping_address: Optional[str] = shipping_address
 
         self._id_attrs = (self.name, self.phone_number, self.email, self.shipping_address)
 

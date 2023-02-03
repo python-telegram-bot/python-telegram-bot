@@ -54,8 +54,8 @@ class WebAppData(TelegramObject):
     def __init__(self, data: str, button_text: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.data = data
-        self.button_text = button_text
+        self.data: str = data
+        self.button_text: str = button_text
 
         self._id_attrs = (self.data, self.button_text)
 

@@ -18,10 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the StringCommandHandler class."""
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, RT, HandlerCallback
 
@@ -74,10 +74,10 @@ class StringCommandHandler(BaseHandler[str, CCT]):
         self,
         command: str,
         callback: HandlerCallback[str, CCT, RT],
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
-        self.command = command
+        self.command: str = command
 
     def check_update(self, update: object) -> Optional[List[str]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -99,7 +99,7 @@ class StringCommandHandler(BaseHandler[str, CCT]):
         self,
         context: CCT,
         update: str,  # skipcq: BAN-B301
-        application: "Application",  # skipcq: BAN-B301
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
         check_result: Optional[List[str]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single

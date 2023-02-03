@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultContact."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -102,14 +102,14 @@ class InlineQueryResultContact(InlineQueryResult):
         # Required
         super().__init__(InlineQueryResultType.CONTACT, id, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.phone_number = phone_number
-            self.first_name = first_name
+            self.phone_number: str = phone_number
+            self.first_name: str = first_name
 
             # Optionals
-            self.last_name = last_name
-            self.vcard = vcard
-            self.reply_markup = reply_markup
-            self.input_message_content = input_message_content
-            self.thumb_url = thumb_url
-            self.thumb_width = thumb_width
-            self.thumb_height = thumb_height
+            self.last_name: Optional[str] = last_name
+            self.vcard: Optional[str] = vcard
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.input_message_content: Optional[InputMessageContent] = input_message_content
+            self.thumb_url: Optional[str] = thumb_url
+            self.thumb_width: Optional[int] = thumb_width
+            self.thumb_height: Optional[int] = thumb_height

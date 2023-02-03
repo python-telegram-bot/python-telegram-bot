@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Game."""
 import sys
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
 
 from telegram._files.animation import Animation
 from telegram._files.photosize import PhotoSize
@@ -110,13 +110,13 @@ class Game(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.title = title
-        self.description = description
-        self.photo = parse_sequence_arg(photo)
+        self.title: str = title
+        self.description: str = description
+        self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
         # Optionals
-        self.text = text
-        self.text_entities = parse_sequence_arg(text_entities)
-        self.animation = animation
+        self.text: Optional[str] = text
+        self.text_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
+        self.animation: Optional[Animation] = animation
 
         self._id_attrs = (self.title, self.description, self.photo)
 

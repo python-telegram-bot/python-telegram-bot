@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence, Tuple, Union
 
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
@@ -94,11 +94,11 @@ class InputMedia(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.type = media_type
-        self.media = media
-        self.caption = caption
-        self.caption_entities = parse_sequence_arg(caption_entities)
-        self.parse_mode = parse_mode
+        self.type: str = media_type
+        self.media: Union[str, InputFile, Animation, Audio, Document, PhotoSize, Video] = media
+        self.caption: Optional[str] = caption
+        self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+        self.parse_mode: ODVInput[str] = parse_mode
 
         self._freeze()
 
@@ -214,11 +214,11 @@ class InputMediaAnimation(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.thumb = self._parse_thumb_input(thumb)
-            self.width = width
-            self.height = height
-            self.duration = duration
-            self.has_spoiler = has_spoiler
+            self.thumb: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumb)
+            self.width: Optional[int] = width
+            self.height: Optional[int] = height
+            self.duration: Optional[int] = duration
+            self.has_spoiler: Optional[bool] = has_spoiler
 
 
 class InputMediaPhoto(InputMedia):
@@ -296,7 +296,7 @@ class InputMediaPhoto(InputMedia):
         )
 
         with self._unfrozen():
-            self.has_spoiler = has_spoiler
+            self.has_spoiler: Optional[bool] = has_spoiler
 
 
 class InputMediaVideo(InputMedia):
@@ -411,12 +411,12 @@ class InputMediaVideo(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.width = width
-            self.height = height
-            self.duration = duration
-            self.thumb = self._parse_thumb_input(thumb)
-            self.supports_streaming = supports_streaming
-            self.has_spoiler = has_spoiler
+            self.width: Optional[int] = width
+            self.height: Optional[int] = height
+            self.duration: Optional[int] = duration
+            self.thumb: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumb)
+            self.supports_streaming: Optional[bool] = supports_streaming
+            self.has_spoiler: Optional[bool] = has_spoiler
 
 
 class InputMediaAudio(InputMedia):
@@ -516,10 +516,10 @@ class InputMediaAudio(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.thumb = self._parse_thumb_input(thumb)
-            self.duration = duration
-            self.title = title
-            self.performer = performer
+            self.thumb: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumb)
+            self.duration: Optional[int] = duration
+            self.title: Optional[str] = title
+            self.performer: Optional[str] = performer
 
 
 class InputMediaDocument(InputMedia):
@@ -603,5 +603,5 @@ class InputMediaDocument(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.thumb = self._parse_thumb_input(thumb)
-            self.disable_content_type_detection = disable_content_type_detection
+            self.thumb: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumb)
+            self.disable_content_type_detection: Optional[bool] = disable_content_type_detection

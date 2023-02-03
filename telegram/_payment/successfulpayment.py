@@ -90,13 +90,13 @@ class SuccessfulPayment(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.currency = currency
-        self.total_amount = total_amount
-        self.invoice_payload = invoice_payload
-        self.shipping_option_id = shipping_option_id
-        self.order_info = order_info
-        self.telegram_payment_charge_id = telegram_payment_charge_id
-        self.provider_payment_charge_id = provider_payment_charge_id
+        self.currency: str = currency
+        self.total_amount: int = total_amount
+        self.invoice_payload: str = invoice_payload
+        self.shipping_option_id: Optional[str] = shipping_option_id
+        self.order_info: Optional[OrderInfo] = order_info
+        self.telegram_payment_charge_id: str = telegram_payment_charge_id
+        self.provider_payment_charge_id: str = provider_payment_charge_id
 
         self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
 
