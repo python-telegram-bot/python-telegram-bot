@@ -1930,9 +1930,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """Use this method to send a group of photos, videos, documents or audios as an album.
         Documents and audio files can be only grouped in an album with messages of the same type.
 
-        .. versionchanged:: 20.0
-            Returns a tuple instead of a list.
-
         Note:
             If you supply a :paramref:`caption` (along with either :paramref:`parse_mode` or
             :paramref:`caption_entities`), then items in :paramref:`media` must have no captions,
@@ -1945,6 +1942,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :meth:`telegram.User.send_media_group`
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. versionchanged:: 20.0
+            Returns a tuple instead of a list.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -3623,9 +3623,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     ) -> Tuple[Update, ...]:
         """Use this method to receive incoming updates using long polling.
 
-        .. versionchanged:: 20.0
-            Returns a tuple instead of a list.
-
         Note:
             1. This method will not work if an outgoing webhook is set up.
             2. In order to avoid getting duplicate updates, recalculate offset after each
@@ -3634,6 +3631,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         .. seealso:: :meth:`telegram.ext.Application.run_polling`,
             :meth:`telegram.ext.Updater.start_polling`
+
+        .. versionchanged:: 20.0
+            Returns a tuple instead of a list.
 
         Args:
             offset (:obj:`int`, optional): Identifier of the first update to be returned. Must be
@@ -4270,13 +4270,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Use this method to get data for high score tables. Will return the score of the specified
         user and several of their neighbors in a game.
 
-        .. versionchanged:: 20.0
-            Returns a tuple instead of a list.
-
         Note:
             This method will currently return scores for the target user, plus two of their
             closest neighbors on each side. Will also return the top three users if the user and
             his neighbors are not among them. Please note that this behavior is subject to change.
+
+        .. versionchanged:: 20.0
+            Returns a tuple instead of a list.
 
         .. admonition:: Shortcuts
             :class: shortcuts
