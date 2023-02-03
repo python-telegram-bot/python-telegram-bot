@@ -306,7 +306,7 @@ class AdmonitionInserter:
 
                 for line in relevant_return_lines:
                     bot_method_name = bot_method_pattern.search(line).group()
-                    bot_method = eval(f"telegram.Bot.{bot_method_name}")
+                    bot_method = getattr(telegram.Bot, bot_method_name)
 
                     link_to_shortcut_method = self._generate_link_to_method(method_name, cls)
 
