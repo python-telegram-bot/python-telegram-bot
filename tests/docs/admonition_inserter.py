@@ -59,15 +59,15 @@ class TestAdmonitionInserter:
         # checking class admonitions
         for admonition_type in admonition_inserter.CLASS_ADMONITION_TYPES:
             # keys are telegram classes
-            for method in admonition_inserter.admonitions[admonition_type]:
+            for cls in admonition_inserter.admonitions[admonition_type]:
                 # Test classes crop up in AppBuilder, they can't come from code being tested.
-                if "tests.conftest" in str(method):
+                if "tests.conftest" in str(cls):
                     continue
 
-                assert isinstance(method, type)
-                assert str(method).startswith("<class 'telegram."), (
-                    rf"Class {method} does not belong to Telegram classes. Admonition:\n"
-                    rf"{admonition_inserter.admonitions[admonition_type][method]}"
+                assert isinstance(cls, type)
+                assert str(cls).startswith("<class 'telegram."), (
+                    rf"Class {cls} does not belong to Telegram classes. Admonition:\n"
+                    rf"{admonition_inserter.admonitions[admonition_type][cls]}"
                 )
 
         # checking Bot method admonitions
