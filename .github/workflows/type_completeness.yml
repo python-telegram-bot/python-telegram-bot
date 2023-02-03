@@ -48,7 +48,7 @@ jobs:
             pr = float(
               json.load(open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
             )
-            base_text = "After this PR, type completeness will be {round(pr, 3)}.".format(base)
+            base_text = f"After this PR, type completeness will be {round(pr, 3)}."
             if pr < (base - 0.1):
                 text = f"This PR decreases type completeness by {round(base - pr, 3)} ❌"
                 set_summary(text)
