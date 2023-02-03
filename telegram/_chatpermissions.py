@@ -53,7 +53,7 @@ class ChatPermissions(TelegramObject):
             :attr:`can_send_messages`.
 
             .. deprecated:: 20.1
-               Replaced with granular media settings.
+               Bot API 6.5 replaced this argument with granular media settings.
         can_send_polls (:obj:`bool`, optional): :obj:`True`, if the user is allowed to send polls,
             implies :attr:`can_send_messages`.
         can_send_other_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to
@@ -101,7 +101,7 @@ class ChatPermissions(TelegramObject):
             :attr:`can_send_messages`.
 
             .. deprecated:: 20.1
-               Replaced with granular media settings.
+               Bot API 6.5 replaced this argument with granular media settings.
         can_send_polls (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send polls,
             implies :attr:`can_send_messages`.
         can_send_other_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
@@ -229,23 +229,7 @@ class ChatPermissions(TelegramObject):
         .. versionadded:: 20.0
 
         """
-        return cls(
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-            True,
-        )
+        return cls(*(15 * (True,)))
 
     @classmethod
     def no_permissions(cls) -> "ChatPermissions":
@@ -255,20 +239,4 @@ class ChatPermissions(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(
-            False,
-            False,
-            False,
-            False,
-            False,
-            False,
-            False,
-            False,
-            False,
-            False,
-            False,
-            False,
-            False,
-            False,
-            False,
-        )
+        return cls(*(15 * (False,)))

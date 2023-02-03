@@ -46,8 +46,8 @@ class ChatJoinRequest(TelegramObject):
 
     .. versionadded:: 13.8
     .. versionchanged:: 20.1
-       In Bot API 6.5 the argument :paramref:`user_chat_id` was added, which changes the position of the
-       optional arguments :paramref:`bio` and :paramref:`invite_link`.
+       In Bot API 6.5 the argument :paramref:`user_chat_id` was added, which changes the position
+       of the optional arguments :paramref:`bio` and :paramref:`invite_link`.
 
     Args:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
@@ -60,6 +60,8 @@ class ChatJoinRequest(TelegramObject):
             storing this identifier. The bot can use this identifier for 24 hours to send messages
             until the join request is processed, assuming no other administrator contacted the
             user.
+
+            .. versionadded:: 20.1
         bio (:obj:`str`, optional): Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link that was used
             by the user to send the join request.
@@ -75,6 +77,8 @@ class ChatJoinRequest(TelegramObject):
             storing this identifier. The bot can use this identifier for 24 hours to send messages
             until the join request is processed, assuming no other administrator contacted the
             user.
+
+            .. versionadded:: 20.1
         bio (:obj:`str`): Optional. Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link that was used
             by the user to send the join request.
