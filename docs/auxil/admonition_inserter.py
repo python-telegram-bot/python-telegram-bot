@@ -26,6 +26,23 @@ import telegram
 import telegram.ext
 
 
+def _iter_own_public_methods(cls: type) -> Iterator[tuple[str, type]]:
+    """Iterates over methods of a class that are not protected/private,
+    not camelCase and not inherited from the parent class.
+
+    Returns pairs of method names and methods.
+
+    This function is defined outside the class because it is used to create class constants.
+    """
+    return (
+        m
+        for m in inspect.getmembers(cls, predicate=inspect.isfunction)  # not .ismethod
+        if not m[0].startswith("_")
+        and m[0].islower()  # to avoid camelCase methods
+        and m[0] in cls.__dict__  # method is not inherited from parent class
+    )
+
+
 class AdmonitionInserter:
     """Class for inserting admonitions into docs of Telegram classes."""
 
@@ -47,23 +64,13 @@ class AdmonitionInserter:
     ForwardRef('DefaultValue[DVValueType]')
     """
 
-    METHODS_FOR_BOT_AND_APPBUILDER = {
-        telegram.Bot: tuple(
-            m[0]
-            for m in inspect.getmembers(telegram.Bot, inspect.isfunction)  # not .ismethod
-            if not m[0].startswith("_")
-            and m[0].islower()  # islower() to avoid camelCase methods
-            and m[0] in telegram.Bot.__dict__  # method is not inherited from TelegramObject
-        ),
-        telegram.ext.ApplicationBuilder: tuple(
-            m[0]
-            for m in inspect.getmembers(telegram.ext.ApplicationBuilder, inspect.isfunction)
-            if not m[0].startswith("_") and m[0] in telegram.ext.ApplicationBuilder.__dict__
-        ),
+    METHOD_NAMES_FOR_BOT_AND_APPBUILDER: dict[type, str] = {
+        cls: tuple(m[0] for m in _iter_own_public_methods(cls))  # m[0] means we take only names
+        for cls in (telegram.Bot, telegram.ext.ApplicationBuilder)
     }
-    """Relevant methods to be mentioned in 'Returned in' and 'Use in' admonitions:
-    Bot methods(public, not aliases, not inherited from TelegramObject) and ApplicationBuilder
-    methods.
+    """A dictionary mapping Bot and ApplicationBuilder classes to their relevant methods that will
+    be mentioned in 'Returned in' and 'Use in' admonitions in other classes' docstrings.
+    Methods must be public, not aliases, not inherited from TelegramObject.
     """
 
     def __init__(self):
@@ -249,8 +256,8 @@ class AdmonitionInserter:
         # i.e. {<class 'telegram._message.Message'>: {:meth:`telegram.Bot.send_message`, ...}}
         methods_for_class = defaultdict(set)
 
-        for cls, methods in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
-            for method_name in methods:
+        for cls, method_names in self.METHOD_NAMES_FOR_BOT_AND_APPBUILDER.items():
+            for method_name in method_names:
 
                 sig = inspect.signature(getattr(cls, method_name))
                 ret_annot = sig.return_annotation
@@ -299,7 +306,7 @@ class AdmonitionInserter:
             if cls is telegram.Bot:
                 continue
 
-            for method_name, method in self._iter_own_public_methods(cls):
+            for method_name, method in _iter_own_public_methods(cls):
 
                 # .getsourcelines() returns a tuple. Item [1] is an int (length of line?)
                 relevant_return_lines = [
@@ -328,8 +335,8 @@ class AdmonitionInserter:
         # {:meth:`telegram.Bot.answer_inline_query`, ...}}
         methods_for_class = defaultdict(set)
 
-        for cls, relevant_methods_for_class in self.METHODS_FOR_BOT_AND_APPBUILDER.items():
-            for method_name in relevant_methods_for_class:
+        for cls, method_names in self.METHOD_NAMES_FOR_BOT_AND_APPBUILDER.items():
+            for method_name in method_names:
                 method_link = self._generate_link_to_method(method_name, cls)
 
                 sig = inspect.signature(getattr(cls, method_name))
@@ -445,19 +452,6 @@ class AdmonitionInserter:
         """Generates a ReST link to a method of a telegram class."""
 
         return f":meth:`{self._generate_class_name_for_link(cls)}.{method_name}`"
-
-    @staticmethod
-    def _iter_own_public_methods(cls: type) -> Iterator[tuple[str, type]]:
-        """Iterates over methods of a class that are not protected/private,
-        not camelCase and not inherited from the parent class.
-        """
-        return (
-            m
-            for m in inspect.getmembers(cls, predicate=inspect.isfunction)  # not .ismethod
-            if not m[0].startswith("_")
-            and m[0].islower()  # to avoid camelCase methods
-            and m[0] in cls.__dict__  # method is not inherited from parent class
-        )
 
     @staticmethod
     def _iter_subclasses(cls: type) -> Iterator:
