@@ -308,16 +308,14 @@ class AdmonitionInserter:
 
             for method_name, method in _iter_own_public_methods(cls):
 
-                # .getsourcelines() returns a tuple. Item [1] is an int (length of line?)
-                relevant_return_lines = [
-                    line
-                    for line in inspect.getsourcelines(method)[0]
-                    if bot_method_pattern.search(line)
-                ]
+                # .getsourcelines() returns a tuple. Item [1] is an int
+                for line in inspect.getsourcelines(method)[0]:
+                    bot_method_match = bot_method_pattern.search(line)
 
-                for line in relevant_return_lines:
-                    bot_method_name = bot_method_pattern.search(line).group()
-                    bot_method = getattr(telegram.Bot, bot_method_name)
+                    if not bot_method_match:
+                        continue
+
+                    bot_method = getattr(telegram.Bot, bot_method_match.group())
 
                     link_to_shortcut_method = self._generate_link_to_method(method_name, cls)
 
