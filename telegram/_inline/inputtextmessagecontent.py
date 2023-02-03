@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
-from typing import Sequence
+from typing import Sequence, Tuple
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
@@ -81,10 +81,10 @@ class InputTextMessageContent(InputMessageContent):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
             # Required
-            self.message_text = message_text
+            self.message_text: str = message_text
             # Optionals
-            self.parse_mode = parse_mode
-            self.entities = parse_sequence_arg(entities)
-            self.disable_web_page_preview = disable_web_page_preview
+            self.parse_mode: ODVInput[str] = parse_mode
+            self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
+            self.disable_web_page_preview: ODVInput[bool] = disable_web_page_preview
 
             self._id_attrs = (self.message_text,)

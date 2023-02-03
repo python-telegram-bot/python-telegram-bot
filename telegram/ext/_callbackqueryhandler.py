@@ -19,11 +19,11 @@
 """This module contains the CallbackQueryHandler class."""
 import asyncio
 import re
-from typing import TYPE_CHECKING, Callable, Match, Optional, Pattern, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, Callable, Match, Optional, Pattern, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
@@ -109,8 +109,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        pattern: Union[str, Pattern, type, Callable[[object], Optional[bool]]] = None,
-        block: DVInput[bool] = DEFAULT_TRUE,
+        pattern: Union[str, Pattern[str], type, Callable[[object], Optional[bool]]] = None,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
 
@@ -122,7 +122,9 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern = pattern
+        self.pattern: Optional[
+            Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
+        ] = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -157,8 +159,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
         self,
         context: CCT,
         update: Update,  # skipcq: BAN-B301
-        application: "Application",  # skipcq: BAN-B301
-        check_result: Union[bool, Match],
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
+        check_result: Union[bool, Match[str]],
     ) -> None:
         """Add the result of ``re.match(pattern, update.callback_query.data)`` to
         :attr:`CallbackContext.matches` as list with one element.

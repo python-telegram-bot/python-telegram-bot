@@ -23,12 +23,12 @@ import copy
 import functools
 import logging
 import pickle
-from contextlib import AbstractAsyncContextManager
 from datetime import datetime
 from types import TracebackType
 from typing import (
     TYPE_CHECKING,
     Any,
+    AsyncContextManager,
     Callable,
     Dict,
     List,
@@ -114,7 +114,7 @@ if TYPE_CHECKING:
 BT = TypeVar("BT", bound="Bot")
 
 
-class Bot(TelegramObject, AbstractAsyncContextManager):
+class Bot(TelegramObject, AsyncContextManager["Bot"]):
     """This object represents a Telegram Bot.
 
     Instances of this class can be used as asyncio context managers, where
@@ -132,7 +132,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             await bot.initialize()
             # code
         finally:
-            await request_object.shutdown()
+            await bot.shutdown()
 
     Note:
         * Most bot methods have the argument ``api_kwargs`` which allows passing arbitrary keywords
@@ -147,10 +147,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
 
-    .. seealso:: :attr:`telegram.ext.Application.bot`,
-        :attr:`telegram.ext.CallbackContext.bot`,
-        :attr:`telegram.ext.Updater.bot`,
-        :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
 
     .. versionadded:: 13.2
@@ -229,13 +226,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         super().__init__(api_kwargs=None)
         if not token:
             raise InvalidToken("You must pass the token you received from https://t.me/Botfather!")
-        self._token = token
+        self._token: str = token
 
-        self._base_url = base_url + self._token
-        self._base_file_url = base_file_url + self._token
-        self._local_mode = local_mode
+        self._base_url: str = base_url + self._token
+        self._base_file_url: str = base_file_url + self._token
+        self._local_mode: bool = local_mode
         self._bot_user: Optional[User] = None
-        self._private_key = None
+        self._private_key: Optional[bytes] = None
         self._logger = logging.getLogger(__name__)
         self._initialized = False
 
@@ -312,7 +309,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         raise pickle.PicklingError("Bot objects cannot be pickled!")
 
-    def __deepcopy__(self, memodict: dict) -> NoReturn:
+    def __deepcopy__(self, memodict: Dict[int, object]) -> NoReturn:
         """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
         be deepcopied and this method will always raise an exception.
 
@@ -723,7 +720,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Message:
         """Use this method to send text messages.
 
-        .. seealso:: :meth:`telegram.Chat.send_message`, :meth:`telegram.User.send_message`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.send_message`, :meth:`telegram.User.send_message`,
             :meth:`telegram.Message.reply_text`, :meth:`telegram.Message.reply_html`,
             :meth:`telegram.Message.reply_markdown`, :meth:`telegram.Message.reply_markdown_v2`
 
@@ -810,8 +810,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         - If the bot has :attr:`~telegram.ChatMemberAdministrator.can_delete_messages`
           permission in a supergroup or a channel, it can delete any message there.
 
-        .. seealso:: :meth:`telegram.Message.delete`,
-            :meth:`telegram.CallbackQuery.delete_message`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.delete`, :meth:`telegram.CallbackQuery.delete_message`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -863,7 +865,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             As a workaround, it is still possible to use :meth:`copy_message`. However, this
             behaviour is undocumented and might be changed by Telegram.
 
-        .. seealso:: :meth:`telegram.Message.forward`, :meth:`telegram.Chat.forward_to`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.forward`, :meth:`telegram.Chat.forward_to`,
             :meth:`telegram.Chat.forward_from`
 
         Args:
@@ -930,9 +935,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Message:
         """Use this method to send photos.
 
-        .. seealso:: :meth:`telegram.Message.reply_photo`, :meth:`telegram.Chat.send_photo`,
-            :meth:`telegram.User.send_photo`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_photo`, :meth:`telegram.Chat.send_photo`,
+            :meth:`telegram.User.send_photo`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1054,9 +1063,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         For sending voice messages, use the :meth:`send_voice` method instead.
 
-        .. seealso:: :meth:`telegram.Message.reply_audio`, :meth:`telegram.Chat.send_audio`,
-            :meth:`telegram.User.send_audio`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_audio`, :meth:`telegram.Chat.send_audio`,
+            :meth:`telegram.User.send_audio`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1180,9 +1193,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD` in size, this limit may be
         changed in the future.
 
-        .. seealso:: :meth:`telegram.Message.reply_document`, :meth:`telegram.Chat.send_document`,
-            :meth:`telegram.User.send_document`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_document`, :meth:`telegram.Chat.send_document`,
+            :meth:`telegram.User.send_document`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1294,9 +1311,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to send static ``.WEBP``, animated ``.TGS``, or video ``.WEBM`` stickers.
 
-        .. seealso:: :meth:`telegram.Message.reply_sticker`, :meth:`telegram.Chat.send_sticker`,
-            :meth:`telegram.User.send_sticker`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_sticker`, :meth:`telegram.Chat.send_sticker`,
+            :meth:`telegram.User.send_sticker`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1391,9 +1412,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             easily generate thumbnails. However, this behaviour is undocumented and might be
             changed by Telegram.
 
-        .. seealso:: :meth:`telegram.Message.reply_video`, :meth:`telegram.Chat.send_video`,
-            :meth:`telegram.User.send_video`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_video`, :meth:`telegram.Chat.send_video`,
+            :meth:`telegram.User.send_video`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1525,10 +1550,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             easily generate thumbnails. However, this behaviour is undocumented and might be
             changed by Telegram.
 
-        .. seealso:: :meth:`telegram.Message.reply_video_note`,
-            :meth:`telegram.Chat.send_video_note`,
-            :meth:`telegram.User.send_video_note`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_video_note`, :meth:`telegram.Chat.send_video_note`,
+            :meth:`telegram.User.send_video_note`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1649,10 +1677,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             generate thumbnails. However, this behaviour is undocumented and might be changed
             by Telegram.
 
-        .. seealso:: :meth:`telegram.Message.reply_animation`,
-            :meth:`telegram.Chat.send_animation`,
-            :meth:`telegram.User.send_animation`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_animation`, :meth:`telegram.Chat.send_animation`,
+            :meth:`telegram.User.send_animation`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1785,9 +1816,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD` voice notes will be
             sent as files.
 
-        .. seealso:: :meth:`telegram.Message.reply_voice`, :meth:`telegram.Chat.send_voice`,
-            :meth:`telegram.User.send_voice`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_voice`, :meth:`telegram.Chat.send_voice`,
+            :meth:`telegram.User.send_voice`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1899,10 +1934,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :paramref:`caption_entities`), then items in :paramref:`media` must have no captions,
             and vice versa.
 
-        .. seealso:: :meth:`telegram.Message.reply_media_group`,
-            :meth:`telegram.Chat.send_media_group`,
-            :meth:`telegram.User.send_media_group`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_media_group`, :meth:`telegram.Chat.send_media_group`,
+            :meth:`telegram.User.send_media_group`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -2028,7 +2066,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             You can either supply a :paramref:`latitude` and :paramref:`longitude` or a
             :paramref:`location`.
 
-        .. seealso:: :meth:`telegram.Message.reply_location`,  :meth:`telegram.Chat.send_location`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_location`,  :meth:`telegram.Chat.send_location`,
             :meth:`telegram.User.send_location`
 
         Args:
@@ -2144,7 +2185,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             You can either supply a :paramref:`latitude` and :paramref:`longitude` or a
             :paramref:`location`.
 
-        .. seealso:: :meth:`telegram.Message.edit_live_location`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.edit_live_location`,
             :meth:`telegram.CallbackQuery.edit_message_live_location`
 
         Args:
@@ -2231,7 +2275,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """Use this method to stop updating a live location message sent by the bot or via the bot
         (for inline bots) before :paramref:`~telegram.Location.live_period` expires.
 
-        .. seealso:: :meth:`telegram.Message.stop_live_location`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.stop_live_location`,
             :meth:`telegram.CallbackQuery.stop_message_live_location`
 
         Args:
@@ -2301,7 +2348,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             * Foursquare details and Google Place details are mutually exclusive. However, this
               behaviour is undocumented and might be changed by Telegram.
 
-        .. seealso:: :meth:`telegram.Message.reply_venue`, :meth:`telegram.Chat.send_venue`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_venue`, :meth:`telegram.Chat.send_venue`,
             :meth:`telegram.User.send_venue`
 
         Args:
@@ -2423,7 +2473,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :paramref:`first_name` with optionally :paramref:`last_name` and optionally
             :paramref:`vcard`.
 
-        .. seealso:: :meth:`telegram.Message.reply_contact`,  :meth:`telegram.Chat.send_contact`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_contact`,  :meth:`telegram.Chat.send_contact`,
             :meth:`telegram.User.send_contact`
 
         Args:
@@ -2520,7 +2573,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Message:
         """Use this method to send a game.
 
-        .. seealso:: :meth:`telegram.Message.reply_game`, :meth:`telegram.Chat.send_game`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_game`, :meth:`telegram.Chat.send_game`,
             :meth:`telegram.User.send_game`
 
         Args:
@@ -2585,7 +2641,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Telegram clients clear its typing status). Telegram only recommends using this method when
         a response from the bot will take a noticeable amount of time to arrive.
 
-        .. seealso:: :meth:`telegram.Message.reply_chat_action`, :meth:`telegram.Chat.send_action`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_chat_action`, :meth:`telegram.Chat.send_action`,
             :meth:`telegram.User.send_chat_action`
 
         Args:
@@ -2746,7 +2805,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             YouTube account to adapt search results accordingly. To do this, it displays a
             'Connect your YouTube account' button above the results, or even before showing any.
             The user presses the button, switches to a private chat with the bot and, in doing so,
-            passes a start parameter that instructs the bot to return an oauth link. Once done, the
+            passes a start parameter that instructs the bot to return an OAuth link. Once done, the
             bot can offer a switch_inline button so that the user can easily return to the chat
             where they wanted to use the bot's inline capabilities.
 
@@ -2756,8 +2815,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :paramref:`telegram.InlineQuery.answer.auto_pagination` set to :obj:`True`, which will
             take care of passing the correct value.
 
-        .. seealso:: :meth:`telegram.InlineQuery.answer`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.InlineQuery.answer`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
@@ -2842,7 +2905,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> UserProfilePhotos:
         """Use this method to get a list of profile pictures for a user.
 
-        .. seealso:: :meth:`telegram.User.get_profile_photos`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.User.get_profile_photos`
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user.
@@ -2900,13 +2966,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             You should save the file's MIME type and name (if available) when the File object
             is received.
 
-        .. seealso:: :meth:`telegram.Animation.get_file`, :meth:`telegram.Audio.get_file`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Animation.get_file`, :meth:`telegram.Audio.get_file`,
             :meth:`telegram.ChatPhoto.get_big_file`, :meth:`telegram.ChatPhoto.get_small_file`,
             :meth:`telegram.Document.get_file`, :meth:`telegram.PassportFile.get_file`,
             :meth:`telegram.PhotoSize.get_file`, :meth:`telegram.Sticker.get_file`,
             :meth:`telegram.Video.get_file`, :meth:`telegram.VideoNote.get_file`,
-            :meth:`telegram.Voice.get_file`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+            :meth:`telegram.Voice.get_file`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             file_id (:obj:`str` | :class:`telegram.Animation` | :class:`telegram.Audio` |         \
@@ -2967,7 +3037,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         using invite links, etc., unless unbanned first. The bot must be an administrator in the
         chat for this to work and must have the appropriate admin rights.
 
-        .. seealso:: :meth:`telegram.Chat.ban_member`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.ban_member`
 
         .. versionadded:: 13.7
 
@@ -3033,7 +3106,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         their channels**. The bot must be an administrator in the supergroup or channel for this
         to work and must have the appropriate administrator rights.
 
-        .. seealso:: :meth:`telegram.Chat.ban_chat`, :meth:`telegram.Chat.ban_sender_chat`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.ban_chat`, :meth:`telegram.Chat.ban_sender_chat`
 
         .. versionadded:: 13.9
 
@@ -3084,7 +3160,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         join it. So if the user is a member of the chat they will also be *removed* from the chat.
         If you don't want this, use the parameter :paramref:`only_if_banned`.
 
-        .. seealso:: :meth:`telegram.Chat.unban_member`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.unban_member`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -3128,7 +3207,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         The bot must be an administrator for this to work and must have the
         appropriate administrator rights.
 
-        .. seealso:: :meth:`telegram.Chat.unban_chat`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.unban_chat`
 
         .. versionadded:: 13.9
 
@@ -3181,7 +3263,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         and accept the terms. Otherwise, you may use links like t.me/your_bot?start=XXXX that open
         your bot with a parameter.
 
-        .. seealso:: :meth:`telegram.CallbackQuery.answer`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.CallbackQuery.answer`
 
         Args:
             callback_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -3251,8 +3336,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Note:
             |editreplymarkup|.
 
-        .. seealso:: :meth:`telegram.Message.edit_text`,
-            :meth:`telegram.CallbackQuery.edit_message_text`, :attr:`telegram.Game.text`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.edit_text`, :meth:`telegram.CallbackQuery.edit_message_text`
+
+        .. seealso:: :attr:`telegram.Game.text`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
@@ -3329,7 +3418,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Note:
             |editreplymarkup|
 
-        .. seealso:: :meth:`telegram.Message.edit_caption`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.edit_caption`,
             :meth:`telegram.CallbackQuery.edit_message_caption`
 
         Args:
@@ -3404,9 +3496,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Note:
             |editreplymarkup|
 
-        .. seealso:: :meth:`telegram.Message.edit_media`,
-            :meth:`telegram.CallbackQuery.edit_message_media`,
-            :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.edit_media`,
+            :meth:`telegram.CallbackQuery.edit_message_media`
+
+        .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         Args:
             media (:class:`telegram.InputMedia`): An object for a new media content
@@ -3466,7 +3562,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Note:
             |editreplymarkup|
 
-        .. seealso:: :meth:`telegram.Message.edit_reply_markup`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.edit_reply_markup`,
             :meth:`telegram.CallbackQuery.edit_message_reply_markup`
 
         Args:
@@ -3672,7 +3771,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.WebhookLimit.MAX_CONNECTIONS_LIMIT`.
                 Defaults to ``40``. Use lower values to limit the load on your bot's server,
                 and higher values to increase your bot's throughput.
-            allowed_updates (Sequence[:obj:`str`], optional): A sequence the types of
+            allowed_updates (Sequence[:obj:`str`], optional): A sequence of the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
@@ -3779,7 +3878,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> bool:
         """Use this method for your bot to leave a group, supergroup or channel.
 
-        .. seealso:: :meth:`telegram.Chat.leave`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.leave`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -3858,7 +3960,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to get a list of administrators in a chat.
 
-        .. seealso:: :meth:`telegram.Chat.get_administrators`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.get_administrators`
 
         .. versionchanged:: 20.0
             Returns a tuple instead of a list.
@@ -3901,7 +4006,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> int:
         """Use this method to get the number of members in a chat.
 
-        .. seealso:: :meth:`telegram.Chat.get_member_count`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.get_member_count`
 
         .. versionadded:: 13.7
 
@@ -3942,7 +4050,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """Use this method to get information about a member of a chat. The method is guaranteed
         to work for other users, only if the bot is an administrator in the chat.
 
-        .. seealso:: :meth:`telegram.Chat.get_member`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.get_member`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -4087,7 +4198,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to set the score of the specified user in a game message.
 
-        .. seealso:: :meth:`telegram.CallbackQuery.set_game_score`, :attr:`telegram.Game.text`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.CallbackQuery.set_game_score`
+
+        .. seealso:: :attr:`telegram.Game.text`
 
         Args:
             user_id (:obj:`int`): User identifier.
@@ -4158,7 +4274,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             closest neighbors on each side. Will also return the top three users if the user and
             his neighbors are not among them. Please note that this behavior is subject to change.
 
-        .. seealso:: :meth:`telegram.CallbackQuery.get_game_high_scores`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.CallbackQuery.get_game_high_scores`,
             :meth:`telegram.Message.get_game_high_scores`
 
         Args:
@@ -4241,7 +4360,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             order of the arguments had to be changed. Use keyword arguments to make sure that the
             arguments are passed correctly.
 
-        .. seealso:: :meth:`telegram.Message.reply_invoice`, :meth:`telegram.Chat.send_invoice`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_invoice`, :meth:`telegram.Chat.send_invoice`,
             :meth:`telegram.User.send_invoice`
 
         .. versionchanged:: 13.5
@@ -4401,7 +4523,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :class:`telegram.Update` with a :attr:`telegram.Update.shipping_query` field to the bot.
         Use this method to reply to shipping queries.
 
-        .. seealso:: :meth:`telegram.ShippingQuery.answer`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.ShippingQuery.answer`
 
         Args:
             shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -4467,7 +4592,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             The Bot API must receive an answer within 10 seconds after the pre-checkout
             query was sent.
 
-        .. seealso:: :meth:`telegram.PreCheckoutQuery.answer`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.PreCheckoutQuery.answer`
 
         Args:
             pre_checkout_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -4571,8 +4699,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         the supergroup for this to work and must have the appropriate admin rights. Pass
         :obj:`True` for all boolean parameters to lift restrictions from a user.
 
-        .. seealso:: :meth:`telegram.ChatPermissions.all_permissions`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
             :meth:`telegram.Chat.restrict_member`
+
+        .. seealso:: :meth:`telegram.ChatPermissions.all_permissions`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
@@ -4641,7 +4773,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         an administrator in the chat for this to work and must have the appropriate admin rights.
         Pass :obj:`False` for all boolean parameters to demote a user.
 
-        .. seealso:: :meth:`telegram.Chat.promote_member`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.promote_member`
 
         .. versionchanged:: 20.0
            The argument ``can_manage_voice_chats`` was renamed to
@@ -4740,7 +4875,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         administrator in the group or a supergroup for this to work and must have the
         :attr:`telegram.ChatMemberAdministrator.can_restrict_members` admin rights.
 
-        .. seealso:: :meth:`telegram.Chat.set_permissions`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.set_permissions`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
@@ -4782,7 +4920,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to set a custom title for administrators promoted by the bot in a
         supergroup. The bot must be an administrator for this to work.
 
-        .. seealso:: :meth:`telegram.Chat.set_administrator_custom_title`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.set_administrator_custom_title`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
@@ -4835,7 +4976,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             by calling the :meth:`get_chat` method. If your bot needs to generate a new primary
             invite link replacing its previous one, use :meth:`export_chat_invite_link` again.
 
-        .. seealso:: :meth:`telegram.Chat.export_invite_link`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.export_invite_link`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -4879,7 +5023,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         administrator in the chat for this to work and must have the appropriate admin rights.
         The link can be revoked using the method :meth:`revoke_chat_invite_link`.
 
-        .. seealso:: :meth:`telegram.Chat.create_invite_link`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.create_invite_link`
 
         .. versionadded:: 13.4
 
@@ -4957,7 +5104,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             parameters to the default values. However, since not documented, this behaviour may
             change unbeknown to PTB.
 
-        .. seealso:: :meth:`telegram.Chat.edit_invite_link`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.edit_invite_link`
 
         .. versionadded:: 13.4
 
@@ -5032,7 +5182,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         revoked, a new link is automatically generated. The bot must be an administrator in the
         chat for this to work and must have the appropriate admin rights.
 
-        .. seealso:: :meth:`telegram.Chat.revoke_invite_link`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.revoke_invite_link`
 
         .. versionadded:: 13.4
 
@@ -5082,8 +5235,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         The bot must be an administrator in the chat for this to work and must have the
         :attr:`telegram.ChatPermissions.can_invite_users` administrator right.
 
-        .. seealso:: :meth:`telegram.Chat.approve_join_request`,
-            :meth:`telegram.ChatJoinRequest.approve`, :meth:`telegram.User.approve_join_request`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.approve_join_request`, :meth:`telegram.ChatJoinRequest.approve`,
+            :meth:`telegram.User.approve_join_request`
 
         .. versionadded:: 13.8
 
@@ -5128,8 +5284,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         The bot must be an administrator in the chat for this to work and must have the
         :attr:`telegram.ChatPermissions.can_invite_users` administrator right.
 
-        .. seealso:: :meth:`telegram.Chat.decline_join_request`,
-            :meth:`telegram.ChatJoinRequest.decline`, :meth:`telegram.User.decline_join_request`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.decline_join_request`, :meth:`telegram.ChatJoinRequest.decline`,
+            :meth:`telegram.User.decline_join_request`
 
         .. versionadded:: 13.8
 
@@ -5174,7 +5333,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Photos can't be changed for private chats. The bot must be an administrator in the chat
         for this to work and must have the appropriate admin rights.
 
-        .. seealso:: :meth:`telegram.Chat.set_photo`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.set_photo`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -5223,7 +5385,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         must be an administrator in the chat for this to work and must have the appropriate admin
         rights.
 
-        .. seealso:: :meth:`telegram.Chat.delete_photo`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.delete_photo`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -5264,7 +5429,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         The bot must be an administrator in the chat for this to work and must have the appropriate
         admin rights.
 
-        .. seealso:: :meth:`telegram.Chat.set_title`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.set_title`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -5308,7 +5476,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         must be an administrator in the chat for this to work and must have the appropriate admin
         rights.
 
-        .. seealso:: :meth:`telegram.Chat.set_description`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.set_description`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -5356,7 +5527,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
         right in a channel.
 
-        .. seealso:: :meth:`telegram.Chat.pin_message`, :meth:`telegram.Message.pin`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.pin_message`, :meth:`telegram.Message.pin`,
             :meth:`telegram.User.pin_message`
 
         Args:
@@ -5408,7 +5582,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
         right in a channel.
 
-        .. seealso:: :meth:`telegram.Chat.unpin_message`, :meth:`telegram.Message.unpin`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.unpin_message`, :meth:`telegram.Message.unpin`,
             :meth:`telegram.User.unpin_message`
 
         Args:
@@ -5453,8 +5630,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         admin right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages`
         admin right in a channel.
 
-        .. seealso:: :meth:`telegram.Chat.unpin_all_messages`,
-            :meth:`telegram.User.unpin_all_messages`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.unpin_all_messages`, :meth:`telegram.User.unpin_all_messages`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -6037,7 +6216,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to send a native poll.
 
-        .. seealso:: :meth:`telegram.Message.reply_poll`, :meth:`telegram.Chat.send_poll`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_poll`, :meth:`telegram.Chat.send_poll`,
             :meth:`telegram.User.send_poll`
 
         Args:
@@ -6158,7 +6340,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to stop a poll which was sent by the bot.
 
-        .. seealso:: :meth:`telegram.Message.stop_poll`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.stop_poll`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -6211,7 +6396,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to send an animated emoji that will display a random value.
 
-        .. seealso:: :meth:`telegram.Message.reply_dice`,  :meth:`telegram.Chat.send_dice`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reply_dice`,  :meth:`telegram.Chat.send_dice`,
             :meth:`telegram.User.send_dice`
 
         Args:
@@ -6618,7 +6806,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         be copied. The method is analogous to the method :meth:`forward_message`, but the copied
         message doesn't have a link to the original message.
 
-        .. seealso:: :meth:`telegram.Message.copy`, :meth:`telegram.Chat.send_copy`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.copy`, :meth:`telegram.Chat.send_copy`,
             :meth:`telegram.Chat.copy_message`, :meth:`telegram.User.send_copy`,
             :meth:`telegram.User.copy_message`
 
@@ -6700,8 +6891,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """Use this method to change the bot's menu button in a private chat, or the default menu
         button.
 
-        .. seealso:: :meth:`get_chat_menu_button`, :meth:`telegram.Chat.set_menu_button`,
-            :meth:`telegram.Chat.get_menu_button`, :meth:`telegram.User.set_menu_button`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.set_menu_button`, :meth:`telegram.User.set_menu_button`
+
+        .. seealso:: :meth:`get_chat_menu_button`, :meth:`telegram.Chat.get_menu_button`
             :meth:`telegram.User.get_menu_button`
 
         .. versionadded:: 20.0
@@ -6742,8 +6937,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """Use this method to get the current value of the bot's menu button in a private chat, or
         the default menu button.
 
-        .. seealso:: :meth:`set_chat_menu_button`, :meth:`telegram.Chat.get_menu_button`,
-            :meth:`telegram.Chat.set_menu_button`, :meth:`telegram.User.get_menu_button`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.get_menu_button`, :meth:`telegram.User.get_menu_button`
+
+        .. seealso:: :meth:`set_chat_menu_button`, :meth:`telegram.Chat.set_menu_button`,
             :meth:`telegram.User.set_menu_button`
 
         .. versionadded:: 20.0
@@ -6949,7 +7148,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         an administrator in the chat for this to work and must have
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
-        .. seealso:: :meth:`telegram.Chat.create_forum_topic`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.create_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7012,8 +7214,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
         unless it is the creator of the topic.
 
-        .. seealso:: :meth:`telegram.Message.edit_forum_topic`,
-            :meth:`telegram.Chat.edit_forum_topic`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.edit_forum_topic`, :meth:`telegram.Chat.edit_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7070,8 +7274,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
         unless it is the creator of the topic.
 
-        .. seealso:: :meth:`telegram.Message.close_forum_topic`,
-            :meth:`telegram.Chat.close_forum_topic`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.close_forum_topic`, :meth:`telegram.Chat.close_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7118,8 +7324,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
         unless it is the creator of the topic.
 
-        .. seealso:: :meth:`telegram.Message.reopen_forum_topic`,
-            :meth:`telegram.Chat.reopen_forum_topic`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.reopen_forum_topic`, :meth:`telegram.Chat.reopen_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7165,8 +7373,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         chat. The bot must be an administrator in the chat for this to work and must have
         :paramref:`~telegram.ChatAdministratorRights.can_delete_messages` administrator rights.
 
-        .. seealso:: :meth:`telegram.Message.delete_forum_topic`,
-            :meth:`telegram.Chat.delete_forum_topic`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.delete_forum_topic`, :meth:`telegram.Chat.delete_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7213,8 +7423,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` administrator rights
         in the supergroup.
 
-        .. seealso:: :meth:`telegram.Message.unpin_all_forum_topic_messages`,
-            :meth:`telegram.Chat.unpin_all_forum_topic_messages`,
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Message.unpin_all_forum_topic_messages`,
+            :meth:`telegram.Chat.unpin_all_forum_topic_messages`
 
         .. versionadded:: 20.0
 
@@ -7260,7 +7473,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         must be an administrator in the chat for this to work and must have
         :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
-        .. seealso:: :meth:`telegram.Chat.edit_general_forum_topic`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.edit_general_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7305,7 +7521,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         be an administrator in the chat for this to work and must have
         :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
-        .. seealso:: :meth:`telegram.Chat.close_general_forum_topic`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.close_general_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7348,7 +7567,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
         The topic will be automatically unhidden if it was hidden.
 
-        .. seealso:: :meth:`telegram.Chat.reopen_general_forum_topic`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.reopen_general_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7391,7 +7613,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
         The topic will be automatically closed if it was open.
 
-        .. seealso:: :meth:`telegram.Chat.hide_general_forum_topic`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.hide_general_forum_topic`
 
         .. versionadded:: 20.0
 
@@ -7433,7 +7658,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         be an administrator in the chat for this to work and must have
         :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
-        .. seealso:: :meth:`telegram.Chat.unhide_general_forum_topic`
+        .. admonition:: Shortcuts
+            :class: shortcuts
+
+            :meth:`telegram.Chat.unhide_general_forum_topic`
 
         .. versionadded:: 20.0
 

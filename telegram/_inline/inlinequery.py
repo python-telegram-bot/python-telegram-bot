@@ -41,7 +41,7 @@ class InlineQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
+        In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
 
     .. versionchanged:: 20.0
         The following are now keyword-only arguments in Bot methods:
@@ -100,14 +100,14 @@ class InlineQuery(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.id = id  # pylint: disable=invalid-name
-        self.from_user = from_user
-        self.query = query
-        self.offset = offset
+        self.id: str = id  # pylint: disable=invalid-name
+        self.from_user: User = from_user
+        self.query: str = query
+        self.offset: str = offset
 
         # Optional
-        self.location = location
-        self.chat_type = chat_type
+        self.location: Optional[Location] = location
+        self.chat_type: Optional[str] = chat_type
 
         self._id_attrs = (self.id,)
 

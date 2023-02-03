@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Voice."""
+from typing import Optional
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._utils.types import JSONDict
@@ -70,6 +71,6 @@ class Voice(_BaseMedium):
         )
         with self._unfrozen():
             # Required
-            self.duration = duration
+            self.duration: int = duration
             # Optional
-            self.mime_type = mime_type
+            self.mime_type: Optional[str] = mime_type

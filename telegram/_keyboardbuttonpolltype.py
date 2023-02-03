@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a type of a Telegram Poll."""
+from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -50,7 +51,7 @@ class KeyboardButtonPollType(TelegramObject):
         self, type: str = None, *, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
     ):  # pylint: disable=redefined-builtin
         super().__init__(api_kwargs=api_kwargs)
-        self.type = type
+        self.type: Optional[str] = type
 
         self._id_attrs = (self.type,)
 

@@ -1,0 +1,61 @@
+name: Check Type Completeness
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  test-type-completeness:
+    name:   test-type-completeness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: git fetch --depth=1  # https://github.com/actions/checkout/issues/329#issuecomment-674881489
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: 'pip'
+          cache-dependency-path: '**/requirements*.txt'
+      - name: Install Pyright
+        run: |
+          python -W ignore -m pip install pyright~=1.1.291
+      - name: Get Base Completeness
+        run: |
+          git checkout ${{ github.base_ref }}
+          pip install . -U
+          pyright --verifytypes telegram --ignoreexternal --outputjson > base.json || true
+      - name: Get PR Completeness
+        run: |
+          git checkout ${{ github.head_ref }}
+          pip install . -U
+          pyright --verifytypes telegram --ignoreexternal --outputjson > pr.json || true
+      - name: Compare Completeness
+        uses: jannekem/run-python-script-action@v1
+        with:
+          script: | 
+            import json
+            import os
+
+            base = float(
+              json.load(open("base.json", "rb"))["typeCompleteness"]["completenessScore"]
+            )
+            pr = float(
+              json.load(open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
+            )
+            if pr < (base - 0.1):
+                text = f"This PR decreases type completeness by {round(base - pr, 3)} ❌"
+                set_summary(text)
+                error(text)
+                exit(1)
+            elif pr > (base + 0.1):
+                text = f"This PR increases type completeness by {round(pr - base, 3)} ✨"
+                set_summary(text)
+                print(text)
+            else:
+                text = f"This PR does not change type completeness by more than 0.1 ✅"
+                set_summary(text)
+                print(text)

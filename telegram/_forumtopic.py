@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram forum topics."""
+from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -59,10 +60,10 @@ class ForumTopic(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.message_thread_id = message_thread_id
-        self.name = name
-        self.icon_color = icon_color
-        self.icon_custom_emoji_id = icon_custom_emoji_id
+        self.message_thread_id: int = message_thread_id
+        self.name: str = name
+        self.icon_color: int = icon_color
+        self.icon_custom_emoji_id: Optional[str] = icon_custom_emoji_id
 
         self._id_attrs = (self.message_thread_id, self.name, self.icon_color)
 
@@ -103,9 +104,9 @@ class ForumTopicCreated(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.name = name
-        self.icon_color = icon_color
-        self.icon_custom_emoji_id = icon_custom_emoji_id
+        self.name: str = name
+        self.icon_color: int = icon_color
+        self.icon_custom_emoji_id: Optional[str] = icon_custom_emoji_id
 
         self._id_attrs = (self.name, self.icon_color)
 
@@ -174,8 +175,8 @@ class ForumTopicEdited(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.name = name
-        self.icon_custom_emoji_id = icon_custom_emoji_id
+        self.name: Optional[str] = name
+        self.icon_custom_emoji_id: Optional[str] = icon_custom_emoji_id
 
         self._id_attrs = (self.name, self.icon_custom_emoji_id)
 

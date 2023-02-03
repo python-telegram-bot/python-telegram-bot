@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import ClassVar, Sequence, Union
+from typing import ClassVar, Optional, Sequence, Tuple, Union
 
 from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
@@ -138,17 +138,17 @@ class ReplyKeyboardMarkup(TelegramObject):
             )
 
         # Required
-        self.keyboard = tuple(
+        self.keyboard: Tuple[Tuple[KeyboardButton, ...], ...] = tuple(
             tuple(KeyboardButton(button) if isinstance(button, str) else button for button in row)
             for row in keyboard
         )
 
         # Optionals
-        self.resize_keyboard = resize_keyboard
-        self.one_time_keyboard = one_time_keyboard
-        self.selective = selective
-        self.input_field_placeholder = input_field_placeholder
-        self.is_persistent = is_persistent
+        self.resize_keyboard: Optional[bool] = resize_keyboard
+        self.one_time_keyboard: Optional[bool] = one_time_keyboard
+        self.selective: Optional[bool] = selective
+        self.input_field_placeholder: Optional[str] = input_field_placeholder
+        self.is_persistent: Optional[bool] = is_persistent
 
         self._id_attrs = (self.keyboard,)
 

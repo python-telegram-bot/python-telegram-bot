@@ -77,7 +77,7 @@ class BotCommandScope(TelegramObject):
 
     def __init__(self, type: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.type = type
+        self.type: str = type
         self._id_attrs = (self.type,)
 
         self._freeze()
@@ -200,7 +200,7 @@ class BotCommandScopeChat(BotCommandScope):
     def __init__(self, chat_id: Union[str, int], *, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.CHAT, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.chat_id = (
+            self.chat_id: Union[str, int] = (
                 chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
             )
             self._id_attrs = (self.type, self.chat_id)
@@ -227,7 +227,7 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
     def __init__(self, chat_id: Union[str, int], *, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.chat_id = (
+            self.chat_id: Union[str, int] = (
                 chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
             )
             self._id_attrs = (self.type, self.chat_id)
@@ -257,8 +257,8 @@ class BotCommandScopeChatMember(BotCommandScope):
     def __init__(self, chat_id: Union[str, int], user_id: int, *, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.CHAT_MEMBER, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.chat_id = (
+            self.chat_id: Union[str, int] = (
                 chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
             )
-            self.user_id = user_id
+            self.user_id: int = user_id
             self._id_attrs = (self.type, self.chat_id, self.user_id)

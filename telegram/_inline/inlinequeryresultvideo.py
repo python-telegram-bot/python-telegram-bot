@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVideo."""
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -145,18 +145,18 @@ class InlineQueryResultVideo(InlineQueryResult):
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.video_url = video_url
-            self.mime_type = mime_type
-            self.thumb_url = thumb_url
-            self.title = title
+            self.video_url: str = video_url
+            self.mime_type: str = mime_type
+            self.thumb_url: str = thumb_url
+            self.title: str = title
 
             # Optional
-            self.caption = caption
-            self.parse_mode = parse_mode
-            self.caption_entities = parse_sequence_arg(caption_entities)
-            self.video_width = video_width
-            self.video_height = video_height
-            self.video_duration = video_duration
-            self.description = description
-            self.reply_markup = reply_markup
-            self.input_message_content = input_message_content
+            self.caption: Optional[str] = caption
+            self.parse_mode: ODVInput[str] = parse_mode
+            self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+            self.video_width: Optional[int] = video_width
+            self.video_height: Optional[int] = video_height
+            self.video_duration: Optional[int] = video_duration
+            self.description: Optional[str] = description
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.input_message_content: Optional[InputMessageContent] = input_message_content

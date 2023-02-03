@@ -38,7 +38,7 @@ class ShippingQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
+        In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
 
     Args:
         id (:obj:`str`): Unique query identifier.
@@ -67,10 +67,10 @@ class ShippingQuery(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.id = id  # pylint: disable=invalid-name
-        self.from_user = from_user
-        self.invoice_payload = invoice_payload
-        self.shipping_address = shipping_address
+        self.id: str = id  # pylint: disable=invalid-name
+        self.from_user: User = from_user
+        self.invoice_payload: str = invoice_payload
+        self.shipping_address: ShippingAddress = shipping_address
 
         self._id_attrs = (self.id,)
 
