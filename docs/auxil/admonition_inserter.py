@@ -299,7 +299,7 @@ class AdmonitionInserter:
             if cls is telegram.Bot:
                 continue
 
-            for method_name, method in inspect.getmembers(cls, predicate=inspect.isfunction):
+            for method_name, method in self._iter_own_public_methods(cls):
 
                 # .getsourcelines() returns a tuple. Item [1] is an int (length of line?)
                 relevant_return_lines = [
@@ -445,6 +445,19 @@ class AdmonitionInserter:
         """Generates a ReST link to a method of a telegram class."""
 
         return f":meth:`{self._generate_class_name_for_link(cls)}.{method_name}`"
+
+    @staticmethod
+    def _iter_own_public_methods(cls: type) -> Iterator[tuple[str, type]]:
+        """Iterates over methods of a class that are not protected/private,
+        not camelCase and not inherited from the parent class.
+        """
+        return (
+            m
+            for m in inspect.getmembers(cls, predicate=inspect.isfunction)  # not .ismethod
+            if not m[0].startswith("_")
+            and m[0].islower()  # to avoid camelCase methods
+            and m[0] in cls.__dict__  # method is not inherited from parent class
+        )
 
     @staticmethod
     def _iter_subclasses(cls: type) -> Iterator:
