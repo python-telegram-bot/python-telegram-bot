@@ -310,9 +310,8 @@ class AdmonitionInserter:
 
                 # .getsourcelines() returns a tuple. Item [1] is an int
                 for line in inspect.getsourcelines(method)[0]:
-                    bot_method_match = bot_method_pattern.search(line)
 
-                    if not bot_method_match:
+                    if not (bot_method_match := bot_method_pattern.search(line)):
                         continue
 
                     bot_method = getattr(telegram.Bot, bot_method_match.group())
