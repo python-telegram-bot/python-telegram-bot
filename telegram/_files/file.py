@@ -127,10 +127,10 @@ class File(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Path:
         """
-        Download this file. By default, the file is saved in the current working directory with its
-        original filename as reported by Telegram. If the file has no filename, the file ID will
-        be used as filename. If :paramref:`custom_path` is supplied as a :obj:`str` or
-        :obj:`pathlib.Path`, it will be saved to that path.
+        Download this file. By default, the file is saved in the current working directory with
+        :attr:`file_path` as file name. If the file has no filename, the file ID will be used as
+        filename. If :paramref:`custom_path` is supplied as a :obj:`str` or :obj:`pathlib.Path`,
+        it will be saved to that path.
 
         Note:
             If :paramref:`custom_path` isn't provided and :attr:`file_path` is the path of a
@@ -154,7 +154,9 @@ class File(TelegramObject):
 
         Args:
             custom_path (:class:`pathlib.Path` | :obj:`str` , optional): The path where the file
-                will be saved to. If not specified, will be saved in the current working directory.
+                will be saved to. If not specified, will be saved in the current working directory
+                with :attr:`file_path` as file name or the :attr:`file_id` if :attr:`file_path`
+                is not set.
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
