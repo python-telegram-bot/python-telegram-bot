@@ -139,10 +139,6 @@ class KeyboardButton(TelegramObject):
         # Required
         self.text: str = text
         # Optionals
-        self.request_contact = request_contact
-        self.request_location = request_location
-        self.request_poll = request_poll
-        self.web_app = web_app
         self.request_contact: Optional[bool] = request_contact
         self.request_location: Optional[bool] = request_location
         self.request_poll: Optional[KeyboardButtonPollType] = request_poll

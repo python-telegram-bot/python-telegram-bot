@@ -507,17 +507,6 @@ class ChatMemberRestricted(ChatMember):
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.is_member = is_member
-            self.can_change_info = can_change_info
-            self.can_invite_users = can_invite_users
-            self.can_pin_messages = can_pin_messages
-            self.can_send_messages = can_send_messages
-            self.can_send_media_messages = can_send_media_messages
-            self.can_send_polls = can_send_polls
-            self.can_send_other_messages = can_send_other_messages
-            self.can_add_web_page_previews = can_add_web_page_previews
-            self.can_manage_topics = can_manage_topics
-            self.until_date = until_date
             self.is_member: bool = is_member
             self.can_change_info: bool = can_change_info
             self.can_invite_users: bool = can_invite_users
