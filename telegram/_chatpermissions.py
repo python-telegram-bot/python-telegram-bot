@@ -35,7 +35,7 @@ class ChatPermissions(TelegramObject):
     .. versionchanged:: 20.0
         :attr:`can_manage_topics` is considered as well when comparing objects of
         this type in terms of equality.
-    .. versionchanged:: 20.0
+    .. versionchanged:: 20.1
         :attr:`can_send_audios`, :attr:`can_send_documents`,:attr:`can_send_photos`,
         :attr:`can_send_videos`,:attr:`can_send_video_notes` and :attr:`can_send_voice_notes` are
         considered as well when comparing objects of this type in terms of equality.
