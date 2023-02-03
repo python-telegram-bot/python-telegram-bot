@@ -282,7 +282,7 @@ class AdmonitionInserter:
             r"""\s*  # any number of whitespaces
             (?<=return\sawait\sself\.get_bot\(\)\.)  # lookbehind
             .+  # the method name we are looking for
-            (?=\() # lookahead: closing bracket
+            (?=\() # lookahead: opening bracket before the args of the method start
             """,
             re.VERBOSE,
         )
