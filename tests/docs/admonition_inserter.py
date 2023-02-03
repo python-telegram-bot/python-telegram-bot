@@ -107,6 +107,11 @@ class TestAdmonitionInserter:
                 ":meth:`telegram.Bot.edit_message_live_location`",  # Union[Message, bool]
             ),
             (
+                "returned_in",
+                telegram.ext.Application,
+                ":meth:`telegram.ext.ApplicationBuilder.build`",  # <class 'types.GenericAlias'>
+            ),
+            (
                 "use_in",
                 telegram.InlineQueryResult,
                 ":meth:`telegram.Bot.answer_web_app_query`",  # ForwardRef
