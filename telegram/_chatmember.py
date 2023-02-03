@@ -374,7 +374,7 @@ class ChatMemberRestricted(ChatMember):
             to send audios, documents, photos, videos, video notes and voice notes.
 
             .. deprecated:: 20.1
-               Replaced with granular media settings.
+               Bot API 6.5 replaced this argument with granular media settings.
         can_send_polls (:obj:`bool`): :obj:`True`, if the user is allowed
             to send polls.
         can_send_other_messages (:obj:`bool`): :obj:`True`, if the user is allowed

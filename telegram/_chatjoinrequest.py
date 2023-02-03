@@ -46,7 +46,7 @@ class ChatJoinRequest(TelegramObject):
 
     .. versionadded:: 13.8
     .. versionchanged:: 20.1
-       The argument :paramref:`user_chat_id` was added, which changes the position of the
+       In Bot API 6.5 the argument :paramref:`user_chat_id` was added, which changes the position of the
        optional arguments :paramref:`bio` and :paramref:`invite_link`.
 
     Args:
