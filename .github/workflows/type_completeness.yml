@@ -52,15 +52,15 @@ jobs:
             if pr < (base - 0.1):
                 text = f"This PR decreases type completeness by {round(base - pr, 3)} ❌"
                 set_summary(text)
-                error(f"{base_text} {text}")
+                error(f"{text} {base_text}")
                 print(Path("pr.readable").read_text(encoding="utf-8"))
                 exit(1)
             elif pr > (base + 0.1):
                 text = f"This PR increases type completeness by {round(pr - base, 3)} ✨"
                 set_summary(text)
-                print(f"{base_text} {text}")
+                print(f"{text} {base_text}")
             else:
                 text = f"This PR does not change type completeness by more than 0.1 ✅"
                 set_summary(text)
-                print(f"{base_text} {text}")
+                print(f"{text} {base_text}")
                 print(Path("pr.readable").read_text(encoding="utf-8"))
