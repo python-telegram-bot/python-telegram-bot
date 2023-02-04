@@ -47,9 +47,12 @@ class KeyboardButton(TelegramObject):
           January, 2020. Older clients will display unsupported message.
         * :attr:`web_app` option will only work in Telegram versions released after 16 April, 2022.
           Older clients will display unsupported message.
+        * :attr:`request_user` and :attr:`request_chat` options will only work in Telegram
+          versions released after 3 February, 2023. Older clients will display unsupported
+          message.
 
     .. versionchanged:: 20.0
-       :paramref:`web_app` is considered as well when comparing objects of this type in terms of
+       :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.
     .. versionchanged:: 20.1
        :paramref:`request_user` and :paramref:`request_chat` is considered as well when comparing
