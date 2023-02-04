@@ -4047,8 +4047,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> ChatMember:
-        """Use this method to get information about a member of a chat. The method is guaranteed
-        to work for other users, only if the bot is an administrator in the chat.
+        """Use this method to get information about a member of a chat. The method is only
+        guaranteed to work for other users if the bot is an administrator in the chat.
 
         .. admonition:: Shortcuts
             :class: shortcuts
