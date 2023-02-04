@@ -20,7 +20,7 @@ tornado~=6.2 # webhooks!ext
 # Cachetools and APS don't have a strict stability policy.
 # Let's be cautious for now.
 cachetools~=5.3.0 # callback-data!ext
-APScheduler~=3.9.1 # job-queue!ext
+APScheduler~=3.10.0 # job-queue!ext
 
 # pytz is required by APS and just needs the lower bound due to #2120
 pytz>=2018.6 # job-queue!ext
