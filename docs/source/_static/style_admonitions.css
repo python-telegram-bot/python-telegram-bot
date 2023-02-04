@@ -56,10 +56,10 @@
   mask-image: var(--icon--use-in);
 }
 
-.admonition.returned-in > ul:hover, .admonition.available-in > ul:hover, .admonition.use-in > ul:hover {
+.admonition.returned-in > ul:hover, .admonition.available-in > ul:hover, .admonition.use-in > ul:hover, .admonition.shortcuts > ul:hover {
   cursor: move;
 }
-.admonition.returned-in > ul, .admonition.available-in > ul, .admonition.use-in > ul {
+.admonition.returned-in > ul, .admonition.available-in > ul, .admonition.use-in > ul, .admonition.shortcuts > ul {
   max-height: 200px;
   overflow-y: scroll;
 }

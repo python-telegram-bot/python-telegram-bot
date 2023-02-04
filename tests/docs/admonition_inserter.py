@@ -22,6 +22,8 @@
 # The tests require Python 3.9+ (just like AdmonitionInserter being tested),
 # so they cannot be included in the main suite while older versions of Python are supported.
 
+import collections.abc
+
 import pytest
 
 import telegram.ext
@@ -44,13 +46,18 @@ class TestAdmonitionInserter:
 
     def test_admonitions_dict(self, admonition_inserter):
         # there are keys for every type of admonition
-        assert len(admonition_inserter.admonitions) == len(admonition_inserter.ADMONITION_TYPES)
+        assert len(admonition_inserter.admonitions) == len(
+            admonition_inserter.ALL_ADMONITION_TYPES
+        )
 
-        # for each type, there is at least one entry ({class/method: admonition text})
-        for admonition_type in admonition_inserter.ADMONITION_TYPES:
+        # for each type of admonitions, there is at least one entry
+        # ({class/method: admonition text})
+        for admonition_type in admonition_inserter.ALL_ADMONITION_TYPES:
             assert admonition_type in admonition_inserter.admonitions
             assert len(admonition_inserter.admonitions[admonition_type].keys()) > 0
 
+        # checking class admonitions
+        for admonition_type in admonition_inserter.CLASS_ADMONITION_TYPES:
             # keys are telegram classes
             for cls in admonition_inserter.admonitions[admonition_type]:
                 # Test classes crop up in AppBuilder, they can't come from code being tested.
@@ -61,6 +68,16 @@ class TestAdmonitionInserter:
                 assert str(cls).startswith("<class 'telegram."), (
                     rf"Class {cls} does not belong to Telegram classes. Admonition:\n"
                     rf"{admonition_inserter.admonitions[admonition_type][cls]}"
+                )
+
+        # checking Bot method admonitions
+        for admonition_type in admonition_inserter.METHOD_ADMONITION_TYPES:
+            for method in admonition_inserter.admonitions[admonition_type]:
+                assert isinstance(method, collections.abc.Callable)
+                assert str(method).startswith("<function Bot."), (
+                    f"Method {method} does not belong to methods that should get admonitions."
+                    "Admonition:\n"
+                    f"{admonition_inserter.admonitions[admonition_type][method]}"
                 )
 
     @pytest.mark.parametrize(
@@ -110,6 +127,13 @@ class TestAdmonitionInserter:
                 "returned_in",
                 telegram.ext.Application,
                 ":meth:`telegram.ext.ApplicationBuilder.build`",  # <class 'types.GenericAlias'>
+            ),
+            (
+                "shortcuts",
+                telegram.Bot.edit_message_caption,
+                # this method in CallbackQuery contains two return statements,
+                # one of which is with Bot
+                ":meth:`telegram.CallbackQuery.edit_message_caption`",
             ),
             (
                 "use_in",
