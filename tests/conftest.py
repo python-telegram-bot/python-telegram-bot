@@ -225,6 +225,9 @@ async def raw_bot(bot_info):
         yield _bot
 
 
+# Here we store the default bots so that we don't have to create them again and again.
+# They are initialized but not shutdown on pytest_sessionfinish because it is causing
+# problems with the event loop (Event loop is closed).
 default_bots = {}
 
 
