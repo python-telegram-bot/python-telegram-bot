@@ -146,7 +146,7 @@ class Poll(TelegramObject):
         id (:obj:`str`): Unique poll identifier.
         question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
             :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
-        options (Sequence[:class:`PollOption`]): List of poll options.
+        options (Sequence[:class:`~telegram.PollOption`]): List of poll options.
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|
@@ -178,7 +178,7 @@ class Poll(TelegramObject):
         id (:obj:`str`): Unique poll identifier.
         question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
             :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
-        options (Tuple[:class:`PollOption`]): List of poll options.
+        options (Tuple[:class:`~telegram.PollOption`]): List of poll options.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|

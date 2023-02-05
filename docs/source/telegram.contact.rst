@@ -1,5 +1,5 @@
-telegram.Contact
-================
+Contact
+=======
 
 .. autoclass:: telegram.Contact
     :members:

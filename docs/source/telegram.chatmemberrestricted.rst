@@ -1,5 +1,5 @@
-telegram.ChatMemberRestricted
-=============================
+ChatMemberRestricted
+====================
 
 .. autoclass:: telegram.ChatMemberRestricted
     :members:

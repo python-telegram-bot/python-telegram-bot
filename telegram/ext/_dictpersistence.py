@@ -49,9 +49,9 @@ class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, 
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
 
     Args:
-        store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
-            saved by this persistence instance. By default, all available kinds of data will be
-            saved.
+        store_data (:class:`~telegram.ext.PersistenceInput`, optional): Specifies which kinds of
+            data will be saved by this persistence instance. By default, all available kinds of
+            data will be saved.
         user_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
         chat_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
@@ -71,8 +71,8 @@ class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, 
 
             .. versionadded:: 20.0
     Attributes:
-        store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
-            persistence instance.
+        store_data (:class:`~telegram.ext.PersistenceInput`): Specifies which kinds of data will
+            be saved by this persistence instance.
     """
 
     __slots__ = (

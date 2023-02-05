@@ -1,5 +1,5 @@
-telegram.PollOption
-===================
+PollOption
+==========
 
 .. autoclass:: telegram.PollOption
     :members:

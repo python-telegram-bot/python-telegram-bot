@@ -33,12 +33,14 @@ jobs:
           git checkout ${{ github.head_ref }}
           pip install . -U
           pyright --verifytypes telegram --ignoreexternal --outputjson > pr.json || true
+          pyright --verifytypes telegram --ignoreexternal > pr.readable || true
       - name: Compare Completeness
         uses: jannekem/run-python-script-action@v1
         with:
           script: | 
             import json
             import os
+            from pathlib import Path
 
             base = float(
               json.load(open("base.json", "rb"))["typeCompleteness"]["completenessScore"]
@@ -46,16 +48,21 @@ jobs:
             pr = float(
               json.load(open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
             )
+            base_text = f"After this PR, type completeness will be {round(pr, 3)}."
             if pr < (base - 0.1):
-                text = f"This PR decreases type completeness by {round(base - pr, 3)} ❌"
+                text = f"This PR decreases type completeness by {round(base - pr, 3)}. ❌"
                 set_summary(text)
-                error(text)
+                print(Path("pr.readable").read_text(encoding="utf-8"))
+                error(f"{text}\n{base_text}")
                 exit(1)
             elif pr > (base + 0.1):
-                text = f"This PR increases type completeness by {round(pr - base, 3)} ✨"
+                text = f"This PR increases type completeness by {round(pr - base, 3)}. ✨"
                 set_summary(text)
-                print(text)
+                if pr < 1:
+                    print(Path("pr.readable").read_text(encoding="utf-8"))
+                print(f"{text}\n{base_text}")
             else:
-                text = f"This PR does not change type completeness by more than 0.1 ✅"
+                text = f"This PR does not change type completeness by more than 0.1. ✅"
                 set_summary(text)
-                print(text)
+                print(Path("pr.readable").read_text(encoding="utf-8"))
+                print(f"{text}\n{base_text}")

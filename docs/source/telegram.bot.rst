@@ -1,5 +1,5 @@
-telegram.Bot
-============
+Bot
+===
 
 .. autoclass:: telegram.Bot
     :members:

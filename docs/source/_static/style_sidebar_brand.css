@@ -1,0 +1,11 @@
+.sidebar-sticky .sidebar-brand {
+      flex-direction: row;
+}
+
+.sidebar-sticky .sidebar-brand .sidebar-logo-container {
+      align-self: center;
+}
+
+.sidebar-sticky .sidebar-brand .sidebar-brand-text {
+      align-self: center;
+}

@@ -1,5 +1,5 @@
-telegram.Callbackgame
-=====================
+Callbackgame
+============
 
 .. autoclass:: telegram.CallbackGame
     :members:

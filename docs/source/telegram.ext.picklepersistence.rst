@@ -1,5 +1,5 @@
-telegram.ext.PicklePersistence
-==============================
+PicklePersistence
+=================
 
 .. autoclass:: telegram.ext.PicklePersistence
     :members:

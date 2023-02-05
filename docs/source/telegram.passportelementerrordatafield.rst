@@ -1,5 +1,5 @@
-telegram.PassportElementErrorDataField
-======================================
+PassportElementErrorDataField
+=============================
 
 .. autoclass:: telegram.PassportElementErrorDataField
     :members:

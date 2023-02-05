@@ -1,5 +1,5 @@
-telegram.InlineQueryResultGif
-=============================
+InlineQueryResultGif
+====================
 
 .. autoclass:: telegram.InlineQueryResultGif
     :members:

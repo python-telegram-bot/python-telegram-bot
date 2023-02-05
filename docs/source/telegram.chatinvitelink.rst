@@ -1,5 +1,5 @@
-telegram.ChatInviteLink
-=======================
+ChatInviteLink
+==============
 
 .. autoclass:: telegram.ChatInviteLink
     :members:

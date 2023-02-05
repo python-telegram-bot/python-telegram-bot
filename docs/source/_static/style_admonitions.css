@@ -1,0 +1,65 @@
+:root {
+  --icon--shortcuts: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-signpost' viewBox='0 0 16 16'%3E%3Cpath d='M7 1.414V4H2a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h5v6h2v-6h3.532a1 1 0 0 0 .768-.36l1.933-2.32a.5.5 0 0 0 0-.64L13.3 4.36a1 1 0 0 0-.768-.36H9V1.414a1 1 0 0 0-2 0zM12.532 5l1.666 2-1.666 2H2V5h10.532z'/%3E%3C/svg%3E");
+  --icon--returned-in: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-arrow-return-right' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.5 1.5A.5.5 0 0 0 1 2v4.8a2.5 2.5 0 0 0 2.5 2.5h9.793l-3.347 3.346a.5.5 0 0 0 .708.708l4.2-4.2a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 8.3H3.5A1.5 1.5 0 0 1 2 6.8V2a.5.5 0 0 0-.5-.5z'/%3E%3C/svg%3E");
+  --icon--available-in: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-geo-fill' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999zm2.493 8.574a.5.5 0 0 1-.411.575c-.712.118-1.28.295-1.655.493a1.319 1.319 0 0 0-.37.265.301.301 0 0 0-.057.09V14l.002.008a.147.147 0 0 0 .016.033.617.617 0 0 0 .145.15c.165.13.435.27.813.395.751.25 1.82.414 3.024.414s2.273-.163 3.024-.414c.378-.126.648-.265.813-.395a.619.619 0 0 0 .146-.15.148.148 0 0 0 .015-.033L12 14v-.004a.301.301 0 0 0-.057-.09 1.318 1.318 0 0 0-.37-.264c-.376-.198-.943-.375-1.655-.493a.5.5 0 1 1 .164-.986c.77.127 1.452.328 1.957.594C12.5 13 13 13.4 13 14c0 .426-.26.752-.544.977-.29.228-.68.413-1.116.558-.878.293-2.059.465-3.34.465-1.281 0-2.462-.172-3.34-.465-.436-.145-.826-.33-1.116-.558C3.26 14.752 3 14.426 3 14c0-.599.5-1 .961-1.243.505-.266 1.187-.467 1.957-.594a.5.5 0 0 1 .575.411z'/%3E%3C/svg%3E");
+  --icon--use-in:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-funnel' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z'/%3E%3C/svg%3E");
+}
+.admonition.shortcuts {
+  border-color: rgb(43, 155, 70);
+}
+.admonition.shortcuts > .admonition-title {
+  background-color: rgba(43, 155, 70, 0.1);
+  border-color: rgb(43, 155, 70);
+}
+.admonition.shortcuts > .admonition-title::before {
+  background-color: rgb(43, 155, 70);
+  -webkit-mask-image: var(--icon--shortcuts);
+  mask-image: var(--icon--shortcuts);
+}
+
+.admonition.returned-in {
+  border-color: rgb(230, 109, 15);
+}
+.admonition.returned-in > .admonition-title {
+  background-color: rgba(177, 108, 51, 0.1);
+  border-color: rgb(230, 109, 15);
+}
+.admonition.returned-in > .admonition-title::before {
+  background-color: rgb(230, 109, 15);
+  -webkit-mask-image: var(--icon--returned-in);
+  mask-image: var(--icon--returned-in);
+}
+
+.admonition.available-in {
+  border-color: rgb(183, 4, 215);
+}
+.admonition.available-in > .admonition-title {
+  background-color: rgba(165, 99, 177, 0.1);
+  border-color: rgb(183, 4, 215);
+}
+.admonition.available-in > .admonition-title::before {
+  background-color: rgb(183, 4, 215);
+  -webkit-mask-image: var(--icon--available-in);
+  mask-image: var(--icon--available-in);
+}
+
+.admonition.use-in {
+  border-color: rgb(203, 147, 1);
+}
+.admonition.use-in > .admonition-title {
+  background-color: rgba(176, 144, 60, 0.1);
+  border-color: rgb(203, 147, 1);
+}
+.admonition.use-in > .admonition-title::before {
+  background-color: rgb(203, 147, 1);
+  -webkit-mask-image: var(--icon--use-in);
+  mask-image: var(--icon--use-in);
+}
+
+.admonition.returned-in > ul:hover, .admonition.available-in > ul:hover, .admonition.use-in > ul:hover, .admonition.shortcuts > ul:hover {
+  cursor: move;
+}
+.admonition.returned-in > ul, .admonition.available-in > ul, .admonition.use-in > ul, .admonition.shortcuts > ul {
+  max-height: 200px;
+  overflow-y: scroll;
+}
