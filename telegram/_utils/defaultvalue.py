@@ -82,8 +82,8 @@ class DefaultValue(Generic[DVType]):
 
     __slots__ = ("value",)
 
-    def __init__(self, value: DVType = None):
-        self.value = value
+    def __init__(self, value: DVType):
+        self.value: DVType = value
 
     def __bool__(self) -> bool:
         return bool(self.value)
@@ -110,7 +110,7 @@ class DefaultValue(Generic[DVType]):
         Returns:
             Same type as input, or the value of the input: The value
         """
-        return obj.value if isinstance(obj, DefaultValue) else obj  # type: ignore[return-value]
+        return obj.value if isinstance(obj, DefaultValue) else obj
 
     # This is mostly here for readability during debugging
     def __str__(self) -> str:
@@ -121,17 +121,17 @@ class DefaultValue(Generic[DVType]):
         return repr(self.value)
 
 
-DEFAULT_NONE: DefaultValue = DefaultValue(None)
+DEFAULT_NONE: DefaultValue[None] = DefaultValue(None)
 """:class:`DefaultValue`: Default :obj:`None`"""
 
-DEFAULT_FALSE: DefaultValue = DefaultValue(False)
+DEFAULT_FALSE: DefaultValue[bool] = DefaultValue(False)
 """:class:`DefaultValue`: Default :obj:`False`"""
 
-DEFAULT_TRUE: DefaultValue = DefaultValue(True)
+DEFAULT_TRUE: DefaultValue[bool] = DefaultValue(True)
 """:class:`DefaultValue`: Default :obj:`True`
 
 .. versionadded:: 20.0
 """
 
-DEFAULT_20: DefaultValue = DefaultValue(20)
+DEFAULT_20: DefaultValue[int] = DefaultValue(20)
 """:class:`DefaultValue`: Default :obj:`20`"""

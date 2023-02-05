@@ -105,14 +105,14 @@ class MessageEntity(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.type = enum.get_member(constants.MessageEntityType, type, type)
-        self.offset = offset
-        self.length = length
+        self.type: str = enum.get_member(constants.MessageEntityType, type, type)
+        self.offset: int = offset
+        self.length: int = length
         # Optionals
-        self.url = url
-        self.user = user
-        self.language = language
-        self.custom_emoji_id = custom_emoji_id
+        self.url: Optional[str] = url
+        self.user: Optional[User] = user
+        self.language: Optional[str] = language
+        self.custom_emoji_id: Optional[str] = custom_emoji_id
 
         self._id_attrs = (self.type, self.offset, self.length)
 

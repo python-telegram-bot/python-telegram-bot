@@ -95,13 +95,13 @@ class PreCheckoutQuery(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.id = id  # pylint: disable=invalid-name
-        self.from_user = from_user
-        self.currency = currency
-        self.total_amount = total_amount
-        self.invoice_payload = invoice_payload
-        self.shipping_option_id = shipping_option_id
-        self.order_info = order_info
+        self.id: str = id  # pylint: disable=invalid-name
+        self.from_user: User = from_user
+        self.currency: str = currency
+        self.total_amount: int = total_amount
+        self.invoice_payload: str = invoice_payload
+        self.shipping_option_id: Optional[str] = shipping_option_id
+        self.order_info: Optional[OrderInfo] = order_info
 
         self._id_attrs = (self.id,)
 

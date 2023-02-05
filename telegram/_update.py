@@ -254,22 +254,22 @@ class Update(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.update_id = update_id
+        self.update_id: int = update_id
         # Optionals
-        self.message = message
-        self.edited_message = edited_message
-        self.inline_query = inline_query
-        self.chosen_inline_result = chosen_inline_result
-        self.callback_query = callback_query
-        self.shipping_query = shipping_query
-        self.pre_checkout_query = pre_checkout_query
-        self.channel_post = channel_post
-        self.edited_channel_post = edited_channel_post
-        self.poll = poll
-        self.poll_answer = poll_answer
-        self.my_chat_member = my_chat_member
-        self.chat_member = chat_member
-        self.chat_join_request = chat_join_request
+        self.message: Optional[Message] = message
+        self.edited_message: Optional[Message] = edited_message
+        self.inline_query: Optional[InlineQuery] = inline_query
+        self.chosen_inline_result: Optional[ChosenInlineResult] = chosen_inline_result
+        self.callback_query: Optional[CallbackQuery] = callback_query
+        self.shipping_query: Optional[ShippingQuery] = shipping_query
+        self.pre_checkout_query: Optional[PreCheckoutQuery] = pre_checkout_query
+        self.channel_post: Optional[Message] = channel_post
+        self.edited_channel_post: Optional[Message] = edited_channel_post
+        self.poll: Optional[Poll] = poll
+        self.poll_answer: Optional[PollAnswer] = poll_answer
+        self.my_chat_member: Optional[ChatMemberUpdated] = my_chat_member
+        self.chat_member: Optional[ChatMemberUpdated] = chat_member
+        self.chat_join_request: Optional[ChatJoinRequest] = chat_join_request
 
         self._effective_user: Optional["User"] = None
         self._effective_chat: Optional["Chat"] = None

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultCachedVideo."""
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -110,13 +110,13 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.video_file_id = video_file_id
-            self.title = title
+            self.video_file_id: str = video_file_id
+            self.title: str = title
 
             # Optionals
-            self.description = description
-            self.caption = caption
-            self.parse_mode = parse_mode
-            self.caption_entities = parse_sequence_arg(caption_entities)
-            self.reply_markup = reply_markup
-            self.input_message_content = input_message_content
+            self.description: Optional[str] = description
+            self.caption: Optional[str] = caption
+            self.parse_mode: ODVInput[str] = parse_mode
+            self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.input_message_content: Optional[InputMessageContent] = input_message_content

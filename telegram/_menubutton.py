@@ -58,7 +58,7 @@ class MenuButton(TelegramObject):
         self, type: str, *, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
     ):  # pylint: disable=redefined-builtin
         super().__init__(api_kwargs=api_kwargs)
-        self.type = type
+        self.type: str = type
 
         self._id_attrs = (self.type,)
 
@@ -150,8 +150,8 @@ class MenuButtonWebApp(MenuButton):
     def __init__(self, text: str, web_app: WebAppInfo, *, api_kwargs: JSONDict = None):
         super().__init__(type=constants.MenuButtonType.WEB_APP, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.text = text
-            self.web_app = web_app
+            self.text: str = text
+            self.web_app: WebAppInfo = web_app
 
             self._id_attrs = (self.type, self.text, self.web_app)
 

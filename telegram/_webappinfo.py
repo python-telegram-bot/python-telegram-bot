@@ -50,7 +50,7 @@ class WebAppInfo(TelegramObject):
     def __init__(self, url: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.url = url
+        self.url: str = url
 
         self._id_attrs = (self.url,)
 

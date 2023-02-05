@@ -22,7 +22,7 @@ from typing import FrozenSet, Optional
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import RT, SCT, DVInput
+from telegram._utils.types import RT, SCT, DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
@@ -84,7 +84,7 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
         callback: HandlerCallback[Update, CCT, RT],
         chat_id: SCT[int] = None,
         username: SCT[str] = None,
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
 

@@ -8,3 +8,4 @@ line_length = 99
 
 [tool.ruff]
 line-length = 99
+target-version = "py37"

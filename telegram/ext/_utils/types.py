@@ -44,7 +44,7 @@ if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import BaseRateLimiter, CallbackContext, JobQueue
 
-CCT = TypeVar("CCT", bound="CallbackContext")
+CCT = TypeVar("CCT", bound="CallbackContext[Any, Any, Any, Any]")
 """An instance of :class:`telegram.ext.CallbackContext` or a custom subclass.
 
 .. versionadded:: 13.6
@@ -113,3 +113,4 @@ RLARGS = TypeVar("RLARGS")
 """Type of the rate limiter arguments.
 
 .. versionadded:: 20.0"""
+FilterDataDict = Dict[str, List[Any]]

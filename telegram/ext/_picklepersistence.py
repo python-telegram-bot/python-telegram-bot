@@ -22,7 +22,7 @@ import pickle
 from copy import deepcopy
 from pathlib import Path
 from sys import version_info as py_ver
-from typing import Any, Callable, Dict, Optional, Set, Tuple, Type, TypeVar, cast, overload
+from typing import Any, Callable, Dict, Optional, Set, Tuple, Type, TypeVar, Union, cast, overload
 
 from telegram import Bot, TelegramObject
 from telegram._utils.types import FilePathInput
@@ -201,7 +201,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     @overload
     def __init__(
-        self: "PicklePersistence[Dict, Dict, Dict]",
+        self: "PicklePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, Any]]",
         filepath: FilePathInput,
         store_data: PersistenceInput = None,
         single_file: bool = True,
@@ -232,15 +232,17 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         context_types: ContextTypes[Any, UD, CD, BD] = None,
     ):
         super().__init__(store_data=store_data, update_interval=update_interval)
-        self.filepath = Path(filepath)
-        self.single_file = single_file
-        self.on_flush = on_flush
+        self.filepath: Path = Path(filepath)
+        self.single_file: Optional[bool] = single_file
+        self.on_flush: Optional[bool] = on_flush
         self.user_data: Optional[Dict[int, UD]] = None
         self.chat_data: Optional[Dict[int, CD]] = None
         self.bot_data: Optional[BD] = None
         self.callback_data: Optional[CDCData] = None
-        self.conversations: Optional[Dict[str, Dict[Tuple, object]]] = None
-        self.context_types = cast(ContextTypes[Any, UD, CD, BD], context_types or ContextTypes())
+        self.conversations: Optional[Dict[str, Dict[Tuple[Union[int, str], ...], object]]] = None
+        self.context_types: ContextTypes[Any, UD, CD, BD] = cast(
+            ContextTypes[Any, UD, CD, BD], context_types or ContextTypes()
+        )
 
     def _load_singlefile(self) -> None:
         try:

@@ -114,6 +114,8 @@ class TestReplyKeyboardMarkupWithoutRequest(TestReplyKeyboardMarkupBase):
             ReplyKeyboardMarkup(["strings_are_not_allowed_in_the_rows_either"])
         with pytest.raises(ValueError):
             ReplyKeyboardMarkup(KeyboardButton("button1"))
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup([[["button1"]]])
 
     def test_from_button(self):
         reply_keyboard_markup = ReplyKeyboardMarkup.from_button(

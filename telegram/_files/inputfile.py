@@ -71,7 +71,7 @@ class InputFile:
         self, obj: Union[IO[bytes], bytes, str], filename: str = None, attach: bool = False
     ):
         if isinstance(obj, bytes):
-            self.input_file_content = obj
+            self.input_file_content: bytes = obj
         elif isinstance(obj, str):
             self.input_file_content = obj.encode("utf-8")
         else:
@@ -81,11 +81,13 @@ class InputFile:
         self.attach_name: Optional[str] = "attached" + uuid4().hex if attach else None
 
         if filename:
-            self.mimetype = mimetypes.guess_type(filename, strict=False)[0] or _DEFAULT_MIME_TYPE
+            self.mimetype: str = (
+                mimetypes.guess_type(filename, strict=False)[0] or _DEFAULT_MIME_TYPE
+            )
         else:
             self.mimetype = _DEFAULT_MIME_TYPE
 
-        self.filename = filename or self.mimetype.replace("/", ".")
+        self.filename: str = filename or self.mimetype.replace("/", ".")
 
     @property
     def field_tuple(self) -> FieldTuple:

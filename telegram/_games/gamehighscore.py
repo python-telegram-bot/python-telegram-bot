@@ -50,9 +50,9 @@ class GameHighScore(TelegramObject):
 
     def __init__(self, position: int, user: User, score: int, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.position = position
-        self.user = user
-        self.score = score
+        self.position: int = position
+        self.user: User = user
+        self.score: int = score
 
         self._id_attrs = (self.position, self.user, self.score)
 

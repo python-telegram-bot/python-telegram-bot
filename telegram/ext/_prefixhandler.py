@@ -18,11 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PrefixHandler class."""
 import itertools
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, FrozenSet, List, Optional, Tuple, TypeVar, Union
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import SCT, DVInput
+from telegram._utils.types import SCT, DVType
 from telegram.ext import filters as filters_module
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
@@ -128,7 +128,7 @@ class PrefixHandler(BaseHandler[Update, CCT]):
         command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],
         filters: filters_module.BaseFilter = None,
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
 
         super().__init__(callback=callback, block=block)
@@ -143,12 +143,16 @@ class PrefixHandler(BaseHandler[Update, CCT]):
         else:
             commands = {x.lower() for x in command}
 
-        self.commands = frozenset(p + c for p, c in itertools.product(prefixes, commands))
-        self.filters = filters if filters is not None else filters_module.UpdateType.MESSAGES
+        self.commands: FrozenSet[str] = frozenset(
+            p + c for p, c in itertools.product(prefixes, commands)
+        )
+        self.filters: filters_module.BaseFilter = (
+            filters if filters is not None else filters_module.UpdateType.MESSAGES
+        )
 
     def check_update(
         self, update: object
-    ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
+    ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict[Any, Any]]]]]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -175,7 +179,7 @@ class PrefixHandler(BaseHandler[Update, CCT]):
         self,
         context: CCT,
         update: Update,  # skipcq: BAN-B301
-        application: "Application",  # skipcq: BAN-B301
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single

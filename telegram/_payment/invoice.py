@@ -79,11 +79,11 @@ class Invoice(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.title = title
-        self.description = description
-        self.start_parameter = start_parameter
-        self.currency = currency
-        self.total_amount = total_amount
+        self.title: str = title
+        self.description: str = description
+        self.start_parameter: str = start_parameter
+        self.currency: str = currency
+        self.total_amount: int = total_amount
 
         self._id_attrs = (
             self.title,

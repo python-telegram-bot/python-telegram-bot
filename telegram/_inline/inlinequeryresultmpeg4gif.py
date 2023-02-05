@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultMpeg4Gif."""
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -137,17 +137,17 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         # Required
         super().__init__(InlineQueryResultType.MPEG4GIF, id, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.mpeg4_url = mpeg4_url
-            self.thumb_url = thumb_url
+            self.mpeg4_url: str = mpeg4_url
+            self.thumb_url: str = thumb_url
 
             # Optional
-            self.mpeg4_width = mpeg4_width
-            self.mpeg4_height = mpeg4_height
-            self.mpeg4_duration = mpeg4_duration
-            self.title = title
-            self.caption = caption
-            self.parse_mode = parse_mode
-            self.caption_entities = parse_sequence_arg(caption_entities)
-            self.reply_markup = reply_markup
-            self.input_message_content = input_message_content
-            self.thumb_mime_type = thumb_mime_type
+            self.mpeg4_width: Optional[int] = mpeg4_width
+            self.mpeg4_height: Optional[int] = mpeg4_height
+            self.mpeg4_duration: Optional[int] = mpeg4_duration
+            self.title: Optional[str] = title
+            self.caption: Optional[str] = caption
+            self.parse_mode: ODVInput[str] = parse_mode
+            self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.input_message_content: Optional[InputMessageContent] = input_message_content
+            self.thumb_mime_type: Optional[str] = thumb_mime_type

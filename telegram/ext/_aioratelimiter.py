@@ -144,14 +144,14 @@ class AIORateLimiter(BaseRateLimiter[int]):
             self._base_limiter = None
 
         if group_max_rate and group_time_period:
-            self._group_max_rate = group_max_rate
-            self._group_time_period = group_time_period
+            self._group_max_rate: float = group_max_rate
+            self._group_time_period: float = group_time_period
         else:
             self._group_max_rate = 0
             self._group_time_period = 0
 
         self._group_limiters: Dict[Union[str, int], AsyncLimiter] = {}
-        self._max_retries = max_retries
+        self._max_retries: int = max_retries
         self._logger = logging.getLogger(__name__)
         self._retry_after_event = asyncio.Event()
         self._retry_after_event.set()

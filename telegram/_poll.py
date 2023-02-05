@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram Poll."""
 import datetime
 import sys
-from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional, Sequence
+from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional, Sequence, Tuple
 
 from telegram import constants
 from telegram._messageentity import MessageEntity
@@ -59,8 +59,8 @@ class PollOption(TelegramObject):
 
     def __init__(self, text: str, voter_count: int, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.text = text
-        self.voter_count = voter_count
+        self.text: str = text
+        self.voter_count: int = voter_count
 
         self._id_attrs = (self.text, self.voter_count)
 
@@ -111,9 +111,9 @@ class PollAnswer(TelegramObject):
         self, poll_id: str, user: User, option_ids: Sequence[int], *, api_kwargs: JSONDict = None
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.poll_id = poll_id
-        self.user = user
-        self.option_ids = parse_sequence_arg(option_ids)
+        self.poll_id: str = poll_id
+        self.user: User = user
+        self.option_ids: Tuple[int, ...] = parse_sequence_arg(option_ids)
 
         self._id_attrs = (self.poll_id, self.user, tuple(self.option_ids))
 
@@ -244,19 +244,21 @@ class Poll(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.id = id  # pylint: disable=invalid-name
-        self.question = question
-        self.options = parse_sequence_arg(options)
-        self.total_voter_count = total_voter_count
-        self.is_closed = is_closed
-        self.is_anonymous = is_anonymous
-        self.type = enum.get_member(constants.PollType, type, type)
-        self.allows_multiple_answers = allows_multiple_answers
-        self.correct_option_id = correct_option_id
-        self.explanation = explanation
-        self.explanation_entities = parse_sequence_arg(explanation_entities)
-        self.open_period = open_period
-        self.close_date = close_date
+        self.id: str = id  # pylint: disable=invalid-name
+        self.question: str = question
+        self.options: Tuple[PollOption, ...] = parse_sequence_arg(options)
+        self.total_voter_count: int = total_voter_count
+        self.is_closed: bool = is_closed
+        self.is_anonymous: bool = is_anonymous
+        self.type: str = enum.get_member(constants.PollType, type, type)
+        self.allows_multiple_answers: bool = allows_multiple_answers
+        self.correct_option_id: Optional[int] = correct_option_id
+        self.explanation: Optional[str] = explanation
+        self.explanation_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(
+            explanation_entities
+        )
+        self.open_period: Optional[int] = open_period
+        self.close_date: Optional[datetime.datetime] = close_date
 
         self._id_attrs = (self.id,)
 

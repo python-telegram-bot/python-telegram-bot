@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultGame."""
+from typing import Optional
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -59,7 +60,7 @@ class InlineQueryResultGame(InlineQueryResult):
         # Required
         super().__init__(InlineQueryResultType.GAME, id, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.id = id
-            self.game_short_name = game_short_name
+            self.id: str = id
+            self.game_short_name: str = game_short_name
 
-            self.reply_markup = reply_markup
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup

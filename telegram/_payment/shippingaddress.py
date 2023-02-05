@@ -68,12 +68,12 @@ class ShippingAddress(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.country_code = country_code
-        self.state = state
-        self.city = city
-        self.street_line1 = street_line1
-        self.street_line2 = street_line2
-        self.post_code = post_code
+        self.country_code: str = country_code
+        self.state: str = state
+        self.city: str = city
+        self.street_line1: str = street_line1
+        self.street_line2: str = street_line2
+        self.post_code: str = post_code
 
         self._id_attrs = (
             self.country_code,

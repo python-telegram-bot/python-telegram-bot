@@ -38,6 +38,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
 )
 
 from telegram._utils.datetime import to_timestamp
@@ -259,7 +260,7 @@ class TelegramObject:
         out["api_kwargs"] = dict(self.api_kwargs)
         return out
 
-    def __setstate__(self, state: dict) -> None:
+    def __setstate__(self, state: Dict[str, object]) -> None:
         """
         Overrides :meth:`object.__setstate__` to customize the unpickling process of objects of
         this type. Modifies the object in-place.
@@ -283,7 +284,7 @@ class TelegramObject:
         setattr(self, "_bot", None)
 
         # get api_kwargs first because we may need to add entries to it (see try-except below)
-        api_kwargs = state.pop("api_kwargs", {})
+        api_kwargs = cast(Dict[str, object], state.pop("api_kwargs", {}))
         # get _frozen before the loop to avoid setting it to True in the loop
         frozen = state.pop("_frozen", False)
 
@@ -307,7 +308,7 @@ class TelegramObject:
         if frozen:
             self._freeze()
 
-    def __deepcopy__(self: Tele_co, memodict: dict) -> Tele_co:
+    def __deepcopy__(self: Tele_co, memodict: Dict[int, object]) -> Tele_co:
         """
         Customizes how :func:`copy.deepcopy` processes objects of this type.
         The only difference to the default implementation is that the :class:`telegram.Bot`

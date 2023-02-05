@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
-from typing import TYPE_CHECKING, ClassVar, Optional, Sequence
+from typing import TYPE_CHECKING, ClassVar, Optional, Sequence, Tuple
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
@@ -152,17 +152,17 @@ class Sticker(_BaseThumbedMedium):
         )
         with self._unfrozen():
             # Required
-            self.width = width
-            self.height = height
-            self.is_animated = is_animated
-            self.is_video = is_video
-            self.type = type
+            self.width: int = width
+            self.height: int = height
+            self.is_animated: bool = is_animated
+            self.is_video: bool = is_video
+            self.type: str = type
             # Optional
-            self.emoji = emoji
-            self.set_name = set_name
-            self.mask_position = mask_position
-            self.premium_animation = premium_animation
-            self.custom_emoji_id = custom_emoji_id
+            self.emoji: Optional[str] = emoji
+            self.set_name: Optional[str] = set_name
+            self.mask_position: Optional[MaskPosition] = mask_position
+            self.premium_animation: Optional[File] = premium_animation
+            self.custom_emoji_id: Optional[str] = custom_emoji_id
 
     REGULAR: ClassVar[str] = constants.StickerType.REGULAR
     """:const:`telegram.constants.StickerType.REGULAR`"""
@@ -265,14 +265,14 @@ class StickerSet(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.name = name
-        self.title = title
-        self.is_animated = is_animated
-        self.is_video = is_video
-        self.stickers = parse_sequence_arg(stickers)
-        self.sticker_type = sticker_type
+        self.name: str = name
+        self.title: str = title
+        self.is_animated: bool = is_animated
+        self.is_video: bool = is_video
+        self.stickers: Tuple[Sticker, ...] = parse_sequence_arg(stickers)
+        self.sticker_type: str = sticker_type
         # Optional
-        self.thumb = thumb
+        self.thumb: Optional[PhotoSize] = thumb
 
         self._id_attrs = (self.name,)
 
@@ -348,10 +348,10 @@ class MaskPosition(TelegramObject):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.point = point
-        self.x_shift = x_shift
-        self.y_shift = y_shift
-        self.scale = scale
+        self.point: str = point
+        self.x_shift: float = x_shift
+        self.y_shift: float = y_shift
+        self.scale: float = scale
 
         self._id_attrs = (self.point, self.x_shift, self.y_shift, self.scale)
 

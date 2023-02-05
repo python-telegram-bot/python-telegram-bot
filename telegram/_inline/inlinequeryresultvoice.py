@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVoice."""
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -115,13 +115,13 @@ class InlineQueryResultVoice(InlineQueryResult):
         # Required
         super().__init__(InlineQueryResultType.VOICE, id, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.voice_url = voice_url
-            self.title = title
+            self.voice_url: str = voice_url
+            self.title: str = title
 
             # Optional
-            self.voice_duration = voice_duration
-            self.caption = caption
-            self.parse_mode = parse_mode
-            self.caption_entities = parse_sequence_arg(caption_entities)
-            self.reply_markup = reply_markup
-            self.input_message_content = input_message_content
+            self.voice_duration: Optional[int] = voice_duration
+            self.caption: Optional[str] = caption
+            self.parse_mode: ODVInput[str] = parse_mode
+            self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.input_message_content: Optional[InputMessageContent] = input_message_content

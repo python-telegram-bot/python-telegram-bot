@@ -17,7 +17,18 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackContext class."""
-from typing import TYPE_CHECKING, Coroutine, Dict, Generic, List, Match, NoReturn, Optional, Type
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Coroutine,
+    Dict,
+    Generic,
+    List,
+    Match,
+    NoReturn,
+    Optional,
+    Type,
+)
 
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
@@ -27,7 +38,6 @@ from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
     from asyncio import Queue
-    from typing import Any
 
     from telegram.ext import Application, Job, JobQueue  # noqa: F401
     from telegram.ext._utils.types import CCT
@@ -126,14 +136,14 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         chat_id: int = None,
         user_id: int = None,
     ):
-        self._application = application
-        self._chat_id = chat_id
-        self._user_id = user_id
+        self._application: Application[BT, CCT, UD, CD, BD, Any] = application
+        self._chat_id: Optional[int] = chat_id
+        self._user_id: Optional[int] = user_id
         self.args: Optional[List[str]] = None
-        self.matches: Optional[List[Match]] = None
+        self.matches: Optional[List[Match[str]]] = None
         self.error: Optional[Exception] = None
-        self.job: Optional["Job"] = None
-        self.coroutine: Optional[Coroutine] = None
+        self.job: Optional["Job[CCT]"] = None
+        self.coroutine: Optional[Coroutine[Any, Any, Any]] = None
 
     @property
     def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":
@@ -222,11 +232,11 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 await self.application.persistence.refresh_bot_data(self.bot_data)
             if self.application.persistence.store_data.chat_data and self._chat_id is not None:
                 await self.application.persistence.refresh_chat_data(
-                    chat_id=self._chat_id, chat_data=self.chat_data
+                    chat_id=self._chat_id, chat_data=self.chat_data  # type: ignore[arg-type]
                 )
             if self.application.persistence.store_data.user_data and self._user_id is not None:
                 await self.application.persistence.refresh_user_data(
-                    user_id=self._user_id, user_data=self.user_data
+                    user_id=self._user_id, user_data=self.user_data  # type: ignore[arg-type]
                 )
 
     def drop_callback_data(self, callback_query: CallbackQuery) -> None:
@@ -264,8 +274,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         update: object,
         error: Exception,
         application: "Application[BT, CCT, UD, CD, BD, Any]",
-        job: "Job" = None,
-        coroutine: Coroutine = None,
+        job: "Job[Any]" = None,
+        coroutine: Coroutine[Any, Any, Any] = None,
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
@@ -340,7 +350,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     @classmethod
     def from_job(
         cls: Type["CCT"],
-        job: "Job",
+        job: "Job[CCT]",
         application: "Application[Any, CCT, Any, Any, Any, Any]",
     ) -> "CCT":
         """
@@ -376,7 +386,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self._application.bot
 
     @property
-    def job_queue(self) -> Optional["JobQueue"]:
+    def job_queue(self) -> Optional["JobQueue[CCT]"]:
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.

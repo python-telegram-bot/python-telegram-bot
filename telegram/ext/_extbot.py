@@ -198,7 +198,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         defaults: "Defaults" = None,
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
-        rate_limiter: "BaseRateLimiter" = None,
+        rate_limiter: "BaseRateLimiter[RLARGS]" = None,
     ):
         super().__init__(
             token=token,
@@ -211,8 +211,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             local_mode=local_mode,
         )
         with self._unfrozen():
-            self._defaults = defaults
-            self._rate_limiter = rate_limiter
+            self._defaults: Optional[Defaults] = defaults
+            self._rate_limiter: Optional[BaseRateLimiter] = rate_limiter
             self._callback_data_cache: Optional[CallbackDataCache] = None
 
             # set up callback_data
@@ -339,7 +339,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         return self._defaults
 
     @property
-    def rate_limiter(self) -> Optional["BaseRateLimiter"]:
+    def rate_limiter(self) -> Optional["BaseRateLimiter[RLARGS]"]:
         """The :class:`telegram.ext.BaseRateLimiter` used by this bot, if any.
 
         .. versionadded:: 20.0

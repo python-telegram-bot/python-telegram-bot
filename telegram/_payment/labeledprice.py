@@ -55,8 +55,8 @@ class LabeledPrice(TelegramObject):
 
     def __init__(self, label: str, amount: int, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.label = label
-        self.amount = amount
+        self.label: str = label
+        self.amount: int = amount
 
         self._id_attrs = (self.label, self.amount)
 

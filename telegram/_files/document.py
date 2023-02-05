@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Document."""
+from typing import Optional
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
@@ -74,5 +75,5 @@ class Document(_BaseThumbedMedium):
         )
         with self._unfrozen():
             # Optional
-            self.mime_type = mime_type
-            self.file_name = file_name
+            self.mime_type: Optional[str] = mime_type
+            self.file_name: Optional[str] = file_name

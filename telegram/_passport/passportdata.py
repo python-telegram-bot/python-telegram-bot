@@ -72,8 +72,8 @@ class PassportData(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
 
-        self.data = parse_sequence_arg(data)
-        self.credentials = credentials
+        self.data: Tuple[EncryptedPassportElement, ...] = parse_sequence_arg(data)
+        self.credentials: EncryptedCredentials = credentials
 
         self._decrypted_data: Optional[Tuple[EncryptedPassportElement]] = None
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])

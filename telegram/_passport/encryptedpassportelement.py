@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 from base64 import b64decode
-from typing import TYPE_CHECKING, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._passport.credentials import decrypt_json
 from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
@@ -166,17 +166,17 @@ class EncryptedPassportElement(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
-        self.type = type
+        self.type: str = type
         # Optionals
-        self.data = data
-        self.phone_number = phone_number
-        self.email = email
-        self.files = parse_sequence_arg(files)
-        self.front_side = front_side
-        self.reverse_side = reverse_side
-        self.selfie = selfie
-        self.translation = parse_sequence_arg(translation)
-        self.hash = hash
+        self.data: Optional[PersonalDetails] = data
+        self.phone_number: Optional[str] = phone_number
+        self.email: Optional[str] = email
+        self.files: Tuple[PassportFile, ...] = parse_sequence_arg(files)
+        self.front_side: Optional[PassportFile] = front_side
+        self.reverse_side: Optional[PassportFile] = reverse_side
+        self.selfie: Optional[PassportFile] = selfie
+        self.translation: Tuple[PassportFile, ...] = parse_sequence_arg(translation)
+        self.hash: str = hash
 
         self._id_attrs = (
             self.type,

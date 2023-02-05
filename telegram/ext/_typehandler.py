@@ -18,10 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the TypeHandler class."""
 
-from typing import Type, TypeVar
+from typing import Optional, Type, TypeVar
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVInput
+from telegram._utils.types import DVType
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
@@ -74,11 +74,11 @@ class TypeHandler(BaseHandler[UT, CCT]):
         type: Type[UT],  # pylint: disable=redefined-builtin
         callback: HandlerCallback[UT, CCT, RT],
         strict: bool = False,
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
-        self.type = type
-        self.strict = strict
+        self.type: Type[UT] = type
+        self.strict: Optional[bool] = strict
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.

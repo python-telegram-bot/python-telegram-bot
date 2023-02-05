@@ -89,14 +89,14 @@ class Venue(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
-        self.location = location
-        self.title = title
-        self.address = address
+        self.location: Location = location
+        self.title: str = title
+        self.address: str = address
         # Optionals
-        self.foursquare_id = foursquare_id
-        self.foursquare_type = foursquare_type
-        self.google_place_id = google_place_id
-        self.google_place_type = google_place_type
+        self.foursquare_id: Optional[str] = foursquare_id
+        self.foursquare_type: Optional[str] = foursquare_type
+        self.google_place_id: Optional[str] = google_place_id
+        self.google_place_type: Optional[str] = google_place_type
 
         self._id_attrs = (self.location, self.title)
 

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVenue."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -129,18 +129,18 @@ class InlineQueryResultVenue(InlineQueryResult):
         # Required
         super().__init__(InlineQueryResultType.VENUE, id, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.latitude = latitude
-            self.longitude = longitude
-            self.title = title
-            self.address = address
+            self.latitude: float = latitude
+            self.longitude: float = longitude
+            self.title: str = title
+            self.address: str = address
 
             # Optional
-            self.foursquare_id = foursquare_id
-            self.foursquare_type = foursquare_type
-            self.google_place_id = google_place_id
-            self.google_place_type = google_place_type
-            self.reply_markup = reply_markup
-            self.input_message_content = input_message_content
-            self.thumb_url = thumb_url
-            self.thumb_width = thumb_width
-            self.thumb_height = thumb_height
+            self.foursquare_id: Optional[str] = foursquare_id
+            self.foursquare_type: Optional[str] = foursquare_type
+            self.google_place_id: Optional[str] = google_place_id
+            self.google_place_type: Optional[str] = google_place_type
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.input_message_content: Optional[InputMessageContent] = input_message_content
+            self.thumb_url: Optional[str] = thumb_url
+            self.thumb_width: Optional[int] = thumb_width
+            self.thumb_height: Optional[int] = thumb_height

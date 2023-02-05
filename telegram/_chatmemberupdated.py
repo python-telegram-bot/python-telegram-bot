@@ -91,14 +91,14 @@ class ChatMemberUpdated(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.chat = chat
-        self.from_user = from_user
-        self.date = date
-        self.old_chat_member = old_chat_member
-        self.new_chat_member = new_chat_member
+        self.chat: Chat = chat
+        self.from_user: User = from_user
+        self.date: datetime.datetime = date
+        self.old_chat_member: ChatMember = old_chat_member
+        self.new_chat_member: ChatMember = new_chat_member
 
         # Optionals
-        self.invite_link = invite_link
+        self.invite_link: Optional[ChatInviteLink] = invite_link
 
         self._id_attrs = (
             self.chat,

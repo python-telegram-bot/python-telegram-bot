@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
-from typing import ClassVar
+from typing import ClassVar, Optional
 
 from telegram import constants
 from telegram._inline.inputmessagecontent import InputMessageContent
@@ -93,14 +93,14 @@ class InputLocationMessageContent(InputMessageContent):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
             # Required
-            self.latitude = latitude
-            self.longitude = longitude
+            self.latitude: float = latitude
+            self.longitude: float = longitude
 
             # Optionals
-            self.live_period = live_period
-            self.horizontal_accuracy = horizontal_accuracy
-            self.heading = heading
-            self.proximity_alert_radius = (
+            self.live_period: Optional[int] = live_period
+            self.horizontal_accuracy: Optional[float] = horizontal_accuracy
+            self.heading: Optional[int] = heading
+            self.proximity_alert_radius: Optional[int] = (
                 int(proximity_alert_radius) if proximity_alert_radius else None
             )
 

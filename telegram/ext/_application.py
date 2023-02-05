@@ -24,13 +24,13 @@ import logging
 import platform
 import signal
 from collections import defaultdict
-from contextlib import AbstractAsyncContextManager
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType, TracebackType
 from typing import (
     TYPE_CHECKING,
     Any,
+    AsyncContextManager,
     Callable,
     Coroutine,
     DefaultDict,
@@ -50,7 +50,7 @@ from typing import (
 
 from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
-from telegram._utils.types import DVInput, ODVInput
+from telegram._utils.types import DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
@@ -60,7 +60,7 @@ from telegram.ext._handler import BaseHandler
 from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
-from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD, ConversationKey, HandlerCallback
+from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, RT, UD, ConversationKey, HandlerCallback
 
 if TYPE_CHECKING:
     from telegram import Message
@@ -105,10 +105,10 @@ class ApplicationHandlerStop(Exception):
 
     def __init__(self, state: object = None) -> None:
         super().__init__()
-        self.state = state
+        self.state: Optional[object] = state
 
 
-class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager):
+class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Application"]):
     """This class dispatches all kinds of updates to its registered handlers, and is the entry
     point to a PTB application.
 
@@ -212,14 +212,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
     """
 
-    # Allowing '__weakref__' creation here since we need it for the JobQueue
     __slots__ = (
         "__create_task_tasks",
         "__update_fetcher_task",
         "__update_persistence_event",
         "__update_persistence_lock",
         "__update_persistence_task",
-        "__weakref__",
+        # Allowing '__weakref__' creation here since we need it for the JobQueue
+        # Uncomment if necessary - currently the __weakref__ slot is already created
+        # in the AsyncContextManager base class
+        # "__weakref__",
         "_chat_data",
         "_chat_ids_to_be_deleted_in_persistence",
         "_chat_ids_to_be_updated_in_persistence",
@@ -251,11 +253,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         self: "Application[BT, CCT, UD, CD, BD, JQ]",
         *,
         bot: BT,
-        update_queue: asyncio.Queue,
+        update_queue: "asyncio.Queue[object]",
         updater: Optional[Updater],
         job_queue: JQ,
         concurrent_updates: Union[bool, int],
-        persistence: Optional[BasePersistence],
+        persistence: Optional[BasePersistence[UD, CD, BD]],
         context_types: ContextTypes[CCT, UD, CD, BD],
         post_init: Optional[
             Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
@@ -275,15 +277,23 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 stacklevel=2,
             )
 
-        self.bot = bot
-        self.update_queue = update_queue
-        self.context_types = context_types
-        self.updater = updater
-        self.handlers: Dict[int, List[BaseHandler]] = {}
-        self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
-        self.post_init = post_init
-        self.post_shutdown = post_shutdown
-        self.post_stop = post_stop
+        self.bot: BT = bot
+        self.update_queue: "asyncio.Queue[object]" = update_queue
+        self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
+        self.updater: Optional[Updater] = updater
+        self.handlers: Dict[int, List[BaseHandler[Any, CCT]]] = {}
+        self.error_handlers: Dict[
+            HandlerCallback[object, CCT, None], Union[bool, DefaultValue[bool]]
+        ] = {}
+        self.post_init: Optional[
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+        ] = post_init
+        self.post_shutdown: Optional[
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+        ] = post_shutdown
+        self.post_stop: Optional[
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+        ] = post_stop
 
         if isinstance(concurrent_updates, int) and concurrent_updates < 0:
             raise ValueError("`concurrent_updates` must be a non-negative integer!")
@@ -292,14 +302,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         self._concurrent_updates_sem = asyncio.BoundedSemaphore(concurrent_updates or 1)
         self._concurrent_updates: int = concurrent_updates or 0
 
-        self.bot_data = self.context_types.bot_data()
+        self.bot_data: BD = self.context_types.bot_data()
         self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
         self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
         # Read only mapping
         self.user_data: Mapping[int, UD] = MappingProxyType(self._user_data)
         self.chat_data: Mapping[int, CD] = MappingProxyType(self._chat_data)
 
-        self.persistence: Optional[BasePersistence] = None
+        self.persistence: Optional[BasePersistence[UD, CD, BD]] = None
         if persistence and not isinstance(persistence, BasePersistence):
             raise TypeError("persistence must be based on telegram.ext.BasePersistence")
         self.persistence = persistence
@@ -319,7 +329,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         # A number of low-level helpers for the internal logic
         self._initialized = False
         self._running = False
-        self._job_queue = job_queue
+        self._job_queue: JQ = job_queue
         self.__update_fetcher_task: Optional[asyncio.Task] = None
         self.__update_persistence_task: Optional[asyncio.Task] = None
         self.__update_persistence_event = asyncio.Event()
@@ -351,7 +361,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         return self._concurrent_updates
 
     @property
-    def job_queue(self) -> Optional["JobQueue"]:
+    def job_queue(self) -> Optional["JobQueue[CCT]"]:
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.
@@ -922,7 +932,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 if close_loop:
                     loop.close()
 
-    def create_task(self, coroutine: Coroutine, update: object = None) -> asyncio.Task:
+    def create_task(
+        self, coroutine: Coroutine[Any, Any, RT], update: object = None
+    ) -> "asyncio.Task[RT]":
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
         the :paramref:`coroutine` with :meth:`process_error`.
 
@@ -1173,10 +1185,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     def add_handlers(
         self,
         handlers: Union[
-            Union[List[BaseHandler], Tuple[BaseHandler]],
-            Dict[int, Union[List[BaseHandler], Tuple[BaseHandler]]],
+            Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]],
+            Dict[int, Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]]],
         ],
-        group: DVInput[int] = DefaultValue(0),
+        group: Union[int, DefaultValue[int]] = DefaultValue(0),
     ) -> None:
         """Registers multiple handlers at once. The order of the handlers in the passed
         sequence(s) matters. See :meth:`add_handler` for details.
@@ -1220,7 +1232,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 "dictionary where the keys are groups and values are sequences of handlers."
             )
 
-    def remove_handler(self, handler: BaseHandler, group: int = DEFAULT_GROUP) -> None:
+    def remove_handler(self, handler: BaseHandler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
         """Remove a handler from the specified group.
 
         Args:
@@ -1503,7 +1515,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     def add_error_handler(
         self,
         callback: HandlerCallback[object, CCT, None],
-        block: DVInput[bool] = DEFAULT_TRUE,
+        block: DVType[bool] = DEFAULT_TRUE,
     ) -> None:
         """Registers an error handler in the Application. This handler will receive every error
         which happens in your bot. See the docs of :meth:`process_error` for more details on how
@@ -1535,7 +1547,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         self.error_handlers[callback] = block
 
-    def remove_error_handler(self, callback: Callable[[object, CCT], None]) -> None:
+    def remove_error_handler(self, callback: HandlerCallback[object, CCT, None]) -> None:
         """Removes an error handler.
 
         Args:
@@ -1548,8 +1560,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         self,
         update: Optional[object],
         error: Exception,
-        job: "Job" = None,
-        coroutine: Coroutine = None,
+        job: "Job[CCT]" = None,
+        coroutine: Coroutine[Any, Any, Any] = None,
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises

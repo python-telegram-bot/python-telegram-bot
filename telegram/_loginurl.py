@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LoginUrl."""
+from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -93,11 +94,11 @@ class LoginUrl(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.url = url
+        self.url: str = url
         # Optional
-        self.forward_text = forward_text
-        self.bot_username = bot_username
-        self.request_write_access = request_write_access
+        self.forward_text: Optional[bool] = forward_text
+        self.bot_username: Optional[str] = bot_username
+        self.request_write_access: Optional[bool] = request_write_access
 
         self._id_attrs = (self.url,)
 

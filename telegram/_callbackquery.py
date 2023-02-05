@@ -127,14 +127,14 @@ class CallbackQuery(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.id = id  # pylint: disable=invalid-name
-        self.from_user = from_user
-        self.chat_instance = chat_instance
+        self.id: str = id  # pylint: disable=invalid-name
+        self.from_user: User = from_user
+        self.chat_instance: str = chat_instance
         # Optionals
-        self.message = message
-        self.data = data
-        self.inline_message_id = inline_message_id
-        self.game_short_name = game_short_name
+        self.message: Optional[Message] = message
+        self.data: Optional[str] = data
+        self.inline_message_id: Optional[str] = inline_message_id
+        self.game_short_name: Optional[str] = game_short_name
 
         self._id_attrs = (self.id,)
 
