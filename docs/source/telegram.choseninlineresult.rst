@@ -1,5 +1,5 @@
-telegram.ChosenInlineResult
-===========================
+ChosenInlineResult
+==================
 
 .. autoclass:: telegram.ChosenInlineResult
     :members:

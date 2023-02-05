@@ -35,7 +35,7 @@ class Venue(TelegramObject):
     considered equal, if their :attr:`location` and :attr:`title` are equal.
 
     Note:
-      Foursquare details and Google Pace details are mutually exclusive. However, this
+      Foursquare details and Google Place details are mutually exclusive. However, this
       behaviour is undocumented and might be changed by Telegram.
 
     Args:

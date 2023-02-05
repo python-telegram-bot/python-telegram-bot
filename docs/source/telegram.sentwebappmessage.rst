@@ -1,5 +1,5 @@
-telegram.SentWebAppMessage
-===============================
+SentWebAppMessage
+=================
 
 .. autoclass:: telegram.SentWebAppMessage
     :members:

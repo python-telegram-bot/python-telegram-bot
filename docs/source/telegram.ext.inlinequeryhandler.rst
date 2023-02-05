@@ -1,5 +1,5 @@
-telegram.ext.InlineQueryHandler
-===============================
+InlineQueryHandler
+==================
 
 .. autoclass:: telegram.ext.InlineQueryHandler
     :members:

@@ -121,9 +121,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
           handled by the specific implementation - see above note.
 
     Args:
-        store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
-            saved by this persistence instance. By default, all available kinds of data will be
-            saved.
+        store_data (:class:`~telegram.ext.PersistenceInput`, optional): Specifies which kinds of
+            data will be saved by this persistence instance. By default, all available kinds of
+            data will be saved.
         update_interval (:obj:`int` | :obj:`float`, optional): The
             :class:`~telegram.ext.Application` will update
             the persistence in regular intervals. This parameter specifies the time (in seconds) to
@@ -132,8 +132,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
             .. versionadded:: 20.0
     Attributes:
-        store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
-            persistence instance.
+        store_data (:class:`~telegram.ext.PersistenceInput`): Specifies which kinds of data will
+            be saved by this persistence instance.
         bot (:class:`telegram.Bot`): The bot associated with the persistence.
     """
 

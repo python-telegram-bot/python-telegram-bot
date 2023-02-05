@@ -1,5 +1,5 @@
-telegram.ForumTopicEdited
-=========================
+ForumTopicEdited
+================
 
 .. autoclass:: telegram.ForumTopicEdited
     :members:

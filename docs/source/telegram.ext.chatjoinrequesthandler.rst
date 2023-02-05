@@ -1,5 +1,5 @@
-telegram.ext.ChatJoinRequestHandler
-===================================
+ChatJoinRequestHandler
+======================
 
 .. autoclass:: telegram.ext.ChatJoinRequestHandler
     :members:

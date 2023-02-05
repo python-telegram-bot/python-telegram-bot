@@ -1,5 +1,5 @@
-telegram.InlineQueryResultVoice
-===============================
+InlineQueryResultVoice
+======================
 
 .. autoclass:: telegram.InlineQueryResultVoice
     :members:

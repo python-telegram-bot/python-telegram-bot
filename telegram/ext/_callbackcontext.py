@@ -389,7 +389,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     def job_queue(self) -> Optional["JobQueue[CCT]"]:
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
-            :class:`telegram.ext.Application`.
+        :class:`telegram.ext.Application`.
 
         .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
         """

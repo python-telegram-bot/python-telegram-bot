@@ -1,5 +1,5 @@
-telegram.ext.CallbackDataCache
-==============================
+CallbackDataCache
+=================
 
 .. autoclass:: telegram.ext.CallbackDataCache
     :members:

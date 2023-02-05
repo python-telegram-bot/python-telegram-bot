@@ -30,6 +30,8 @@ jobs:
         run: |
           python -W ignore -m pip install --upgrade pip
           python -W ignore -m pip install -r requirements-all.txt
+      - name: Test autogeneration of admonitions
+        run: pytest -v --tb=short tests/docs/admonition_inserter.py
       - name: Build docs
         run: sphinx-build docs/source docs/build/html -W --keep-going -j auto
       - name: Upload docs
