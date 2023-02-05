@@ -22,7 +22,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Callable, List, Optional
+from typing import Callable, Dict, List, Optional
 
 import pytest
 from httpx import AsyncClient, Response
@@ -48,7 +48,9 @@ from telegram.ext.filters import MessageFilter, UpdateFilter
 from telegram.request import RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from tests.auxil.object_conversions import env_var_2_bool
-from tests.bots import get_bot
+from tests.bots import BotInfoProvider
+
+BOT_INFO = BotInfoProvider()
 
 
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
@@ -118,8 +120,8 @@ def event_loop(request):
 
 
 @pytest.fixture(scope="session")
-def bot_info():
-    return get_bot()
+def bot_info() -> Dict[str, str]:
+    return BOT_INFO.get_info()
 
 
 # Below classes are used to monkeypatch attributes since parent classes don't have __dict__
@@ -184,7 +186,7 @@ async def mocked_get_me(self):
 
 def get_bot_user(token: str) -> User:
     """Used to return a mock user in bot.get_me(). This saves API calls on every init."""
-    bot_info = get_bot()
+    bot_info = BOT_INFO.get_info()
     user_id = int(token.split(":")[0])
     first_name = bot_info.get("name")
     username = bot_info.get("username").strip("@")
@@ -354,7 +356,7 @@ def make_message(text, **kwargs):
     """
     bot = kwargs.pop("bot", None)
     if bot is None:
-        bot = make_bot(get_bot())
+        bot = make_bot(BOT_INFO.get_info())
     message = Message(
         message_id=1,
         from_user=kwargs.pop("user", User(id=1, first_name="", is_bot=False)),

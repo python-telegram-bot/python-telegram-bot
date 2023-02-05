@@ -49,7 +49,14 @@ FALLBACKS = json.loads(base64.b64decode(FALLBACKS).decode("utf-8"))  # type: lis
 
 
 class BotInfoProvider:
-    chosen_bot = {}
+    def __init__(self):
+        self._cached = {}
+
+    def get_info(self):
+        if self._cached:
+            return self._cached
+        self._cached = {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}
+        return self._cached
 
 
 def get(key, fallback):
@@ -62,10 +69,3 @@ def get(key, fallback):
 
     # Otherwise go with the fallback
     return fallback
-
-
-def get_bot():
-    if BotInfoProvider.chosen_bot:
-        return BotInfoProvider.chosen_bot
-    BotInfoProvider.chosen_bot = {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}
-    return BotInfoProvider.chosen_bot
