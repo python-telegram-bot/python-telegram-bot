@@ -178,10 +178,10 @@ class DictApplication(Application):
     pass
 
 
-async def mocked_get_me(self):
-    if self._bot_user is None:
-        self._bot_user = get_bot_user(self.token)
-    return self._bot_user
+async def mocked_get_me(bot: Bot):
+    if bot._bot_user is None:
+        bot._bot_user = get_bot_user(bot.token)
+    return bot._bot_user
 
 
 def get_bot_user(token: str) -> User:
