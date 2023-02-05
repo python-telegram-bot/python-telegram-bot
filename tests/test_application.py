@@ -62,12 +62,6 @@ from tests.conftest import (
 )
 
 
-@pytest.fixture(scope="function")
-def one_time_bot(bot_info):
-    """A function scoped bot since the session bot would shutdown when `async with app` finishes"""
-    return make_bot(bot_info)
-
-
 class CustomContext(CallbackContext):
     pass
 

@@ -208,6 +208,12 @@ async def bot(bot_info):
         yield _bot
 
 
+@pytest.fixture(scope="function")
+def one_time_bot(bot_info):
+    """A function scoped bot since the session bot would shutdown when `async with app` finishes"""
+    return make_bot(bot_info)
+
+
 @pytest.fixture(scope="session")
 async def cdc_bot(bot_info):
     """Makes an ExtBot instance with the given bot_info that uses arbitrary callback_data"""
