@@ -27,6 +27,9 @@ from telegram.ext import Defaults
 # sample time specification values categorised into absolute / delta / time-of-day
 from tests.conftest import TEST_WITH_OPT_DEPS
 
+# We do not parametrize tests with these variables, since there's a tiny chance that there is an
+# error while collecting the tests (happens when time goes from HH:59:00 -> HH+1:00:00) when we
+# run the test suite with multiple workers
 DELTA_TIME_SPECS = [dtm.timedelta(hours=3, seconds=42, milliseconds=2), 30, 7.5]
 TIME_OF_DAY_TIME_SPECS = [
     dtm.time(12, 42, tzinfo=dtm.timezone(dtm.timedelta(hours=-7))),
@@ -96,6 +99,7 @@ class TestDatetime:
         with pytest.raises(ValueError):
             tg_dtm.to_float_timestamp(dtm.datetime(2019, 11, 11), reference_timestamp=123)
 
+    # see note on parametrization at the top of this file
     def test_to_float_timestamp_delta(self):
         """Conversion from a 'delta' time specification to timestamp"""
         reference_t = 0
@@ -131,6 +135,7 @@ class TestDatetime:
             ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))
         )
 
+    # see note on parametrization at the top of this file
     def test_to_float_timestamp_default_reference(self):
         """The reference timestamp for relative time specifications should default to now"""
         for i in RELATIVE_TIME_SPECS:
@@ -143,6 +148,7 @@ class TestDatetime:
         with pytest.raises(TypeError, match="Defaults"):
             tg_dtm.to_float_timestamp(Defaults())
 
+    # see note on parametrization at the top of this file
     def test_to_timestamp(self):
         # delegate tests to `to_float_timestamp`
         for i in TIME_SPECS:
