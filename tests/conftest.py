@@ -187,6 +187,10 @@ async def mocked_get_me(bot: Bot):
 def get_bot_user(token: str) -> User:
     """Used to return a mock user in bot.get_me(). This saves API calls on every init."""
     bot_info = BOT_INFO.get_info()
+    # We don't take token from bot_info, because we need to make a bot with a specific ID. So we
+    # generate the correct user_id from the token (token from bot_info is random each test run).
+    # This is important in e.g. bot equality tests. The other parameters like first_name don't
+    # matter as much. In the future we may provide a way to get all the correct info from the token
     user_id = int(token.split(":")[0])
     first_name = bot_info.get("name")
     username = bot_info.get("username").strip("@")
