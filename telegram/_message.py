@@ -3552,8 +3552,8 @@ class Message(TelegramObject):
 
         Note:
             * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-                Telegram for backward compatibility. You should use
-                :meth:`text_markdown_v2` instead.
+              Telegram for backward compatibility. You should use
+              :meth:`text_markdown_v2` instead.
 
             * |custom_emoji_formatting_note|
 
@@ -3596,8 +3596,8 @@ class Message(TelegramObject):
 
         Note:
             * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-                Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
-                instead.
+              Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
+              instead.
 
             * |custom_emoji_formatting_note|
 
@@ -3686,8 +3686,8 @@ class Message(TelegramObject):
 
         Note:
             * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-                Telegram for backward compatibility. You should use
-                :meth:`caption_markdown_v2_urled` instead.
+              Telegram for backward compatibility. You should use
+              :meth:`caption_markdown_v2_urled` instead.
 
             * |custom_emoji_formatting_note|
 
