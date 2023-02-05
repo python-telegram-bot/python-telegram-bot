@@ -1,0 +1,15 @@
+figure > img {
+    height: 300px;  /* resize figures so they aren't too big */
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) figure > img {  /* auto and dark is dark mode */
+        filter: invert(92%);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    body[data-theme="dark"] figure > img {  /* auto and light is light mode */
+        filter: invert(92%);
+    }
+}

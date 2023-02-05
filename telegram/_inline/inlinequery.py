@@ -40,6 +40,16 @@ class InlineQuery(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
+    .. figure:: https://core.telegram.org/file/464001466/10e4a/r4FKyQ7gw5g.134366/f2\
+        606a53d683374703
+        :align: center
+
+        Inline queries on Telegram
+
+    .. seealso::
+        The :class:`telegram.InlineQueryResult` classes represent the media the user can choose
+        from (see above figure).
+
     Note:
         In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
 
