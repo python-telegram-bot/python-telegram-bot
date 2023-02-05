@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """
-This module contains two objects to request chats/users and their resulting service
-messages.
+This module contains two objects used for request chats/users service messages.
 """
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
