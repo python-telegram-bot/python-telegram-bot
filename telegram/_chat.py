@@ -961,7 +961,7 @@ class Chat(TelegramObject):
         .. versionadded:: 13.2
 
         .. versionadded:: 20.1
-            added :paramref:`telegram.Bot.restrict_chat_member.use_independent_chat_permissions`.
+            Added :paramref:`~telegram.Bot.restrict_chat_member.use_independent_chat_permissions`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -999,7 +999,7 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.set_chat_permissions`.
 
         .. versionadded:: 20.1
-            added :paramref:`telegram.Bot.set_chat_permissions.use_independent_chat_permissions`.
+            Added :paramref:`~telegram.Bot.set_chat_permissions.use_independent_chat_permissions`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

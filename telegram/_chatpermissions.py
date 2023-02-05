@@ -101,7 +101,7 @@ class ChatPermissions(TelegramObject):
             :attr:`can_send_messages`.
 
             .. deprecated:: 20.1
-               Bot API 6.5 replaced this argument with granular media settings.
+               Bot API 6.5 replaced this attribute with granular media settings.
         can_send_polls (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send polls,
             implies :attr:`can_send_messages`.
         can_send_other_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to

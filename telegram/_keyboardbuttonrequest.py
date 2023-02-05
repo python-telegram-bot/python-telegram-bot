@@ -71,8 +71,10 @@ class KeyboardButtonRequestUser(TelegramObject):
         api_kwargs: JSONDict = None,  # skipcq: PYL-W0622
     ):
         super().__init__(api_kwargs=api_kwargs)
+        # Required
         self.request_id: int = request_id
 
+        # Optionals
         self.user_is_bot: Optional[bool] = user_is_bot
         self.user_is_premium: Optional[bool] = user_is_premium
 
@@ -151,7 +153,7 @@ class KeyboardButtonRequestChat(TelegramObject):
             restrictions are applied.
         bot_administrator_rights (:class:`ChatAdministratorRights`, optional): Specifies the
             required administrator rights of the bot in the chat. The rights must be a subset of
-            :attr:`user_administrator_rights`. If not specified, no additional restrictions are
+            :paramref:`user_administrator_rights`. If not specified, no additional restrictions are
             applied.
         bot_is_member (:obj:`bool`, optional): Pass :obj:`True` to request a chat with the bot
             as a member. Otherwise, no additional restrictions are applied.
@@ -165,16 +167,16 @@ class KeyboardButtonRequestChat(TelegramObject):
         chat_has_username (:obj:`bool`, optional): Pass :obj:`True` to request a supergroup or a
             channel with a username, pass :obj:`False` to request a chat without a username. If
             not specified, no additional restrictions are applied.
-        chat_is_created (:obj:`bool`) Optional.  Pass :obj:`True` to request a chat owned by the
+        chat_is_created (:obj:`bool`) Optional. Pass :obj:`True` to request a chat owned by the
             user. Otherwise, no additional restrictions are applied.
-        user_administrator_rights (:class:`ChatAdministratorRights`) Optional.  Specifies the
+        user_administrator_rights (:class:`ChatAdministratorRights`) Optional. Specifies the
             required administrator rights of the user in the chat. If not specified, no additional
             restrictions are applied.
-        bot_administrator_rights (:class:`ChatAdministratorRights`) Optional.  Specifies the
+        bot_administrator_rights (:class:`ChatAdministratorRights`) Optional. Specifies the
             required administrator rights of the bot in the chat. The rights must be a subset of
             :attr:`user_administrator_rights`. If not specified, no additional restrictions are
             applied.
-        bot_is_member (:obj:`bool`) Optional.  Pass :obj:`True` to request a chat with the bot
+        bot_is_member (:obj:`bool`) Optional. Pass :obj:`True` to request a chat with the bot
             as a member. Otherwise, no additional restrictions are applied.
     """
 
