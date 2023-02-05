@@ -200,6 +200,12 @@ class TestBotWithoutRequest:
     is tested in `test_callbackdatacache`
     """
 
+    test_flag = None
+
+    @pytest.fixture(scope="function", autouse=True)
+    def reset(self):
+        self.test_flag = None
+
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     def test_slot_behaviour(self, bot_class, bot, mro_slots):
         inst = bot_class(bot.token)
@@ -222,15 +228,11 @@ class TestBotWithoutRequest:
             assert to_dict_bot["last_name"] == bot.last_name
 
     async def test_initialize_and_shutdown(self, bot: DictExtBot, monkeypatch):
-        test_flag = []
-
         async def initialize(*args, **kwargs):
-            nonlocal test_flag
-            test_flag = ["initialize"]
+            self.test_flag = ["initialize"]
 
         async def stop(*args, **kwargs):
-            nonlocal test_flag
-            test_flag.append("stop")
+            self.test_flag.append("stop")
 
         temp_bot = DictBot(token=bot.token)
         orig_stop = temp_bot.request.shutdown
@@ -239,11 +241,11 @@ class TestBotWithoutRequest:
             monkeypatch.setattr(temp_bot.request, "initialize", initialize)
             monkeypatch.setattr(temp_bot.request, "shutdown", stop)
             await temp_bot.initialize()
-            assert test_flag == ["initialize"]
+            assert self.test_flag == ["initialize"]
             assert temp_bot.bot == bot.bot
 
             await temp_bot.shutdown()
-            assert test_flag == ["initialize", "stop"]
+            assert self.test_flag == ["initialize", "stop"]
         finally:
             await orig_stop()
 
@@ -272,15 +274,11 @@ class TestBotWithoutRequest:
         assert self.received["shutdown"] == 2
 
     async def test_context_manager(self, monkeypatch, bot):
-        test_flag = []
-
         async def initialize():
-            nonlocal test_flag
-            test_flag = ["initialize"]
+            self.test_flag = ["initialize"]
 
         async def shutdown(*args):
-            nonlocal test_flag
-            test_flag.append("stop")
+            self.test_flag.append("stop")
 
         monkeypatch.setattr(bot, "initialize", initialize)
         monkeypatch.setattr(bot, "shutdown", shutdown)
@@ -288,17 +286,14 @@ class TestBotWithoutRequest:
         async with bot:
             pass
 
-        assert test_flag == ["initialize", "stop"]
+        assert self.test_flag == ["initialize", "stop"]
 
     async def test_context_manager_exception_on_init(self, monkeypatch, bot):
-        test_flag = []
-
         async def initialize():
             raise RuntimeError("initialize")
 
         async def shutdown():
-            nonlocal test_flag
-            test_flag = "stop"
+            self.test_flag = "stop"
 
         monkeypatch.setattr(bot, "initialize", initialize)
         monkeypatch.setattr(bot, "shutdown", shutdown)
@@ -307,7 +302,7 @@ class TestBotWithoutRequest:
             async with bot:
                 pass
 
-        assert test_flag == "stop"
+        assert self.test_flag == "stop"
 
     async def test_equality(self):
         async with make_bot(token=FALLBACKS[0]["token"]) as a, make_bot(
@@ -1265,20 +1260,19 @@ class TestBotWithoutRequest:
         try:
             bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
-            test_flag = False
+            self.test_flag = False
             file = data_file("telegram.jpg")
             expected = file.as_uri()
 
             async def make_assertion(_, data, *args, **kwargs):
-                nonlocal test_flag
                 if local_mode:
-                    test_flag = data.get("photo") == expected
+                    self.test_flag = data.get("photo") == expected
                 else:
-                    test_flag = isinstance(data.get("photo"), InputFile)
+                    self.test_flag = isinstance(data.get("photo"), InputFile)
 
             monkeypatch.setattr(bot, "_post", make_assertion)
             await bot.set_chat_photo(chat_id, file)
-            assert test_flag
+            assert self.test_flag
         finally:
             bot._local_mode = False
 
