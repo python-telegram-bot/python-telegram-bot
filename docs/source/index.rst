@@ -32,8 +32,6 @@
    GitHub Repository <https://github.com/python-telegram-bot/python-telegram-bot/>
    Telegram Channel <https://t.me/pythontelegrambotchannel/>
    Telegram User Group <https://t.me/pythontelegrambotgroup/>
+   coc
    contributing
    testing
-   coc
-
-
