@@ -16,9 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""
-This module contains two objects to request chats/users.
-"""
+"""This module contains two objects to request chats/users."""
 from typing import TYPE_CHECKING, Optional
 
 from telegram._chatadministratorrights import ChatAdministratorRights
