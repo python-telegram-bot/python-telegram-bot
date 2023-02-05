@@ -85,7 +85,7 @@ Here's how to make a one-off code change.
    -  In addition, PTB uses some formatting/styling and linting tools in the pre-commit setup. Some of those tools also have command line tools that can help to run these tools outside of the pre-commit step. If you'd like to leverage that, please have a look at the `pre-commit config file`_ for an overview of which tools (and which versions of them) are used. For example, we use `Black`_ for code formatting. Plugins for Black exist for some `popular editors`_. You can use those instead of manually formatting everything.
 
    - Please ensure that the code you write is well-tested and that all automated tests still pass. We
-     have dedicated an :doc:`testing page <testing>` to help you with that.
+     have dedicated an `testing page`_ to help you with that.
 
    - Don't break backward compatibility.
 
@@ -265,3 +265,4 @@ break the API classes. For example:
 .. _`RTD build`: https://docs.python-telegram-bot.org/en/doc-fixes
 .. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html
 .. _`section`: #documenting
+.. _`testing page`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/tests/README.rst
