@@ -42,7 +42,7 @@ class ChatJoinRequest(TelegramObject):
         * Since Bot API 5.5, bots are allowed to contact users who sent a join request to a chat
           where the bot is an administrator with the
           :attr:`~telegram.ChatMemberAdministrator.can_invite_users` administrator right – even
-            if the user never interacted with the bot before.
+          if the user never interacted with the bot before.
         * Telegram does not guarantee that :attr:`from_user.id <from_user>` coincides with the
           ``chat_id`` of the user. Please use :attr:`user_chat_id` to contact the user in
           response to their join request.
