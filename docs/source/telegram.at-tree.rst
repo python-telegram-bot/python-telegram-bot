@@ -55,8 +55,8 @@ Available Types
     telegram.inputmediavideo
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
-    telegram.keyboardbuttonrequestuser
     telegram.keyboardbuttonrequestchat
+    telegram.keyboardbuttonrequestuser
     telegram.location
     telegram.loginurl
     telegram.menubutton

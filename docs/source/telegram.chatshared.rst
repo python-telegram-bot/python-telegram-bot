@@ -1,4 +1,4 @@
-telegram.ChatShared
+ChatShared
 ===================
 
 .. autoclass:: telegram.ChatShared

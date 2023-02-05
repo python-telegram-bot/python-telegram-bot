@@ -1,4 +1,4 @@
-telegram.KeyboardButtonRequestUser
+KeyboardButtonRequestUser
 ==================================
 
 .. autoclass:: telegram.KeyboardButtonRequestUser

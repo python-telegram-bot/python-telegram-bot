@@ -1,4 +1,4 @@
-telegram.KeyboardButtonRequestChat
+KeyboardButtonRequestChat
 ==================================
 
 .. autoclass:: telegram.KeyboardButtonRequestChat

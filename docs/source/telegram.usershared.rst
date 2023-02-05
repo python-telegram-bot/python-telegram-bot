@@ -1,4 +1,4 @@
-telegram.UserShared
+UserShared
 ===================
 
 .. autoclass:: telegram.UserShared
