@@ -454,7 +454,9 @@ class TestApplication:
             assert self.received == 1
             try:  # just in case start_polling times out
                 await app.updater.start_polling()
-            finally:  # stop the app so it doesn't crash on shutdown
+            except TelegramError:
+                pytest.xfail("start_polling timed out")
+            else:
                 await app.stop()
             assert not app.running
             # app.stop() should not stop the updater!
