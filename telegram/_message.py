@@ -46,7 +46,6 @@ from telegram._forumtopic import (
 )
 from telegram._games.game import Game
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-from telegram._keyboardbuttonrequest import ChatShared, UserShared
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._passport.passportdata import PassportData
@@ -54,6 +53,7 @@ from telegram._payment.invoice import Invoice
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
+from telegram._shared import ChatShared, UserShared
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg

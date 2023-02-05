@@ -354,9 +354,8 @@ class ChatMemberRestricted(ChatMember):
 
     .. versionadded:: 13.7
     .. versionchanged:: 20.0
-       The argument :paramref:`can_manage_topics` was added, which changes the position of the
-       optional argument :paramref:`until_date`.
-       (Edit: This was a mistake, the argument is of course not optional)
+       All arguments were made positional and their order was changed.
+       The argument can_manage_topics was added.
 
     Args:
         user (:class:`telegram.User`): Information about the user.

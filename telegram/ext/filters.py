@@ -1782,6 +1782,18 @@ class StatusUpdate:
         :attr:`telegram.Message.supergroup_chat_created` or
         :attr:`telegram.Message.channel_chat_created`."""
 
+    class _ChatShared(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.chat_shared)
+
+    CHAT_SHARED = _ChatShared(name="filters.StatusUpdate.CHAT_SHARED")
+    """Messages that contain :attr:`telegram.Message.chat_shared`.
+
+    .. versionadded:: 20.1
+    """
+
     class _ConnectedWebsite(MessageFilter):
         __slots__ = ()
 
@@ -1956,6 +1968,18 @@ class StatusUpdate:
     )
     """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
+    class _UserShared(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.user_shared)
+
+    USER_SHARED = _UserShared(name="filters.StatusUpdate.USER_SHARED")
+    """Messages that contain :attr:`telegram.Message.user_shared`.
+
+    .. versionadded:: 20.1
+    """
+
     class _VideoChatEnded(MessageFilter):
         __slots__ = ()
 
@@ -2036,30 +2060,6 @@ class StatusUpdate:
     """Messages that contain :attr:`telegram.Message.write_access_allowed`.
 
     .. versionadded:: 20.0
-    """
-
-    class _UserShared(MessageFilter):
-        __slots__ = ()
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.user_shared)
-
-    USER_SHARED = _UserShared(name="filters.StatusUpdate.USER_SHARED")
-    """Messages that contain :attr:`telegram.Message.user_shared`.
-
-    .. versionadded:: 20.1
-    """
-
-    class _ChatShared(MessageFilter):
-        __slots__ = ()
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.chat_shared)
-
-    CHAT_SHARED = _ChatShared(name="filters.StatusUpdate.CHAT_SHARED")
-    """Messages that contain :attr:`telegram.Message.chat_shared`.
-
-    .. versionadded:: 20.1
     """
 
 

@@ -149,6 +149,13 @@ class TestChatPermissions:
             can_send_other_messages=False,
         )
         d = User(123, "", False)
+        e = ChatPermissions(
+            can_send_messages=True,
+            can_send_media_messages=True,
+            can_send_polls=True,
+            can_send_other_messages=False,
+            can_send_videos=True,
+        )
 
         assert a == b
         assert hash(a) == hash(b)
@@ -159,6 +166,10 @@ class TestChatPermissions:
 
         assert a != d
         assert hash(a) != hash(d)
+
+        # we expect this to be true since we don't compare these in V20
+        assert a == e
+        assert hash(a) == hash(e)
 
     def test_all_permissions(self):
         f = ChatPermissions()
@@ -183,3 +194,13 @@ class TestChatPermissions:
             assert t[key] is False
         # and as a finisher, make sure the default is different.
         assert f != t
+
+    def test_equality_warning(self, recwarn, chat_permissions):
+
+        recwarn.clear()
+        assert chat_permissions == chat_permissions
+
+        assert str(recwarn[0].message) == (
+            "In v21, granular media settings will be considered as well when comparing"
+            " ChatPermissions instances."
+        )

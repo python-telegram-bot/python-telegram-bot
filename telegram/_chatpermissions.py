@@ -21,6 +21,8 @@ from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 
 class ChatPermissions(TelegramObject):
@@ -35,10 +37,11 @@ class ChatPermissions(TelegramObject):
     .. versionchanged:: 20.0
         :attr:`can_manage_topics` is considered as well when comparing objects of
         this type in terms of equality.
-    .. versionchanged:: 20.1
-        :attr:`can_send_audios`, :attr:`can_send_documents`,:attr:`can_send_photos`,
-        :attr:`can_send_videos`,:attr:`can_send_video_notes` and :attr:`can_send_voice_notes` are
-        considered as well when comparing objects of this type in terms of equality.
+    .. deprecated:: 20.1
+        :attr:`can_send_audios`, :attr:`can_send_documents`, :attr:`can_send_photos`,
+        :attr:`can_send_videos`, :attr:`can_send_video_notes` and :attr:`can_send_voice_notes`
+        will be considered as well when comparing objects of this type in terms of equality in
+        V21.
 
     Note:
         Though not stated explicitly in the official docs, Telegram changes not only the
@@ -209,15 +212,22 @@ class ChatPermissions(TelegramObject):
             self.can_invite_users,
             self.can_pin_messages,
             self.can_manage_topics,
-            self.can_send_audios,
-            self.can_send_documents,
-            self.can_send_photos,
-            self.can_send_videos,
-            self.can_send_video_notes,
-            self.can_send_voice_notes,
         )
 
         self._freeze()
+
+    def __eq__(self, other: object) -> bool:
+        warn(
+            "In v21, granular media settings will be considered as well when comparing"
+            " ChatPermissions instances.",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        # Intend: Added so support the own __eq__ function (which otherwise breaks hashing)
+        return super().__hash__()
 
     @classmethod
     def all_permissions(cls) -> "ChatPermissions":

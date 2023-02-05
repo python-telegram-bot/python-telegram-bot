@@ -83,49 +83,6 @@ class KeyboardButtonRequestUser(TelegramObject):
         self._freeze()
 
 
-class UserShared(TelegramObject):
-    """
-    This object contains information about the user whose identifier was shared with the bot
-    using a :class:`telegram.KeyboardButtonRequestUser` button.
-
-    Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`request_id` and :attr:`user_id` are equal.
-
-    .. versionadded:: 20.1
-
-    Args:
-        request_id (:obj:`int`): Identifier of the request.
-        user_id (:obj:`int`): Identifier of the shared user. This number may be greater than 32
-            bits and some programming languages may have difficulty/silent defects in interpreting
-            it. But it is smaller than 52 bits, so a signed 64-bit integer or double-precision
-            float type are safe for storing this identifier.
-
-    Attributes:
-        request_id (:obj:`int`): Identifier of the request.
-        user_id (:obj:`int`): Identifier of the shared user. This number may be greater than 32
-            bits and some programming languages may have difficulty/silent defects in interpreting
-            it. But it is smaller than 52 bits, so a signed 64-bit integer or double-precision
-            float type are safe for storing this identifier.
-    """
-
-    __slots__ = ("request_id", "user_id")
-
-    def __init__(
-        self,
-        request_id: int,
-        user_id: int,
-        *,
-        api_kwargs: JSONDict = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.request_id: int = request_id
-        self.user_id: int = user_id
-
-        self._id_attrs = (self.request_id, self.user_id)
-
-        self._freeze()
-
-
 class KeyboardButtonRequestChat(TelegramObject):
     """This object defines the criteria used to request a suitable chat. The identifier of the
     selected user will be shared with the bot when the corresponding button is pressed.
@@ -241,46 +198,3 @@ class KeyboardButtonRequestChat(TelegramObject):
         )
 
         return super().de_json(data=data, bot=bot)
-
-
-class ChatShared(TelegramObject):
-    """
-    This object contains information about the chat whose identifier was shared with the bot
-    using a :class:`telegram.KeyboardButtonRequestChat` button.
-
-    Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`request_id` and :attr:`chat_id` are equal.
-
-    .. versionadded:: 20.1
-
-    Args:
-        request_id (:obj:`int`): Identifier of the request.
-        chat_id (:obj:`int`): Identifier of the shared user. This number may be greater than 32
-            bits and some programming languages may have difficulty/silent defects in interpreting
-            it. But it is smaller than 52 bits, so a signed 64-bit integer or double-precision
-            float type are safe for storing this identifier.
-
-    Attributes:
-        request_id (:obj:`int`): Identifier of the request.
-        chat_id (:obj:`int`): Identifier of the shared user. This number may be greater than 32
-            bits and some programming languages may have difficulty/silent defects in interpreting
-            it. But it is smaller than 52 bits, so a signed 64-bit integer or double-precision
-            float type are safe for storing this identifier.
-    """
-
-    __slots__ = ("request_id", "chat_id")
-
-    def __init__(
-        self,
-        request_id: int,
-        chat_id: int,
-        *,
-        api_kwargs: JSONDict = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.request_id: int = request_id
-        self.chat_id: int = chat_id
-
-        self._id_attrs = (self.request_id, self.chat_id)
-
-        self._freeze()
