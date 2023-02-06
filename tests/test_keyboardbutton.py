@@ -107,8 +107,12 @@ class TestKeyboardButton:
         c = KeyboardButton("Test", request_location=True)
         d = KeyboardButton("Test", web_app=WebAppInfo(url="https://ptb.org"))
         e = InlineKeyboardButton("test", callback_data="test")
-        f = KeyboardButton("Test", request_chat=KeyboardButtonRequestChat(1, False))
-        g = KeyboardButton("Test", request_user=KeyboardButtonRequestUser(1))
+        f = KeyboardButton(
+            "test",
+            request_contact=True,
+            request_chat=KeyboardButtonRequestChat(1, False),
+            request_user=KeyboardButtonRequestUser(2),
+        )
 
         assert a == b
         assert hash(a) == hash(b)
@@ -122,8 +126,16 @@ class TestKeyboardButton:
         assert a != e
         assert hash(a) != hash(e)
 
-        assert a != f
-        assert hash(a) != hash(f)
+        # we expect this to be true since we don't compare these in V20
+        assert a == f
+        assert hash(a) == hash(f)
 
-        assert a != g
-        assert hash(a) != hash(g)
+    def test_equality_warning(self, recwarn, keyboard_button):
+
+        recwarn.clear()
+        assert keyboard_button == keyboard_button
+
+        assert str(recwarn[0].message) == (
+            "In v21, granular media settings will be considered as well when comparing"
+            " ChatPermissions instances."
+        )
