@@ -1426,9 +1426,6 @@ class User(TelegramObject):
         Note:
             |user_chat_id_note|
 
-        Note:
-            |user_chat_id_note|
-
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
