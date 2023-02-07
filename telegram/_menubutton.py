@@ -109,10 +109,10 @@ class MenuButtonCommands(MenuButton):
 
     .. raw:: html
 
-        <video height="300px" loop autoplay muted>
+        <center><video height="300px" loop autoplay muted>
             <source src="https://core.telegram.org/file/464001555/10fbd/jvTuV2Ke7WQ.1916669.mp4/a0\
 56de323645db409d" type="video/mp4">
-        </video>
+        </video></center>
 
     .. versionadded:: 20.0
     Attributes:
