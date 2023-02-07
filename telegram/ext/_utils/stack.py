@@ -52,10 +52,10 @@ def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
         return False
 
     # https://stackoverflow.com/a/57712700/10606962
-    if Path(frame.f_code.co_filename) == caller:
+    if Path(frame.f_code.co_filename).resolve() == caller:
         return True
     while frame.f_back:
         frame = frame.f_back
-        if Path(frame.f_code.co_filename) == caller:
+        if Path(frame.f_code.co_filename).resolve() == caller:
             return True
     return False
