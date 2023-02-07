@@ -14,7 +14,7 @@
    :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-6.4-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-6.5-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
