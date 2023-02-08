@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import inspect
-import os
 from pathlib import Path
 
 from telegram.ext._utils.stack import was_called_by
@@ -32,30 +31,45 @@ class TestStack:
         file = Path(__file__)
         assert was_called_by(frame, file)
 
-    def test_called_by_file_in_symlink(self):
-        tests_folder = Path(__file__).parent
-        project_root = tests_folder.parent
-        temp_symlink = project_root / "temp_tests"
-        dummy_file_content = "import inspect\ndef dummy_func():\
+    def test_called_by_symlink_file(self, tmp_path):
+        # Set up a call from a linked file in a temp directory,
+        # then test it with its resolved path.
+        # Here we expect `was_called_by` to recognize
+        # "`tmp_path`/foo_link.py" as same as "`tmp_path`/foo.py".
+        temp_file = tmp_path / "foo.py"
+        foo_content = "import inspect\ndef foo_func():\
             \n    return inspect.currentframe() "
-        try:
-            # Set up a call from a different file in a symlink directory,
-            # then test it with its resolved path.
-            # Here we expect `was_called_by` to recognize
-            # "../temp_tests/dummy.py" as same as "../tests/dummy".
-            os.symlink(tests_folder, temp_symlink)
-            with open(temp_symlink / "dummy.py", 'w') as f:
-                f.write(dummy_file_content)
-            from temp_tests.dummy import dummy_func
+        with temp_file.open('w') as f:
+            f.write(foo_content)
+        symlink_file = tmp_path / "foo_link.py"
+        symlink_file.symlink_to(temp_file)
+        import sys
+        sys.path.append(tmp_path.as_posix())
+        from foo_link import foo_func
+        frame = foo_func()
+        assert was_called_by(frame, temp_file)
 
-            frame = dummy_func()
-            file = tests_folder / "dummy.py"
-            assert was_called_by(frame, file)
-        finally:
-            if os.path.exists(temp_symlink):
-                os.unlink(temp_symlink)
-            if os.path.exists(tests_folder / "dummy.py"):
-                os.remove(tests_folder / "dummy.py")
+    def test_called_by_symlink_file_nested(self, tmp_path):
+        # Same as test_called_by_symlink_file except 
+        # foo_func is nested inside bar_func to test
+        # if `was_called_by` can resolve paths in recursion.
+        temp_file1 = tmp_path / "foo.py"
+        foo_content = "import inspect\ndef foo_func():\
+            \n    return inspect.currentframe() "
+        with temp_file1.open('w') as f:
+            f.write(foo_content)
+        temp_file2 = tmp_path / "bar.py"
+        bar_content = "from foo import foo_func\ndef bar_func():\
+            \n    return foo_func()"
+        with temp_file2.open('w') as f:
+            f.write(bar_content)
+        symlink_file2 = tmp_path / "bar_link.py"
+        symlink_file2.symlink_to(temp_file2)
+        import sys
+        sys.path.append(tmp_path.as_posix())
+        from bar_link import bar_func
+        frame = bar_func()
+        assert was_called_by(frame, temp_file2)
 
     # Testing a call by a different file is somewhat hard but it's covered in
     # TestUpdater/Application.test_manual_init_warning
