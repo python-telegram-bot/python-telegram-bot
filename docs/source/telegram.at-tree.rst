@@ -31,6 +31,7 @@ Available Types
     telegram.chatmemberupdated
     telegram.chatpermissions
     telegram.chatphoto
+    telegram.chatshared
     telegram.contact
     telegram.dice
     telegram.document
@@ -54,6 +55,8 @@ Available Types
     telegram.inputmediavideo
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
+    telegram.keyboardbuttonrequestchat
+    telegram.keyboardbuttonrequestuser
     telegram.location
     telegram.loginurl
     telegram.menubutton
@@ -76,6 +79,7 @@ Available Types
     telegram.update
     telegram.user
     telegram.userprofilephotos
+    telegram.usershared
     telegram.venue
     telegram.video
     telegram.videochatended
