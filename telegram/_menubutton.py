@@ -107,12 +107,7 @@ class MenuButton(TelegramObject):
 class MenuButtonCommands(MenuButton):
     """Represents a menu button, which opens the bot's list of commands.
 
-    .. raw:: html
-
-        <center><video height="300px" loop autoplay muted>
-            <source src="https://core.telegram.org/file/464001555/10fbd/jvTuV2Ke7WQ.1916669.mp4/a0\
-56de323645db409d" type="video/mp4">
-        </video></center>
+    .. include:: inclusions/menu_button_command_video.rst
 
     .. versionadded:: 20.0
     Attributes:
