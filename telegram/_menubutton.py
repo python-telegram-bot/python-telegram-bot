@@ -107,6 +107,8 @@ class MenuButton(TelegramObject):
 class MenuButtonCommands(MenuButton):
     """Represents a menu button, which opens the bot's list of commands.
 
+    .. include:: inclusions/menu_button_command_video.rst
+
     .. versionadded:: 20.0
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.MenuButtonType.COMMANDS`.

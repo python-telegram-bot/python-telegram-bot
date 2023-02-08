@@ -35,6 +35,15 @@ class InlineKeyboardMarkup(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their size of :attr:`inline_keyboard` and all the buttons are equal.
 
+    .. figure:: https://core.telegram.org/file/464001863/110f3/I47qTXAD9Z4.120010/e0\
+        ea04f66357b640ec
+        :align: center
+
+        An inline keyboard on a message
+
+    .. seealso::
+        An another kind of keyboard would be the :class:`telegram.ReplyKeyboardMarkup`.
+
     Examples:
         * :any:`Inline Keyboard 1 <examples.inlinekeyboard>`
         * :any:`Inline Keyboard 2 <examples.inlinekeyboard2>`
