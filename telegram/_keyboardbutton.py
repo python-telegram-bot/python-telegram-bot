@@ -21,9 +21,12 @@
 from typing import TYPE_CHECKING, Optional
 
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
+from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUser
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
 from telegram._webappinfo import WebAppInfo
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -31,12 +34,12 @@ if TYPE_CHECKING:
 
 class KeyboardButton(TelegramObject):
     """
-    This object represents one button of the reply keyboard. For simple text buttons String can be
-    used instead of this object to specify text of the button.
+    This object represents one button of the reply keyboard. For simple text buttons, :obj:`str`
+    can be used instead of this object to specify text of the button.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location`,
-    :attr:`request_poll` and :attr:`web_app` are equal.
+    :attr:`request_poll`, :attr:`web_app`, :attr:`request_user` and :attr:`request_chat` are equal.
 
     Note:
         * Optional fields are mutually exclusive.
@@ -46,10 +49,16 @@ class KeyboardButton(TelegramObject):
           January, 2020. Older clients will display unsupported message.
         * :attr:`web_app` option will only work in Telegram versions released after 16 April, 2022.
           Older clients will display unsupported message.
+        * :attr:`request_user` and :attr:`request_chat` options will only work in Telegram
+          versions released after 3 February, 2023. Older clients will display unsupported
+          message.
 
     .. versionchanged:: 20.0
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.
+    .. deprecated:: 20.1
+       :paramref:`request_user` and :paramref:`request_chat` will be considered as well when
+       comparing objects of this type in terms of equality in V21.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -67,6 +76,18 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.0
+        request_user (:class:`KeyboardButtonRequestUser`, optional): If specified, pressing the
+            button will open a list of suitable users. Tapping on any user will send its
+            identifier to the bot in a :attr:`telegram.Message.user_shared` service message.
+            Available in private chats only.
+
+            .. versionadded:: 20.1
+        request_chat (:class:`KeyboardButtonRequestChat`, optional): If specified, pressing the
+            button will open a list of suitable chats. Tapping on a chat will send its
+            identifier to the bot in a :attr:`telegram.Message.chat_shared` service message.
+            Available in private chats only.
+
+            .. versionadded:: 20.1
     Attributes:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
             sent to the bot as a message when the button is pressed.
@@ -83,9 +104,29 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.0
+        request_user (:class:`KeyboardButtonRequestUser`): Optional. If specified, pressing the
+            button will open a list of suitable users. Tapping on any user will send its
+            identifier to the bot in a :attr:`telegram.Message.user_shared` service message.
+            Available in private chats only.
+
+            .. versionadded:: 20.1
+        request_chat (:class:`KeyboardButtonRequestChat`): Optional. If specified, pressing the
+            button will open a list of suitable chats. Tapping on a chat will send its
+            identifier to the bot in a :attr:`telegram.Message.chat_shared` service message.
+            Available in private chats only.
+
+            .. versionadded:: 20.1
     """
 
-    __slots__ = ("request_location", "request_contact", "request_poll", "text", "web_app")
+    __slots__ = (
+        "request_location",
+        "request_contact",
+        "request_poll",
+        "text",
+        "web_app",
+        "request_user",
+        "request_chat",
+    )
 
     def __init__(
         self,
@@ -94,6 +135,8 @@ class KeyboardButton(TelegramObject):
         request_location: bool = None,
         request_poll: KeyboardButtonPollType = None,
         web_app: WebAppInfo = None,
+        request_user: KeyboardButtonRequestUser = None,
+        request_chat: KeyboardButtonRequestChat = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -105,6 +148,8 @@ class KeyboardButton(TelegramObject):
         self.request_location: Optional[bool] = request_location
         self.request_poll: Optional[KeyboardButtonPollType] = request_poll
         self.web_app: Optional[WebAppInfo] = web_app
+        self.request_user: Optional[KeyboardButtonRequestUser] = request_user
+        self.request_chat: Optional[KeyboardButtonRequestChat] = request_chat
 
         self._id_attrs = (
             self.text,
@@ -116,6 +161,19 @@ class KeyboardButton(TelegramObject):
 
         self._freeze()
 
+    def __eq__(self, other: object) -> bool:
+        warn(
+            "In v21, granular media settings will be considered as well when comparing"
+            " ChatPermissions instances.",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        # Intend: Added so support the own __eq__ function (which otherwise breaks hashing)
+        return super().__hash__()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["KeyboardButton"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -125,6 +183,8 @@ class KeyboardButton(TelegramObject):
             return None
 
         data["request_poll"] = KeyboardButtonPollType.de_json(data.get("request_poll"), bot)
+        data["request_user"] = KeyboardButtonRequestUser.de_json(data.get("request_user"), bot)
+        data["request_chat"] = KeyboardButtonRequestChat.de_json(data.get("request_chat"), bot)
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 
         return super().de_json(data=data, bot=bot)

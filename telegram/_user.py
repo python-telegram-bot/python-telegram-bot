@@ -109,6 +109,9 @@ class User(TelegramObject):
             the bot to the attachment menu.
 
             .. versionadded:: 20.0
+    .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
+        coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
+        case so far, but Telegram does not guarantee that this stays this way.
     """
 
     __slots__ = (
@@ -293,6 +296,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.pin_chat_message`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
@@ -324,6 +330,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unpin_chat_message`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
@@ -353,6 +362,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.unpin_all_chat_messages`.
+
+        Note:
+            |user_chat_id_note|
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -391,6 +403,9 @@ class User(TelegramObject):
              await bot.send_message(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
+
+        Note:
+            |user_chat_id_note|
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -442,6 +457,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -492,6 +510,9 @@ class User(TelegramObject):
              await bot.send_media_group(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
+
+        Note:
+            |user_chat_id_note|
 
         Returns:
             Tuple[:class:`telegram.Message`:] On success, a tuple of :class:`~telegram.Message`
@@ -546,6 +567,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -591,6 +615,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :obj:`True`: On success.
 
@@ -634,6 +661,9 @@ class User(TelegramObject):
              await bot.send_contact(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
+
+        Note:
+            |user_chat_id_note|
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -680,6 +710,9 @@ class User(TelegramObject):
              await bot.send_dice(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
+
+        Note:
+            |user_chat_id_note|
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -729,6 +762,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -776,6 +812,9 @@ class User(TelegramObject):
              await bot.send_game(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
+
+        Note:
+            |user_chat_id_note|
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -844,6 +883,9 @@ class User(TelegramObject):
             is an optional argument and therefore the
             order of the arguments had to be changed. Use keyword arguments to make sure that the
             arguments are passed correctly.
+
+        Note:
+            |user_chat_id_note|
 
         .. versionchanged:: 13.5
             As of Bot API 5.2, the parameter
@@ -917,6 +959,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -974,6 +1019,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -1024,6 +1072,9 @@ class User(TelegramObject):
              await bot.send_sticker(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
+
+        Note:
+            |user_chat_id_note|
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -1076,6 +1127,9 @@ class User(TelegramObject):
              await bot.send_video(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
+
+        Note:
+            |user_chat_id_note|
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -1137,6 +1191,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -1191,6 +1248,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -1241,6 +1301,9 @@ class User(TelegramObject):
              await bot.send_voice(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
+
+        Note:
+            |user_chat_id_note|
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -1300,6 +1363,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -1357,6 +1423,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -1407,6 +1476,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
+        Note:
+            |user_chat_id_note|
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -1448,6 +1520,9 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.approve_chat_join_request`.
 
+        Note:
+            |user_chat_id_note|
+
         .. versionadded:: 13.8
 
         Returns:
@@ -1480,6 +1555,9 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.decline_chat_join_request`.
+
+        Note:
+            |user_chat_id_note|
 
         .. versionadded:: 13.8
 
@@ -1516,6 +1594,9 @@ class User(TelegramObject):
 
         .. seealso:: :meth:`get_menu_button`
 
+        Note:
+            |user_chat_id_note|
+
         .. versionadded:: 20.0
 
         Returns:
@@ -1548,6 +1629,9 @@ class User(TelegramObject):
         :meth:`telegram.Bot.get_chat_menu_button`.
 
         .. seealso:: :meth:`set_menu_button`
+
+        Note:
+            |user_chat_id_note|
 
         .. versionadded:: 20.0
 
