@@ -301,7 +301,6 @@ class Updater(AsyncContextManager["Updater"]):
         ready: asyncio.Event,
         error_callback: Optional[Callable[[TelegramError], None]],
     ) -> None:
-
         self._logger.debug("Updater started (polling)")
 
         # the bootstrapping phase does two things:

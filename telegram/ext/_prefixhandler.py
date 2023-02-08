@@ -130,7 +130,6 @@ class PrefixHandler(BaseHandler[Update, CCT]):
         filters: filters_module.BaseFilter = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
-
         super().__init__(callback=callback, block=block)
 
         if isinstance(prefix, str):

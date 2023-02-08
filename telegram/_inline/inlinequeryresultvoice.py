@@ -111,7 +111,6 @@ class InlineQueryResultVoice(InlineQueryResult):
         *,
         api_kwargs: JSONDict = None,
     ):
-
         # Required
         super().__init__(InlineQueryResultType.VOICE, id, api_kwargs=api_kwargs)
         with self._unfrozen():

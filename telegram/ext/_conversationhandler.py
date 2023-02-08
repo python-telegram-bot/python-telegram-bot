@@ -292,6 +292,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
     WAITING: ClassVar[int] = -3
     """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
     previous :attr:`block=False <block>` handler to finish."""
+
     # pylint: disable=super-init-not-called
     def __init__(
         self,

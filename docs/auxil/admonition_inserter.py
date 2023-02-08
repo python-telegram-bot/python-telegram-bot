@@ -106,7 +106,6 @@ class AdmonitionInserter:
         # docs.auxil.sphinx_hooks.autodoc_process_docstring()
 
         for admonition_type in self.ALL_ADMONITION_TYPES:
-
             # If there is no admonition of the given type for the given class or method,
             # continue to the next admonition type, maybe the class/method is listed there.
             if obj not in self.admonitions[admonition_type]:
@@ -258,7 +257,6 @@ class AdmonitionInserter:
 
         for cls, method_names in self.METHOD_NAMES_FOR_BOT_AND_APPBUILDER.items():
             for method_name in method_names:
-
                 sig = inspect.signature(getattr(cls, method_name))
                 ret_annot = sig.return_annotation
 
@@ -301,16 +299,13 @@ class AdmonitionInserter:
         # inspect methods of all telegram classes for return statements that indicate
         # that this given method is a shortcut for a Bot method
         for class_name, cls in inspect.getmembers(telegram, predicate=inspect.isclass):
-
             # no need to inspect Bot's own methods, as Bot can't have shortcuts in Bot
             if cls is telegram.Bot:
                 continue
 
             for method_name, method in _iter_own_public_methods(cls):
-
                 # .getsourcelines() returns a tuple. Item [1] is an int
                 for line in inspect.getsourcelines(method)[0]:
-
                     if not (bot_method_match := bot_method_pattern.search(line)):
                         continue
 
@@ -412,7 +407,6 @@ class AdmonitionInserter:
         admonition_for_class = {}
 
         for cls, attrs in attrs_or_methods_for_class.items():
-
             if cls is telegram.ext.ApplicationBuilder:
                 # ApplicationBuilder is only used in and returned from its own methods,
                 # so its page needs no admonitions.
@@ -472,7 +466,6 @@ class AdmonitionInserter:
         **Modifies dictionary in place.**
         """
         for cls in self._resolve_arg(arg):
-
             # When trying to resolve an argument from args or return annotation,
             # the method _resolve_arg returns None if nothing could be resolved.
             # Also, if class was resolved correctly, "telegram" will definitely be in its str().
@@ -549,7 +542,6 @@ class AdmonitionInserter:
         # For some reason "InlineQueryResult", "InputMedia" & some others are currently not
         # recognized as ForwardRefs and are identified as plain strings.
         elif isinstance(arg, str):
-
             # args like "ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]" can be recognized as strings.
             # Remove whatever is in the square brackets because it doesn't need to be parsed.
             arg = re.sub(r"\[.+]", "", arg)

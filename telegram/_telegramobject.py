@@ -289,7 +289,6 @@ class TelegramObject:
         frozen = state.pop("_frozen", False)
 
         for key, val in state.items():
-
             try:
                 setattr(self, key, val)
             except AttributeError:
@@ -402,7 +401,6 @@ class TelegramObject:
         data = {}
 
         for key in self._get_attrs_names(include_private=include_private):
-
             value = getattr(self, key, None)
             if value is not None:
                 if recursive and hasattr(value, "to_dict"):
