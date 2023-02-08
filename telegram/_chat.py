@@ -943,6 +943,7 @@ class Chat(TelegramObject):
         user_id: Union[str, int],
         permissions: ChatPermissions,
         until_date: Union[int, datetime] = None,
+        use_independent_chat_permissions: bool = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -959,6 +960,9 @@ class Chat(TelegramObject):
 
         .. versionadded:: 13.2
 
+        .. versionadded:: 20.1
+            Added :paramref:`~telegram.Bot.restrict_chat_member.use_independent_chat_permissions`.
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
@@ -968,6 +972,7 @@ class Chat(TelegramObject):
             user_id=user_id,
             permissions=permissions,
             until_date=until_date,
+            use_independent_chat_permissions=use_independent_chat_permissions,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -978,6 +983,7 @@ class Chat(TelegramObject):
     async def set_permissions(
         self,
         permissions: ChatPermissions,
+        use_independent_chat_permissions: bool = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -992,6 +998,9 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_permissions`.
 
+        .. versionadded:: 20.1
+            Added :paramref:`~telegram.Bot.set_chat_permissions.use_independent_chat_permissions`.
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
@@ -999,6 +1008,7 @@ class Chat(TelegramObject):
         return await self.get_bot().set_chat_permissions(
             chat_id=self.id,
             permissions=permissions,
+            use_independent_chat_permissions=use_independent_chat_permissions,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

@@ -354,8 +354,8 @@ class ChatMemberRestricted(ChatMember):
 
     .. versionadded:: 13.7
     .. versionchanged:: 20.0
-       The argument :paramref:`can_manage_topics` was added, which changes the position of the
-       optional argument :paramref:`until_date`.
+       All arguments were made positional and their order was changed.
+       The argument can_manage_topics was added.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -368,9 +368,12 @@ class ChatMemberRestricted(ChatMember):
         can_pin_messages (:obj:`bool`): :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
         can_send_messages (:obj:`bool`): :obj:`True`, if the user is allowed
-            to send text messages, contacts, locations and venues.
+            to send text messages, contacts, invoices, locations and venues.
         can_send_media_messages (:obj:`bool`): :obj:`True`, if the user is allowed
             to send audios, documents, photos, videos, video notes and voice notes.
+
+            .. deprecated:: 20.1
+               Bot API 6.5 replaced this argument with granular media settings.
         can_send_polls (:obj:`bool`): :obj:`True`, if the user is allowed
             to send polls.
         can_send_other_messages (:obj:`bool`): :obj:`True`, if the user is allowed
@@ -383,6 +386,26 @@ class ChatMemberRestricted(ChatMember):
             .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
+        can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
+
+            .. versionadded:: 20.1
+        can_send_documents (:obj:`bool`): :obj:`True`, if the user is allowed to send documents.
+
+            .. versionadded:: 20.1
+        can_send_photos (:obj:`bool`): :obj:`True`, if the user is allowed to send photos.
+
+            .. versionadded:: 20.1
+        can_send_videos (:obj:`bool`): :obj:`True`, if the user is allowed to send videos.
+
+            .. versionadded:: 20.1
+        can_send_video_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send video
+            notes.
+
+            .. versionadded:: 20.1
+        can_send_voice_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send voice
+            notes.
+
+            .. versionadded:: 20.1
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -400,6 +423,9 @@ class ChatMemberRestricted(ChatMember):
             to send text messages, contacts, locations and venues.
         can_send_media_messages (:obj:`bool`): :obj:`True`, if the user is allowed
             to send audios, documents, photos, videos, video notes and voice notes.
+
+            .. deprecated:: 20.1
+               Bot API 6.5 replaced this attribute with granular media settings.
         can_send_polls (:obj:`bool`): :obj:`True`, if the user is allowed
             to send polls.
         can_send_other_messages (:obj:`bool`): :obj:`True`, if the user is allowed
@@ -412,6 +438,26 @@ class ChatMemberRestricted(ChatMember):
             .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
+        can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
+
+            .. versionadded:: 20.1
+        can_send_documents (:obj:`bool`): :obj:`True`, if the user is allowed to send documents.
+
+            .. versionadded:: 20.1
+        can_send_photos (:obj:`bool`): :obj:`True`, if the user is allowed to send photos.
+
+            .. versionadded:: 20.1
+        can_send_videos (:obj:`bool`): :obj:`True`, if the user is allowed to send videos.
+
+            .. versionadded:: 20.1
+        can_send_video_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send video
+            notes.
+
+            .. versionadded:: 20.1
+        can_send_voice_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send voice
+            notes.
+
+            .. versionadded:: 20.1
 
     """
 
@@ -427,6 +473,12 @@ class ChatMemberRestricted(ChatMember):
         "can_add_web_page_previews",
         "can_manage_topics",
         "until_date",
+        "can_send_audios",
+        "can_send_documents",
+        "can_send_photos",
+        "can_send_videos",
+        "can_send_video_notes",
+        "can_send_voice_notes",
     )
 
     def __init__(
@@ -443,6 +495,12 @@ class ChatMemberRestricted(ChatMember):
         can_add_web_page_previews: bool,
         can_manage_topics: bool,
         until_date: datetime.datetime,
+        can_send_audios: bool,
+        can_send_documents: bool,
+        can_send_photos: bool,
+        can_send_videos: bool,
+        can_send_video_notes: bool,
+        can_send_voice_notes: bool,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -459,6 +517,12 @@ class ChatMemberRestricted(ChatMember):
             self.can_add_web_page_previews: bool = can_add_web_page_previews
             self.can_manage_topics: bool = can_manage_topics
             self.until_date: datetime.datetime = until_date
+            self.can_send_audios: bool = can_send_audios
+            self.can_send_documents: bool = can_send_documents
+            self.can_send_photos: bool = can_send_photos
+            self.can_send_videos: bool = can_send_videos
+            self.can_send_video_notes: bool = can_send_video_notes
+            self.can_send_voice_notes: bool = can_send_voice_notes
 
 
 class ChatMemberLeft(ChatMember):

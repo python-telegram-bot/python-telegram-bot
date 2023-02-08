@@ -199,7 +199,6 @@ class TestAIORateLimiter:
 
     @pytest.mark.parametrize("max_retries", [0, 1, 4])
     async def test_max_retries(self, bot, max_retries):
-
         bot = ExtBot(
             token=bot.token,
             request=self.CountRequest(retry_after=1),
