@@ -38,14 +38,16 @@ class TestStack:
         # "`tmp_path`/foo_link.py" as same as "`tmp_path`/foo.py".
         temp_file = tmp_path / "foo.py"
         foo_content = "import inspect\ndef foo_func():\
-            \n    return inspect.currentframe() "
-        with temp_file.open('w') as f:
+            \n    return inspect.currentframe()"
+        with temp_file.open("w") as f:
             f.write(foo_content)
         symlink_file = tmp_path / "foo_link.py"
         symlink_file.symlink_to(temp_file)
         import sys
+
         sys.path.append(tmp_path.as_posix())
         from foo_link import foo_func
+
         frame = foo_func()
         assert was_called_by(frame, temp_file)
 
@@ -55,19 +57,21 @@ class TestStack:
         # if `was_called_by` can resolve paths in recursion.
         temp_file1 = tmp_path / "foo.py"
         foo_content = "import inspect\ndef foo_func():\
-            \n    return inspect.currentframe() "
-        with temp_file1.open('w') as f:
+            \n    return inspect.currentframe()"
+        with temp_file1.open("w") as f:
             f.write(foo_content)
         temp_file2 = tmp_path / "bar.py"
         bar_content = "from foo import foo_func\ndef bar_func():\
             \n    return foo_func()"
-        with temp_file2.open('w') as f:
+        with temp_file2.open("w") as f:
             f.write(bar_content)
         symlink_file2 = tmp_path / "bar_link.py"
         symlink_file2.symlink_to(temp_file2)
         import sys
+
         sys.path.append(tmp_path.as_posix())
         from bar_link import bar_func
+
         frame = bar_func()
         assert was_called_by(frame, temp_file2)
 
