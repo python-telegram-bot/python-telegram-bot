@@ -201,7 +201,6 @@ class TestChatPermissions:
         assert f != t
 
     def test_equality_warning(self, recwarn, chat_permissions):
-
         recwarn.clear()
         assert chat_permissions == chat_permissions
 

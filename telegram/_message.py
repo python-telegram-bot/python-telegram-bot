@@ -3241,10 +3241,10 @@ class Message(TelegramObject):
         html_text = ""
         last_offset = 0
 
-        sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
+        sorted_entities = sorted(entities.items(), key=lambda item: item[0].offset)
         parsed_entities = []
 
-        for (entity, text) in sorted_entities:
+        for entity, text in sorted_entities:
             if entity not in parsed_entities:
                 nested_entities = {
                     e: t
@@ -3426,10 +3426,10 @@ class Message(TelegramObject):
         markdown_text = ""
         last_offset = 0
 
-        sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
+        sorted_entities = sorted(entities.items(), key=lambda item: item[0].offset)
         parsed_entities = []
 
-        for (entity, text) in sorted_entities:
+        for entity, text in sorted_entities:
             if entity not in parsed_entities:
                 nested_entities = {
                     e: t

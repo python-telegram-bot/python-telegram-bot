@@ -80,7 +80,6 @@ class MessageHandler(BaseHandler[Update, CCT]):
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
     ):
-
         super().__init__(callback, block=block)
         self.filters: filters_module.BaseFilter = (
             filters if filters is not None else filters_module.ALL
