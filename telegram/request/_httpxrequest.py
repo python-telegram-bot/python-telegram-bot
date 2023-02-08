@@ -122,7 +122,7 @@ class HTTPXRequest(BaseRequest):
             "proxies": proxy_url,
             "limits": limits,
             "http1": http1,
-            "http2": (not http1),
+            "http2": not http1,
         }
 
         try:
