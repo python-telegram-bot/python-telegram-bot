@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 
 class InvalidCallbackData(TelegramError):
     """
-    Raised when the received callback data has been tempered with or deleted from cache.
+    Raised when the received callback data has been tampered with or deleted from cache.
 
     Examples:
         :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
@@ -115,8 +115,7 @@ class CallbackDataCache:
     Examples:
         :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
 
-    .. seealso:: :attr:`telegram.ext.ExtBot.callback_data_cache`,
-        :wiki:`Architecture Overview <Architecture>`,
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
         :wiki:`Arbitrary callback_data <Arbitrary-callback_data>`
 
     .. versionadded:: 13.6

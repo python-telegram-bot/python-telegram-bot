@@ -125,8 +125,8 @@ class ConversationHandler(BaseHandler[Update, CCT]):
 
     Warning:
         :class:`ConversationHandler` heavily relies on incoming updates being processed one by one.
-        When using this handler, :attr:`telegram.ext.Application.concurrent_updates` should be
-        :obj:`False`.
+        When using this handler, :attr:`telegram.ext.ApplicationBuilder.concurrent_updates` should
+        be set to :obj:`False`.
 
     Note:
         :class:`ConversationHandler` will only accept updates that are (subclass-)instances of

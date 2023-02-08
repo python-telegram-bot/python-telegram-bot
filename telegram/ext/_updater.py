@@ -410,10 +410,9 @@ class Updater(AsyncContextManager["Updater"]):
             :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass
             ``webhook_url`` instead of calling ``updater.bot.set_webhook(webhook_url)`` manually.
         .. versionchanged:: 20.0
+
             * Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates` and
               removed the deprecated argument ``force_event_loop``.
-            * To use this method, PTB must be installed via
-              ``pip install python-telegram-bot[webhooks]``.
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Defaults to

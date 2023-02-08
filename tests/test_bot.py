@@ -1093,11 +1093,12 @@ class TestBotWithoutRequest:
             data = request_data.json_parameters
             chat_id = data["chat_id"] == "2"
             permissions = data["permissions"] == chat_permissions.to_json()
-            return chat_id and permissions
+            use_independent_chat_permissions = data["use_independent_chat_permissions"]
+            return chat_id and permissions and use_independent_chat_permissions
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
 
-        assert await bot.set_chat_permissions(2, chat_permissions)
+        assert await bot.set_chat_permissions(2, chat_permissions, True)
 
     async def test_set_chat_administrator_custom_title(self, monkeypatch, bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -1235,6 +1236,26 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.answer_pre_checkout_query(1, False, error_message="Not enough fish")
+
+    async def test_restrict_chat_member(self, bot, chat_permissions, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.json_parameters
+            chat_id = data["chat_id"] == "@chat"
+            user_id = data["user_id"] == "2"
+            permissions = data["permissions"] == chat_permissions.to_json()
+            until_date = data["until_date"] == "200"
+            use_independent_chat_permissions = data["use_independent_chat_permissions"]
+            return (
+                chat_id
+                and user_id
+                and permissions
+                and until_date
+                and use_independent_chat_permissions
+            )
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        assert await bot.restrict_chat_member("@chat", 2, chat_permissions, 200, True)
 
     async def test_restrict_chat_member_default_tz(
         self, monkeypatch, tz_bot, channel_id, chat_permissions
@@ -2521,14 +2542,6 @@ class TestBotWithRequest:
         assert high_scores[0].score == BASE_GAME_SCORE - 10
 
     # send_invoice and create_invoice_link is tested in test_invoice
-
-    async def test_restrict_chat_member(self, bot, channel_id, chat_permissions):
-        # TODO: Add bot to supergroup so this can be tested properly
-        with pytest.raises(BadRequest, match="Method is available only for supergroups"):
-            assert await bot.restrict_chat_member(
-                channel_id, 95205500, chat_permissions, until_date=dtm.datetime.utcnow()
-            )
-
     async def test_promote_chat_member(self, bot, channel_id, monkeypatch):
         # TODO: Add bot to supergroup so this can be tested properly / give bot perms
         with pytest.raises(BadRequest, match="Not enough rights"):

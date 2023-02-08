@@ -18,7 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import InlineKeyboardButton, KeyboardButton, KeyboardButtonPollType, WebAppInfo
+from telegram import (
+    InlineKeyboardButton,
+    KeyboardButton,
+    KeyboardButtonPollType,
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestUser,
+    WebAppInfo,
+)
 
 
 @pytest.fixture(scope="module")
@@ -29,6 +36,8 @@ def keyboard_button():
         request_contact=TestKeyboardButtonBase.request_contact,
         request_poll=TestKeyboardButtonBase.request_poll,
         web_app=TestKeyboardButtonBase.web_app,
+        request_chat=TestKeyboardButtonBase.request_chat,
+        request_user=TestKeyboardButtonBase.request_user,
     )
 
 
@@ -38,6 +47,8 @@ class TestKeyboardButtonBase:
     request_contact = True
     request_poll = KeyboardButtonPollType("quiz")
     web_app = WebAppInfo(url="https://example.com")
+    request_chat = KeyboardButtonRequestChat(1, True)
+    request_user = KeyboardButtonRequestUser(2)
 
 
 class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
@@ -53,6 +64,8 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert keyboard_button.request_contact == self.request_contact
         assert keyboard_button.request_poll == self.request_poll
         assert keyboard_button.web_app == self.web_app
+        assert keyboard_button.request_chat == self.request_chat
+        assert keyboard_button.request_user == self.request_user
 
     def test_to_dict(self, keyboard_button):
         keyboard_button_dict = keyboard_button.to_dict()
@@ -63,6 +76,8 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert keyboard_button_dict["request_contact"] == keyboard_button.request_contact
         assert keyboard_button_dict["request_poll"] == keyboard_button.request_poll.to_dict()
         assert keyboard_button_dict["web_app"] == keyboard_button.web_app.to_dict()
+        assert keyboard_button_dict["request_chat"] == keyboard_button.request_chat.to_dict()
+        assert keyboard_button_dict["request_user"] == keyboard_button.request_user.to_dict()
 
     def test_de_json(self, bot):
         json_dict = {
@@ -71,6 +86,8 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
             "request_contact": self.request_contact,
             "request_poll": self.request_poll.to_dict(),
             "web_app": self.web_app.to_dict(),
+            "request_chat": self.request_chat.to_dict(),
+            "request_user": self.request_user.to_dict(),
         }
 
         inline_keyboard_button = KeyboardButton.de_json(json_dict, None)
@@ -80,6 +97,8 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert inline_keyboard_button.request_contact == self.request_contact
         assert inline_keyboard_button.request_poll == self.request_poll
         assert inline_keyboard_button.web_app == self.web_app
+        assert inline_keyboard_button.request_chat == self.request_chat
+        assert inline_keyboard_button.request_user == self.request_user
 
         none = KeyboardButton.de_json({}, None)
         assert none is None
@@ -90,6 +109,12 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         c = KeyboardButton("Test", request_location=True)
         d = KeyboardButton("Test", web_app=WebAppInfo(url="https://ptb.org"))
         e = InlineKeyboardButton("test", callback_data="test")
+        f = KeyboardButton(
+            "test",
+            request_contact=True,
+            request_chat=KeyboardButtonRequestChat(1, False),
+            request_user=KeyboardButtonRequestUser(2),
+        )
 
         assert a == b
         assert hash(a) == hash(b)
@@ -102,3 +127,16 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
 
         assert a != e
         assert hash(a) != hash(e)
+
+        # we expect this to be true since we don't compare these in V20
+        assert a == f
+        assert hash(a) == hash(f)
+
+    def test_equality_warning(self, recwarn, keyboard_button):
+        recwarn.clear()
+        assert keyboard_button == keyboard_button
+
+        assert str(recwarn[0].message) == (
+            "In v21, granular media settings will be considered as well when comparing"
+            " ChatPermissions instances."
+        )

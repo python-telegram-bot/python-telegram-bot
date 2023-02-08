@@ -1,5 +1,5 @@
-telegram.WebAppData
-===========================
+WebAppData
+==========
 
 .. autoclass:: telegram.WebAppData
     :members:

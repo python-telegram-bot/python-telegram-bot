@@ -1,5 +1,5 @@
-telegram.InlineQueryResultCachedSticker
-=======================================
+InlineQueryResultCachedSticker
+==============================
 
 .. autoclass:: telegram.InlineQueryResultCachedSticker
     :members:

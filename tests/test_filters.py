@@ -1046,6 +1046,16 @@ class TestFilters:
         assert filters.StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
         update.message.write_access_allowed = None
 
+        update.message.user_shared = "user_shared"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.USER_SHARED.check_update(update)
+        update.message.user_shared = None
+
+        update.message.chat_shared = "user_shared"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.CHAT_SHARED.check_update(update)
+        update.message.chat_shared = None
+
     def test_filters_forwarded(self, update):
         assert not filters.FORWARDED.check_update(update)
         update.message.forward_date = datetime.datetime.utcnow()

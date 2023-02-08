@@ -1,5 +1,5 @@
-telegram.Credentials
-====================
+Credentials
+===========
 
 .. autoclass:: telegram.Credentials
     :members:

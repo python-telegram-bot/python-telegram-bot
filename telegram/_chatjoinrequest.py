@@ -39,17 +39,32 @@ class ChatJoinRequest(TelegramObject):
     considered equal, if their :attr:`chat`, :attr:`from_user` and :attr:`date` are equal.
 
     Note:
-        Since Bot API 5.5, bots are allowed to contact users who sent a join request to a chat
-        where the bot is an administrator with the
-        :attr:`~telegram.ChatMemberAdministrator.can_invite_users` administrator right – even if
-        the user never interacted with the bot before.
+        * Since Bot API 5.5, bots are allowed to contact users who sent a join request to a chat
+          where the bot is an administrator with the
+          :attr:`~telegram.ChatMemberAdministrator.can_invite_users` administrator right – even
+          if the user never interacted with the bot before.
+        * Telegram does not guarantee that :attr:`from_user.id <from_user>` coincides with the
+          ``chat_id`` of the user. Please use :attr:`user_chat_id` to contact the user in
+          response to their join request.
 
     .. versionadded:: 13.8
+    .. versionchanged:: 20.1
+       In Bot API 6.5 the argument :paramref:`user_chat_id` was added, which changes the position
+       of the optional arguments :paramref:`bio` and :paramref:`invite_link`.
 
     Args:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
         from_user (:class:`telegram.User`): User that sent the join request.
         date (:class:`datetime.datetime`): Date the request was sent.
+        user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
+            request. This number may have more than 32 significant bits and some programming
+            languages may have difficulty/silent defects in interpreting it. But it has at most 52
+            significant bits, so a 64-bit integer or double-precision float type are safe for
+            storing this identifier. The bot can use this identifier for 24 hours to send messages
+            until the join request is processed, assuming no other administrator contacted the
+            user.
+
+            .. versionadded:: 20.1
         bio (:obj:`str`, optional): Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link that was used
             by the user to send the join request.
@@ -58,19 +73,29 @@ class ChatJoinRequest(TelegramObject):
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
         from_user (:class:`telegram.User`): User that sent the join request.
         date (:class:`datetime.datetime`): Date the request was sent.
+        user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
+            request. This number may have more than 32 significant bits and some programming
+            languages may have difficulty/silent defects in interpreting it. But it has at most 52
+            significant bits, so a 64-bit integer or double-precision float type are safe for
+            storing this identifier. The bot can use this identifier for 24 hours to send messages
+            until the join request is processed, assuming no other administrator contacted the
+            user.
+
+            .. versionadded:: 20.1
         bio (:obj:`str`): Optional. Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link that was used
             by the user to send the join request.
 
     """
 
-    __slots__ = ("chat", "from_user", "date", "bio", "invite_link")
+    __slots__ = ("chat", "from_user", "date", "bio", "invite_link", "user_chat_id")
 
     def __init__(
         self,
         chat: Chat,
         from_user: User,
         date: datetime.datetime,
+        user_chat_id: int,
         bio: str = None,
         invite_link: ChatInviteLink = None,
         *,
@@ -81,6 +106,7 @@ class ChatJoinRequest(TelegramObject):
         self.chat: Chat = chat
         self.from_user: User = from_user
         self.date: datetime.datetime = date
+        self.user_chat_id: int = user_chat_id
 
         # Optionals
         self.bio: Optional[str] = bio

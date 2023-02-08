@@ -2051,7 +2051,6 @@ class TestConversationHandler:
             await app.stop()
 
     async def test_no_timeout_on_end(self, app, user1):
-
         conv_handler = ConversationHandler(
             entry_points=[MessageHandler(filters.ALL, callback=self.start_end)],
             states={ConversationHandler.TIMEOUT: [TypeHandler(Update, self.passout2)]},
@@ -2114,7 +2113,6 @@ class TestConversationHandler:
     async def test_blocking_resolution_order(
         self, bot_info, default_block, ch_block, handler_block, ext_bot
     ):
-
         event = asyncio.Event()
 
         async def callback(_, __):

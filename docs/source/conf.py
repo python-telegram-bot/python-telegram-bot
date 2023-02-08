@@ -1,20 +1,12 @@
-import inspect
 import os
 import re
-import subprocess
 import sys
-from enum import Enum
 from pathlib import Path
-from typing import List, Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-from docutils.nodes import Element
 from sphinx.application import Sphinx
-from sphinx.domains.python import PyXRefRole
-from sphinx.environment import BuildEnvironment
-from sphinx.util import logging
 
 sys.path.insert(0, os.path.abspath("../.."))
 
@@ -34,7 +26,7 @@ version = "20.0"  # telegram.__version__[:3]
 release = "20.0"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "5.1.1"
+needs_sphinx = "6.1.3"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -46,6 +38,7 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx.ext.extlinks",
     "sphinx_paramlinks",
+    "sphinx_copybutton",
     "sphinxcontrib.mermaid",
     "sphinx_search.extension",
 ]
@@ -220,7 +213,13 @@ html_favicon = "ptb-logo_1024.ico"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_css_files = ["style_external_link.css", "style_mermaid_diagrams.css"]
+html_css_files = [
+    "style_external_link.css",
+    "style_mermaid_diagrams.css",
+    "style_sidebar_brand.css",
+    "style_general.css",
+    "style_admonitions.css",
+]
 
 html_permalinks_icon = "¶"  # Furo's default permalink icon is `#` which doesn't look great imo.
 
@@ -284,326 +283,16 @@ texinfo_documents = [
 
 # -- script stuff --------------------------------------------------------
 
-# get the sphinx(!) logger
-# Makes sure logs render in red and also plays nicely with e.g. the `nitpicky` option.
-sphinx_logger = logging.getLogger(__name__)
+# Due to Sphinx behaviour, these imports only work when imported here, not at top of module.
 
-CONSTANTS_ROLE = "tg-const"
-import telegram  # We need this so that the `eval` below works
-
-
-class TGConstXRefRole(PyXRefRole):
-    """This is a bit of Sphinx magic. We add a new role type called tg-const that allows us to
-    reference values from the `telegram.constants.module` while using the actual value as title
-    of the link.
-
-    Example:
-
-        :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` renders as `4096` but links to the
-        constant.
-    """
-
-    def process_link(
-        self,
-        env: BuildEnvironment,
-        refnode: Element,
-        has_explicit_title: bool,
-        title: str,
-        target: str,
-    ) -> Tuple[str, str]:
-        title, target = super().process_link(env, refnode, has_explicit_title, title, target)
-        try:
-            # We use `eval` to get the value of the expression. Maybe there are better ways to
-            # do this via importlib or so, but it does the job for now
-            value = eval(target)
-            # Maybe we need a better check if the target is actually from tg.constants
-            # for now checking if it's an Enum suffices since those are used nowhere else in PTB
-            if isinstance(value, Enum):
-                # Special casing for file size limits
-                if isinstance(value, telegram.constants.FileSizeLimit):
-                    return f"{int(value.value / 1e6)} MB", target
-                return repr(value.value), target
-            # Just for (Bot API) versions number auto add in constants:
-            if isinstance(value, str) and target in (
-                "telegram.constants.BOT_API_VERSION",
-                "telegram.__version__",
-            ):
-                return value, target
-            if isinstance(value, tuple) and target in (
-                "telegram.constants.BOT_API_VERSION_INFO",
-                "telegram.__version_info__",
-            ):
-                return repr(value), target
-            sphinx_logger.warning(
-                f"%s:%d: WARNING: Did not convert reference %s. :{CONSTANTS_ROLE}: is not supposed"
-                " to be used with this type of target.",
-                refnode.source,
-                refnode.line,
-                refnode.rawsource,
-            )
-            return title, target
-        except Exception as exc:
-            sphinx_logger.exception(
-                "%s:%d: WARNING: Did not convert reference %s due to an exception.",
-                refnode.source,
-                refnode.line,
-                refnode.rawsource,
-                exc_info=exc,
-            )
-            return title, target
-
-
-def autodoc_skip_member(app, what, name, obj, skip, options):
-    """We use this to not document certain members like filter() or check_update() for filters.
-    See https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#skipping-members"""
-
-    included = {"MessageFilter", "UpdateFilter"}  # filter() and check_update() only for these.
-    included_in_obj = any(inc in repr(obj) for inc in included)
-
-    if included_in_obj:  # it's difficult to see if check_update is from an inherited-member or not
-        for frame in inspect.stack():  # From https://github.com/sphinx-doc/sphinx/issues/9533
-            if frame.function == "filter_members":
-                docobj = frame.frame.f_locals["self"].object
-                if not any(inc in str(docobj) for inc in included) and name == "check_update":
-                    return True
-                break
-
-    if name == "filter" and obj.__module__ == "telegram.ext.filters":
-        if not included_in_obj:
-            return True  # return True to exclude from docs.
-
-
-# ------------------------------------------------------------------------------------------------
-# This part is for getting the [source] links on the classes, methods etc link to the correct
-# files & lines on github. Can be simplified once https://github.com/sphinx-doc/sphinx/issues/1556
-# is closed
-
-line_numbers = {}
-file_root = Path(inspect.getsourcefile(telegram)).parent.parent.resolve()
-import telegram.ext  # Needed for checking if an object is a BaseFilter
-
-keyword_args = [
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.read_timeout: Value to pass to :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to {read_timeout}.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.read_timeout: {read_timeout_type}, optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.write_timeout: Value to pass to :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to {write_timeout}.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.write_timeout: :obj:`float` | :obj:`None`, optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.connect_timeout: Value to pass to :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.connect_timeout: :obj:`float` | :obj:`None`, optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.pool_timeout: Value to pass to :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.pool_timeout: :obj:`float` | :obj:`None`, optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.api_kwargs: Arbitrary keyword arguments to be passed to the Telegram API.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.api_kwargs: :obj:`dict`, optional",
-    "",
-]
-
-write_timeout_sub = [":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`", "``20``"]
-read_timeout_sub = [
-    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
-    "``2``. :paramref:`timeout` will be added to this value",
-]
-read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
-
-
-def find_insert_pos(lines: List[str]) -> int:
-    """Finds the correct position to insert the keyword arguments and returns the index."""
-    for idx, value in reversed(list(enumerate(lines))):  # reversed since :returns: is at the end
-        if value.startswith(":returns:"):
-            return idx
-    else:
-        return False
-
-
-def is_write_timeout_20(obj: object) -> int:
-    """inspects the default value of write_timeout parameter of the bot method."""
-    sig = inspect.signature(obj)
-    return 1 if (sig.parameters["write_timeout"].default == 20) else 0
-
-
-def check_timeout_and_api_kwargs_presence(obj: object) -> int:
-    """Checks if the method has timeout and api_kwargs keyword only parameters."""
-    sig = inspect.signature(obj)
-    params_to_check = (
-        "read_timeout",
-        "write_timeout",
-        "connect_timeout",
-        "pool_timeout",
-        "api_kwargs",
-    )
-    return all(
-        param in sig.parameters and sig.parameters[param].kind == inspect.Parameter.KEYWORD_ONLY
-        for param in params_to_check
-    )
-
-
-def autodoc_process_docstring(
-    app: Sphinx, what, name: str, obj: object, options, lines: List[str]
-):
-    """We do two things:
-    1) Use this method to automatically insert the Keyword Args for the Bot methods.
-
-    2) Misuse this autodoc hook to get the file names & line numbers because we have access
-       to the actual object here.
-    """
-    # 1) Insert the Keyword Args for the Bot methods
-    method_name = name.split(".")[-1]
-    if (
-        name.startswith("telegram.Bot.")
-        and what == "method"
-        and method_name.islower()
-        and check_timeout_and_api_kwargs_presence(obj)
-    ):
-        insert_index = find_insert_pos(lines)
-        if not insert_index:
-            raise ValueError(
-                f"Couldn't find the correct position to insert the keyword args for {obj}."
-            )
-
-        long_write_timeout = is_write_timeout_20(obj)
-        get_updates_sub = 1 if (method_name == "get_updates") else 0
-        # The below can be done in 1 line with itertools.chain, but this must be modified in-place
-        for i in range(insert_index, insert_index + len(keyword_args)):
-            lines.insert(
-                i,
-                keyword_args[i - insert_index].format(
-                    method=method_name,
-                    write_timeout=write_timeout_sub[long_write_timeout],
-                    read_timeout=read_timeout_sub[get_updates_sub],
-                    read_timeout_type=read_timeout_type[get_updates_sub],
-                ),
-            )
-
-    # 2) Get the file names & line numbers
-    # We can't properly handle ordinary attributes.
-    # In linkcode_resolve we'll resolve to the `__init__` or module instead
-    if what == "attribute":
-        return
-
-    # Special casing for properties
-    if hasattr(obj, "fget"):
-        obj = obj.fget
-
-    # Special casing for filters
-    if isinstance(obj, telegram.ext.filters.BaseFilter):
-        obj = obj.__class__
-
-    try:
-        source_lines, start_line = inspect.getsourcelines(obj)
-        end_line = start_line + len(source_lines)
-        file = Path(inspect.getsourcefile(obj)).relative_to(file_root)
-        line_numbers[name] = (file, start_line, end_line)
-    except Exception:
-        pass
-
-    # Since we don't document the `__init__`, we call this manually to have it available for
-    # attributes -- see the note above
-    if what == "class":
-        autodoc_process_docstring(app, "method", f"{name}.__init__", obj.__init__, options, lines)
-
-
-def _git_branch() -> str:
-    """Get's the current git sha if available or fall back to `master`"""
-    try:
-        output = subprocess.check_output(  # skipcq: BAN-B607
-            ["git", "describe", "--tags", "--always"], stderr=subprocess.STDOUT
-        )
-        return output.decode().strip()
-    except Exception as exc:
-        sphinx_logger.exception(
-            "Failed to get a description of the current commit. Falling back to `master`.",
-            exc_info=exc,
-        )
-        return "master"
-
-
-git_branch = _git_branch()
-base_url = "https://github.com/python-telegram-bot/python-telegram-bot/blob/"
-
-
-def linkcode_resolve(_, info):
-    """See www.sphinx-doc.org/en/master/usage/extensions/linkcode.html"""
-    combined = ".".join((info["module"], info["fullname"]))
-    # special casing for ExtBot which is due to the special structure of extbot.rst
-    combined = combined.replace("ExtBot.ExtBot", "ExtBot")
-
-    line_info = line_numbers.get(combined)
-
-    if not line_info:
-        # Try the __init__
-        line_info = line_numbers.get(f"{combined.rsplit('.', 1)[0]}.__init__")
-    if not line_info:
-        # Try the class
-        line_info = line_numbers.get(f"{combined.rsplit('.', 1)[0]}")
-    if not line_info:
-        # Try the module
-        line_info = line_numbers.get(info["module"])
-
-    if not line_info:
-        return
-
-    file, start_line, end_line = line_info
-    return f"{base_url}{git_branch}/{file}#L{start_line}-L{end_line}"
-
-
-# End of logic for the [source] links
-# ------------------------------------------------------------------------------------------------
-
-
-# Some base classes are implementation detail
-# We want to instead show *their* base class
-PRIVATE_BASE_CLASSES = {
-    "_ChatUserBaseFilter": "MessageFilter",
-    "_Dice": "MessageFilter",
-    "_BaseThumbedMedium": "TelegramObject",
-    "_BaseMedium": "TelegramObject",
-    "_CredentialsBase": "TelegramObject",
-}
-
-
-def autodoc_process_bases(app, name, obj, option, bases: list):
-    """Here we fine tune how the base class's classes are displayed."""
-    for idx, base in enumerate(bases):
-        # let's use a string representation of the object
-        base = str(base)
-
-        # Special case for abstract context managers which are wrongly resoled for some reason
-        if base.startswith("typing.AbstractAsyncContextManager"):
-            bases[idx] = ":class:`contextlib.AbstractAsyncContextManager`"
-            continue
-
-        # Special case because base classes are in std lib:
-        if "StringEnum" in base == "<enum 'StringEnum'>":
-            bases[idx] = ":class:`enum.Enum`"
-            bases.insert(0, ":class:`str`")
-            continue
-
-        if "IntEnum" in base:
-            bases[idx] = ":class:`enum.IntEnum`"
-            continue
-
-        # Drop generics (at least for now)
-        if base.endswith("]"):
-            base = base.split("[", maxsplit=1)[0]
-            bases[idx] = f":class:`{base}`"
-
-        # Now convert `telegram._message.Message` to `telegram.Message` etc
-        match = re.search(pattern=r"(telegram(\.ext|))\.[_\w\.]+", string=base)
-        if not match or "_utils" in base:
-            continue
-
-        parts = match.group(0).split(".")
-
-        # Remove private paths
-        for index, part in enumerate(parts):
-            if part.startswith("_"):
-                parts = parts[:index] + parts[-1:]
-                break
-
-        # Replace private base classes with their respective parent
-        parts = [PRIVATE_BASE_CLASSES.get(part, part) for part in parts]
-
-        base = ".".join(parts)
-
-        bases[idx] = f":class:`{base}`"
+# Not used but must be imported for the linkcode extension to find it
+from docs.auxil.link_code import linkcode_resolve
+from docs.auxil.sphinx_hooks import (
+    autodoc_process_bases,
+    autodoc_process_docstring,
+    autodoc_skip_member,
+)
+from docs.auxil.tg_const_role import CONSTANTS_ROLE, TGConstXRefRole
 
 
 def setup(app: Sphinx):

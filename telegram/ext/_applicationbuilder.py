@@ -546,7 +546,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def pool_timeout(self: BuilderType, pool_timeout: Optional[float]) -> BuilderType:
         """Sets the connection pool's connection freeing timeout for the
         :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter of
-        :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
+        :attr:`telegram.Bot.request`. Defaults to ``1.0``.
 
         .. include:: inclusions/pool_size_tip.rst
 
@@ -689,7 +689,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     ) -> BuilderType:
         """Sets the connection pool's connection freeing timeout for the
         :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter which is used for the
-        :meth:`telegram.Bot.get_updates` request. Defaults to :obj:`None`.
+        :meth:`telegram.Bot.get_updates` request. Defaults to ``1.0``.
 
         Args:
             get_updates_pool_timeout (:obj:`float`): See
@@ -812,8 +812,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def local_mode(self: BuilderType, local_mode: bool) -> BuilderType:
         """Specifies the value for :paramref:`~telegram.Bot.local_mode` for the
-         :attr:`telegram.ext.Application.bot`.
-         If not called, will default to :obj:`False`.
+        :attr:`telegram.ext.Application.bot`.
+        If not called, will default to :obj:`False`.
 
         .. seealso:: :wiki:`Local Bot API Server <Local-Bot-API-Server>`
 
@@ -870,6 +870,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def concurrent_updates(self: BuilderType, concurrent_updates: Union[bool, int]) -> BuilderType:
         """Specifies if and how many updates may be processed concurrently instead of one by one.
+        If not called, updates will be processed one by one.
 
         Warning:
             Processing updates concurrently is not recommended when stateful handlers like

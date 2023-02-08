@@ -54,6 +54,7 @@ chat_join_request = ChatJoinRequest(
     chat=Chat(1, Chat.SUPERGROUP),
     from_user=User(1, "first_name", False),
     date=from_timestamp(int(time.time())),
+    user_chat_id=1,
     bio="bio",
 )
 

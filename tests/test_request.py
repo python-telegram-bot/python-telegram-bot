@@ -476,7 +476,6 @@ class TestHTTPXRequestWithoutRequest:
             write_timeout=default_timeouts.write,
             pool_timeout=default_timeouts.pool,
         ) as httpx_request:
-
             monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
             await httpx_request.do_request(method="GET", url="URL")
 
@@ -496,7 +495,6 @@ class TestHTTPXRequestWithoutRequest:
             write_timeout=default_timeouts.write,
             pool_timeout=default_timeouts.pool,
         ) as httpx_request:
-
             monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
             await httpx_request.do_request(
                 method="GET",

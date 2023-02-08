@@ -60,9 +60,7 @@ class JobQueue(Generic[CCT]):
     Examples:
         :any:`Timer Bot <examples.timerbot>`
 
-    .. seealso:: :attr:`telegram.ext.Application.job_queue`,
-        :attr:`telegram.ext.CallbackContext.job_queue`,
-        :wiki:`Architecture Overview <Architecture>`,
+    .. seealso:: :wiki:`Architecture Overview <Architecture>`,
         :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
 
     .. versionchanged:: 20.0
@@ -670,8 +668,9 @@ class Job(Generic[CCT]):
 
                 async def callback(context: CallbackContext)
 
-        data (:obj:`object`, optional): Additional data needed for the callback function. Can be
-            accessed through :attr:`Job.data` in the callback. Defaults to :obj:`None`.
+        data (:obj:`object`, optional): Additional data needed for the :paramref:`callback`
+            function. Can be accessed through :attr:`Job.data` in the callback. Defaults to
+            :obj:`None`.
         name (:obj:`str`, optional): The name of the new job. Defaults to
             :external:obj:`callback.__name__ <definition.__name__>`.
         chat_id (:obj:`int`, optional): Chat id of the chat that this job is associated with.
@@ -683,7 +682,7 @@ class Job(Generic[CCT]):
     Attributes:
         callback (:term:`coroutine function`): The callback function that should be executed by the
             new job.
-        data (:obj:`object`): Optional. Additional data needed for the callback function.
+        data (:obj:`object`): Optional. Additional data needed for the :attr:`callback` function.
         name (:obj:`str`): Optional. The name of the new job.
         chat_id (:obj:`int`): Optional. Chat id of the chat that this job is associated with.
 

@@ -1,5 +1,5 @@
-telegram.Chat
-=============
+Chat
+====
 
 .. autoclass:: telegram.Chat
     :members:
