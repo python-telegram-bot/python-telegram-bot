@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import inspect
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from telegram.ext._utils.stack import was_called_by
 
