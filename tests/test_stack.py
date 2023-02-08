@@ -53,7 +53,7 @@ class TestStack:
 
     def test_called_by_symlink_file_nested(self, tmp_path):
         # Same as test_called_by_symlink_file except
-        # foo_func is nested inside bar_func to test
+        # inner_func is nested inside outer_func to test
         # if `was_called_by` can resolve paths in recursion.
         temp_file1 = tmp_path / "foo.py"
         foo_content = "import inspect\ndef foo_func():\
