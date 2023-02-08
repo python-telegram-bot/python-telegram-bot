@@ -141,7 +141,6 @@ class InlineQueryResultVideo(InlineQueryResult):
         *,
         api_kwargs: JSONDict = None,
     ):
-
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
         with self._unfrozen():

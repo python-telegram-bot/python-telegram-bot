@@ -117,13 +117,13 @@ class HTTPXRequest(BaseRequest):
 
         http1 = http_version == "1.1"
 
-        self._client_kwargs = dict(
-            timeout=timeout,
-            proxies=proxy_url,
-            limits=limits,
-            http1=http1,
-            http2=not http1,
-        )
+        self._client_kwargs = {
+            "timeout": timeout,
+            "proxies": proxy_url,
+            "limits": limits,
+            "http1": http1,
+            "http2": not http1,
+        }
 
         try:
             self._client = self._build_client()

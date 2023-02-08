@@ -130,7 +130,6 @@ class InlineQueryResultGif(InlineQueryResult):
         *,
         api_kwargs: JSONDict = None,
     ):
-
         # Required
         super().__init__(InlineQueryResultType.GIF, id, api_kwargs=api_kwargs)
         with self._unfrozen():

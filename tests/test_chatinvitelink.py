@@ -45,7 +45,6 @@ def invite_link(creator):
 
 
 class TestChatInviteLink:
-
     link = "thisialink"
     creates_join_request = False
     primary = True

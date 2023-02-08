@@ -391,7 +391,6 @@ class InputMediaVideo(InputMedia):
         *,
         api_kwargs: JSONDict = None,
     ):
-
         if isinstance(media, Video):
             width = width if width is not None else media.width
             height = height if height is not None else media.height

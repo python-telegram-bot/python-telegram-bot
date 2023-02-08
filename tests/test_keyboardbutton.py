@@ -131,7 +131,6 @@ class TestKeyboardButton:
         assert hash(a) == hash(f)
 
     def test_equality_warning(self, recwarn, keyboard_button):
-
         recwarn.clear()
         assert keyboard_button == keyboard_button
 
