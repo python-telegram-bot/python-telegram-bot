@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import inspect
 from pathlib import Path
+import sys
 
 from telegram.ext._utils.stack import was_called_by
 
@@ -27,6 +28,8 @@ class TestStack:
         assert not was_called_by(None, None)
 
     def test_called_by_current_file(self):
+        # Testing a call by a different file is somewhat hard but it's covered in
+        # TestUpdater/Application.test_manual_init_warning
         frame = inspect.currentframe()
         file = Path(__file__)
         assert was_called_by(frame, file)
@@ -43,7 +46,6 @@ class TestStack:
             f.write(foo_content)
         symlink_file = tmp_path / "foo_link.py"
         symlink_file.symlink_to(temp_file)
-        import sys
 
         sys.path.append(tmp_path.as_posix())
         from foo_link import foo_func
@@ -67,13 +69,9 @@ class TestStack:
             f.write(bar_content)
         symlink_file2 = tmp_path / "bar_link.py"
         symlink_file2.symlink_to(temp_file2)
-        import sys
 
         sys.path.append(tmp_path.as_posix())
         from bar_link import bar_func
 
         frame = bar_func()
         assert was_called_by(frame, temp_file2)
-
-    # Testing a call by a different file is somewhat hard but it's covered in
-    # TestUpdater/Application.test_manual_init_warning
