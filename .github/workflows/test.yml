@@ -58,11 +58,10 @@ jobs:
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
           pip install -r requirements-opts.txt
-          # `-n auto --dist=loadgroup` uses pytest-xdist to run distribute each tests across
-          # available CPUs. Tests marked with `xdist_group` run in the same worker (in order).
-          # Increasing number of workers has little effect on test duration, but it seems to
-          # increase flakyness.
-          pytest -v --cov --cov-append -n auto --dist=loadgroup
+          # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU
+          # worker. Increasing number of workers has little effect on test duration, but it seems
+          # to increase flakyness, specially on python 3.7 with --dist=loadgroup.
+          pytest -v --cov --cov-append -n auto --dist loadfile
           status=$(( $? > status ? $? : status))
           exit ${status}
         env:
