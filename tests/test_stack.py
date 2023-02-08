@@ -35,7 +35,7 @@ class TestStack:
         # Set up a call from a linked file in a temp directory,
         # then test it with its resolved path.
         # Here we expect `was_called_by` to recognize
-        # "`tmp_path`/foo_link.py" as same as "`tmp_path`/foo.py".
+        # "`tmp_path`/caller_link.py" as same as "`tmp_path`/caller.py".
         temp_file = tmp_path / "foo.py"
         foo_content = "import inspect\ndef foo_func():\
             \n    return inspect.currentframe()"
