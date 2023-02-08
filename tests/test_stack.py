@@ -39,39 +39,39 @@ class TestStack:
         # then test it with its resolved path.
         # Here we expect `was_called_by` to recognize
         # "`tmp_path`/caller_link.py" as same as "`tmp_path`/caller.py".
-        temp_file = tmp_path / "foo.py"
-        foo_content = "import inspect\ndef foo_func():\
+        temp_file = tmp_path / "caller.py"
+        caller_content = "import inspect\ndef caller_func():\
             \n    return inspect.currentframe()"
         with temp_file.open("w") as f:
-            f.write(foo_content)
-        symlink_file = tmp_path / "foo_link.py"
+            f.write(caller_content)
+        symlink_file = tmp_path / "caller_link.py"
         symlink_file.symlink_to(temp_file)
 
         sys.path.append(tmp_path.as_posix())
-        from foo_link import foo_func
+        from caller_link import caller_func
 
-        frame = foo_func()
+        frame = caller_func()
         assert was_called_by(frame, temp_file)
 
     def test_called_by_symlink_file_nested(self, tmp_path):
         # Same as test_called_by_symlink_file except
         # inner_func is nested inside outer_func to test
         # if `was_called_by` can resolve paths in recursion.
-        temp_file1 = tmp_path / "foo.py"
-        foo_content = "import inspect\ndef foo_func():\
+        temp_file1 = tmp_path / "inner.py"
+        inner_content = "import inspect\ndef inner_func():\
             \n    return inspect.currentframe()"
         with temp_file1.open("w") as f:
-            f.write(foo_content)
-        temp_file2 = tmp_path / "bar.py"
-        bar_content = "from foo import foo_func\ndef bar_func():\
-            \n    return foo_func()"
+            f.write(inner_content)
+        temp_file2 = tmp_path / "outer.py"
+        outer_content = "from inner import inner_func\ndef outer_func():\
+            \n    return inner_func()"
         with temp_file2.open("w") as f:
-            f.write(bar_content)
-        symlink_file2 = tmp_path / "bar_link.py"
+            f.write(outer_content)
+        symlink_file2 = tmp_path / "outer_link.py"
         symlink_file2.symlink_to(temp_file2)
 
         sys.path.append(tmp_path.as_posix())
-        from bar_link import bar_func
+        from outer_link import outer_func
 
-        frame = bar_func()
+        frame = outer_func()
         assert was_called_by(frame, temp_file2)
