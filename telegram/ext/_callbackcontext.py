@@ -20,7 +20,7 @@
 from typing import (
     TYPE_CHECKING,
     Any,
-    Coroutine,
+    Awaitable,
     Dict,
     Generic,
     List,
@@ -143,7 +143,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.matches: Optional[List[Match[str]]] = None
         self.error: Optional[Exception] = None
         self.job: Optional["Job[CCT]"] = None
-        self.coroutine: Optional[Coroutine[Any, Any, Any]] = None
+        self.coroutine: Optional[Awaitable[Any]] = None
 
     @property
     def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":
@@ -275,7 +275,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         error: Exception,
         application: "Application[BT, CCT, UD, CD, BD, Any]",
         job: "Job[Any]" = None,
-        coroutine: Coroutine[Any, Any, Any] = None,
+        coroutine: Awaitable[Any] = None,
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error

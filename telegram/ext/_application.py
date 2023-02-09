@@ -31,6 +31,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     AsyncContextManager,
+    Awaitable,
     Callable,
     Coroutine,
     DefaultDict,
@@ -71,7 +72,6 @@ if TYPE_CHECKING:
 DEFAULT_GROUP: int = 0
 
 _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-name
-_RT = TypeVar("_RT")
 _STOP_SIGNAL = object()
 
 _logger = logging.getLogger(__name__)
@@ -933,9 +933,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 if close_loop:
                     loop.close()
 
-    def create_task(
-        self, coroutine: Coroutine[Any, Any, RT], update: object = None
-    ) -> "asyncio.Task[RT]":
+    def create_task(self, coroutine: Awaitable[RT], update: object = None) -> "asyncio.Task[RT]":
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
         the :paramref:`coroutine` with :meth:`process_error`.
 
@@ -960,13 +958,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         return self.__create_task(coroutine=coroutine, update=update)
 
     def __create_task(
-        self, coroutine: Coroutine, update: object = None, is_error_handler: bool = False
-    ) -> asyncio.Task:
+        self, coroutine: Awaitable[RT], update: object = None, is_error_handler: bool = False
+    ) -> "asyncio.Task[RT]":
         # Unfortunately, we can't know if `coroutine` runs one of the error handler functions
         # but by passing `is_error_handler=True` from `process_error`, we can make sure that we
         # get at most one recursion of the user calls `create_task` manually with an error handler
         # function
-        task = asyncio.create_task(
+        task: "asyncio.Task[RT]" = asyncio.create_task(
             self.__create_task_callback(
                 coroutine=coroutine, update=update, is_error_handler=is_error_handler
             )
@@ -995,10 +993,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     async def __create_task_callback(
         self,
-        coroutine: Coroutine[Any, Any, _RT],
+        coroutine: Awaitable[RT],
         update: object = None,
         is_error_handler: bool = False,
-    ) -> _RT:
+    ) -> RT:
         try:
             return await coroutine
         except asyncio.CancelledError as cancel:
@@ -1562,7 +1560,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update: Optional[object],
         error: Exception,
         job: "Job[CCT]" = None,
-        coroutine: Coroutine[Any, Any, Any] = None,
+        coroutine: Awaitable[Any] = None,
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises
