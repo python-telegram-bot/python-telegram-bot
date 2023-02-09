@@ -117,7 +117,7 @@ class HTTPXRequest(BaseRequest):
 
         http1 = http_version == "1.1"
 
-        self._client_kwargs = {}
+        self._client_kwargs = dict()
         self._client_kwargs["timeout"] = timeout
         self._client_kwargs["proxies"] = proxy_url
         self._client_kwargs["limits"] = limits
