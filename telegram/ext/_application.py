@@ -946,7 +946,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         .. seealso:: :wiki:`Concurrency`
 
         Args:
-            coroutine (:term:`coroutine function`): The coroutine to run as task.
+            coroutine (:term:`awaitable`): The awaitable to run as task.
             update (:obj:`object`, optional): If set, will be passed to :meth:`process_error`
                 as additional information for the error handlers. Moreover, the corresponding
                 :attr:`chat_data` and :attr:`user_data` entries will be updated in the next run of
