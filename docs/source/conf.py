@@ -21,9 +21,9 @@ author = "Leandro Toledo"
 # built documents.
 #
 # The short X.Y version.
-version = "20.0"  # telegram.__version__[:3]
+version = "20.1"  # telegram.__version__[:3]
 # The full version, including alpha/beta/rc tags.
-release = "20.0"  # telegram.__version__
+release = "20.1"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "6.1.3"
@@ -219,6 +219,7 @@ html_css_files = [
     "style_sidebar_brand.css",
     "style_general.css",
     "style_admonitions.css",
+    "style_images.css",
 ]
 
 html_permalinks_icon = "¶"  # Furo's default permalink icon is `#` which doesn't look great imo.

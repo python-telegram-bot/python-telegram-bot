@@ -149,7 +149,7 @@ Optional Dependencies
 
 PTB can be installed with optional dependencies:
 
-* ``pip install python-telegram-bot[passport]`` installs the `cryptography>=3.0 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
+* ``pip install python-telegram-bot[passport]`` installs the `cryptography>=39.0.1 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
 * ``pip install python-telegram-bot[socks]`` installs `httpx[socks] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to work behind a Socks5 server.
 * ``pip install python-telegram-bot[rate-limiter]`` installs `aiolimiter~=1.0.0 <https://aiolimiter.readthedocs.io/en/stable/>`_. Use this, if you want to use ``telegram.ext.AIORateLimiter``.
 * ``pip install python-telegram-bot[webhooks]`` installs the `tornado~=6.2 <https://www.tornadoweb.org/en/stable/>`_ library. Use this, if you want to use ``telegram.ext.Updater.start_webhook``/``telegram.ext.Application.run_webhook``.
