@@ -114,7 +114,7 @@ if TYPE_CHECKING:
 BT = TypeVar("BT", bound="Bot")
 
 
-class Bot(TelegramObject, AsyncContextManager):
+class Bot(TelegramObject, AsyncContextManager["Bot"]):
     """This object represents a Telegram Bot.
 
     Instances of this class can be used as asyncio context managers, where
@@ -254,7 +254,7 @@ class Bot(TelegramObject, AsyncContextManager):
         self._freeze()
 
     @property
-    def token(self):
+    def token(self) -> str:
         """:obj:`str`: Bot's unique authentication token.
 
         .. versionadded:: 20.0
