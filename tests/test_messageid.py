@@ -20,12 +20,12 @@ import pytest
 from telegram import MessageId, User
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def message_id():
-    return MessageId(message_id=TestMessageId.m_id)
+    return MessageId(message_id=TestMessageIdWithoutRequest.m_id)
 
 
-class TestMessageId:
+class TestMessageIdWithoutRequest:
     m_id = 1234
 
     def test_slot_behaviour(self, message_id, mro_slots):

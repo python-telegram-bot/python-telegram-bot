@@ -27,27 +27,27 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_venue():
     return InlineQueryResultVenue(
-        TestInlineQueryResultVenue.id_,
-        TestInlineQueryResultVenue.latitude,
-        TestInlineQueryResultVenue.longitude,
-        TestInlineQueryResultVenue.title,
-        TestInlineQueryResultVenue.address,
-        foursquare_id=TestInlineQueryResultVenue.foursquare_id,
-        foursquare_type=TestInlineQueryResultVenue.foursquare_type,
-        thumb_url=TestInlineQueryResultVenue.thumb_url,
-        thumb_width=TestInlineQueryResultVenue.thumb_width,
-        thumb_height=TestInlineQueryResultVenue.thumb_height,
-        input_message_content=TestInlineQueryResultVenue.input_message_content,
-        reply_markup=TestInlineQueryResultVenue.reply_markup,
-        google_place_id=TestInlineQueryResultVenue.google_place_id,
-        google_place_type=TestInlineQueryResultVenue.google_place_type,
+        TestInlineQueryResultVenueBase.id_,
+        TestInlineQueryResultVenueBase.latitude,
+        TestInlineQueryResultVenueBase.longitude,
+        TestInlineQueryResultVenueBase.title,
+        TestInlineQueryResultVenueBase.address,
+        foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
+        foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
+        thumb_url=TestInlineQueryResultVenueBase.thumb_url,
+        thumb_width=TestInlineQueryResultVenueBase.thumb_width,
+        thumb_height=TestInlineQueryResultVenueBase.thumb_height,
+        input_message_content=TestInlineQueryResultVenueBase.input_message_content,
+        reply_markup=TestInlineQueryResultVenueBase.reply_markup,
+        google_place_id=TestInlineQueryResultVenueBase.google_place_id,
+        google_place_type=TestInlineQueryResultVenueBase.google_place_type,
     )
 
 
-class TestInlineQueryResultVenue:
+class TestInlineQueryResultVenueBase:
     id_ = "id"
     type_ = "venue"
     latitude = "latitude"
@@ -64,6 +64,8 @@ class TestInlineQueryResultVenue:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultVenueWithoutRequest(TestInlineQueryResultVenueBase):
     def test_slot_behaviour(self, inline_query_result_venue, mro_slots):
         inst = inline_query_result_venue
         for attr in inst.__slots__:

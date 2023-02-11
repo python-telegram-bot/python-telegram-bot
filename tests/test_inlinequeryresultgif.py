@@ -28,26 +28,26 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_gif():
     return InlineQueryResultGif(
-        TestInlineQueryResultGif.id_,
-        TestInlineQueryResultGif.gif_url,
-        TestInlineQueryResultGif.thumb_url,
-        gif_width=TestInlineQueryResultGif.gif_width,
-        gif_height=TestInlineQueryResultGif.gif_height,
-        gif_duration=TestInlineQueryResultGif.gif_duration,
-        title=TestInlineQueryResultGif.title,
-        caption=TestInlineQueryResultGif.caption,
-        parse_mode=TestInlineQueryResultGif.parse_mode,
-        caption_entities=TestInlineQueryResultGif.caption_entities,
-        input_message_content=TestInlineQueryResultGif.input_message_content,
-        reply_markup=TestInlineQueryResultGif.reply_markup,
-        thumb_mime_type=TestInlineQueryResultGif.thumb_mime_type,
+        TestInlineQueryResultGifBase.id_,
+        TestInlineQueryResultGifBase.gif_url,
+        TestInlineQueryResultGifBase.thumb_url,
+        gif_width=TestInlineQueryResultGifBase.gif_width,
+        gif_height=TestInlineQueryResultGifBase.gif_height,
+        gif_duration=TestInlineQueryResultGifBase.gif_duration,
+        title=TestInlineQueryResultGifBase.title,
+        caption=TestInlineQueryResultGifBase.caption,
+        parse_mode=TestInlineQueryResultGifBase.parse_mode,
+        caption_entities=TestInlineQueryResultGifBase.caption_entities,
+        input_message_content=TestInlineQueryResultGifBase.input_message_content,
+        reply_markup=TestInlineQueryResultGifBase.reply_markup,
+        thumb_mime_type=TestInlineQueryResultGifBase.thumb_mime_type,
     )
 
 
-class TestInlineQueryResultGif:
+class TestInlineQueryResultGifBase:
     id_ = "id"
     type_ = "gif"
     gif_url = "gif url"
@@ -63,6 +63,8 @@ class TestInlineQueryResultGif:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
     def test_slot_behaviour(self, inline_query_result_gif, mro_slots):
         inst = inline_query_result_gif
         for attr in inst.__slots__:

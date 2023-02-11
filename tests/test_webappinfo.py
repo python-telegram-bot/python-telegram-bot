@@ -22,14 +22,16 @@ import pytest
 from telegram import WebAppInfo
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def web_app_info():
-    return WebAppInfo(url=TestWebAppInfo.url)
+    return WebAppInfo(url=TestWebAppInfoBase.url)
 
 
-class TestWebAppInfo:
+class TestWebAppInfoBase:
     url = "https://www.example.com"
 
+
+class TestWebAppInfoWithoutRequest(TestWebAppInfoBase):
     def test_slot_behaviour(self, web_app_info, mro_slots):
         for attr in web_app_info.__slots__:
             assert getattr(web_app_info, attr, "err") != "err", f"got extra slot '{attr}'"

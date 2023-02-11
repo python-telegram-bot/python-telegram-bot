@@ -24,27 +24,27 @@ from telegram import ChatInviteLink, User
 from telegram._utils.datetime import to_timestamp
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def creator():
     return User(1, "First name", False)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def invite_link(creator):
     return ChatInviteLink(
-        TestChatInviteLink.link,
+        TestChatInviteLinkBase.link,
         creator,
-        TestChatInviteLink.creates_join_request,
-        TestChatInviteLink.primary,
-        TestChatInviteLink.revoked,
-        expire_date=TestChatInviteLink.expire_date,
-        member_limit=TestChatInviteLink.member_limit,
-        name=TestChatInviteLink.name,
-        pending_join_request_count=TestChatInviteLink.pending_join_request_count,
+        TestChatInviteLinkBase.creates_join_request,
+        TestChatInviteLinkBase.primary,
+        TestChatInviteLinkBase.revoked,
+        expire_date=TestChatInviteLinkBase.expire_date,
+        member_limit=TestChatInviteLinkBase.member_limit,
+        name=TestChatInviteLinkBase.name,
+        pending_join_request_count=TestChatInviteLinkBase.pending_join_request_count,
     )
 
 
-class TestChatInviteLink:
+class TestChatInviteLinkBase:
     link = "thisialink"
     creates_join_request = False
     primary = True
@@ -54,6 +54,8 @@ class TestChatInviteLink:
     name = "LinkName"
     pending_join_request_count = 42
 
+
+class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
     def test_slot_behaviour(self, mro_slots, invite_link):
         for attr in invite_link.__slots__:
             assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"

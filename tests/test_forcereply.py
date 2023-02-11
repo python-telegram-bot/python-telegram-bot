@@ -22,29 +22,22 @@ import pytest
 from telegram import ForceReply, ReplyKeyboardRemove
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def force_reply():
-    return ForceReply(
-        TestForceReply.selective,
-        TestForceReply.input_field_placeholder,
-    )
+    return ForceReply(TestForceReplyBase.selective, TestForceReplyBase.input_field_placeholder)
 
 
-class TestForceReply:
+class TestForceReplyBase:
     force_reply = True
     selective = True
     input_field_placeholder = "force replies can be annoying if not used properly"
 
+
+class TestForceReplyWithoutRequest(TestForceReplyBase):
     def test_slot_behaviour(self, force_reply, mro_slots):
         for attr in force_reply.__slots__:
             assert getattr(force_reply, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(force_reply)) == len(set(mro_slots(force_reply))), "duplicate slot"
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
-        message = await bot.send_message(chat_id, "text", reply_markup=force_reply)
-
-        assert message.text == "text"
 
     def test_expected(self, force_reply):
         assert force_reply.force_reply == self.force_reply
@@ -73,3 +66,9 @@ class TestForceReply:
 
         assert a != d
         assert hash(a) != hash(d)
+
+
+class TestForceReplyWithRequest(TestForceReplyBase):
+    async def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
+        message = await bot.send_message(chat_id, "text", reply_markup=force_reply)
+        assert message.text == "text"

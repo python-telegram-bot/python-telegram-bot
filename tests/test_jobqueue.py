@@ -27,9 +27,7 @@ import time
 import pytest
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
-from tests.auxil.object_conversions import env_var_2_bool
-
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+from tests.conftest import TEST_WITH_OPT_DEPS, make_bot
 
 if TEST_WITH_OPT_DEPS:
     import pytz
@@ -46,7 +44,7 @@ class CustomContext(CallbackContext):
 
 
 @pytest.fixture(scope="function")
-async def job_queue(bot, app):
+async def job_queue(app):
     jq = JobQueue()
     jq.set_application(app)
     await jq.start()
@@ -179,9 +177,9 @@ class TestJobQueue:
         job_queue.run_repeating(
             self.job_run_once, 0.5, first=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.2)
         )
-        await asyncio.sleep(0.15)
+        await asyncio.sleep(0.05)
         assert self.result == 0
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(0.25)
         assert self.result == 1
 
     async def test_run_repeating_last(self, job_queue):
@@ -192,7 +190,7 @@ class TestJobQueue:
         assert self.result == 1
 
     async def test_run_repeating_last_timezone(self, job_queue, timezone):
-        """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
+        """Test correct scheduling of job when passing a timezone-aware datetime as ``last``"""
         job_queue.run_repeating(
             self.job_run_once, 0.25, last=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.4)
         )
@@ -244,6 +242,7 @@ class TestJobQueue:
         j2 = job_queue.run_repeating(self.job_run_once, 0.2)
 
         await asyncio.sleep(0.25)
+        assert self.result == 1
 
         j1.schedule_removal()
         j2.schedule_removal()
@@ -273,8 +272,8 @@ class TestJobQueue:
         await asyncio.sleep(0.3)
         assert self.result == 1
 
-    async def test_in_application(self, bot):
-        app = ApplicationBuilder().token(bot.token).build()
+    async def test_in_application(self, bot_info):
+        app = ApplicationBuilder().bot(make_bot(bot_info)).build()
         async with app:
             assert not app.job_queue.scheduler.running
             await app.start()
@@ -311,7 +310,7 @@ class TestJobQueue:
         # Testing running at a specific datetime
         delta, now = dtm.timedelta(seconds=0.5), dtm.datetime.now(UTC)
         when = now + delta
-        expected_time = (now + delta).timestamp()
+        expected_time = when.timestamp()
 
         job_queue.run_once(self.job_datetime_tests, when)
         await asyncio.sleep(0.6)
@@ -444,8 +443,11 @@ class TestJobQueue:
         callback = self.job_run_once
 
         job1 = job_queue.run_once(callback, 10, name="name1")
+        await asyncio.sleep(0.03)  # To stablize tests on windows
         job2 = job_queue.run_once(callback, 10, name="name1")
+        await asyncio.sleep(0.03)
         job3 = job_queue.run_once(callback, 10, name="name2")
+        await asyncio.sleep(0.03)
 
         assert job_queue.jobs() == (job1, job2, job3)
         assert job_queue.get_jobs_by_name("name1") == (job1, job2)
@@ -453,9 +455,9 @@ class TestJobQueue:
 
     async def test_job_run(self, app):
         job = app.job_queue.run_repeating(self.job_run_once, 0.02)
-        await asyncio.sleep(0.05)
-        assert self.result == 0
-        await job.run(app)
+        await asyncio.sleep(0.05)  # the job queue has not started yet
+        assert self.result == 0  # so the job will not run
+        await job.run(app)  # but this will force it to run
         assert self.result == 1
 
     async def test_enable_disable_job(self, job_queue):
@@ -569,7 +571,7 @@ class TestJobQueue:
         )
         job_queue.set_application(application)
 
-        def callback(context):
+        async def callback(context):
             self.result = (
                 type(context),
                 context.user_data,
@@ -603,8 +605,8 @@ class TestJobQueue:
         if wait:
             assert not task.done()
             ready_event.set()
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.1)  # no CancelledError (see source of JobQueue.stop for details)
             assert task.done()
         else:
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.1)  # unfortunately we will get a CancelledError here
             assert task.done()

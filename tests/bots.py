@@ -45,26 +45,27 @@ if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
     BOTS = json.loads(base64.b64decode(BOTS).decode("utf-8"))
     JOB_INDEX = int(JOB_INDEX)
 
-FALLBACKS = json.loads(base64.b64decode(FALLBACKS).decode("utf-8"))
+FALLBACKS = json.loads(base64.b64decode(FALLBACKS).decode("utf-8"))  # type: list[dict[str, str]]
 
 
-def get(name, fallback):
-    # If we have TOKEN, PAYMENT_PROVIDER_TOKEN, CHAT_ID, SUPER_GROUP_ID,
-    # CHANNEL_ID, BOT_NAME, or BOT_USERNAME in the environment, then use that
-    val = os.getenv(name.upper())
-    if val:
-        return val
+class BotInfoProvider:
+    def __init__(self):
+        self._cached = {}
 
+    def get_info(self):
+        if self._cached:
+            return self._cached
+        self._cached = {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}
+        return self._cached
+
+
+def get(key, fallback):
     # If we're running as a github action then fetch bots from the repo secrets
     if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
         try:
-            return BOTS[JOB_INDEX][name]
-        except (KeyError, IndexError):
+            return BOTS[JOB_INDEX][key]
+        except (IndexError, KeyError):
             pass
 
     # Otherwise go with the fallback
     return fallback
-
-
-def get_bot():
-    return {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}

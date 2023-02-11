@@ -21,21 +21,23 @@ import pytest
 from telegram import PassportElementErrorDataField, PassportElementErrorUnspecified
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def passport_element_error_unspecified():
     return PassportElementErrorUnspecified(
-        TestPassportElementErrorUnspecified.type_,
-        TestPassportElementErrorUnspecified.element_hash,
-        TestPassportElementErrorUnspecified.message,
+        TestPassportElementErrorUnspecifiedBase.type_,
+        TestPassportElementErrorUnspecifiedBase.element_hash,
+        TestPassportElementErrorUnspecifiedBase.message,
     )
 
 
-class TestPassportElementErrorUnspecified:
+class TestPassportElementErrorUnspecifiedBase:
     source = "unspecified"
     type_ = "test_type"
     element_hash = "element_hash"
     message = "Error message"
 
+
+class TestPassportElementErrorUnspecifiedWithoutRequest(TestPassportElementErrorUnspecifiedBase):
     def test_slot_behaviour(self, passport_element_error_unspecified, mro_slots):
         inst = passport_element_error_unspecified
         for attr in inst.__slots__:

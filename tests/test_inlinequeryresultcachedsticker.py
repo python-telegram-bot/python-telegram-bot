@@ -27,23 +27,25 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_cached_sticker():
     return InlineQueryResultCachedSticker(
-        TestInlineQueryResultCachedSticker.id_,
-        TestInlineQueryResultCachedSticker.sticker_file_id,
-        input_message_content=TestInlineQueryResultCachedSticker.input_message_content,
-        reply_markup=TestInlineQueryResultCachedSticker.reply_markup,
+        TestInlineQueryResultCachedStickerBase.id_,
+        TestInlineQueryResultCachedStickerBase.sticker_file_id,
+        input_message_content=TestInlineQueryResultCachedStickerBase.input_message_content,
+        reply_markup=TestInlineQueryResultCachedStickerBase.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedSticker:
+class TestInlineQueryResultCachedStickerBase:
     id_ = "id"
     type_ = "sticker"
     sticker_file_id = "sticker file id"
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultCachedStickerWithoutRequest(TestInlineQueryResultCachedStickerBase):
     def test_slot_behaviour(self, inline_query_result_cached_sticker, mro_slots):
         inst = inline_query_result_cached_sticker
         for attr in inst.__slots__:

@@ -21,15 +21,17 @@ import pytest
 from telegram import LabeledPrice, Location
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def labeled_price():
-    return LabeledPrice(TestLabeledPrice.label, TestLabeledPrice.amount)
+    return LabeledPrice(TestLabeledPriceBase.label, TestLabeledPriceBase.amount)
 
 
-class TestLabeledPrice:
+class TestLabeledPriceBase:
     label = "label"
     amount = 100
 
+
+class TestLabeledPriceWithoutRequest(TestLabeledPriceBase):
     def test_slot_behaviour(self, labeled_price, mro_slots):
         inst = labeled_price
         for attr in inst.__slots__:

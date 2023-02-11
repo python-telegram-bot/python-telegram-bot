@@ -19,7 +19,7 @@
 from telegram import MessageAutoDeleteTimerChanged, VideoChatEnded
 
 
-class TestMessageAutoDeleteTimerChanged:
+class TestMessageAutoDeleteTimerChangedWithoutRequest:
     message_auto_delete_time = 100
 
     def test_slot_behaviour(self, mro_slots):

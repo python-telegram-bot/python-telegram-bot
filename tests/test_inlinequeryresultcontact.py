@@ -27,22 +27,22 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_contact():
     return InlineQueryResultContact(
-        TestInlineQueryResultContact.id_,
-        TestInlineQueryResultContact.phone_number,
-        TestInlineQueryResultContact.first_name,
-        last_name=TestInlineQueryResultContact.last_name,
-        thumb_url=TestInlineQueryResultContact.thumb_url,
-        thumb_width=TestInlineQueryResultContact.thumb_width,
-        thumb_height=TestInlineQueryResultContact.thumb_height,
-        input_message_content=TestInlineQueryResultContact.input_message_content,
-        reply_markup=TestInlineQueryResultContact.reply_markup,
+        TestInlineQueryResultContactBase.id_,
+        TestInlineQueryResultContactBase.phone_number,
+        TestInlineQueryResultContactBase.first_name,
+        last_name=TestInlineQueryResultContactBase.last_name,
+        thumb_url=TestInlineQueryResultContactBase.thumb_url,
+        thumb_width=TestInlineQueryResultContactBase.thumb_width,
+        thumb_height=TestInlineQueryResultContactBase.thumb_height,
+        input_message_content=TestInlineQueryResultContactBase.input_message_content,
+        reply_markup=TestInlineQueryResultContactBase.reply_markup,
     )
 
 
-class TestInlineQueryResultContact:
+class TestInlineQueryResultContactBase:
     id_ = "id"
     type_ = "contact"
     phone_number = "phone_number"
@@ -54,6 +54,8 @@ class TestInlineQueryResultContact:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultContactWithoutRequest(TestInlineQueryResultContactBase):
     def test_slot_behaviour(self, inline_query_result_contact, mro_slots):
         inst = inline_query_result_contact
         for attr in inst.__slots__:

@@ -66,13 +66,13 @@ from tests.auxil.bot_method_checks import (
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def message(bot):
     message = Message(
-        message_id=TestMessage.id_,
-        date=TestMessage.date,
-        chat=copy(TestMessage.chat),
-        from_user=copy(TestMessage.from_user),
+        message_id=TestMessageBase.id_,
+        date=TestMessageBase.date,
+        chat=copy(TestMessageBase.chat),
+        from_user=copy(TestMessageBase.from_user),
     )
     message.set_bot(bot)
     message._unfreeze()
@@ -271,17 +271,17 @@ def message(bot):
 )
 def message_params(bot, request):
     message = Message(
-        message_id=TestMessage.id_,
-        from_user=TestMessage.from_user,
-        date=TestMessage.date,
-        chat=TestMessage.chat,
+        message_id=TestMessageBase.id_,
+        from_user=TestMessageBase.from_user,
+        date=TestMessageBase.date,
+        chat=TestMessageBase.chat,
         **request.param,
     )
     message.set_bot(bot)
     return message
 
 
-class TestMessage:
+class TestMessageBase:
     id_ = 1
     from_user = User(2, "testuser", False)
     date = datetime.utcnow()
@@ -347,6 +347,13 @@ class TestMessage:
         caption_entities=[MessageEntity(**e) for e in test_entities_v2],
     )
 
+
+class TestMessageWithoutRequest(TestMessageBase):
+    def test_slot_behaviour(self, message, mro_slots):
+        for attr in message.__slots__:
+            assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
+
     def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
         assert new.api_kwargs == {}
@@ -358,10 +365,26 @@ class TestMessage:
         for slot in new.__slots__:
             assert not isinstance(new[slot], dict)
 
-    def test_slot_behaviour(self, message, mro_slots):
-        for attr in message.__slots__:
-            assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
+    def test_equality(self):
+        id_ = 1
+        a = Message(id_, self.date, self.chat, from_user=self.from_user)
+        b = Message(id_, self.date, self.chat, from_user=self.from_user)
+        c = Message(id_, self.date, Chat(123, Chat.GROUP), from_user=User(0, "", False))
+        d = Message(0, self.date, self.chat, from_user=self.from_user)
+        e = Update(id_)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
 
     async def test_parse_entity(self):
         text = (
@@ -563,7 +586,7 @@ class TestMessage:
         expected = b"\\U0001f469\\u200d\\U0001f469\\u200d *ABC*".decode("unicode-escape")
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
         message = Message(
-            1, self.from_user, self.date, self.chat, text=text, entities=[bold_entity]
+            1, self.date, self.chat, self.from_user, text=text, entities=[bold_entity]
         )
         assert expected == message.text_markdown
 
@@ -1826,34 +1849,3 @@ class TestMessage:
 
         monkeypatch.setattr(message.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
         assert await message.unpin_all_forum_topic_messages()
-
-    def test_equality(self):
-        id_ = 1
-        a = Message(
-            id_,
-            self.date,
-            self.chat,
-            from_user=self.from_user,
-        )
-        b = Message(
-            id_,
-            self.date,
-            self.chat,
-            from_user=self.from_user,
-        )
-        c = Message(id_, self.date, Chat(123, Chat.GROUP), from_user=User(0, "", False))
-        d = Message(0, self.date, self.chat, from_user=self.from_user)
-        e = Update(id_)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a != c
-        assert hash(a) != hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

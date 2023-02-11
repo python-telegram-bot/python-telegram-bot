@@ -28,27 +28,27 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_video():
     return InlineQueryResultVideo(
-        TestInlineQueryResultVideo.id_,
-        TestInlineQueryResultVideo.video_url,
-        TestInlineQueryResultVideo.mime_type,
-        TestInlineQueryResultVideo.thumb_url,
-        TestInlineQueryResultVideo.title,
-        video_width=TestInlineQueryResultVideo.video_width,
-        video_height=TestInlineQueryResultVideo.video_height,
-        video_duration=TestInlineQueryResultVideo.video_duration,
-        caption=TestInlineQueryResultVideo.caption,
-        parse_mode=TestInlineQueryResultVideo.parse_mode,
-        caption_entities=TestInlineQueryResultVideo.caption_entities,
-        description=TestInlineQueryResultVideo.description,
-        input_message_content=TestInlineQueryResultVideo.input_message_content,
-        reply_markup=TestInlineQueryResultVideo.reply_markup,
+        TestInlineQueryResultVideoBase.id_,
+        TestInlineQueryResultVideoBase.video_url,
+        TestInlineQueryResultVideoBase.mime_type,
+        TestInlineQueryResultVideoBase.thumb_url,
+        TestInlineQueryResultVideoBase.title,
+        video_width=TestInlineQueryResultVideoBase.video_width,
+        video_height=TestInlineQueryResultVideoBase.video_height,
+        video_duration=TestInlineQueryResultVideoBase.video_duration,
+        caption=TestInlineQueryResultVideoBase.caption,
+        parse_mode=TestInlineQueryResultVideoBase.parse_mode,
+        caption_entities=TestInlineQueryResultVideoBase.caption_entities,
+        description=TestInlineQueryResultVideoBase.description,
+        input_message_content=TestInlineQueryResultVideoBase.input_message_content,
+        reply_markup=TestInlineQueryResultVideoBase.reply_markup,
     )
 
 
-class TestInlineQueryResultVideo:
+class TestInlineQueryResultVideoBase:
     id_ = "id"
     type_ = "video"
     video_url = "video url"
@@ -65,6 +65,8 @@ class TestInlineQueryResultVideo:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
     def test_slot_behaviour(self, inline_query_result_video, mro_slots):
         inst = inline_query_result_video
         for attr in inst.__slots__:

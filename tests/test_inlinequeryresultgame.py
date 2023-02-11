@@ -26,21 +26,23 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_game():
     return InlineQueryResultGame(
-        TestInlineQueryResultGame.id_,
-        TestInlineQueryResultGame.game_short_name,
-        reply_markup=TestInlineQueryResultGame.reply_markup,
+        TestInlineQueryResultGameBase.id_,
+        TestInlineQueryResultGameBase.game_short_name,
+        reply_markup=TestInlineQueryResultGameBase.reply_markup,
     )
 
 
-class TestInlineQueryResultGame:
+class TestInlineQueryResultGameBase:
     id_ = "id"
     type_ = "game"
     game_short_name = "game short name"
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultGameWithoutRequest(TestInlineQueryResultGameBase):
     def test_slot_behaviour(self, inline_query_result_game, mro_slots):
         inst = inline_query_result_game
         for attr in inst.__slots__:

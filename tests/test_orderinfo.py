@@ -21,22 +21,24 @@ import pytest
 from telegram import OrderInfo, ShippingAddress
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def order_info():
     return OrderInfo(
-        TestOrderInfo.name,
-        TestOrderInfo.phone_number,
-        TestOrderInfo.email,
-        TestOrderInfo.shipping_address,
+        TestOrderInfoBase.name,
+        TestOrderInfoBase.phone_number,
+        TestOrderInfoBase.email,
+        TestOrderInfoBase.shipping_address,
     )
 
 
-class TestOrderInfo:
+class TestOrderInfoBase:
     name = "name"
     phone_number = "phone_number"
     email = "email"
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
+
+class TestOrderInfoWithoutRequest(TestOrderInfoBase):
     def test_slot_behaviour(self, order_info, mro_slots):
         for attr in order_info.__slots__:
             assert getattr(order_info, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -44,10 +46,10 @@ class TestOrderInfo:
 
     def test_de_json(self, bot):
         json_dict = {
-            "name": TestOrderInfo.name,
-            "phone_number": TestOrderInfo.phone_number,
-            "email": TestOrderInfo.email,
-            "shipping_address": TestOrderInfo.shipping_address.to_dict(),
+            "name": self.name,
+            "phone_number": self.phone_number,
+            "email": self.email,
+            "shipping_address": self.shipping_address.to_dict(),
         }
         order_info = OrderInfo.de_json(json_dict, bot)
         assert order_info.api_kwargs == {}

@@ -21,19 +21,19 @@ import pytest
 from telegram import ShippingAddress
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def shipping_address():
     return ShippingAddress(
-        TestShippingAddress.country_code,
-        TestShippingAddress.state,
-        TestShippingAddress.city,
-        TestShippingAddress.street_line1,
-        TestShippingAddress.street_line2,
-        TestShippingAddress.post_code,
+        TestShippingAddressBase.country_code,
+        TestShippingAddressBase.state,
+        TestShippingAddressBase.city,
+        TestShippingAddressBase.street_line1,
+        TestShippingAddressBase.street_line2,
+        TestShippingAddressBase.post_code,
     )
 
 
-class TestShippingAddress:
+class TestShippingAddressBase:
     country_code = "GB"
     state = "state"
     city = "London"
@@ -41,6 +41,8 @@ class TestShippingAddress:
     street_line2 = "street_line2"
     post_code = "WC1"
 
+
+class TestShippingAddressWithoutRequest(TestShippingAddressBase):
     def test_slot_behaviour(self, shipping_address, mro_slots):
         inst = shipping_address
         for attr in inst.__slots__:
@@ -98,10 +100,20 @@ class TestShippingAddress:
             "", self.state, self.city, self.street_line1, self.street_line2, self.post_code
         )
         d2 = ShippingAddress(
-            self.country_code, "", self.city, self.street_line1, self.street_line2, self.post_code
+            self.country_code,
+            "",
+            self.city,
+            self.street_line1,
+            self.street_line2,
+            self.post_code,
         )
         d3 = ShippingAddress(
-            self.country_code, self.state, "", self.street_line1, self.street_line2, self.post_code
+            self.country_code,
+            self.state,
+            "",
+            self.street_line1,
+            self.street_line2,
+            self.post_code,
         )
         d4 = ShippingAddress(
             self.country_code, self.state, self.city, "", self.street_line2, self.post_code

@@ -22,22 +22,26 @@ import pytest
 from telegram import ChosenInlineResult, Location, User, Voice
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def user():
     user = User(1, "First name", False)
     user._unfreeze()
     return user
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def chosen_inline_result(user):
-    return ChosenInlineResult(TestChosenInlineResult.result_id, user, TestChosenInlineResult.query)
+    return ChosenInlineResult(
+        TestChosenInlineResultBase.result_id, user, TestChosenInlineResultBase.query
+    )
 
 
-class TestChosenInlineResult:
+class TestChosenInlineResultBase:
     result_id = "result id"
     query = "query text"
 
+
+class TestChosenInlineResultWithoutRequest(TestChosenInlineResultBase):
     def test_slot_behaviour(self, chosen_inline_result, mro_slots):
         inst = chosen_inline_result
         for attr in inst.__slots__:

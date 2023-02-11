@@ -29,20 +29,20 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_cached_audio():
     return InlineQueryResultCachedAudio(
-        TestInlineQueryResultCachedAudio.id_,
-        TestInlineQueryResultCachedAudio.audio_file_id,
-        caption=TestInlineQueryResultCachedAudio.caption,
-        parse_mode=TestInlineQueryResultCachedAudio.parse_mode,
-        caption_entities=TestInlineQueryResultCachedAudio.caption_entities,
-        input_message_content=TestInlineQueryResultCachedAudio.input_message_content,
-        reply_markup=TestInlineQueryResultCachedAudio.reply_markup,
+        TestInlineQueryResultCachedAudioBase.id_,
+        TestInlineQueryResultCachedAudioBase.audio_file_id,
+        caption=TestInlineQueryResultCachedAudioBase.caption,
+        parse_mode=TestInlineQueryResultCachedAudioBase.parse_mode,
+        caption_entities=TestInlineQueryResultCachedAudioBase.caption_entities,
+        input_message_content=TestInlineQueryResultCachedAudioBase.input_message_content,
+        reply_markup=TestInlineQueryResultCachedAudioBase.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedAudio:
+class TestInlineQueryResultCachedAudioBase:
     id_ = "id"
     type_ = "audio"
     audio_file_id = "audio file id"
@@ -52,6 +52,8 @@ class TestInlineQueryResultCachedAudio:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultCachedAudioWithoutRequest(TestInlineQueryResultCachedAudioBase):
     def test_slot_behaviour(self, inline_query_result_cached_audio, mro_slots):
         inst = inline_query_result_cached_audio
         for attr in inst.__slots__:

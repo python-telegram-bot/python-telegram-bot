@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
+
 import pytest
 
 from telegram import Invoice, LabeledPrice
@@ -23,18 +25,18 @@ from telegram.error import BadRequest
 from telegram.request import RequestData
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def invoice():
     return Invoice(
-        TestInvoice.title,
-        TestInvoice.description,
-        TestInvoice.start_parameter,
-        TestInvoice.currency,
-        TestInvoice.total_amount,
+        TestInvoiceBase.title,
+        TestInvoiceBase.description,
+        TestInvoiceBase.start_parameter,
+        TestInvoiceBase.currency,
+        TestInvoiceBase.total_amount,
     )
 
 
-class TestInvoice:
+class TestInvoiceBase:
     payload = "payload"
     prices = [LabeledPrice("Fish", 100), LabeledPrice("Fish Tax", 1000)]
     provider_data = """{"test":"test"}"""
@@ -46,6 +48,8 @@ class TestInvoice:
     max_tip_amount = 42
     suggested_tip_amounts = [13, 42]
 
+
+class TestInvoiceWithoutRequest(TestInvoiceBase):
     def test_slot_behaviour(self, invoice, mro_slots):
         for attr in invoice.__slots__:
             assert getattr(invoice, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -54,11 +58,11 @@ class TestInvoice:
     def test_de_json(self, bot):
         invoice_json = Invoice.de_json(
             {
-                "title": TestInvoice.title,
-                "description": TestInvoice.description,
-                "start_parameter": TestInvoice.start_parameter,
-                "currency": TestInvoice.currency,
-                "total_amount": TestInvoice.total_amount,
+                "title": self.title,
+                "description": self.description,
+                "start_parameter": self.start_parameter,
+                "currency": self.currency,
+                "total_amount": self.total_amount,
             },
             bot,
         )
@@ -80,100 +84,12 @@ class TestInvoice:
         assert invoice_dict["currency"] == invoice.currency
         assert invoice_dict["total_amount"] == invoice.total_amount
 
-    @pytest.mark.flaky(3, 1)
-    async def test_send_required_args_only(self, bot, chat_id, provider_token):
-        message = await bot.send_invoice(
-            chat_id=chat_id,
-            title=self.title,
-            description=self.description,
-            payload=self.payload,
-            provider_token=provider_token,
-            currency=self.currency,
-            prices=self.prices,
-        )
-
-        assert message.invoice.currency == self.currency
-        assert message.invoice.start_parameter == ""
-        assert message.invoice.description == self.description
-        assert message.invoice.title == self.title
-        assert message.invoice.total_amount == self.total_amount
-
-        link = await bot.create_invoice_link(
-            title=self.title,
-            description=self.description,
-            payload=self.payload,
-            provider_token=provider_token,
-            currency=self.currency,
-            prices=self.prices,
-        )
-        assert isinstance(link, str)
-        assert link != ""
-
-    async def test_send_all_args_send_invoice(self, bot, chat_id, provider_token, monkeypatch):
-        message = await bot.send_invoice(
-            chat_id,
-            self.title,
-            self.description,
-            self.payload,
-            provider_token,
-            self.currency,
-            self.prices,
-            max_tip_amount=self.max_tip_amount,
-            suggested_tip_amounts=self.suggested_tip_amounts,
-            start_parameter=self.start_parameter,
-            provider_data=self.provider_data,
-            photo_url="https://raw.githubusercontent.com/"
-            "python-telegram-bot/logos/master/"
-            "logo/png/ptb-logo_240.png",
-            photo_size=240,
-            photo_width=240,
-            photo_height=240,
-            need_name=True,
-            need_phone_number=True,
-            need_email=True,
-            need_shipping_address=True,
-            send_phone_number_to_provider=True,
-            send_email_to_provider=True,
-            is_flexible=True,
-            disable_notification=True,
-            protect_content=True,
-        )
-
-        assert message.invoice.currency == self.currency
-        assert message.invoice.start_parameter == self.start_parameter
-        assert message.invoice.description == self.description
-        assert message.invoice.title == self.title
-        assert message.invoice.total_amount == self.total_amount
-        assert message.has_protected_content
-
-        # We do this next one as safety guard to make sure that we pass all of the optional
+    async def test_send_invoice_all_args_mock(self, bot, monkeypatch):
+        # We do this one as safety guard to make sure that we pass all of the optional
         # parameters correctly because #2526 went unnoticed for 3 years …
         async def make_assertion(*args, **_):
             kwargs = args[1]
-            return (
-                kwargs["chat_id"] == "chat_id"
-                and kwargs["title"] == "title"
-                and kwargs["description"] == "description"
-                and kwargs["payload"] == "payload"
-                and kwargs["provider_token"] == "provider_token"
-                and kwargs["currency"] == "currency"
-                and kwargs["prices"] == self.prices
-                and kwargs["max_tip_amount"] == "max_tip_amount"
-                and kwargs["suggested_tip_amounts"] == "suggested_tip_amounts"
-                and kwargs["start_parameter"] == "start_parameter"
-                and kwargs["provider_data"] == "provider_data"
-                and kwargs["photo_url"] == "photo_url"
-                and kwargs["photo_size"] == "photo_size"
-                and kwargs["photo_width"] == "photo_width"
-                and kwargs["photo_height"] == "photo_height"
-                and kwargs["need_name"] == "need_name"
-                and kwargs["need_phone_number"] == "need_phone_number"
-                and kwargs["need_email"] == "need_email"
-                and kwargs["need_shipping_address"] == "need_shipping_address"
-                and kwargs["send_phone_number_to_provider"] == "send_phone_number_to_provider"
-                and kwargs["send_email_to_provider"] == "send_email_to_provider"
-                and kwargs["is_flexible"] == "is_flexible"
-            )
+            return all([kwargs[key] == key for key in kwargs])
 
         monkeypatch.setattr(bot, "_send_message", make_assertion)
         assert await bot.send_invoice(
@@ -183,7 +99,7 @@ class TestInvoice:
             payload="payload",
             provider_token="provider_token",
             currency="currency",
-            prices=self.prices,
+            prices="prices",
             max_tip_amount="max_tip_amount",
             suggested_tip_amounts="suggested_tip_amounts",
             start_parameter="start_parameter",
@@ -203,33 +119,10 @@ class TestInvoice:
             protect_content=True,
         )
 
-    async def test_send_all_args_create_invoice_link(
-        self, bot, chat_id, provider_token, monkeypatch
-    ):
+    async def test_send_all_args_create_invoice_link(self, bot, monkeypatch):
         async def make_assertion(*args, **_):
             kwargs = args[1]
-            return (
-                kwargs["title"] == "title"
-                and kwargs["description"] == "description"
-                and kwargs["payload"] == "payload"
-                and kwargs["provider_token"] == "provider_token"
-                and kwargs["currency"] == "currency"
-                and kwargs["prices"] == self.prices
-                and kwargs["max_tip_amount"] == "max_tip_amount"
-                and kwargs["suggested_tip_amounts"] == "suggested_tip_amounts"
-                and kwargs["provider_data"] == "provider_data"
-                and kwargs["photo_url"] == "photo_url"
-                and kwargs["photo_size"] == "photo_size"
-                and kwargs["photo_width"] == "photo_width"
-                and kwargs["photo_height"] == "photo_height"
-                and kwargs["need_name"] == "need_name"
-                and kwargs["need_phone_number"] == "need_phone_number"
-                and kwargs["need_email"] == "need_email"
-                and kwargs["need_shipping_address"] == "need_shipping_address"
-                and kwargs["send_phone_number_to_provider"] == "send_phone_number_to_provider"
-                and kwargs["send_email_to_provider"] == "send_email_to_provider"
-                and kwargs["is_flexible"] == "is_flexible"
-            )
+            return all([kwargs[i] == i for i in kwargs])
 
         monkeypatch.setattr(bot, "_post", make_assertion)
         assert await bot.create_invoice_link(
@@ -238,7 +131,7 @@ class TestInvoice:
             payload="payload",
             provider_token="provider_token",
             currency="currency",
-            prices=self.prices,
+            prices="prices",
             max_tip_amount="max_tip_amount",
             suggested_tip_amounts="suggested_tip_amounts",
             provider_data="provider_data",
@@ -273,7 +166,75 @@ class TestInvoice:
             start_parameter=self.start_parameter,
         )
 
-    @pytest.mark.flaky(3, 1)
+    def test_equality(self):
+        a = Invoice("invoice", "desc", "start", "EUR", 7)
+        b = Invoice("invoice", "desc", "start", "EUR", 7)
+        c = Invoice("invoices", "description", "stop", "USD", 8)
+        d = LabeledPrice("label", 5)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+class TestInvoiceWithRequest(TestInvoiceBase):
+    async def test_send_required_args_only(self, bot, chat_id, provider_token):
+        message = await bot.send_invoice(
+            chat_id=chat_id,
+            title=self.title,
+            description=self.description,
+            payload=self.payload,
+            provider_token=provider_token,
+            currency=self.currency,
+            prices=self.prices,
+        )
+
+        assert message.invoice.currency == self.currency
+        assert message.invoice.start_parameter == ""
+        assert message.invoice.description == self.description
+        assert message.invoice.title == self.title
+        assert message.invoice.total_amount == self.total_amount
+
+        link = await bot.create_invoice_link(
+            title=self.title,
+            description=self.description,
+            payload=self.payload,
+            provider_token=provider_token,
+            currency=self.currency,
+            prices=self.prices,
+        )
+
+        assert isinstance(link, str)
+        assert link != ""
+
+    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
+    async def test_send_invoice_default_protect_content(
+        self, chat_id, default_bot, provider_token
+    ):
+        tasks = asyncio.gather(
+            *(
+                default_bot.send_invoice(
+                    chat_id,
+                    self.title,
+                    self.description,
+                    self.payload,
+                    provider_token,
+                    self.currency,
+                    self.prices,
+                    **kwargs,
+                )
+                for kwargs in ({}, {"protect_content": False})
+            )
+        )
+        protected, unprotected = await tasks
+        assert protected.has_protected_content
+        assert not unprotected.has_protected_content
+
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -326,12 +287,8 @@ class TestInvoice:
                     reply_to_message_id=reply_to_message.message_id,
                 )
 
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
-    async def test_send_invoice_default_protect_content(
-        self, chat_id, default_bot, provider_token
-    ):
-        protected = await default_bot.send_invoice(
+    async def test_send_all_args_send_invoice(self, bot, chat_id, provider_token):
+        message = await bot.send_invoice(
             chat_id,
             self.title,
             self.description,
@@ -339,31 +296,26 @@ class TestInvoice:
             provider_token,
             self.currency,
             self.prices,
+            max_tip_amount=self.max_tip_amount,
+            suggested_tip_amounts=self.suggested_tip_amounts,
+            start_parameter=self.start_parameter,
+            provider_data=self.provider_data,
+            photo_url="https://raw.githubusercontent.com/"
+            "python-telegram-bot/logos/master/logo/png/ptb-logo_240.png",
+            photo_size=240,
+            photo_width=240,
+            photo_height=240,
+            need_name=True,
+            need_phone_number=True,
+            need_email=True,
+            need_shipping_address=True,
+            send_phone_number_to_provider=True,
+            send_email_to_provider=True,
+            is_flexible=True,
+            disable_notification=True,
+            protect_content=True,
         )
-        assert protected.has_protected_content
-        unprotected = await default_bot.send_invoice(
-            chat_id,
-            self.title,
-            self.description,
-            self.payload,
-            provider_token,
-            self.currency,
-            self.prices,
-            protect_content=False,
-        )
-        assert not unprotected.has_protected_content
 
-    def test_equality(self):
-        a = Invoice("invoice", "desc", "start", "EUR", 7)
-        b = Invoice("invoice", "desc", "start", "EUR", 7)
-        c = Invoice("invoices", "description", "stop", "USD", 8)
-        d = LabeledPrice("label", 5)
-
-        assert a == b
-        assert hash(a) == hash(b)
-
-        assert a != c
-        assert hash(a) != hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
+        for attr in message.invoice.__slots__:
+            assert getattr(message.invoice, attr) == getattr(self, attr)
+        assert message.has_protected_content

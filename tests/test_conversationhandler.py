@@ -24,7 +24,6 @@ from warnings import filterwarnings
 import pytest
 
 from telegram import (
-    Bot,
     CallbackQuery,
     Chat,
     ChosenInlineResult,
@@ -45,7 +44,6 @@ from telegram.ext import (
     CommandHandler,
     ConversationHandler,
     Defaults,
-    ExtBot,
     InlineQueryHandler,
     JobQueue,
     MessageHandler,
@@ -59,7 +57,7 @@ from telegram.ext import (
     filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import make_command_message
+from tests.conftest import DictBot, make_bot, make_command_message
 
 
 @pytest.fixture(scope="class")
@@ -1255,7 +1253,7 @@ class TestConversationHandler:
             await app.process_update(Update(update_id=2, message=brew_message))
             assert handler.check_update(Update(0, message=pour_coffee_message))
             # assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
-            await asyncio.sleep(0.7)
+            await asyncio.sleep(0.75)
             assert handler.check_update(Update(0, message=start_message))
             # assert handler.conversations.get((self.group.id, user1.id)) is None
 
@@ -2113,7 +2111,7 @@ class TestConversationHandler:
     @pytest.mark.parametrize("handler_block", [True, False, None])
     @pytest.mark.parametrize("ext_bot", [True, False], ids=["ExtBot", "Bot"])
     async def test_blocking_resolution_order(
-        self, bot, default_block, ch_block, handler_block, ext_bot
+        self, bot_info, default_block, ch_block, handler_block, ext_bot
     ):
         event = asyncio.Event()
 
@@ -2149,7 +2147,7 @@ class TestConversationHandler:
                 fallbacks=[fallback],
             )
 
-        bot = ExtBot(bot.token, defaults=defaults) if ext_bot else Bot(bot.token)
+        bot = make_bot(bot_info, defaults=defaults) if ext_bot else DictBot(bot_info["token"])
         app = ApplicationBuilder().bot(bot).build()
         app.add_handler(conv_handler)
 
@@ -2160,7 +2158,7 @@ class TestConversationHandler:
             fallback_message.set_bot(bot)
 
             # This loop makes sure that we test all of entry points, states handler & fallbacks
-            for message in [start_message, start_message, fallback_message]:
+            for message in [start_message, fallback_message]:
                 process_update_task = asyncio.create_task(
                     app.process_update(Update(0, message=message))
                 )

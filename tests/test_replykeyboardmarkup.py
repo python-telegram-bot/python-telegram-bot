@@ -22,80 +22,31 @@ import pytest
 from telegram import InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def reply_keyboard_markup():
     return ReplyKeyboardMarkup(
-        TestReplyKeyboardMarkup.keyboard,
-        resize_keyboard=TestReplyKeyboardMarkup.resize_keyboard,
-        one_time_keyboard=TestReplyKeyboardMarkup.one_time_keyboard,
-        selective=TestReplyKeyboardMarkup.selective,
-        is_persistent=TestReplyKeyboardMarkup.is_persistent,
+        TestReplyKeyboardMarkupBase.keyboard,
+        resize_keyboard=TestReplyKeyboardMarkupBase.resize_keyboard,
+        one_time_keyboard=TestReplyKeyboardMarkupBase.one_time_keyboard,
+        selective=TestReplyKeyboardMarkupBase.selective,
+        is_persistent=TestReplyKeyboardMarkupBase.is_persistent,
     )
 
 
-class TestReplyKeyboardMarkup:
+class TestReplyKeyboardMarkupBase:
     keyboard = [[KeyboardButton("button1"), KeyboardButton("button2")]]
     resize_keyboard = True
     one_time_keyboard = True
     selective = True
     is_persistent = True
 
+
+class TestReplyKeyboardMarkupWithoutRequest(TestReplyKeyboardMarkupBase):
     def test_slot_behaviour(self, reply_keyboard_markup, mro_slots):
         inst = reply_keyboard_markup
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_message_with_reply_keyboard_markup(
-        self, bot, chat_id, reply_keyboard_markup
-    ):
-        message = await bot.send_message(chat_id, "Text", reply_markup=reply_keyboard_markup)
-
-        assert message.text == "Text"
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_message_with_data_markup(self, bot, chat_id):
-        message = await bot.send_message(
-            chat_id, "text 2", reply_markup={"keyboard": [["1", "2"]]}
-        )
-
-        assert message.text == "text 2"
-
-    def test_from_button(self):
-        reply_keyboard_markup = ReplyKeyboardMarkup.from_button(
-            KeyboardButton(text="button1")
-        ).keyboard
-        assert len(reply_keyboard_markup) == 1
-        assert len(reply_keyboard_markup[0]) == 1
-
-        reply_keyboard_markup = ReplyKeyboardMarkup.from_button("button1").keyboard
-        assert len(reply_keyboard_markup) == 1
-        assert len(reply_keyboard_markup[0]) == 1
-
-    def test_from_row(self):
-        reply_keyboard_markup = ReplyKeyboardMarkup.from_row(
-            [KeyboardButton(text="button1"), KeyboardButton(text="button2")]
-        ).keyboard
-        assert len(reply_keyboard_markup) == 1
-        assert len(reply_keyboard_markup[0]) == 2
-
-        reply_keyboard_markup = ReplyKeyboardMarkup.from_row(["button1", "button2"]).keyboard
-        assert len(reply_keyboard_markup) == 1
-        assert len(reply_keyboard_markup[0]) == 2
-
-    def test_from_column(self):
-        reply_keyboard_markup = ReplyKeyboardMarkup.from_column(
-            [KeyboardButton(text="button1"), KeyboardButton(text="button2")]
-        ).keyboard
-        assert len(reply_keyboard_markup) == 2
-        assert len(reply_keyboard_markup[0]) == 1
-        assert len(reply_keyboard_markup[1]) == 1
-
-        reply_keyboard_markup = ReplyKeyboardMarkup.from_column(["button1", "button2"]).keyboard
-        assert len(reply_keyboard_markup) == 2
-        assert len(reply_keyboard_markup[0]) == 1
-        assert len(reply_keyboard_markup[1]) == 1
 
     def test_expected_values(self, reply_keyboard_markup):
         assert isinstance(reply_keyboard_markup.keyboard, tuple)
@@ -106,18 +57,6 @@ class TestReplyKeyboardMarkup:
         assert reply_keyboard_markup.one_time_keyboard == self.one_time_keyboard
         assert reply_keyboard_markup.selective == self.selective
         assert reply_keyboard_markup.is_persistent == self.is_persistent
-
-    def test_wrong_keyboard_inputs(self):
-        with pytest.raises(ValueError):
-            ReplyKeyboardMarkup([["button1"], 1])
-        with pytest.raises(ValueError):
-            ReplyKeyboardMarkup("strings_are_not_allowed")
-        with pytest.raises(ValueError):
-            ReplyKeyboardMarkup(["strings_are_not_allowed_in_the_rows_either"])
-        with pytest.raises(ValueError):
-            ReplyKeyboardMarkup(KeyboardButton("button1"))
-        with pytest.raises(ValueError):
-            ReplyKeyboardMarkup([[["button1"]]])
 
     def test_to_dict(self, reply_keyboard_markup):
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()
@@ -165,3 +104,66 @@ class TestReplyKeyboardMarkup:
 
         assert a != f
         assert hash(a) != hash(f)
+
+    def test_wrong_keyboard_inputs(self):
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup([["button1"], 1])
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup("strings_are_not_allowed")
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup(["strings_are_not_allowed_in_the_rows_either"])
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup(KeyboardButton("button1"))
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup([[["button1"]]])
+
+    def test_from_button(self):
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_button(
+            KeyboardButton(text="button1")
+        ).keyboard
+        assert len(reply_keyboard_markup) == 1
+        assert len(reply_keyboard_markup[0]) == 1
+
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_button("button1").keyboard
+        assert len(reply_keyboard_markup) == 1
+        assert len(reply_keyboard_markup[0]) == 1
+
+    def test_from_row(self):
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_row(
+            [KeyboardButton(text="button1"), KeyboardButton(text="button2")]
+        ).keyboard
+        assert len(reply_keyboard_markup) == 1
+        assert len(reply_keyboard_markup[0]) == 2
+
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_row(["button1", "button2"]).keyboard
+        assert len(reply_keyboard_markup) == 1
+        assert len(reply_keyboard_markup[0]) == 2
+
+    def test_from_column(self):
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_column(
+            [KeyboardButton(text="button1"), KeyboardButton(text="button2")]
+        ).keyboard
+        assert len(reply_keyboard_markup) == 2
+        assert len(reply_keyboard_markup[0]) == 1
+        assert len(reply_keyboard_markup[1]) == 1
+
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_column(["button1", "button2"]).keyboard
+        assert len(reply_keyboard_markup) == 2
+        assert len(reply_keyboard_markup[0]) == 1
+        assert len(reply_keyboard_markup[1]) == 1
+
+
+class TestReplyKeyboardMarkupWithRequest(TestReplyKeyboardMarkupBase):
+    async def test_send_message_with_reply_keyboard_markup(
+        self, bot, chat_id, reply_keyboard_markup
+    ):
+        message = await bot.send_message(chat_id, "Text", reply_markup=reply_keyboard_markup)
+
+        assert message.text == "Text"
+
+    async def test_send_message_with_data_markup(self, bot, chat_id):
+        message = await bot.send_message(
+            chat_id, "text 2", reply_markup={"keyboard": [["1", "2"]]}
+        )
+
+        assert message.text == "text 2"

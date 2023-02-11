@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import os
 from pathlib import Path
 
@@ -35,20 +36,17 @@ from tests.conftest import data_file
 
 @pytest.fixture(scope="function")
 def audio_file():
-    with open(data_file("telegram.mp3"), "rb") as f:
+    with data_file("telegram.mp3").open("rb") as f:
         yield f
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 async def audio(bot, chat_id):
-    with data_file("telegram.mp3").open("rb") as f:
-        thumb = data_file("thumb.jpg")
-        return (
-            await bot.send_audio(chat_id, audio=f, read_timeout=50, thumb=thumb.open("rb"))
-        ).audio
+    with data_file("telegram.mp3").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
+        return (await bot.send_audio(chat_id, audio=f, read_timeout=50, thumb=thumb)).audio
 
 
-class TestAudio:
+class TestAudioBase:
     caption = "Test *audio*"
     performer = "Leandro Toledo"
     title = "Teste"
@@ -65,6 +63,8 @@ class TestAudio:
     audio_file_id = "5a3128a4d2a04750b5b58397f3b5e812"
     audio_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
+
+class TestAudioWithoutRequest(TestAudioBase):
     def test_slot_behaviour(self, audio, mro_slots):
         for attr in audio.__slots__:
             assert getattr(audio, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -87,176 +87,6 @@ class TestAudio:
         assert audio.thumb.file_size == self.thumb_file_size
         assert audio.thumb.width == self.thumb_width
         assert audio.thumb.height == self.thumb_height
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
-        message = await bot.send_audio(
-            chat_id,
-            audio=audio_file,
-            caption=self.caption,
-            duration=self.duration,
-            performer=self.performer,
-            title=self.title,
-            disable_notification=False,
-            protect_content=True,
-            parse_mode="Markdown",
-            thumb=thumb_file,
-        )
-
-        assert message.caption == self.caption.replace("*", "")
-
-        assert isinstance(message.audio, Audio)
-        assert isinstance(message.audio.file_id, str)
-        assert isinstance(message.audio.file_unique_id, str)
-        assert message.audio.file_unique_id is not None
-        assert message.audio.file_id is not None
-        assert message.audio.duration == self.duration
-        assert message.audio.performer == self.performer
-        assert message.audio.title == self.title
-        assert message.audio.file_name == self.file_name
-        assert message.audio.mime_type == self.mime_type
-        assert message.audio.file_size == self.file_size
-        assert message.audio.thumb.file_size == self.thumb_file_size
-        assert message.audio.thumb.width == self.thumb_width
-        assert message.audio.thumb.height == self.thumb_height
-        assert message.has_protected_content
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-
-        assert await bot.send_audio(chat_id, audio_file, filename="custom_filename")
-
-    @pytest.mark.flaky(3, 1)
-    async def test_get_and_download(self, bot, audio):
-        path = Path("telegram.mp3")
-        if path.is_file():
-            path.unlink()
-
-        new_file = await bot.get_file(audio.file_id)
-
-        assert new_file.file_size == self.file_size
-        assert new_file.file_id == audio.file_id
-        assert new_file.file_unique_id == audio.file_unique_id
-        assert str(new_file.file_path).startswith("https://")
-
-        await new_file.download_to_drive("telegram.mp3")
-
-        assert path.is_file()
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_mp3_url_file(self, bot, chat_id, audio):
-        message = await bot.send_audio(
-            chat_id=chat_id, audio=self.audio_file_url, caption=self.caption
-        )
-
-        assert message.caption == self.caption
-
-        assert isinstance(message.audio, Audio)
-        assert isinstance(message.audio.file_id, str)
-        assert isinstance(message.audio.file_unique_id, str)
-        assert message.audio.file_unique_id is not None
-        assert message.audio.file_id is not None
-        assert message.audio.duration == audio.duration
-        assert message.audio.mime_type == audio.mime_type
-        assert message.audio.file_size == audio.file_size
-
-    @pytest.mark.flaky(3, 1)
-    async def test_resend(self, bot, chat_id, audio):
-        message = await bot.send_audio(chat_id=chat_id, audio=audio.file_id)
-
-        assert message.audio == audio
-
-    async def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.json_parameters["audio"] == audio.file_id
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_audio(audio=audio, chat_id=chat_id)
-        assert message
-
-    @pytest.mark.flaky(3, 1)
-    async def test_send_audio_caption_entities(self, bot, chat_id, audio):
-        test_string = "Italic Bold Code"
-        entities = [
-            MessageEntity(MessageEntity.ITALIC, 0, 6),
-            MessageEntity(MessageEntity.ITALIC, 7, 4),
-            MessageEntity(MessageEntity.ITALIC, 12, 4),
-        ]
-        message = await bot.send_audio(
-            chat_id, audio, caption=test_string, caption_entities=entities
-        )
-
-        assert message.caption == test_string
-        assert message.caption_entities == tuple(entities)
-
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_send_audio_default_parse_mode_1(self, default_bot, chat_id, audio_file):
-        test_string = "Italic Bold Code"
-        test_markdown_string = "_Italic_ *Bold* `Code`"
-
-        message = await default_bot.send_audio(chat_id, audio_file, caption=test_markdown_string)
-        assert message.caption_markdown == test_markdown_string
-        assert message.caption == test_string
-
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_send_audio_default_parse_mode_2(self, default_bot, chat_id, audio_file):
-        test_markdown_string = "_Italic_ *Bold* `Code`"
-
-        message = await default_bot.send_audio(
-            chat_id, audio_file, caption=test_markdown_string, parse_mode=None
-        )
-        assert message.caption == test_markdown_string
-        assert message.caption_markdown == escape_markdown(test_markdown_string)
-
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
-    async def test_send_audio_default_parse_mode_3(self, default_bot, chat_id, audio_file):
-        test_markdown_string = "_Italic_ *Bold* `Code`"
-
-        message = await default_bot.send_audio(
-            chat_id, audio_file, caption=test_markdown_string, parse_mode="HTML"
-        )
-        assert message.caption == test_markdown_string
-        assert message.caption_markdown == escape_markdown(test_markdown_string)
-
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
-    async def test_send_audio_default_protect_content(self, default_bot, chat_id, audio):
-        protected_audio = await default_bot.send_audio(chat_id, audio)
-        assert protected_audio.has_protected_content
-        unprotected = await default_bot.send_audio(chat_id, audio, protect_content=False)
-        assert not unprotected.has_protected_content
-
-    @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_send_audio_local_files(self, monkeypatch, bot, chat_id, local_mode):
-        try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
-            test_flag = False
-            file = data_file("telegram.jpg")
-            expected = file.as_uri()
-
-            async def make_assertion(_, data, *args, **kwargs):
-                nonlocal test_flag
-                if local_mode:
-                    test_flag = data.get("audio") == expected and data.get("thumb") == expected
-                else:
-                    test_flag = isinstance(data.get("audio"), InputFile) and isinstance(
-                        data.get("thumb"), InputFile
-                    )
-
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_audio(chat_id, file, thumb=file)
-            assert test_flag
-            monkeypatch.delattr(bot, "_post")
-        finally:
-            bot._local_mode = False
 
     def test_de_json(self, bot, audio):
         json_dict = {
@@ -294,33 +124,6 @@ class TestAudio:
         assert audio_dict["file_size"] == audio.file_size
         assert audio_dict["file_name"] == audio.file_name
 
-    @pytest.mark.flaky(3, 1)
-    async def test_error_send_empty_file(self, bot, chat_id):
-        audio_file = open(os.devnull, "rb")
-
-        with pytest.raises(TelegramError):
-            await bot.send_audio(chat_id=chat_id, audio=audio_file)
-
-    @pytest.mark.flaky(3, 1)
-    async def test_error_send_empty_file_id(self, bot, chat_id):
-        with pytest.raises(TelegramError):
-            await bot.send_audio(chat_id=chat_id, audio="")
-
-    async def test_error_send_without_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError):
-            await bot.send_audio(chat_id=chat_id)
-
-    async def test_get_file_instance_method(self, monkeypatch, audio):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["file_id"] == audio.file_id
-
-        assert check_shortcut_signature(Audio.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(audio.get_file, audio.get_bot(), "get_file")
-        assert await check_defaults_handling(audio.get_file, audio.get_bot())
-
-        monkeypatch.setattr(audio._bot, "get_file", make_assertion)
-        assert await audio.get_file()
-
     def test_equality(self, audio):
         a = Audio(audio.file_id, audio.file_unique_id, audio.duration)
         b = Audio("", audio.file_unique_id, audio.duration)
@@ -340,3 +143,187 @@ class TestAudio:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters["audio"] == audio.file_id
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_audio(audio=audio, chat_id=chat_id)
+
+    async def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_audio(chat_id, audio_file, filename="custom_filename")
+
+    @pytest.mark.parametrize("local_mode", [True, False])
+    async def test_send_audio_local_files(self, monkeypatch, bot, chat_id, local_mode):
+        try:
+            bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local bot API set up
+            test_flag = False
+            file = data_file("telegram.jpg")
+            expected = file.as_uri()
+
+            async def make_assertion(_, data, *args, **kwargs):
+                nonlocal test_flag
+                if local_mode:
+                    test_flag = data.get("audio") == expected and data.get("thumb") == expected
+                else:
+                    test_flag = isinstance(data.get("audio"), InputFile) and isinstance(
+                        data.get("thumb"), InputFile
+                    )
+
+            monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.send_audio(chat_id, file, thumb=file)
+            assert test_flag
+        finally:
+            bot._local_mode = False
+
+    async def test_get_file_instance_method(self, monkeypatch, audio):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["file_id"] == audio.file_id
+
+        assert check_shortcut_signature(Audio.get_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(audio.get_file, audio.get_bot(), "get_file")
+        assert await check_defaults_handling(audio.get_file, audio.get_bot())
+
+        monkeypatch.setattr(audio._bot, "get_file", make_assertion)
+        assert await audio.get_file()
+
+
+class TestAudioWithRequest(TestAudioBase):
+    async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
+        message = await bot.send_audio(
+            chat_id,
+            audio=audio_file,
+            caption=self.caption,
+            duration=self.duration,
+            performer=self.performer,
+            title=self.title,
+            disable_notification=False,
+            protect_content=True,
+            parse_mode="Markdown",
+            thumb=thumb_file,
+        )
+
+        assert message.caption == self.caption.replace("*", "")
+
+        assert isinstance(message.audio, Audio)
+        assert isinstance(message.audio.file_id, str)
+        assert isinstance(message.audio.file_unique_id, str)
+        assert message.audio.file_unique_id is not None
+        assert message.audio.file_id is not None
+        assert message.audio.duration == self.duration
+        assert message.audio.performer == self.performer
+        assert message.audio.title == self.title
+        assert message.audio.file_name == self.file_name
+        assert message.audio.mime_type == self.mime_type
+        assert message.audio.file_size == self.file_size
+        assert message.audio.thumb.file_size == self.thumb_file_size
+        assert message.audio.thumb.width == self.thumb_width
+        assert message.audio.thumb.height == self.thumb_height
+        assert message.has_protected_content
+
+    async def test_get_and_download(self, bot, chat_id, audio):
+        path = Path("telegram.mp3")
+        if path.is_file():
+            path.unlink()
+
+        new_file = await bot.get_file(audio.file_id)
+
+        assert new_file.file_size == self.file_size
+        assert new_file.file_unique_id == audio.file_unique_id
+        assert str(new_file.file_path).startswith("https://")
+
+        await new_file.download_to_drive("telegram.mp3")
+        assert path.is_file()
+
+    async def test_send_mp3_url_file(self, bot, chat_id, audio):
+        message = await bot.send_audio(
+            chat_id=chat_id, audio=self.audio_file_url, caption=self.caption
+        )
+
+        assert message.caption == self.caption
+
+        assert isinstance(message.audio, Audio)
+        assert isinstance(message.audio.file_id, str)
+        assert isinstance(message.audio.file_unique_id, str)
+        assert message.audio.file_unique_id is not None
+        assert message.audio.file_id is not None
+        assert message.audio.duration == audio.duration
+        assert message.audio.mime_type == audio.mime_type
+        assert message.audio.file_size == audio.file_size
+
+    async def test_send_audio_caption_entities(self, bot, chat_id, audio):
+        test_string = "Italic Bold Code"
+        entities = [
+            MessageEntity(MessageEntity.ITALIC, 0, 6),
+            MessageEntity(MessageEntity.ITALIC, 7, 4),
+            MessageEntity(MessageEntity.ITALIC, 12, 4),
+        ]
+        message = await bot.send_audio(
+            chat_id, audio, caption=test_string, caption_entities=entities
+        )
+
+        assert message.caption == test_string
+        assert message.caption_entities == tuple(entities)
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    async def test_send_audio_default_parse_mode_1(self, default_bot, chat_id, audio_file):
+        test_string = "Italic Bold Code"
+        test_markdown_string = "_Italic_ *Bold* `Code`"
+
+        message = await default_bot.send_audio(chat_id, audio_file, caption=test_markdown_string)
+        assert message.caption_markdown == test_markdown_string
+        assert message.caption == test_string
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    async def test_send_audio_default_parse_mode_2(self, default_bot, chat_id, audio_file):
+        test_markdown_string = "_Italic_ *Bold* `Code`"
+
+        message = await default_bot.send_audio(
+            chat_id, audio_file, caption=test_markdown_string, parse_mode=None
+        )
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    async def test_send_audio_default_parse_mode_3(self, default_bot, chat_id, audio_file):
+        test_markdown_string = "_Italic_ *Bold* `Code`"
+
+        message = await default_bot.send_audio(
+            chat_id, audio_file, caption=test_markdown_string, parse_mode="HTML"
+        )
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
+    async def test_send_audio_default_protect_content(self, default_bot, chat_id, audio):
+        tasks = asyncio.gather(
+            default_bot.send_audio(chat_id, audio),
+            default_bot.send_audio(chat_id, audio, protect_content=False),
+        )
+        protected, unprotected = await tasks
+        assert protected.has_protected_content
+        assert not unprotected.has_protected_content
+
+    async def test_resend(self, bot, chat_id, audio):
+        message = await bot.send_audio(chat_id=chat_id, audio=audio.file_id)
+        assert message.audio == audio
+
+    async def test_error_send_empty_file(self, bot, chat_id):
+        audio_file = open(os.devnull, "rb")
+
+        with pytest.raises(TelegramError):
+            await bot.send_audio(chat_id=chat_id, audio=audio_file)
+
+    async def test_error_send_empty_file_id(self, bot, chat_id):
+        with pytest.raises(TelegramError):
+            await bot.send_audio(chat_id=chat_id, audio="")
+
+    async def test_error_send_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            await bot.send_audio(chat_id=chat_id)

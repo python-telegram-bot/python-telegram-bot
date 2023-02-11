@@ -26,30 +26,26 @@ Because imports in pytest are intricate, we just run
 
 with the TEST_WITH_OPT_DEPS environment variable set to False in addition to the regular test suite
 """
-import os
-
 import pytest
 
 from telegram import _bot as bot
 from telegram._passport import credentials as credentials
-from tests.auxil.object_conversions import env_var_2_bool
-
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+from tests.conftest import TEST_WITH_OPT_DEPS
 
 
 @pytest.mark.skipif(
     TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
-class TestNoPassport:
-    def test_bot_init(self, bot_info, monkeypatch):
+class TestNoPassportWithoutRequest:
+    def test_bot_init(self, bot_info):
         with pytest.raises(RuntimeError, match="passport"):
             bot.Bot(bot_info["token"], private_key=1, private_key_password=2)
 
-    def test_credentials_decrypt(self, monkeypatch):
+    def test_credentials_decrypt(self):
         with pytest.raises(RuntimeError, match="passport"):
             credentials.decrypt(1, 1, 1)
 
-    def test_encrypted_credentials_decrypted_secret(self, monkeypatch):
+    def test_encrypted_credentials_decrypted_secret(self):
         ec = credentials.EncryptedCredentials("data", "hash", "secret")
         with pytest.raises(RuntimeError, match="passport"):
             ec.decrypted_secret

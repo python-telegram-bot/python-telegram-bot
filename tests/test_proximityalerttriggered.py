@@ -21,20 +21,22 @@ import pytest
 from telegram import BotCommand, ProximityAlertTriggered, User
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def proximity_alert_triggered():
     return ProximityAlertTriggered(
-        traveler=TestProximityAlertTriggered.traveler,
-        watcher=TestProximityAlertTriggered.watcher,
-        distance=TestProximityAlertTriggered.distance,
+        TestProximityAlertTriggeredBase.traveler,
+        TestProximityAlertTriggeredBase.watcher,
+        TestProximityAlertTriggeredBase.distance,
     )
 
 
-class TestProximityAlertTriggered:
+class TestProximityAlertTriggeredBase:
     traveler = User(1, "foo", False)
     watcher = User(2, "bar", False)
     distance = 42
 
+
+class TestProximityAlertTriggeredWithoutRequest(TestProximityAlertTriggeredBase):
     def test_slot_behaviour(self, proximity_alert_triggered, mro_slots):
         inst = proximity_alert_triggered
         for attr in inst.__slots__:

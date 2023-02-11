@@ -27,24 +27,26 @@ from tests.auxil.bot_method_checks import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def shipping_query(bot):
     sq = ShippingQuery(
-        TestShippingQuery.id_,
-        TestShippingQuery.from_user,
-        TestShippingQuery.invoice_payload,
-        TestShippingQuery.shipping_address,
+        TestShippingQueryBase.id_,
+        TestShippingQueryBase.from_user,
+        TestShippingQueryBase.invoice_payload,
+        TestShippingQueryBase.shipping_address,
     )
     sq.set_bot(bot)
     return sq
 
 
-class TestShippingQuery:
+class TestShippingQueryBase:
     id_ = "5"
     invoice_payload = "invoice_payload"
     from_user = User(0, "", False)
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
+
+class TestShippingQueryWithoutRequest(TestShippingQueryBase):
     def test_slot_behaviour(self, shipping_query, mro_slots):
         inst = shipping_query
         for attr in inst.__slots__:
@@ -53,10 +55,10 @@ class TestShippingQuery:
 
     def test_de_json(self, bot):
         json_dict = {
-            "id": TestShippingQuery.id_,
-            "invoice_payload": TestShippingQuery.invoice_payload,
-            "from": TestShippingQuery.from_user.to_dict(),
-            "shipping_address": TestShippingQuery.shipping_address.to_dict(),
+            "id": self.id_,
+            "invoice_payload": self.invoice_payload,
+            "from": self.from_user.to_dict(),
+            "shipping_address": self.shipping_address.to_dict(),
         }
         shipping_query = ShippingQuery.de_json(json_dict, bot)
         assert shipping_query.api_kwargs == {}
@@ -75,21 +77,6 @@ class TestShippingQuery:
         assert shipping_query_dict["invoice_payload"] == shipping_query.invoice_payload
         assert shipping_query_dict["from"] == shipping_query.from_user.to_dict()
         assert shipping_query_dict["shipping_address"] == shipping_query.shipping_address.to_dict()
-
-    async def test_answer(self, monkeypatch, shipping_query):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["shipping_query_id"] == shipping_query.id
-
-        assert check_shortcut_signature(
-            ShippingQuery.answer, Bot.answer_shipping_query, ["shipping_query_id"], []
-        )
-        assert await check_shortcut_call(
-            shipping_query.answer, shipping_query._bot, "answer_shipping_query"
-        )
-        assert await check_defaults_handling(shipping_query.answer, shipping_query._bot)
-
-        monkeypatch.setattr(shipping_query._bot, "answer_shipping_query", make_assertion)
-        assert await shipping_query.answer(ok=True)
 
     def test_equality(self):
         a = ShippingQuery(self.id_, self.from_user, self.invoice_payload, self.shipping_address)
@@ -110,3 +97,18 @@ class TestShippingQuery:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_answer(self, monkeypatch, shipping_query):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["shipping_query_id"] == shipping_query.id
+
+        assert check_shortcut_signature(
+            ShippingQuery.answer, Bot.answer_shipping_query, ["shipping_query_id"], []
+        )
+        assert await check_shortcut_call(
+            shipping_query.answer, shipping_query._bot, "answer_shipping_query"
+        )
+        assert await check_defaults_handling(shipping_query.answer, shipping_query._bot)
+
+        monkeypatch.setattr(shipping_query._bot, "answer_shipping_query", make_assertion)
+        assert await shipping_query.answer(ok=True)

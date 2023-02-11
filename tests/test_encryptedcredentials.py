@@ -22,20 +22,22 @@ import pytest
 from telegram import EncryptedCredentials, PassportElementError
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def encrypted_credentials():
     return EncryptedCredentials(
-        TestEncryptedCredentials.data,
-        TestEncryptedCredentials.hash,
-        TestEncryptedCredentials.secret,
+        TestEncryptedCredentialsBase.data,
+        TestEncryptedCredentialsBase.hash,
+        TestEncryptedCredentialsBase.secret,
     )
 
 
-class TestEncryptedCredentials:
+class TestEncryptedCredentialsBase:
     data = "data"
     hash = "hash"
     secret = "secret"
 
+
+class TestEncryptedCredentialsWithoutRequest(TestEncryptedCredentialsBase):
     def test_slot_behaviour(self, encrypted_credentials, mro_slots):
         inst = encrypted_credentials
         for attr in inst.__slots__:

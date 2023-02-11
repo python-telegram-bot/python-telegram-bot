@@ -21,14 +21,16 @@ import pytest
 from telegram import KeyboardButtonPollType, Poll
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def keyboard_button_poll_type():
-    return KeyboardButtonPollType(TestKeyboardButtonPollType.type)
+    return KeyboardButtonPollType(TestKeyboardButtonPollTypeBase.type)
 
 
-class TestKeyboardButtonPollType:
+class TestKeyboardButtonPollTypeBase:
     type = Poll.QUIZ
 
+
+class TestKeyboardButtonPollTypeWithoutRequest(TestKeyboardButtonPollTypeBase):
     def test_slot_behaviour(self, keyboard_button_poll_type, mro_slots):
         inst = keyboard_button_poll_type
         for attr in inst.__slots__:

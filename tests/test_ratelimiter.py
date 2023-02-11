@@ -36,9 +36,7 @@ from telegram.constants import ParseMode
 from telegram.error import RetryAfter
 from telegram.ext import AIORateLimiter, BaseRateLimiter, Defaults, ExtBot
 from telegram.request import BaseRequest, RequestData
-from tests.auxil.object_conversions import env_var_2_bool
-
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+from tests.conftest import TEST_WITH_OPT_DEPS
 
 
 @pytest.mark.skipif(

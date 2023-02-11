@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
-import os
 import time
 
 import pytest
@@ -26,18 +25,22 @@ from telegram._utils import datetime as tg_dtm
 from telegram.ext import Defaults
 
 # sample time specification values categorised into absolute / delta / time-of-day
-from tests.auxil.object_conversions import env_var_2_bool
+from tests.conftest import TEST_WITH_OPT_DEPS
 
-ABSOLUTE_TIME_SPECS = [
-    dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))).replace(second=0, microsecond=0),
-    dtm.datetime.utcnow().replace(second=0, microsecond=0),
-]
+# We do not parametrize tests with these variables, since there's a tiny chance that there is an
+# error while collecting the tests (happens when time goes from HH:59:00 -> HH+1:00:00) when we
+# run the test suite with multiple workers
 DELTA_TIME_SPECS = [dtm.timedelta(hours=3, seconds=42, milliseconds=2), 30, 7.5]
 TIME_OF_DAY_TIME_SPECS = [
     dtm.time(12, 42, tzinfo=dtm.timezone(dtm.timedelta(hours=-7))),
     dtm.time(12, 42),
 ]
 RELATIVE_TIME_SPECS = DELTA_TIME_SPECS + TIME_OF_DAY_TIME_SPECS
+
+ABSOLUTE_TIME_SPECS = [
+    dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))),
+    dtm.datetime.utcnow(),
+]
 TIME_SPECS = ABSOLUTE_TIME_SPECS + RELATIVE_TIME_SPECS
 
 """
@@ -49,7 +52,6 @@ Because imports in pytest are intricate, we just run
 
 with the TEST_WITH_OPT_DEPS=False environment variable in addition to the regular test suite.
 """
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 class TestDatetime:
@@ -97,12 +99,15 @@ class TestDatetime:
         with pytest.raises(ValueError):
             tg_dtm.to_float_timestamp(dtm.datetime(2019, 11, 11), reference_timestamp=123)
 
-    @pytest.mark.parametrize("time_spec", DELTA_TIME_SPECS, ids=str)
-    def test_to_float_timestamp_delta(self, time_spec):
+    # see note on parametrization at the top of this file
+    def test_to_float_timestamp_delta(self):
         """Conversion from a 'delta' time specification to timestamp"""
         reference_t = 0
-        delta = time_spec.total_seconds() if hasattr(time_spec, "total_seconds") else time_spec
-        assert tg_dtm.to_float_timestamp(time_spec, reference_t) == reference_t + delta
+        for i in DELTA_TIME_SPECS:
+            delta = i.total_seconds() if hasattr(i, "total_seconds") else i
+            assert (
+                tg_dtm.to_float_timestamp(i, reference_t) == reference_t + delta
+            ), f"failed for {i}"
 
     def test_to_float_timestamp_time_of_day(self):
         """Conversion from time-of-day specification to timestamp"""
@@ -130,22 +135,24 @@ class TestDatetime:
             ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))
         )
 
-    @pytest.mark.parametrize("time_spec", RELATIVE_TIME_SPECS, ids=str)
-    def test_to_float_timestamp_default_reference(self, time_spec):
+    # see note on parametrization at the top of this file
+    def test_to_float_timestamp_default_reference(self):
         """The reference timestamp for relative time specifications should default to now"""
-        now = time.time()
-        assert tg_dtm.to_float_timestamp(time_spec) == pytest.approx(
-            tg_dtm.to_float_timestamp(time_spec, reference_timestamp=now)
-        )
+        for i in RELATIVE_TIME_SPECS:
+            now = time.time()
+            assert tg_dtm.to_float_timestamp(i) == pytest.approx(
+                tg_dtm.to_float_timestamp(i, reference_timestamp=now)
+            ), f"Failed for {i}"
 
     def test_to_float_timestamp_error(self):
         with pytest.raises(TypeError, match="Defaults"):
             tg_dtm.to_float_timestamp(Defaults())
 
-    @pytest.mark.parametrize("time_spec", TIME_SPECS, ids=str)
-    def test_to_timestamp(self, time_spec):
+    # see note on parametrization at the top of this file
+    def test_to_timestamp(self):
         # delegate tests to `to_float_timestamp`
-        assert tg_dtm.to_timestamp(time_spec) == int(tg_dtm.to_float_timestamp(time_spec))
+        for i in TIME_SPECS:
+            assert tg_dtm.to_timestamp(i) == int(tg_dtm.to_float_timestamp(i)), f"Failed for {i}"
 
     def test_to_timestamp_none(self):
         # this 'convenience' behaviour has been left left for backwards compatibility

@@ -28,22 +28,22 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_cached_photo():
     return InlineQueryResultCachedPhoto(
-        TestInlineQueryResultCachedPhoto.id_,
-        TestInlineQueryResultCachedPhoto.photo_file_id,
-        title=TestInlineQueryResultCachedPhoto.title,
-        description=TestInlineQueryResultCachedPhoto.description,
-        caption=TestInlineQueryResultCachedPhoto.caption,
-        parse_mode=TestInlineQueryResultCachedPhoto.parse_mode,
-        caption_entities=TestInlineQueryResultCachedPhoto.caption_entities,
-        input_message_content=TestInlineQueryResultCachedPhoto.input_message_content,
-        reply_markup=TestInlineQueryResultCachedPhoto.reply_markup,
+        TestInlineQueryResultCachedPhotoBase.id_,
+        TestInlineQueryResultCachedPhotoBase.photo_file_id,
+        title=TestInlineQueryResultCachedPhotoBase.title,
+        description=TestInlineQueryResultCachedPhotoBase.description,
+        caption=TestInlineQueryResultCachedPhotoBase.caption,
+        parse_mode=TestInlineQueryResultCachedPhotoBase.parse_mode,
+        caption_entities=TestInlineQueryResultCachedPhotoBase.caption_entities,
+        input_message_content=TestInlineQueryResultCachedPhotoBase.input_message_content,
+        reply_markup=TestInlineQueryResultCachedPhotoBase.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedPhoto:
+class TestInlineQueryResultCachedPhotoBase:
     id_ = "id"
     type_ = "photo"
     photo_file_id = "photo file id"
@@ -55,6 +55,8 @@ class TestInlineQueryResultCachedPhoto:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultCachedPhotoWithoutRequest(TestInlineQueryResultCachedPhotoBase):
     def test_slot_behaviour(self, inline_query_result_cached_photo, mro_slots):
         inst = inline_query_result_cached_photo
         for attr in inst.__slots__:

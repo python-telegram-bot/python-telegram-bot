@@ -21,7 +21,7 @@ import pytest
 from telegram import ChatAdministratorRights
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def chat_admin_rights():
     return ChatAdministratorRights(
         can_change_info=True,
@@ -39,7 +39,7 @@ def chat_admin_rights():
     )
 
 
-class TestChatAdministratorRights:
+class TestChatAdministratorRightsWithoutRequest:
     def test_slot_behaviour(self, chat_admin_rights, mro_slots):
         inst = chat_admin_rights
         for attr in inst.__slots__:
