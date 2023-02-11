@@ -22,14 +22,16 @@ import pytest
 from telegram import BotCommand, Dice
 
 
-@pytest.fixture(scope="class", params=Dice.ALL_EMOJI)
+@pytest.fixture(scope="module", params=Dice.ALL_EMOJI)
 def dice(request):
     return Dice(value=5, emoji=request.param)
 
 
-class TestDice:
+class TestDiceBase:
     value = 4
 
+
+class TestDiceWithoutRequest(TestDiceBase):
     def test_slot_behaviour(self, dice, mro_slots):
         for attr in dice.__slots__:
             assert getattr(dice, attr, "err") != "err", f"got extra slot '{attr}'"

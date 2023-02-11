@@ -22,16 +22,16 @@ import pytest
 from telegram import SentWebAppMessage
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def sent_web_app_message():
-    return SentWebAppMessage(
-        inline_message_id=TestSentWebAppMessage.inline_message_id,
-    )
+    return SentWebAppMessage(inline_message_id=TestSentWebAppMessageBase.inline_message_id)
 
 
-class TestSentWebAppMessage:
+class TestSentWebAppMessageBase:
     inline_message_id = "123"
 
+
+class TestSentWebAppMessageWithoutRequest(TestSentWebAppMessageBase):
     def test_slot_behaviour(self, sent_web_app_message, mro_slots):
         inst = sent_web_app_message
         for attr in inst.__slots__:

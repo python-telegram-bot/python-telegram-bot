@@ -22,33 +22,33 @@ import pytest
 from telegram import InputInvoiceMessageContent, InputTextMessageContent, LabeledPrice
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_invoice_message_content():
     return InputInvoiceMessageContent(
-        title=TestInputInvoiceMessageContent.title,
-        description=TestInputInvoiceMessageContent.description,
-        payload=TestInputInvoiceMessageContent.payload,
-        provider_token=TestInputInvoiceMessageContent.provider_token,
-        currency=TestInputInvoiceMessageContent.currency,
-        prices=TestInputInvoiceMessageContent.prices,
-        max_tip_amount=TestInputInvoiceMessageContent.max_tip_amount,
-        suggested_tip_amounts=TestInputInvoiceMessageContent.suggested_tip_amounts,
-        provider_data=TestInputInvoiceMessageContent.provider_data,
-        photo_url=TestInputInvoiceMessageContent.photo_url,
-        photo_size=TestInputInvoiceMessageContent.photo_size,
-        photo_width=TestInputInvoiceMessageContent.photo_width,
-        photo_height=TestInputInvoiceMessageContent.photo_height,
-        need_name=TestInputInvoiceMessageContent.need_name,
-        need_phone_number=TestInputInvoiceMessageContent.need_phone_number,
-        need_email=TestInputInvoiceMessageContent.need_email,
-        need_shipping_address=TestInputInvoiceMessageContent.need_shipping_address,
-        send_phone_number_to_provider=TestInputInvoiceMessageContent.send_phone_number_to_provider,
-        send_email_to_provider=TestInputInvoiceMessageContent.send_email_to_provider,
-        is_flexible=TestInputInvoiceMessageContent.is_flexible,
+        title=TestInputInvoiceMessageContentBase.title,
+        description=TestInputInvoiceMessageContentBase.description,
+        payload=TestInputInvoiceMessageContentBase.payload,
+        provider_token=TestInputInvoiceMessageContentBase.provider_token,
+        currency=TestInputInvoiceMessageContentBase.currency,
+        prices=TestInputInvoiceMessageContentBase.prices,
+        max_tip_amount=TestInputInvoiceMessageContentBase.max_tip_amount,
+        suggested_tip_amounts=TestInputInvoiceMessageContentBase.suggested_tip_amounts,
+        provider_data=TestInputInvoiceMessageContentBase.provider_data,
+        photo_url=TestInputInvoiceMessageContentBase.photo_url,
+        photo_size=TestInputInvoiceMessageContentBase.photo_size,
+        photo_width=TestInputInvoiceMessageContentBase.photo_width,
+        photo_height=TestInputInvoiceMessageContentBase.photo_height,
+        need_name=TestInputInvoiceMessageContentBase.need_name,
+        need_phone_number=TestInputInvoiceMessageContentBase.need_phone_number,
+        need_email=TestInputInvoiceMessageContentBase.need_email,
+        need_shipping_address=TestInputInvoiceMessageContentBase.need_shipping_address,
+        send_phone_number_to_provider=TestInputInvoiceMessageContentBase.send_phone_number_to_provider,  # noqa: E501
+        send_email_to_provider=TestInputInvoiceMessageContentBase.send_email_to_provider,
+        is_flexible=TestInputInvoiceMessageContentBase.is_flexible,
     )
 
 
-class TestInputInvoiceMessageContent:
+class TestInputInvoiceMessageContentBase:
     title = "invoice title"
     description = "invoice description"
     payload = "invoice payload"
@@ -70,6 +70,8 @@ class TestInputInvoiceMessageContent:
     send_email_to_provider = True
     is_flexible = True
 
+
+class TestInputInvoiceMessageContentWithoutRequest(TestInputInvoiceMessageContentBase):
     def test_slot_behaviour(self, input_invoice_message_content, mro_slots):
         inst = input_invoice_message_content
         for attr in inst.__slots__:
@@ -103,29 +105,7 @@ class TestInputInvoiceMessageContent:
         assert input_invoice_message_content.send_email_to_provider == self.send_email_to_provider
         assert input_invoice_message_content.is_flexible == self.is_flexible
 
-    def test_suggested_tip_amonuts_always_tuple(self):
-        input_invoice_message_content = InputInvoiceMessageContent(
-            title=self.title,
-            description=self.description,
-            payload=self.payload,
-            provider_token=self.provider_token,
-            currency=self.currency,
-            prices=self.prices,
-            max_tip_amount=self.max_tip_amount,
-            suggested_tip_amounts=self.suggested_tip_amounts,
-            provider_data=self.provider_data,
-            photo_url=self.photo_url,
-            photo_size=self.photo_size,
-            photo_width=self.photo_width,
-            photo_height=self.photo_height,
-            need_name=self.need_name,
-            need_phone_number=self.need_phone_number,
-            need_email=self.need_email,
-            need_shipping_address=self.need_shipping_address,
-            send_phone_number_to_provider=self.send_phone_number_to_provider,
-            send_email_to_provider=self.send_email_to_provider,
-            is_flexible=self.is_flexible,
-        )
+    def test_suggested_tip_amonuts_always_tuple(self, input_invoice_message_content):
         assert isinstance(input_invoice_message_content.suggested_tip_amounts, tuple)
         assert input_invoice_message_content.suggested_tip_amounts == tuple(
             int(amount) for amount in self.suggested_tip_amounts

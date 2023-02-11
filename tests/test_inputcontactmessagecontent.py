@@ -21,20 +21,22 @@ import pytest
 from telegram import InputContactMessageContent, User
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_contact_message_content():
     return InputContactMessageContent(
-        TestInputContactMessageContent.phone_number,
-        TestInputContactMessageContent.first_name,
-        last_name=TestInputContactMessageContent.last_name,
+        TestInputContactMessageContentBase.phone_number,
+        TestInputContactMessageContentBase.first_name,
+        TestInputContactMessageContentBase.last_name,
     )
 
 
-class TestInputContactMessageContent:
+class TestInputContactMessageContentBase:
     phone_number = "phone number"
     first_name = "first name"
     last_name = "last name"
 
+
+class TestInputContactMessageContentWithoutRequest(TestInputContactMessageContentBase):
     def test_slot_behaviour(self, input_contact_message_content, mro_slots):
         inst = input_contact_message_content
         for attr in inst.__slots__:

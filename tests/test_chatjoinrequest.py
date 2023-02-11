@@ -29,26 +29,26 @@ from tests.auxil.bot_method_checks import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def time():
     return datetime.datetime.now(tz=UTC)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def chat_join_request(bot, time):
     cjr = ChatJoinRequest(
-        chat=TestChatJoinRequest.chat,
-        from_user=TestChatJoinRequest.from_user,
+        chat=TestChatJoinRequestBase.chat,
+        from_user=TestChatJoinRequestBase.from_user,
         date=time,
-        bio=TestChatJoinRequest.bio,
-        invite_link=TestChatJoinRequest.invite_link,
-        user_chat_id=TestChatJoinRequest.from_user.id,
+        bio=TestChatJoinRequestBase.bio,
+        invite_link=TestChatJoinRequestBase.invite_link,
+        user_chat_id=TestChatJoinRequestBase.from_user.id,
     )
     cjr.set_bot(bot)
     return cjr
 
 
-class TestChatJoinRequest:
+class TestChatJoinRequestBase:
     chat = Chat(1, Chat.SUPERGROUP)
     from_user = User(2, "first_name", False)
     bio = "bio"
@@ -61,6 +61,8 @@ class TestChatJoinRequest:
         is_primary=False,
     )
 
+
+class TestChatJoinRequestWithoutRequest(TestChatJoinRequestBase):
     def test_slot_behaviour(self, chat_join_request, mro_slots):
         inst = chat_join_request
         for attr in inst.__slots__:

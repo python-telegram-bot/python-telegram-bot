@@ -28,21 +28,21 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_cached_voice():
     return InlineQueryResultCachedVoice(
-        TestInlineQueryResultCachedVoice.id_,
-        TestInlineQueryResultCachedVoice.voice_file_id,
-        TestInlineQueryResultCachedVoice.title,
-        caption=TestInlineQueryResultCachedVoice.caption,
-        parse_mode=TestInlineQueryResultCachedVoice.parse_mode,
-        caption_entities=TestInlineQueryResultCachedVoice.caption_entities,
-        input_message_content=TestInlineQueryResultCachedVoice.input_message_content,
-        reply_markup=TestInlineQueryResultCachedVoice.reply_markup,
+        TestInlineQueryResultCachedVoiceBase.id_,
+        TestInlineQueryResultCachedVoiceBase.voice_file_id,
+        TestInlineQueryResultCachedVoiceBase.title,
+        caption=TestInlineQueryResultCachedVoiceBase.caption,
+        parse_mode=TestInlineQueryResultCachedVoiceBase.parse_mode,
+        caption_entities=TestInlineQueryResultCachedVoiceBase.caption_entities,
+        input_message_content=TestInlineQueryResultCachedVoiceBase.input_message_content,
+        reply_markup=TestInlineQueryResultCachedVoiceBase.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedVoice:
+class TestInlineQueryResultCachedVoiceBase:
     id_ = "id"
     type_ = "voice"
     voice_file_id = "voice file id"
@@ -53,6 +53,8 @@ class TestInlineQueryResultCachedVoice:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultCachedVoiceWithoutRequest(TestInlineQueryResultCachedVoiceBase):
     def test_slot_behaviour(self, inline_query_result_cached_voice, mro_slots):
         inst = inline_query_result_cached_voice
         for attr in inst.__slots__:

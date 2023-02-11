@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import datetime
 
 import pytest
@@ -44,7 +45,7 @@ async def emoji_id(bot):
     return first_sticker.custom_emoji_id
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 async def forum_topic_object(forum_group_id, emoji_id):
     return ForumTopic(
         message_thread_id=forum_group_id,
@@ -54,7 +55,7 @@ async def forum_topic_object(forum_group_id, emoji_id):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 async def real_topic(bot, emoji_id, forum_group_id):
     result = await bot.create_forum_topic(
         chat_id=forum_group_id,
@@ -71,13 +72,12 @@ async def real_topic(bot, emoji_id, forum_group_id):
     assert result is True, "Topic was not deleted"
 
 
-class TestForumTopic:
+class TestForumTopicWithoutRequest:
     def test_slot_behaviour(self, mro_slots, forum_topic_object):
-        for attr in forum_topic_object.__slots__:
-            assert getattr(forum_topic_object, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(forum_topic_object)) == len(
-            set(mro_slots(forum_topic_object))
-        ), "duplicate slot"
+        inst = forum_topic_object
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     async def test_expected_values(self, emoji_id, forum_group_id, forum_topic_object):
         assert forum_topic_object.message_thread_id == forum_group_id
@@ -152,8 +152,7 @@ class TestForumTopic:
         assert hash(a) != hash(e)
 
 
-@pytest.mark.flaky(3, 1)
-class TestForumMethods:
+class TestForumMethodsWithRequest:
     async def test_create_forum_topic(self, real_topic):
         result = real_topic
         assert isinstance(result, ForumTopic)
@@ -237,22 +236,20 @@ class TestForumMethods:
 
     async def test_unpin_all_forum_topic_messages(self, bot, forum_group_id, real_topic):
         message_thread_id = real_topic.message_thread_id
+        pin_msg_tasks = set()
 
-        msgs = [
-            await (
-                await bot.send_message(
-                    chat_id=forum_group_id, text=TEST_MSG_TEXT, message_thread_id=message_thread_id
-                )
-            ).pin()
+        awaitables = {
+            bot.send_message(forum_group_id, TEST_MSG_TEXT, message_thread_id=message_thread_id)
             for _ in range(2)
-        ]
+        }
+        for coro in asyncio.as_completed(awaitables):
+            msg = await coro
+            pin_msg_tasks.add(asyncio.create_task(msg.pin()))
 
-        assert all(msgs) is True, "Message(s) were not pinned"
+        assert all([await task for task in pin_msg_tasks]) is True, "Message(s) were not pinned"
 
         # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
-        result = await bot.unpin_all_forum_topic_messages(
-            chat_id=forum_group_id, message_thread_id=message_thread_id
-        )
+        result = await bot.unpin_all_forum_topic_messages(forum_group_id, message_thread_id)
         assert result is True, "Failed to unpin all the messages in forum topic"
 
     async def test_edit_general_forum_topic(self, bot, forum_group_id):
@@ -304,12 +301,12 @@ class TestForumMethods:
         assert result is True, "Failed to reopen general forum topic"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def topic_created():
     return ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
 
 
-class TestForumTopicCreated:
+class TestForumTopicCreatedWithoutRequest:
     def test_slot_behaviour(self, topic_created, mro_slots):
         for attr in topic_created.__slots__:
             assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -358,7 +355,7 @@ class TestForumTopicCreated:
         assert hash(a) != hash(d)
 
 
-class TestForumTopicClosed:
+class TestForumTopicClosedWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         action = ForumTopicClosed()
         for attr in action.__slots__:
@@ -376,7 +373,7 @@ class TestForumTopicClosed:
         assert action_dict == {}
 
 
-class TestForumTopicReopened:
+class TestForumTopicReopenedWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         action = ForumTopicReopened()
         for attr in action.__slots__:

@@ -97,22 +97,25 @@ all_types = (
 ids = all_types + ("callback_query_without_message",)
 
 
-@pytest.fixture(params=params, ids=ids)
+@pytest.fixture(scope="module", params=params, ids=ids)
 def update(request):
-    return Update(update_id=TestUpdate.update_id, **request.param)
+    return Update(update_id=TestUpdateBase.update_id, **request.param)
 
 
-class TestUpdate:
+class TestUpdateBase:
     update_id = 868573637
 
-    def test_slot_behaviour(self, update, mro_slots):
+
+class TestUpdateWithoutRequest(TestUpdateBase):
+    def test_slot_behaviour(self, mro_slots):
+        update = Update(self.update_id)
         for attr in update.__slots__:
             assert getattr(update, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"
 
     @pytest.mark.parametrize("paramdict", argvalues=params, ids=ids)
     def test_de_json(self, bot, paramdict):
-        json_dict = {"update_id": TestUpdate.update_id}
+        json_dict = {"update_id": self.update_id}
         # Convert the single update 'item' to a dict of that item and apply it to the json_dict
         json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
         update = Update.de_json(json_dict, bot)
@@ -141,6 +144,26 @@ class TestUpdate:
         for _type in all_types:
             if getattr(update, _type) is not None:
                 assert update_dict[_type] == getattr(update, _type).to_dict()
+
+    def test_equality(self):
+        a = Update(self.update_id, message=message)
+        b = Update(self.update_id, message=message)
+        c = Update(self.update_id)
+        d = Update(0, message=message)
+        e = User(self.update_id, "", False)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
 
     def test_effective_chat(self, update):
         # Test that it's sometimes None per docstring
@@ -188,23 +211,3 @@ class TestUpdate:
             assert eff_message.message_id == message.message_id
         else:
             assert eff_message is None
-
-    def test_equality(self):
-        a = Update(self.update_id, message=message)
-        b = Update(self.update_id, message=message)
-        c = Update(self.update_id)
-        d = Update(0, message=message)
-        e = User(self.update_id, "", False)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

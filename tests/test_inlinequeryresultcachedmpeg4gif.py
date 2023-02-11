@@ -28,21 +28,21 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_cached_mpeg4_gif():
     return InlineQueryResultCachedMpeg4Gif(
-        TestInlineQueryResultCachedMpeg4Gif.id_,
-        TestInlineQueryResultCachedMpeg4Gif.mpeg4_file_id,
-        title=TestInlineQueryResultCachedMpeg4Gif.title,
-        caption=TestInlineQueryResultCachedMpeg4Gif.caption,
-        parse_mode=TestInlineQueryResultCachedMpeg4Gif.parse_mode,
-        caption_entities=TestInlineQueryResultCachedMpeg4Gif.caption_entities,
-        input_message_content=TestInlineQueryResultCachedMpeg4Gif.input_message_content,
-        reply_markup=TestInlineQueryResultCachedMpeg4Gif.reply_markup,
+        TestInlineQueryResultCachedMpeg4GifBase.id_,
+        TestInlineQueryResultCachedMpeg4GifBase.mpeg4_file_id,
+        title=TestInlineQueryResultCachedMpeg4GifBase.title,
+        caption=TestInlineQueryResultCachedMpeg4GifBase.caption,
+        parse_mode=TestInlineQueryResultCachedMpeg4GifBase.parse_mode,
+        caption_entities=TestInlineQueryResultCachedMpeg4GifBase.caption_entities,
+        input_message_content=TestInlineQueryResultCachedMpeg4GifBase.input_message_content,
+        reply_markup=TestInlineQueryResultCachedMpeg4GifBase.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedMpeg4Gif:
+class TestInlineQueryResultCachedMpeg4GifBase:
     id_ = "id"
     type_ = "mpeg4_gif"
     mpeg4_file_id = "mpeg4 file id"
@@ -53,6 +53,8 @@ class TestInlineQueryResultCachedMpeg4Gif:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultCachedMpeg4GifWithoutRequest(TestInlineQueryResultCachedMpeg4GifBase):
     def test_slot_behaviour(self, inline_query_result_cached_mpeg4_gif, mro_slots):
         inst = inline_query_result_cached_mpeg4_gif
         for attr in inst.__slots__:

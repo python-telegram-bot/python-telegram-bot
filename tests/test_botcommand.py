@@ -22,12 +22,12 @@ import pytest
 from telegram import BotCommand, Dice
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def bot_command():
     return BotCommand(command="start", description="A command")
 
 
-class TestBotCommand:
+class TestBotCommandWithoutRequest:
     command = "start"
     description = "A command"
 

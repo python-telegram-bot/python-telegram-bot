@@ -22,7 +22,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Dict, List, Optional
 
 import pytest
 from httpx import AsyncClient, Response
@@ -48,14 +48,47 @@ from telegram.ext.filters import MessageFilter, UpdateFilter
 from telegram.request import RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from tests.auxil.object_conversions import env_var_2_bool
-from tests.bots import get_bot
+from tests.bots import BotInfoProvider
+
+BOT_INFO = BotInfoProvider()
 
 
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
-def pytest_runtestloop(session):
+def pytest_runtestloop(session: pytest.Session):
     session.add_marker(
         pytest.mark.filterwarnings("ignore::telegram.warnings.PTBDeprecationWarning")
     )
+
+
+def pytest_collection_modifyitems(items: List[pytest.Item]):
+    """Here we add a flaky marker to all request making tests and a (no_)req marker to the rest."""
+    for item in items:  # items are the test methods
+        parent = item.parent  # Get the parent of the item (class, or module if defined outside)
+        if parent is None:  # should never happen, but just in case
+            return
+        if (  # Check if the class name ends with 'WithRequest' and if it has no flaky marker
+            parent.name.endswith("WithRequest")
+            and not parent.get_closest_marker(  # get_closest_marker gets pytest.marks with `name`
+                name="flaky"
+            )  # don't add/override any previously set markers
+            and not parent.get_closest_marker(name="req")
+        ):  # Add the flaky marker with a rerun filter to the class
+            parent.add_marker(pytest.mark.flaky(3, 1, rerun_filter=no_rerun_after_xfail_or_flood))
+            parent.add_marker(pytest.mark.req)
+        # Add the no_req marker to all classes that end with 'WithoutRequest' and don't have it
+        elif parent.name.endswith("WithoutRequest") and not parent.get_closest_marker(
+            name="no_req"
+        ):
+            parent.add_marker(pytest.mark.no_req)
+
+
+def no_rerun_after_xfail_or_flood(error, name, test: pytest.Function, plugin):
+    """Don't rerun tests that have xfailed when marked with xfail, or when we hit a flood limit."""
+    xfail_present = test.get_closest_marker(name="xfail")
+    did_we_flood = "flood" in getattr(error[1], "msg", "")  # _pytest.outcomes.XFailed has 'msg'
+    if xfail_present or did_we_flood:
+        return False
+    return True
 
 
 GITHUB_ACTION = os.getenv("GITHUB_ACTION", False)
@@ -86,19 +119,12 @@ def event_loop(request):
     # loop.close() # instead of closing here, do that at the every end of the test session
 
 
-# Related to the above, see https://stackoverflow.com/a/67307042/10606962
-def pytest_sessionfinish(session, exitstatus):
-    asyncio.get_event_loop().close()
-
-
 @pytest.fixture(scope="session")
-def bot_info():
-    return get_bot()
+def bot_info() -> Dict[str, str]:
+    return BOT_INFO.get_info()
 
 
 # Below classes are used to monkeypatch attributes since parent classes don't have __dict__
-
-
 class TestHttpxRequest(HTTPXRequest):
     async def _request_wrapper(
         self,
@@ -132,6 +158,10 @@ class DictExtBot(ExtBot):
         # Makes it easier to work with the bot in tests
         self._unfreeze()
 
+    # Here we override get_me for caching because we don't want to call the API repeatedly in tests
+    async def get_me(self, *args, **kwargs):
+        return await mocked_get_me(self)
+
 
 class DictBot(Bot):
     def __init__(self, *args, **kwargs):
@@ -139,9 +169,40 @@ class DictBot(Bot):
         # Makes it easier to work with the bot in tests
         self._unfreeze()
 
+    # Here we override get_me for caching because we don't want to call the API repeatedly in tests
+    async def get_me(self, *args, **kwargs):
+        return await mocked_get_me(self)
+
 
 class DictApplication(Application):
     pass
+
+
+async def mocked_get_me(bot: Bot):
+    if bot._bot_user is None:
+        bot._bot_user = get_bot_user(bot.token)
+    return bot._bot_user
+
+
+def get_bot_user(token: str) -> User:
+    """Used to return a mock user in bot.get_me(). This saves API calls on every init."""
+    bot_info = BOT_INFO.get_info()
+    # We don't take token from bot_info, because we need to make a bot with a specific ID. So we
+    # generate the correct user_id from the token (token from bot_info is random each test run).
+    # This is important in e.g. bot equality tests. The other parameters like first_name don't
+    # matter as much. In the future we may provide a way to get all the correct info from the token
+    user_id = int(token.split(":")[0])
+    first_name = bot_info.get("name")
+    username = bot_info.get("username").strip("@")
+    return User(
+        user_id,
+        first_name,
+        is_bot=True,
+        username=username,
+        can_join_groups=True,
+        can_read_all_group_messages=False,
+        supports_inline_queries=True,
+    )
 
 
 @pytest.fixture(scope="session")
@@ -149,6 +210,12 @@ async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
     async with make_bot(bot_info) as _bot:
         yield _bot
+
+
+@pytest.fixture(scope="function")
+def one_time_bot(bot_info):
+    """A function scoped bot since the session bot would shutdown when `async with app` finishes"""
+    return make_bot(bot_info)
 
 
 @pytest.fixture(scope="session")
@@ -170,20 +237,36 @@ async def raw_bot(bot_info):
         yield _bot
 
 
-@pytest.fixture(scope="function")
+# Here we store the default bots so that we don't have to create them again and again.
+# They are initialized but not shutdown on pytest_sessionfinish because it is causing
+# problems with the event loop (Event loop is closed).
+default_bots = {}
+
+
+@pytest.fixture(scope="session")
 async def default_bot(request, bot_info):
     param = request.param if hasattr(request, "param") else {}
+    defaults = Defaults(**param)
 
-    default_bot = make_bot(bot_info, defaults=Defaults(**param))
-    async with default_bot:
-        yield default_bot
+    # If the bot is already created, return it. Else make a new one.
+    default_bot = default_bots.get(defaults, None)
+    if default_bot is None:
+        default_bot = make_bot(bot_info, defaults=defaults)
+        await default_bot.initialize()
+        default_bots[defaults] = default_bot  # Defaults object is hashable
+    return default_bot
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 async def tz_bot(timezone, bot_info):
-    default_bot = make_bot(bot_info, defaults=Defaults(tzinfo=timezone))
-    async with default_bot:
-        yield default_bot
+    defaults = Defaults(tzinfo=timezone)
+    try:  # If the bot is already created, return it. Saves time since get_me is not called again.
+        return default_bots[defaults]
+    except KeyError:
+        default_bot = make_bot(bot_info, defaults=defaults)
+        await default_bot.initialize()
+        default_bots[defaults] = default_bot
+        return default_bot
 
 
 @pytest.fixture(scope="session")
@@ -243,16 +326,14 @@ def data_file(filename: str) -> Path:
 
 @pytest.fixture(scope="function")
 def thumb_file():
-    f = data_file("thumb.jpg").open("rb")
-    yield f
-    f.close()
+    with data_file("thumb.jpg").open("rb") as f:
+        yield f
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def class_thumb_file():
-    f = data_file("thumb.jpg").open("rb")
-    yield f
-    f.close()
+    with data_file("thumb.jpg").open("rb") as f:
+        yield f
 
 
 def make_bot(bot_info=None, **kwargs):
@@ -285,7 +366,7 @@ def make_message(text, **kwargs):
     """
     bot = kwargs.pop("bot", None)
     if bot is None:
-        bot = make_bot(get_bot())
+        bot = make_bot(BOT_INFO.get_info())
     message = Message(
         message_id=1,
         from_user=kwargs.pop("user", User(id=1, first_name="", is_bot=False)),
@@ -401,7 +482,7 @@ class BasicTimezone(datetime.tzinfo):
         return datetime.timedelta(0)
 
 
-@pytest.fixture(params=["Europe/Berlin", "Asia/Singapore", "UTC"])
+@pytest.fixture(scope="session", params=["Europe/Berlin", "Asia/Singapore", "UTC"])
 def tzinfo(request):
     if TEST_WITH_OPT_DEPS:
         return pytz.timezone(request.param)
@@ -410,7 +491,7 @@ def tzinfo(request):
         return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def timezone(tzinfo):
     return tzinfo
 

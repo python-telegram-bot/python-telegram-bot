@@ -22,22 +22,22 @@ import pytest
 from telegram import EncryptedPassportElement, PassportElementError, PassportFile
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def encrypted_passport_element():
     return EncryptedPassportElement(
-        TestEncryptedPassportElement.type_,
+        TestEncryptedPassportElementBase.type_,
         "this is a hash",
-        data=TestEncryptedPassportElement.data,
-        phone_number=TestEncryptedPassportElement.phone_number,
-        email=TestEncryptedPassportElement.email,
-        files=TestEncryptedPassportElement.files,
-        front_side=TestEncryptedPassportElement.front_side,
-        reverse_side=TestEncryptedPassportElement.reverse_side,
-        selfie=TestEncryptedPassportElement.selfie,
+        data=TestEncryptedPassportElementBase.data,
+        phone_number=TestEncryptedPassportElementBase.phone_number,
+        email=TestEncryptedPassportElementBase.email,
+        files=TestEncryptedPassportElementBase.files,
+        front_side=TestEncryptedPassportElementBase.front_side,
+        reverse_side=TestEncryptedPassportElementBase.reverse_side,
+        selfie=TestEncryptedPassportElementBase.selfie,
     )
 
 
-class TestEncryptedPassportElement:
+class TestEncryptedPassportElementBase:
     type_ = "type"
     hash = "this is a hash"
     data = "data"
@@ -48,6 +48,8 @@ class TestEncryptedPassportElement:
     reverse_side = PassportFile("file_id", 50, 0, 25)
     selfie = PassportFile("file_id", 50, 0, 25)
 
+
+class TestEncryptedPassportElementWithoutRequest(TestEncryptedPassportElementBase):
     def test_slot_behaviour(self, encrypted_passport_element, mro_slots):
         inst = encrypted_passport_element
         for attr in inst.__slots__:

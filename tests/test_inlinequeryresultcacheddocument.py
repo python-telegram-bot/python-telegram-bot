@@ -29,22 +29,22 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_cached_document():
     return InlineQueryResultCachedDocument(
-        TestInlineQueryResultCachedDocument.id_,
-        TestInlineQueryResultCachedDocument.title,
-        TestInlineQueryResultCachedDocument.document_file_id,
-        caption=TestInlineQueryResultCachedDocument.caption,
-        parse_mode=TestInlineQueryResultCachedDocument.parse_mode,
-        caption_entities=TestInlineQueryResultCachedDocument.caption_entities,
-        description=TestInlineQueryResultCachedDocument.description,
-        input_message_content=TestInlineQueryResultCachedDocument.input_message_content,
-        reply_markup=TestInlineQueryResultCachedDocument.reply_markup,
+        TestInlineQueryResultCachedDocumentBase.id_,
+        TestInlineQueryResultCachedDocumentBase.title,
+        TestInlineQueryResultCachedDocumentBase.document_file_id,
+        caption=TestInlineQueryResultCachedDocumentBase.caption,
+        parse_mode=TestInlineQueryResultCachedDocumentBase.parse_mode,
+        caption_entities=TestInlineQueryResultCachedDocumentBase.caption_entities,
+        description=TestInlineQueryResultCachedDocumentBase.description,
+        input_message_content=TestInlineQueryResultCachedDocumentBase.input_message_content,
+        reply_markup=TestInlineQueryResultCachedDocumentBase.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedDocument:
+class TestInlineQueryResultCachedDocumentBase:
     id_ = "id"
     type_ = "document"
     document_file_id = "document file id"
@@ -56,6 +56,8 @@ class TestInlineQueryResultCachedDocument:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultCachedDocumentWithoutRequest(TestInlineQueryResultCachedDocumentBase):
     def test_slot_behaviour(self, inline_query_result_cached_document, mro_slots):
         inst = inline_query_result_cached_document
         for attr in inst.__slots__:

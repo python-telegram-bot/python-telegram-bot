@@ -31,7 +31,7 @@ from telegram import (
 
 
 @pytest.fixture(
-    scope="class",
+    scope="module",
     params=[
         MenuButton.DEFAULT,
         MenuButton.WEB_APP,
@@ -43,7 +43,7 @@ def scope_type(request):
 
 
 @pytest.fixture(
-    scope="class",
+    scope="module",
     params=[
         MenuButtonDefault,
         MenuButtonCommands,
@@ -60,7 +60,7 @@ def scope_class(request):
 
 
 @pytest.fixture(
-    scope="class",
+    scope="module",
     params=[
         (MenuButtonDefault, MenuButton.DEFAULT),
         (MenuButtonCommands, MenuButton.COMMANDS),
@@ -76,24 +76,26 @@ def scope_class_and_type(request):
     return request.param
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def menu_button(scope_class_and_type):
     # We use de_json here so that we don't have to worry about which class gets which arguments
     return scope_class_and_type[0].de_json(
         dict(
             type=scope_class_and_type[1],
-            text=TestMenuButton.text,
-            web_app=TestMenuButton.web_app.to_dict(),
+            text=TestMenuButtonselfBase.text,
+            web_app=TestMenuButtonselfBase.web_app.to_dict(),
         ),
         bot=None,
     )
 
 
-# All the scope types are very similar, so we test everything via parametrization
-class TestMenuButton:
+class TestMenuButtonselfBase:
     text = "button_text"
     web_app = WebAppInfo(url="https://python-telegram-bot.org/web_app")
 
+
+# All the scope types are very similar, so we test everything via parametrization
+class TestMenuButtonWithoutRequest(TestMenuButtonselfBase):
     def test_slot_behaviour(self, menu_button, mro_slots):
         for attr in menu_button.__slots__:
             assert getattr(menu_button, attr, "err") != "err", f"got extra slot '{attr}'"

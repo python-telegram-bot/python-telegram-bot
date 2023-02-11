@@ -28,25 +28,25 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_photo():
     return InlineQueryResultPhoto(
-        TestInlineQueryResultPhoto.id_,
-        TestInlineQueryResultPhoto.photo_url,
-        TestInlineQueryResultPhoto.thumb_url,
-        photo_width=TestInlineQueryResultPhoto.photo_width,
-        photo_height=TestInlineQueryResultPhoto.photo_height,
-        title=TestInlineQueryResultPhoto.title,
-        description=TestInlineQueryResultPhoto.description,
-        caption=TestInlineQueryResultPhoto.caption,
-        parse_mode=TestInlineQueryResultPhoto.parse_mode,
-        caption_entities=TestInlineQueryResultPhoto.caption_entities,
-        input_message_content=TestInlineQueryResultPhoto.input_message_content,
-        reply_markup=TestInlineQueryResultPhoto.reply_markup,
+        TestInlineQueryResultPhotoBase.id_,
+        TestInlineQueryResultPhotoBase.photo_url,
+        TestInlineQueryResultPhotoBase.thumb_url,
+        photo_width=TestInlineQueryResultPhotoBase.photo_width,
+        photo_height=TestInlineQueryResultPhotoBase.photo_height,
+        title=TestInlineQueryResultPhotoBase.title,
+        description=TestInlineQueryResultPhotoBase.description,
+        caption=TestInlineQueryResultPhotoBase.caption,
+        parse_mode=TestInlineQueryResultPhotoBase.parse_mode,
+        caption_entities=TestInlineQueryResultPhotoBase.caption_entities,
+        input_message_content=TestInlineQueryResultPhotoBase.input_message_content,
+        reply_markup=TestInlineQueryResultPhotoBase.reply_markup,
     )
 
 
-class TestInlineQueryResultPhoto:
+class TestInlineQueryResultPhotoBase:
     id_ = "id"
     type_ = "photo"
     photo_url = "photo url"
@@ -62,6 +62,8 @@ class TestInlineQueryResultPhoto:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
     def test_slot_behaviour(self, inline_query_result_photo, mro_slots):
         inst = inline_query_result_photo
         for attr in inst.__slots__:

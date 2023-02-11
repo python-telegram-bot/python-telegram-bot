@@ -21,21 +21,25 @@ import pytest
 from telegram import PassportElementErrorDataField, PassportElementErrorTranslationFile
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def passport_element_error_translation_file():
     return PassportElementErrorTranslationFile(
-        TestPassportElementErrorTranslationFile.type_,
-        TestPassportElementErrorTranslationFile.file_hash,
-        TestPassportElementErrorTranslationFile.message,
+        TestPassportElementErrorTranslationFileBase.type_,
+        TestPassportElementErrorTranslationFileBase.file_hash,
+        TestPassportElementErrorTranslationFileBase.message,
     )
 
 
-class TestPassportElementErrorTranslationFile:
+class TestPassportElementErrorTranslationFileBase:
     source = "translation_file"
     type_ = "test_type"
     file_hash = "file_hash"
     message = "Error message"
 
+
+class TestPassportElementErrorTranslationFileWithoutRequest(
+    TestPassportElementErrorTranslationFileBase
+):
     def test_slot_behaviour(self, passport_element_error_translation_file, mro_slots):
         inst = passport_element_error_translation_file
         for attr in inst.__slots__:

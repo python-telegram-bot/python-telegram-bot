@@ -22,22 +22,24 @@ from telegram import InputTextMessageContent, MessageEntity
 from telegram.constants import ParseMode
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_text_message_content():
     return InputTextMessageContent(
-        TestInputTextMessageContent.message_text,
-        parse_mode=TestInputTextMessageContent.parse_mode,
-        entities=TestInputTextMessageContent.entities,
-        disable_web_page_preview=TestInputTextMessageContent.disable_web_page_preview,
+        TestInputTextMessageContentBase.message_text,
+        parse_mode=TestInputTextMessageContentBase.parse_mode,
+        entities=TestInputTextMessageContentBase.entities,
+        disable_web_page_preview=TestInputTextMessageContentBase.disable_web_page_preview,
     )
 
 
-class TestInputTextMessageContent:
+class TestInputTextMessageContentBase:
     message_text = "*message text*"
     parse_mode = ParseMode.MARKDOWN
     entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     disable_web_page_preview = True
 
+
+class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase):
     def test_slot_behaviour(self, input_text_message_content, mro_slots):
         inst = input_text_message_content
         for attr in inst.__slots__:

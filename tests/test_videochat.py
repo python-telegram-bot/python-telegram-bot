@@ -30,17 +30,17 @@ from telegram import (
 from telegram._utils.datetime import to_timestamp
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def user1():
     return User(first_name="Misses Test", id=123, is_bot=False)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def user2():
     return User(first_name="Mister Test", id=124, is_bot=False)
 
 
-class TestVideoChatStarted:
+class TestVideoChatStartedWithoutRequest:
     def test_slot_behaviour(self, mro_slots):
         action = VideoChatStarted()
         for attr in action.__slots__:
@@ -58,7 +58,7 @@ class TestVideoChatStarted:
         assert video_chat_dict == {}
 
 
-class TestVideoChatEnded:
+class TestVideoChatEndedWithoutRequest:
     duration = 100
 
     def test_slot_behaviour(self, mro_slots):
@@ -97,7 +97,7 @@ class TestVideoChatEnded:
         assert hash(a) != hash(d)
 
 
-class TestVideoChatParticipantsInvited:
+class TestVideoChatParticipantsInvitedWithoutRequest:
     def test_slot_behaviour(self, mro_slots, user1):
         action = VideoChatParticipantsInvited([user1])
         for attr in action.__slots__:
@@ -148,7 +148,7 @@ class TestVideoChatParticipantsInvited:
         assert hash(a) != hash(e)
 
 
-class TestVideoChatScheduled:
+class TestVideoChatScheduledWithoutRequest:
     start_date = dtm.datetime.now(dtm.timezone.utc)
 
     def test_slot_behaviour(self, mro_slots):

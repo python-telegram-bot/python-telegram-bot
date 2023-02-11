@@ -108,28 +108,28 @@ def file_rqs(file_params) -> RequestData:
     )
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def mixed_params(file_params, simple_params) -> Dict[str, Any]:
     both = file_params.copy()
     both.update(simple_params)
     return both
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def mixed_jsons(file_jsons, simple_jsons) -> Dict[str, Any]:
     both = file_jsons.copy()
     both.update(simple_jsons)
     return both
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def mixed_rqs(mixed_params) -> RequestData:
     return RequestData(
         [RequestParameter.from_input(key, value) for key, value in mixed_params.items()]
     )
 
 
-class TestRequestData:
+class TestRequestDataWithoutRequest:
     def test_slot_behaviour(self, simple_rqs, mro_slots):
         for attr in simple_rqs.__slots__:
             assert getattr(simple_rqs, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -201,7 +201,7 @@ class TestRequestData:
         assert file_rqs.multipart_data == expected
         assert mixed_rqs.multipart_data == expected
 
-    def test_url_encoding(self, monkeypatch):
+    def test_url_encoding(self):
         data = RequestData(
             [
                 RequestParameter.from_input("chat_id", 123),

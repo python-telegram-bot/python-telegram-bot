@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import logging
-import os
 from collections import defaultdict
 from http import HTTPStatus
 from pathlib import Path
@@ -31,8 +30,8 @@ from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from telegram.request import HTTPXRequest
-from tests.auxil.object_conversions import env_var_2_bool
 from tests.conftest import (
+    TEST_WITH_OPT_DEPS,
     DictBot,
     data_file,
     make_bot,
@@ -40,8 +39,6 @@ from tests.conftest import (
     make_message_update,
     send_webhook_message,
 )
-
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 if TEST_WITH_OPT_DEPS:
     from telegram.ext._utils.webhookhandler import WebhookServer
@@ -532,7 +529,7 @@ class TestUpdater:
         # that depends on this distinction works
         if ext_bot and not isinstance(updater.bot, ExtBot):
             updater.bot = ExtBot(updater.bot.token)
-        if not ext_bot and not type(updater.bot) is Bot:
+        if not ext_bot and type(updater.bot) is not Bot:
             updater.bot = DictBot(updater.bot.token)
 
         async def delete_webhook(*args, **kwargs):

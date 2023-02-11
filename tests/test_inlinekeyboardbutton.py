@@ -22,22 +22,22 @@ import pytest
 from telegram import CallbackGame, InlineKeyboardButton, LoginUrl, WebAppInfo
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_keyboard_button():
     return InlineKeyboardButton(
-        TestInlineKeyboardButton.text,
-        url=TestInlineKeyboardButton.url,
-        callback_data=TestInlineKeyboardButton.callback_data,
-        switch_inline_query=TestInlineKeyboardButton.switch_inline_query,
-        switch_inline_query_current_chat=TestInlineKeyboardButton.switch_inline_query_current_chat,
-        callback_game=TestInlineKeyboardButton.callback_game,
-        pay=TestInlineKeyboardButton.pay,
-        login_url=TestInlineKeyboardButton.login_url,
-        web_app=TestInlineKeyboardButton.web_app,
+        TestInlineKeyboardButtonBase.text,
+        url=TestInlineKeyboardButtonBase.url,
+        callback_data=TestInlineKeyboardButtonBase.callback_data,
+        switch_inline_query=TestInlineKeyboardButtonBase.switch_inline_query,
+        switch_inline_query_current_chat=TestInlineKeyboardButtonBase.switch_inline_query_current_chat,  # noqa: E501
+        callback_game=TestInlineKeyboardButtonBase.callback_game,
+        pay=TestInlineKeyboardButtonBase.pay,
+        login_url=TestInlineKeyboardButtonBase.login_url,
+        web_app=TestInlineKeyboardButtonBase.web_app,
     )
 
 
-class TestInlineKeyboardButton:
+class TestInlineKeyboardButtonBase:
     text = "text"
     url = "url"
     callback_data = "callback data"
@@ -48,6 +48,8 @@ class TestInlineKeyboardButton:
     login_url = LoginUrl("http://google.com")
     web_app = WebAppInfo(url="https://example.com")
 
+
+class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
     def test_slot_behaviour(self, inline_keyboard_button, mro_slots):
         inst = inline_keyboard_button
         for attr in inst.__slots__:

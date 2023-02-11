@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+import asyncio
+
 import pytest
 
 from telegram import Contact, Voice
@@ -24,22 +26,24 @@ from telegram.error import BadRequest
 from telegram.request import RequestData
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def contact():
     return Contact(
-        TestContact.phone_number,
-        TestContact.first_name,
-        TestContact.last_name,
-        TestContact.user_id,
+        TestContactBase.phone_number,
+        TestContactBase.first_name,
+        TestContactBase.last_name,
+        TestContactBase.user_id,
     )
 
 
-class TestContact:
+class TestContactBase:
     phone_number = "+11234567890"
     first_name = "Leandro"
     last_name = "Toledo"
     user_id = 23
 
+
+class TestContactWithoutRequest(TestContactBase):
     def test_slot_behaviour(self, contact, mro_slots):
         for attr in contact.__slots__:
             assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -68,6 +72,48 @@ class TestContact:
         assert contact.last_name == self.last_name
         assert contact.user_id == self.user_id
 
+    def test_to_dict(self, contact):
+        contact_dict = contact.to_dict()
+
+        assert isinstance(contact_dict, dict)
+        assert contact_dict["phone_number"] == contact.phone_number
+        assert contact_dict["first_name"] == contact.first_name
+        assert contact_dict["last_name"] == contact.last_name
+        assert contact_dict["user_id"] == contact.user_id
+
+    def test_equality(self):
+        a = Contact(self.phone_number, self.first_name)
+        b = Contact(self.phone_number, self.first_name)
+        c = Contact(self.phone_number, "")
+        d = Contact("", self.first_name)
+        e = Voice("", "unique_id", 0)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+    async def test_send_contact_without_required(self, bot, chat_id):
+        with pytest.raises(ValueError, match="Either contact or phone_number and first_name"):
+            await bot.send_contact(chat_id=chat_id)
+
+    async def test_send_mutually_exclusive(self, bot, chat_id, contact):
+        with pytest.raises(ValueError, match="Not both"):
+            await bot.send_contact(
+                chat_id=chat_id,
+                contact=contact,
+                phone_number=contact.phone_number,
+                first_name=contact.first_name,
+            )
+
     async def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.json_parameters
@@ -77,10 +123,10 @@ class TestContact:
             return phone and first and last
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
-        message = await bot.send_contact(contact=contact, chat_id=chat_id)
-        assert message
+        assert await bot.send_contact(contact=contact, chat_id=chat_id)
 
-    @pytest.mark.flaky(3, 1)
+
+class TestContactWithRequest(TestContactBase):
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -114,54 +160,12 @@ class TestContact:
                     chat_id, contact=contact, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_contact_default_protect_content(self, chat_id, default_bot, contact):
-        protected = await default_bot.send_contact(chat_id, contact=contact)
-        assert protected.has_protected_content
-        unprotected = await default_bot.send_contact(
-            chat_id, contact=contact, protect_content=False
+        tasks = asyncio.gather(
+            default_bot.send_contact(chat_id, contact=contact),
+            default_bot.send_contact(chat_id, contact=contact, protect_content=False),
         )
+        protected, unprotected = await tasks
+        assert protected.has_protected_content
         assert not unprotected.has_protected_content
-
-    async def test_send_contact_without_required(self, bot, chat_id):
-        with pytest.raises(ValueError, match="Either contact or phone_number and first_name"):
-            await bot.send_contact(chat_id=chat_id)
-
-    async def test_send_mutually_exclusive(self, bot, chat_id, contact):
-        with pytest.raises(ValueError, match="Not both"):
-            await bot.send_contact(
-                chat_id=chat_id,
-                contact=contact,
-                phone_number=contact.phone_number,
-                first_name=contact.first_name,
-            )
-
-    def test_to_dict(self, contact):
-        contact_dict = contact.to_dict()
-
-        assert isinstance(contact_dict, dict)
-        assert contact_dict["phone_number"] == contact.phone_number
-        assert contact_dict["first_name"] == contact.first_name
-        assert contact_dict["last_name"] == contact.last_name
-        assert contact_dict["user_id"] == contact.user_id
-
-    def test_equality(self):
-        a = Contact(self.phone_number, self.first_name)
-        b = Contact(self.phone_number, self.first_name)
-        c = Contact(self.phone_number, "")
-        d = Contact("", self.first_name)
-        e = Voice("", "unique_id", 0)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

@@ -28,26 +28,26 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_mpeg4_gif():
     return InlineQueryResultMpeg4Gif(
-        TestInlineQueryResultMpeg4Gif.id_,
-        TestInlineQueryResultMpeg4Gif.mpeg4_url,
-        TestInlineQueryResultMpeg4Gif.thumb_url,
-        mpeg4_width=TestInlineQueryResultMpeg4Gif.mpeg4_width,
-        mpeg4_height=TestInlineQueryResultMpeg4Gif.mpeg4_height,
-        mpeg4_duration=TestInlineQueryResultMpeg4Gif.mpeg4_duration,
-        title=TestInlineQueryResultMpeg4Gif.title,
-        caption=TestInlineQueryResultMpeg4Gif.caption,
-        parse_mode=TestInlineQueryResultMpeg4Gif.parse_mode,
-        caption_entities=TestInlineQueryResultMpeg4Gif.caption_entities,
-        input_message_content=TestInlineQueryResultMpeg4Gif.input_message_content,
-        reply_markup=TestInlineQueryResultMpeg4Gif.reply_markup,
-        thumb_mime_type=TestInlineQueryResultMpeg4Gif.thumb_mime_type,
+        TestInlineQueryResultMpeg4GifBase.id_,
+        TestInlineQueryResultMpeg4GifBase.mpeg4_url,
+        TestInlineQueryResultMpeg4GifBase.thumb_url,
+        mpeg4_width=TestInlineQueryResultMpeg4GifBase.mpeg4_width,
+        mpeg4_height=TestInlineQueryResultMpeg4GifBase.mpeg4_height,
+        mpeg4_duration=TestInlineQueryResultMpeg4GifBase.mpeg4_duration,
+        title=TestInlineQueryResultMpeg4GifBase.title,
+        caption=TestInlineQueryResultMpeg4GifBase.caption,
+        parse_mode=TestInlineQueryResultMpeg4GifBase.parse_mode,
+        caption_entities=TestInlineQueryResultMpeg4GifBase.caption_entities,
+        input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
+        reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
+        thumb_mime_type=TestInlineQueryResultMpeg4GifBase.thumb_mime_type,
     )
 
 
-class TestInlineQueryResultMpeg4Gif:
+class TestInlineQueryResultMpeg4GifBase:
     id_ = "id"
     type_ = "mpeg4_gif"
     mpeg4_url = "mpeg4 url"
@@ -63,6 +63,8 @@ class TestInlineQueryResultMpeg4Gif:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifBase):
     def test_slot_behaviour(self, inline_query_result_mpeg4_gif, mro_slots):
         inst = inline_query_result_mpeg4_gif
         for attr in inst.__slots__:
