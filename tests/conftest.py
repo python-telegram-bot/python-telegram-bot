@@ -88,7 +88,7 @@ def pytest_collection_modifyitems(items: List[pytest.Item]):
 
 
 if GITHUB_ACTION:
-    pytest_plugins = ["tests.plugin_github_group"]
+    pytest_plugins = ["tests.auxil.plugin_github_group"]
 
 
 # Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be
