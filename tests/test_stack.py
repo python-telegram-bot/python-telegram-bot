@@ -21,7 +21,19 @@ import logging
 import sys
 from pathlib import Path
 
+import pytest
+
 from telegram.ext._utils.stack import was_called_by
+
+
+def symlink_to(source: Path, target: Path) -> None:
+    """Wrapper around Path.symlink_to that pytest-skips OS Errors.
+    Useful e.g. for making tests not fail locally due to permission errors.
+    """
+    try:
+        source.symlink_to(target)
+    except OSError as exc:
+        pytest.skip(f"Skipping due to OS error while creating symlink: {exc!r}")
 
 
 class TestStack:
@@ -64,7 +76,7 @@ def caller_func():
             f.write(caller_content)
 
         symlink_file = tmp_path / "caller_link.py"
-        symlink_file.symlink_to(temp_file)
+        symlink_to(symlink_file, temp_file)
 
         sys.path.append(tmp_path.as_posix())
         from caller_link import caller_func
@@ -95,7 +107,7 @@ def outer_func():
             f.write(outer_content)
 
         symlink_file2 = tmp_path / "outer_link.py"
-        symlink_file2.symlink_to(temp_file2)
+        symlink_to(symlink_file2, temp_file2)
 
         sys.path.append(tmp_path.as_posix())
         from outer_link import outer_func
