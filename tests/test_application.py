@@ -55,9 +55,10 @@ from telegram.ext import (
 from telegram.warnings import PTBUserWarning
 from tests.auxil.asyncio import call_after
 from tests.auxil.build_messages import make_message_update
-from tests.auxil.ci_bots import make_bot
 from tests.auxil.files import PROJECT_ROOT_PATH
 from tests.auxil.networking import send_webhook_message
+from tests.auxil.pytest_classes import make_bot
+from tests.auxil.slots import mro_slots
 
 
 class CustomContext(CallbackContext):
@@ -117,7 +118,7 @@ class TestApplication:
         ):
             self.received = context.error.message
 
-    async def test_slot_behaviour(self, one_time_bot, mro_slots):
+    async def test_slot_behaviour(self, one_time_bot):
         async with ApplicationBuilder().bot(one_time_bot).build() as app:
             for at in app.__slots__:
                 at = f"_Application{at}" if at.startswith("__") and not at.endswith("__") else at

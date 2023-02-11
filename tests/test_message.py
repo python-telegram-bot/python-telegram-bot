@@ -63,6 +63,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.slots import mro_slots
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -349,7 +350,7 @@ class TestMessageBase:
 
 
 class TestMessageWithoutRequest(TestMessageBase):
-    def test_slot_behaviour(self, message, mro_slots):
+    def test_slot_behaviour(self, message):
         for attr in message.__slots__:
             assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"

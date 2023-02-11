@@ -32,6 +32,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -65,7 +66,7 @@ class TestAudioBase:
 
 
 class TestAudioWithoutRequest(TestAudioBase):
-    def test_slot_behaviour(self, audio, mro_slots):
+    def test_slot_behaviour(self, audio):
         for attr in audio.__slots__:
             assert getattr(audio, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(audio)) == len(set(mro_slots(audio))), "duplicate slot"

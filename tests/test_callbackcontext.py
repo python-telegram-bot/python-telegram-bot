@@ -31,6 +31,7 @@ from telegram import (
 )
 from telegram.error import TelegramError
 from telegram.ext import ApplicationBuilder, CallbackContext, Job
+from tests.auxil.slots import mro_slots
 
 """
 CallbackContext.refresh_data is tested in TestBasePersistence
@@ -38,7 +39,7 @@ CallbackContext.refresh_data is tested in TestBasePersistence
 
 
 class TestCallbackContext:
-    def test_slot_behaviour(self, app, mro_slots):
+    def test_slot_behaviour(self, app):
         c = CallbackContext(app)
         for attr in c.__slots__:
             assert getattr(c, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -32,6 +32,7 @@ from telegram import (
     Sticker,
 )
 from telegram.error import BadRequest
+from tests.auxil.slots import mro_slots
 
 TEST_MSG_TEXT = "Topics are forever"
 TEST_TOPIC_ICON_COLOR = 0x6FB9F0
@@ -73,7 +74,7 @@ async def real_topic(bot, emoji_id, forum_group_id):
 
 
 class TestForumTopicWithoutRequest:
-    def test_slot_behaviour(self, mro_slots, forum_topic_object):
+    def test_slot_behaviour(self, forum_topic_object):
         inst = forum_topic_object
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -307,7 +308,7 @@ def topic_created():
 
 
 class TestForumTopicCreatedWithoutRequest:
-    def test_slot_behaviour(self, topic_created, mro_slots):
+    def test_slot_behaviour(self, topic_created):
         for attr in topic_created.__slots__:
             assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(topic_created)) == len(
@@ -356,7 +357,7 @@ class TestForumTopicCreatedWithoutRequest:
 
 
 class TestForumTopicClosedWithoutRequest:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         action = ForumTopicClosed()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -374,7 +375,7 @@ class TestForumTopicClosedWithoutRequest:
 
 
 class TestForumTopicReopenedWithoutRequest:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         action = ForumTopicReopened()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -397,7 +398,7 @@ def topic_edited(emoji_id):
 
 
 class TestForumTopicEdited:
-    def test_slot_behaviour(self, topic_edited, mro_slots):
+    def test_slot_behaviour(self, topic_edited):
         for attr in topic_edited.__slots__:
             assert getattr(topic_edited, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(topic_edited)) == len(set(mro_slots(topic_edited))), "duplicate slot"
@@ -448,7 +449,7 @@ class TestForumTopicEdited:
 
 
 class TestGeneralForumTopicHidden:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         action = GeneralForumTopicHidden()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -466,7 +467,7 @@ class TestGeneralForumTopicHidden:
 
 
 class TestGeneralForumTopicUnhidden:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         action = GeneralForumTopicUnhidden()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"

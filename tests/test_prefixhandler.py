@@ -20,6 +20,7 @@ import pytest
 from telegram import Chat
 from telegram.ext import CallbackContext, PrefixHandler, filters
 from tests.auxil.build_messages import make_command_update, make_message, make_message_update
+from tests.auxil.slots import mro_slots
 from tests.test_commandhandler import BaseTest, is_match
 
 
@@ -33,7 +34,7 @@ class TestPrefixHandler(BaseTest):
     COMMANDS = ["help", "test"]
     COMBINATIONS = list(combinations(PREFIXES, COMMANDS))
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         handler = self.make_default_handler()
         for attr in handler.__slots__:
             assert getattr(handler, attr, "err") != "err", f"got extra slot '{attr}'"

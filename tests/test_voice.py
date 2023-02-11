@@ -32,6 +32,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -57,7 +58,7 @@ class TestVoiceBase:
 
 
 class TestVoiceWithoutRequest(TestVoiceBase):
-    def test_slot_behaviour(self, voice, mro_slots):
+    def test_slot_behaviour(self, voice):
         for attr in voice.__slots__:
             assert getattr(voice, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(voice)) == len(set(mro_slots(voice))), "duplicate slot"

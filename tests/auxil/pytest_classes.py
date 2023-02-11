@@ -22,12 +22,15 @@ pytest framework. A common change is to allow monkeypatching of the class member
 enforcing slots in the subclasses."""
 from telegram import Bot, User
 from telegram.ext import Application, ExtBot
-from tests.conftest import BOT_INFO
+from tests.auxil.ci_bots import BOT_INFO_PROVIDER
+from tests.auxil.constants import PRIVATE_KEY
+from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.networking import NonchalantHttpxRequest
 
 
 def _get_bot_user(token: str) -> User:
     """Used to return a mock user in bot.get_me(). This saves API calls on every init."""
-    bot_info = BOT_INFO.get_info()
+    bot_info = BOT_INFO_PROVIDER.get_info()
     # We don't take token from bot_info, because we need to make a bot with a specific ID. So we
     # generate the correct user_id from the token (token from bot_info is random each test run).
     # This is important in e.g. bot equality tests. The other parameters like first_name don't
@@ -80,3 +83,20 @@ class PytestBot(Bot):
 
 class PytestApplication(Application):
     pass
+
+
+def make_bot(bot_info=None, **kwargs):
+    """
+    Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
+    """
+    token = kwargs.pop("token", (bot_info or {}).get("token"))
+    private_key = kwargs.pop("private_key", PRIVATE_KEY)
+    kwargs.pop("token", None)
+    _bot = PytestExtBot(
+        token=token,
+        private_key=private_key if TEST_WITH_OPT_DEPS else None,
+        request=NonchalantHttpxRequest(8),
+        get_updates_request=NonchalantHttpxRequest(1),
+        **kwargs,
+    )
+    return _bot

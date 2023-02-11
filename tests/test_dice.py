@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import BotCommand, Dice
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module", params=Dice.ALL_EMOJI)
@@ -32,7 +33,7 @@ class TestDiceBase:
 
 
 class TestDiceWithoutRequest(TestDiceBase):
-    def test_slot_behaviour(self, dice, mro_slots):
+    def test_slot_behaviour(self, dice):
         for attr in dice.__slots__:
             assert getattr(dice, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(dice)) == len(set(mro_slots(dice))), "duplicate slot"

@@ -20,6 +20,7 @@
 import pytest
 
 from telegram.ext._utils.trackingdict import TrackingDict
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -35,7 +36,7 @@ def data() -> dict:
 
 
 class TestTrackingDict:
-    def test_slot_behaviour(self, td, mro_slots):
+    def test_slot_behaviour(self, td):
         for attr in td.__slots__:
             assert getattr(td, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(td)) == len(set(mro_slots(td))), "duplicate slot"

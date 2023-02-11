@@ -25,10 +25,11 @@ from telegram import InputFile, InputMediaPhoto, InputMediaVideo, MessageEntity
 from telegram.constants import ChatType
 from telegram.request._requestparameter import RequestParameter
 from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 class TestRequestParameterWithoutRequest:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = RequestParameter("name", "value", [1, 2])
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

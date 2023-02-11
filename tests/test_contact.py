@@ -24,6 +24,7 @@ import pytest
 from telegram import Contact, Voice
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -44,7 +45,7 @@ class TestContactBase:
 
 
 class TestContactWithoutRequest(TestContactBase):
-    def test_slot_behaviour(self, contact, mro_slots):
+    def test_slot_behaviour(self, contact):
         for attr in contact.__slots__:
             assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(contact)) == len(set(mro_slots(contact))), "duplicate slot"

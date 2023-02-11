@@ -27,8 +27,9 @@ import time
 import pytest
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
-from tests.auxil.ci_bots import make_bot
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.pytest_classes import make_bot
+from tests.auxil.slots import mro_slots
 
 if TEST_WITH_OPT_DEPS:
     import pytz
@@ -126,7 +127,7 @@ class TestJobQueue:
     async def error_handler_raise_error(self, *args):
         raise Exception("Failing bigly")
 
-    def test_slot_behaviour(self, job_queue, mro_slots):
+    def test_slot_behaviour(self, job_queue):
         for attr in job_queue.__slots__:
             assert getattr(job_queue, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"

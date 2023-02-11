@@ -24,6 +24,7 @@ import pytest
 
 from telegram import InputFile
 from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -32,7 +33,7 @@ def png_file():
 
 
 class TestInputFileWithoutRequest:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = InputFile(BytesIO(b"blah"), filename="tg.jpg")
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

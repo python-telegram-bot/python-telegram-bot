@@ -22,6 +22,7 @@ import pytest
 
 from telegram import ChatInviteLink, User
 from telegram._utils.datetime import to_timestamp
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -56,7 +57,7 @@ class TestChatInviteLinkBase:
 
 
 class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
-    def test_slot_behaviour(self, mro_slots, invite_link):
+    def test_slot_behaviour(self, invite_link):
         for attr in invite_link.__slots__:
             assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invite_link)) == len(set(mro_slots(invite_link))), "duplicate slot"

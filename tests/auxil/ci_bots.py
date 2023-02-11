@@ -1,4 +1,23 @@
 #!/usr/bin/env python
+
+#
+#  A library that provides a Python interface to the Telegram Bot API
+#  Copyright (C) 2015-2023
+#  Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Lesser Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Lesser Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser Public License
+#  along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2023
@@ -21,11 +40,6 @@ import base64
 import json
 import os
 import random
-
-from tests.auxil.constants import PRIVATE_KEY
-from tests.auxil.envvars import TEST_WITH_OPT_DEPS
-from tests.auxil.networking import NonchalantHttpxRequest
-from tests.auxil.pytest_classes import PytestExtBot
 
 # Provide some public fallbacks so it's easy for contributors to run tests on their local machine
 # These bots are only able to talk in our test chats, so they are quite useless for other
@@ -76,18 +90,4 @@ class BotInfoProvider:
         return self._cached
 
 
-def make_bot(bot_info=None, **kwargs):
-    """
-    Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
-    """
-    token = kwargs.pop("token", (bot_info or {}).get("token"))
-    private_key = kwargs.pop("private_key", PRIVATE_KEY)
-    kwargs.pop("token", None)
-    _bot = PytestExtBot(
-        token=token,
-        private_key=private_key if TEST_WITH_OPT_DEPS else None,
-        request=NonchalantHttpxRequest(8),
-        get_updates_request=NonchalantHttpxRequest(1),
-        **kwargs,
-    )
-    return _bot
+BOT_INFO_PROVIDER = BotInfoProvider()

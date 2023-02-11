@@ -37,18 +37,16 @@ from telegram import (
 from telegram.ext import ApplicationBuilder, Defaults, Updater
 from telegram.ext.filters import MessageFilter, UpdateFilter
 from tests.auxil.build_messages import DATE
-from tests.auxil.ci_bots import BotInfoProvider, make_bot
+from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.constants import PRIVATE_KEY
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
-from tests.auxil.pytest_classes import PytestApplication, PytestBot
+from tests.auxil.pytest_classes import PytestApplication, PytestBot, make_bot
 from tests.auxil.timezones import BasicTimezone
 
 if TEST_WITH_OPT_DEPS:
     import pytz
-
-BOT_INFO = BotInfoProvider()
 
 
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
@@ -109,7 +107,7 @@ def event_loop(request):
 
 @pytest.fixture(scope="session")
 def bot_info() -> Dict[str, str]:
-    return BOT_INFO.get_info()
+    return BOT_INFO_PROVIDER.get_info()
 
 
 @pytest.fixture(scope="session")

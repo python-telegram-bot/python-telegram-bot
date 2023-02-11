@@ -31,6 +31,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -96,7 +97,7 @@ class TestStickerBase:
 
 
 class TestStickerWithoutRequest(TestStickerBase):
-    def test_slot_behaviour(self, sticker, mro_slots):
+    def test_slot_behaviour(self, sticker):
         for attr in sticker.__slots__:
             assert getattr(sticker, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(sticker)) == len(set(mro_slots(sticker))), "duplicate slot"
@@ -500,7 +501,7 @@ class TestStickerSetBase:
 
 
 class TestStickerSetWithoutRequest(TestStickerSetBase):
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = StickerSet("this", "is", True, self.stickers, True, "not")
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -886,7 +887,7 @@ class TestMaskPositionBase:
 
 
 class TestMaskPositionWithoutRequest(TestMaskPositionBase):
-    def test_slot_behaviour(self, mask_position, mro_slots):
+    def test_slot_behaviour(self, mask_position):
         inst = mask_position
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

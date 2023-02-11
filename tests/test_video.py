@@ -32,6 +32,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -64,7 +65,7 @@ class TestVideoBase:
 
 
 class TestVideoWithoutRequest(TestVideoBase):
-    def test_slot_behaviour(self, video, mro_slots):
+    def test_slot_behaviour(self, video):
         for attr in video.__slots__:
             assert getattr(video, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(video)) == len(set(mro_slots(video))), "duplicate slot"

@@ -31,11 +31,11 @@ from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from telegram.request import HTTPXRequest
 from tests.auxil.build_messages import make_message, make_message_update
-from tests.auxil.ci_bots import make_bot
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import send_webhook_message
-from tests.auxil.pytest_classes import PytestBot
+from tests.auxil.pytest_classes import PytestBot, make_bot
+from tests.auxil.slots import mro_slots
 
 if TEST_WITH_OPT_DEPS:
     from telegram.ext._utils.webhookhandler import WebhookServer
@@ -81,7 +81,7 @@ class TestUpdater:
         self.received = update.message.text
         self.cb_handler_called.set()
 
-    async def test_slot_behaviour(self, updater, mro_slots):
+    async def test_slot_behaviour(self, updater):
         async with updater:
             for at in updater.__slots__:
                 at = f"_Updater{at}" if at.startswith("__") and not at.endswith("__") else at

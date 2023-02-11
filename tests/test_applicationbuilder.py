@@ -36,6 +36,7 @@ from telegram.ext import (
 )
 from telegram.ext._applicationbuilder import _BOT_CHECKS
 from telegram.request import HTTPXRequest
+from tests.auxil.slots import mro_slots
 
 from .auxil.constants import PRIVATE_KEY
 from .auxil.envvars import TEST_WITH_OPT_DEPS
@@ -58,7 +59,7 @@ class TestApplicationBuilderNoOptDeps:
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")
 class TestApplicationBuilder:
-    def test_slot_behaviour(self, builder, mro_slots):
+    def test_slot_behaviour(self, builder):
         for attr in builder.__slots__:
             assert getattr(builder, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(builder)) == len(set(mro_slots(builder))), "duplicate slot"

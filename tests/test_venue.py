@@ -23,6 +23,7 @@ import pytest
 from telegram import Location, Venue
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -49,7 +50,7 @@ class TestVenueBase:
 
 
 class TestVenueWithoutRequest(TestVenueBase):
-    def test_slot_behaviour(self, venue, mro_slots):
+    def test_slot_behaviour(self, venue):
         for attr in venue.__slots__:
             assert getattr(venue, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(venue)) == len(set(mro_slots(venue))), "duplicate slot"

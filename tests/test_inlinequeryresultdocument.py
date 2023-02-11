@@ -26,6 +26,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -65,7 +66,7 @@ class TestInlineQueryResultDocumentBase:
 
 
 class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentBase):
-    def test_slot_behaviour(self, inline_query_result_document, mro_slots):
+    def test_slot_behaviour(self, inline_query_result_document):
         inst = inline_query_result_document
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

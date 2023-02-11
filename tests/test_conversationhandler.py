@@ -58,8 +58,8 @@ from telegram.ext import (
 )
 from telegram.warnings import PTBUserWarning
 from tests.auxil.build_messages import make_command_message
-from tests.auxil.ci_bots import make_bot
-from tests.auxil.pytest_classes import PytestBot
+from tests.auxil.pytest_classes import PytestBot, make_bot
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -246,7 +246,7 @@ class TestConversationHandler:
     async def stop(self, update, context):
         return self._set_state(update, self.STOPPING)
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         handler = ConversationHandler(entry_points=[], states={}, fallbacks=[])
         for attr in handler.__slots__:
             assert getattr(handler, attr, "err") != "err", f"got extra slot '{attr}'"

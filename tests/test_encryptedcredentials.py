@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import EncryptedCredentials, PassportElementError
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -38,7 +39,7 @@ class TestEncryptedCredentialsBase:
 
 
 class TestEncryptedCredentialsWithoutRequest(TestEncryptedCredentialsBase):
-    def test_slot_behaviour(self, encrypted_credentials, mro_slots):
+    def test_slot_behaviour(self, encrypted_credentials):
         inst = encrypted_credentials
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

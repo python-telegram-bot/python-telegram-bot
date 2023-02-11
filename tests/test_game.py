@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import Animation, Game, MessageEntity, PhotoSize
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -49,7 +50,7 @@ class TestGameBase:
 
 
 class TestGameWithoutRequest(TestGameBase):
-    def test_slot_behaviour(self, game, mro_slots):
+    def test_slot_behaviour(self, game):
         for attr in game.__slots__:
             assert getattr(game, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(game)) == len(set(mro_slots(game))), "duplicate slot"

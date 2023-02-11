@@ -35,7 +35,8 @@ from telegram.error import PassportDecryptionError
 # here, although they are implicitly tested. Testing for those classes was too much work and not
 # worth it.
 from telegram.request import RequestData
-from tests.auxil.ci_bots import make_bot
+from tests.auxil.pytest_classes import make_bot
+from tests.auxil.slots import mro_slots
 
 RAW_PASSPORT_DATA = {
     "credentials": {
@@ -243,7 +244,7 @@ class TestPassportBase:
 
 
 class TestPassportWithoutRequest(TestPassportBase):
-    def test_slot_behaviour(self, passport_data, mro_slots):
+    def test_slot_behaviour(self, passport_data):
         inst = passport_data
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

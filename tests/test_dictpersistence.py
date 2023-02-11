@@ -21,6 +21,7 @@ import json
 import pytest
 
 from telegram.ext import DictPersistence
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(autouse=True)
@@ -90,7 +91,7 @@ class TestDictPersistence:
     """Just tests the DictPersistence interface. Integration of persistence into Applictation
     is tested in TestBasePersistence!"""
 
-    async def test_slot_behaviour(self, mro_slots, recwarn):
+    async def test_slot_behaviour(self, recwarn):
         inst = DictPersistence()
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

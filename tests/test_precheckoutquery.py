@@ -25,6 +25,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -53,7 +54,7 @@ class TestPreCheckoutQueryBase:
 
 
 class TestPreCheckoutQueryWithoutRequest(TestPreCheckoutQueryBase):
-    def test_slot_behaviour(self, pre_checkout_query, mro_slots):
+    def test_slot_behaviour(self, pre_checkout_query):
         inst = pre_checkout_query
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import WebAppData
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -33,7 +34,7 @@ class TestWebAppDataBase:
 
 
 class TestWebAppDataWithoutRequest(TestWebAppDataBase):
-    def test_slot_behaviour(self, web_app_data, mro_slots):
+    def test_slot_behaviour(self, web_app_data):
         for attr in web_app_data.__slots__:
             assert getattr(web_app_data, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(web_app_data)) == len(set(mro_slots(web_app_data))), "duplicate slot"

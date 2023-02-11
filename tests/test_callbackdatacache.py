@@ -28,6 +28,7 @@ from telegram._utils.datetime import UTC
 from telegram.ext import ExtBot
 from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -53,7 +54,7 @@ class TestNoCallbackDataCache:
 
 
 class TestInvalidCallbackData:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         invalid_callback_data = InvalidCallbackData()
         for attr in invalid_callback_data.__slots__:
             assert getattr(invalid_callback_data, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -63,7 +64,7 @@ class TestInvalidCallbackData:
 
 
 class TestKeyboardData:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         keyboard_data = _KeyboardData("uuid")
         for attr in keyboard_data.__slots__:
             assert getattr(keyboard_data, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -77,7 +78,7 @@ class TestKeyboardData:
     reason="Only relevant if the optional dependency is installed",
 )
 class TestCallbackDataCache:
-    def test_slot_behaviour(self, callback_data_cache, mro_slots):
+    def test_slot_behaviour(self, callback_data_cache):
         for attr in callback_data_cache.__slots__:
             attr = (
                 f"_CallbackDataCache{attr}"

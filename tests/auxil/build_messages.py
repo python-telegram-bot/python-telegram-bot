@@ -20,8 +20,8 @@ import datetime
 import re
 
 from telegram import Chat, Message, MessageEntity, Update, User
-from tests.auxil.ci_bots import make_bot
-from tests.conftest import BOT_INFO
+from tests.auxil.ci_bots import BOT_INFO_PROVIDER
+from tests.auxil.pytest_classes import make_bot
 
 CMD_PATTERN = re.compile(r"/[\da-z_]{1,32}(?:@\w{1,32})?")
 DATE = datetime.datetime.now()
@@ -36,7 +36,7 @@ def make_message(text, **kwargs):
     """
     bot = kwargs.pop("bot", None)
     if bot is None:
-        bot = make_bot(BOT_INFO.get_info())
+        bot = make_bot(BOT_INFO_PROVIDER.get_info())
     message = Message(
         message_id=1,
         from_user=kwargs.pop("user", User(id=1, first_name="", is_bot=False)),

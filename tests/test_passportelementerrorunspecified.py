@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import PassportElementErrorDataField, PassportElementErrorUnspecified
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -38,7 +39,7 @@ class TestPassportElementErrorUnspecifiedBase:
 
 
 class TestPassportElementErrorUnspecifiedWithoutRequest(TestPassportElementErrorUnspecifiedBase):
-    def test_slot_behaviour(self, passport_element_error_unspecified, mro_slots):
+    def test_slot_behaviour(self, passport_element_error_unspecified):
         inst = passport_element_error_unspecified
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

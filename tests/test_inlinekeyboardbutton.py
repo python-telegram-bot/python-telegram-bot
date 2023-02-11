@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import CallbackGame, InlineKeyboardButton, LoginUrl, WebAppInfo
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -50,7 +51,7 @@ class TestInlineKeyboardButtonBase:
 
 
 class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
-    def test_slot_behaviour(self, inline_keyboard_button, mro_slots):
+    def test_slot_behaviour(self, inline_keyboard_button):
         inst = inline_keyboard_button
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

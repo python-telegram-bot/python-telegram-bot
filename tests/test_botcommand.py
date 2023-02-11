@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import BotCommand, Dice
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -31,7 +32,7 @@ class TestBotCommandWithoutRequest:
     command = "start"
     description = "A command"
 
-    def test_slot_behaviour(self, bot_command, mro_slots):
+    def test_slot_behaviour(self, bot_command):
         for attr in bot_command.__slots__:
             assert getattr(bot_command, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(bot_command)) == len(set(mro_slots(bot_command))), "duplicate slot"

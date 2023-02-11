@@ -37,6 +37,7 @@ from telegram.constants import ParseMode
 # noinspection PyUnresolvedReferences
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from tests.auxil.slots import mro_slots
 
 from .auxil.files import data_file
 from .auxil.networking import expect_bad_request
@@ -140,7 +141,7 @@ class TestInputMediaVideoBase:
 
 
 class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
-    def test_slot_behaviour(self, input_media_video, mro_slots):
+    def test_slot_behaviour(self, input_media_video):
         inst = input_media_video
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -213,7 +214,7 @@ class TestInputMediaPhotoBase:
 
 
 class TestInputMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
-    def test_slot_behaviour(self, input_media_photo, mro_slots):
+    def test_slot_behaviour(self, input_media_photo):
         inst = input_media_photo
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -274,7 +275,7 @@ class TestInputMediaAnimationBase:
 
 
 class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
-    def test_slot_behaviour(self, input_media_animation, mro_slots):
+    def test_slot_behaviour(self, input_media_animation):
         inst = input_media_animation
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -341,7 +342,7 @@ class TestInputMediaAudioBase:
 
 
 class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
-    def test_slot_behaviour(self, input_media_audio, mro_slots):
+    def test_slot_behaviour(self, input_media_audio):
         inst = input_media_audio
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -410,7 +411,7 @@ class TestInputMediaDocumentBase:
 
 
 class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
-    def test_slot_behaviour(self, input_media_document, mro_slots):
+    def test_slot_behaviour(self, input_media_document):
         inst = input_media_document
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

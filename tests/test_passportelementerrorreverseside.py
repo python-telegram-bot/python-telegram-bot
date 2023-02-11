@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import PassportElementErrorReverseSide, PassportElementErrorSelfie
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -38,7 +39,7 @@ class TestPassportElementErrorReverseSideBase:
 
 
 class TestPassportElementErrorReverseSideWithoutRequest(TestPassportElementErrorReverseSideBase):
-    def test_slot_behaviour(self, passport_element_error_reverse_side, mro_slots):
+    def test_slot_behaviour(self, passport_element_error_reverse_side):
         inst = passport_element_error_reverse_side
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

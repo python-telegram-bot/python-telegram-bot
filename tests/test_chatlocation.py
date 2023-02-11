@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import ChatLocation, Location, User
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -33,7 +34,7 @@ class TestChatLocationBase:
 
 
 class TestChatLocationWithoutRequest(TestChatLocationBase):
-    def test_slot_behaviour(self, chat_location, mro_slots):
+    def test_slot_behaviour(self, chat_location):
         inst = chat_location
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

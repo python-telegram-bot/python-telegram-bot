@@ -41,6 +41,7 @@ from telegram.error import (
     TimedOut,
 )
 from telegram.request._httpxrequest import HTTPXRequest
+from tests.auxil.slots import mro_slots
 
 from .auxil.envvars import TEST_WITH_OPT_DEPS
 
@@ -99,7 +100,7 @@ class TestRequestWithoutRequest:
         with pytest.raises(ImportError, match=r"Other Error Message"):
             HTTPXRequest(proxy_url="socks5://foo")
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = HTTPXRequest()
         for attr in inst.__slots__:
             if attr.startswith("__"):

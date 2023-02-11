@@ -23,12 +23,13 @@ import pytest
 
 from telegram import Bot
 from telegram.ext import CallbackContext, JobQueue, TypeHandler
+from tests.auxil.slots import mro_slots
 
 
 class TestTypeHandler:
     test_flag = False
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = TypeHandler(dict, self.callback)
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

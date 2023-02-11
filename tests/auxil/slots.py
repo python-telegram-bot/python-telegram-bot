@@ -16,11 +16,26 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-from pathlib import Path
-
-PROJECT_ROOT_PATH = Path(__file__).parent.parent.parent.resolve()
-TEST_DATA_PATH = PROJECT_ROOT_PATH / "tests" / "data"
+import inspect
 
 
-def data_file(filename: str) -> Path:
-    return TEST_DATA_PATH / filename
+def mro_slots(obj, only_parents: bool = False):
+    """Returns a list of all slots of a class and its parents.
+    Args:
+        obj (:obj:`type`): The class or class-instance to get the slots from.
+        only_parents (:obj:`bool`, optional): If ``True``, only the slots of the parents are
+            returned. Defaults to ``False``.
+    """
+    cls = obj if inspect.isclass(obj) else obj.__class__
+
+    if only_parents:
+        classes = cls.__mro__[1:]
+    else:
+        classes = cls.__mro__
+
+    return [
+        attr
+        for cls in classes
+        if hasattr(cls, "__slots__")  # The Exception class doesn't have slots
+        for attr in cls.__slots__
+    ]

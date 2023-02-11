@@ -33,6 +33,7 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function")
@@ -60,7 +61,7 @@ class TestChatPhotoBase:
 
 
 class TestChatPhotoWithoutRequest(TestChatPhotoBase):
-    def test_slot_behaviour(self, chat_photo, mro_slots):
+    def test_slot_behaviour(self, chat_photo):
         for attr in chat_photo.__slots__:
             assert getattr(chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(chat_photo)) == len(set(mro_slots(chat_photo))), "duplicate slot"
