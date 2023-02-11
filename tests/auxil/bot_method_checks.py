@@ -338,14 +338,9 @@ async def check_defaults_handling(
                         pytest.fail(f"ILQR.i_m_c has a {attr}, expected it to be absent")
                 # Here we explicitly use that we only pass InputTextMessageContent for testing
                 # which has both attributes
-                elif (
-                    imc.get(
-                        attr,
-                    )
-                    != df_value
-                ):
+                elif imc.get(attr) != df_value:
                     pytest.fail(
-                        f"Got value {imc.get(attr, )} for ILQR.i_m_c.{attr} instead of {df_value}"
+                        f"Got value {imc.get(attr)} for ILQR.i_m_c.{attr} instead of {df_value}"
                     )
 
         # Check datetime conversion
