@@ -24,7 +24,7 @@ import pytest
 
 from telegram import File, FileCredentials, Voice
 from telegram.error import TelegramError
-from tests.conftest import data_file
+from tests.auxil.files import data_file
 
 
 @pytest.fixture(scope="module")

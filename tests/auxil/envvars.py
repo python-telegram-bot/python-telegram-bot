@@ -15,6 +15,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
 
 
 def env_var_2_bool(env_var: object) -> bool:
@@ -23,3 +24,7 @@ def env_var_2_bool(env_var: object) -> bool:
     if not isinstance(env_var, str):
         return False
     return env_var.lower().strip() == "true"
+
+
+GITHUB_ACTION = os.getenv("GITHUB_ACTION", False)
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))

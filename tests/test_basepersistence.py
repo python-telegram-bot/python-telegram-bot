@@ -43,7 +43,9 @@ from telegram.ext import (
     filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import DictApplication, make_bot, make_message_update
+from tests.auxil.build_messages import make_message_update
+from tests.auxil.ci_bots import make_bot
+from tests.auxil.pytest_classes import PytestApplication
 
 
 class HandlerStates(int, enum.Enum):
@@ -249,7 +251,7 @@ def build_papp(
         ApplicationBuilder()
         .bot(bot)
         .persistence(persistence)
-        .application_class(DictApplication)
+        .application_class(PytestApplication)
         .build()
     )
 

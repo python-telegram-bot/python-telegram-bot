@@ -24,7 +24,7 @@ import pytest
 
 from telegram import User
 from telegram.ext import Defaults
-from tests.conftest import TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 
 
 class TestDefault:

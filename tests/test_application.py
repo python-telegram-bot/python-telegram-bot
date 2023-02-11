@@ -53,13 +53,11 @@ from telegram.ext import (
     filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import (
-    PROJECT_ROOT_PATH,
-    call_after,
-    make_bot,
-    make_message_update,
-    send_webhook_message,
-)
+from tests.auxil.asyncio import call_after
+from tests.auxil.build_messages import make_message_update
+from tests.auxil.ci_bots import make_bot
+from tests.auxil.files import PROJECT_ROOT_PATH
+from tests.auxil.networking import send_webhook_message
 
 
 class CustomContext(CallbackContext):

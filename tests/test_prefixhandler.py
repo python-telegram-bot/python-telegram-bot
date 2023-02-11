@@ -19,7 +19,7 @@ import pytest
 
 from telegram import Chat
 from telegram.ext import CallbackContext, PrefixHandler, filters
-from tests.conftest import make_command_update, make_message, make_message_update
+from tests.auxil.build_messages import make_command_update, make_message, make_message_update
 from tests.test_commandhandler import BaseTest, is_match
 
 

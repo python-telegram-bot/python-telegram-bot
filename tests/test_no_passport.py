@@ -30,7 +30,7 @@ import pytest
 
 from telegram import _bot as bot
 from telegram._passport import credentials as credentials
-from tests.conftest import TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 
 
 @pytest.mark.skipif(

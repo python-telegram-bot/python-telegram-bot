@@ -27,7 +27,8 @@ import time
 import pytest
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
-from tests.conftest import TEST_WITH_OPT_DEPS, make_bot
+from tests.auxil.ci_bots import make_bot
+from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 
 if TEST_WITH_OPT_DEPS:
     import pytz

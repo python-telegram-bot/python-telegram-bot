@@ -25,7 +25,7 @@ import pytest
 import telegram._utils.datetime
 import telegram._utils.files
 from telegram import Animation, InputFile, MessageEntity
-from tests.conftest import TEST_DATA_PATH, data_file
+from tests.auxil.files import TEST_DATA_PATH, data_file
 
 
 class TestFiles:

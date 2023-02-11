@@ -28,7 +28,7 @@ import pytest
 
 from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
 from telegram.ext import PicklePersistence
-from tests.conftest import data_file
+from tests.auxil.files import data_file
 
 
 def all_subclasses(cls):

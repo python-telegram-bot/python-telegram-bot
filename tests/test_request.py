@@ -42,7 +42,7 @@ from telegram.error import (
 )
 from telegram.request._httpxrequest import HTTPXRequest
 
-from .conftest import TEST_WITH_OPT_DEPS
+from .auxil.envvars import TEST_WITH_OPT_DEPS
 
 # We only need mixed_rqs fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401

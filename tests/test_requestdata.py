@@ -25,7 +25,7 @@ import pytest
 from telegram import InputFile, InputMediaPhoto, InputMediaVideo, MessageEntity
 from telegram.request import RequestData
 from telegram.request._requestparameter import RequestParameter
-from tests.conftest import data_file
+from tests.auxil.files import data_file
 
 
 @pytest.fixture(scope="module")

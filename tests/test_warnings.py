@@ -23,7 +23,7 @@ import pytest
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning, PTBRuntimeWarning, PTBUserWarning
-from tests.conftest import PROJECT_ROOT_PATH
+from tests.auxil.files import PROJECT_ROOT_PATH
 
 
 class TestWarnings:

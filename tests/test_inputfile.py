@@ -23,7 +23,7 @@ from io import BytesIO
 import pytest
 
 from telegram import InputFile
-from tests.conftest import data_file
+from tests.auxil.files import data_file
 
 
 @pytest.fixture(scope="module")

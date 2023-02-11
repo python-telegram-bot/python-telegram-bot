@@ -31,7 +31,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.conftest import data_file
+from tests.auxil.files import data_file
 
 
 @pytest.fixture(scope="function")

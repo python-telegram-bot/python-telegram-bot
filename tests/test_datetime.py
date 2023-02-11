@@ -25,7 +25,7 @@ from telegram._utils import datetime as tg_dtm
 from telegram.ext import Defaults
 
 # sample time specification values categorised into absolute / delta / time-of-day
-from tests.conftest import TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 
 # We do not parametrize tests with these variables, since there's a tiny chance that there is an
 # error while collecting the tests (happens when time goes from HH:59:00 -> HH+1:00:00) when we

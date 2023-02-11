@@ -35,7 +35,7 @@ from telegram.error import PassportDecryptionError
 # here, although they are implicitly tested. Testing for those classes was too much work and not
 # worth it.
 from telegram.request import RequestData
-from tests.conftest import make_bot
+from tests.auxil.ci_bots import make_bot
 
 RAW_PASSPORT_DATA = {
     "credentials": {

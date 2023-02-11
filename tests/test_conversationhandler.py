@@ -57,7 +57,9 @@ from telegram.ext import (
     filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import DictBot, make_bot, make_command_message
+from tests.auxil.build_messages import make_command_message
+from tests.auxil.ci_bots import make_bot
+from tests.auxil.pytest_classes import PytestBot
 
 
 @pytest.fixture(scope="class")
@@ -2147,7 +2149,7 @@ class TestConversationHandler:
                 fallbacks=[fallback],
             )
 
-        bot = make_bot(bot_info, defaults=defaults) if ext_bot else DictBot(bot_info["token"])
+        bot = make_bot(bot_info, defaults=defaults) if ext_bot else PytestBot(bot_info["token"])
         app = ApplicationBuilder().bot(bot).build()
         app.add_handler(conv_handler)
 

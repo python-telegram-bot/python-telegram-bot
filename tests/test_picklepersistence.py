@@ -27,7 +27,7 @@ import pytest
 from telegram import Chat, Message, TelegramObject, Update, User
 from telegram.ext import ContextTypes, PersistenceInput, PicklePersistence
 from telegram.warnings import PTBUserWarning
-from tests.conftest import make_bot
+from tests.auxil.ci_bots import make_bot
 
 
 @pytest.fixture(autouse=True)

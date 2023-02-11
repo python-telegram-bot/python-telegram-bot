@@ -23,7 +23,11 @@ import pytest
 
 from telegram import Bot, Chat, Message, Update
 from telegram.ext import CallbackContext, CommandHandler, JobQueue, filters
-from tests.conftest import make_command_message, make_command_update, make_message_update
+from tests.auxil.build_messages import (
+    make_command_message,
+    make_command_update,
+    make_message_update,
+)
 
 
 def is_match(handler, update):

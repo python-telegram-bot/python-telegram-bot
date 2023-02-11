@@ -75,16 +75,11 @@ from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
 from tests.auxil.bot_method_checks import check_defaults_handling
-from tests.bots import FALLBACKS
-from tests.conftest import (
-    GITHUB_ACTION,
-    TEST_WITH_OPT_DEPS,
-    DictBot,
-    DictExtBot,
-    data_file,
-    expect_bad_request,
-    make_bot,
-)
+from tests.auxil.ci_bots import FALLBACKS, make_bot
+from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
+from tests.auxil.files import data_file
+from tests.auxil.networking import expect_bad_request
+from tests.auxil.pytest_classes import PytestBot, PytestExtBot
 
 
 def to_camel_case(snake_str):
@@ -227,14 +222,14 @@ class TestBotWithoutRequest:
         if bot.last_name:
             assert to_dict_bot["last_name"] == bot.last_name
 
-    async def test_initialize_and_shutdown(self, bot: DictExtBot, monkeypatch):
+    async def test_initialize_and_shutdown(self, bot: PytestExtBot, monkeypatch):
         async def initialize(*args, **kwargs):
             self.test_flag = ["initialize"]
 
         async def stop(*args, **kwargs):
             self.test_flag.append("stop")
 
-        temp_bot = DictBot(token=bot.token)
+        temp_bot = PytestBot(token=bot.token)
         orig_stop = temp_bot.request.shutdown
 
         try:
@@ -261,7 +256,7 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(HTTPXRequest, "initialize", initialize)
         monkeypatch.setattr(HTTPXRequest, "shutdown", shutdown)
 
-        test_bot = DictBot(bot.token)
+        test_bot = PytestBot(bot.token)
         await test_bot.initialize()
         await test_bot.initialize()
         await test_bot.initialize()
@@ -379,7 +374,7 @@ class TestBotWithoutRequest:
             re.match(rf"\s*\@\_log\s*async def {bot_method_name}", source)
         ), f"{bot_method_name} is missing the @_log decorator"
 
-    async def test_log_decorator(self, bot: DictExtBot, caplog):
+    async def test_log_decorator(self, bot: PytestExtBot, caplog):
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
             await ExtBot(bot.token).get_me()
@@ -427,8 +422,8 @@ class TestBotWithoutRequest:
         bot_class,
         bot_method_name: str,
         bot_method,
-        bot: DictExtBot,
-        raw_bot: DictBot,
+        bot: PytestExtBot,
+        raw_bot: PytestBot,
     ):
         """
         Here we check that the bot methods handle tg.ext.Defaults correctly. This has two parts:

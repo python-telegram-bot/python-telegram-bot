@@ -37,8 +37,9 @@ from telegram.constants import ParseMode
 # noinspection PyUnresolvedReferences
 from telegram.error import BadRequest
 from telegram.request import RequestData
-from tests.conftest import data_file, expect_bad_request
 
+from .auxil.files import data_file
+from .auxil.networking import expect_bad_request
 from .test_animation import animation, animation_file  # noqa: F401
 
 # noinspection PyUnresolvedReferences

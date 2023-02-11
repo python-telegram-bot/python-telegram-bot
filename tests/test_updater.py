@@ -30,15 +30,12 @@ from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from telegram.request import HTTPXRequest
-from tests.conftest import (
-    TEST_WITH_OPT_DEPS,
-    DictBot,
-    data_file,
-    make_bot,
-    make_message,
-    make_message_update,
-    send_webhook_message,
-)
+from tests.auxil.build_messages import make_message, make_message_update
+from tests.auxil.ci_bots import make_bot
+from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.files import data_file
+from tests.auxil.networking import send_webhook_message
+from tests.auxil.pytest_classes import PytestBot
 
 if TEST_WITH_OPT_DEPS:
     from telegram.ext._utils.webhookhandler import WebhookServer
@@ -530,7 +527,7 @@ class TestUpdater:
         if ext_bot and not isinstance(updater.bot, ExtBot):
             updater.bot = ExtBot(updater.bot.token)
         if not ext_bot and type(updater.bot) is not Bot:
-            updater.bot = DictBot(updater.bot.token)
+            updater.bot = PytestBot(updater.bot.token)
 
         async def delete_webhook(*args, **kwargs):
             # Dropping pending updates is done by passing the parameter to delete_webhook

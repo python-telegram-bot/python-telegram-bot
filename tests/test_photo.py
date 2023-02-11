@@ -31,7 +31,8 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.conftest import data_file, expect_bad_request
+from tests.auxil.files import data_file
+from tests.auxil.networking import expect_bad_request
 
 
 @pytest.fixture(scope="function")
