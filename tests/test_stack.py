@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import inspect
+import logging
 import sys
 from pathlib import Path
 
@@ -33,6 +34,20 @@ class TestStack:
         frame = inspect.currentframe()
         file = Path(__file__)
         assert was_called_by(frame, file)
+
+    def test_exception(self, monkeypatch, caplog):
+        def resolve(self):
+            raise RuntimeError("Can Not Resolve")
+
+        with caplog.at_level(logging.DEBUG):
+            monkeypatch.setattr(Path, "resolve", resolve)
+            assert not was_called_by(inspect.currentframe(), None)
+
+        assert len(caplog.records) == 1
+        assert caplog.records[0].levelno == logging.DEBUG
+        assert caplog.records[0].getMessage().startswith("Failed to check")
+        assert caplog.records[0].exc_info[0] is RuntimeError
+        assert "Can Not Resolve" in str(caplog.records[0].exc_info[1])
 
     def test_called_by_symlink_file(self, tmp_path):
         # Set up a call from a linked file in a temp directory,
