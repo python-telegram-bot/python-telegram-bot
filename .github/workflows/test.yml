@@ -13,11 +13,10 @@ on:
 jobs:
   pytest:
     name: pytest
-    runs-on: ${{matrix.os}}
+    runs-on: windows-latest
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
-        os: [windows-latest,]
       fail-fast: False
     steps:
       - uses: actions/checkout@v3
