@@ -40,10 +40,14 @@ class TestStack:
         # Here we expect `was_called_by` to recognize
         # "`tmp_path`/caller_link.py" as same as "`tmp_path`/caller.py".
         temp_file = tmp_path / "caller.py"
-        caller_content = "import inspect\ndef caller_func():\
-            \n    return inspect.currentframe()"
+        caller_content = """
+import inspect
+def caller_func():
+    return inspect.currentframe()
+        """
         with temp_file.open("w") as f:
             f.write(caller_content)
+
         symlink_file = tmp_path / "caller_link.py"
         symlink_file.symlink_to(temp_file)
 
@@ -58,15 +62,23 @@ class TestStack:
         # inner_func is nested inside outer_func to test
         # if `was_called_by` can resolve paths in recursion.
         temp_file1 = tmp_path / "inner.py"
-        inner_content = "import inspect\ndef inner_func():\
-            \n    return inspect.currentframe()"
+        inner_content = """
+import inspect
+def inner_func():
+    return inspect.currentframe()
+        """
         with temp_file1.open("w") as f:
             f.write(inner_content)
+
         temp_file2 = tmp_path / "outer.py"
-        outer_content = "from inner import inner_func\ndef outer_func():\
-            \n    return inner_func()"
+        outer_content = """
+from inner import inner_func
+def outer_func():
+    return inner_func()
+        """
         with temp_file2.open("w") as f:
             f.write(outer_content)
+
         symlink_file2 = tmp_path / "outer_link.py"
         symlink_file2.symlink_to(temp_file2)
 
