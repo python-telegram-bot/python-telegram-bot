@@ -61,7 +61,7 @@ class TestAdmonitionInserter:
             # keys are telegram classes
             for cls in admonition_inserter.admonitions[admonition_type]:
                 # Test classes crop up in AppBuilder, they can't come from code being tested.
-                if "tests.conftest" in str(cls):
+                if "tests." in str(cls):
                     continue
 
                 assert isinstance(cls, type)
