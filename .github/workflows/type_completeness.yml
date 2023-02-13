@@ -23,17 +23,18 @@ jobs:
       - name: Install Pyright
         run: |
           python -W ignore -m pip install pyright~=1.1.291
+      - name: Get PR Completeness
+        # Must run before base completeness, as base completeness will checkout the base branch
+        # And we can't go back to the PR branch after that in case the PR is coming from a fork
+        run: |
+          pip install . -U
+          pyright --verifytypes telegram --ignoreexternal --outputjson > pr.json || true
+          pyright --verifytypes telegram --ignoreexternal > pr.readable || true
       - name: Get Base Completeness
         run: |
           git checkout ${{ github.base_ref }}
           pip install . -U
           pyright --verifytypes telegram --ignoreexternal --outputjson > base.json || true
-      - name: Get PR Completeness
-        run: |
-          git checkout ${{ github.head_ref }}
-          pip install . -U
-          pyright --verifytypes telegram --ignoreexternal --outputjson > pr.json || true
-          pyright --verifytypes telegram --ignoreexternal > pr.readable || true
       - name: Compare Completeness
         uses: jannekem/run-python-script-action@v1
         with:
