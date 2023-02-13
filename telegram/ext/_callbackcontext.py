@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackContext class."""
-import asyncio
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -40,7 +39,7 @@ from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
-    from asyncio import Queue
+    from asyncio import Future, Queue
 
     from telegram.ext import Application, Job, JobQueue  # noqa: F401
     from telegram.ext._utils.types import CCT
@@ -147,7 +146,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.error: Optional[Exception] = None
         self.job: Optional["Job[CCT]"] = None
         self.coroutine: Optional[
-            Union[Generator[Optional["asyncio.Future[object]"], None, Any], Awaitable[Any]]
+            Union[Generator[Optional["Future[object]"], None, Any], Awaitable[Any]]
         ] = None
 
     @property
@@ -280,9 +279,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         error: Exception,
         application: "Application[BT, CCT, UD, CD, BD, Any]",
         job: "Job[Any]" = None,
-        coroutine: Union[
-            Generator[Optional["asyncio.Future[object]"], None, Any], Awaitable[Any]
-        ] = None,
+        coroutine: Union[Generator[Optional["Future[object]"], None, Any], Awaitable[Any]] = None,
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
