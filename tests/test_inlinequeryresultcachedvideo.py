@@ -28,22 +28,22 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_cached_video():
     return InlineQueryResultCachedVideo(
-        TestInlineQueryResultCachedVideo.id_,
-        TestInlineQueryResultCachedVideo.video_file_id,
-        TestInlineQueryResultCachedVideo.title,
-        caption=TestInlineQueryResultCachedVideo.caption,
-        parse_mode=TestInlineQueryResultCachedVideo.parse_mode,
-        caption_entities=TestInlineQueryResultCachedVideo.caption_entities,
-        description=TestInlineQueryResultCachedVideo.description,
-        input_message_content=TestInlineQueryResultCachedVideo.input_message_content,
-        reply_markup=TestInlineQueryResultCachedVideo.reply_markup,
+        TestInlineQueryResultCachedVideoBase.id_,
+        TestInlineQueryResultCachedVideoBase.video_file_id,
+        TestInlineQueryResultCachedVideoBase.title,
+        caption=TestInlineQueryResultCachedVideoBase.caption,
+        parse_mode=TestInlineQueryResultCachedVideoBase.parse_mode,
+        caption_entities=TestInlineQueryResultCachedVideoBase.caption_entities,
+        description=TestInlineQueryResultCachedVideoBase.description,
+        input_message_content=TestInlineQueryResultCachedVideoBase.input_message_content,
+        reply_markup=TestInlineQueryResultCachedVideoBase.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedVideo:
+class TestInlineQueryResultCachedVideoBase:
     id_ = "id"
     type_ = "video"
     video_file_id = "video file id"
@@ -55,6 +55,8 @@ class TestInlineQueryResultCachedVideo:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultCachedVideoWithoutRequest(TestInlineQueryResultCachedVideoBase):
     def test_slot_behaviour(self, inline_query_result_cached_video, mro_slots):
         inst = inline_query_result_cached_video
         for attr in inst.__slots__:

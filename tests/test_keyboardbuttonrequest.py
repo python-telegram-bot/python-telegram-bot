@@ -25,17 +25,19 @@ from telegram import ChatAdministratorRights, KeyboardButtonRequestChat, Keyboar
 @pytest.fixture(scope="class")
 def request_user():
     return KeyboardButtonRequestUser(
-        TestKeyboardButtonRequestUser.request_id,
-        TestKeyboardButtonRequestUser.user_is_bot,
-        TestKeyboardButtonRequestUser.user_is_premium,
+        TestKeyboardButtonRequestUserBase.request_id,
+        TestKeyboardButtonRequestUserBase.user_is_bot,
+        TestKeyboardButtonRequestUserBase.user_is_premium,
     )
 
 
-class TestKeyboardButtonRequestUser:
+class TestKeyboardButtonRequestUserBase:
     request_id = 123
     user_is_bot = True
     user_is_premium = False
 
+
+class TestKeyboardButtonRequestUserWithoutRequest(TestKeyboardButtonRequestUserBase):
     def test_slot_behaviour(self, request_user, mro_slots):
         for attr in request_user.__slots__:
             assert getattr(request_user, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -78,18 +80,18 @@ class TestKeyboardButtonRequestUser:
 @pytest.fixture(scope="class")
 def request_chat():
     return KeyboardButtonRequestChat(
-        TestKeyboardButtonRequestChat.request_id,
-        TestKeyboardButtonRequestChat.chat_is_channel,
-        TestKeyboardButtonRequestChat.chat_is_forum,
-        TestKeyboardButtonRequestChat.chat_has_username,
-        TestKeyboardButtonRequestChat.chat_is_created,
-        TestKeyboardButtonRequestChat.user_administrator_rights,
-        TestKeyboardButtonRequestChat.bot_administrator_rights,
-        TestKeyboardButtonRequestChat.bot_is_member,
+        TestKeyboardButtonRequestChatBase.request_id,
+        TestKeyboardButtonRequestChatBase.chat_is_channel,
+        TestKeyboardButtonRequestChatBase.chat_is_forum,
+        TestKeyboardButtonRequestChatBase.chat_has_username,
+        TestKeyboardButtonRequestChatBase.chat_is_created,
+        TestKeyboardButtonRequestChatBase.user_administrator_rights,
+        TestKeyboardButtonRequestChatBase.bot_administrator_rights,
+        TestKeyboardButtonRequestChatBase.bot_is_member,
     )
 
 
-class TestKeyboardButtonRequestChat:
+class TestKeyboardButtonRequestChatBase:
     request_id = 456
     chat_is_channel = True
     chat_is_forum = False
@@ -103,6 +105,8 @@ class TestKeyboardButtonRequestChat:
     )
     bot_is_member = True
 
+
+class TestKeyboardButtonRequestChatWithoutRequest(TestKeyboardButtonRequestChatBase):
     def test_slot_behaviour(self, request_chat, mro_slots):
         for attr in request_chat.__slots__:
             assert getattr(request_chat, attr, "err") != "err", f"got extra slot '{attr}'"

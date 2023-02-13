@@ -21,21 +21,23 @@ import pytest
 from telegram import PassportElementErrorDataField, PassportElementErrorSelfie
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def passport_element_error_selfie():
     return PassportElementErrorSelfie(
-        TestPassportElementErrorSelfie.type_,
-        TestPassportElementErrorSelfie.file_hash,
-        TestPassportElementErrorSelfie.message,
+        TestPassportElementErrorSelfieBase.type_,
+        TestPassportElementErrorSelfieBase.file_hash,
+        TestPassportElementErrorSelfieBase.message,
     )
 
 
-class TestPassportElementErrorSelfie:
+class TestPassportElementErrorSelfieBase:
     source = "selfie"
     type_ = "test_type"
     file_hash = "file_hash"
     message = "Error message"
 
+
+class TestPassportElementErrorSelfieWithoutRequest(TestPassportElementErrorSelfieBase):
     def test_slot_behaviour(self, passport_element_error_selfie, mro_slots):
         inst = passport_element_error_selfie
         for attr in inst.__slots__:

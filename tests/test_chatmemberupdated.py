@@ -34,26 +34,26 @@ from telegram import (
 from telegram._utils.datetime import UTC, to_timestamp
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def user():
     return User(1, "First name", False)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def chat():
     return Chat(1, Chat.SUPERGROUP, "Chat")
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def old_chat_member(user):
-    return ChatMember(user, TestChatMemberUpdated.old_status)
+    return ChatMember(user, TestChatMemberUpdatedBase.old_status)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def new_chat_member(user):
     return ChatMemberAdministrator(
         user,
-        TestChatMemberUpdated.new_status,
+        TestChatMemberUpdatedBase.new_status,
         True,
         True,
         True,
@@ -66,25 +66,27 @@ def new_chat_member(user):
     )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def time():
     return datetime.datetime.now(tz=UTC)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def invite_link(user):
     return ChatInviteLink("link", user, False, True, True)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def chat_member_updated(user, chat, old_chat_member, new_chat_member, invite_link, time):
     return ChatMemberUpdated(chat, user, time, old_chat_member, new_chat_member, invite_link)
 
 
-class TestChatMemberUpdated:
+class TestChatMemberUpdatedBase:
     old_status = ChatMember.MEMBER
     new_status = ChatMember.ADMINISTRATOR
 
+
+class TestChatMemberUpdatedWithoutRequest(TestChatMemberUpdatedBase):
     def test_slot_behaviour(self, mro_slots, chat_member_updated):
         action = chat_member_updated
         for attr in action.__slots__:

@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import copy
 from collections.abc import Sequence
 
@@ -56,86 +57,75 @@ from .test_photo import _photo, photo, photo_file, thumb  # noqa: F401
 from .test_video import video, video_file  # noqa: F401
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_media_video(class_thumb_file):
     return InputMediaVideo(
-        media=TestInputMediaVideo.media,
-        caption=TestInputMediaVideo.caption,
-        width=TestInputMediaVideo.width,
-        height=TestInputMediaVideo.height,
-        duration=TestInputMediaVideo.duration,
-        parse_mode=TestInputMediaVideo.parse_mode,
-        caption_entities=TestInputMediaVideo.caption_entities,
+        media=TestInputMediaVideoBase.media,
+        caption=TestInputMediaVideoBase.caption,
+        width=TestInputMediaVideoBase.width,
+        height=TestInputMediaVideoBase.height,
+        duration=TestInputMediaVideoBase.duration,
+        parse_mode=TestInputMediaVideoBase.parse_mode,
+        caption_entities=TestInputMediaVideoBase.caption_entities,
         thumb=class_thumb_file,
-        supports_streaming=TestInputMediaVideo.supports_streaming,
-        has_spoiler=TestInputMediaVideo.has_spoiler,
+        supports_streaming=TestInputMediaVideoBase.supports_streaming,
+        has_spoiler=TestInputMediaVideoBase.has_spoiler,
     )
 
 
-@pytest.fixture(scope="class")
-def input_media_photo(class_thumb_file):
+@pytest.fixture(scope="module")
+def input_media_photo():
     return InputMediaPhoto(
-        media=TestInputMediaPhoto.media,
-        caption=TestInputMediaPhoto.caption,
-        parse_mode=TestInputMediaPhoto.parse_mode,
-        caption_entities=TestInputMediaPhoto.caption_entities,
-        has_spoiler=TestInputMediaPhoto.has_spoiler,
+        media=TestInputMediaPhotoBase.media,
+        caption=TestInputMediaPhotoBase.caption,
+        parse_mode=TestInputMediaPhotoBase.parse_mode,
+        caption_entities=TestInputMediaPhotoBase.caption_entities,
+        has_spoiler=TestInputMediaPhotoBase.has_spoiler,
     )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_media_animation(class_thumb_file):
     return InputMediaAnimation(
-        media=TestInputMediaAnimation.media,
-        caption=TestInputMediaAnimation.caption,
-        parse_mode=TestInputMediaAnimation.parse_mode,
-        caption_entities=TestInputMediaAnimation.caption_entities,
-        width=TestInputMediaAnimation.width,
-        height=TestInputMediaAnimation.height,
+        media=TestInputMediaAnimationBase.media,
+        caption=TestInputMediaAnimationBase.caption,
+        parse_mode=TestInputMediaAnimationBase.parse_mode,
+        caption_entities=TestInputMediaAnimationBase.caption_entities,
+        width=TestInputMediaAnimationBase.width,
+        height=TestInputMediaAnimationBase.height,
         thumb=class_thumb_file,
-        duration=TestInputMediaAnimation.duration,
-        has_spoiler=TestInputMediaAnimation.has_spoiler,
+        duration=TestInputMediaAnimationBase.duration,
+        has_spoiler=TestInputMediaAnimationBase.has_spoiler,
     )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_media_audio(class_thumb_file):
     return InputMediaAudio(
-        media=TestInputMediaAudio.media,
-        caption=TestInputMediaAudio.caption,
-        duration=TestInputMediaAudio.duration,
-        performer=TestInputMediaAudio.performer,
-        title=TestInputMediaAudio.title,
+        media=TestInputMediaAudioBase.media,
+        caption=TestInputMediaAudioBase.caption,
+        duration=TestInputMediaAudioBase.duration,
+        performer=TestInputMediaAudioBase.performer,
+        title=TestInputMediaAudioBase.title,
         thumb=class_thumb_file,
-        parse_mode=TestInputMediaAudio.parse_mode,
-        caption_entities=TestInputMediaAudio.caption_entities,
+        parse_mode=TestInputMediaAudioBase.parse_mode,
+        caption_entities=TestInputMediaAudioBase.caption_entities,
     )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_media_document(class_thumb_file):
     return InputMediaDocument(
-        media=TestInputMediaDocument.media,
-        caption=TestInputMediaDocument.caption,
+        media=TestInputMediaDocumentBase.media,
+        caption=TestInputMediaDocumentBase.caption,
         thumb=class_thumb_file,
-        parse_mode=TestInputMediaDocument.parse_mode,
-        caption_entities=TestInputMediaDocument.caption_entities,
-        disable_content_type_detection=TestInputMediaDocument.disable_content_type_detection,
+        parse_mode=TestInputMediaDocumentBase.parse_mode,
+        caption_entities=TestInputMediaDocumentBase.caption_entities,
+        disable_content_type_detection=TestInputMediaDocumentBase.disable_content_type_detection,
     )
 
 
-class CustomSequence(Sequence):
-    def __init__(self, items):
-        self.items = items
-
-    def __getitem__(self, index):
-        return self.items[index]
-
-    def __len__(self):
-        return len(self.items)
-
-
-class TestInputMediaVideo:
+class TestInputMediaVideoBase:
     type_ = "video"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -147,6 +137,8 @@ class TestInputMediaVideo:
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     has_spoiler = True
 
+
+class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
     def test_slot_behaviour(self, input_media_video, mro_slots):
         inst = input_media_video
         for attr in inst.__slots__:
@@ -210,7 +202,7 @@ class TestInputMediaVideo:
         assert input_media_video.thumb == data_file("telegram.jpg").as_uri()
 
 
-class TestInputMediaPhoto:
+class TestInputMediaPhotoBase:
     type_ = "photo"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -218,6 +210,8 @@ class TestInputMediaPhoto:
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     has_spoiler = True
 
+
+class TestInputMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
     def test_slot_behaviour(self, input_media_photo, mro_slots):
         inst = input_media_photo
         for attr in inst.__slots__:
@@ -266,7 +260,7 @@ class TestInputMediaPhoto:
         assert input_media_photo.media == data_file("telegram.mp4").as_uri()
 
 
-class TestInputMediaAnimation:
+class TestInputMediaAnimationBase:
     type_ = "animation"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -277,6 +271,8 @@ class TestInputMediaAnimation:
     duration = 1
     has_spoiler = True
 
+
+class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
     def test_slot_behaviour(self, input_media_animation, mro_slots):
         inst = input_media_animation
         for attr in inst.__slots__:
@@ -332,7 +328,7 @@ class TestInputMediaAnimation:
         assert input_media_animation.thumb == data_file("telegram.jpg").as_uri()
 
 
-class TestInputMediaAudio:
+class TestInputMediaAudioBase:
     type_ = "audio"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -342,6 +338,8 @@ class TestInputMediaAudio:
     parse_mode = "HTML"
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
 
+
+class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
     def test_slot_behaviour(self, input_media_audio, mro_slots):
         inst = input_media_audio
         for attr in inst.__slots__:
@@ -401,7 +399,7 @@ class TestInputMediaAudio:
         assert input_media_audio.thumb == data_file("telegram.jpg").as_uri()
 
 
-class TestInputMediaDocument:
+class TestInputMediaDocumentBase:
     type_ = "document"
     media = "NOTAREALFILEID"
     caption = "My Caption"
@@ -409,6 +407,8 @@ class TestInputMediaDocument:
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     disable_content_type_detection = True
 
+
+class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
     def test_slot_behaviour(self, input_media_document, mro_slots):
         inst = input_media_document
         for attr in inst.__slots__:
@@ -467,7 +467,7 @@ class TestInputMediaDocument:
         assert input_media_document.thumb == data_file("telegram.jpg").as_uri()
 
 
-@pytest.fixture(scope="function")  # noqa: F811
+@pytest.fixture(scope="module")  # noqa: F811
 def media_group(photo, thumb):  # noqa: F811
     return [
         InputMediaPhoto(photo, caption="*photo* 1", parse_mode="Markdown"),
@@ -478,12 +478,12 @@ def media_group(photo, thumb):  # noqa: F811
     ]
 
 
-@pytest.fixture(scope="function")  # noqa: F811
+@pytest.fixture(scope="module")  # noqa: F811
 def media_group_no_caption_args(photo, thumb):  # noqa: F811
     return [InputMediaPhoto(photo), InputMediaPhoto(thumb), InputMediaPhoto(photo)]
 
 
-@pytest.fixture(scope="function")  # noqa: F811
+@pytest.fixture(scope="module")  # noqa: F811
 def media_group_no_caption_only_caption_entities(photo, thumb):  # noqa: F811
     return [
         InputMediaPhoto(photo, caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]),
@@ -491,7 +491,7 @@ def media_group_no_caption_only_caption_entities(photo, thumb):  # noqa: F811
     ]
 
 
-@pytest.fixture(scope="function")  # noqa: F811
+@pytest.fixture(scope="module")  # noqa: F811
 def media_group_no_caption_only_parse_mode(photo, thumb):  # noqa: F811
     return [
         InputMediaPhoto(photo, parse_mode="Markdown"),
@@ -499,32 +499,7 @@ def media_group_no_caption_only_parse_mode(photo, thumb):  # noqa: F811
     ]
 
 
-class TestSendMediaGroup:
-    @pytest.mark.flaky(3, 1)
-    async def test_send_media_group_photo(self, bot, chat_id, media_group):
-        messages = await bot.send_media_group(chat_id, media_group)
-        assert isinstance(messages, tuple)
-        assert len(messages) == 3
-        assert all(isinstance(mes, Message) for mes in messages)
-        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
-        assert all(mes.caption == f"photo {idx+1}" for idx, mes in enumerate(messages))
-        assert all(
-            mes.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),) for mes in messages
-        )
-
-    async def test_send_media_group_with_message_thread_id(
-        self, bot, real_topic, forum_group_id, media_group  # noqa: F811
-    ):
-        messages = await bot.send_media_group(
-            forum_group_id,
-            media_group,
-            message_thread_id=real_topic.message_thread_id,
-        )
-        assert isinstance(messages, tuple)
-        assert len(messages) == 3
-        assert all(isinstance(mes, Message) for mes in messages)
-        assert all(i.message_thread_id == real_topic.message_thread_id for i in messages)
-
+class TestSendMediaGroupWithoutRequest:
     async def test_send_media_group_throws_error_with_group_caption_and_individual_captions(
         self,
         bot,
@@ -544,6 +519,143 @@ class TestSendMediaGroup:
             ):
                 await bot.send_media_group(chat_id, group, caption="foo")
 
+    async def test_send_media_group_custom_filename(
+        self,
+        bot,
+        chat_id,
+        photo_file,  # noqa: F811
+        animation_file,  # noqa: F811
+        audio_file,  # noqa: F811
+        video_file,  # noqa: F811
+        monkeypatch,
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            result = all(
+                field_tuple[0] == "custom_filename"
+                for field_tuple in request_data.multipart_data.values()
+            )
+            if result is True:
+                raise Exception("Test was successful")
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        media = [
+            InputMediaAnimation(animation_file, filename="custom_filename"),
+            InputMediaAudio(audio_file, filename="custom_filename"),
+            InputMediaPhoto(photo_file, filename="custom_filename"),
+            InputMediaVideo(video_file, filename="custom_filename"),
+        ]
+
+        with pytest.raises(Exception, match="Test was successful"):
+            await bot.send_media_group(chat_id, media)
+
+    async def test_send_media_group_with_thumbs(
+        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
+    ):
+        async def make_assertion(method, url, request_data: RequestData, *args, **kwargs):
+            nonlocal input_video
+            files = request_data.multipart_data
+            video_check = files[input_video.media.attach_name] == input_video.media.field_tuple
+            thumb_check = files[input_video.thumb.attach_name] == input_video.thumb.field_tuple
+            result = video_check and thumb_check
+            raise Exception(f"Test was {'successful' if result else 'failing'}")
+
+        monkeypatch.setattr(bot.request, "_request_wrapper", make_assertion)
+        input_video = InputMediaVideo(video_file, thumb=photo_file)
+        with pytest.raises(Exception, match="Test was successful"):
+            await bot.send_media_group(chat_id, [input_video, input_video])
+
+    async def test_edit_message_media_with_thumb(
+        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
+    ):
+        async def make_assertion(
+            method: str, url: str, request_data: RequestData = None, *args, **kwargs
+        ):
+            files = request_data.multipart_data
+            video_check = files[input_video.media.attach_name] == input_video.media.field_tuple
+            thumb_check = files[input_video.thumb.attach_name] == input_video.thumb.field_tuple
+            result = video_check and thumb_check
+            raise Exception(f"Test was {'successful' if result else 'failing'}")
+
+        monkeypatch.setattr(bot.request, "_request_wrapper", make_assertion)
+        input_video = InputMediaVideo(video_file, thumb=photo_file)
+        with pytest.raises(Exception, match="Test was successful"):
+            await bot.edit_message_media(chat_id=chat_id, message_id=123, media=input_video)
+
+
+class CustomSequence(Sequence):
+    def __init__(self, items):
+        self.items = items
+
+    def __getitem__(self, index):
+        return self.items[index]
+
+    def __len__(self):
+        return len(self.items)
+
+
+class TestSendMediaGroupWithRequest:
+    async def test_send_media_group_photo(self, bot, chat_id, media_group):
+        messages = await bot.send_media_group(chat_id, media_group)
+        assert isinstance(messages, tuple)
+        assert len(messages) == 3
+        assert all(isinstance(mes, Message) for mes in messages)
+        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
+        assert all(mes.caption == f"photo {idx+1}" for idx, mes in enumerate(messages))
+        assert all(
+            mes.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),) for mes in messages
+        )
+
+    async def test_send_media_group_new_files(
+        self, bot, chat_id, video_file, photo_file  # noqa: F811
+    ):
+        async def func():
+            return await bot.send_media_group(
+                chat_id,
+                [
+                    InputMediaVideo(video_file),
+                    InputMediaPhoto(photo_file),
+                    InputMediaPhoto(data_file("telegram.jpg").read_bytes()),
+                ],
+            )
+
+        messages = await expect_bad_request(
+            func, "Type of file mismatch", "Telegram did not accept the file."
+        )
+
+        assert isinstance(messages, tuple)
+        assert len(messages) == 3
+        assert all(isinstance(mes, Message) for mes in messages)
+        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
+
+    @pytest.mark.parametrize("sequence_type", [list, tuple, CustomSequence])
+    @pytest.mark.parametrize("bot_class", ["raw_bot", "ext_bot"])
+    async def test_send_media_group_different_sequences(
+        self, bot, chat_id, media_group, sequence_type, bot_class, raw_bot
+    ):
+        """Test that send_media_group accepts different sequence types. This test ensures that
+        Bot._insert_defaults works for arbitrary sequence types."""
+        bot = bot if bot_class == "ext_bot" else raw_bot
+
+        messages = await bot.send_media_group(chat_id, sequence_type(media_group))
+        assert isinstance(messages, tuple)
+        assert len(messages) == 3
+        assert all(isinstance(mes, Message) for mes in messages)
+        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
+
+    async def test_send_media_group_with_message_thread_id(
+        self, bot, real_topic, forum_group_id, media_group  # noqa: F811
+    ):
+        messages = await bot.send_media_group(
+            forum_group_id,
+            media_group,
+            message_thread_id=real_topic.message_thread_id,
+        )
+        assert isinstance(messages, tuple)
+        assert len(messages) == 3
+        assert all(isinstance(mes, Message) for mes in messages)
+        assert all(i.message_thread_id == real_topic.message_thread_id for i in messages)
+
     @pytest.mark.parametrize(
         "caption, parse_mode, caption_entities",
         [
@@ -553,7 +665,6 @@ class TestSendMediaGroup:
             ("photo 1", None, [MessageEntity(MessageEntity.BOLD, 0, 5)]),
         ],
     )
-    @pytest.mark.flaky(3, 1)
     async def test_send_media_group_with_group_caption(
         self,
         bot,
@@ -598,16 +709,15 @@ class TestSendMediaGroup:
         assert all(mes.caption is None for mes in other_messages)
         assert not any(mes.caption_entities for mes in other_messages)
 
-    @pytest.mark.flaky(3, 1)
     async def test_send_media_group_all_args(self, bot, raw_bot, chat_id, media_group):
         ext_bot = bot
-        for bot in (ext_bot, raw_bot):
-            # We need to test 1) below both the bot and raw_bot and setting this up with
-            # pytest.parametrize appears to be difficult ...
-
-            m1 = await bot.send_message(chat_id, text="test")
+        # We need to test 1) below both the bot and raw_bot and setting this up with
+        # pytest.parametrize appears to be difficult ...
+        aws = {b.send_message(chat_id, text="test") for b in (ext_bot, raw_bot)}
+        for msg_task in asyncio.as_completed(aws):
+            m1 = await msg_task
             copied_media_group = copy.copy(media_group)
-            messages = await bot.send_media_group(
+            messages = await m1.get_bot().send_media_group(
                 chat_id,
                 media_group,
                 disable_notification=True,
@@ -633,7 +743,6 @@ class TestSendMediaGroup:
             )
             assert all(mes.has_protected_content for mes in messages)
 
-    @pytest.mark.flaky(3, 1)
     async def test_send_media_group_with_spoiler(
         self, bot, chat_id, photo_file, video_file  # noqa: F811
     ):
@@ -649,97 +758,36 @@ class TestSendMediaGroup:
         assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
         assert all(mes.has_media_spoiler for mes in messages)
 
-    @pytest.mark.flaky(3, 1)
-    async def test_send_media_group_custom_filename(
-        self,
-        bot,
-        chat_id,
-        photo_file,  # noqa: F811
-        animation_file,  # noqa: F811
-        audio_file,  # noqa: F811
-        video_file,  # noqa: F811
-        monkeypatch,
-    ):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            result = all(
-                field_tuple[0] == "custom_filename"
-                for field_tuple in request_data.multipart_data.values()
+    async def test_edit_message_media(self, bot, raw_bot, chat_id, media_group):
+        ext_bot = bot
+        # We need to test 1) below both the bot and raw_bot and setting this up with
+        # pytest.parametrize appears to be difficult ...
+        aws = {b.send_media_group(chat_id, media_group) for b in (ext_bot, raw_bot)}
+        for msg_task in asyncio.as_completed(aws):
+            messages = await msg_task
+            cid = messages[-1].chat.id
+            mid = messages[-1].message_id
+            copied_media = copy.copy(media_group[0])
+            new_message = (
+                await messages[-1]
+                .get_bot()
+                .edit_message_media(chat_id=cid, message_id=mid, media=media_group[0])
             )
-            if result is True:
-                raise Exception("Test was successful")
+            assert isinstance(new_message, Message)
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+            # 1)
+            # make sure that the media was not modified
+            assert media_group[0].parse_mode == copied_media.parse_mode
 
-        media = [
-            InputMediaAnimation(animation_file, filename="custom_filename"),
-            InputMediaAudio(audio_file, filename="custom_filename"),
-            InputMediaPhoto(photo_file, filename="custom_filename"),
-            InputMediaVideo(video_file, filename="custom_filename"),
-        ]
-
-        with pytest.raises(Exception, match="Test was successful"):
-            await bot.send_media_group(chat_id, media)
-
-    async def test_send_media_group_with_thumbs(
-        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
-    ):
-        async def make_assertion(method, url, request_data: RequestData, *args, **kwargs):
-            files = request_data.multipart_data
-            video_check = files[input_video.media.attach_name] == input_video.media.field_tuple
-            thumb_check = files[input_video.thumb.attach_name] == input_video.thumb.field_tuple
-            result = video_check and thumb_check
-            raise Exception(f"Test was {'successful' if result else 'failing'}")
-
-        monkeypatch.setattr(bot.request, "_request_wrapper", make_assertion)
-        input_video = InputMediaVideo(video_file, thumb=photo_file)
-        with pytest.raises(Exception, match="Test was successful"):
-            await bot.send_media_group(chat_id, [input_video, input_video])
-
-    @pytest.mark.flaky(3, 1)  # noqa: F811
-    async def test_send_media_group_new_files(
-        self,
-        bot,
-        chat_id,
-        video_file,  # noqa: F811
-        photo_file,  # noqa: F811
-        animation_file,  # noqa: F811
-    ):
-        async def func():
-            return await bot.send_media_group(
-                chat_id,
-                [
-                    InputMediaVideo(video_file),
-                    InputMediaPhoto(photo_file),
-                    InputMediaPhoto(data_file("telegram.jpg").read_bytes()),
-                ],
-            )
-
-        messages = await expect_bad_request(
-            func, "Type of file mismatch", "Telegram did not accept the file."
+    async def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
+        messages = await bot.send_media_group(chat_id, media_group)
+        cid = messages[-1].chat.id
+        mid = messages[-1].message_id
+        new_message = await bot.edit_message_media(
+            chat_id=cid, message_id=mid, media=InputMediaPhoto(thumb_file)
         )
+        assert isinstance(new_message, Message)
 
-        assert isinstance(messages, tuple)
-        assert len(messages) == 3
-        assert all(isinstance(mes, Message) for mes in messages)
-        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
-
-    @pytest.mark.flaky(3, 1)
-    @pytest.mark.parametrize("sequence_type", [list, tuple, CustomSequence])
-    @pytest.mark.parametrize("bot_class", ["raw_bot", "ext_bot"])
-    async def test_send_media_group_different_sequences(
-        self, bot, chat_id, media_group, sequence_type, bot_class, raw_bot
-    ):
-        """Test that send_media_group accepts different sequence types. This test ensures that
-        Bot._insert_defaults works for arbitrary sequence types."""
-        bot = bot if bot_class == "ext_bot" else raw_bot
-
-        messages = await bot.send_media_group(chat_id, sequence_type(media_group))
-        assert isinstance(messages, tuple)
-        assert len(messages) == 3
-        assert all(isinstance(mes, Message) for mes in messages)
-        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
-
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -773,19 +821,18 @@ class TestSendMediaGroup:
                     chat_id, media_group, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_media_group_default_protect_content(
         self, chat_id, media_group, default_bot
     ):
-        protected = await default_bot.send_media_group(chat_id, media_group)
-        assert all(msg.has_protected_content for msg in protected)
-        unprotected = await default_bot.send_media_group(
-            chat_id, media_group, protect_content=False
+        tasks = asyncio.gather(
+            default_bot.send_media_group(chat_id, media_group),
+            default_bot.send_media_group(chat_id, media_group, protect_content=False),
         )
+        protected, unprotected = await tasks
+        assert all(msg.has_protected_content for msg in protected)
         assert not all(msg.has_protected_content for msg in unprotected)
 
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True)
     async def test_send_media_group_default_parse_mode(
         self, chat_id, media_group_no_caption_args, default_bot
@@ -797,19 +844,21 @@ class TestSendMediaGroup:
         # make sure no parse_mode was set as a side effect
         assert not any(item.parse_mode for item in media_group_no_caption_args)
 
-        overridden_markdown_v2 = await default_bot.send_media_group(
-            chat_id,
-            media_group_no_caption_args.copy(),
-            caption="*photo* 1",
-            parse_mode=ParseMode.MARKDOWN_V2,
+        tasks = asyncio.gather(
+            default_bot.send_media_group(
+                chat_id,
+                media_group_no_caption_args.copy(),
+                caption="*photo* 1",
+                parse_mode=ParseMode.MARKDOWN_V2,
+            ),
+            default_bot.send_media_group(
+                chat_id,
+                media_group_no_caption_args.copy(),
+                caption="<b>photo</b> 1",
+                parse_mode=None,
+            ),
         )
-
-        overridden_none = await default_bot.send_media_group(
-            chat_id,
-            media_group_no_caption_args.copy(),
-            caption="<b>photo</b> 1",
-            parse_mode=None,
-        )
+        overridden_markdown_v2, overridden_none = await tasks
 
         # Make sure first message got the caption, which will lead to Telegram
         # displaying its caption as group caption
@@ -830,53 +879,6 @@ class TestSendMediaGroup:
             assert all(mes.caption is None for mes in other_messages)
             assert not any(mes.caption_entities for mes in other_messages)
 
-    @pytest.mark.flaky(3, 1)
-    async def test_edit_message_media(self, bot, raw_bot, chat_id, media_group):
-        ext_bot = bot
-        for bot in (ext_bot, raw_bot):
-            # We need to test 1) below both the bot and raw_bot and setting this up with
-            # pytest.parametrize appears to be difficult ...
-            messages = await bot.send_media_group(chat_id, media_group)
-            cid = messages[-1].chat.id
-            mid = messages[-1].message_id
-            copied_media = copy.copy(media_group[0])
-            new_message = await bot.edit_message_media(
-                chat_id=cid, message_id=mid, media=media_group[0]
-            )
-            assert isinstance(new_message, Message)
-
-            # 1)
-            # make sure that the media was not modified
-            assert media_group[0].parse_mode == copied_media.parse_mode
-
-    @pytest.mark.flaky(3, 1)
-    async def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
-        messages = await bot.send_media_group(chat_id, media_group)
-        cid = messages[-1].chat.id
-        mid = messages[-1].message_id
-        new_message = await bot.edit_message_media(
-            chat_id=cid, message_id=mid, media=InputMediaPhoto(thumb_file)
-        )
-        assert isinstance(new_message, Message)
-
-    async def test_edit_message_media_with_thumb(
-        self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
-    ):
-        async def make_assertion(
-            method: str, url: str, request_data: RequestData = None, *args, **kwargs
-        ):
-            files = request_data.multipart_data
-            video_check = files[input_video.media.attach_name] == input_video.media.field_tuple
-            thumb_check = files[input_video.thumb.attach_name] == input_video.thumb.field_tuple
-            result = video_check and thumb_check
-            raise Exception(f"Test was {'successful' if result else 'failing'}")
-
-        monkeypatch.setattr(bot.request, "_request_wrapper", make_assertion)
-        input_video = InputMediaVideo(video_file, thumb=photo_file)
-        with pytest.raises(Exception, match="Test was successful"):
-            await bot.edit_message_media(chat_id=chat_id, message_id=123, media=input_video)
-
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True, ids=["HTML-Bot"]
     )

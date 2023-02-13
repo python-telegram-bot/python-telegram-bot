@@ -28,26 +28,26 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_document():
     return InlineQueryResultDocument(
-        TestInlineQueryResultDocument.id_,
-        TestInlineQueryResultDocument.document_url,
-        TestInlineQueryResultDocument.title,
-        TestInlineQueryResultDocument.mime_type,
-        caption=TestInlineQueryResultDocument.caption,
-        parse_mode=TestInlineQueryResultDocument.parse_mode,
-        caption_entities=TestInlineQueryResultDocument.caption_entities,
-        description=TestInlineQueryResultDocument.description,
-        thumb_url=TestInlineQueryResultDocument.thumb_url,
-        thumb_width=TestInlineQueryResultDocument.thumb_width,
-        thumb_height=TestInlineQueryResultDocument.thumb_height,
-        input_message_content=TestInlineQueryResultDocument.input_message_content,
-        reply_markup=TestInlineQueryResultDocument.reply_markup,
+        TestInlineQueryResultDocumentBase.id_,
+        TestInlineQueryResultDocumentBase.document_url,
+        TestInlineQueryResultDocumentBase.title,
+        TestInlineQueryResultDocumentBase.mime_type,
+        caption=TestInlineQueryResultDocumentBase.caption,
+        parse_mode=TestInlineQueryResultDocumentBase.parse_mode,
+        caption_entities=TestInlineQueryResultDocumentBase.caption_entities,
+        description=TestInlineQueryResultDocumentBase.description,
+        thumb_url=TestInlineQueryResultDocumentBase.thumb_url,
+        thumb_width=TestInlineQueryResultDocumentBase.thumb_width,
+        thumb_height=TestInlineQueryResultDocumentBase.thumb_height,
+        input_message_content=TestInlineQueryResultDocumentBase.input_message_content,
+        reply_markup=TestInlineQueryResultDocumentBase.reply_markup,
     )
 
 
-class TestInlineQueryResultDocument:
+class TestInlineQueryResultDocumentBase:
     id_ = "id"
     type_ = "document"
     document_url = "document url"
@@ -63,6 +63,8 @@ class TestInlineQueryResultDocument:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentBase):
     def test_slot_behaviour(self, inline_query_result_document, mro_slots):
         inst = inline_query_result_document
         for attr in inst.__slots__:

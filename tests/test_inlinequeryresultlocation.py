@@ -27,26 +27,26 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_location():
     return InlineQueryResultLocation(
-        TestInlineQueryResultLocation.id_,
-        TestInlineQueryResultLocation.latitude,
-        TestInlineQueryResultLocation.longitude,
-        TestInlineQueryResultLocation.title,
-        live_period=TestInlineQueryResultLocation.live_period,
-        thumb_url=TestInlineQueryResultLocation.thumb_url,
-        thumb_width=TestInlineQueryResultLocation.thumb_width,
-        thumb_height=TestInlineQueryResultLocation.thumb_height,
-        input_message_content=TestInlineQueryResultLocation.input_message_content,
-        reply_markup=TestInlineQueryResultLocation.reply_markup,
-        horizontal_accuracy=TestInlineQueryResultLocation.horizontal_accuracy,
-        heading=TestInlineQueryResultLocation.heading,
-        proximity_alert_radius=TestInlineQueryResultLocation.proximity_alert_radius,
+        TestInlineQueryResultLocationBase.id_,
+        TestInlineQueryResultLocationBase.latitude,
+        TestInlineQueryResultLocationBase.longitude,
+        TestInlineQueryResultLocationBase.title,
+        live_period=TestInlineQueryResultLocationBase.live_period,
+        thumb_url=TestInlineQueryResultLocationBase.thumb_url,
+        thumb_width=TestInlineQueryResultLocationBase.thumb_width,
+        thumb_height=TestInlineQueryResultLocationBase.thumb_height,
+        input_message_content=TestInlineQueryResultLocationBase.input_message_content,
+        reply_markup=TestInlineQueryResultLocationBase.reply_markup,
+        horizontal_accuracy=TestInlineQueryResultLocationBase.horizontal_accuracy,
+        heading=TestInlineQueryResultLocationBase.heading,
+        proximity_alert_radius=TestInlineQueryResultLocationBase.proximity_alert_radius,
     )
 
 
-class TestInlineQueryResultLocation:
+class TestInlineQueryResultLocationBase:
     id_ = "id"
     type_ = "location"
     latitude = 0.0
@@ -62,6 +62,8 @@ class TestInlineQueryResultLocation:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultLocationWithoutRequest(TestInlineQueryResultLocationBase):
     def test_slot_behaviour(self, inline_query_result_location, mro_slots):
         inst = inline_query_result_location
         for attr in inst.__slots__:

@@ -32,23 +32,23 @@ from tests.auxil.bot_method_checks import (
 @pytest.fixture(scope="function", params=["message", "inline"])
 def callback_query(bot, request):
     cbq = CallbackQuery(
-        TestCallbackQuery.id_,
-        TestCallbackQuery.from_user,
-        TestCallbackQuery.chat_instance,
-        data=TestCallbackQuery.data,
-        game_short_name=TestCallbackQuery.game_short_name,
+        TestCallbackQueryBase.id_,
+        TestCallbackQueryBase.from_user,
+        TestCallbackQueryBase.chat_instance,
+        data=TestCallbackQueryBase.data,
+        game_short_name=TestCallbackQueryBase.game_short_name,
     )
     cbq.set_bot(bot)
     cbq._unfreeze()
     if request.param == "message":
-        cbq.message = TestCallbackQuery.message
+        cbq.message = TestCallbackQueryBase.message
         cbq.message.set_bot(bot)
     else:
-        cbq.inline_message_id = TestCallbackQuery.inline_message_id
+        cbq.inline_message_id = TestCallbackQueryBase.inline_message_id
     return cbq
 
 
-class TestCallbackQuery:
+class TestCallbackQueryBase:
     id_ = "id"
     from_user = User(1, "test_user", False)
     chat_instance = "chat_instance"
@@ -57,6 +57,8 @@ class TestCallbackQuery:
     inline_message_id = "inline_message_id"
     game_short_name = "the_game"
 
+
+class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
     @staticmethod
     def skip_params(callback_query: CallbackQuery):
         if callback_query.inline_message_id:
@@ -120,6 +122,26 @@ class TestCallbackQuery:
             assert callback_query_dict["inline_message_id"] == callback_query.inline_message_id
         assert callback_query_dict["data"] == callback_query.data
         assert callback_query_dict["game_short_name"] == callback_query.game_short_name
+
+    def test_equality(self):
+        a = CallbackQuery(self.id_, self.from_user, "chat")
+        b = CallbackQuery(self.id_, self.from_user, "chat")
+        c = CallbackQuery(self.id_, None, "")
+        d = CallbackQuery("", None, "chat")
+        e = Audio(self.id_, "unique_id", 1)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
 
     async def test_answer(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
@@ -447,23 +469,3 @@ class TestCallbackQuery:
 
         monkeypatch.setattr(callback_query.get_bot(), "copy_message", make_assertion)
         assert await callback_query.copy_message(1)
-
-    def test_equality(self):
-        a = CallbackQuery(self.id_, self.from_user, "chat")
-        b = CallbackQuery(self.id_, self.from_user, "chat")
-        c = CallbackQuery(self.id_, None, "")
-        d = CallbackQuery("", None, "chat")
-        e = Audio(self.id_, "unique_id", 1)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)

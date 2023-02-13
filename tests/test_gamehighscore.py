@@ -22,25 +22,31 @@ import pytest
 from telegram import GameHighScore, User
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def game_highscore():
     return GameHighScore(
-        TestGameHighScore.position, TestGameHighScore.user, TestGameHighScore.score
+        TestGameHighScoreBase.position, TestGameHighScoreBase.user, TestGameHighScoreBase.score
     )
 
 
-class TestGameHighScore:
+class TestGameHighScoreBase:
     position = 12
     user = User(2, "test user", False)
     score = 42
 
+
+class TestGameHighScoreWithoutRequest(TestGameHighScoreBase):
     def test_slot_behaviour(self, game_highscore, mro_slots):
         for attr in game_highscore.__slots__:
             assert getattr(game_highscore, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(game_highscore)) == len(set(mro_slots(game_highscore))), "same slot"
 
     def test_de_json(self, bot):
-        json_dict = {"position": self.position, "user": self.user.to_dict(), "score": self.score}
+        json_dict = {
+            "position": self.position,
+            "user": self.user.to_dict(),
+            "score": self.score,
+        }
         highscore = GameHighScore.de_json(json_dict, bot)
         assert highscore.api_kwargs == {}
 

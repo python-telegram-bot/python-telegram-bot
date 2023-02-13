@@ -21,19 +21,19 @@ import pytest
 from telegram import InputLocationMessageContent, Location
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_location_message_content():
     return InputLocationMessageContent(
-        TestInputLocationMessageContent.latitude,
-        TestInputLocationMessageContent.longitude,
-        live_period=TestInputLocationMessageContent.live_period,
-        horizontal_accuracy=TestInputLocationMessageContent.horizontal_accuracy,
-        heading=TestInputLocationMessageContent.heading,
-        proximity_alert_radius=TestInputLocationMessageContent.proximity_alert_radius,
+        TestInputLocationMessageContentBase.latitude,
+        TestInputLocationMessageContentBase.longitude,
+        live_period=TestInputLocationMessageContentBase.live_period,
+        horizontal_accuracy=TestInputLocationMessageContentBase.horizontal_accuracy,
+        heading=TestInputLocationMessageContentBase.heading,
+        proximity_alert_radius=TestInputLocationMessageContentBase.proximity_alert_radius,
     )
 
 
-class TestInputLocationMessageContent:
+class TestInputLocationMessageContentBase:
     latitude = -23.691288
     longitude = -46.788279
     live_period = 80
@@ -41,6 +41,8 @@ class TestInputLocationMessageContent:
     heading = 90
     proximity_alert_radius = 999
 
+
+class TestInputLocationMessageContentWithoutRequest(TestInputLocationMessageContentBase):
     def test_slot_behaviour(self, input_location_message_content, mro_slots):
         inst = input_location_message_content
         for attr in inst.__slots__:

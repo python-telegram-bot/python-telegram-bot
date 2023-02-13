@@ -27,26 +27,28 @@ from tests.auxil.bot_method_checks import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query(bot):
     ilq = InlineQuery(
-        TestInlineQuery.id_,
-        TestInlineQuery.from_user,
-        TestInlineQuery.query,
-        TestInlineQuery.offset,
-        location=TestInlineQuery.location,
+        TestInlineQueryBase.id_,
+        TestInlineQueryBase.from_user,
+        TestInlineQueryBase.query,
+        TestInlineQueryBase.offset,
+        location=TestInlineQueryBase.location,
     )
     ilq.set_bot(bot)
     return ilq
 
 
-class TestInlineQuery:
+class TestInlineQueryBase:
     id_ = 1234
     from_user = User(1, "First name", False)
     query = "query text"
     offset = "offset"
     location = Location(8.8, 53.1)
 
+
+class TestInlineQueryWithoutRequest(TestInlineQueryBase):
     def test_slot_behaviour(self, inline_query, mro_slots):
         for attr in inline_query.__slots__:
             assert getattr(inline_query, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -79,34 +81,6 @@ class TestInlineQuery:
         assert inline_query_dict["query"] == inline_query.query
         assert inline_query_dict["offset"] == inline_query.offset
 
-    async def test_answer(self, monkeypatch, inline_query):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["inline_query_id"] == inline_query.id
-
-        assert check_shortcut_signature(
-            InlineQuery.answer, Bot.answer_inline_query, ["inline_query_id"], ["auto_pagination"]
-        )
-        assert await check_shortcut_call(
-            inline_query.answer, inline_query.get_bot(), "answer_inline_query"
-        )
-        assert await check_defaults_handling(inline_query.answer, inline_query.get_bot())
-
-        monkeypatch.setattr(inline_query.get_bot(), "answer_inline_query", make_assertion)
-        assert await inline_query.answer(results=[])
-
-    async def test_answer_error(self, inline_query):
-        with pytest.raises(ValueError, match="mutually exclusive"):
-            await inline_query.answer(results=[], auto_pagination=True, current_offset="foobar")
-
-    async def test_answer_auto_pagination(self, monkeypatch, inline_query):
-        async def make_assertion(*_, **kwargs):
-            inline_query_id_matches = kwargs["inline_query_id"] == inline_query.id
-            offset_matches = kwargs.get("current_offset") == inline_query.offset
-            return offset_matches and inline_query_id_matches
-
-        monkeypatch.setattr(inline_query.get_bot(), "answer_inline_query", make_assertion)
-        assert await inline_query.answer(results=[], auto_pagination=True)
-
     def test_equality(self):
         a = InlineQuery(self.id_, User(1, "", False), "", "")
         b = InlineQuery(self.id_, User(1, "", False), "", "")
@@ -126,3 +100,31 @@ class TestInlineQuery:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_answer_error(self, inline_query):
+        with pytest.raises(ValueError, match="mutually exclusive"):
+            await inline_query.answer(results=[], auto_pagination=True, current_offset="foobar")
+
+    async def test_answer(self, monkeypatch, inline_query):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["inline_query_id"] == inline_query.id
+
+        assert check_shortcut_signature(
+            InlineQuery.answer, Bot.answer_inline_query, ["inline_query_id"], ["auto_pagination"]
+        )
+        assert await check_shortcut_call(
+            inline_query.answer, inline_query.get_bot(), "answer_inline_query"
+        )
+        assert await check_defaults_handling(inline_query.answer, inline_query.get_bot())
+
+        monkeypatch.setattr(inline_query.get_bot(), "answer_inline_query", make_assertion)
+        assert await inline_query.answer(results=[])
+
+    async def test_answer_auto_pagination(self, monkeypatch, inline_query):
+        async def make_assertion(*_, **kwargs):
+            inline_query_id_matches = kwargs["inline_query_id"] == inline_query.id
+            offset_matches = kwargs.get("current_offset") == inline_query.offset
+            return offset_matches and inline_query_id_matches
+
+        monkeypatch.setattr(inline_query.get_bot(), "answer_inline_query", make_assertion)
+        assert await inline_query.answer(results=[], auto_pagination=True)

@@ -29,23 +29,23 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_audio():
     return InlineQueryResultAudio(
-        TestInlineQueryResultAudio.id_,
-        TestInlineQueryResultAudio.audio_url,
-        TestInlineQueryResultAudio.title,
-        performer=TestInlineQueryResultAudio.performer,
-        audio_duration=TestInlineQueryResultAudio.audio_duration,
-        caption=TestInlineQueryResultAudio.caption,
-        parse_mode=TestInlineQueryResultAudio.parse_mode,
-        caption_entities=TestInlineQueryResultAudio.caption_entities,
-        input_message_content=TestInlineQueryResultAudio.input_message_content,
-        reply_markup=TestInlineQueryResultAudio.reply_markup,
+        TestInlineQueryResultAudioBase.id_,
+        TestInlineQueryResultAudioBase.audio_url,
+        TestInlineQueryResultAudioBase.title,
+        performer=TestInlineQueryResultAudioBase.performer,
+        audio_duration=TestInlineQueryResultAudioBase.audio_duration,
+        caption=TestInlineQueryResultAudioBase.caption,
+        parse_mode=TestInlineQueryResultAudioBase.parse_mode,
+        caption_entities=TestInlineQueryResultAudioBase.caption_entities,
+        input_message_content=TestInlineQueryResultAudioBase.input_message_content,
+        reply_markup=TestInlineQueryResultAudioBase.reply_markup,
     )
 
 
-class TestInlineQueryResultAudio:
+class TestInlineQueryResultAudioBase:
     id_ = "id"
     type_ = "audio"
     audio_url = "audio url"
@@ -58,6 +58,8 @@ class TestInlineQueryResultAudio:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultAudioWithoutRequest(TestInlineQueryResultAudioBase):
     def test_slot_behaviour(self, inline_query_result_audio, mro_slots):
         inst = inline_query_result_audio
         for attr in inst.__slots__:

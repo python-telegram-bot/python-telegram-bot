@@ -27,22 +27,22 @@ from tests.auxil.bot_method_checks import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def pre_checkout_query(bot):
     pcq = PreCheckoutQuery(
-        TestPreCheckoutQuery.id_,
-        TestPreCheckoutQuery.from_user,
-        TestPreCheckoutQuery.currency,
-        TestPreCheckoutQuery.total_amount,
-        TestPreCheckoutQuery.invoice_payload,
-        shipping_option_id=TestPreCheckoutQuery.shipping_option_id,
-        order_info=TestPreCheckoutQuery.order_info,
+        TestPreCheckoutQueryBase.id_,
+        TestPreCheckoutQueryBase.from_user,
+        TestPreCheckoutQueryBase.currency,
+        TestPreCheckoutQueryBase.total_amount,
+        TestPreCheckoutQueryBase.invoice_payload,
+        shipping_option_id=TestPreCheckoutQueryBase.shipping_option_id,
+        order_info=TestPreCheckoutQueryBase.order_info,
     )
     pcq.set_bot(bot)
     return pcq
 
 
-class TestPreCheckoutQuery:
+class TestPreCheckoutQueryBase:
     id_ = 5
     invoice_payload = "invoice_payload"
     shipping_option_id = "shipping_option_id"
@@ -51,6 +51,8 @@ class TestPreCheckoutQuery:
     from_user = User(0, "", False)
     order_info = OrderInfo()
 
+
+class TestPreCheckoutQueryWithoutRequest(TestPreCheckoutQueryBase):
     def test_slot_behaviour(self, pre_checkout_query, mro_slots):
         inst = pre_checkout_query
         for attr in inst.__slots__:
@@ -91,27 +93,6 @@ class TestPreCheckoutQuery:
         assert pre_checkout_query_dict["from"] == pre_checkout_query.from_user.to_dict()
         assert pre_checkout_query_dict["order_info"] == pre_checkout_query.order_info.to_dict()
 
-    async def test_answer(self, monkeypatch, pre_checkout_query):
-        async def make_assertion(*_, **kwargs):
-            return kwargs["pre_checkout_query_id"] == pre_checkout_query.id
-
-        assert check_shortcut_signature(
-            PreCheckoutQuery.answer, Bot.answer_pre_checkout_query, ["pre_checkout_query_id"], []
-        )
-        assert await check_shortcut_call(
-            pre_checkout_query.answer,
-            pre_checkout_query.get_bot(),
-            "answer_pre_checkout_query",
-        )
-        assert await check_defaults_handling(
-            pre_checkout_query.answer, pre_checkout_query.get_bot()
-        )
-
-        monkeypatch.setattr(
-            pre_checkout_query.get_bot(), "answer_pre_checkout_query", make_assertion
-        )
-        assert await pre_checkout_query.answer(ok=True)
-
     def test_equality(self):
         a = PreCheckoutQuery(
             self.id_, self.from_user, self.currency, self.total_amount, self.invoice_payload
@@ -137,3 +118,24 @@ class TestPreCheckoutQuery:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_answer(self, monkeypatch, pre_checkout_query):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["pre_checkout_query_id"] == pre_checkout_query.id
+
+        assert check_shortcut_signature(
+            PreCheckoutQuery.answer, Bot.answer_pre_checkout_query, ["pre_checkout_query_id"], []
+        )
+        assert await check_shortcut_call(
+            pre_checkout_query.answer,
+            pre_checkout_query.get_bot(),
+            "answer_pre_checkout_query",
+        )
+        assert await check_defaults_handling(
+            pre_checkout_query.answer, pre_checkout_query.get_bot()
+        )
+
+        monkeypatch.setattr(
+            pre_checkout_query.get_bot(), "answer_pre_checkout_query", make_assertion
+        )
+        assert await pre_checkout_query.answer(ok=True)

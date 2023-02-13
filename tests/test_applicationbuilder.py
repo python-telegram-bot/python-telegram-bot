@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-import os
 from dataclasses import dataclass
 
 import httpx
@@ -38,10 +37,7 @@ from telegram.ext import (
 from telegram.ext._applicationbuilder import _BOT_CHECKS
 from telegram.request import HTTPXRequest
 
-from .auxil.object_conversions import env_var_2_bool
-from .conftest import PRIVATE_KEY, data_file
-
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+from .conftest import PRIVATE_KEY, TEST_WITH_OPT_DEPS, data_file
 
 
 @pytest.fixture(scope="function")

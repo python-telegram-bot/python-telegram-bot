@@ -22,7 +22,7 @@ from telegram import MessageEntity, User
 from telegram.constants import MessageEntityType
 
 
-@pytest.fixture(scope="class", params=MessageEntity.ALL_TYPES)
+@pytest.fixture(scope="module", params=MessageEntity.ALL_TYPES)
 def message_entity(request):
     type_ = request.param
     url = None
@@ -37,12 +37,14 @@ def message_entity(request):
     return MessageEntity(type_, 1, 3, url=url, user=user, language=language)
 
 
-class TestMessageEntity:
+class TestMessageEntityBase:
     type_ = "url"
     offset = 1
     length = 2
     url = "url"
 
+
+class TestMessageEntityWithoutRequest(TestMessageEntityBase):
     def test_slot_behaviour(self, message_entity, mro_slots):
         inst = message_entity
         for attr in inst.__slots__:

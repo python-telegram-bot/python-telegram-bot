@@ -19,7 +19,7 @@
 from telegram import PhotoSize, UserProfilePhotos
 
 
-class TestUserProfilePhotos:
+class TestUserProfilePhotosBase:
     total_count = 2
     photos = [
         [
@@ -32,6 +32,8 @@ class TestUserProfilePhotos:
         ],
     ]
 
+
+class TestUserProfilePhotosWithoutRequest(TestUserProfilePhotosBase):
     def test_slot_behaviour(self, mro_slots):
         inst = UserProfilePhotos(self.total_count, self.photos)
         for attr in inst.__slots__:

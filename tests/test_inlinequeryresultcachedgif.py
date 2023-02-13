@@ -28,21 +28,21 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_cached_gif():
     return InlineQueryResultCachedGif(
-        TestInlineQueryResultCachedGif.id_,
-        TestInlineQueryResultCachedGif.gif_file_id,
-        title=TestInlineQueryResultCachedGif.title,
-        caption=TestInlineQueryResultCachedGif.caption,
-        parse_mode=TestInlineQueryResultCachedGif.parse_mode,
-        caption_entities=TestInlineQueryResultCachedGif.caption_entities,
-        input_message_content=TestInlineQueryResultCachedGif.input_message_content,
-        reply_markup=TestInlineQueryResultCachedGif.reply_markup,
+        TestInlineQueryResultCachedGifBase.id_,
+        TestInlineQueryResultCachedGifBase.gif_file_id,
+        title=TestInlineQueryResultCachedGifBase.title,
+        caption=TestInlineQueryResultCachedGifBase.caption,
+        parse_mode=TestInlineQueryResultCachedGifBase.parse_mode,
+        caption_entities=TestInlineQueryResultCachedGifBase.caption_entities,
+        input_message_content=TestInlineQueryResultCachedGifBase.input_message_content,
+        reply_markup=TestInlineQueryResultCachedGifBase.reply_markup,
     )
 
 
-class TestInlineQueryResultCachedGif:
+class TestInlineQueryResultCachedGifBase:
     id_ = "id"
     type_ = "gif"
     gif_file_id = "gif file id"
@@ -53,6 +53,8 @@ class TestInlineQueryResultCachedGif:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultCachedGifWithoutRequest(TestInlineQueryResultCachedGifBase):
     def test_slot_behaviour(self, inline_query_result_cached_gif, mro_slots):
         inst = inline_query_result_cached_gif
         for attr in inst.__slots__:

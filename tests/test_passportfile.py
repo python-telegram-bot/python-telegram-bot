@@ -29,21 +29,23 @@ from tests.auxil.bot_method_checks import (
 @pytest.fixture(scope="class")
 def passport_file(bot):
     pf = PassportFile(
-        file_id=TestPassportFile.file_id,
-        file_unique_id=TestPassportFile.file_unique_id,
-        file_size=TestPassportFile.file_size,
-        file_date=TestPassportFile.file_date,
+        file_id=TestPassportFileBase.file_id,
+        file_unique_id=TestPassportFileBase.file_unique_id,
+        file_size=TestPassportFileBase.file_size,
+        file_date=TestPassportFileBase.file_date,
     )
     pf.set_bot(bot)
     return pf
 
 
-class TestPassportFile:
+class TestPassportFileBase:
     file_id = "data"
     file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     file_size = 50
     file_date = 1532879128
 
+
+class TestPassportFileWithoutRequest(TestPassportFileBase):
     def test_slot_behaviour(self, passport_file, mro_slots):
         inst = passport_file
         for attr in inst.__slots__:
@@ -65,21 +67,6 @@ class TestPassportFile:
         assert passport_file_dict["file_size"] == passport_file.file_size
         assert passport_file_dict["file_date"] == passport_file.file_date
 
-    async def test_get_file_instance_method(self, monkeypatch, passport_file):
-        async def make_assertion(*_, **kwargs):
-            result = kwargs["file_id"] == passport_file.file_id
-            # we need to be a bit hacky here, b/c PF.get_file needs Bot.get_file to return a File
-            return File(file_id=result, file_unique_id=result)
-
-        assert check_shortcut_signature(PassportFile.get_file, Bot.get_file, ["file_id"], [])
-        assert await check_shortcut_call(
-            passport_file.get_file, passport_file.get_bot(), "get_file"
-        )
-        assert await check_defaults_handling(passport_file.get_file, passport_file.get_bot())
-
-        monkeypatch.setattr(passport_file.get_bot(), "get_file", make_assertion)
-        assert (await passport_file.get_file()).file_id == "True"
-
     def test_equality(self):
         a = PassportFile(self.file_id, self.file_unique_id, self.file_size, self.file_date)
         b = PassportFile("", self.file_unique_id, self.file_size, self.file_date)
@@ -99,3 +86,18 @@ class TestPassportFile:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    async def test_get_file_instance_method(self, monkeypatch, passport_file):
+        async def make_assertion(*_, **kwargs):
+            result = kwargs["file_id"] == passport_file.file_id
+            # we need to be a bit hacky here, b/c PF.get_file needs Bot.get_file to return a File
+            return File(file_id=result, file_unique_id=result)
+
+        assert check_shortcut_signature(PassportFile.get_file, Bot.get_file, ["file_id"], [])
+        assert await check_shortcut_call(
+            passport_file.get_file, passport_file.get_bot(), "get_file"
+        )
+        assert await check_defaults_handling(passport_file.get_file, passport_file.get_bot())
+
+        monkeypatch.setattr(passport_file.get_bot(), "get_file", make_assertion)
+        assert (await passport_file.get_file()).file_id == "True"

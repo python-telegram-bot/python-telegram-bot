@@ -22,21 +22,21 @@ import pytest
 from telegram import Animation, Game, MessageEntity, PhotoSize
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 def game():
     game = Game(
-        TestGame.title,
-        TestGame.description,
-        TestGame.photo,
-        text=TestGame.text,
-        text_entities=TestGame.text_entities,
-        animation=TestGame.animation,
+        TestGameBase.title,
+        TestGameBase.description,
+        TestGameBase.photo,
+        text=TestGameBase.text,
+        text_entities=TestGameBase.text_entities,
+        animation=TestGameBase.animation,
     )
     game._unfreeze()
     return game
 
 
-class TestGame:
+class TestGameBase:
     title = "Python-telegram-bot Test Game"
     description = "description"
     photo = [PhotoSize("Blah", "ElseBlah", 640, 360, file_size=0)]
@@ -47,6 +47,8 @@ class TestGame:
     text_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     animation = Animation("blah", "unique_id", 320, 180, 1)
 
+
+class TestGameWithoutRequest(TestGameBase):
     def test_slot_behaviour(self, game, mro_slots):
         for attr in game.__slots__:
             assert getattr(game, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -95,20 +97,6 @@ class TestGame:
         assert game_dict["text_entities"] == [game.text_entities[0].to_dict()]
         assert game_dict["animation"] == game.animation.to_dict()
 
-    def test_parse_entity(self, game):
-        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
-        game.text_entities = [entity]
-
-        assert game.parse_text_entity(entity) == "http://google.com"
-
-    def test_parse_entities(self, game):
-        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
-        entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
-        game.text_entities = [entity_2, entity]
-
-        assert game.parse_text_entities(MessageEntity.URL) == {entity: "http://google.com"}
-        assert game.parse_text_entities() == {entity: "http://google.com", entity_2: "h"}
-
     def test_equality(self):
         a = Game("title", "description", [PhotoSize("Blah", "unique_id", 640, 360, file_size=0)])
         b = Game(
@@ -133,3 +121,17 @@ class TestGame:
 
         assert a != d
         assert hash(a) != hash(d)
+
+    def test_parse_entity(self, game):
+        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
+        game.text_entities = [entity]
+
+        assert game.parse_text_entity(entity) == "http://google.com"
+
+    def test_parse_entities(self, game):
+        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
+        entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
+        game.text_entities = [entity_2, entity]
+
+        assert game.parse_text_entities(MessageEntity.URL) == {entity: "http://google.com"}
+        assert game.parse_text_entities() == {entity: "http://google.com", entity_2: "h"}

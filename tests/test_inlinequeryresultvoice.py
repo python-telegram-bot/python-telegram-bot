@@ -28,22 +28,22 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_voice():
     return InlineQueryResultVoice(
-        id=TestInlineQueryResultVoice.id_,
-        voice_url=TestInlineQueryResultVoice.voice_url,
-        title=TestInlineQueryResultVoice.title,
-        voice_duration=TestInlineQueryResultVoice.voice_duration,
-        caption=TestInlineQueryResultVoice.caption,
-        parse_mode=TestInlineQueryResultVoice.parse_mode,
-        caption_entities=TestInlineQueryResultVoice.caption_entities,
-        input_message_content=TestInlineQueryResultVoice.input_message_content,
-        reply_markup=TestInlineQueryResultVoice.reply_markup,
+        id=TestInlineQueryResultVoiceBase.id_,
+        voice_url=TestInlineQueryResultVoiceBase.voice_url,
+        title=TestInlineQueryResultVoiceBase.title,
+        voice_duration=TestInlineQueryResultVoiceBase.voice_duration,
+        caption=TestInlineQueryResultVoiceBase.caption,
+        parse_mode=TestInlineQueryResultVoiceBase.parse_mode,
+        caption_entities=TestInlineQueryResultVoiceBase.caption_entities,
+        input_message_content=TestInlineQueryResultVoiceBase.input_message_content,
+        reply_markup=TestInlineQueryResultVoiceBase.reply_markup,
     )
 
 
-class TestInlineQueryResultVoice:
+class TestInlineQueryResultVoiceBase:
     id_ = "id"
     type_ = "voice"
     voice_url = "voice url"
@@ -55,6 +55,8 @@ class TestInlineQueryResultVoice:
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
+
+class TestInlineQueryResultVoiceWithoutRequest(TestInlineQueryResultVoiceBase):
     def test_slot_behaviour(self, inline_query_result_voice, mro_slots):
         inst = inline_query_result_voice
         for attr in inst.__slots__:

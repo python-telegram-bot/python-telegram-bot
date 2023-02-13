@@ -21,21 +21,21 @@ import pytest
 from telegram import InputVenueMessageContent, Location
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def input_venue_message_content():
     return InputVenueMessageContent(
-        TestInputVenueMessageContent.latitude,
-        TestInputVenueMessageContent.longitude,
-        TestInputVenueMessageContent.title,
-        TestInputVenueMessageContent.address,
-        foursquare_id=TestInputVenueMessageContent.foursquare_id,
-        foursquare_type=TestInputVenueMessageContent.foursquare_type,
-        google_place_id=TestInputVenueMessageContent.google_place_id,
-        google_place_type=TestInputVenueMessageContent.google_place_type,
+        TestInputVenueMessageContentBase.latitude,
+        TestInputVenueMessageContentBase.longitude,
+        TestInputVenueMessageContentBase.title,
+        TestInputVenueMessageContentBase.address,
+        foursquare_id=TestInputVenueMessageContentBase.foursquare_id,
+        foursquare_type=TestInputVenueMessageContentBase.foursquare_type,
+        google_place_id=TestInputVenueMessageContentBase.google_place_id,
+        google_place_type=TestInputVenueMessageContentBase.google_place_type,
     )
 
 
-class TestInputVenueMessageContent:
+class TestInputVenueMessageContentBase:
     latitude = 1.0
     longitude = 2.0
     title = "title"
@@ -45,6 +45,8 @@ class TestInputVenueMessageContent:
     google_place_id = "google place id"
     google_place_type = "google place type"
 
+
+class TestInputVenueMessageContentWithoutRequest(TestInputVenueMessageContentBase):
     def test_slot_behaviour(self, input_venue_message_content, mro_slots):
         inst = input_venue_message_content
         for attr in inst.__slots__:

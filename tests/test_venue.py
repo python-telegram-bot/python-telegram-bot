@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
+
 import pytest
 
 from telegram import Location, Venue
@@ -23,20 +25,20 @@ from telegram.error import BadRequest
 from telegram.request import RequestData
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def venue():
     return Venue(
-        TestVenue.location,
-        TestVenue.title,
-        TestVenue.address,
-        foursquare_id=TestVenue.foursquare_id,
-        foursquare_type=TestVenue.foursquare_type,
-        google_place_id=TestVenue.google_place_id,
-        google_place_type=TestVenue.google_place_type,
+        TestVenueBase.location,
+        TestVenueBase.title,
+        TestVenueBase.address,
+        foursquare_id=TestVenueBase.foursquare_id,
+        foursquare_type=TestVenueBase.foursquare_type,
+        google_place_id=TestVenueBase.google_place_id,
+        google_place_type=TestVenueBase.google_place_type,
     )
 
 
-class TestVenue:
+class TestVenueBase:
     location = Location(longitude=-46.788279, latitude=-23.691288)
     title = "title"
     address = "address"
@@ -45,6 +47,8 @@ class TestVenue:
     google_place_id = "google place id"
     google_place_type = "google place type"
 
+
+class TestVenueWithoutRequest(TestVenueBase):
     def test_slot_behaviour(self, venue, mro_slots):
         for attr in venue.__slots__:
             assert getattr(venue, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -52,13 +56,13 @@ class TestVenue:
 
     def test_de_json(self, bot):
         json_dict = {
-            "location": TestVenue.location.to_dict(),
-            "title": TestVenue.title,
-            "address": TestVenue.address,
-            "foursquare_id": TestVenue.foursquare_id,
-            "foursquare_type": TestVenue.foursquare_type,
-            "google_place_id": TestVenue.google_place_id,
-            "google_place_type": TestVenue.google_place_type,
+            "location": self.location.to_dict(),
+            "title": self.title,
+            "address": self.address,
+            "foursquare_id": self.foursquare_id,
+            "foursquare_type": self.foursquare_type,
+            "google_place_id": self.google_place_id,
+            "google_place_type": self.google_place_type,
         }
         venue = Venue.de_json(json_dict, bot)
         assert venue.api_kwargs == {}
@@ -70,6 +74,53 @@ class TestVenue:
         assert venue.foursquare_type == self.foursquare_type
         assert venue.google_place_id == self.google_place_id
         assert venue.google_place_type == self.google_place_type
+
+    def test_to_dict(self, venue):
+        venue_dict = venue.to_dict()
+
+        assert isinstance(venue_dict, dict)
+        assert venue_dict["location"] == venue.location.to_dict()
+        assert venue_dict["title"] == venue.title
+        assert venue_dict["address"] == venue.address
+        assert venue_dict["foursquare_id"] == venue.foursquare_id
+        assert venue_dict["foursquare_type"] == venue.foursquare_type
+        assert venue_dict["google_place_id"] == venue.google_place_id
+        assert venue_dict["google_place_type"] == venue.google_place_type
+
+    def test_equality(self):
+        a = Venue(Location(0, 0), self.title, self.address)
+        b = Venue(Location(0, 0), self.title, self.address)
+        c = Venue(Location(0, 0), self.title, "")
+        d = Venue(Location(0, 1), self.title, self.address)
+        d2 = Venue(Location(0, 0), "", self.address)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != d2
+        assert hash(a) != hash(d2)
+
+    async def test_send_venue_without_required(self, bot, chat_id):
+        with pytest.raises(ValueError, match="Either venue or latitude, longitude, address and"):
+            await bot.send_venue(chat_id=chat_id)
+
+    async def test_send_venue_mutually_exclusive(self, bot, chat_id, venue):
+        with pytest.raises(ValueError, match="Not both"):
+            await bot.send_venue(
+                chat_id=chat_id,
+                latitude=1,
+                longitude=1,
+                address="address",
+                title="title",
+                venue=venue,
+            )
 
     async def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -89,7 +140,8 @@ class TestVenue:
         message = await bot.send_venue(chat_id, venue=venue)
         assert message
 
-    @pytest.mark.flaky(3, 1)
+
+class TestVenueWithRequest(TestVenueBase):
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -123,57 +175,12 @@ class TestVenue:
                     chat_id, venue=venue, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_venue_default_protect_content(self, default_bot, chat_id, venue):
-        protected = await default_bot.send_venue(chat_id, venue=venue)
+        tasks = asyncio.gather(
+            default_bot.send_venue(chat_id, venue=venue),
+            default_bot.send_venue(chat_id, venue=venue, protect_content=False),
+        )
+        protected, unprotected = await tasks
         assert protected.has_protected_content
-        unprotected = await default_bot.send_venue(chat_id, venue=venue, protect_content=False)
         assert not unprotected.has_protected_content
-
-    async def test_send_venue_without_required(self, bot, chat_id):
-        with pytest.raises(ValueError, match="Either venue or latitude, longitude, address and"):
-            await bot.send_venue(chat_id=chat_id)
-
-    async def test_send_venue_mutually_exclusive(self, bot, chat_id, venue):
-        with pytest.raises(ValueError, match="Not both"):
-            await bot.send_venue(
-                chat_id=chat_id,
-                latitude=1,
-                longitude=1,
-                address="address",
-                title="title",
-                venue=venue,
-            )
-
-    def test_to_dict(self, venue):
-        venue_dict = venue.to_dict()
-
-        assert isinstance(venue_dict, dict)
-        assert venue_dict["location"] == venue.location.to_dict()
-        assert venue_dict["title"] == venue.title
-        assert venue_dict["address"] == venue.address
-        assert venue_dict["foursquare_id"] == venue.foursquare_id
-        assert venue_dict["foursquare_type"] == venue.foursquare_type
-        assert venue_dict["google_place_id"] == venue.google_place_id
-        assert venue_dict["google_place_type"] == venue.google_place_type
-
-    def test_equality(self):
-        a = Venue(Location(0, 0), self.title, self.address)
-        b = Venue(Location(0, 0), self.title, self.address)
-        c = Venue(Location(0, 0), self.title, "")
-        d = Venue(Location(0, 1), self.title, self.address)
-        d2 = Venue(Location(0, 0), "", self.address)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != d2
-        assert hash(a) != hash(d2)

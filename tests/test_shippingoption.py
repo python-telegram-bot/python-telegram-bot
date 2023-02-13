@@ -21,18 +21,20 @@ import pytest
 from telegram import LabeledPrice, ShippingOption, Voice
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def shipping_option():
     return ShippingOption(
-        TestShippingOption.id_, TestShippingOption.title, TestShippingOption.prices
+        TestShippingOptionBase.id_, TestShippingOptionBase.title, TestShippingOptionBase.prices
     )
 
 
-class TestShippingOption:
+class TestShippingOptionBase:
     id_ = "id"
     title = "title"
     prices = [LabeledPrice("Fish Container", 100), LabeledPrice("Premium Fish Container", 1000)]
 
+
+class TestShippingOptionWithoutRequest(TestShippingOptionBase):
     def test_slot_behaviour(self, shipping_option, mro_slots):
         inst = shipping_option
         for attr in inst.__slots__:

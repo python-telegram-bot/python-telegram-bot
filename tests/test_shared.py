@@ -25,15 +25,17 @@ from telegram import ChatShared, UserShared
 @pytest.fixture(scope="class")
 def user_shared():
     return UserShared(
-        TestUserShared.request_id,
-        TestUserShared.user_id,
+        TestUserSharedBase.request_id,
+        TestUserSharedBase.user_id,
     )
 
 
-class TestUserShared:
+class TestUserSharedBase:
     request_id = 789
     user_id = 101112
 
+
+class TestUserSharedWithoutRequest(TestUserSharedBase):
     def test_slot_behaviour(self, user_shared, mro_slots):
         for attr in user_shared.__slots__:
             assert getattr(user_shared, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -77,15 +79,17 @@ class TestUserShared:
 @pytest.fixture(scope="class")
 def chat_shared():
     return ChatShared(
-        TestChatShared.request_id,
-        TestChatShared.chat_id,
+        TestChatSharedBase.request_id,
+        TestChatSharedBase.chat_id,
     )
 
 
-class TestChatShared:
+class TestChatSharedBase:
     request_id = 131415
     chat_id = 161718
 
+
+class TestChatSharedWithoutRequest(TestChatSharedBase):
     def test_slot_behaviour(self, chat_shared, mro_slots):
         for attr in chat_shared.__slots__:
             assert getattr(chat_shared, attr, "err") != "err", f"got extra slot '{attr}'"

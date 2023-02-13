@@ -20,7 +20,6 @@
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import asyncio
 import json
-import os
 from collections import defaultdict
 from dataclasses import dataclass
 from http import HTTPStatus
@@ -43,9 +42,9 @@ from telegram.error import (
 )
 from telegram.request._httpxrequest import HTTPXRequest
 
-from .auxil.object_conversions import env_var_2_bool
+from .conftest import TEST_WITH_OPT_DEPS
 
-# We only need the first fixture, but it uses the others, so pytest needs us to import them as well
+# We only need mixed_rqs fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401
     file_params,
     input_media_photo,
@@ -72,9 +71,6 @@ async def httpx_request():
         yield rq
 
 
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
-
-
 @pytest.mark.skipif(
     TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
@@ -84,14 +80,14 @@ class TestNoSocks:
             HTTPXRequest(proxy_url="socks5://foo")
 
 
-class TestRequest:
+class TestRequestWithoutRequest:
     test_flag = None
 
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = None
 
-    async def test_init_import_errors(self, bot, monkeypatch):
+    async def test_init_import_errors(self, monkeypatch):
         """Makes sure that import errors are forwarded - related to TestNoSocks above"""
 
         def __init__(self, *args, **kwargs):
@@ -325,7 +321,7 @@ class TestRequest:
         assert self.test_flag == (1, 2, 3, 4)
 
 
-class TestHTTPXRequest:
+class TestHTTPXRequestWithoutRequest:
     test_flag = None
 
     @pytest.fixture(autouse=True)
@@ -595,8 +591,9 @@ class TestHTTPXRequest:
                     httpx_request.do_request(method="GET", url="URL"),
                 )
 
-    @pytest.mark.flaky(3, 1)
-    async def test_do_request_wait_for_pool(self, monkeypatch, httpx_request):
+
+class TestHTTPXRequestWithRequest:
+    async def test_do_request_wait_for_pool(self, httpx_request):
         """The pool logic is buried rather deeply in httpxcore, so we make actual requests here
         instead of mocking"""
         task_1 = asyncio.create_task(

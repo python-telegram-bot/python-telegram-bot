@@ -37,7 +37,7 @@ jobs:
       - name: Compare Completeness
         uses: jannekem/run-python-script-action@v1
         with:
-          script: | 
+          script: |
             import json
             import os
             from pathlib import Path

@@ -28,23 +28,23 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def inline_query_result_article():
     return InlineQueryResultArticle(
-        TestInlineQueryResultArticle.id_,
-        TestInlineQueryResultArticle.title,
-        input_message_content=TestInlineQueryResultArticle.input_message_content,
-        reply_markup=TestInlineQueryResultArticle.reply_markup,
-        url=TestInlineQueryResultArticle.url,
-        hide_url=TestInlineQueryResultArticle.hide_url,
-        description=TestInlineQueryResultArticle.description,
-        thumb_url=TestInlineQueryResultArticle.thumb_url,
-        thumb_height=TestInlineQueryResultArticle.thumb_height,
-        thumb_width=TestInlineQueryResultArticle.thumb_width,
+        TestInlineQueryResultArticleBase.id_,
+        TestInlineQueryResultArticleBase.title,
+        input_message_content=TestInlineQueryResultArticleBase.input_message_content,
+        reply_markup=TestInlineQueryResultArticleBase.reply_markup,
+        url=TestInlineQueryResultArticleBase.url,
+        hide_url=TestInlineQueryResultArticleBase.hide_url,
+        description=TestInlineQueryResultArticleBase.description,
+        thumb_url=TestInlineQueryResultArticleBase.thumb_url,
+        thumb_height=TestInlineQueryResultArticleBase.thumb_height,
+        thumb_width=TestInlineQueryResultArticleBase.thumb_width,
     )
 
 
-class TestInlineQueryResultArticle:
+class TestInlineQueryResultArticleBase:
     id_ = "id"
     type_ = "article"
     title = "title"
@@ -57,6 +57,8 @@ class TestInlineQueryResultArticle:
     thumb_height = 10
     thumb_width = 15
 
+
+class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBase):
     def test_slot_behaviour(self, inline_query_result_article, mro_slots, recwarn):
         inst = inline_query_result_article
         for attr in inst.__slots__:

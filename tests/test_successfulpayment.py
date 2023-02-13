@@ -21,20 +21,20 @@ import pytest
 from telegram import OrderInfo, SuccessfulPayment
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def successful_payment():
     return SuccessfulPayment(
-        TestSuccessfulPayment.currency,
-        TestSuccessfulPayment.total_amount,
-        TestSuccessfulPayment.invoice_payload,
-        TestSuccessfulPayment.telegram_payment_charge_id,
-        TestSuccessfulPayment.provider_payment_charge_id,
-        shipping_option_id=TestSuccessfulPayment.shipping_option_id,
-        order_info=TestSuccessfulPayment.order_info,
+        TestSuccessfulPaymentBase.currency,
+        TestSuccessfulPaymentBase.total_amount,
+        TestSuccessfulPaymentBase.invoice_payload,
+        TestSuccessfulPaymentBase.telegram_payment_charge_id,
+        TestSuccessfulPaymentBase.provider_payment_charge_id,
+        shipping_option_id=TestSuccessfulPaymentBase.shipping_option_id,
+        order_info=TestSuccessfulPaymentBase.order_info,
     )
 
 
-class TestSuccessfulPayment:
+class TestSuccessfulPaymentBase:
     invoice_payload = "invoice_payload"
     shipping_option_id = "shipping_option_id"
     currency = "EUR"
@@ -43,6 +43,8 @@ class TestSuccessfulPayment:
     telegram_payment_charge_id = "telegram_payment_charge_id"
     provider_payment_charge_id = "provider_payment_charge_id"
 
+
+class TestSuccessfulPaymentWithoutRequest(TestSuccessfulPaymentBase):
     def test_slot_behaviour(self, successful_payment, mro_slots):
         inst = successful_payment
         for attr in inst.__slots__:

@@ -21,21 +21,23 @@ import pytest
 from telegram import PassportElementErrorReverseSide, PassportElementErrorSelfie
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def passport_element_error_reverse_side():
     return PassportElementErrorReverseSide(
-        TestPassportElementErrorReverseSide.type_,
-        TestPassportElementErrorReverseSide.file_hash,
-        TestPassportElementErrorReverseSide.message,
+        TestPassportElementErrorReverseSideBase.type_,
+        TestPassportElementErrorReverseSideBase.file_hash,
+        TestPassportElementErrorReverseSideBase.message,
     )
 
 
-class TestPassportElementErrorReverseSide:
+class TestPassportElementErrorReverseSideBase:
     source = "reverse_side"
     type_ = "test_type"
     file_hash = "file_hash"
     message = "Error message"
 
+
+class TestPassportElementErrorReverseSideWithoutRequest(TestPassportElementErrorReverseSideBase):
     def test_slot_behaviour(self, passport_element_error_reverse_side, mro_slots):
         inst = passport_element_error_reverse_side
         for attr in inst.__slots__:
