@@ -53,7 +53,7 @@ from telegram.ext import (
     filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.auxil.asyncio import call_after
+from tests.auxil.asyncio_helpers import call_after
 from tests.auxil.build_messages import make_message_update
 from tests.auxil.files import PROJECT_ROOT_PATH
 from tests.auxil.networking import send_webhook_message

@@ -28,7 +28,7 @@ from telegram.request import HTTPXRequest, RequestData
 
 
 class NonchalantHttpxRequest(HTTPXRequest):
-    """This Request class is used in the tests to supress errors that we don't to care about
+    """This Request class is used in the tests to suppress errors that we don't care about
     in the test suite.
     """
 
