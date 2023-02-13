@@ -1291,7 +1291,8 @@ class TestApplication:
         async def callback():
             await asyncio.sleep(0.01)
             return 42
-
+        # `asyncio.gather` returns an `asyncio.Future` and not an
+        # `asyncio.Task`
         out = await app.create_task(asyncio.gather(callback()))
         assert out == [42]
 
