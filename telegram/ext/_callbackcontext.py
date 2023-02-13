@@ -17,17 +17,20 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackContext class."""
+import asyncio
 from typing import (
     TYPE_CHECKING,
     Any,
     Awaitable,
     Dict,
+    Generator,
     Generic,
     List,
     Match,
     NoReturn,
     Optional,
     Type,
+    Union,
 )
 
 from telegram._callbackquery import CallbackQuery
@@ -143,7 +146,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.matches: Optional[List[Match[str]]] = None
         self.error: Optional[Exception] = None
         self.job: Optional["Job[CCT]"] = None
-        self.coroutine: Optional[Awaitable[Any]] = None
+        self.coroutine: Optional[
+            Union[Generator[Optional["asyncio.Future[object]"], None, Any], Awaitable[Any]]
+        ] = None
 
     @property
     def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":
@@ -275,7 +280,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         error: Exception,
         application: "Application[BT, CCT, UD, CD, BD, Any]",
         job: "Job[Any]" = None,
-        coroutine: Awaitable[Any] = None,
+        coroutine: Union[
+            Generator[Optional["asyncio.Future[object]"], None, Any], Awaitable[Any]
+        ] = None,
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error

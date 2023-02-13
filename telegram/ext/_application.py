@@ -36,6 +36,7 @@ from typing import (
     Coroutine,
     DefaultDict,
     Dict,
+    Generator,
     Generic,
     List,
     Mapping,
@@ -933,7 +934,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 if close_loop:
                     loop.close()
 
-    def create_task(self, coroutine: Awaitable[RT], update: object = None) -> "asyncio.Task[RT]":
+    def create_task(
+        self,
+        coroutine: Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]],
+        update: object = None,
+    ) -> "asyncio.Task[RT]":
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
         the :paramref:`coroutine` with :meth:`process_error`.
 
@@ -958,7 +963,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         return self.__create_task(coroutine=coroutine, update=update)
 
     def __create_task(
-        self, coroutine: Awaitable[RT], update: object = None, is_error_handler: bool = False
+        self,
+        coroutine: Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]],
+        update: object = None,
+        is_error_handler: bool = False,
     ) -> "asyncio.Task[RT]":
         # Unfortunately, we can't know if `coroutine` runs one of the error handler functions
         # but by passing `is_error_handler=True` from `process_error`, we can make sure that we
@@ -993,11 +1001,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     async def __create_task_callback(
         self,
-        coroutine: Awaitable[RT],
+        coroutine: Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]],
         update: object = None,
         is_error_handler: bool = False,
     ) -> RT:
         try:
+            if isinstance(coroutine, Generator):
+                return await asyncio.create_task(coroutine)
             return await coroutine
         except asyncio.CancelledError as cancel:
             # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop this
@@ -1560,7 +1570,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update: Optional[object],
         error: Exception,
         job: "Job[CCT]" = None,
-        coroutine: Awaitable[Any] = None,
+        coroutine: Union[
+            Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]
+        ] = None,
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises
