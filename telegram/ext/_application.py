@@ -953,8 +953,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         Args:
             coroutine (:term:`awaitable`): The awaitable to run as task.
 
-            .. versionchanged:: 20.2
-                Accepts :class:`asyncio.Future` and generator-based coroutine functions.
+                .. versionchanged:: 20.2
+                    Accepts :class:`asyncio.Future` and generator-based coroutine functions.
             update (:obj:`object`, optional): If set, will be passed to :meth:`process_error`
                 as additional information for the error handlers. Moreover, the corresponding
                 :attr:`chat_data` and :attr:`user_data` entries will be updated in the next run of
