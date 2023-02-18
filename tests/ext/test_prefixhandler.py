@@ -21,7 +21,7 @@ from telegram import Chat
 from telegram.ext import CallbackContext, PrefixHandler, filters
 from tests.auxil.build_messages import make_command_update, make_message, make_message_update
 from tests.auxil.slots import mro_slots
-from tests.test_commandhandler import BaseTest, is_match
+from tests.ext.test_commandhandler import BaseTest, is_match
 
 
 def combinations(prefixes, commands):

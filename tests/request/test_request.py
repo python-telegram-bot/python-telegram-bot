@@ -41,9 +41,8 @@ from telegram.error import (
     TimedOut,
 )
 from telegram.request._httpxrequest import HTTPXRequest
+from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
-
-from .auxil.envvars import TEST_WITH_OPT_DEPS
 
 # We only need mixed_rqs fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401

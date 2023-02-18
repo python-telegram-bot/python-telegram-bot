@@ -37,20 +37,19 @@ from telegram.constants import ParseMode
 # noinspection PyUnresolvedReferences
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from tests._files.test_animation import animation, animation_file  # noqa: F401
+from tests.auxil.files import data_file
+from tests.auxil.networking import expect_bad_request
 from tests.auxil.slots import mro_slots
 
-from .auxil.files import data_file
-from .auxil.networking import expect_bad_request
-from .test_animation import animation, animation_file  # noqa: F401
+# noinspection PyUnresolvedReferences
+from tests.test_forum import emoji_id, real_topic  # noqa: F401
 
 # noinspection PyUnresolvedReferences
 from .test_audio import audio, audio_file  # noqa: F401
 
 # noinspection PyUnresolvedReferences
 from .test_document import document, document_file  # noqa: F401
-
-# noinspection PyUnresolvedReferences
-from .test_forum import emoji_id, real_topic  # noqa: F401
 
 # noinspection PyUnresolvedReferences
 from .test_photo import _photo, photo, photo_file, thumb  # noqa: F401
