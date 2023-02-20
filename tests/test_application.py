@@ -1287,6 +1287,26 @@ class TestApplication:
             await asyncio.sleep(0.05)
             assert stop_task.done()
 
+    async def test_create_task_awaiting_future(self, app):
+        async def callback():
+            await asyncio.sleep(0.01)
+            return 42
+
+        # `asyncio.gather` returns an `asyncio.Future` and not an
+        # `asyncio.Task`
+        out = await app.create_task(asyncio.gather(callback()))
+        assert out == [42]
+
+    async def test_create_task_awaiting_generator(self, app):
+        event = asyncio.Event()
+
+        def gen():
+            yield
+            event.set()
+
+        await app.create_task(gen())
+        assert event.is_set()
+
     async def test_no_concurrent_updates(self, app):
         queue = asyncio.Queue()
         event_1 = asyncio.Event()
