@@ -20,14 +20,16 @@
 from typing import (
     TYPE_CHECKING,
     Any,
-    Coroutine,
+    Awaitable,
     Dict,
+    Generator,
     Generic,
     List,
     Match,
     NoReturn,
     Optional,
     Type,
+    Union,
 )
 
 from telegram._callbackquery import CallbackQuery
@@ -37,7 +39,7 @@ from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
-    from asyncio import Queue
+    from asyncio import Future, Queue
 
     from telegram.ext import Application, Job, JobQueue  # noqa: F401
     from telegram.ext._utils.types import CCT
@@ -96,8 +98,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
             .. versionadded:: 20.0
     Attributes:
-        coroutine (:term:`coroutine function`): Optional. Only present in error handlers if the
-            error was caused by a coroutine run with :meth:`Application.create_task` or a handler
+        coroutine (:term:`awaitable`): Optional. Only present in error handlers if the
+            error was caused by an awaitable run with :meth:`Application.create_task` or a handler
             callback with :attr:`block=False <BaseHandler.block>`.
         matches (List[:meth:`re.Match <re.Match.expand>`]): Optional. If the associated update
             originated from a :class:`filters.Regex`, this will contain a list of match objects for
@@ -143,7 +145,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.matches: Optional[List[Match[str]]] = None
         self.error: Optional[Exception] = None
         self.job: Optional["Job[CCT]"] = None
-        self.coroutine: Optional[Coroutine[Any, Any, Any]] = None
+        self.coroutine: Optional[
+            Union[Generator[Optional["Future[object]"], None, Any], Awaitable[Any]]
+        ] = None
 
     @property
     def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":
@@ -275,7 +279,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         error: Exception,
         application: "Application[BT, CCT, UD, CD, BD, Any]",
         job: "Job[Any]" = None,
-        coroutine: Coroutine[Any, Any, Any] = None,
+        coroutine: Union[Generator[Optional["Future[object]"], None, Any], Awaitable[Any]] = None,
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
@@ -295,13 +299,15 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             job (:class:`telegram.ext.Job`, optional): The job associated with the error.
 
                 .. versionadded:: 20.0
-            coroutine (:term:`coroutine function`, optional): The coroutine function associated
+            coroutine (:term:`awaitable`, optional): The awaitable associated
                 with this error if the error was caused by a coroutine run with
                 :meth:`Application.create_task` or a handler callback with
                 :attr:`block=False <BaseHandler.block>`.
 
                 .. versionadded:: 20.0
 
+                .. versionchanged:: 20.2
+                    Accepts :class:`asyncio.Future` and generator-based coroutine functions.
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
