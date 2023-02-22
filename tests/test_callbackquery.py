@@ -27,6 +27,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="function", params=["message", "inline"])
@@ -83,7 +84,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
             message_id = kwargs["message_id"] == callback_query.message.message_id
         return id_ and chat_id and message_id
 
-    def test_slot_behaviour(self, callback_query, mro_slots):
+    def test_slot_behaviour(self, callback_query):
         for attr in callback_query.__slots__:
             assert getattr(callback_query, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(callback_query)) == len(set(mro_slots(callback_query))), "same slot"

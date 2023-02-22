@@ -17,12 +17,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 from telegram import MessageAutoDeleteTimerChanged, VideoChatEnded
+from tests.auxil.slots import mro_slots
 
 
 class TestMessageAutoDeleteTimerChangedWithoutRequest:
     message_auto_delete_time = 100
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         action = MessageAutoDeleteTimerChanged(self.message_auto_delete_time)
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
