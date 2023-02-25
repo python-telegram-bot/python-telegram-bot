@@ -20,6 +20,7 @@ import pytest
 
 from telegram import MessageEntity, User
 from telegram.constants import MessageEntityType
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module", params=MessageEntity.ALL_TYPES)
@@ -45,7 +46,7 @@ class TestMessageEntityBase:
 
 
 class TestMessageEntityWithoutRequest(TestMessageEntityBase):
-    def test_slot_behaviour(self, message_entity, mro_slots):
+    def test_slot_behaviour(self, message_entity):
         inst = message_entity
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

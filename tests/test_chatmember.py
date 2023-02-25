@@ -34,6 +34,7 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import to_timestamp
+from tests.auxil.slots import mro_slots
 
 ignored = ["self", "api_kwargs"]
 
@@ -188,7 +189,7 @@ def chat_member_type(request):
     indirect=True,
 )
 class TestChatMemberTypesWithoutRequest:
-    def test_slot_behaviour(self, chat_member_type, mro_slots):
+    def test_slot_behaviour(self, chat_member_type):
         inst = chat_member_type
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

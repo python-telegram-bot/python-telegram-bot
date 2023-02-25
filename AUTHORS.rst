@@ -100,6 +100,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Riko Naka <https://github.com/rikonaka>`_
 - `Rizlas <https://github.com/rizlas>`_
 - `Sahil Sharma <https://github.com/sahilsharma811>`_
+- `Sam Mosleh <https://github.com/sam-mosleh>`_
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `Shivam Saini <https://github.com/shivamsn97>`_

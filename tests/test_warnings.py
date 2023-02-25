@@ -23,7 +23,8 @@ import pytest
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning, PTBRuntimeWarning, PTBUserWarning
-from tests.conftest import PROJECT_ROOT_PATH
+from tests.auxil.files import PROJECT_ROOT_PATH
+from tests.auxil.slots import mro_slots
 
 
 class TestWarnings:
@@ -35,7 +36,7 @@ class TestWarnings:
             (PTBDeprecationWarning()),
         ],
     )
-    def test_slots_behavior(self, inst, mro_slots):
+    def test_slots_behavior(self, inst):
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"

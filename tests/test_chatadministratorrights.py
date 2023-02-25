@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import ChatAdministratorRights
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -40,7 +41,7 @@ def chat_admin_rights():
 
 
 class TestChatAdministratorRightsWithoutRequest:
-    def test_slot_behaviour(self, chat_admin_rights, mro_slots):
+    def test_slot_behaviour(self, chat_admin_rights):
         inst = chat_admin_rights
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

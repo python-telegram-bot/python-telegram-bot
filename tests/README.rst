@@ -63,6 +63,8 @@ are a few conventions that you should follow:
 - Make use of pytest's fixtures and parametrize wherever possible. Having knowledge of pytest's
   tooling can help you as well. You can look at the existing tests for examples and inspiration.
 
+- New fixtures should go into ``conftest.py``. New auxiliary functions and classes, used either directly in the tests or in the fixtures, should go into the ``tests/auxil`` directory.
+
 If you have made some API changes, you may want to run ``test_official`` to validate that the changes are
 complete and correct. To run it, export an environment variable first:
 

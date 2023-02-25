@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from telegram import WriteAccessAllowed
+from tests.auxil.slots import mro_slots
 
 
 class TestWriteAccessAllowed:
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         action = WriteAccessAllowed()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"

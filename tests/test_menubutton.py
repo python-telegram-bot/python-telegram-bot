@@ -28,6 +28,7 @@ from telegram import (
     MenuButtonWebApp,
     WebAppInfo,
 )
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(
@@ -96,7 +97,7 @@ class TestMenuButtonselfBase:
 
 # All the scope types are very similar, so we test everything via parametrization
 class TestMenuButtonWithoutRequest(TestMenuButtonselfBase):
-    def test_slot_behaviour(self, menu_button, mro_slots):
+    def test_slot_behaviour(self, menu_button):
         for attr in menu_button.__slots__:
             assert getattr(menu_button, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(menu_button)) == len(set(mro_slots(menu_button))), "duplicate slot"

@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import LoginUrl
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -39,7 +40,7 @@ class TestLoginUrlBase:
 
 
 class TestLoginUrlWithoutRequest(TestLoginUrlBase):
-    def test_slot_behaviour(self, login_url, mro_slots):
+    def test_slot_behaviour(self, login_url):
         for attr in login_url.__slots__:
             assert getattr(login_url, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(login_url)) == len(set(mro_slots(login_url))), "duplicate slot"

@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import ChatShared, UserShared
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -36,7 +37,7 @@ class TestUserSharedBase:
 
 
 class TestUserSharedWithoutRequest(TestUserSharedBase):
-    def test_slot_behaviour(self, user_shared, mro_slots):
+    def test_slot_behaviour(self, user_shared):
         for attr in user_shared.__slots__:
             assert getattr(user_shared, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(user_shared)) == len(set(mro_slots(user_shared))), "duplicate slot"
@@ -90,7 +91,7 @@ class TestChatSharedBase:
 
 
 class TestChatSharedWithoutRequest(TestChatSharedBase):
-    def test_slot_behaviour(self, chat_shared, mro_slots):
+    def test_slot_behaviour(self, chat_shared):
         for attr in chat_shared.__slots__:
             assert getattr(chat_shared, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(chat_shared)) == len(set(mro_slots(chat_shared))), "duplicate slot"

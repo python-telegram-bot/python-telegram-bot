@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import ReplyKeyboardRemove
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -32,7 +33,7 @@ class TestReplyKeyboardRemoveBase:
 
 
 class TestReplyKeyboardRemoveWithoutRequest(TestReplyKeyboardRemoveBase):
-    def test_slot_behaviour(self, reply_keyboard_remove, mro_slots):
+    def test_slot_behaviour(self, reply_keyboard_remove):
         inst = reply_keyboard_remove
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
