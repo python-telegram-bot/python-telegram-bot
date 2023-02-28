@@ -44,42 +44,23 @@ jobs:
         # The first & second one are achieved by mocking the corresponding import
         # See test_helpers.py & test_no_passport.py for details
         run: |
-          # Test without passport
-          pytest -v --cov -k test_no_passport.py
+          # We test without optional dependencies first. This includes:
+          # - without pytz
+          # - without jobqueue
+          # - without ratelimiter
+          # - without webhooks
+          # - without arbitrary callback data
+          # - without socks suppport
+          TO_TEST="test_no_passport.py or test_datetime.py or test_defaults.py or test_jobqueue.py or test_applicationbuilder.py or test_ratelimiter.py or test_updater.py or test_callbackdatacache.py or test_request.py"
+          pytest -v --cov -k "${TO_TEST}"
           status=$?
-
-          # test without pytz
-          pytest -v --cov --cov-append -k test_datetime.py
-          status=$(( $? > status ? $? : status))
-          pytest -v --cov --cov-append -k test_defaults.py
-          status=$(( $? > status ? $? : status))
-
-          # test without pytz & jobqueue
-          pytest -v --cov --cov-append -k test_jobqueue.py
-          pytest -v --cov --cov-append -k test_applicationbuilder.py
-          status=$(( $? > status ? $? : status))
-
-          # Test without ratelimiter
-          pytest -v --cov --cov-append -k test_ratelimiter.py
-          status=$(( $? > status ? $? : status))
-
-          # Test without webhooks
-          pytest -v --cov --cov-append -k test_updater.py
-          status=$(( $? > status ? $? : status))
-
-          # Test without callback-data
-          pytest -v --cov --cov-append -k test_callbackdatacache.py
-          status=$(( $? > status ? $? : status))
-
-          # Test without socks
-          pytest -v --cov --cov-append -k test_request.py
-          status=$(( $? > status ? $? : status))
 
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
           pip install -r requirements-opts.txt
           # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU
-          # worker
+          # worker. Increasing number of workers has little effect on test duration, but it seems
+          # to increase flakyness, specially on python 3.7 with --dist=loadgroup.
           pytest -v --cov --cov-append -n auto --dist loadfile
           status=$(( $? > status ? $? : status))
           exit ${status}

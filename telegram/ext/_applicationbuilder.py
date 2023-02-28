@@ -221,12 +221,12 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                 DefaultValue.get_value(getattr(self, f"{prefix}connection_pool_size")) or 256
             )
 
-        timeouts = dict(
-            connect_timeout=getattr(self, f"{prefix}connect_timeout"),
-            read_timeout=getattr(self, f"{prefix}read_timeout"),
-            write_timeout=getattr(self, f"{prefix}write_timeout"),
-            pool_timeout=getattr(self, f"{prefix}pool_timeout"),
-        )
+        timeouts = {
+            "connect_timeout": getattr(self, f"{prefix}connect_timeout"),
+            "read_timeout": getattr(self, f"{prefix}read_timeout"),
+            "write_timeout": getattr(self, f"{prefix}write_timeout"),
+            "pool_timeout": getattr(self, f"{prefix}pool_timeout"),
+        }
         # Get timeouts that were actually set-
         effective_timeouts = {
             key: value for key, value in timeouts.items() if not isinstance(value, DefaultValue)

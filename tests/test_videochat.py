@@ -28,20 +28,21 @@ from telegram import (
     VideoChatStarted,
 )
 from telegram._utils.datetime import to_timestamp
+from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def user1():
     return User(first_name="Misses Test", id=123, is_bot=False)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def user2():
     return User(first_name="Mister Test", id=124, is_bot=False)
 
 
-class TestVideoChatStarted:
-    def test_slot_behaviour(self, mro_slots):
+class TestVideoChatStartedWithoutRequest:
+    def test_slot_behaviour(self):
         action = VideoChatStarted()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -58,10 +59,10 @@ class TestVideoChatStarted:
         assert video_chat_dict == {}
 
 
-class TestVideoChatEnded:
+class TestVideoChatEndedWithoutRequest:
     duration = 100
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         action = VideoChatEnded(8)
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -97,8 +98,8 @@ class TestVideoChatEnded:
         assert hash(a) != hash(d)
 
 
-class TestVideoChatParticipantsInvited:
-    def test_slot_behaviour(self, mro_slots, user1):
+class TestVideoChatParticipantsInvitedWithoutRequest:
+    def test_slot_behaviour(self, user1):
         action = VideoChatParticipantsInvited([user1])
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -148,10 +149,10 @@ class TestVideoChatParticipantsInvited:
         assert hash(a) != hash(e)
 
 
-class TestVideoChatScheduled:
+class TestVideoChatScheduledWithoutRequest:
     start_date = dtm.datetime.now(dtm.timezone.utc)
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = VideoChatScheduled(self.start_date)
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

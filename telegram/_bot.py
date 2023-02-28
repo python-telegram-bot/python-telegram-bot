@@ -4467,6 +4467,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         user_id: Union[str, int],
         permissions: ChatPermissions,
         until_date: Union[int, datetime] = None,
+        use_independent_chat_permissions: bool = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4493,6 +4494,21 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 used.
             permissions (:class:`telegram.ChatPermissions`): An object for new user
                 permissions.
+            use_independent_chat_permissions (:obj:`bool`, optional): Pass :obj:`True` if chat
+                permissions are set independently. Otherwise, the
+                :attr:`~telegram.ChatPermissions.can_send_other_messages` and
+                :attr:`~telegram.ChatPermissions.can_add_web_page_previews` permissions will imply
+                the :attr:`~telegram.ChatPermissions.can_send_messages`,
+                :attr:`~telegram.ChatPermissions.can_send_audios`,
+                :attr:`~telegram.ChatPermissions.can_send_documents`,
+                :attr:`~telegram.ChatPermissions.can_send_photos`,
+                :attr:`~telegram.ChatPermissions.can_send_videos`,
+                :attr:`~telegram.ChatPermissions.can_send_video_notes`, and
+                :attr:`~telegram.ChatPermissions.can_send_voice_notes` permissions; the
+                :attr:`~telegram.ChatPermissions.can_send_polls` permission will imply the
+                :attr:`~telegram.ChatPermissions.can_send_messages` permission.
+
+                .. versionadded: 20.1
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4505,6 +4521,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "user_id": user_id,
             "permissions": permissions,
             "until_date": until_date,
+            "use_independent_chat_permissions": use_independent_chat_permissions,
         }
 
         result = await self._post(
@@ -4633,6 +4650,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self,
         chat_id: Union[str, int],
         permissions: ChatPermissions,
+        use_independent_chat_permissions: bool = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4648,6 +4666,21 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             permissions (:class:`telegram.ChatPermissions`): New default chat permissions.
+            use_independent_chat_permissions (:obj:`bool`, optional): Pass :obj:`True` if chat
+                permissions are set independently. Otherwise, the
+                :attr:`~telegram.ChatPermissions.can_send_other_messages` and
+                :attr:`~telegram.ChatPermissions.can_add_web_page_previews` permissions will imply
+                the :attr:`~telegram.ChatPermissions.can_send_messages`,
+                :attr:`~telegram.ChatPermissions.can_send_audios`,
+                :attr:`~telegram.ChatPermissions.can_send_documents`,
+                :attr:`~telegram.ChatPermissions.can_send_photos`,
+                :attr:`~telegram.ChatPermissions.can_send_videos`,
+                :attr:`~telegram.ChatPermissions.can_send_video_notes`, and
+                :attr:`~telegram.ChatPermissions.can_send_voice_notes` permissions; the
+                :attr:`~telegram.ChatPermissions.can_send_polls` permission will imply the
+                :attr:`~telegram.ChatPermissions.can_send_messages` permission.
+
+                .. versionadded: 20.1
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4656,7 +4689,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "permissions": permissions}
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "permissions": permissions,
+            "use_independent_chat_permissions": use_independent_chat_permissions,
+        }
         result = await self._post(
             "setChatPermissions",
             data,

@@ -20,19 +20,20 @@
 import pytest
 
 from telegram import SentWebAppMessage
+from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def sent_web_app_message():
-    return SentWebAppMessage(
-        inline_message_id=TestSentWebAppMessage.inline_message_id,
-    )
+    return SentWebAppMessage(inline_message_id=TestSentWebAppMessageBase.inline_message_id)
 
 
-class TestSentWebAppMessage:
+class TestSentWebAppMessageBase:
     inline_message_id = "123"
 
-    def test_slot_behaviour(self, sent_web_app_message, mro_slots):
+
+class TestSentWebAppMessageWithoutRequest(TestSentWebAppMessageBase):
+    def test_slot_behaviour(self, sent_web_app_message):
         inst = sent_web_app_message
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

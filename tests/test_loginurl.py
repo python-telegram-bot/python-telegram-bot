@@ -19,25 +19,28 @@
 import pytest
 
 from telegram import LoginUrl
+from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def login_url():
     return LoginUrl(
-        url=TestLoginUrl.url,
-        forward_text=TestLoginUrl.forward_text,
-        bot_username=TestLoginUrl.bot_username,
-        request_write_access=TestLoginUrl.request_write_access,
+        url=TestLoginUrlBase.url,
+        forward_text=TestLoginUrlBase.forward_text,
+        bot_username=TestLoginUrlBase.bot_username,
+        request_write_access=TestLoginUrlBase.request_write_access,
     )
 
 
-class TestLoginUrl:
+class TestLoginUrlBase:
     url = "http://www.google.com"
     forward_text = "Send me forward!"
     bot_username = "botname"
     request_write_access = True
 
-    def test_slot_behaviour(self, login_url, mro_slots):
+
+class TestLoginUrlWithoutRequest(TestLoginUrlBase):
+    def test_slot_behaviour(self, login_url):
         for attr in login_url.__slots__:
             assert getattr(login_url, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(login_url)) == len(set(mro_slots(login_url))), "duplicate slot"

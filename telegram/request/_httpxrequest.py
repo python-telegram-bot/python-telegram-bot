@@ -117,7 +117,9 @@ class HTTPXRequest(BaseRequest):
 
         http1 = http_version == "1.1"
 
-        self._client_kwargs = dict(
+        # See https://github.com/python-telegram-bot/python-telegram-bot/pull/3542
+        # for why we need to use `dict()` here.
+        self._client_kwargs = dict(  # pylint: disable=use-dict-literal
             timeout=timeout,
             proxies=proxy_url,
             limits=limits,

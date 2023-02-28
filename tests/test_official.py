@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup
 
 import telegram
 from telegram._utils.defaultvalue import DefaultValue
-from tests.auxil.object_conversions import env_var_2_bool
+from tests.auxil.envvars import env_var_2_bool
 
 IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
 IGNORED_PARAMETERS = {
@@ -194,6 +194,8 @@ def check_object(h4):
         ignored |= {"caption", "caption_entities", "media", "media_type", "parse_mode"}
     elif name.startswith("InputMedia"):
         ignored |= {"filename"}  # Convenience parameter
+    elif name in ("ChatMemberRestricted", "ChatPermissions"):
+        ignored |= {"can_send_media_messages"}  # Depreciated param we keep
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 

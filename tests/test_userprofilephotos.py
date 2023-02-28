@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from telegram import PhotoSize, UserProfilePhotos
+from tests.auxil.slots import mro_slots
 
 
-class TestUserProfilePhotos:
+class TestUserProfilePhotosBase:
     total_count = 2
     photos = [
         [
@@ -32,7 +33,9 @@ class TestUserProfilePhotos:
         ],
     ]
 
-    def test_slot_behaviour(self, mro_slots):
+
+class TestUserProfilePhotosWithoutRequest(TestUserProfilePhotosBase):
+    def test_slot_behaviour(self):
         inst = UserProfilePhotos(self.total_count, self.photos)
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

@@ -27,27 +27,29 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def time():
     return datetime.datetime.now(tz=UTC)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def chat_join_request(bot, time):
     cjr = ChatJoinRequest(
-        chat=TestChatJoinRequest.chat,
-        from_user=TestChatJoinRequest.from_user,
+        chat=TestChatJoinRequestBase.chat,
+        from_user=TestChatJoinRequestBase.from_user,
         date=time,
-        bio=TestChatJoinRequest.bio,
-        invite_link=TestChatJoinRequest.invite_link,
+        bio=TestChatJoinRequestBase.bio,
+        invite_link=TestChatJoinRequestBase.invite_link,
+        user_chat_id=TestChatJoinRequestBase.from_user.id,
     )
     cjr.set_bot(bot)
     return cjr
 
 
-class TestChatJoinRequest:
+class TestChatJoinRequestBase:
     chat = Chat(1, Chat.SUPERGROUP)
     from_user = User(2, "first_name", False)
     bio = "bio"
@@ -60,7 +62,9 @@ class TestChatJoinRequest:
         is_primary=False,
     )
 
-    def test_slot_behaviour(self, chat_join_request, mro_slots):
+
+class TestChatJoinRequestWithoutRequest(TestChatJoinRequestBase):
+    def test_slot_behaviour(self, chat_join_request):
         inst = chat_join_request
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -71,6 +75,7 @@ class TestChatJoinRequest:
             "chat": self.chat.to_dict(),
             "from": self.from_user.to_dict(),
             "date": to_timestamp(time),
+            "user_chat_id": self.from_user.id,
         }
         chat_join_request = ChatJoinRequest.de_json(json_dict, bot)
         assert chat_join_request.api_kwargs == {}
@@ -79,6 +84,7 @@ class TestChatJoinRequest:
         assert chat_join_request.from_user == self.from_user
         assert abs(chat_join_request.date - time) < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
+        assert chat_join_request.user_chat_id == self.from_user.id
 
         json_dict.update({"bio": self.bio, "invite_link": self.invite_link.to_dict()})
         chat_join_request = ChatJoinRequest.de_json(json_dict, bot)
@@ -88,6 +94,7 @@ class TestChatJoinRequest:
         assert chat_join_request.from_user == self.from_user
         assert abs(chat_join_request.date - time) < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
+        assert chat_join_request.user_chat_id == self.from_user.id
         assert chat_join_request.bio == self.bio
         assert chat_join_request.invite_link == self.invite_link
 
@@ -100,13 +107,16 @@ class TestChatJoinRequest:
         assert chat_join_request_dict["date"] == to_timestamp(chat_join_request.date)
         assert chat_join_request_dict["bio"] == chat_join_request.bio
         assert chat_join_request_dict["invite_link"] == chat_join_request.invite_link.to_dict()
+        assert chat_join_request_dict["user_chat_id"] == self.from_user.id
 
     def test_equality(self, chat_join_request, time):
         a = chat_join_request
-        b = ChatJoinRequest(self.chat, self.from_user, time)
-        c = ChatJoinRequest(self.chat, self.from_user, time, bio="bio")
-        d = ChatJoinRequest(self.chat, self.from_user, time + datetime.timedelta(1))
-        e = ChatJoinRequest(self.chat, User(-1, "last_name", True), time)
+        b = ChatJoinRequest(self.chat, self.from_user, time, self.from_user.id)
+        c = ChatJoinRequest(self.chat, self.from_user, time, self.from_user.id, bio="bio")
+        d = ChatJoinRequest(
+            self.chat, self.from_user, time + datetime.timedelta(1), self.from_user.id
+        )
+        e = ChatJoinRequest(self.chat, User(-1, "last_name", True), time, -1)
         f = User(456, "", False)
 
         assert a == b

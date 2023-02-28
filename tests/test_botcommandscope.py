@@ -31,9 +31,10 @@ from telegram import (
     BotCommandScopeDefault,
     Dice,
 )
+from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="class", params=["str", "int"])
+@pytest.fixture(scope="module", params=["str", "int"])
 def chat_id(request):
     if request.param == "str":
         return "@supergroupusername"
@@ -57,7 +58,7 @@ def scope_type(request):
 
 
 @pytest.fixture(
-    scope="class",
+    scope="module",
     params=[
         BotCommandScopeDefault,
         BotCommandScopeAllPrivateChats,
@@ -82,7 +83,7 @@ def scope_class(request):
 
 
 @pytest.fixture(
-    scope="class",
+    scope="module",
     params=[
         (BotCommandScopeDefault, BotCommandScope.DEFAULT),
         (BotCommandScopeAllPrivateChats, BotCommandScope.ALL_PRIVATE_CHATS),
@@ -106,7 +107,7 @@ def scope_class_and_type(request):
     return request.param
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def bot_command_scope(scope_class_and_type, chat_id):
     # we use de_json here so that we don't have to worry about which class needs which arguments
     return scope_class_and_type[0].de_json(
@@ -115,8 +116,8 @@ def bot_command_scope(scope_class_and_type, chat_id):
 
 
 # All the scope types are very similar, so we test everything via parametrization
-class TestBotCommandScope:
-    def test_slot_behaviour(self, bot_command_scope, mro_slots):
+class TestBotCommandScopeWithoutRequest:
+    def test_slot_behaviour(self, bot_command_scope):
         for attr in bot_command_scope.__slots__:
             assert getattr(bot_command_scope, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(bot_command_scope)) == len(

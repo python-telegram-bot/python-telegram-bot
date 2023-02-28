@@ -11,7 +11,7 @@
 # versions and only increase the lower bound if necessary
 
 httpx[socks] # socks
-cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=3.0 # passport
+cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=39.0.1 # passport
 aiolimiter~=1.0.0 # rate-limiter!ext
 
 # tornado is rather stable, but let's not allow the next mayor release without prior testing

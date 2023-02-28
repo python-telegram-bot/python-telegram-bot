@@ -23,23 +23,24 @@ import pytest
 
 from telegram import LoginUrl, WebhookInfo
 from telegram._utils.datetime import from_timestamp
+from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def webhook_info():
     return WebhookInfo(
-        url=TestWebhookInfo.url,
-        has_custom_certificate=TestWebhookInfo.has_custom_certificate,
-        pending_update_count=TestWebhookInfo.pending_update_count,
-        ip_address=TestWebhookInfo.ip_address,
-        last_error_date=TestWebhookInfo.last_error_date,
-        max_connections=TestWebhookInfo.max_connections,
-        allowed_updates=TestWebhookInfo.allowed_updates,
-        last_synchronization_error_date=TestWebhookInfo.last_synchronization_error_date,
+        url=TestWebhookInfoBase.url,
+        has_custom_certificate=TestWebhookInfoBase.has_custom_certificate,
+        pending_update_count=TestWebhookInfoBase.pending_update_count,
+        ip_address=TestWebhookInfoBase.ip_address,
+        last_error_date=TestWebhookInfoBase.last_error_date,
+        max_connections=TestWebhookInfoBase.max_connections,
+        allowed_updates=TestWebhookInfoBase.allowed_updates,
+        last_synchronization_error_date=TestWebhookInfoBase.last_synchronization_error_date,
     )
 
 
-class TestWebhookInfo:
+class TestWebhookInfoBase:
     url = "http://www.google.com"
     has_custom_certificate = False
     pending_update_count = 5
@@ -49,7 +50,9 @@ class TestWebhookInfo:
     allowed_updates = ["type1", "type2"]
     last_synchronization_error_date = time.time()
 
-    def test_slot_behaviour(self, webhook_info, mro_slots):
+
+class TestWebhookInfoWithoutRequest(TestWebhookInfoBase):
+    def test_slot_behaviour(self, webhook_info):
         for attr in webhook_info.__slots__:
             assert getattr(webhook_info, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(webhook_info)) == len(set(mro_slots(webhook_info))), "duplicate slot"

@@ -28,7 +28,8 @@ import pytest
 
 from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
 from telegram.ext import PicklePersistence
-from tests.conftest import data_file
+from tests.auxil.files import data_file
+from tests.auxil.slots import mro_slots
 
 
 def all_subclasses(cls):
@@ -204,7 +205,7 @@ class TestTelegramObject:
         assert isinstance(to_dict_recurse["subclass"], dict)
         assert to_dict_recurse["subclass"]["recursive"] == "recursive"
 
-    def test_slot_behaviour(self, mro_slots):
+    def test_slot_behaviour(self):
         inst = TelegramObject()
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

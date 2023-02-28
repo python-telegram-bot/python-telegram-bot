@@ -34,6 +34,7 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import to_timestamp
+from tests.auxil.slots import mro_slots
 
 ignored = ["self", "api_kwargs"]
 
@@ -61,6 +62,12 @@ class CMDefaults:
     can_manage_chat: bool = True
     can_manage_video_chats: bool = True
     can_manage_topics: bool = True
+    can_send_audios: bool = True
+    can_send_documents: bool = True
+    can_send_photos: bool = True
+    can_send_videos: bool = True
+    can_send_video_notes: bool = True
+    can_send_voice_notes: bool = True
 
 
 def chat_member_owner():
@@ -105,6 +112,12 @@ def chat_member_restricted():
         CMDefaults.can_add_web_page_previews,
         CMDefaults.can_manage_topics,
         CMDefaults.until_date,
+        CMDefaults.can_send_audios,
+        CMDefaults.can_send_documents,
+        CMDefaults.can_send_photos,
+        CMDefaults.can_send_videos,
+        CMDefaults.can_send_video_notes,
+        CMDefaults.can_send_voice_notes,
     )
 
 
@@ -175,8 +188,8 @@ def chat_member_type(request):
     ],
     indirect=True,
 )
-class TestChatMemberTypes:
-    def test_slot_behaviour(self, chat_member_type, mro_slots):
+class TestChatMemberTypesWithoutRequest:
+    def test_slot_behaviour(self, chat_member_type):
         inst = chat_member_type
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

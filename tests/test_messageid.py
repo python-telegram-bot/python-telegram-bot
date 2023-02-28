@@ -18,17 +18,18 @@
 import pytest
 
 from telegram import MessageId, User
+from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def message_id():
-    return MessageId(message_id=TestMessageId.m_id)
+    return MessageId(message_id=TestMessageIdWithoutRequest.m_id)
 
 
-class TestMessageId:
+class TestMessageIdWithoutRequest:
     m_id = 1234
 
-    def test_slot_behaviour(self, message_id, mro_slots):
+    def test_slot_behaviour(self, message_id):
         for attr in message_id.__slots__:
             assert getattr(message_id, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(message_id)) == len(set(mro_slots(message_id))), "duplicate slot"

@@ -21,6 +21,8 @@ from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 
 class ChatPermissions(TelegramObject):
@@ -35,6 +37,11 @@ class ChatPermissions(TelegramObject):
     .. versionchanged:: 20.0
         :attr:`can_manage_topics` is considered as well when comparing objects of
         this type in terms of equality.
+    .. deprecated:: 20.1
+        :attr:`can_send_audios`, :attr:`can_send_documents`, :attr:`can_send_photos`,
+        :attr:`can_send_videos`, :attr:`can_send_video_notes` and :attr:`can_send_voice_notes`
+        will be considered as well when comparing objects of this type in terms of equality in
+        V21.
 
     Note:
         Though not stated explicitly in the official docs, Telegram changes not only the
@@ -47,6 +54,9 @@ class ChatPermissions(TelegramObject):
         can_send_media_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to
             send audios, documents, photos, videos, video notes and voice notes, implies
             :attr:`can_send_messages`.
+
+            .. deprecated:: 20.1
+               Bot API 6.5 replaced this argument with granular media settings.
         can_send_polls (:obj:`bool`, optional): :obj:`True`, if the user is allowed to send polls,
             implies :attr:`can_send_messages`.
         can_send_other_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to
@@ -65,6 +75,26 @@ class ChatPermissions(TelegramObject):
             :attr:`can_pin_messages`.
 
             .. versionadded:: 20.0
+        can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
+
+            .. versionadded:: 20.1
+        can_send_documents (:obj:`bool`): :obj:`True`, if the user is allowed to send documents.
+
+            .. versionadded:: 20.1
+        can_send_photos (:obj:`bool`): :obj:`True`, if the user is allowed to send photos.
+
+            .. versionadded:: 20.1
+        can_send_videos (:obj:`bool`): :obj:`True`, if the user is allowed to send videos.
+
+            .. versionadded:: 20.1
+        can_send_video_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send video
+            notes.
+
+            .. versionadded:: 20.1
+        can_send_voice_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send voice
+            notes.
+
+            .. versionadded:: 20.1
 
     Attributes:
         can_send_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send text
@@ -72,6 +102,9 @@ class ChatPermissions(TelegramObject):
         can_send_media_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
             send audios, documents, photos, videos, video notes and voice notes, implies
             :attr:`can_send_messages`.
+
+            .. deprecated:: 20.1
+               Bot API 6.5 replaced this attribute with granular media settings.
         can_send_polls (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send polls,
             implies :attr:`can_send_messages`.
         can_send_other_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to
@@ -90,6 +123,26 @@ class ChatPermissions(TelegramObject):
             :attr:`can_pin_messages`.
 
             .. versionadded:: 20.0
+        can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
+
+            .. versionadded:: 20.1
+        can_send_documents (:obj:`bool`): :obj:`True`, if the user is allowed to send documents.
+
+            .. versionadded:: 20.1
+        can_send_photos (:obj:`bool`): :obj:`True`, if the user is allowed to send photos.
+
+            .. versionadded:: 20.1
+        can_send_videos (:obj:`bool`): :obj:`True`, if the user is allowed to send videos.
+
+            .. versionadded:: 20.1
+        can_send_video_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send video
+            notes.
+
+            .. versionadded:: 20.1
+        can_send_voice_notes (:obj:`bool`): :obj:`True`, if the user is allowed to send voice
+            notes.
+
+            .. versionadded:: 20.1
 
     """
 
@@ -103,6 +156,12 @@ class ChatPermissions(TelegramObject):
         "can_pin_messages",
         "can_add_web_page_previews",
         "can_manage_topics",
+        "can_send_audios",
+        "can_send_documents",
+        "can_send_photos",
+        "can_send_videos",
+        "can_send_video_notes",
+        "can_send_voice_notes",
     )
 
     def __init__(
@@ -116,6 +175,12 @@ class ChatPermissions(TelegramObject):
         can_invite_users: bool = None,
         can_pin_messages: bool = None,
         can_manage_topics: bool = None,
+        can_send_audios: bool = None,
+        can_send_documents: bool = None,
+        can_send_photos: bool = None,
+        can_send_videos: bool = None,
+        can_send_video_notes: bool = None,
+        can_send_voice_notes: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -130,6 +195,12 @@ class ChatPermissions(TelegramObject):
         self.can_invite_users: Optional[bool] = can_invite_users
         self.can_pin_messages: Optional[bool] = can_pin_messages
         self.can_manage_topics: Optional[bool] = can_manage_topics
+        self.can_send_audios: Optional[bool] = can_send_audios
+        self.can_send_documents: Optional[bool] = can_send_documents
+        self.can_send_photos: Optional[bool] = can_send_photos
+        self.can_send_videos: Optional[bool] = can_send_videos
+        self.can_send_video_notes: Optional[bool] = can_send_video_notes
+        self.can_send_voice_notes: Optional[bool] = can_send_voice_notes
 
         self._id_attrs = (
             self.can_send_messages,
@@ -145,6 +216,19 @@ class ChatPermissions(TelegramObject):
 
         self._freeze()
 
+    def __eq__(self, other: object) -> bool:
+        warn(
+            "In v21, granular media settings will be considered as well when comparing"
+            " ChatPermissions instances.",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        # Intend: Added so support the own __eq__ function (which otherwise breaks hashing)
+        return super().__hash__()
+
     @classmethod
     def all_permissions(cls) -> "ChatPermissions":
         """
@@ -155,7 +239,7 @@ class ChatPermissions(TelegramObject):
         .. versionadded:: 20.0
 
         """
-        return cls(True, True, True, True, True, True, True, True, True)
+        return cls(*(15 * (True,)))
 
     @classmethod
     def no_permissions(cls) -> "ChatPermissions":
@@ -165,4 +249,4 @@ class ChatPermissions(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(False, False, False, False, False, False, False, False, False)
+        return cls(*(15 * (False,)))

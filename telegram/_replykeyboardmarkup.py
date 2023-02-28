@@ -33,6 +33,15 @@ class ReplyKeyboardMarkup(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their size of :attr:`keyboard` and all the buttons are equal.
 
+    .. figure:: https://core.telegram.org/file/464001950/1191a/2RwpmgU-swU.123554/b5\
+        0478c124d5914c23
+        :align: center
+
+        A reply keyboard with reply options.
+
+    .. seealso::
+        An another kind of keyboard would be the :class:`telegram.InlineKeyboardMarkup`.
+
     Examples:
         * Example usage: A user requests to change the bot's language, bot replies to the request
           with a keyboard to select the new language. Other users in the group don't see
