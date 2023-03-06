@@ -243,35 +243,34 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             HTTPXRequest() if request is None else request,
         )
 
-        # this section is about raising an error when using HTTP/2 and connect to a local bot api
-        # instance. Checking if a custom url starts with http is the best way to do that since
-        # this ensures a) a local bot api instance is used and b) probably no proxy runs in front
-        # of it.
+        # this section is about issuing a warning when using HTTP/2 and connect to a local bot api
+        # instance, which currently only supports HTTP/1.1. Checking if a custom base url is set
+        # is the best way to do that.
 
-        error_string = ""
+        warning_string = ""
 
         if (
             isinstance(self._request[0], HTTPXRequest)
             and self._request[0].http_version == "2"
-            and not base_url.startswith("https")
+            and not base_url.startswith("https://api.telegram.org/bot")
         ):
-            error_string = "get_updates_request"
+            warning_string = "get_updates_request"
 
         if (
             isinstance(self._request[1], HTTPXRequest)
             and self._request[1].http_version == "2"
-            and not base_url.startswith("https")
+            and not base_url.startswith("https://api.telegram.org/bot")
         ):
-            if error_string:
-                error_string += " and request"
+            if warning_string:
+                warning_string += " and request"
             else:
-                error_string = "request"
+                warning_string = "request"
 
-        if error_string:
+        if warning_string:
             warn(
-                f"You set the HTTP version for the {error_string} HTTPX instance to HTTP/2. The "
-                "local bot api instances do not natively support this. You need to either run a "
-                "http proxy in front of it or change the version back.",
+                f"You set the HTTP version for the {warning_string} HTTPXRequest instance to "
+                f"HTTP/2. The self hosted bot api instances only support HTTP/1.1. You should "
+                f"either run a HTTP proxy in front of it which supports HTTP/2 or use HTTP/1.1.",
                 PTBUserWarning,
                 stacklevel=2,
             )

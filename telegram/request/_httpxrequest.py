@@ -91,7 +91,7 @@ class HTTPXRequest(BaseRequest):
 
     """
 
-    __slots__ = ("_client", "_client_kwargs", "http_version")
+    __slots__ = ("_client", "_client_kwargs", "_http_version")
 
     def __init__(
         self,
@@ -103,7 +103,7 @@ class HTTPXRequest(BaseRequest):
         pool_timeout: Optional[float] = 1.0,
         http_version: str = "1.1",
     ):
-        self.http_version = http_version
+        self._http_version = http_version
         timeout = httpx.Timeout(
             connect=connect_timeout,
             read=read_timeout,
@@ -133,13 +133,22 @@ class HTTPXRequest(BaseRequest):
         try:
             self._client = self._build_client()
         except ImportError as exc:
-            if "httpx[socks]" not in str(exc):
+            if "httpx[socks]" not in str(exc) or "httpx[http2]" not in str(exc):
                 raise exc
 
+            if "httpx[socks]" in str(exc):
+                raise RuntimeError(
+                    "To use Socks5 proxies, PTB must be installed via `pip install "
+                    "python-telegram-bot[socks]`."
+                ) from exc
             raise RuntimeError(
-                "To use Socks5 proxies, PTB must be installed via `pip install "
-                "python-telegram-bot[socks]`."
+                "To use HTTP/2, PTB must be installed via `pip install "
+                "python-telegram-bot[http2]`."
             ) from exc
+
+    @property
+    def http_version(self) -> str:
+        return self._http_version
 
     def _build_client(self) -> httpx.AsyncClient:
         return httpx.AsyncClient(**self._client_kwargs)  # type: ignore[arg-type]

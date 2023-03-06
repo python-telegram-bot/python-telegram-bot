@@ -1649,14 +1649,15 @@ class TestBotWithoutRequest:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
+    @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")
     async def test_http2_warning(self):
         with pytest.raises(
-            PTBUserWarning, match="You set the HTTP version for the request HTTPX instance"
+            PTBUserWarning, match="You set the HTTP version for the request HTTPXRequest instance"
         ):
             Bot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
         with pytest.raises(
             PTBUserWarning,
-            match="You set the HTTP version for the get_updates_request HTTPX instance",
+            match="You set the HTTP version for the get_updates_request HTTPXRequest instance",
         ):
             Bot(
                 "12345:ABCDE",
@@ -1665,7 +1666,7 @@ class TestBotWithoutRequest:
             )
         with pytest.raises(
             PTBUserWarning,
-            match="You set the HTTP version for the get_updates_request and request HTTPX "
+            match="You set the HTTP version for the get_updates_request and request HTTPXRequest "
             "instance",
         ):
             Bot(
@@ -1674,6 +1675,13 @@ class TestBotWithoutRequest:
                 request=HTTPXRequest(http_version="2"),
                 get_updates_request=HTTPXRequest(http_version="2"),
             )
+
+    @pytest.mark.skipif(
+        TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
+    )
+    async def test_http2_runtime_error(self, bot):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[http2\]"):
+            HTTPXRequest(http_version="2")
 
 
 class TestBotWithRequest:

@@ -11,6 +11,7 @@
 # versions and only increase the lower bound if necessary
 
 httpx[socks] # socks
+httpx[http2] # http2
 cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=39.0.1 # passport
 aiolimiter~=1.0.0 # rate-limiter!ext
 

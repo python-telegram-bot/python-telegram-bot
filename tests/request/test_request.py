@@ -414,6 +414,17 @@ class TestHTTPXRequestWithoutRequest:
             )
             assert resp.http_version == "HTTP/1.1"
 
+    @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")
+    async def test_http_2_response(self):
+        httpx_request = HTTPXRequest(http_version="2")
+        async with httpx_request:
+            resp = await httpx_request._client.request(
+                url="https://python-telegram-bot.org",
+                method="GET",
+                headers={"User-Agent": httpx_request.USER_AGENT},
+            )
+            assert resp.http_version == "HTTP/2"
+
     async def test_do_request_after_shutdown(self, httpx_request):
         await httpx_request.shutdown()
         with pytest.raises(RuntimeError, match="not initialized"):

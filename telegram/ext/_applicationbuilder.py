@@ -730,9 +730,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             Reset the default version to 1.1.
 
         Note:
-            HTTPX currently errors out with HTTP/2 when Telegram cancels the keepalive connection,
-            see `#3556 <https://github.com/python-telegram-bot/python-telegram-bot/issues/3556>`_
-            for more details.
+            Users have obsered stability issues with HTTP/2, which are due to how the `h2 library
+            <https://github.com/python-hyper/h2>`, which httpx uses to realize HTTP/2, handles
+            cancellations of keepalive connections. See `#3556 <https://github.com/
+            python-telegram-bot/python-telegram-bot/issues/3556>`_ for a discussion.
 
             You will also need to install the http2 dependency or use your own request backend.
             Keep in mind that the HTTP/1.1 implementation may be considered the `"more robust
