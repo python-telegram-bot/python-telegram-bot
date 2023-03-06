@@ -6,5 +6,4 @@
 # versions and only increase the lower bound if necessary
 
 # httpx has no stable release yet, so let's be cautious for now
-# HTTP/2 is more performant and stable than HTTP/1.1, specially for concurrent requests
-httpx[http2] ~= 0.23.3
+httpx ~= 0.23.3

@@ -92,12 +92,14 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.warnings import warn
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit
 from telegram.error import InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -240,6 +242,33 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             HTTPXRequest() if get_updates_request is None else get_updates_request,
             HTTPXRequest() if request is None else request,
         )
+
+        # this section is about raising an error when using HTTP/2 and connect to a local bot api
+        # instance. Checking if a custom url starts with http is the best way to do that since
+        # this ensures a) a local bot api instance is used and b) probably no proxy runs in front
+        # of it.
+
+        error_string = ""
+
+        if isinstance(self._request[0], HTTPXRequest):
+            if self._request[0].http_version == "2" and not base_url.startswith("https"):
+                error_string = "get_updates_request"
+
+        if isinstance(self._request[1], HTTPXRequest):
+            if self._request[1].http_version == "2" and not base_url.startswith("https"):
+                if error_string:
+                    error_string += " and request"
+                else:
+                    error_string = "request"
+
+        if error_string:
+            warn(
+                f"You set the HTTP version for the {error_string} HTTPX instance to HTTP/2. The "
+                "local bot api instances do not natively support this. You need to either run a "
+                "http proxy in front of it or change the version back.",
+                PTBUserWarning,
+                stacklevel=2,
+            )
 
         if private_key:
             if not CRYPTO_INSTALLED:

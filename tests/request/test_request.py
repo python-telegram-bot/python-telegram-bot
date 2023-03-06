@@ -345,7 +345,8 @@ class TestHTTPXRequestWithoutRequest:
         assert request._client.limits == httpx.Limits(
             max_connections=1, max_keepalive_connections=1
         )
-        assert request._client.http2 is True
+        assert request._client.http1 is True
+        assert not request._client.http2
 
         request = HTTPXRequest(
             connection_pool_size=42,
@@ -412,16 +413,6 @@ class TestHTTPXRequestWithoutRequest:
                 headers={"User-Agent": httpx_request.USER_AGENT},
             )
             assert resp.http_version == "HTTP/1.1"
-
-    async def test_http_2_response(self):
-        httpx_request = HTTPXRequest()
-        async with httpx_request:
-            resp = await httpx_request._client.request(
-                url="https://python-telegram-bot.org",
-                method="GET",
-                headers={"User-Agent": httpx_request.USER_AGENT},
-            )
-            assert resp.http_version == "HTTP/2"
 
     async def test_do_request_after_shutdown(self, httpx_request):
         await httpx_request.shutdown()
