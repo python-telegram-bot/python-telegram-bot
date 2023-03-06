@@ -25,9 +25,12 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
+import logging
 from pathlib import Path
 from types import FrameType
 from typing import Optional
+
+_logger = logging.getLogger(__name__)
 
 
 def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
@@ -51,11 +54,22 @@ def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
     if frame is None:
         return False
 
+    try:
+        return _was_called_by(frame, caller)
+    except Exception as exc:
+        _logger.debug(
+            "Failed to check if frame was called by `caller`. Assuming that it was not.",
+            exc_info=exc,
+        )
+        return False
+
+
+def _was_called_by(frame: FrameType, caller: Path) -> bool:
     # https://stackoverflow.com/a/57712700/10606962
-    if Path(frame.f_code.co_filename) == caller:
+    if Path(frame.f_code.co_filename).resolve() == caller:
         return True
     while frame.f_back:
         frame = frame.f_back
-        if Path(frame.f_code.co_filename) == caller:
+        if Path(frame.f_code.co_filename).resolve() == caller:
             return True
     return False
