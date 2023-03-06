@@ -250,16 +250,22 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         error_string = ""
 
-        if isinstance(self._request[0], HTTPXRequest):
-            if self._request[0].http_version == "2" and not base_url.startswith("https"):
-                error_string = "get_updates_request"
+        if (
+            isinstance(self._request[0], HTTPXRequest)
+            and self._request[0].http_version == "2"
+            and not base_url.startswith("https")
+        ):
+            error_string = "get_updates_request"
 
-        if isinstance(self._request[1], HTTPXRequest):
-            if self._request[1].http_version == "2" and not base_url.startswith("https"):
-                if error_string:
-                    error_string += " and request"
-                else:
-                    error_string = "request"
+        if (
+            isinstance(self._request[1], HTTPXRequest)
+            and self._request[1].http_version == "2"
+            and not base_url.startswith("https")
+        ):
+            if error_string:
+                error_string += " and request"
+            else:
+                error_string = "request"
 
         if error_string:
             warn(
