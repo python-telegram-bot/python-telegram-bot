@@ -20,7 +20,7 @@ repos:
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
-    rev: v2.16.1
+    rev: v2.16.4
     hooks:
     -   id: pylint
         files: ^(telegram|examples)/.*\.py$
@@ -38,7 +38,7 @@ repos:
           - aiolimiter~=1.0.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.991
+    rev: v1.0.1
     hooks:
     -   id: mypy
         name: mypy-ptb
@@ -80,7 +80,7 @@ repos:
         - --diff
         - --check
 -   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.243'
+    rev: 'v0.0.254'
     hooks:
     -   id: ruff
         name: ruff
