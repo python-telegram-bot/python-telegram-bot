@@ -33,6 +33,8 @@ from telegram import (
     Bot,
     BotCommand,
     BotCommandScopeChat,
+    BotDescription,
+    BotShortDescription,
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
@@ -3196,3 +3198,61 @@ class TestBotWithRequest:
         finally:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
+
+    async def test_set_get_my_description(self, bot):
+        default_description = f"{bot.username} - default - {dtm.datetime.utcnow().isoformat()}"
+        en_description = f"{bot.username} - en - {dtm.datetime.utcnow().isoformat()}"
+        de_description = f"{bot.username} - de - {dtm.datetime.utcnow().isoformat()}"
+
+        # Set the descriptions
+        assert await bot.set_my_description(default_description)
+        assert await bot.set_my_description(en_description, language_code="en")
+        assert await bot.set_my_description(de_description, language_code="de")
+
+        # Check that they were set correctly
+        assert await bot.get_my_description() == BotDescription(default_description)
+        assert await bot.get_my_description("en") == BotDescription(en_description)
+        assert await bot.get_my_description("de") == BotDescription(de_description)
+
+        # Delete the descriptions
+        assert await bot.set_my_description(None)
+        assert await bot.set_my_description(None, language_code="en")
+        assert await bot.set_my_description(None, language_code="de")
+
+        # Check that they were deleted correctly
+        assert await bot.get_my_description() == BotDescription("")
+        assert await bot.get_my_description("en") == BotDescription("")
+        assert await bot.get_my_description("de") == BotDescription("")
+
+    async def test_set_get_my_short_description(self, bot):
+        default_short_description = (
+            f"{bot.username} - default - {dtm.datetime.utcnow().isoformat()}"
+        )
+        en_short_description = f"{bot.username} - en - {dtm.datetime.utcnow().isoformat()}"
+        de_short_description = f"{bot.username} - de - {dtm.datetime.utcnow().isoformat()}"
+
+        # Set the short_descriptions
+        assert await bot.set_my_short_description(default_short_description)
+        assert await bot.set_my_short_description(en_short_description, language_code="en")
+        assert await bot.set_my_short_description(de_short_description, language_code="de")
+
+        # Check that they were set correctly
+        assert await bot.get_my_short_description() == BotShortDescription(
+            default_short_description
+        )
+        assert await bot.get_my_short_description("en") == BotShortDescription(
+            en_short_description
+        )
+        assert await bot.get_my_short_description("de") == BotShortDescription(
+            de_short_description
+        )
+
+        # Delete the short_descriptions
+        assert await bot.set_my_short_description(None)
+        assert await bot.set_my_short_description(None, language_code="en")
+        assert await bot.set_my_short_description(None, language_code="de")
+
+        # Check that they were deleted correctly
+        assert await bot.get_my_short_description() == BotShortDescription("")
+        assert await bot.get_my_short_description("en") == BotShortDescription("")
+        assert await bot.get_my_short_description("de") == BotShortDescription("")

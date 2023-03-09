@@ -37,6 +37,8 @@ __all__ = (  # Keep this alphabetically ordered
     "BotCommandScopeChatAdministrators",
     "BotCommandScopeChatMember",
     "BotCommandScopeDefault",
+    "BotDescription",
+    "BotShortDescription",
     "CallbackGame",
     "CallbackQuery",
     "Chat",
@@ -200,6 +202,7 @@ from ._botcommandscope import (
     BotCommandScopeChatMember,
     BotCommandScopeDefault,
 )
+from ._botdescription import BotDescription, BotShortDescription
 from ._callbackquery import CallbackQuery
 from ._chat import Chat
 from ._chatadministratorrights import ChatAdministratorRights

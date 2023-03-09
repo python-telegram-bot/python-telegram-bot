@@ -55,6 +55,7 @@ except ImportError:
 
 from telegram._botcommand import BotCommand
 from telegram._botcommandscope import BotCommandScope
+from telegram._botdescription import BotDescription, BotShortDescription
 from telegram._chat import Chat
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._chatinvitelink import ChatInviteLink
@@ -7325,6 +7326,177 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
+    @_log
+    async def set_my_description(
+        self,
+        description: str = None,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to change the bot's description, which is shown in the chat with the bot
+        if the chat is empty.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            description (:obj:`str`): Optional. New bot description;
+                0- :tg-const:`telegram.constants.BotDescriptionLimit.MAX_DESCRIPTION_LENGTH`
+                characters. Pass an empty string to remove the dedicated description for the given
+                language.
+            language_code (:obj:`str`): Optional. A two-letter ISO 639-1 language code. If empty,
+                the description will be applied to all users for whose language there is no
+                dedicated description.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"description": description, "language_code": language_code}
+
+        return await self._post(
+            "setMyDescription",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def set_my_short_description(
+        self,
+        short_description: str = None,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to change the bot's short description, which is shown on the bot's profile
+        page and is sent together with the link when users share the bot.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            short_description (:obj:`str`): Optional. New short description for the bot;
+                0- :tg-const:`telegram.constants.BotDescriptionLimit.MAX_SHORT_DESCRIPTION_LENGTH`
+                characters. Pass an empty string to remove the dedicated description for the given
+                language.
+            language_code (:obj:`str`): Optional. A two-letter ISO 639-1 language code. If empty,
+                the description will be applied to all users for whose language there is no
+                dedicated description.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"short_description": short_description, "language_code": language_code}
+
+        return await self._post(
+            "setMyShortDescription",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def get_my_description(
+        self,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> BotDescription:
+        """
+        Use this method to get the current bot description for the given user language.
+
+        Args:
+            language_code (:obj:`str`): Optional. A two-letter ISO 639-1 language code or an empty
+                string.
+
+        Returns:
+            :class:`telegram.BotDescription`: On success, the bot description is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data = {"language_code": language_code}
+        return BotDescription.de_json(  # type: ignore[return-value]
+            await self._post(
+                "getMyDescription",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            bot=self,
+        )
+
+    @_log
+    async def get_my_short_description(
+        self,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> BotShortDescription:
+        """
+        Use this method to get the current bot short description for the given user language.
+
+        Args:
+            language_code (:obj:`str`): Optional. A two-letter ISO 639-1 language code or an empty
+                string.
+
+        Returns:
+            :class:`telegram.BotShortDescription`: On success, the bot short description is
+                returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data = {"language_code": language_code}
+        return BotShortDescription.de_json(  # type: ignore[return-value]
+            await self._post(
+                "getMyShortDescription",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            bot=self,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # skipcq: PYL-W0613
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -7543,3 +7715,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`hide_general_forum_topic`"""
     unhideGeneralForumTopic = unhide_general_forum_topic
     """Alias for :meth:`unhide_general_forum_topic`"""
+    setMyDescription = set_my_description
+    """Alias for :meth:`set_my_description`"""
+    setMyShortDescription = set_my_short_description
+    """Alias for :meth:`set_my_short_description`"""
+    getMyDescription = get_my_description
+    """Alias for :meth:`get_my_description`"""
+    getMyShortDescription = get_my_short_description
+    """Alias for :meth:`get_my_short_description`"""

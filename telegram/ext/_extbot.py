@@ -44,6 +44,8 @@ from telegram import (
     Bot,
     BotCommand,
     BotCommandScope,
+    BotDescription,
+    BotShortDescription,
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
@@ -3432,6 +3434,90 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def set_my_description(
+        self,
+        description: str = None,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_my_description(
+            description=description,
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_my_short_description(
+        self,
+        short_description: str = None,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_my_short_description(
+            short_description=short_description,
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_my_description(
+        self,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> BotDescription:
+        return await super().get_my_description(
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_my_short_description(
+        self,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> BotShortDescription:
+        return await super().get_my_short_description(
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -3533,3 +3619,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     reopenGeneralForumTopic = reopen_general_forum_topic
     hideGeneralForumTopic = hide_general_forum_topic
     unhideGeneralForumTopic = unhide_general_forum_topic
+    setMyDescription = set_my_description
+    getMyDescription = get_my_description
+    setMyShortDescription = set_my_short_description
+    getMyShortDescription = get_my_short_description

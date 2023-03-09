@@ -36,6 +36,7 @@ __all__ = [
     "BOT_API_VERSION_INFO",
     "BotCommandLimit",
     "BotCommandScopeType",
+    "BotDescriptionLimit",
     "CallbackQueryLimit",
     "ChatAction",
     "ChatID",
@@ -182,6 +183,28 @@ class BotCommandScopeType(StringEnum):
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeChatAdministrators`."""
     CHAT_MEMBER = "chat_member"
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeChatMember`."""
+
+
+class BotDescriptionLimit(IntEnum):
+    """This enum contains limitations for the methods :meth:`telegram.Bot.set_my_description` and
+    :meth:`telegram.Bot.set_my_short_description`. The enum members of this enumeration are
+    instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_DESCRIPTION_LENGTH = 512
+    """:obj:`int`: Maximum length for the parameter
+    :paramref:`~telegram.Bot.set_my_description.description` of
+    :meth:`telegram.Bot.set_my_description`
+    """
+    MAX_SHORT_DESCRIPTION_LENGTH = 120
+    """:obj:`int`: Maximum length for the parameter
+    :paramref:`~telegram.Bot.set_my_short_description.short_description` of
+    :meth:`telegram.Bot.set_my_short_description`
+    """
 
 
 class CallbackQueryLimit(IntEnum):
