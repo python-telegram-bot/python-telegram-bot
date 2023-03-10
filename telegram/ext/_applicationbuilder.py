@@ -568,23 +568,24 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: :meth:`get_updates_http_version`
 
+        Note:
+            Users have observed stability issues with HTTP/2, which happen due to how the `h2
+            library handles <https://github.com/python-hyper/h2/issues/1181>` cancellations of
+            keepalive connections. See `#3556 <https://github.com/python-telegram-bot/
+            python-telegram-bot/issues/3556>`_ for a discussion.
+
+            If you want to use HTTP/2, you must install PTB with the optional requirement
+            ``http2``, i.e.
+            .. code-block:: bash
+
+               pip install python-telegram-bot[http2]
+
+            Keep in mind that the HTTP/1.1 implementation may be considered the `"more
+            robust option at this time" <https://www.python-httpx.org/http2#enabling-http2>`_.
+
         .. versionadded:: 20.1
         .. versionchanged:: 20.1.1
             Reset the default version to 1.1.
-
-        Note:
-            HTTPX currently errors out with HTTP/2 when Telegram cancels the keepalive connection,
-            see `#3556 <https://github.com/python-telegram-bot/python-telegram-bot/issues/3556>`_
-            for more details.
-
-            You will also need to install the http2 dependency or use your own request backend.
-            Keep in mind that the HTTP/1.1 implementation may be considered the `"more robust
-            option at this time" <https://www.python-httpx.org/http2#enabling-http2>`_.
-
-            .. code-block:: bash
-
-               pip install httpx[http2]
-
 
         Args:
             http_version (:obj:`str`): Pass ``"2"`` if you'd like to use HTTP/2 for making
@@ -725,23 +726,23 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: :meth:`http_version`
 
-        .. versionadded:: 20.1
-        .. versionchanged:: 20.1.1
-            Reset the default version to 1.1.
-
         Note:
-            Users have obsered stability issues with HTTP/2, which are due to how the `h2 library
-            <https://github.com/python-hyper/h2>`, which httpx uses to realize HTTP/2, handles
-            cancellations of keepalive connections. See `#3556 <https://github.com/
-            python-telegram-bot/python-telegram-bot/issues/3556>`_ for a discussion.
+            Users have observed stability issues with HTTP/2, which happen due to how the `h2
+            library handles <https://github.com/python-hyper/h2/issues/1181>` cancellations of
+            keepalive connections. See `#3556 <https://github.com/python-telegram-bot/
+            python-telegram-bot/issues/3556>`_ for a discussion.
 
-            You will also need to install the http2 dependency or use your own request backend.
-            Keep in mind that the HTTP/1.1 implementation may be considered the `"more robust
-            option at this time" <https://www.python-httpx.org/http2#enabling-http2>`_.
+            You will also need to install the http2 dependency. Keep in mind that the HTTP/1.1
+            implementation may be considered the `"more robust option at this time"
+            <https://www.python-httpx.org/http2#enabling-http2>`_.
 
             .. code-block:: bash
 
                pip install httpx[http2]
+
+        .. versionadded:: 20.1
+        .. versionchanged:: 20.1.1
+            Reset the default version to 1.1.
 
         Args:
             get_updates_http_version (:obj:`str`): Pass ``"2"`` if you'd like to use HTTP/2 for

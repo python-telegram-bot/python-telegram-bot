@@ -133,7 +133,8 @@ class HTTPXRequest(BaseRequest):
         try:
             self._client = self._build_client()
         except ImportError as exc:
-            if "httpx[socks]" not in str(exc) or "httpx[http2]" not in str(exc):
+            print(exc)
+            if "httpx[http2]" not in str(exc) and "httpx[socks]" not in str(exc):
                 raise exc
 
             if "httpx[socks]" in str(exc):
@@ -148,6 +149,9 @@ class HTTPXRequest(BaseRequest):
 
     @property
     def http_version(self) -> str:
+        """:obj:`str`: Used HTTP version, see :paramref:`http_version`.
+
+        .. versionadded:: NEXT.VERSION"""
         return self._http_version
 
     def _build_client(self) -> httpx.AsyncClient:
