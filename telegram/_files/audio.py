@@ -46,6 +46,13 @@ class Audio(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
             which the music file belongs.
 
+            .. deprecated:: NEXT.VERSION
+               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+        thumbnail (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
+            which the music file belongs.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -60,6 +67,13 @@ class Audio(_BaseThumbedMedium):
         file_size (:obj:`int`): Optional. File size in bytes.
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
             which the music file belongs.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 6.6 renamed this argument to :attr:`thumbnail`.
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
+            which the music file belongs.
+
+            .. versionadded:: NEXT.VERSION
 
 
     """
@@ -77,6 +91,7 @@ class Audio(_BaseThumbedMedium):
         file_size: int = None,
         thumb: PhotoSize = None,
         file_name: str = None,
+        thumbnail: PhotoSize = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -85,6 +100,7 @@ class Audio(_BaseThumbedMedium):
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():

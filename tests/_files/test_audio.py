@@ -44,7 +44,7 @@ def audio_file():
 @pytest.fixture(scope="module")
 async def audio(bot, chat_id):
     with data_file("telegram.mp3").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
-        return (await bot.send_audio(chat_id, audio=f, read_timeout=50, thumb=thumb)).audio
+        return (await bot.send_audio(chat_id, audio=f, read_timeout=50, thumbnail=thumb)).audio
 
 
 class TestAudioBase:
@@ -85,9 +85,9 @@ class TestAudioWithoutRequest(TestAudioBase):
         assert audio.title is None
         assert audio.mime_type == self.mime_type
         assert audio.file_size == self.file_size
-        assert audio.thumb.file_size == self.thumb_file_size
-        assert audio.thumb.width == self.thumb_width
-        assert audio.thumb.height == self.thumb_height
+        assert audio.thumbnail.file_size == self.thumb_file_size
+        assert audio.thumbnail.width == self.thumb_width
+        assert audio.thumbnail.height == self.thumb_height
 
     def test_de_json(self, bot, audio):
         json_dict = {
@@ -99,7 +99,7 @@ class TestAudioWithoutRequest(TestAudioBase):
             "file_name": self.file_name,
             "mime_type": self.mime_type,
             "file_size": self.file_size,
-            "thumb": audio.thumb.to_dict(),
+            "thumbnail": audio.thumbnail.to_dict(),
         }
         json_audio = Audio.de_json(json_dict, bot)
         assert json_audio.api_kwargs == {}
@@ -112,7 +112,7 @@ class TestAudioWithoutRequest(TestAudioBase):
         assert json_audio.file_name == self.file_name
         assert json_audio.mime_type == self.mime_type
         assert json_audio.file_size == self.file_size
-        assert json_audio.thumb == audio.thumb
+        assert json_audio.thumbnail == audio.thumbnail
 
     def test_to_dict(self, audio):
         audio_dict = audio.to_dict()
@@ -171,17 +171,26 @@ class TestAudioWithoutRequest(TestAudioBase):
             async def make_assertion(_, data, *args, **kwargs):
                 nonlocal test_flag
                 if local_mode:
-                    test_flag = data.get("audio") == expected and data.get("thumb") == expected
+                    test_flag = data.get("audio") == expected and data.get("thumbnail") == expected
                 else:
                     test_flag = isinstance(data.get("audio"), InputFile) and isinstance(
-                        data.get("thumb"), InputFile
+                        data.get("thumbnail"), InputFile
                     )
 
             monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_audio(chat_id, file, thumb=file)
+            await bot.send_audio(chat_id, file, thumbnail=file)
             assert test_flag
         finally:
             bot._local_mode = False
+
+    async def test_send_audio_with_local_files_throws_error_with_different_thumb_and_thumbnail(
+        self, monkeypatch, bot, chat_id
+    ):
+        file = data_file("telegram.jpg")
+        different_file = data_file("telegram_no_standard_header.jpg")
+
+        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
+            await bot.send_audio(chat_id, file, thumbnail=file, thumb=different_file)
 
     async def test_get_file_instance_method(self, monkeypatch, audio):
         async def make_assertion(*_, **kwargs):
@@ -207,7 +216,7 @@ class TestAudioWithRequest(TestAudioBase):
             disable_notification=False,
             protect_content=True,
             parse_mode="Markdown",
-            thumb=thumb_file,
+            thumbnail=thumb_file,
         )
 
         assert message.caption == self.caption.replace("*", "")
@@ -223,9 +232,9 @@ class TestAudioWithRequest(TestAudioBase):
         assert message.audio.file_name == self.file_name
         assert message.audio.mime_type == self.mime_type
         assert message.audio.file_size == self.file_size
-        assert message.audio.thumb.file_size == self.thumb_file_size
-        assert message.audio.thumb.width == self.thumb_width
-        assert message.audio.thumb.height == self.thumb_height
+        assert message.audio.thumbnail.file_size == self.thumb_file_size
+        assert message.audio.thumbnail.width == self.thumb_width
+        assert message.audio.thumbnail.height == self.thumb_height
         assert message.has_protected_content
 
     async def test_get_and_download(self, bot, chat_id, audio):
