@@ -101,7 +101,7 @@ class _BaseThumbedMedium(_BaseMedium):
         if thumb:
             warn(
                 "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' might become deprecated in the future.",
+                "The argument 'thumb' will be removed in the next major version of PTB.",
                 PTBDeprecationWarning,
                 stacklevel=2,
             )
