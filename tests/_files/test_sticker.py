@@ -433,6 +433,13 @@ class TestStickerWithRequest(TestStickerBase):
         assert emoji_sticker_list[0].file_size == 3678
         assert emoji_sticker_list[0].file_unique_id == "AgAD6gwAAoY06FM"
 
+    # async def test_set_custom_emoji_sticker_set_thumbnail(self, bot):
+    # custom_emoji_set = await bot.get_sticker_set("PTBStaticEmojiTestPack")
+    # Returns stickerset_invalid for some reason, even though we fetch one in the previous test
+    # assert await bot.set_custom_emoji_sticker_set_thumbnail(
+    #     "PTBStaticEmojiTestPack", custom_emoji_set.stickers[0].custom_emoji_id,
+    # )
+
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_sticker(chat_id, open(os.devnull, "rb"))
@@ -775,6 +782,17 @@ class TestStickerSetWithRequest:
                     )
                     assert v
 
+    async def test_delete_sticker_set(self, bot, chat_id, sticker_file):
+        assert await bot.create_new_sticker_set(
+            chat_id,
+            name=f"temp_set_by_{bot.username}",
+            title="Stickerset delete Test",
+            png_sticker=sticker_file,
+            emojis="😄",
+        )
+        assert await bot.delete_sticker_set(f"temp_set_by_{bot.username}")
+
+    # Test add_sticker_to_set
     async def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
         with data_file("telegram_sticker.png").open("rb") as f:
             # chat_id was hardcoded as 95205500 but it stopped working for some reason
@@ -812,6 +830,7 @@ class TestStickerSetWithRequest:
                 chat_id, f"video_test_by_{bot.username}", webm_sticker=f, emojis="🤔"
             )
 
+    # Test set_sticker_position_in_set
     async def test_bot_methods_2_png(self, bot, sticker_set):
         await asyncio.sleep(1)
         file_id = sticker_set.stickers[0].file_id
@@ -827,6 +846,7 @@ class TestStickerSetWithRequest:
         file_id = video_sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
+    # Test set_sticker_set_thumb
     async def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
         await asyncio.sleep(1)
         assert await bot.set_sticker_set_thumb(
@@ -853,6 +873,7 @@ class TestStickerSetWithRequest:
     def test_bot_methods_3_webm(self, bot, chat_id, video_sticker_file, video_sticker_set):
         pass
 
+    # Test delete_sticker_from_set
     async def test_bot_methods_4_png(self, bot, sticker_set):
         await asyncio.sleep(1)
         file_id = sticker_set.stickers[-1].file_id
@@ -867,6 +888,55 @@ class TestStickerSetWithRequest:
         await asyncio.sleep(1)
         file_id = video_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
+
+    # Test set_sticker_emoji_list. It has been found that the first emoji in the list is the one
+    # that is used in `Sticker.emoji` as string (which is returned in `get_sticker_set`)
+    async def test_bot_methods_5_png(self, bot, sticker_set):
+        file_id = sticker_set.stickers[-1].file_id
+        assert await bot.set_sticker_emoji_list(file_id, ["😔", "😟"])
+        ss = await bot.get_sticker_set(f"test_by_{bot.username}")
+        assert ss.stickers[-1].emoji == "😔"
+
+    async def test_bot_methods_5_tgs(self, bot, animated_sticker_set):
+        file_id = animated_sticker_set.stickers[-1].file_id
+        assert await bot.set_sticker_emoji_list(file_id, ["😔", "😟"])
+        ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
+        assert ss.stickers[-1].emoji == "😔"
+
+    async def test_bot_methods_5_webm(self, bot, video_sticker_set):
+        file_id = video_sticker_set.stickers[-1].file_id
+        assert await bot.set_sticker_emoji_list(file_id, ["😔", "😟"])
+        ss = await bot.get_sticker_set(f"video_test_by_{bot.username}")
+        assert ss.stickers[-1].emoji == "😔"
+
+    # Test set_sticker_set_title.
+    async def test_bot_methods_6_png(self, bot):
+        assert await bot.set_sticker_set_title(f"test_by_{bot.username}", "new title")
+        ss = await bot.get_sticker_set(f"test_by_{bot.username}")
+        assert ss.title == "new title"
+
+    async def test_bot_methods_6_tgs(self, bot):
+        assert await bot.set_sticker_set_title(f"animated_test_by_{bot.username}", "new title")
+        ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
+        assert ss.title == "new title"
+
+    async def test_bot_methods_6_webm(self, bot):
+        assert await bot.set_sticker_set_title(f"video_test_by_{bot.username}", "new title")
+        ss = await bot.get_sticker_set(f"video_test_by_{bot.username}")
+        assert ss.title == "new title"
+
+    # Test set_sticker_keywords. No way to find out the set keywords on a sticker after setting it.
+    async def test_bot_methods_7_png(self, bot, sticker_set):
+        file_id = sticker_set.stickers[-1].file_id
+        assert await bot.set_sticker_keywords(file_id, ["test", "test2"])
+
+    async def test_bot_methods_7_tgs(self, bot, animated_sticker_set):
+        file_id = animated_sticker_set.stickers[-1].file_id
+        assert await bot.set_sticker_keywords(file_id, ["test", "test2"])
+
+    async def test_bot_methods_7_webm(self, bot, video_sticker_set):
+        file_id = video_sticker_set.stickers[-1].file_id
+        assert await bot.set_sticker_keywords(file_id, ["test", "test2"])
 
 
 @pytest.fixture(scope="module")
@@ -936,3 +1006,32 @@ class TestMaskPositionWithoutRequest(TestMaskPositionBase):
 
         assert a != e
         assert hash(a) != hash(e)
+
+
+class TestMaskPositionWithRequest(TestMaskPositionBase):
+    async def test_create_new_mask_sticker_set(self, bot, chat_id, sticker_file, mask_position):
+        name = f"masks_by_{bot.username}"
+        try:
+            ss = await bot.get_sticker_set(name)
+            assert isinstance(ss, StickerSet)
+        except BadRequest as e:
+            if not e.message == "Stickerset_invalid":
+                raise e
+            # TODO: Update arguments to create_new_sticker_set
+            sticker_set = await bot.create_new_sticker_set(
+                chat_id,
+                name,
+                "Mask Stickers",
+                mask_position=mask_position,
+                sticker_type=Sticker.MASK,
+                emojis="😔",
+                png_sticker=sticker_file,
+            )
+            assert sticker_set
+
+    async def test_set_sticker_mask_position(self, bot):
+        ss = await bot.get_sticker_set(f"masks_by_{bot.username}")
+        m = MaskPosition(MaskPosition.FOREHEAD, 0, 0, 4)
+        assert await bot.set_sticker_mask_position(ss.stickers[-1].file_id, m)
+        ss = await bot.get_sticker_set(f"masks_by_{bot.username}")
+        assert ss.stickers[-1].mask_position == m

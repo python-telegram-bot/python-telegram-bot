@@ -3520,6 +3520,136 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def set_custom_emoji_sticker_set_thumbnail(
+        self,
+        name: str,
+        custom_emoji_id: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_custom_emoji_sticker_set_thumbnail(
+            name=name,
+            custom_emoji_id=custom_emoji_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_sticker_set_title(
+        self,
+        name: str,
+        title: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_sticker_set_title(
+            name=name,
+            title=title,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def delete_sticker_set(
+        self,
+        name: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().delete_sticker_set(
+            name=name,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_sticker_emoji_list(
+        self,
+        sticker: str,
+        emoji_list: Sequence[str],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_sticker_emoji_list(
+            sticker=sticker,
+            emoji_list=emoji_list,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_sticker_keywords(
+        self,
+        sticker: str,
+        keywords: Sequence[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_sticker_keywords(
+            sticker=sticker,
+            keywords=keywords,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_sticker_mask_position(
+        self,
+        sticker: str,
+        mask_position: MaskPosition = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_sticker_mask_position(
+            sticker=sticker,
+            mask_position=mask_position,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -3625,3 +3755,9 @@ class ExtBot(Bot, Generic[RLARGS]):
     getMyDescription = get_my_description
     setMyShortDescription = set_my_short_description
     getMyShortDescription = get_my_short_description
+    setCustomEmojiStickerSetThumbnail = set_custom_emoji_sticker_set_thumbnail
+    setStickerSetTitle = set_sticker_set_title
+    deleteStickerSet = delete_sticker_set
+    setStickerEmojiList = set_sticker_emoji_list
+    setStickerKeywords = set_sticker_keywords
+    setStickerMaskPosition = set_sticker_mask_position
