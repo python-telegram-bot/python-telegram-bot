@@ -1732,7 +1732,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "duration": duration,
             "width": width,
             "height": height,
-            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
             "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
             "has_spoiler": has_spoiler,
         }
