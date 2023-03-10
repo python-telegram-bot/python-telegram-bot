@@ -5856,6 +5856,44 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         return result
 
     @_log
+    async def delete_sticker_set(
+        self,
+        name: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to delete a sticker set that was created by the bot.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            name (:obj:`str`): Sticker set name.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"name": name}
+        result = await self._post(
+            "deleteStickerSet",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return result
+
+    @_log
     async def set_sticker_set_thumb(
         self,
         name: str,
@@ -5905,6 +5943,221 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         result = await self._post(
             "setStickerSetThumb",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return result
+
+    @_log
+    async def set_sticker_set_title(
+        self,
+        name: str,
+        title: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to set the title of a created sticker set.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            name (:obj:`str`): Sticker set name.
+            title (:obj:`str`): Sticker set title,
+                :tg-const:`telegram.constants.StickerLimit.MIN_NAME_AND_TITLE`-
+                :tg-const:`telegram.constants.StickerLimit.MAX_NAME_AND_TITLE` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"name": name, "title": title}
+        result = await self._post(
+            "setStickerSetTitle",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return result
+
+    @_log
+    async def set_sticker_emoji_list(
+        self,
+        sticker: str,
+        emoji_list: Sequence[str],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to change the list of emoji assigned to a regular or custom emoji sticker.
+        The sticker must belong to a sticker set created by the bot.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            sticker (:obj:`str`): File identifier of the sticker.
+            emoji_list (Sequence[:obj:`str`]): A sequence of
+                :tg-const:`telegram.constants.StickerLimit.MIN_STICKER_EMOJI`-
+                :tg-const:`telegram.constants.StickerLimit.MAX_STICKER_EMOJI` emoji associated with
+                the sticker.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {"sticker": sticker, "emoji_list": emoji_list}
+        result = await self._post(
+            "setStickerEmojiList",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return result
+
+    @_log
+    async def set_sticker_keywords(
+        self,
+        sticker: str,
+        keywords: Sequence[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to change search keywords assigned to a regular or custom emoji sticker.
+        The sticker must belong to a sticker set created by the bot.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            sticker (:obj:`str`): File identifier of the sticker.
+            keywords (Sequence[:obj:`str`]): A sequence of
+                0-:tg-const:`telegram.constants.StickerLimit.MAX_SEARCH_KEYWORDS` search keywords
+                for the sticker with total length up to
+                :tg-const:`telegram.constants.StickerLimit.MAX_KEYWORD_LENGTH` characters.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {"sticker": sticker, "keywords": keywords}
+        result = await self._post(
+            "setStickerKeywords",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return result
+
+    @_log
+    async def set_sticker_mask_position(
+        self,
+        sticker: str,
+        mask_position: MaskPosition = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to change the mask position of a mask sticker.
+        The sticker must belong to a sticker set that was created by the bot.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            sticker (:obj:`str`): File identifier of the sticker.
+            mask_position (:class:`telegram.MaskPosition`, optional): A object with the position
+                where the mask should be placed on faces. Omit the parameter to remove the mask
+                position.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {"sticker": sticker, "mask_position": mask_position}
+        result = await self._post(
+            "setStickerMaskPosition",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return result
+
+    @_log
+    async def set_custom_emoji_sticker_set_thumbnail(
+        self,
+        name: str,
+        custom_emoji_id: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to set the thumbnail of a custom emoji sticker set.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            name (:obj:`str`): Sticker set name.
+            custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of a sticker from the
+                sticker set; pass an empty string to drop the thumbnail and use the first sticker
+                as the thumbnail.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+
+        data: JSONDict = {"name": name, "custom_emoji_id": custom_emoji_id}
+
+        result = await self._post(
+            "setCustomEmojiStickerSetThumbnail",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -7773,3 +8026,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`get_my_description`"""
     getMyShortDescription = get_my_short_description
     """Alias for :meth:`get_my_short_description`"""
+    setCustomEmojiStickerSetThumbnail = set_custom_emoji_sticker_set_thumbnail
+    """Alias for :meth:`set_custom_emoji_sticker_set_thumbnail`"""
+    setStickerSetTitle = set_sticker_set_title
+    """Alias for :meth:`set_sticker_set_title`"""
+    deleteStickerSet = delete_sticker_set
+    """Alias for :meth:`delete_sticker_set`"""
+    setStickerEmojiList = set_sticker_emoji_list
+    """Alias for :meth:`set_sticker_emoji_list`"""
+    setStickerKeywords = set_sticker_keywords
+    """Alias for :meth:`set_sticker_keywords`"""
+    setStickerMaskPosition = set_sticker_mask_position
+    """Alias for :meth:`set_sticker_mask_position`"""

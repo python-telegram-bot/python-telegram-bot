@@ -1267,7 +1267,8 @@ class ReplyLimit(IntEnum):
 
 
 class StickerLimit(IntEnum):
-    """This enum contains limitations for :meth:`telegram.Bot.create_new_sticker_set`.
+    """This enum contains limitations for various sticker methods, such as
+    :meth:`telegram.Bot.create_new_sticker_set`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
@@ -1286,6 +1287,34 @@ class StickerLimit(IntEnum):
     :paramref:`~telegram.Bot.create_new_sticker_set.name` parameter or the
     :paramref:`~telegram.Bot.create_new_sticker_set.title` parameter of
     :meth:`telegram.Bot.create_new_sticker_set`.
+    """
+    MIN_STICKER_EMOJI = 1
+    """:obj:`int`: Minimum number of emojis associated with a sticker, passed as the
+    :paramref:`~telegram.Bot.setStickerEmojiList.emoji_list` parameter of
+    :meth:`telegram.Bot.set_sticker_emoji_list`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MAX_STICKER_EMOJI = 20
+    """:obj:`int`: Maximum number of emojis associated with a sticker, passed as the
+    :paramref:`~telegram.Bot.setStickerEmojiList.emoji_list` parameter of
+    :meth:`telegram.Bot.set_sticker_emoji_list`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MAX_SEARCH_KEYWORDS = 20
+    """:obj:`int`: Maximum number of search keywords for a sticker, passed as the
+    :paramref:`~telegram.Bot.set_sticker_keywords.keywords` parameter of
+    :meth:`telegram.Bot.set_sticker_keywords`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MAX_KEYWORD_LENGTH = 64
+    """:obj:`int`: Maximum number of characters in a search keyword for a sticker, for each item in
+    :paramref:`~telegram.Bot.set_sticker_keywords.keywords` sequence of
+    :meth:`telegram.Bot.set_sticker_keywords`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
 
