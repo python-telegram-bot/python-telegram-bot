@@ -22,6 +22,8 @@ from typing import TYPE_CHECKING, Optional, Type, TypeVar
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -46,6 +48,12 @@ class _BaseThumbedMedium(_BaseMedium):
         file_size (:obj:`int`, optional): File size.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
 
+            .. deprecated:: NEXT.VERSION
+               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+        thumbnail (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         file_id (:obj:`str`): File identifier.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
@@ -54,10 +62,15 @@ class _BaseThumbedMedium(_BaseMedium):
         file_size (:obj:`int`): Optional. File size.
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
 
+            .. deprecated:: NEXT.VERSION
+               Bot API 6.6 renamed this argument to :attr:`thumbnail`.
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ("thumb",)
+    __slots__ = ("thumb", "thumbnail")
 
     def __init__(
         self,
@@ -65,6 +78,7 @@ class _BaseThumbedMedium(_BaseMedium):
         file_unique_id: str,
         file_size: int = None,
         thumb: PhotoSize = None,
+        thumbnail: PhotoSize = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -74,7 +88,24 @@ class _BaseThumbedMedium(_BaseMedium):
             file_size=file_size,
             api_kwargs=api_kwargs,
         )
+
+        if thumb and thumbnail and thumb != thumbnail:
+            raise ValueError(
+                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
+                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
+                "instead of 'thumb'."
+            )
+
         self.thumb: Optional[PhotoSize] = thumb
+        self.thumbnail: Optional[PhotoSize] = thumbnail
+        if thumb:
+            warn(
+                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
+                "The argument 'thumb' might become deprecated in the future.",
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
+            self.thumbnail = thumb
 
     @classmethod
     def de_json(
@@ -87,7 +118,13 @@ class _BaseThumbedMedium(_BaseMedium):
             return None
 
         # In case this wasn't already done by the subclass
-        if not isinstance(data.get("thumb"), PhotoSize):
-            data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
+        if not isinstance(data.get("thumbnail"), PhotoSize):
+            data["thumbnail"] = PhotoSize.de_json(data.get("thumbnail"), bot)
 
-        return super().de_json(data=data, bot=bot)
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if "thumb" in data:
+            api_kwargs["thumb"] = data.pop("thumb")
+
+        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)

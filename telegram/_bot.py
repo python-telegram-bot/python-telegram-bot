@@ -43,6 +43,9 @@ from typing import (
     no_type_check,
 )
 
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
+
 try:
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
@@ -1614,6 +1617,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1657,6 +1661,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
+                .. deprecated:: NEXT.VERSION
+                   Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
                 animations by file_id),
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
@@ -1685,6 +1691,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 covered with a spoiler animation.
 
                 .. versionadded:: 20.0
+            thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): |thumbdocstring|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the animation, when uploading a
@@ -1700,6 +1710,22 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
+        if thumb and thumbnail and thumb != thumbnail:
+            raise ValueError(
+                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
+                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
+                "instead of 'thumb'."
+            )
+
+        if thumb:
+            warn(
+                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
+                "The argument 'thumb' might become deprecated in the future.",
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
+            thumbnail = thumb
+
         data: JSONDict = {
             "chat_id": chat_id,
             "animation": self._parse_file_input(animation, Animation, filename=filename),
@@ -1707,6 +1733,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "width": width,
             "height": height,
             "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
             "has_spoiler": has_spoiler,
         }
 
