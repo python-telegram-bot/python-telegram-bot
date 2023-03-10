@@ -1,7 +1,7 @@
 pre-commit  # needed for pre-commit hooks in the git commit command
 
 # For the test suite
-pytest==7.2.1
+pytest==7.2.2
 pytest-asyncio==0.20.3  # needed because pytest doesn't come with native support for coroutines as tests
 pytest-xdist==3.2.0  # xdist runs tests in parallel
 flaky  # Used for flaky tests (flaky decorator)
