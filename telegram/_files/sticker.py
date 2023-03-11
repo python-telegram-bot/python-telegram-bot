@@ -26,6 +26,8 @@ from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -220,6 +222,13 @@ class StickerSet(TelegramObject):
         thumb (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
+            .. deprecated:: NEXT.VERSION
+               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+        thumbnail (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
+            ``.TGS``, or ``.WEBM`` format.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
@@ -240,6 +249,12 @@ class StickerSet(TelegramObject):
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
+            .. deprecated:: NEXT.VERSION
+               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
+            ``.TGS``, or ``.WEBM`` format.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -248,6 +263,7 @@ class StickerSet(TelegramObject):
         "name",
         "stickers",
         "thumb",
+        "thumbnail",
         "title",
         "sticker_type",
     )
@@ -261,6 +277,7 @@ class StickerSet(TelegramObject):
         is_video: bool,
         sticker_type: str,
         thumb: PhotoSize = None,
+        thumbnail: PhotoSize = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -272,7 +289,24 @@ class StickerSet(TelegramObject):
         self.stickers: Tuple[Sticker, ...] = parse_sequence_arg(stickers)
         self.sticker_type: str = sticker_type
         # Optional
+
+        if thumb and thumbnail and thumb != thumbnail:
+            raise ValueError(
+                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
+                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
+                "instead of 'thumb'."
+            )
+
         self.thumb: Optional[PhotoSize] = thumb
+        self.thumbnail: Optional[PhotoSize] = thumbnail
+        if thumb:
+            warn(
+                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
+                "The argument 'thumb' will be removed in the next major version of PTB.",
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
+            self.thumbnail = thumb
 
         self._id_attrs = (self.name,)
 
@@ -285,13 +319,15 @@ class StickerSet(TelegramObject):
             return None
 
         data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
+        data["thumbnail"] = PhotoSize.de_json(data.get("thumbnail"), bot)
         data["stickers"] = Sticker.de_list(data.get("stickers"), bot)
 
         api_kwargs = {}
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        if "contains_masks" in data:
-            api_kwargs["contains_masks"] = data.pop("contains_masks")
+        # These are deprecated fields that TG still returns for backwards compatibility
+        # Let's filter them out to speed up the de-json process
+        for deprecated_field in ("contains_masks", "thumb"):
+            if deprecated_field in data:
+                api_kwargs[deprecated_field] = data.pop(deprecated_field)
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 

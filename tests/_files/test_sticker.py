@@ -109,11 +109,11 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert isinstance(sticker.file_unique_id, str)
         assert sticker.file_id != ""
         assert sticker.file_unique_id != ""
-        assert isinstance(sticker.thumb, PhotoSize)
-        assert isinstance(sticker.thumb.file_id, str)
-        assert isinstance(sticker.thumb.file_unique_id, str)
-        assert sticker.thumb.file_id != ""
-        assert sticker.thumb.file_unique_id != ""
+        assert isinstance(sticker.thumbnail, PhotoSize)
+        assert isinstance(sticker.thumbnail.file_id, str)
+        assert isinstance(sticker.thumbnail.file_unique_id, str)
+        assert sticker.thumbnail.file_id != ""
+        assert sticker.thumbnail.file_unique_id != ""
 
     def test_expected_values(self, sticker):
         assert sticker.width == self.width
@@ -121,9 +121,9 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert sticker.is_animated == self.is_animated
         assert sticker.is_video == self.is_video
         assert sticker.file_size == self.file_size
-        assert sticker.thumb.width == self.thumb_width
-        assert sticker.thumb.height == self.thumb_height
-        assert sticker.thumb.file_size == self.thumb_file_size
+        assert sticker.thumbnail.width == self.thumb_width
+        assert sticker.thumbnail.height == self.thumb_height
+        assert sticker.thumbnail.file_size == self.thumb_file_size
         assert sticker.type == self.type
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert sticker.premium_animation == self.premium_animation
@@ -139,7 +139,7 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert sticker_dict["is_animated"] == sticker.is_animated
         assert sticker_dict["is_video"] == sticker.is_video
         assert sticker_dict["file_size"] == sticker.file_size
-        assert sticker_dict["thumb"] == sticker.thumb.to_dict()
+        assert sticker_dict["thumbnail"] == sticker.thumbnail.to_dict()
         assert sticker_dict["type"] == sticker.type
 
     def test_de_json(self, bot, sticker):
@@ -150,7 +150,7 @@ class TestStickerWithoutRequest(TestStickerBase):
             "height": self.height,
             "is_animated": self.is_animated,
             "is_video": self.is_video,
-            "thumb": sticker.thumb.to_dict(),
+            "thumbnail": sticker.thumbnail.to_dict(),
             "emoji": self.emoji,
             "file_size": self.file_size,
             "premium_animation": self.premium_animation.to_dict(),
@@ -168,7 +168,7 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert json_sticker.is_video == self.is_video
         assert json_sticker.emoji == self.emoji
         assert json_sticker.file_size == self.file_size
-        assert json_sticker.thumb == sticker.thumb
+        assert json_sticker.thumbnail == sticker.thumbnail
         assert json_sticker.premium_animation == self.premium_animation
         assert json_sticker.type == self.type
         assert json_sticker.custom_emoji_id == self.custom_emoji_id
@@ -286,14 +286,14 @@ class TestStickerWithRequest(TestStickerBase):
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert message.sticker.premium_animation == sticker.premium_animation
 
-        assert isinstance(message.sticker.thumb, PhotoSize)
-        assert isinstance(message.sticker.thumb.file_id, str)
-        assert isinstance(message.sticker.thumb.file_unique_id, str)
-        assert message.sticker.thumb.file_id != ""
-        assert message.sticker.thumb.file_unique_id != ""
-        assert message.sticker.thumb.width == sticker.thumb.width
-        assert message.sticker.thumb.height == sticker.thumb.height
-        assert message.sticker.thumb.file_size == sticker.thumb.file_size
+        assert isinstance(message.sticker.thumbnail, PhotoSize)
+        assert isinstance(message.sticker.thumbnail.file_id, str)
+        assert isinstance(message.sticker.thumbnail.file_unique_id, str)
+        assert message.sticker.thumbnail.file_id != ""
+        assert message.sticker.thumbnail.file_unique_id != ""
+        assert message.sticker.thumbnail.width == sticker.thumbnail.width
+        assert message.sticker.thumbnail.height == sticker.thumbnail.height
+        assert message.sticker.thumbnail.file_size == sticker.thumbnail.file_size
 
     async def test_get_and_download(self, bot, sticker, chat_id):
         path = Path("telegram.webp")
@@ -337,14 +337,14 @@ class TestStickerWithRequest(TestStickerBase):
         assert message.sticker.file_size == sticker.file_size
         assert message.sticker.type == sticker.type
 
-        assert isinstance(message.sticker.thumb, PhotoSize)
-        assert isinstance(message.sticker.thumb.file_id, str)
-        assert isinstance(message.sticker.thumb.file_unique_id, str)
-        assert message.sticker.thumb.file_id != ""
-        assert message.sticker.thumb.file_unique_id != ""
-        assert message.sticker.thumb.width == sticker.thumb.width
-        assert message.sticker.thumb.height == sticker.thumb.height
-        assert message.sticker.thumb.file_size == sticker.thumb.file_size
+        assert isinstance(message.sticker.thumbnail, PhotoSize)
+        assert isinstance(message.sticker.thumbnail.file_id, str)
+        assert isinstance(message.sticker.thumbnail.file_unique_id, str)
+        assert message.sticker.thumbnail.file_id != ""
+        assert message.sticker.thumbnail.file_unique_id != ""
+        assert message.sticker.thumbnail.width == sticker.thumbnail.width
+        assert message.sticker.thumbnail.height == sticker.thumbnail.height
+        assert message.sticker.thumbnail.file_size == sticker.thumbnail.file_size
 
     @pytest.mark.parametrize(
         "default_bot,custom",
@@ -426,10 +426,10 @@ class TestStickerWithRequest(TestStickerBase):
         assert emoji_sticker_list[0].set_name == "PTBStaticEmojiTestPack"
         assert emoji_sticker_list[0].type == Sticker.CUSTOM_EMOJI
         assert emoji_sticker_list[0].custom_emoji_id == "6046140249875156202"
-        assert emoji_sticker_list[0].thumb.width == 100
-        assert emoji_sticker_list[0].thumb.height == 100
-        assert emoji_sticker_list[0].thumb.file_size == 3614
-        assert emoji_sticker_list[0].thumb.file_unique_id == "AQAD6gwAAoY06FNy"
+        assert emoji_sticker_list[0].thumbnail.width == 100
+        assert emoji_sticker_list[0].thumbnail.height == 100
+        assert emoji_sticker_list[0].thumbnail.file_size == 3614
+        assert emoji_sticker_list[0].thumbnail.file_unique_id == "AQAD6gwAAoY06FNy"
         assert emoji_sticker_list[0].file_size == 3678
         assert emoji_sticker_list[0].file_unique_id == "AgAD6gwAAoY06FM"
 
@@ -522,7 +522,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             "is_animated": self.is_animated,
             "is_video": self.is_video,
             "stickers": [x.to_dict() for x in self.stickers],
-            "thumb": sticker.thumb.to_dict(),
+            "thumb": sticker.thumbnail.to_dict(),
             "sticker_type": self.sticker_type,
             "contains_masks": self.contains_masks,
         }
@@ -533,7 +533,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert sticker_set.is_animated == self.is_animated
         assert sticker_set.is_video == self.is_video
         assert sticker_set.stickers == tuple(self.stickers)
-        assert sticker_set.thumb == sticker.thumb
+        assert sticker_set.thumbnail == sticker.thumbnail
         assert sticker_set.sticker_type == self.sticker_type
         assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks}
 
@@ -546,7 +546,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert sticker_set_dict["is_animated"] == sticker_set.is_animated
         assert sticker_set_dict["is_video"] == sticker_set.is_video
         assert sticker_set_dict["stickers"][0] == sticker_set.stickers[0].to_dict()
-        assert sticker_set_dict["thumb"] == sticker_set.thumb.to_dict()
+        assert sticker_set_dict["thumbnail"] == sticker_set.thumbnail.to_dict()
         assert sticker_set_dict["sticker_type"] == sticker_set.sticker_type
 
     def test_equality(self):
@@ -715,12 +715,12 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             async def make_assertion(_, data, *args, **kwargs):
                 nonlocal test_flag
                 if local_mode:
-                    test_flag = data.get("thumb") == expected
+                    test_flag = data.get("thumbnail") == expected
                 else:
-                    test_flag = isinstance(data.get("thumb"), InputFile)
+                    test_flag = isinstance(data.get("thumbnail"), InputFile)
 
             monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.set_sticker_set_thumb("name", chat_id, thumb=file)
+            await bot.set_sticker_set_thumb("name", chat_id, thumbnail=file)
             assert test_flag
         finally:
             bot._local_mode = False
