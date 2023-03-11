@@ -202,7 +202,13 @@ class Sticker(_BaseThumbedMedium):
         data["mask_position"] = MaskPosition.de_json(data.get("mask_position"), bot)
         data["premium_animation"] = File.de_json(data.get("premium_animation"), bot)
 
-        return super().de_json(data=data, bot=bot)
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if "thumb" in data:
+            api_kwargs["thumb"] = data.pop("thumb")
+
+        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
 
 class StickerSet(TelegramObject):
