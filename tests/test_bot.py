@@ -188,7 +188,6 @@ class InputMessageContentDWPP(InputMessageContent):
         self.disable_web_page_preview = disable_web_page_preview
 
 
-@pytest.mark.skipif(TEST_WITH_OPT_DEPS, reason="No need to run this twice")
 class TestBotWithoutRequest:
     """
     Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
@@ -1649,12 +1648,34 @@ class TestBotWithoutRequest:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    async def test_http2_runtime_error(self, bot):
-        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[http2\]"):
-            HTTPXRequest(http_version="2")
+    async def test_http2_runtime_error(self, recwarn):
+        Bot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
+        Bot(
+            "12345:ABCDE",
+            base_url="http://",
+            get_updates_request=HTTPXRequest(http_version="2"),
+        )
+        Bot(
+            "12345:ABCDE",
+            base_url="http://",
+            request=HTTPXRequest(http_version="2"),
+            get_updates_request=HTTPXRequest(http_version="2"),
+        )
+        # this exists to make sure the error is also raised by extbot
+        ExtBot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
+        assert len(recwarn) == 4
+        assert "You set the HTTP version for the request HTTPXRequest instance" in str(
+            recwarn[0].message
+        )
+        assert "You set the HTTP version for the get_updates_request HTTPXRequest instance" in str(
+            recwarn[1].message
+        )
+        assert (
+            "You set the HTTP version for the get_updates_request and request HTTPXRequest "
+            "instance" in str(recwarn[2].message)
+        )
 
 
-@pytest.mark.skipif(TEST_WITH_OPT_DEPS, reason="No need to run this twice")
 class TestBotWithRequest:
     """
     Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
@@ -3202,37 +3223,3 @@ class TestBotWithRequest:
         finally:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
-
-
-@pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")
-class TestBotWithOptDeps:
-    """
-    This class exists to test the behaivour of
-    """
-
-    async def test_http2_warning(self, recwarn):
-        Bot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
-        Bot(
-            "12345:ABCDE",
-            base_url="http://",
-            get_updates_request=HTTPXRequest(http_version="2"),
-        )
-        Bot(
-            "12345:ABCDE",
-            base_url="http://",
-            request=HTTPXRequest(http_version="2"),
-            get_updates_request=HTTPXRequest(http_version="2"),
-        )
-        # this exists to make sure the error is also raised by extbot
-        ExtBot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
-        assert len(recwarn) == 4
-        assert "You set the HTTP version for the request HTTPXRequest instance" in str(
-            recwarn[0].message
-        )
-        assert "You set the HTTP version for the get_updates_request HTTPXRequest instance" in str(
-            recwarn[1].message
-        )
-        assert (
-            "You set the HTTP version for the get_updates_request and request HTTPXRequest "
-            "instance" in str(recwarn[2].message)
-        )
