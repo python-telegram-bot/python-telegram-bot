@@ -63,6 +63,9 @@ class Sticker(_BaseThumbedMedium):
             .. versionadded:: 20.0
         thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
             ``.JPG`` format.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
         set_name (:obj:`str`, optional): Name of the sticker set to which the sticker belongs.
         mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the position
@@ -77,6 +80,10 @@ class Sticker(_BaseThumbedMedium):
             custom emoji.
 
             .. versionadded:: 20.0
+        thumbnail (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
+            ``.JPG`` format.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -97,6 +104,9 @@ class Sticker(_BaseThumbedMedium):
             .. versionadded:: 20.0
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the ``.WEBP`` or
             ``.JPG`` format.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
         emoji (:obj:`str`): Optional. Emoji associated with the sticker.
         set_name (:obj:`str`): Optional. Name of the sticker set to which the sticker belongs.
         mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
@@ -111,6 +121,10 @@ class Sticker(_BaseThumbedMedium):
             custom emoji.
 
             .. versionadded:: 20.0
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the ``.WEBP`` or
+            ``.JPG`` format.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -142,6 +156,7 @@ class Sticker(_BaseThumbedMedium):
         mask_position: "MaskPosition" = None,
         premium_animation: "File" = None,
         custom_emoji_id: str = None,
+        thumbnail: PhotoSize = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -150,6 +165,7 @@ class Sticker(_BaseThumbedMedium):
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
@@ -182,6 +198,7 @@ class Sticker(_BaseThumbedMedium):
             return None
 
         data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
+        data["thumbnail"] = PhotoSize.de_json(data.get("thumbnail"), bot)
         data["mask_position"] = MaskPosition.de_json(data.get("mask_position"), bot)
         data["premium_animation"] = File.de_json(data.get("premium_animation"), bot)
 
@@ -250,7 +267,7 @@ class StickerSet(TelegramObject):
             ``.TGS``, or ``.WEBM`` format.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
