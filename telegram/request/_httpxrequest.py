@@ -148,9 +148,11 @@ class HTTPXRequest(BaseRequest):
 
     @property
     def http_version(self) -> str:
-        """:obj:`str`: Used HTTP version, see :paramref:`http_version`.
+        """
+        :obj:`str`: Used HTTP version, see :paramref:`http_version`.
 
-        .. versionadded:: NEXT.VERSION"""
+        .. versionadded:: NEXT.VERSION
+        """
         return self._http_version
 
     def _build_client(self) -> httpx.AsyncClient:
