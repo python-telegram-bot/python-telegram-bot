@@ -243,9 +243,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             HTTPXRequest() if request is None else request,
         )
 
-        # this section is about issuing a warning when using HTTP/2 and connect to a self hosted bot api
-        # instance, which currently only supports HTTP/1.1. Checking if a custom base url is set
-        # is the best way to do that.
+        # this section is about issuing a warning when using HTTP/2 and connect to a self hosted
+        # bot api instance, which currently only supports HTTP/1.1. Checking if a custom base url
+        # is set is the best way to do that.
 
         warning_string = ""
 
