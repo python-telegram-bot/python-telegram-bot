@@ -584,7 +584,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             robust option at this time" <https://www.python-httpx.org/http2#enabling-http2>`_.
 
         .. versionadded:: 20.1
-        .. versionchanged:: 20.1.1
+        .. versionchanged:: NEXT.VERSION
             Reset the default version to 1.1.
 
         Args:
@@ -741,7 +741,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                pip install httpx[http2]
 
         .. versionadded:: 20.1
-        .. versionchanged:: 20.1.1
+        .. versionchanged:: NEXT.VERSION
             Reset the default version to 1.1.
 
         Args:

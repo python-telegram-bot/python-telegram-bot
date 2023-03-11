@@ -86,7 +86,7 @@ class HTTPXRequest(BaseRequest):
             Defaults to ``"1.1"``.
 
             .. versionadded:: 20.1
-            .. versionchanged:: 20.1.1
+            .. versionchanged:: NEXT.VERSION
                 Reset the default version to 1.1.
 
     """
