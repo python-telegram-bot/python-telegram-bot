@@ -3210,7 +3210,6 @@ class TestBotWithOptDeps:
     This class exists to test the behaivour of
     """
 
-    @pytest.mark.dev
     async def test_http2_warning(self, recwarn):
         Bot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
         Bot(
