@@ -92,12 +92,14 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.warnings import warn
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit
 from telegram.error import InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -240,6 +242,38 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             HTTPXRequest() if get_updates_request is None else get_updates_request,
             HTTPXRequest() if request is None else request,
         )
+
+        # this section is about issuing a warning when using HTTP/2 and connect to a self hosted
+        # bot api instance, which currently only supports HTTP/1.1. Checking if a custom base url
+        # is set is the best way to do that.
+
+        warning_string = ""
+
+        if (
+            isinstance(self._request[0], HTTPXRequest)
+            and self._request[0].http_version == "2"
+            and not base_url.startswith("https://api.telegram.org/bot")
+        ):
+            warning_string = "get_updates_request"
+
+        if (
+            isinstance(self._request[1], HTTPXRequest)
+            and self._request[1].http_version == "2"
+            and not base_url.startswith("https://api.telegram.org/bot")
+        ):
+            if warning_string:
+                warning_string += " and request"
+            else:
+                warning_string = "request"
+
+        if warning_string:
+            warn(
+                f"You set the HTTP version for the {warning_string} HTTPXRequest instance to "
+                f"HTTP/2. The self hosted bot api instances only support HTTP/1.1. You should "
+                f"either run a HTTP proxy in front of it which supports HTTP/2 or use HTTP/1.1.",
+                PTBUserWarning,
+                stacklevel=2,
+            )
 
         if private_key:
             if not CRYPTO_INSTALLED:
