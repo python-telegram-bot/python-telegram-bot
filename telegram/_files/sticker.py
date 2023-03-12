@@ -324,8 +324,7 @@ class StickerSet(TelegramObject):
         self.thumbnail: Optional[PhotoSize] = thumbnail
         if thumb:
             warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
+                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
                 PTBDeprecationWarning,
                 stacklevel=2,
             )

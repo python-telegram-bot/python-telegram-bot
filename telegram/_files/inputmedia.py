@@ -230,8 +230,7 @@ class InputMediaAnimation(InputMedia):
 
         if thumb:
             warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
+                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
                 PTBDeprecationWarning,
                 stacklevel=2,
             )
@@ -465,8 +464,7 @@ class InputMediaVideo(InputMedia):
 
         if thumb:
             warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
+                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
                 PTBDeprecationWarning,
                 stacklevel=2,
             )
@@ -601,8 +599,7 @@ class InputMediaAudio(InputMedia):
 
         if thumb:
             warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
+                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
                 PTBDeprecationWarning,
                 stacklevel=2,
             )
@@ -719,8 +716,7 @@ class InputMediaDocument(InputMedia):
 
         if thumb:
             warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
+                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
                 PTBDeprecationWarning,
                 stacklevel=2,
             )
