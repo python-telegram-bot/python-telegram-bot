@@ -184,7 +184,7 @@ class TestAudioWithoutRequest(TestAudioBase):
             bot._local_mode = False
 
     async def test_send_audio_with_local_files_throws_error_with_different_thumb_and_thumbnail(
-        self, monkeypatch, bot, chat_id
+        self, bot, chat_id
     ):
         file = data_file("telegram.jpg")
         different_file = data_file("telegram_no_standard_header.jpg")

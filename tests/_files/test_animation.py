@@ -179,7 +179,7 @@ class TestAnimationWithoutRequest(TestAnimationBase):
         assert await bot.send_animation(animation=animation, chat_id=chat_id)
 
     async def test_send_animation_with_local_files_throws_error_with_different_thumb_and_thumbnail(
-        self, monkeypatch, bot, chat_id
+        self, bot, chat_id
     ):
         file = data_file("telegram.jpg")
         different_file = data_file("telegram_no_standard_header.jpg")
