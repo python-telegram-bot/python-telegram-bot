@@ -6297,7 +6297,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-
         data: JSONDict = {"name": name, "custom_emoji_id": custom_emoji_id}
 
         result = await self._post(
