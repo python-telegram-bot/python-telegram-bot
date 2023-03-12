@@ -65,7 +65,7 @@ class Sticker(_BaseThumbedMedium):
             ``.JPG`` format.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
         set_name (:obj:`str`, optional): Name of the sticker set to which the sticker belongs.
         mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the position
@@ -106,7 +106,7 @@ class Sticker(_BaseThumbedMedium):
             ``.JPG`` format.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
+               As of Bot API 6.6 this attribute is deprecated in favor of :attr:`thumbnail`.
         emoji (:obj:`str`): Optional. Emoji associated with the sticker.
         set_name (:obj:`str`): Optional. Name of the sticker set to which the sticker belongs.
         mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
@@ -246,7 +246,7 @@ class StickerSet(TelegramObject):
             ``.TGS``, or ``.WEBM`` format.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
@@ -273,7 +273,7 @@ class StickerSet(TelegramObject):
             ``.TGS``, or ``.WEBM`` format.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
+               As of Bot API 6.6 this attribute is deprecated in favor of :attr:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 

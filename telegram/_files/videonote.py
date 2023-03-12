@@ -41,7 +41,7 @@ class VideoNote(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
         file_size (:obj:`int`, optional): File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`, optional): Video thumbnail.
 
@@ -59,7 +59,7 @@ class VideoNote(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
+               As of Bot API 6.6 this attribute is deprecated in favor of :attr:`thumbnail`.
         file_size (:obj:`int`): Optional. File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
 

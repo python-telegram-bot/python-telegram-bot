@@ -47,7 +47,7 @@ class Audio(_BaseThumbedMedium):
             which the music file belongs.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
             which the music file belongs.
 
@@ -69,7 +69,7 @@ class Audio(_BaseThumbedMedium):
             which the music file belongs.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
+               As of Bot API 6.6 this attribute is deprecated in favor of :attr:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
             which the music file belongs.
 

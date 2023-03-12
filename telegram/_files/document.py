@@ -39,7 +39,7 @@ class Document(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by sender.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
         file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size in bytes.
@@ -55,7 +55,7 @@ class Document(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`): Optional. Document thumbnail as defined by sender.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
+               As of Bot API 6.6 this attribute is deprecated in favor of :attr:`thumbnail`.
         file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.

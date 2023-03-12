@@ -49,7 +49,7 @@ class _BaseThumbedMedium(_BaseMedium):
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
 
             .. versionadded:: NEXT.VERSION
@@ -63,7 +63,7 @@ class _BaseThumbedMedium(_BaseMedium):
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
+               As of Bot API 6.6 this attribute is deprecated in favor of :attr:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
 
             .. versionadded:: NEXT.VERSION

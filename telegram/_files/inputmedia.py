@@ -142,7 +142,7 @@ class InputMediaAnimation(InputMedia):
                Accept :obj:`bytes` as input.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
         caption (:obj:`str`, optional): Caption of the animation to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
@@ -170,7 +170,7 @@ class InputMediaAnimation(InputMedia):
         thumb (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
+               As of Bot API 6.6 this attribute is deprecated in favor of :attr:`thumbnail`.
         caption (:obj:`str`): Optional. Caption of the animation to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
@@ -378,7 +378,7 @@ class InputMediaVideo(InputMedia):
                Accept :obj:`bytes` as input.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
         has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the video needs to be covered
             with a spoiler animation.
 
@@ -409,7 +409,7 @@ class InputMediaVideo(InputMedia):
         thumb (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
+               As of Bot API 6.6 this attribute is deprecated in favor of :attr:`thumbnail`.
         has_spoiler (:obj:`bool`): Optional. :obj:`True`, if the video is covered with a
             spoiler animation.
 
@@ -532,7 +532,7 @@ class InputMediaAudio(InputMedia):
                Accept :obj:`bytes` as input.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
         thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
 
@@ -558,7 +558,7 @@ class InputMediaAudio(InputMedia):
         thumb (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
+               As of Bot API 6.6 this attribute is deprecated in favor of :attr:`thumbnail`.
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. versionadded:: NEXT.VERSION
@@ -657,7 +657,7 @@ class InputMediaDocument(InputMedia):
                Accept :obj:`bytes` as input.
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+               As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
         disable_content_type_detection (:obj:`bool`, optional): Disables automatic server-side
             content type detection for files uploaded using multipart/form-data. Always
             :obj:`True`, if the document is sent as part of an album.
@@ -682,7 +682,7 @@ class InputMediaDocument(InputMedia):
         thumb (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. deprecated:: NEXT.VERSION
-               Bot API 6.6 renamed this attribute to :attr:`thumbnail`.
+               As of Bot API 6.6 this attribute is deprecated in favor of :attr:`thumbnail`.
         disable_content_type_detection (:obj:`bool`): Optional. Disables automatic server-side
             content type detection for files uploaded using multipart/form-data. Always
             :obj:`True`, if the document is sent as part of an album.
