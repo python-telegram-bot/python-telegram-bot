@@ -193,7 +193,6 @@ class Sticker(_BaseThumbedMedium):
         if not data:
             return None
 
-        data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
         data["thumbnail"] = PhotoSize.de_json(data.get("thumbnail"), bot)
         data["mask_position"] = MaskPosition.de_json(data.get("mask_position"), bot)
         data["premium_animation"] = File.de_json(data.get("premium_animation"), bot)
