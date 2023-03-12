@@ -25,6 +25,7 @@ import pytest
 from telegram import Bot, InputFile, PhotoSize, VideoNote, Voice
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -82,6 +83,13 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         assert video_note.length == self.length
         assert video_note.duration == self.duration
         assert video_note.file_size == self.file_size
+
+    def test_thumb_property_deprecation_warning(self, video_note, recwarn):
+        assert video_note.thumb is video_note.thumbnail
+        assert len(recwarn) == 1
+        assert issubclass(recwarn[0].category, PTBDeprecationWarning)
+        assert "'thumb' to 'thumbnail'" in str(recwarn[0].message)
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_de_json(self, bot):
         json_dict = {

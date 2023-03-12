@@ -37,6 +37,7 @@ from telegram.constants import ParseMode
 # noinspection PyUnresolvedReferences
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests._files.test_animation import animation, animation_file  # noqa: F401
 from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
@@ -159,6 +160,13 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
         assert isinstance(input_media_video.thumbnail, InputFile)
         assert input_media_video.thumb is input_media_video.thumbnail
         assert input_media_video.has_spoiler == self.has_spoiler
+
+    def test_thumb_property_deprecation_warning(self, input_media_video, recwarn):
+        assert input_media_video.thumb is input_media_video.thumbnail
+        assert len(recwarn) == 1
+        assert issubclass(recwarn[0].category, PTBDeprecationWarning)
+        assert "'thumb' to 'thumbnail'" in str(recwarn[0].message)
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_caption_entities_always_tuple(self):
         input_media_video = InputMediaVideo(self.media)
@@ -299,6 +307,13 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
         assert input_media_animation.thumb is input_media_animation.thumbnail
         assert input_media_animation.has_spoiler == self.has_spoiler
 
+    def test_thumb_property_deprecation_warning(self, input_media_animation, recwarn):
+        assert input_media_animation.thumb is input_media_animation.thumbnail
+        assert len(recwarn) == 1
+        assert issubclass(recwarn[0].category, PTBDeprecationWarning)
+        assert "'thumb' to 'thumbnail'" in str(recwarn[0].message)
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
+
     def test_caption_entities_always_tuple(self):
         input_media_animation = InputMediaAnimation(self.media)
         assert input_media_animation.caption_entities == ()
@@ -376,6 +391,13 @@ class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
         assert input_media_audio.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_audio.thumbnail, InputFile)
         assert input_media_audio.thumb is input_media_audio.thumbnail
+
+    def test_thumb_property_deprecation_warning(self, input_media_audio, recwarn):
+        assert input_media_audio.thumb is input_media_audio.thumbnail
+        assert len(recwarn) == 1
+        assert issubclass(recwarn[0].category, PTBDeprecationWarning)
+        assert "'thumb' to 'thumbnail'" in str(recwarn[0].message)
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_caption_entities_always_tuple(self):
         input_media_audio = InputMediaAudio(self.media)
@@ -455,6 +477,13 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
         )
         assert isinstance(input_media_document.thumbnail, InputFile)
         assert input_media_document.thumb is input_media_document.thumbnail
+
+    def test_thumb_property_deprecation_warning(self, input_media_document, recwarn):
+        assert input_media_document.thumb is input_media_document.thumbnail
+        assert len(recwarn) == 1
+        assert issubclass(recwarn[0].category, PTBDeprecationWarning)
+        assert "'thumb' to 'thumbnail'" in str(recwarn[0].message)
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_caption_entities_always_tuple(self):
         input_media_document = InputMediaDocument(self.media)

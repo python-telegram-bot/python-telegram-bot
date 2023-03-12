@@ -52,10 +52,6 @@ class Document(_BaseThumbedMedium):
             or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
             the same over time and for different bots. Can't be used to download or reuse the file.
-        thumb (:class:`telegram.PhotoSize`): Optional. Document thumbnail as defined by sender.
-
-            .. deprecated:: NEXT.VERSION
-               |thumbattributedeprecation| :attr:`thumbnail`.
         file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.

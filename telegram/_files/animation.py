@@ -60,10 +60,6 @@ class Animation(_BaseThumbedMedium):
         width (:obj:`int`): Video width as defined by sender.
         height (:obj:`int`): Video height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
-        thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined by sender.
-
-            .. deprecated:: NEXT.VERSION
-               |thumbattributedeprecation| :attr:`thumbnail`.
         file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.

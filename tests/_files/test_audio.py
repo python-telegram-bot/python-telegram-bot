@@ -26,6 +26,7 @@ from telegram import Audio, Bot, InputFile, MessageEntity, Voice
 from telegram.error import TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -88,6 +89,13 @@ class TestAudioWithoutRequest(TestAudioBase):
         assert audio.thumbnail.file_size == self.thumb_file_size
         assert audio.thumbnail.width == self.thumb_width
         assert audio.thumbnail.height == self.thumb_height
+
+    def test_thumb_property_deprecation_warning(self, audio, recwarn):
+        assert audio.thumb is audio.thumbnail
+        assert len(recwarn) == 1
+        assert issubclass(recwarn[0].category, PTBDeprecationWarning)
+        assert "'thumb' to 'thumbnail'" in str(recwarn[0].message)
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_de_json(self, bot, audio):
         json_dict = {

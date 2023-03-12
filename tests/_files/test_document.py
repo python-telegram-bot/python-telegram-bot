@@ -26,6 +26,7 @@ from telegram import Bot, Document, InputFile, MessageEntity, PhotoSize, Voice
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -80,6 +81,13 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert document.thumbnail.file_size == self.thumb_file_size
         assert document.thumbnail.width == self.thumb_width
         assert document.thumbnail.height == self.thumb_height
+
+    def test_thumb_property_deprecation_warning(self, document, recwarn):
+        assert document.thumb is document.thumbnail
+        assert len(recwarn) == 1
+        assert issubclass(recwarn[0].category, PTBDeprecationWarning)
+        assert "'thumb' to 'thumbnail'" in str(recwarn[0].message)
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_de_json(self, bot, document):
         json_dict = {

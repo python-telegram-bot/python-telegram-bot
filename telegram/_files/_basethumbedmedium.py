@@ -60,17 +60,13 @@ class _BaseThumbedMedium(_BaseMedium):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): Optional. File size.
-        thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
-
-            .. deprecated:: NEXT.VERSION
-               |thumbattributedeprecation| :attr:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
 
             .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ("thumb", "thumbnail")
+    __slots__ = ("thumbnail",)
 
     def __init__(
         self,
@@ -96,7 +92,6 @@ class _BaseThumbedMedium(_BaseMedium):
                 "instead of 'thumb'."
             )
 
-        self.thumb: Optional[PhotoSize] = thumb
         self.thumbnail: Optional[PhotoSize] = thumbnail
         if thumb:
             warn(
@@ -106,6 +101,19 @@ class _BaseThumbedMedium(_BaseMedium):
                 stacklevel=2,
             )
             self.thumbnail = thumb
+
+    @property
+    def thumb(self) -> Optional[PhotoSize]:
+        """:class:`telegram.PhotoSize`: Optional. Thumbnail as defined by sender.
+
+        .. deprecated:: NEXT.VERSION
+           |thumbattributedeprecation| :attr:`thumbnail`."""
+        warn(
+            "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
+        return self.thumbnail
 
     @classmethod
     def de_json(

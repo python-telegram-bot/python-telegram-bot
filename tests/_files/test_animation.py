@@ -26,6 +26,7 @@ from telegram import Animation, Bot, InputFile, MessageEntity, PhotoSize, Voice
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -81,6 +82,13 @@ class TestAnimationWithoutRequest(TestAnimationBase):
         assert animation.mime_type == self.mime_type
         assert animation.file_name.startswith("game.gif") == self.file_name.startswith("game.gif")
         assert isinstance(animation.thumbnail, PhotoSize)
+
+    def test_thumb_property_deprecation_warning(self, animation, recwarn):
+        assert animation.thumb is animation.thumbnail
+        assert len(recwarn) == 1
+        assert issubclass(recwarn[0].category, PTBDeprecationWarning)
+        assert "'thumb' to 'thumbnail'" in str(recwarn[0].message)
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_de_json(self, bot, animation):
         json_dict = {

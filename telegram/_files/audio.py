@@ -65,11 +65,6 @@ class Audio(_BaseThumbedMedium):
         file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.
-        thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
-            which the music file belongs.
-
-            .. deprecated:: NEXT.VERSION
-               |thumbattributedeprecation| :attr:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
             which the music file belongs.
 

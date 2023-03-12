@@ -56,10 +56,6 @@ class VideoNote(_BaseThumbedMedium):
         length (:obj:`int`): Video width and height (diameter of the video message) as defined
             by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
-        thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
-
-            .. deprecated:: NEXT.VERSION
-               |thumbattributedeprecation| :attr:`thumbnail`.
         file_size (:obj:`int`): Optional. File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
 
