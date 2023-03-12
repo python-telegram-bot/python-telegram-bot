@@ -1105,7 +1105,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     :paramref:`~telegram.Bot.local_mode`.
 
                 .. deprecated:: NEXT.VERSION
-                   As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
+                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
@@ -1255,7 +1255,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     :paramref:`~telegram.Bot.local_mode`.
 
                 .. deprecated:: NEXT.VERSION
-                   As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
+                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
@@ -1486,7 +1486,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     :paramref:`~telegram.Bot.local_mode`.
 
                 .. deprecated:: NEXT.VERSION
-                   As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
+                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the video needs to be covered
                 with a spoiler animation.
 
@@ -1635,7 +1635,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     :paramref:`~telegram.Bot.local_mode`.
 
                 .. deprecated:: NEXT.VERSION
-                   As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
+                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
@@ -1759,7 +1759,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     :paramref:`~telegram.Bot.local_mode`.
 
                 .. deprecated:: NEXT.VERSION
-                   As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
+                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
                 animations by file_id),
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
@@ -6059,7 +6059,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                    Accept :obj:`bytes` as input.
 
                 .. deprecated:: NEXT.VERSION
-                   As of Bot API 6.6 this argument is deprecated in favor of :paramref:`thumbnail`.
+                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             thumbnail (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): A **PNG** image with the thumbnail, must
                 be up to 128 kilobytes in size and have width and height exactly 100px, or a
