@@ -748,6 +748,7 @@ class User(TelegramObject):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -783,6 +784,7 @@ class User(TelegramObject):
             pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
             disable_content_type_detection=disable_content_type_detection,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1005,6 +1007,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1049,6 +1052,7 @@ class User(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
+            thumbnail=thumbnail,
         )
 
     async def send_sticker(
@@ -1114,6 +1118,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1152,6 +1157,7 @@ class User(TelegramObject):
             parse_mode=parse_mode,
             supports_streaming=supports_streaming,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
