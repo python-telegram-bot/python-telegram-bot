@@ -289,7 +289,8 @@ class BaseRequest(
         except Exception as exc:
             raise NetworkError(f"Unknown error in HTTP implementation: {repr(exc)}") from exc
 
-        if HTTPStatus.OK <= code <= 299:
+        last_http_success_code = 299
+        if HTTPStatus.OK <= code <= last_http_success_code:
             # 200-299 range are HTTP success statuses
             return payload
 

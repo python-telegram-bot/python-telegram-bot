@@ -159,7 +159,8 @@ class Game(TelegramObject):
             raise RuntimeError("This Game has no 'text'.")
 
         # Is it a narrow build, if so we don't need to convert
-        if sys.maxunicode == 0xFFFF:
+        max_value = 0xFFFF
+        if sys.maxunicode == max_value:
             return self.text[entity.offset : entity.offset + entity.length]
         entity_text = self.text.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]

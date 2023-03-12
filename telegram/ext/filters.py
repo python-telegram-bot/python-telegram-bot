@@ -244,7 +244,7 @@ class MessageFilter(BaseFilter):
 
     Please see :class:`BaseFilter` for details on how to create custom filters.
 
-    .. seealso:: :wiki:`Advanced Filters <Extensions-–-Advanced-Filters>`
+    .. seealso:: :wiki:`Advanced Filters <Extensions---Advanced-Filters>`
 
     """
 
@@ -387,7 +387,7 @@ class _MergedFilter(UpdateFilter):
                 if isinstance(base[k], list):
                     base[k] += comp_value
                 else:
-                    base[k] = [base[k]] + comp_value
+                    base[k] = [base[k], *comp_value]
             except KeyError:
                 base[k] = comp_value
         return base

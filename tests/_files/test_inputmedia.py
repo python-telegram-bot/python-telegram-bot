@@ -468,7 +468,7 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
         assert input_media_document.thumb == data_file("telegram.jpg").as_uri()
 
 
-@pytest.fixture(scope="module")  # noqa: F811
+@pytest.fixture(scope="module")
 def media_group(photo, thumb):  # noqa: F811
     return [
         InputMediaPhoto(photo, caption="*photo* 1", parse_mode="Markdown"),
@@ -479,12 +479,12 @@ def media_group(photo, thumb):  # noqa: F811
     ]
 
 
-@pytest.fixture(scope="module")  # noqa: F811
+@pytest.fixture(scope="module")
 def media_group_no_caption_args(photo, thumb):  # noqa: F811
     return [InputMediaPhoto(photo), InputMediaPhoto(thumb), InputMediaPhoto(photo)]
 
 
-@pytest.fixture(scope="module")  # noqa: F811
+@pytest.fixture(scope="module")
 def media_group_no_caption_only_caption_entities(photo, thumb):  # noqa: F811
     return [
         InputMediaPhoto(photo, caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]),
@@ -492,7 +492,7 @@ def media_group_no_caption_only_caption_entities(photo, thumb):  # noqa: F811
     ]
 
 
-@pytest.fixture(scope="module")  # noqa: F811
+@pytest.fixture(scope="module")
 def media_group_no_caption_only_parse_mode(photo, thumb):  # noqa: F811
     return [
         InputMediaPhoto(photo, parse_mode="Markdown"),

@@ -2056,7 +2056,7 @@ class TestBotWithRequest:
         assert protected_poll.has_protected_content
         assert not unprotect_poll.has_protected_content
 
-    @pytest.mark.parametrize("emoji", Dice.ALL_EMOJI + [None])
+    @pytest.mark.parametrize("emoji", [*Dice.ALL_EMOJI, None])
     async def test_send_dice(self, bot, chat_id, emoji):
         message = await bot.send_dice(chat_id, emoji=emoji, protect_content=True)
 

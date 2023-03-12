@@ -468,12 +468,11 @@ class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, 
         tmp: Dict[int, Dict[object, object]] = {}
         decoded_data = json.loads(data)
         for user, user_data in decoded_data.items():
-            user = int(user)
-            tmp[user] = {}
+            int_user_id = int(user)
+            tmp[int_user_id] = {}
             for key, value in user_data.items():
                 try:
-                    key = int(key)
+                    tmp[int_user_id][int(key)] = value
                 except ValueError:
                     pass
-                tmp[user][key] = value
         return tmp

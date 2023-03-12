@@ -167,7 +167,8 @@ class AIORateLimiter(BaseRateLimiter[int]):
         # We only do that if we have a lot of limiters lying around to avoid looping on every call
         # This is a minimal effort approach - a full-fledged cache could use a TTL approach
         # or at least adapt the threshold dynamically depending on the number of active limiters
-        if len(self._group_limiters) > 512:
+        max_limiters = 512
+        if len(self._group_limiters) > max_limiters:
             # We copy to avoid modifying the dict while we iterate over it
             for key, limiter in self._group_limiters.copy().items():
                 if key == group_id:

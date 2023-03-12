@@ -147,7 +147,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
 
-    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+    .. seealso:: :wiki:`Your First Bot <Extensions---Your-first-Bot>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
 
     .. versionadded:: 13.2
@@ -374,10 +374,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             # 1)
             if isinstance(val, InputMedia):
                 # Copy object as not to edit it in-place
-                val = copy.copy(val)
-                with val._unfrozen():
-                    val.parse_mode = DefaultValue.get_value(val.parse_mode)
-                data[key] = val
+                new = copy.copy(val)
+                with new._unfrozen():
+                    new.parse_mode = DefaultValue.get_value(new.parse_mode)
+                data[key] = new
             elif key == "media" and isinstance(val, Sequence):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy.copy(media) for media in val]
@@ -1885,7 +1885,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto`,\
                 :class:`telegram.InputMediaVideo`]): An array
                 describing messages to be sent, must include
-                :tg-const:`telegram.constants.MediaGroupLimit.MIN_MEDIA_LENGTH`–
+                :tg-const:`telegram.constants.MediaGroupLimit.MIN_MEDIA_LENGTH`-
                 :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
 
                 .. versionchanged:: 20.0
@@ -2613,18 +2613,18 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     # the callback *might* return more results on the next call, so we increment
                     # the page count
                     next_offset = str(current_offset_int + 1)
+
+            elif len(results) > (current_offset_int + 1) * InlineQueryLimit.RESULTS:
+                # we expect more results for the next page
+                next_offset_int = current_offset_int + 1
+                next_offset = str(next_offset_int)
+                effective_results = results[
+                    current_offset_int
+                    * InlineQueryLimit.RESULTS : next_offset_int
+                    * InlineQueryLimit.RESULTS
+                ]
             else:
-                if len(results) > (current_offset_int + 1) * InlineQueryLimit.RESULTS:
-                    # we expect more results for the next page
-                    next_offset_int = current_offset_int + 1
-                    next_offset = str(next_offset_int)
-                    effective_results = results[
-                        current_offset_int
-                        * InlineQueryLimit.RESULTS : next_offset_int
-                        * InlineQueryLimit.RESULTS
-                    ]
-                else:
-                    effective_results = results[current_offset_int * InlineQueryLimit.RESULTS :]
+                effective_results = results[current_offset_int * InlineQueryLimit.RESULTS :]
         else:
             effective_results = results  # type: ignore[assignment]
 
