@@ -43,10 +43,6 @@ from typing import (
     no_type_check,
 )
 
-from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
-from telegram.warnings import PTBDeprecationWarning
-
 try:
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
@@ -97,12 +93,15 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit
 from telegram.error import InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -1399,8 +1398,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Message:
-        """
-        Use this method to send video files, Telegram clients support mp4 videos
+        """Use this method to send video files, Telegram clients support mp4 videos
         (other formats may be sent as Document).
 
         Bots can currently send video files of up to

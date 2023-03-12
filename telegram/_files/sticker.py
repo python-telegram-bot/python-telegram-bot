@@ -200,7 +200,7 @@ class Sticker(_BaseThumbedMedium):
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
         # Let's filter it out to speed up the de-json process
-        if "thumb" in data:
+        if data.get("thumb") is not None:
             api_kwargs["thumb"] = data.pop("thumb")
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
