@@ -26,8 +26,7 @@ from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram.warnings import PTBDeprecationWarning
+from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -313,23 +312,10 @@ class StickerSet(TelegramObject):
         self.sticker_type: str = sticker_type
         # Optional
 
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        self.thumb: Optional[PhotoSize] = thumb
-        self.thumbnail: Optional[PhotoSize] = thumbnail
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            self.thumbnail = thumb
-
+        self.thumb = thumb
+        self.thumbnail: Optional[PhotoSize] = warn_about_thumb_return_thumbnail(
+            thumb=thumb, thumbnail=thumbnail
+        )
         self._id_attrs = (self.name,)
 
         self._freeze()

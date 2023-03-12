@@ -22,8 +22,7 @@ from typing import TYPE_CHECKING, Optional, Type, TypeVar
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram.warnings import PTBDeprecationWarning
+from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -89,22 +88,10 @@ class _BaseThumbedMedium(_BaseMedium):
             api_kwargs=api_kwargs,
         )
 
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        self.thumb: Optional[PhotoSize] = thumb
-        self.thumbnail: Optional[PhotoSize] = thumbnail
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            self.thumbnail = thumb
+        self.thumb = thumb
+        self.thumbnail: Optional[PhotoSize] = warn_about_thumb_return_thumbnail(
+            thumb=thumb, thumbnail=thumbnail
+        )
 
     @classmethod
     def de_json(
