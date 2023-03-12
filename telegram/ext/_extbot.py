@@ -3226,11 +3226,38 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def set_sticker_set_thumbnail(
+        self,
+        name: str,
+        user_id: Union[str, int],
+        thumbnail: FileInput = None,
+        # Deprecated param `thumb` not included. Would be strange to allow someone to call
+        # the new method with an old param.
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_sticker_set_thumbnail(
+            name=name,
+            user_id=user_id,
+            thumbnail=thumbnail,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def set_sticker_set_thumb(
         self,
         name: str,
         user_id: Union[str, int],
         thumb: FileInput = None,
+        thumbnail: FileInput = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3243,6 +3270,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             name=name,
             user_id=user_id,
             thumb=thumb,
+            thumbnail=thumbnail,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3729,6 +3757,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     setStickerPositionInSet = set_sticker_position_in_set
     deleteStickerFromSet = delete_sticker_from_set
     setStickerSetThumb = set_sticker_set_thumb
+    setStickerSetThumbnail = set_sticker_set_thumbnail
     setPassportDataErrors = set_passport_data_errors
     sendPoll = send_poll
     stopPoll = stop_poll

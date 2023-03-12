@@ -5918,11 +5918,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         return result
 
     @_log
-    async def set_sticker_set_thumb(
+    async def set_sticker_set_thumbnail(
         self,
         name: str,
         user_id: Union[str, int],
-        thumb: FileInput = None,
+        thumbnail: FileInput = None,
+        # Deprecated param `thumb` not included. Would be strange to allow someone to call
+        # the new method with an old param.
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5933,6 +5935,61 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set
         for animated sticker sets only. Video thumbnails can be set only for video sticker sets
         only.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            name (:obj:`str`): Sticker set name
+            user_id (:obj:`int`): User identifier of created sticker set owner.
+            thumbnail (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
+                optional): A **PNG** image with the thumbnail, must
+                be up to 128 kilobytes in size and have width and height exactly 100px, or a
+                **TGS** animation with the thumbnail up to 32 kilobytes in size; see
+                https://core.telegram.org/stickers#animation-requirements for animated
+                sticker technical requirements, or a **WEBM** video with the thumbnail up to 32
+                kilobytes in size; see
+                https://core.telegram.org/stickers#video-requirements for video sticker
+                technical requirements.
+                |fileinput|
+                Animated sticker set thumbnails can't be uploaded via HTTP URL.
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        return await self._set_sticker_set_thumbnail(
+            name=name,
+            user_id=user_id,
+            thumbnail=thumbnail,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def set_sticker_set_thumb(
+        self,
+        name: str,
+        user_id: Union[str, int],
+        thumb: FileInput = None,
+        thumbnail: FileInput = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set
+        for animated sticker sets only. Video thumbnails can be set only for video sticker sets
+        only.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 6.6 renamed this method to :meth:`~Bot.set_sticker_set_thumbnail`.
 
         Args:
             name (:obj:`str`): Sticker set name
@@ -5952,6 +6009,21 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
 
+                .. deprecated:: NEXT.VERSION
+                   Bot API 6.6 renamed this argument to :paramref:`thumbnail`.
+            thumbnail (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
+                optional): A **PNG** image with the thumbnail, must
+                be up to 128 kilobytes in size and have width and height exactly 100px, or a
+                **TGS** animation with the thumbnail up to 32 kilobytes in size; see
+                https://core.telegram.org/stickers#animation-requirements for animated
+                sticker technical requirements, or a **WEBM** video with the thumbnail up to 32
+                kilobytes in size; see
+                https://core.telegram.org/stickers#video-requirements for video sticker
+                technical requirements.
+                |fileinput|
+                Animated sticker set thumbnails can't be uploaded via HTTP URL.
+
+                .. versionadded:: NEXT.VERSION
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
@@ -5959,10 +6031,58 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
+        warn(
+            "Bot API 6.6 renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail', "
+            "hence method 'set_sticker_set_thumb' was renamed to 'set_sticker_set_thumbnail' "
+            "in PTB. The old methods will be removed in the next major version of PTB.",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
+
+        if thumb and thumbnail and thumb != thumbnail:
+            raise ValueError(
+                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
+                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
+                "instead of 'thumb'."
+            )
+
+        if thumb:
+            warn(
+                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
+                "The argument 'thumb' will be removed in the next major version of PTB.",
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
+            thumbnail = thumb
+
+        return await self._set_sticker_set_thumbnail(
+            name=name,
+            user_id=user_id,
+            thumbnail=thumbnail,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def _set_sticker_set_thumbnail(
+        self,
+        name: str,
+        user_id: Union[str, int],
+        thumbnail: FileInput = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         data: JSONDict = {
             "name": name,
             "user_id": user_id,
-            "thumb": self._parse_file_input(thumb) if thumb else None,
+            "thumbnail": self._parse_file_input(thumbnail) if thumbnail else None,
         }
 
         result = await self._post(
@@ -7989,7 +8109,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     deleteStickerFromSet = delete_sticker_from_set
     """Alias for :meth:`delete_sticker_from_set`"""
     setStickerSetThumb = set_sticker_set_thumb
-    """Alias for :meth:`set_sticker_set_thumb`"""
+    """Alias for :meth:`set_sticker_set_thumb`
+
+    .. deprecated:: NEXT.VERSION
+       Bot API 6.6 renamed this method to :meth:`~Bot.set_sticker_set_thumbnail`.
+    """
+    setStickerSetThumbnail = set_sticker_set_thumbnail
+    """Alias for :meth:`set_sticker_set_thumbnail`"""
     setPassportDataErrors = set_passport_data_errors
     """Alias for :meth:`set_passport_data_errors`"""
     sendPoll = send_poll

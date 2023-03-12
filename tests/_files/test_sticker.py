@@ -538,6 +538,9 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks, "thumb": None}
 
     def test_sticker_set_to_dict(self, sticker_set):
+        # TODO strangely the test passes when I print the set but fails with KeyError
+        #  for "thumbnail" without the print statement
+        print(sticker_set)
         sticker_set_dict = sticker_set.to_dict()
 
         assert isinstance(sticker_set_dict, dict)
@@ -704,7 +707,9 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             bot._local_mode = False
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_set_sticker_set_thumb_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_set_sticker_set_thumbnail_local_files(
+        self, monkeypatch, bot, chat_id, local_mode
+    ):
         try:
             bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
@@ -720,10 +725,19 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
                     test_flag = isinstance(data.get("thumbnail"), InputFile)
 
             monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.set_sticker_set_thumb("name", chat_id, thumbnail=file)
+            await bot.set_sticker_set_thumbnail("name", chat_id, thumbnail=file)
             assert test_flag
         finally:
             bot._local_mode = False
+
+    async def test_set_sticker_set_thumb_local_files_fails_with_different_thumb_and_thumbnail(
+        self, bot, chat_id
+    ):
+        file = data_file("telegram.jpg")
+        different_file = data_file("telegram_no_standard_header.jpg")
+
+        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
+            await bot.set_sticker_set_thumb("name", chat_id, thumbnail=file, thumb=different_file)
 
     async def test_get_file_instance_method(self, monkeypatch, sticker):
         async def make_assertion(*_, **kwargs):
@@ -849,7 +863,7 @@ class TestStickerSetWithRequest:
     # Test set_sticker_set_thumb
     async def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
         await asyncio.sleep(1)
-        assert await bot.set_sticker_set_thumb(
+        assert await bot.set_sticker_set_thumbnail(
             f"test_by_{bot.username}", chat_id, sticker_set_thumb_file
         )
 
@@ -860,8 +874,8 @@ class TestStickerSetWithRequest:
         animated_test = f"animated_test_by_{bot.username}"
         file_id = animated_sticker_set.stickers[-1].file_id
         tasks = asyncio.gather(
-            bot.set_sticker_set_thumb(animated_test, chat_id, animated_sticker_file),
-            bot.set_sticker_set_thumb(animated_test, chat_id, file_id),
+            bot.set_sticker_set_thumbnail(animated_test, chat_id, animated_sticker_file),
+            bot.set_sticker_set_thumbnail(animated_test, chat_id, file_id),
         )
         assert all(await tasks)
 
