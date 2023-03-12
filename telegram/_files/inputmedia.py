@@ -246,8 +246,8 @@ class InputMediaAnimation(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.thumb: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumb)
             self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumbnail)
+            self.thumb: Optional[Union[str, InputFile]] = self.thumbnail
             self.width: Optional[int] = width
             self.height: Optional[int] = height
             self.duration: Optional[int] = duration
@@ -484,8 +484,8 @@ class InputMediaVideo(InputMedia):
             self.width: Optional[int] = width
             self.height: Optional[int] = height
             self.duration: Optional[int] = duration
-            self.thumb: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumb)
             self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumbnail)
+            self.thumb: Optional[Union[str, InputFile]] = self.thumbnail
             self.supports_streaming: Optional[bool] = supports_streaming
             self.has_spoiler: Optional[bool] = has_spoiler
 
@@ -617,8 +617,8 @@ class InputMediaAudio(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.thumb: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumb)
             self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumbnail)
+            self.thumb: Optional[Union[str, InputFile]] = self.thumbnail
             self.duration: Optional[int] = duration
             self.title: Optional[str] = title
             self.performer: Optional[str] = performer
@@ -735,6 +735,6 @@ class InputMediaDocument(InputMedia):
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
-            self.thumb: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumb)
             self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumbnail)
+            self.thumb: Optional[Union[str, InputFile]] = self.thumbnail
             self.disable_content_type_detection: Optional[bool] = disable_content_type_detection
