@@ -38,6 +38,7 @@ IGNORED_PARAMETERS = {
     "pool_timeout",
     "bot",
     "api_kwargs",
+    "thumb",  # was renamed to "thumbnail" in Bot API 6.6 in a lot of classes and methods
 }
 
 ignored_param_requirements = {  # Ignore these since there's convenience params in them (eg. Venue)
@@ -127,7 +128,7 @@ def check_method(h4):
     kw_or_positional_args = [
         p.name for p in sig.parameters.values() if p.kind != inspect.Parameter.KEYWORD_ONLY
     ]
-    assert set(kw_or_positional_args).difference(checked).difference(["self"]) == set(), (
+    assert set(kw_or_positional_args).difference(checked).difference(["self", "thumb"]) == set(), (
         f"In {method.__qualname__}, extra args should be keyword only "
         f"(compared to {name} in API)"
     )
