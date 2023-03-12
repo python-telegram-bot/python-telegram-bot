@@ -472,7 +472,8 @@ class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, 
             tmp[int_user_id] = {}
             for key, value in user_data.items():
                 try:
-                    tmp[int_user_id][int(key)] = value
+                    _id = int(key)
                 except ValueError:
-                    pass
+                    _id = key
+                tmp[int_user_id][_id] = value
         return tmp
