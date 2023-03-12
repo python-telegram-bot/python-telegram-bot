@@ -74,7 +74,7 @@ async def httpx_request():
 @pytest.mark.skipif(
     TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
-class TestNoSocksHTTP2:
+class TestNoSocksHTTP2WithoutRequest:
     async def test_init(self, bot):
         with pytest.raises(RuntimeError, match=r"python-telegram-bot\[socks\]"):
             HTTPXRequest(proxy_url="socks5://foo")
@@ -83,7 +83,7 @@ class TestNoSocksHTTP2:
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")
-class TestHTTP2:
+class TestHTTP2WithRequest:
     async def test_http_2_response(self):
         httpx_request = HTTPXRequest(http_version="2")
         async with httpx_request:
