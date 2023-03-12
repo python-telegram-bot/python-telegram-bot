@@ -538,9 +538,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks, "thumb": None}
 
     def test_sticker_set_to_dict(self, sticker_set):
-        # TODO strangely the test passes when I print the set but fails with KeyError
-        #  for "thumbnail" without the print statement
-        print(sticker_set)
         sticker_set_dict = sticker_set.to_dict()
 
         assert isinstance(sticker_set_dict, dict)

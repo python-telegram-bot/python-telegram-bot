@@ -124,13 +124,13 @@ class RequestParameter:
             else:
                 data.pop("media", None)
 
-            thumb = data.get("thumb", None)
-            if isinstance(thumb, InputFile):
-                if thumb.attach_uri:
-                    data["thumb"] = thumb.attach_uri
+            thumbnail = data.get("thumbnail", None)
+            if isinstance(thumbnail, InputFile):
+                if thumbnail.attach_uri:
+                    data["thumbnail"] = thumbnail.attach_uri
                 else:
-                    data.pop("thumb", None)
-                return data, [value.media, thumb]
+                    data.pop("thumbnail", None)
+                return data, [value.media, thumbnail]
 
             return data, [value.media]
         if isinstance(value, TelegramObject):

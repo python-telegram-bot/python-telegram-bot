@@ -608,9 +608,6 @@ class TestSendMediaGroupWithoutRequest:
         ):
             files = request_data.multipart_data
             video_check = files[input_video.media.attach_name] == input_video.media.field_tuple
-            # TODO for some reason this fails with KeyError after renaming thumb to thumbnail,
-            #  and if instead I take the only key in files and use it, the test fails with
-            #  "Test was failing" error
             thumb_check = (
                 files[input_video.thumbnail.attach_name] == input_video.thumbnail.field_tuple
             )
