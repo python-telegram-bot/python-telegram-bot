@@ -44,6 +44,7 @@ from typing import (
 )
 
 from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
 from telegram.warnings import PTBDeprecationWarning
 
 try:
@@ -1125,29 +1126,18 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            thumbnail = thumb
-
+        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
+            thumb=thumb, thumbnail=thumbnail
+        )
         data: JSONDict = {
             "chat_id": chat_id,
             "audio": self._parse_file_input(audio, Audio, filename=filename),
             "duration": duration,
             "performer": performer,
             "title": title,
-            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
+            "thumbnail": self._parse_file_input(thumbnail_or_thumb, attach=True)
+            if thumbnail_or_thumb
+            else None,
         }
 
         return await self._send_message(
@@ -1273,27 +1263,17 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            thumbnail = thumb
+        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
+            thumb=thumb, thumbnail=thumbnail
+        )
 
         data: JSONDict = {
             "chat_id": chat_id,
             "document": self._parse_file_input(document, Document, filename=filename),
             "disable_content_type_detection": disable_content_type_detection,
-            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
+            "thumbnail": self._parse_file_input(thumbnail_or_thumb, attach=True)
+            if thumbnail_or_thumb
+            else None,
         }
 
         return await self._send_message(
@@ -1511,22 +1491,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
 
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            thumbnail = thumb
-
+        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
+            thumb=thumb, thumbnail=thumbnail
+        )
         data: JSONDict = {
             "chat_id": chat_id,
             "video": self._parse_file_input(video, Video, filename=filename),
@@ -1534,7 +1501,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "width": width,
             "height": height,
             "supports_streaming": supports_streaming,
-            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
+            "thumbnail": self._parse_file_input(thumbnail_or_thumb, attach=True)
+            if thumbnail_or_thumb
+            else None,
             "has_spoiler": has_spoiler,
         }
 
@@ -1655,28 +1624,17 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            thumbnail = thumb
-
+        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
+            thumb=thumb, thumbnail=thumbnail
+        )
         data: JSONDict = {
             "chat_id": chat_id,
             "video_note": self._parse_file_input(video_note, VideoNote, filename=filename),
             "duration": duration,
             "length": length,
-            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
+            "thumbnail": self._parse_file_input(thumbnail_or_thumb, attach=True)
+            if thumbnail_or_thumb
+            else None,
         }
 
         return await self._send_message(
@@ -1807,29 +1765,18 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            thumbnail = thumb
-
+        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
+            thumb=thumb, thumbnail=thumbnail
+        )
         data: JSONDict = {
             "chat_id": chat_id,
             "animation": self._parse_file_input(animation, Animation, filename=filename),
             "duration": duration,
             "width": width,
             "height": height,
-            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
+            "thumbnail": self._parse_file_input(thumbnail_or_thumb, attach=True)
+            if thumbnail_or_thumb
+            else None,
             "has_spoiler": has_spoiler,
         }
 
@@ -6088,26 +6035,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             stacklevel=2,
         )
 
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            thumbnail = thumb
-
+        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
+            thumb=thumb, thumbnail=thumbnail
+        )
         return await self._set_sticker_set_thumbnail(
             name=name,
             user_id=user_id,
-            thumbnail=thumbnail,
+            thumbnail=thumbnail_or_thumb,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

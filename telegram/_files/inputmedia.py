@@ -32,6 +32,7 @@ from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict, ODVInput
 from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
 from telegram.constants import InputMediaType
 from telegram.warnings import PTBDeprecationWarning
 
@@ -217,22 +218,7 @@ class InputMediaAnimation(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            thumbnail = thumb
-
+        thumbnail = warn_about_thumb_return_thumbnail(thumb=thumb, thumbnail=thumbnail)
         super().__init__(
             InputMediaType.ANIMATION,
             media,
@@ -460,22 +446,7 @@ class InputMediaVideo(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            thumbnail = thumb
-
+        thumbnail = warn_about_thumb_return_thumbnail(thumb=thumb, thumbnail=thumbnail)
         super().__init__(
             InputMediaType.VIDEO,
             media,
@@ -605,22 +576,7 @@ class InputMediaAudio(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            thumbnail = thumb
-
+        thumbnail = warn_about_thumb_return_thumbnail(thumb=thumb, thumbnail=thumbnail)
         super().__init__(
             InputMediaType.AUDIO,
             media,
@@ -732,22 +688,7 @@ class InputMediaDocument(InputMedia):
         # things to work in local mode.
         media = parse_file_input(media, Document, filename=filename, attach=True, local_mode=True)
 
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            thumbnail = thumb
-
+        thumbnail = warn_about_thumb_return_thumbnail(thumb=thumb, thumbnail=thumbnail)
         super().__init__(
             InputMediaType.DOCUMENT,
             media,

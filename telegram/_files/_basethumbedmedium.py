@@ -23,6 +23,7 @@ from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
 from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
@@ -85,22 +86,9 @@ class _BaseThumbedMedium(_BaseMedium):
             api_kwargs=api_kwargs,
         )
 
-        if thumb and thumbnail and thumb != thumbnail:
-            raise ValueError(
-                "You passed different entities as 'thumb' and 'thumbnail'. The parameter 'thumb' "
-                "was renamed to 'thumbnail' in Bot API 6.6. We recommend using 'thumbnail' "
-                "instead of 'thumb'."
-            )
-
-        self.thumbnail: Optional[PhotoSize] = thumbnail
-        if thumb:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'. "
-                "The argument 'thumb' will be removed in the next major version of PTB.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            self.thumbnail = thumb
+        self.thumbnail: Optional[PhotoSize] = warn_about_thumb_return_thumbnail(
+            thumb=thumb, thumbnail=thumbnail
+        )
 
     @property
     def thumb(self) -> Optional[PhotoSize]:
