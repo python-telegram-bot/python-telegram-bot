@@ -242,7 +242,7 @@ class InputMediaAnimation(InputMedia):
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn(
-            "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
+            "Bot API 6.6 renamed the attribute 'thumb' to 'thumbnail'.",
             PTBDeprecationWarning,
             stacklevel=2,
         )
@@ -471,7 +471,7 @@ class InputMediaVideo(InputMedia):
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn(
-            "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
+            "Bot API 6.6 renamed the attribute 'thumb' to 'thumbnail'.",
             PTBDeprecationWarning,
             stacklevel=2,
         )
@@ -599,7 +599,7 @@ class InputMediaAudio(InputMedia):
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn(
-            "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
+            "Bot API 6.6 renamed the attribute 'thumb' to 'thumbnail'.",
             PTBDeprecationWarning,
             stacklevel=2,
         )
@@ -709,7 +709,7 @@ class InputMediaDocument(InputMedia):
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn(
-            "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
+            "Bot API 6.6 renamed the attribute 'thumb' to 'thumbnail'.",
             PTBDeprecationWarning,
             stacklevel=2,
         )

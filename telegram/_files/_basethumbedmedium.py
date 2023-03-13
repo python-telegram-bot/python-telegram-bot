@@ -98,7 +98,7 @@ class _BaseThumbedMedium(_BaseMedium):
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn(
-            "Bot API 6.6 renamed the argument 'thumb' to 'thumbnail'.",
+            "Bot API 6.6 renamed the attribute 'thumb' to 'thumbnail'.",
             PTBDeprecationWarning,
             stacklevel=2,
         )
