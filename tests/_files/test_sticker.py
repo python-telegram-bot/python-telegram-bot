@@ -815,14 +815,18 @@ class TestStickerSetWithRequest:
                     assert v
 
     async def test_delete_sticker_set(self, bot, chat_id, sticker_file):
-        assert await bot.create_new_sticker_set(
-            chat_id,
-            name=f"temp_set_by_{bot.username}",
-            title="Stickerset delete Test",
-            png_sticker=sticker_file,
-            emojis="😄",
-        )
-        assert await bot.delete_sticker_set(f"temp_set_by_{bot.username}")
+        try:
+            assert await bot.create_new_sticker_set(
+                chat_id,
+                name=f"temp_set_by_{bot.username}",
+                title="Stickerset delete Test",
+                png_sticker=sticker_file,
+                emojis="😄",
+            )
+        finally:
+            # Make sure that the sticker set is deleted even if the test fails
+            # so that it can be recreated in the next test run
+            assert await bot.delete_sticker_set(f"temp_set_by_{bot.username}")
 
     # Test add_sticker_to_set
     async def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
@@ -907,16 +911,22 @@ class TestStickerSetWithRequest:
 
     # Test delete_sticker_from_set
     async def test_bot_methods_4_png(self, bot, sticker_set):
+        if len(sticker_set.stickers) <= 1:
+            pytest.skip("Sticker set only has one sticker, deleting it will delete the set.")
         await asyncio.sleep(1)
         file_id = sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
     async def test_bot_methods_4_tgs(self, bot, animated_sticker_set):
+        if len(animated_sticker_set.stickers) <= 1:
+            pytest.skip("Sticker set only has one sticker, deleting it will delete the set.")
         await asyncio.sleep(1)
         file_id = animated_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
     async def test_bot_methods_4_webm(self, bot, video_sticker_set):
+        if len(video_sticker_set.stickers) <= 1:
+            pytest.skip("Sticker set only has one sticker, deleting it will delete the set.")
         await asyncio.sleep(1)
         file_id = video_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
