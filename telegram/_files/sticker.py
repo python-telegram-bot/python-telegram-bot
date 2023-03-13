@@ -330,7 +330,6 @@ class StickerSet(TelegramObject):
         if not data:
             return None
 
-        data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
         data["thumbnail"] = PhotoSize.de_json(data.get("thumbnail"), bot)
         data["stickers"] = Sticker.de_list(data.get("stickers"), bot)
 

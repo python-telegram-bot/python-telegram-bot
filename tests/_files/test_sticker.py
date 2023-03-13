@@ -173,7 +173,7 @@ class TestStickerWithoutRequest(TestStickerBase):
             "custom_emoji_id": self.custom_emoji_id,
         }
         json_sticker = Sticker.de_json(json_dict, bot)
-        assert json_sticker.api_kwargs == {"thumb": None}
+        assert json_sticker.api_kwargs == {}
 
         assert json_sticker.file_id == self.sticker_file_id
         assert json_sticker.file_unique_id == self.sticker_file_unique_id
@@ -556,7 +556,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert sticker_set.stickers == tuple(self.stickers)
         assert sticker_set.thumbnail == sticker.thumbnail
         assert sticker_set.sticker_type == self.sticker_type
-        assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks, "thumb": None}
+        assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks}
 
     def test_sticker_set_to_dict(self, sticker_set):
         sticker_set_dict = sticker_set.to_dict()
