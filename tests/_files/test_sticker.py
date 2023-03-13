@@ -545,6 +545,19 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
+    def test_thumb_property_deprecation_warning(self, recwarn):
+        sticker_set = StickerSet(
+            name=self.name,
+            title=self.title,
+            is_animated=self.is_animated,
+            stickers=self.stickers,
+            is_video=self.is_video,
+            sticker_type=self.sticker_type,
+            thumb=object(),
+        )
+        assert sticker_set.thumb is sticker_set.thumbnail
+        check_thumb_deprecation_warnings(recwarn, __file__)
+
     def test_de_json(self, bot, sticker):
         name = f"test_by_{bot.username}"
         json_dict = {
