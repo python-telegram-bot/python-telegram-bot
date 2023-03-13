@@ -85,6 +85,11 @@ class Sticker(_BaseThumbedMedium):
             ``.JPG`` format.
 
             .. versionadded:: NEXT.VERSION
+        needs_repainting (:obj:`bool`, optional): :obj:`True`, if the sticker must be repainted to
+            a text color in messages, the color of the Telegram Premium badge in emoji status,
+            white color on chat photos, or another appropriate color in other places.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -121,6 +126,11 @@ class Sticker(_BaseThumbedMedium):
             ``.JPG`` format.
 
             .. versionadded:: NEXT.VERSION
+        needs_repainting (:obj:`bool`): Optional. :obj:`True`, if the sticker must be repainted to
+            a text color in messages, the color of the Telegram Premium badge in emoji status,
+            white color on chat photos, or another appropriate color in other places.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -134,6 +144,7 @@ class Sticker(_BaseThumbedMedium):
         "premium_animation",
         "type",
         "custom_emoji_id",
+        "needs_repainting",
     )
 
     def __init__(
@@ -153,6 +164,7 @@ class Sticker(_BaseThumbedMedium):
         premium_animation: "File" = None,
         custom_emoji_id: str = None,
         thumbnail: PhotoSize = None,
+        needs_repainting: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -177,6 +189,7 @@ class Sticker(_BaseThumbedMedium):
             self.mask_position: Optional[MaskPosition] = mask_position
             self.premium_animation: Optional[File] = premium_animation
             self.custom_emoji_id: Optional[str] = custom_emoji_id
+            self.needs_repainting: Optional[bool] = needs_repainting
 
     REGULAR: ClassVar[str] = constants.StickerType.REGULAR
     """:const:`telegram.constants.StickerType.REGULAR`"""

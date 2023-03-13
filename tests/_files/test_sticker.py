@@ -44,7 +44,11 @@ def sticker_file():
 @pytest.fixture(scope="module")
 async def sticker(bot, chat_id):
     with data_file("telegram.webp").open("rb") as f:
-        return (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
+        sticker = (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
+        # necessary to properly test needs_repainting
+        with sticker._unfrozen():
+            sticker.needs_repainting = TestStickerBase.needs_repainting
+        return sticker
 
 
 @pytest.fixture(scope="function")
@@ -90,6 +94,7 @@ class TestStickerBase:
     thumb_file_size = 21472
     type = Sticker.REGULAR
     custom_emoji_id = "ThisIsSuchACustomEmojiID"
+    needs_repainting = True
 
     sticker_file_id = "5a3128a4d2a04750b5b58397f3b5e812"
     sticker_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
@@ -115,6 +120,7 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert isinstance(sticker.thumbnail.file_unique_id, str)
         assert sticker.thumbnail.file_id != ""
         assert sticker.thumbnail.file_unique_id != ""
+        assert isinstance(sticker.needs_repainting, bool)
 
     def test_expected_values(self, sticker):
         assert sticker.width == self.width
@@ -126,6 +132,7 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert sticker.thumbnail.height == self.thumb_height
         assert sticker.thumbnail.file_size == self.thumb_file_size
         assert sticker.type == self.type
+        assert sticker.needs_repainting == self.needs_repainting
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert sticker.premium_animation == self.premium_animation
 
@@ -156,6 +163,7 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert sticker_dict["file_size"] == sticker.file_size
         assert sticker_dict["thumbnail"] == sticker.thumbnail.to_dict()
         assert sticker_dict["type"] == sticker.type
+        assert sticker_dict["needs_repainting"] == sticker.needs_repainting
 
     def test_de_json(self, bot, sticker):
         json_dict = {
@@ -171,6 +179,7 @@ class TestStickerWithoutRequest(TestStickerBase):
             "premium_animation": self.premium_animation.to_dict(),
             "type": self.type,
             "custom_emoji_id": self.custom_emoji_id,
+            "needs_repainting": self.needs_repainting,
         }
         json_sticker = Sticker.de_json(json_dict, bot)
         assert json_sticker.api_kwargs == {}
@@ -187,6 +196,7 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert json_sticker.premium_animation == self.premium_animation
         assert json_sticker.type == self.type
         assert json_sticker.custom_emoji_id == self.custom_emoji_id
+        assert json_sticker.needs_repainting == self.needs_repainting
 
     def test_equality(self, sticker):
         a = Sticker(
