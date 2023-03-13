@@ -135,9 +135,8 @@ As these features are *optional*, the corresponding 3rd party dependencies are n
 Instead, they are listed as optional dependencies.
 This allows to avoid unnecessary dependency conflicts for users who don't need the optional features.
 
-The only required dependency is `httpx[http2] ~= 0.23.3 <https://www.python-httpx.org>`_ for
-``telegram.request.HTTPXRequest``, the default networking backend. By default, HTTP/2 is used, as it
-provides greater performance and stability, specially for concurrent requests.
+The only required dependency is `httpx ~= 0.23.3 <https://www.python-httpx.org>`_ for
+``telegram.request.HTTPXRequest``, the default networking backend.
 
 ``python-telegram-bot`` is most useful when used along with additional libraries.
 To minimize dependency conflicts, we try to be liberal in terms of version requirements on the (optional) dependencies.
@@ -151,6 +150,7 @@ PTB can be installed with optional dependencies:
 
 * ``pip install python-telegram-bot[passport]`` installs the `cryptography>=39.0.1 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
 * ``pip install python-telegram-bot[socks]`` installs `httpx[socks] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to work behind a Socks5 server.
+* ``pip install python-telegram-bot[http2]`` installs `httpx[http2] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to use HTTP/2.
 * ``pip install python-telegram-bot[rate-limiter]`` installs `aiolimiter~=1.0.0 <https://aiolimiter.readthedocs.io/en/stable/>`_. Use this, if you want to use ``telegram.ext.AIORateLimiter``.
 * ``pip install python-telegram-bot[webhooks]`` installs the `tornado~=6.2 <https://www.tornadoweb.org/en/stable/>`_ library. Use this, if you want to use ``telegram.ext.Updater.start_webhook``/``telegram.ext.Application.run_webhook``.
 * ``pip install python-telegram-bot[callback-data]`` installs the `cachetools~=5.3.0 <https://cachetools.readthedocs.io/en/latest/>`_ library. Use this, if you want to use `arbitrary callback_data <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_.
