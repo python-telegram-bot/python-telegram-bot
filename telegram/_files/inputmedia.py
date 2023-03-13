@@ -218,7 +218,7 @@ class InputMediaAnimation(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        thumbnail = warn_about_thumb_return_thumbnail(thumb=thumb, thumbnail=thumbnail)
+        thumbnail = warn_about_thumb_return_thumbnail(deprecated_arg=thumb, new_arg=thumbnail)
         super().__init__(
             InputMediaType.ANIMATION,
             media,
@@ -446,7 +446,7 @@ class InputMediaVideo(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        thumbnail = warn_about_thumb_return_thumbnail(thumb=thumb, thumbnail=thumbnail)
+        thumbnail = warn_about_thumb_return_thumbnail(deprecated_arg=thumb, new_arg=thumbnail)
         super().__init__(
             InputMediaType.VIDEO,
             media,
@@ -576,7 +576,7 @@ class InputMediaAudio(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        thumbnail = warn_about_thumb_return_thumbnail(thumb=thumb, thumbnail=thumbnail)
+        thumbnail = warn_about_thumb_return_thumbnail(deprecated_arg=thumb, new_arg=thumbnail)
         super().__init__(
             InputMediaType.AUDIO,
             media,
@@ -688,7 +688,7 @@ class InputMediaDocument(InputMedia):
         # things to work in local mode.
         media = parse_file_input(media, Document, filename=filename, attach=True, local_mode=True)
 
-        thumbnail = warn_about_thumb_return_thumbnail(thumb=thumb, thumbnail=thumbnail)
+        thumbnail = warn_about_thumb_return_thumbnail(deprecated_arg=thumb, new_arg=thumbnail)
         super().__init__(
             InputMediaType.DOCUMENT,
             media,

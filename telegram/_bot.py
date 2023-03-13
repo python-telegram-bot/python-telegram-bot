@@ -1158,7 +1158,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            thumb=thumb, thumbnail=thumbnail
+            deprecated_arg=thumb, new_arg=thumbnail
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1295,7 +1295,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            thumb=thumb, thumbnail=thumbnail
+            deprecated_arg=thumb, new_arg=thumbnail
         )
 
         data: JSONDict = {
@@ -1522,7 +1522,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
 
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            thumb=thumb, thumbnail=thumbnail
+            deprecated_arg=thumb, new_arg=thumbnail
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1655,7 +1655,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            thumb=thumb, thumbnail=thumbnail
+            deprecated_arg=thumb, new_arg=thumbnail
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1796,7 +1796,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            thumb=thumb, thumbnail=thumbnail
+            deprecated_arg=thumb,
+            new_arg=thumbnail,
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -6066,7 +6067,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
 
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            thumb=thumb, thumbnail=thumbnail
+            deprecated_arg=thumb, new_arg=thumbnail
         )
         return await self._set_sticker_set_thumbnail(
             name=name,

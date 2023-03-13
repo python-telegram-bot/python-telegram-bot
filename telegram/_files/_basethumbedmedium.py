@@ -23,7 +23,7 @@ from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
+from telegram._utils.warnings_transition import warn_about_deprecated_arg_return_new_arg
 from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
@@ -86,8 +86,12 @@ class _BaseThumbedMedium(_BaseMedium):
             api_kwargs=api_kwargs,
         )
 
-        self.thumbnail: Optional[PhotoSize] = warn_about_thumb_return_thumbnail(
-            thumb=thumb, thumbnail=thumbnail
+        self.thumbnail: Optional[PhotoSize] = warn_about_deprecated_arg_return_new_arg(
+            deprecated_arg=thumb,
+            new_arg=thumbnail,
+            deprecated_arg_name="thumb",
+            new_arg_name="thumbnail",
+            bot_api_version="6.6",
         )
 
     @property

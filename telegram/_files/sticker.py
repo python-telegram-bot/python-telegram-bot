@@ -303,7 +303,7 @@ class StickerSet(TelegramObject):
         # Optional
 
         self.thumbnail: Optional[PhotoSize] = warn_about_thumb_return_thumbnail(
-            thumb=thumb, thumbnail=thumbnail
+            deprecated_arg=thumb, new_arg=thumbnail
         )
         self._id_attrs = (self.name,)
 
