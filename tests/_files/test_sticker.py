@@ -25,12 +25,12 @@ import pytest
 from telegram import Audio, Bot, File, InputFile, MaskPosition, PhotoSize, Sticker, StickerSet
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deprecations import check_thumb_deprecation_warnings
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -129,12 +129,19 @@ class TestStickerWithoutRequest(TestStickerBase):
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert sticker.premium_animation == self.premium_animation
 
-    def test_thumb_property_deprecation_warning(self, sticker, recwarn):
+    def test_thumb_property_deprecation_warning(self, recwarn):
+        sticker = Sticker(
+            file_id="id",
+            file_unique_id="unique_id",
+            width=1,
+            height=1,
+            thumb=object(),
+            is_animated=False,
+            is_video=False,
+            type=Sticker.REGULAR,
+        )
         assert sticker.thumb is sticker.thumbnail
-        assert len(recwarn) == 1
-        assert issubclass(recwarn[0].category, PTBDeprecationWarning)
-        assert "'thumb' to 'thumbnail'" in str(recwarn[0].message)
-        assert recwarn[0].filename == __file__, "wrong stacklevel"
+        check_thumb_deprecation_warnings(recwarn, __file__)
 
     def test_to_dict(self, sticker):
         sticker_dict = sticker.to_dict()

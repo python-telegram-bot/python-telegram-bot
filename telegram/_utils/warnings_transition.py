@@ -38,6 +38,7 @@ def warn_about_deprecated_arg_return_new_arg(
     deprecated_arg_name: str,
     new_arg_name: str,
     bot_api_version: str,
+    stacklevel: int = 3,
 ) -> Any:
     """A helper function for the transition in API when argument is renamed.
 
@@ -58,9 +59,10 @@ def warn_about_deprecated_arg_return_new_arg(
 
     if deprecated_arg:
         warn(
-            f"Bot API {bot_api_version} renamed the argument '{deprecated_arg}' to '{new_arg}'.",
+            f"Bot API {bot_api_version} renamed the argument '{deprecated_arg_name}' to "
+            f"'{new_arg_name}'.",
             PTBDeprecationWarning,
-            stacklevel=2,
+            stacklevel=stacklevel,
         )
         return deprecated_arg
 

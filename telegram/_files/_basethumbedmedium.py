@@ -92,6 +92,7 @@ class _BaseThumbedMedium(_BaseMedium):
             deprecated_arg_name="thumb",
             new_arg_name="thumbnail",
             bot_api_version="6.6",
+            stacklevel=4,
         )
 
     @property
