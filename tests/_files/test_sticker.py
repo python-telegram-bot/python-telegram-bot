@@ -331,6 +331,12 @@ class TestStickerWithRequest(TestStickerBase):
 
         assert message.sticker == sticker
 
+    async def test_send_with_emoji(self, bot, chat_id):
+        message = await bot.send_sticker(
+            chat_id=chat_id, sticker=data_file("telegram.jpg"), emoji=self.emoji
+        )
+        assert message.sticker.emoji == self.emoji
+
     async def test_send_on_server_emoji(self, bot, chat_id):
         server_file_id = "CAADAQADHAADyIsGAAFZfq1bphjqlgI"
         message = await bot.send_sticker(chat_id=chat_id, sticker=server_file_id)

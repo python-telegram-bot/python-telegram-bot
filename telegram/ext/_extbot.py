@@ -2732,6 +2732,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        emoji: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -2753,6 +2754,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            emoji=emoji,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 

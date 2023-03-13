@@ -1337,6 +1337,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        emoji: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -1362,6 +1363,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
+            emoji (:obj:`str`, optional): Emoji associated with the sticker; only for just
+                uploaded stickers
+
+                .. versionadded:: NEXT.VERSION
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1384,7 +1389,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "sticker": self._parse_file_input(sticker, Sticker)}
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "sticker": self._parse_file_input(sticker, Sticker),
+            "emoji": emoji,
+        }
         return await self._send_message(
             "sendSticker",
             data,

@@ -1567,6 +1567,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        emoji: str = None,
         *,
         quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1605,6 +1606,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            emoji=emoji,
         )
 
     async def reply_video(
