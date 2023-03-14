@@ -116,6 +116,7 @@ __all__ = (  # Keep this alphabetically ordered
     "InputMediaPhoto",
     "InputMediaVideo",
     "InputMessageContent",
+    "InputSticker",
     "InputTextMessageContent",
     "InputVenueMessageContent",
     "Invoice",
@@ -237,6 +238,7 @@ from ._files.inputmedia import (
     InputMediaPhoto,
     InputMediaVideo,
 )
+from ._files.inputsticker import InputSticker
 from ._files.location import Location
 from ._files.photosize import PhotoSize
 from ._files.sticker import MaskPosition, Sticker, StickerSet
