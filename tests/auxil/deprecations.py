@@ -46,7 +46,12 @@ def check_thumb_deprecation_warnings(
         AssertionError: If the correct deprecation warnings were not raised.
     """
     names = ("argument", "attribute")
-    assert len(recwarn) == 2
+    expected_recwarn_length = 2
+    actual_recwarn_length = len(recwarn)
+    assert actual_recwarn_length == expected_recwarn_length, (
+        f"expected recwarn length {expected_recwarn_length}, actual length {actual_recwarn_length}"
+        f". Contents: {[item.message for item in recwarn.list]}"
+    )
     for i in range(2):
         assert issubclass(recwarn[i].category, PTBDeprecationWarning)
         assert f"{names[i]} '{deprecated_name}' to '{new_name}'" in str(recwarn[i].message), (
