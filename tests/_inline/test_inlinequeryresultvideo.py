@@ -26,6 +26,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
+from tests.auxil.deprecations import check_thumb_deprecation_warnings
 from tests.auxil.slots import mro_slots
 
 
@@ -35,7 +36,7 @@ def inline_query_result_video():
         TestInlineQueryResultVideoBase.id_,
         TestInlineQueryResultVideoBase.video_url,
         TestInlineQueryResultVideoBase.mime_type,
-        TestInlineQueryResultVideoBase.thumb_url,
+        TestInlineQueryResultVideoBase.thumbnail_url,
         TestInlineQueryResultVideoBase.title,
         video_width=TestInlineQueryResultVideoBase.video_width,
         video_height=TestInlineQueryResultVideoBase.video_height,
@@ -57,7 +58,7 @@ class TestInlineQueryResultVideoBase:
     video_width = 10
     video_height = 15
     video_duration = 15
-    thumb_url = "thumb url"
+    thumbnail_url = "thumbnail url"
     title = "title"
     caption = "caption"
     parse_mode = "Markdown"
@@ -82,7 +83,7 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
         assert inline_query_result_video.video_width == self.video_width
         assert inline_query_result_video.video_height == self.video_height
         assert inline_query_result_video.video_duration == self.video_duration
-        assert inline_query_result_video.thumb_url == self.thumb_url
+        assert inline_query_result_video.thumbnail_url == self.thumbnail_url
         assert inline_query_result_video.title == self.title
         assert inline_query_result_video.description == self.description
         assert inline_query_result_video.caption == self.caption
@@ -96,9 +97,32 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
 
     def test_caption_entities_always_tuple(self):
         video = InlineQueryResultVideo(
-            self.id_, self.video_url, self.mime_type, self.thumb_url, self.title
+            self.id_, self.video_url, self.mime_type, self.thumbnail_url, self.title
         )
         assert video.caption_entities == ()
+
+    def test_thumb_url_property_deprecation_warning(self, recwarn):
+        iqr_video = InlineQueryResultVideo(
+            TestInlineQueryResultVideoBase.id_,
+            TestInlineQueryResultVideoBase.video_url,
+            TestInlineQueryResultVideoBase.mime_type,
+            TestInlineQueryResultVideoBase.thumbnail_url,
+            TestInlineQueryResultVideoBase.title,
+            video_width=TestInlineQueryResultVideoBase.video_width,
+            video_height=TestInlineQueryResultVideoBase.video_height,
+            video_duration=TestInlineQueryResultVideoBase.video_duration,
+            caption=TestInlineQueryResultVideoBase.caption,
+            parse_mode=TestInlineQueryResultVideoBase.parse_mode,
+            caption_entities=TestInlineQueryResultVideoBase.caption_entities,
+            description=TestInlineQueryResultVideoBase.description,
+            input_message_content=TestInlineQueryResultVideoBase.input_message_content,
+            reply_markup=TestInlineQueryResultVideoBase.reply_markup,
+            thumb_url=TestInlineQueryResultVideoBase.thumbnail_url,  # deprecated arg
+        )
+        assert iqr_video.thumb_url == iqr_video.thumbnail_url
+        check_thumb_deprecation_warnings(
+            recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
+        )
 
     def test_to_dict(self, inline_query_result_video):
         inline_query_result_video_dict = inline_query_result_video.to_dict()
@@ -119,7 +143,10 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
             inline_query_result_video_dict["video_duration"]
             == inline_query_result_video.video_duration
         )
-        assert inline_query_result_video_dict["thumb_url"] == inline_query_result_video.thumb_url
+        assert (
+            inline_query_result_video_dict["thumbnail_url"]
+            == inline_query_result_video.thumbnail_url
+        )
         assert inline_query_result_video_dict["title"] == inline_query_result_video.title
         assert (
             inline_query_result_video_dict["description"] == inline_query_result_video.description
@@ -140,13 +167,15 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
 
     def test_equality(self):
         a = InlineQueryResultVideo(
-            self.id_, self.video_url, self.mime_type, self.thumb_url, self.title
+            self.id_, self.video_url, self.mime_type, self.thumbnail_url, self.title
         )
         b = InlineQueryResultVideo(
-            self.id_, self.video_url, self.mime_type, self.thumb_url, self.title
+            self.id_, self.video_url, self.mime_type, self.thumbnail_url, self.title
         )
-        c = InlineQueryResultVideo(self.id_, "", self.mime_type, self.thumb_url, self.title)
-        d = InlineQueryResultVideo("", self.video_url, self.mime_type, self.thumb_url, self.title)
+        c = InlineQueryResultVideo(self.id_, "", self.mime_type, self.thumbnail_url, self.title)
+        d = InlineQueryResultVideo(
+            "", self.video_url, self.mime_type, self.thumbnail_url, self.title
+        )
         e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b
