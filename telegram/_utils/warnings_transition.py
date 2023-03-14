@@ -69,6 +69,23 @@ def warn_about_deprecated_arg_return_new_arg(
     return new_arg
 
 
+def warn_about_deprecated_attr_in_property(
+    deprecated_attr_name: str,
+    new_attr_name: str,
+    bot_api_version: str,
+    stacklevel: int = 3,
+) -> None:
+    """A helper function for the transition in API when attribute is renamed.
+    It is meant to be called from properties that replace deprecated attributes in classes.
+    """
+    warn(
+        f"Bot API {bot_api_version} renamed the attribute '{deprecated_attr_name}' to "
+        f"'{new_attr_name}'.",
+        PTBDeprecationWarning,
+        stacklevel=stacklevel,
+    )
+
+
 warn_about_thumb_return_thumbnail = functools.partial(
     warn_about_deprecated_arg_return_new_arg,
     deprecated_arg_name="thumb",

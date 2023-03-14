@@ -22,9 +22,10 @@ from typing import TYPE_CHECKING, Optional, Type, TypeVar
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import warn_about_deprecated_arg_return_new_arg
-from telegram.warnings import PTBDeprecationWarning
+from telegram._utils.warnings_transition import (
+    warn_about_deprecated_arg_return_new_arg,
+    warn_about_deprecated_attr_in_property,
+)
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -102,10 +103,8 @@ class _BaseThumbedMedium(_BaseMedium):
         .. deprecated:: NEXT.VERSION
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
-        warn(
-            "Bot API 6.6 renamed the attribute 'thumb' to 'thumbnail'.",
-            PTBDeprecationWarning,
-            stacklevel=2,
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb", new_attr_name="thumbnail", bot_api_version="6.6"
         )
         return self.thumbnail
 
