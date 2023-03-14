@@ -97,7 +97,7 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
         assert inline_query_result_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_thumb_url_property_deprecation_warning(self, recwarn):
-        iqr_gif = InlineQueryResultGif(
+        inline_query_result_gif = InlineQueryResultGif(
             TestInlineQueryResultGifBase.id_,
             TestInlineQueryResultGifBase.gif_url,
             TestInlineQueryResultGifBase.thumbnail_url,
@@ -113,13 +113,13 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
             thumbnail_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,
             thumb_url=TestInlineQueryResultGifBase.thumbnail_url,  # deprecated arg
         )
-        assert iqr_gif.thumb_url == iqr_gif.thumbnail_url
+        assert inline_query_result_gif.thumb_url == inline_query_result_gif.thumbnail_url
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )
 
     def test_thumb_mime_type_property_deprecation_warning(self, recwarn):
-        iqr_gif = InlineQueryResultGif(
+        inline_query_result_gif = InlineQueryResultGif(
             TestInlineQueryResultGifBase.id_,
             TestInlineQueryResultGifBase.gif_url,
             TestInlineQueryResultGifBase.thumbnail_url,
@@ -134,7 +134,9 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
             reply_markup=TestInlineQueryResultGifBase.reply_markup,
             thumb_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,  # deprecated arg
         )
-        assert iqr_gif.thumb_mime_type == iqr_gif.thumbnail_mime_type
+        assert (
+            inline_query_result_gif.thumb_mime_type == inline_query_result_gif.thumbnail_mime_type
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_mime_type", new_name="thumbnail_mime_type"
         )

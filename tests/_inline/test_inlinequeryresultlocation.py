@@ -92,7 +92,7 @@ class TestInlineQueryResultLocationWithoutRequest(TestInlineQueryResultLocationB
         assert inline_query_result_location.proximity_alert_radius == self.proximity_alert_radius
 
     def test_thumb_url_property_deprecation_warning(self, recwarn):
-        iqr_location = InlineQueryResultLocation(
+        inline_query_result_location = InlineQueryResultLocation(
             TestInlineQueryResultLocationBase.id_,
             TestInlineQueryResultLocationBase.latitude,
             TestInlineQueryResultLocationBase.longitude,
@@ -107,13 +107,13 @@ class TestInlineQueryResultLocationWithoutRequest(TestInlineQueryResultLocationB
             thumbnail_height=TestInlineQueryResultLocationBase.thumbnail_height,
             thumbnail_width=TestInlineQueryResultLocationBase.thumbnail_width,
         )
-        assert iqr_location.thumb_url == iqr_location.thumbnail_url
+        assert inline_query_result_location.thumb_url == inline_query_result_location.thumbnail_url
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )
 
     def test_thumb_height_property_deprecation_warning(self, recwarn):
-        iqr_location = InlineQueryResultLocation(
+        inline_query_result_location = InlineQueryResultLocation(
             TestInlineQueryResultLocationBase.id_,
             TestInlineQueryResultLocationBase.latitude,
             TestInlineQueryResultLocationBase.longitude,
@@ -128,13 +128,16 @@ class TestInlineQueryResultLocationWithoutRequest(TestInlineQueryResultLocationB
             thumb_height=TestInlineQueryResultLocationBase.thumbnail_height,  # deprecated arg
             thumbnail_width=TestInlineQueryResultLocationBase.thumbnail_width,
         )
-        assert iqr_location.thumb_height == iqr_location.thumbnail_height
+        assert (
+            inline_query_result_location.thumb_height
+            == inline_query_result_location.thumbnail_height
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_height", new_name="thumbnail_height"
         )
 
     def test_thumb_width_property_deprecation_warning(self, recwarn):
-        iqr_location = InlineQueryResultLocation(
+        inline_query_result_location = InlineQueryResultLocation(
             TestInlineQueryResultLocationBase.id_,
             TestInlineQueryResultLocationBase.latitude,
             TestInlineQueryResultLocationBase.longitude,
@@ -149,7 +152,10 @@ class TestInlineQueryResultLocationWithoutRequest(TestInlineQueryResultLocationB
             thumbnail_height=TestInlineQueryResultLocationBase.thumbnail_height,
             thumb_width=TestInlineQueryResultLocationBase.thumbnail_width,  # deprecated arg
         )
-        assert iqr_location.thumb_width == iqr_location.thumbnail_width
+        assert (
+            inline_query_result_location.thumb_width
+            == inline_query_result_location.thumbnail_width
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
         )

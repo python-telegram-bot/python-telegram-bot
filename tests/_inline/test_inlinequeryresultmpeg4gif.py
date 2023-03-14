@@ -97,7 +97,7 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
         assert result.caption_entities == ()
 
     def test_thumb_url_property_deprecation_warning(self, recwarn):
-        iqr_gif = InlineQueryResultMpeg4Gif(
+        inline_query_result_mpeg4_gif = InlineQueryResultMpeg4Gif(
             TestInlineQueryResultMpeg4GifBase.id_,
             TestInlineQueryResultMpeg4GifBase.mpeg4_url,
             TestInlineQueryResultMpeg4GifBase.thumbnail_url,
@@ -113,13 +113,15 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
             thumbnail_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,
             thumb_url=TestInlineQueryResultMpeg4GifBase.thumbnail_url,  # deprecated arg
         )
-        assert iqr_gif.thumb_url == iqr_gif.thumbnail_url
+        assert (
+            inline_query_result_mpeg4_gif.thumb_url == inline_query_result_mpeg4_gif.thumbnail_url
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )
 
     def test_thumb_mime_type_property_deprecation_warning(self, recwarn):
-        iqr_gif = InlineQueryResultMpeg4Gif(
+        inline_query_result_mpeg4_gif = InlineQueryResultMpeg4Gif(
             TestInlineQueryResultMpeg4GifBase.id_,
             TestInlineQueryResultMpeg4GifBase.mpeg4_url,
             TestInlineQueryResultMpeg4GifBase.thumbnail_url,
@@ -134,7 +136,10 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
             reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
             thumb_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,  # deprecated
         )
-        assert iqr_gif.thumb_mime_type == iqr_gif.thumbnail_mime_type
+        assert (
+            inline_query_result_mpeg4_gif.thumb_mime_type
+            == inline_query_result_mpeg4_gif.thumbnail_mime_type
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_mime_type", new_name="thumbnail_mime_type"
         )

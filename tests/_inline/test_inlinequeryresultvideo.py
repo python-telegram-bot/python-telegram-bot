@@ -102,7 +102,7 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
         assert video.caption_entities == ()
 
     def test_thumb_url_property_deprecation_warning(self, recwarn):
-        iqr_video = InlineQueryResultVideo(
+        inline_query_result_video = InlineQueryResultVideo(
             TestInlineQueryResultVideoBase.id_,
             TestInlineQueryResultVideoBase.video_url,
             TestInlineQueryResultVideoBase.mime_type,
@@ -119,7 +119,7 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
             reply_markup=TestInlineQueryResultVideoBase.reply_markup,
             thumb_url=TestInlineQueryResultVideoBase.thumbnail_url,  # deprecated arg
         )
-        assert iqr_video.thumb_url == iqr_video.thumbnail_url
+        assert inline_query_result_video.thumb_url == inline_query_result_video.thumbnail_url
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )

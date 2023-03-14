@@ -93,7 +93,7 @@ class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentB
         assert inline_query_result_document.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_thumb_url_property_deprecation_warning(self, recwarn):
-        iqr_document = InlineQueryResultDocument(
+        inline_query_result_document = InlineQueryResultDocument(
             TestInlineQueryResultDocumentBase.id_,
             TestInlineQueryResultDocumentBase.document_url,
             TestInlineQueryResultDocumentBase.title,
@@ -108,13 +108,13 @@ class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentB
             thumbnail_height=TestInlineQueryResultDocumentBase.thumbnail_height,
             thumbnail_width=TestInlineQueryResultDocumentBase.thumbnail_width,
         )
-        assert iqr_document.thumb_url == iqr_document.thumbnail_url
+        assert inline_query_result_document.thumb_url == inline_query_result_document.thumbnail_url
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )
 
     def test_thumb_height_property_deprecation_warning(self, recwarn):
-        iqr_document = InlineQueryResultDocument(
+        inline_query_result_document = InlineQueryResultDocument(
             TestInlineQueryResultDocumentBase.id_,
             TestInlineQueryResultDocumentBase.document_url,
             TestInlineQueryResultDocumentBase.title,
@@ -129,13 +129,16 @@ class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentB
             thumb_height=TestInlineQueryResultDocumentBase.thumbnail_height,  # deprecated arg
             thumbnail_width=TestInlineQueryResultDocumentBase.thumbnail_width,
         )
-        assert iqr_document.thumb_height == iqr_document.thumbnail_height
+        assert (
+            inline_query_result_document.thumb_height
+            == inline_query_result_document.thumbnail_height
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_height", new_name="thumbnail_height"
         )
 
     def test_thumb_width_property_deprecation_warning(self, recwarn):
-        iqr_document = InlineQueryResultDocument(
+        inline_query_result_document = InlineQueryResultDocument(
             TestInlineQueryResultDocumentBase.id_,
             TestInlineQueryResultDocumentBase.document_url,
             TestInlineQueryResultDocumentBase.title,
@@ -150,7 +153,10 @@ class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentB
             thumbnail_height=TestInlineQueryResultDocumentBase.thumbnail_height,
             thumb_width=TestInlineQueryResultDocumentBase.thumbnail_width,  # deprecated arg
         )
-        assert iqr_document.thumb_width == iqr_document.thumbnail_width
+        assert (
+            inline_query_result_document.thumb_width
+            == inline_query_result_document.thumbnail_width
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
         )

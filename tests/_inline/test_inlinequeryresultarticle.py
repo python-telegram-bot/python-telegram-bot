@@ -84,7 +84,7 @@ class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBas
         assert inline_query_result_article.thumbnail_width == self.thumbnail_width
 
     def test_thumb_url_property_deprecation_warning(self, recwarn):
-        iqr_article = InlineQueryResultArticle(
+        inline_query_result_article = InlineQueryResultArticle(
             TestInlineQueryResultArticleBase.id_,
             TestInlineQueryResultArticleBase.title,
             input_message_content=TestInlineQueryResultArticleBase.input_message_content,
@@ -96,13 +96,13 @@ class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBas
             thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
             thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
         )
-        assert iqr_article.thumb_url == iqr_article.thumbnail_url
+        assert inline_query_result_article.thumb_url == inline_query_result_article.thumbnail_url
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )
 
     def test_thumb_height_property_deprecation_warning(self, recwarn):
-        iqr_article = InlineQueryResultArticle(
+        inline_query_result_article = InlineQueryResultArticle(
             TestInlineQueryResultArticleBase.id_,
             TestInlineQueryResultArticleBase.title,
             input_message_content=TestInlineQueryResultArticleBase.input_message_content,
@@ -114,13 +114,16 @@ class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBas
             thumb_height=TestInlineQueryResultArticleBase.thumbnail_height,  # deprecated arg
             thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
         )
-        assert iqr_article.thumb_height == iqr_article.thumbnail_height
+        assert (
+            inline_query_result_article.thumb_height
+            == inline_query_result_article.thumbnail_height
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_height", new_name="thumbnail_height"
         )
 
     def test_thumb_width_property_deprecation_warning(self, recwarn):
-        iqr_article = InlineQueryResultArticle(
+        inline_query_result_article = InlineQueryResultArticle(
             TestInlineQueryResultArticleBase.id_,
             TestInlineQueryResultArticleBase.title,
             input_message_content=TestInlineQueryResultArticleBase.input_message_content,
@@ -132,7 +135,9 @@ class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBas
             thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
             thumb_width=TestInlineQueryResultArticleBase.thumbnail_width,  # deprecated arg
         )
-        assert iqr_article.thumb_width == iqr_article.thumbnail_width
+        assert (
+            inline_query_result_article.thumb_width == inline_query_result_article.thumbnail_width
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
         )

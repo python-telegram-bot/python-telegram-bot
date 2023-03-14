@@ -95,7 +95,7 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
         assert result.caption_entities == ()
 
     def test_thumb_url_property_deprecation_warning(self, recwarn):
-        iqr_photo = InlineQueryResultPhoto(
+        inline_query_result_photo = InlineQueryResultPhoto(
             TestInlineQueryResultPhotoBase.id_,
             TestInlineQueryResultPhotoBase.photo_url,
             TestInlineQueryResultPhotoBase.thumbnail_url,
@@ -110,7 +110,7 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
             reply_markup=TestInlineQueryResultPhotoBase.reply_markup,
             thumb_url=TestInlineQueryResultPhotoBase.thumbnail_url,  # deprecated arg
         )
-        assert iqr_photo.thumb_url == iqr_photo.thumbnail_url
+        assert inline_query_result_photo.thumb_url == inline_query_result_photo.thumbnail_url
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )

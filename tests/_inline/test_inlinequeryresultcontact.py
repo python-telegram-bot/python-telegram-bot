@@ -80,7 +80,7 @@ class TestInlineQueryResultContactWithoutRequest(TestInlineQueryResultContactBas
         assert inline_query_result_contact.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_thumb_url_property_deprecation_warning(self, recwarn):
-        iqr_contact = InlineQueryResultContact(
+        inline_query_result_contact = InlineQueryResultContact(
             TestInlineQueryResultContactBase.id_,
             TestInlineQueryResultContactBase.phone_number,
             TestInlineQueryResultContactBase.first_name,
@@ -91,13 +91,13 @@ class TestInlineQueryResultContactWithoutRequest(TestInlineQueryResultContactBas
             thumbnail_height=TestInlineQueryResultContactBase.thumbnail_height,
             thumbnail_width=TestInlineQueryResultContactBase.thumbnail_width,
         )
-        assert iqr_contact.thumb_url == iqr_contact.thumbnail_url
+        assert inline_query_result_contact.thumb_url == inline_query_result_contact.thumbnail_url
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )
 
     def test_thumb_height_property_deprecation_warning(self, recwarn):
-        iqr_contact = InlineQueryResultContact(
+        inline_query_result_contact = InlineQueryResultContact(
             TestInlineQueryResultContactBase.id_,
             TestInlineQueryResultContactBase.phone_number,
             TestInlineQueryResultContactBase.first_name,
@@ -108,13 +108,16 @@ class TestInlineQueryResultContactWithoutRequest(TestInlineQueryResultContactBas
             thumb_height=TestInlineQueryResultContactBase.thumbnail_height,  # deprecated arg
             thumbnail_width=TestInlineQueryResultContactBase.thumbnail_width,
         )
-        assert iqr_contact.thumb_height == iqr_contact.thumbnail_height
+        assert (
+            inline_query_result_contact.thumb_height
+            == inline_query_result_contact.thumbnail_height
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_height", new_name="thumbnail_height"
         )
 
     def test_thumb_width_property_deprecation_warning(self, recwarn):
-        iqr_contact = InlineQueryResultContact(
+        inline_query_result_contact = InlineQueryResultContact(
             TestInlineQueryResultContactBase.id_,
             TestInlineQueryResultContactBase.phone_number,
             TestInlineQueryResultContactBase.first_name,
@@ -125,7 +128,9 @@ class TestInlineQueryResultContactWithoutRequest(TestInlineQueryResultContactBas
             thumbnail_height=TestInlineQueryResultContactBase.thumbnail_height,
             thumb_width=TestInlineQueryResultContactBase.thumbnail_width,  # deprecated arg
         )
-        assert iqr_contact.thumb_width == iqr_contact.thumbnail_width
+        assert (
+            inline_query_result_contact.thumb_width == inline_query_result_contact.thumbnail_width
+        )
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
         )
