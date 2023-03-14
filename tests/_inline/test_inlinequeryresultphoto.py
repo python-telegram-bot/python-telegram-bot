@@ -115,6 +115,27 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )
 
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
+        with pytest.raises(
+            ValueError,
+            match="different entities as 'thumb_url' and 'thumbnail_url'",
+        ):
+            InlineQueryResultPhoto(
+                TestInlineQueryResultPhotoBase.id_,
+                TestInlineQueryResultPhotoBase.photo_url,
+                TestInlineQueryResultPhotoBase.thumbnail_url,
+                photo_width=TestInlineQueryResultPhotoBase.photo_width,
+                photo_height=TestInlineQueryResultPhotoBase.photo_height,
+                title=TestInlineQueryResultPhotoBase.title,
+                description=TestInlineQueryResultPhotoBase.description,
+                caption=TestInlineQueryResultPhotoBase.caption,
+                parse_mode=TestInlineQueryResultPhotoBase.parse_mode,
+                caption_entities=TestInlineQueryResultPhotoBase.caption_entities,
+                input_message_content=TestInlineQueryResultPhotoBase.input_message_content,
+                reply_markup=TestInlineQueryResultPhotoBase.reply_markup,
+                thumb_url="some other url",
+            )
+
     def test_to_dict(self, inline_query_result_photo):
         inline_query_result_photo_dict = inline_query_result_photo.to_dict()
 

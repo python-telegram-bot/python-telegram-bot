@@ -124,6 +124,29 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )
 
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
+        with pytest.raises(
+            ValueError,
+            match="different entities as 'thumb_url' and 'thumbnail_url'",
+        ):
+            InlineQueryResultVideo(
+                TestInlineQueryResultVideoBase.id_,
+                TestInlineQueryResultVideoBase.video_url,
+                TestInlineQueryResultVideoBase.mime_type,
+                TestInlineQueryResultVideoBase.thumbnail_url,
+                TestInlineQueryResultVideoBase.title,
+                video_width=TestInlineQueryResultVideoBase.video_width,
+                video_height=TestInlineQueryResultVideoBase.video_height,
+                video_duration=TestInlineQueryResultVideoBase.video_duration,
+                caption=TestInlineQueryResultVideoBase.caption,
+                parse_mode=TestInlineQueryResultVideoBase.parse_mode,
+                caption_entities=TestInlineQueryResultVideoBase.caption_entities,
+                description=TestInlineQueryResultVideoBase.description,
+                input_message_content=TestInlineQueryResultVideoBase.input_message_content,
+                reply_markup=TestInlineQueryResultVideoBase.reply_markup,
+                thumb_url="some other url",
+            )
+
     def test_to_dict(self, inline_query_result_video):
         inline_query_result_video_dict = inline_query_result_video.to_dict()
 

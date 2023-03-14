@@ -160,6 +160,72 @@ class TestInlineQueryResultVenueWithoutRequest(TestInlineQueryResultVenueBase):
             recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
         )
 
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
+        with pytest.raises(
+            ValueError, match="different entities as 'thumb_url' and 'thumbnail_url'"
+        ):
+            InlineQueryResultVenue(
+                TestInlineQueryResultVenueBase.id_,
+                TestInlineQueryResultVenueBase.latitude,
+                TestInlineQueryResultVenueBase.longitude,
+                TestInlineQueryResultVenueBase.title,
+                TestInlineQueryResultVenueBase.address,
+                foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
+                foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
+                input_message_content=TestInlineQueryResultVenueBase.input_message_content,
+                reply_markup=TestInlineQueryResultVenueBase.reply_markup,
+                google_place_id=TestInlineQueryResultVenueBase.google_place_id,
+                google_place_type=TestInlineQueryResultVenueBase.google_place_type,
+                thumbnail_url=TestInlineQueryResultVenueBase.thumbnail_url,
+                thumb_url="some other url",
+                thumbnail_height=TestInlineQueryResultVenueBase.thumbnail_height,
+                thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_height(self):
+        with pytest.raises(
+            ValueError, match="different entities as 'thumb_height' and 'thumbnail_height'"
+        ):
+            InlineQueryResultVenue(
+                TestInlineQueryResultVenueBase.id_,
+                TestInlineQueryResultVenueBase.latitude,
+                TestInlineQueryResultVenueBase.longitude,
+                TestInlineQueryResultVenueBase.title,
+                TestInlineQueryResultVenueBase.address,
+                foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
+                foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
+                input_message_content=TestInlineQueryResultVenueBase.input_message_content,
+                reply_markup=TestInlineQueryResultVenueBase.reply_markup,
+                google_place_id=TestInlineQueryResultVenueBase.google_place_id,
+                google_place_type=TestInlineQueryResultVenueBase.google_place_type,
+                thumbnail_url=TestInlineQueryResultVenueBase.thumbnail_url,
+                thumbnail_height=TestInlineQueryResultVenueBase.thumbnail_height,
+                thumb_height=TestInlineQueryResultVenueBase.thumbnail_height + 1,
+                thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_width(self):
+        with pytest.raises(
+            ValueError, match="different entities as 'thumb_width' and 'thumbnail_width'"
+        ):
+            InlineQueryResultVenue(
+                TestInlineQueryResultVenueBase.id_,
+                TestInlineQueryResultVenueBase.latitude,
+                TestInlineQueryResultVenueBase.longitude,
+                TestInlineQueryResultVenueBase.title,
+                TestInlineQueryResultVenueBase.address,
+                foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
+                foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
+                input_message_content=TestInlineQueryResultVenueBase.input_message_content,
+                reply_markup=TestInlineQueryResultVenueBase.reply_markup,
+                google_place_id=TestInlineQueryResultVenueBase.google_place_id,
+                google_place_type=TestInlineQueryResultVenueBase.google_place_type,
+                thumbnail_url=TestInlineQueryResultVenueBase.thumbnail_url,
+                thumbnail_height=TestInlineQueryResultVenueBase.thumbnail_height,
+                thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
+                thumb_width=TestInlineQueryResultVenueBase.thumbnail_width + 1,
+            )
+
     def test_to_dict(self, inline_query_result_venue):
         inline_query_result_venue_dict = inline_query_result_venue.to_dict()
 

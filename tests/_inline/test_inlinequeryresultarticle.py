@@ -142,6 +142,61 @@ class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBas
             recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
         )
 
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
+        with pytest.raises(
+            ValueError,
+            match="different entities as 'thumb_url' and 'thumbnail_url'",
+        ):
+            InlineQueryResultArticle(
+                TestInlineQueryResultArticleBase.id_,
+                TestInlineQueryResultArticleBase.title,
+                input_message_content=TestInlineQueryResultArticleBase.input_message_content,
+                reply_markup=TestInlineQueryResultArticleBase.reply_markup,
+                url=TestInlineQueryResultArticleBase.url,
+                hide_url=TestInlineQueryResultArticleBase.hide_url,
+                description=TestInlineQueryResultArticleBase.description,
+                thumbnail_url=TestInlineQueryResultArticleBase.thumbnail_url,
+                thumb_url="some other url",
+                thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
+                thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_height(self):
+        with pytest.raises(
+            ValueError,
+            match="different entities as 'thumb_height' and 'thumbnail_height'",
+        ):
+            InlineQueryResultArticle(
+                TestInlineQueryResultArticleBase.id_,
+                TestInlineQueryResultArticleBase.title,
+                input_message_content=TestInlineQueryResultArticleBase.input_message_content,
+                reply_markup=TestInlineQueryResultArticleBase.reply_markup,
+                url=TestInlineQueryResultArticleBase.url,
+                hide_url=TestInlineQueryResultArticleBase.hide_url,
+                description=TestInlineQueryResultArticleBase.description,
+                thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
+                thumb_height=TestInlineQueryResultArticleBase.thumbnail_height + 1,
+                thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_width(self):
+        with pytest.raises(
+            ValueError,
+            match="different entities as 'thumb_width' and 'thumbnail_width'",
+        ):
+            InlineQueryResultArticle(
+                TestInlineQueryResultArticleBase.id_,
+                TestInlineQueryResultArticleBase.title,
+                input_message_content=TestInlineQueryResultArticleBase.input_message_content,
+                reply_markup=TestInlineQueryResultArticleBase.reply_markup,
+                url=TestInlineQueryResultArticleBase.url,
+                hide_url=TestInlineQueryResultArticleBase.hide_url,
+                description=TestInlineQueryResultArticleBase.description,
+                thumbnail_height=TestInlineQueryResultArticleBase.thumbnail_height,
+                thumbnail_width=TestInlineQueryResultArticleBase.thumbnail_width,
+                thumb_width=TestInlineQueryResultArticleBase.thumbnail_width + 1,
+            )
+
     def test_to_dict(self, inline_query_result_article):
         inline_query_result_article_dict = inline_query_result_article.to_dict()
 
