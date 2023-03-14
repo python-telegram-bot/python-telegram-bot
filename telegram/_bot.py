@@ -1529,7 +1529,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
             deprecated_arg=thumb, new_arg=thumbnail
         )
