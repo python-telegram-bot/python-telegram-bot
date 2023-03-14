@@ -39,6 +39,7 @@ IGNORED_PARAMETERS = {
     "bot",
     "api_kwargs",
     "thumb",  # was renamed to "thumbnail" in Bot API 6.6 in a lot of classes and methods
+    "thumb_url",  # was renamed to "thumbnail_url" in Bot API 6.6 in a lot of classes
 }
 
 ignored_param_requirements = {  # Ignore these since there's convenience params in them (eg. Venue)
@@ -196,7 +197,17 @@ def check_object(h4):
     elif name.startswith("InputMedia"):
         ignored |= {"filename"}  # Convenience parameter
     elif name in ("ChatMemberRestricted", "ChatPermissions"):
-        ignored |= {"can_send_media_messages"}  # Depreciated param we keep
+        ignored |= {"can_send_media_messages"}  # Deprecated param we keep
+    elif name in (
+        "InlineQueryResultArticle",
+        "InlineQueryResultContact",
+        "InlineQueryResultDocument",
+        "InlineQueryResultLocation",
+        "InlineQueryResultVenue",
+    ):
+        ignored |= {"thumb_height", "thumb_width"}  # Deprecated params we keep
+    elif name in ("InlineQueryResultGif", "InlineQueryResultMpeg4Gif"):
+        ignored |= {"thumb_mime_type"}  # Deprecated param we keep
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
