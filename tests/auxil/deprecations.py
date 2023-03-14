@@ -49,7 +49,10 @@ def check_thumb_deprecation_warnings(
     assert len(recwarn) == 2
     for i in range(2):
         assert issubclass(recwarn[i].category, PTBDeprecationWarning)
-        assert f"{names[i]} '{deprecated_name}' to '{new_name}'" in str(recwarn[i].message)
+        assert f"{names[i]} '{deprecated_name}' to '{new_name}'" in str(recwarn[i].message), (
+            f"Warning issued by file {recwarn[i].filename} does not contain expected phrase: "
+            f"\"{names[i]} '{deprecated_name}' to '{new_name}'\""
+        )
         assert (
             recwarn[i].filename == calling_file
         ), f"Warning for {names[i]} issued by file {recwarn[i].filename}, expected {calling_file}"
