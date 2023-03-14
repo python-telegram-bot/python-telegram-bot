@@ -22,15 +22,22 @@ from _pytest.recwarn import WarningsRecorder
 from telegram.warnings import PTBDeprecationWarning
 
 
-def check_thumb_deprecation_warnings(recwarn: WarningsRecorder, calling_file: str) -> bool:
+def check_thumb_deprecation_warnings(
+    recwarn: WarningsRecorder,
+    calling_file: str,
+    deprecated_name: str = "thumb",
+    new_name: str = "thumbnail",
+) -> bool:
     """Check that the correct deprecation warnings are issued. This includes
 
-    * a warning for using the deprecated `thumb` argument
-    * a warning for using the deprecated `thumb` attribute
+    * a warning for using the deprecated `thumb...` argument
+    * a warning for using the deprecated `thumb...` attribute
 
     Args:
         recwarn: pytest's recwarn fixture.
         calling_file: The file that called this function.
+        deprecated_name: Name of deprecated argument/attribute to check in the warning text.
+        new_name: Name of new argument/attribute to check in the warning text.
 
     Returns:
         True if the correct deprecation warnings were raised, False otherwise.
@@ -42,7 +49,7 @@ def check_thumb_deprecation_warnings(recwarn: WarningsRecorder, calling_file: st
     assert len(recwarn) == 2
     for i in range(2):
         assert issubclass(recwarn[i].category, PTBDeprecationWarning)
-        assert f"{names[i]} 'thumb' to 'thumbnail'" in str(recwarn[i].message)
+        assert f"{names[i]} '{deprecated_name}' to '{new_name}'" in str(recwarn[i].message)
         assert (
             recwarn[i].filename == calling_file
         ), f"Warning for {names[i]} issued by file {recwarn[i].filename}, expected {calling_file}"
