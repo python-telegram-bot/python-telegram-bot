@@ -19,6 +19,7 @@
 
 from _pytest.recwarn import WarningsRecorder
 
+from telegram._utils import warnings_transition
 from telegram.warnings import PTBDeprecationWarning
 
 
@@ -27,6 +28,7 @@ def check_thumb_deprecation_warnings(
     calling_file: str,
     deprecated_name: str = "thumb",
     new_name: str = "thumbnail",
+    expected_recwarn_length: int = 2,
 ) -> bool:
     """Check that the correct deprecation warnings are issued. This includes
 
@@ -38,6 +40,7 @@ def check_thumb_deprecation_warnings(
         calling_file: The file that called this function.
         deprecated_name: Name of deprecated argument/attribute to check in the warning text.
         new_name: Name of new argument/attribute to check in the warning text.
+        expected_recwarn_length: expected number of warnings issued.
 
     Returns:
         True if the correct deprecation warnings were raised, False otherwise.
@@ -45,21 +48,42 @@ def check_thumb_deprecation_warnings(
     Raises:
         AssertionError: If the correct deprecation warnings were not raised.
     """
-    names = ("argument", "attribute")
-    expected_recwarn_length = 2
+    names = (
+        ("argument", "attribute")
+        if expected_recwarn_length == 2
+        else ("argument", "argument", "attribute")
+    )
     actual_recwarn_length = len(recwarn)
     assert actual_recwarn_length == expected_recwarn_length, (
         f"expected recwarn length {expected_recwarn_length}, actual length {actual_recwarn_length}"
         f". Contents: {[item.message for item in recwarn.list]}"
     )
-    for i in range(2):
+    for i in range(expected_recwarn_length):
+        if recwarn[i].filename.endswith("python.py"):
+            # this is a wrapper
+            assert "Make sure you either change this argument to positional or rename it" in str(
+                recwarn[i].message
+            ), (
+                f'Warning issued by file {recwarn[i].filename} ("{str(recwarn[i].message)}") '
+                "does not contain expected phrase: "
+                f"\"{names[i]} '{deprecated_name}' to '{new_name}'\""
+            )
+            continue
+
         assert issubclass(recwarn[i].category, PTBDeprecationWarning)
         assert f"{names[i]} '{deprecated_name}' to '{new_name}'" in str(recwarn[i].message), (
-            f"Warning issued by file {recwarn[i].filename} does not contain expected phrase: "
+            f'Warning issued by file {recwarn[i].filename} ("{str(recwarn[i].message)}") '
+            "does not contain expected phrase: "
             f"\"{names[i]} '{deprecated_name}' to '{new_name}'\""
         )
+
         assert (
-            recwarn[i].filename == calling_file
-        ), f"Warning for {names[i]} issued by file {recwarn[i].filename}, expected {calling_file}"
+            # the warning could be issued by a decorator imported from warnings_transition
+            recwarn[i].filename
+            in (calling_file, warnings_transition.__file__)
+        ), (
+            f'Warning for {names[i]} ("{str(recwarn[i].message)}") was issued by file '
+            f"{recwarn[i].filename}, expected {calling_file} or {warnings_transition.__file__}"
+        )
 
     return True

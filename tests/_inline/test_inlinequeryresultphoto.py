@@ -112,8 +112,54 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
         )
         assert inline_query_result_photo.thumb_url == inline_query_result_photo.thumbnail_url
         check_thumb_deprecation_warnings(
-            recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+            expected_recwarn_length=3,
         )
+
+    def test_thumb_url_property_issues_warning_and_works_without_positional_arg(self, recwarn):
+        inline_query_result_photo = InlineQueryResultPhoto(
+            TestInlineQueryResultPhotoBase.id_,
+            TestInlineQueryResultPhotoBase.photo_url,
+            # positional argument thumbnail_url should be here, but it's not
+            photo_width=TestInlineQueryResultPhotoBase.photo_width,
+            photo_height=TestInlineQueryResultPhotoBase.photo_height,
+            title=TestInlineQueryResultPhotoBase.title,
+            description=TestInlineQueryResultPhotoBase.description,
+            caption=TestInlineQueryResultPhotoBase.caption,
+            parse_mode=TestInlineQueryResultPhotoBase.parse_mode,
+            caption_entities=TestInlineQueryResultPhotoBase.caption_entities,
+            input_message_content=TestInlineQueryResultPhotoBase.input_message_content,
+            reply_markup=TestInlineQueryResultPhotoBase.reply_markup,
+            thumb_url=TestInlineQueryResultPhotoBase.thumbnail_url,  # deprecated arg
+        )
+        assert inline_query_result_photo.thumb_url == inline_query_result_photo.thumbnail_url
+        check_thumb_deprecation_warnings(
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+            expected_recwarn_length=3,
+        )
+
+    def test_thumb_url_property_throws_error_without_thumbnail_url_or_thumb_url(self, recwarn):
+        with pytest.raises(ValueError, match="You must pass either"):
+            InlineQueryResultPhoto(
+                TestInlineQueryResultPhotoBase.id_,
+                TestInlineQueryResultPhotoBase.photo_url,
+                # no thumbnail_url or thumb_url
+                photo_width=TestInlineQueryResultPhotoBase.photo_width,
+                photo_height=TestInlineQueryResultPhotoBase.photo_height,
+                title=TestInlineQueryResultPhotoBase.title,
+                description=TestInlineQueryResultPhotoBase.description,
+                caption=TestInlineQueryResultPhotoBase.caption,
+                parse_mode=TestInlineQueryResultPhotoBase.parse_mode,
+                caption_entities=TestInlineQueryResultPhotoBase.caption_entities,
+                input_message_content=TestInlineQueryResultPhotoBase.input_message_content,
+                reply_markup=TestInlineQueryResultPhotoBase.reply_markup,
+            )
 
     def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
         with pytest.raises(

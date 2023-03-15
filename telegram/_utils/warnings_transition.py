@@ -24,6 +24,7 @@ inside warnings.py.
 .. versionadded:: NEXT.VERSION
 """
 import functools
+from collections.abc import Callable
 from typing import Any
 
 from telegram._utils.warnings import warn
@@ -95,3 +96,21 @@ warn_about_thumb_return_thumbnail = functools.partial(
 """A helper function to warn about using a deprecated 'thumb' argument and return it or the new
 'thumbnail' argument, introduced in API 6.6.
 """
+
+
+def warn_about_required_thumb_param_passed_as_kwarg(func) -> Callable:  # type: ignore
+    """A wrapper that issues a warning when a required `thumb_url` param is passed as kwarg."""
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs) -> Any:  # type: ignore
+        if "thumb_url" in kwargs:
+            warn(
+                "Bot API 6.6 renamed the argument 'thumb_url' to 'thumbnail_url'. Make sure you "
+                "either change this argument to positional or rename it.",
+                PTBDeprecationWarning,
+                stacklevel=3,
+            )
+
+        return func(*args, **kwargs)
+
+    return wrapper

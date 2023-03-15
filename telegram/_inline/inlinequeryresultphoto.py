@@ -28,6 +28,7 @@ from telegram._utils.types import JSONDict, ODVInput
 from telegram._utils.warnings_transition import (
     warn_about_deprecated_arg_return_new_arg,
     warn_about_deprecated_attr_in_property,
+    warn_about_required_thumb_param_passed_as_kwarg,
 )
 from telegram.constants import InlineQueryResultType
 
@@ -49,7 +50,13 @@ class InlineQueryResultPhoto(InlineQueryResult):
             :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in JPEG format. Photo size
             must not exceed 5MB.
-        thumbnail_url (:obj:`str`): URL of the thumbnail for the photo.
+        thumbnail_url (:obj:`str`, optional): URL of the thumbnail for the photo.
+
+            Warning:
+                In Bot API, this is **not** an optional argument. It is formally optional here
+                to allow you to pass the deprecated :paramref:`thumb_url` instead. If you pass
+                neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`, :class:`ValueError`
+                will be raised.
 
             .. versionadded:: NEXT.VERSION
         photo_width (:obj:`int`, optional): Width of the photo.
@@ -73,6 +80,10 @@ class InlineQueryResultPhoto(InlineQueryResult):
 
             .. deprecated:: NEXT.VERSION
                |thumbargumentdeprecation| :paramref:`thumbnail_url`.
+
+    Raises:
+        ValueError: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is supplied
+            or if both are supplied and are not equal.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.PHOTO`.
@@ -117,11 +128,15 @@ class InlineQueryResultPhoto(InlineQueryResult):
         "thumbnail_url",
     )
 
+    @warn_about_required_thumb_param_passed_as_kwarg
     def __init__(
         self,
         id: str,  # pylint: disable=redefined-builtin
         photo_url: str,
-        thumbnail_url: str,
+        # thumbnail_url is not optional in Telegram API, but we want to support thumb_url as well,
+        # so thumbnail_url may not be passed.  We will raise TypeError manually if neither
+        # thumbnail_url or thumb_url are passed
+        thumbnail_url: str = None,
         photo_width: int = None,
         photo_height: int = None,
         title: str = None,
@@ -132,12 +147,16 @@ class InlineQueryResultPhoto(InlineQueryResult):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence[MessageEntity] = None,
         # thumbnail_url is not optional in Telegram API, but deprecated thumb_url will have to be.
-        # This way the user can pass thumbnail_url as a positional argument and thumb_url
-        # as a keyword_argument
         thumb_url: str = None,
         *,
         api_kwargs: JSONDict = None,
     ):
+        if not (thumbnail_url or thumb_url):
+            raise ValueError(
+                "You must pass either 'thumbnail_url' or 'thumb_url'. Note that 'thumb_url' is "
+                "deprecated."
+            )
+
         # Required
         super().__init__(InlineQueryResultType.PHOTO, id, api_kwargs=api_kwargs)
         with self._unfrozen():
