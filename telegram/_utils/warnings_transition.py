@@ -106,7 +106,7 @@ def warn_about_required_thumb_param_passed_as_kwarg(func) -> Callable:  # type: 
         if "thumb_url" in kwargs:
             warn(
                 "Bot API 6.6 renamed the argument 'thumb_url' to 'thumbnail_url'. Make sure you "
-                "either change this argument to positional or rename it.",
+                "rename it in your code.",
                 PTBDeprecationWarning,
                 stacklevel=3,
             )
