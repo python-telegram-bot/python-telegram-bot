@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InputSticker."""
 
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence, Tuple, Union
 
 from telegram._files.inputfile import InputFile
 from telegram._files.sticker import MaskPosition
@@ -87,9 +87,9 @@ class InputSticker(TelegramObject):
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
         self.sticker: Union[str, InputFile] = parse_file_input(sticker, local_mode=True)
-        self.emoji_list: Sequence[str] = parse_sequence_arg(emoji_list)
+        self.emoji_list: Tuple[str, ...] = parse_sequence_arg(emoji_list)
         self.mask_position: Optional[MaskPosition] = mask_position
-        self.keywords: Sequence[str] = parse_sequence_arg(keywords)
+        self.keywords: Tuple[str, ...] = parse_sequence_arg(keywords)
 
         self._id_attrs = (self.sticker, self.emoji_list)
 
