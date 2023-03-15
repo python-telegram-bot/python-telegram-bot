@@ -138,7 +138,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         photo_url: str,
         # thumbnail_url is not optional in Telegram API, but we want to support thumb_url as well,
-        # so thumbnail_url may not be passed.  We will raise TypeError manually if neither
+        # so thumbnail_url may not be passed.  We will raise ValueError manually if neither
         # thumbnail_url nor thumb_url are passed
         thumbnail_url: str = None,
         photo_width: int = None,
