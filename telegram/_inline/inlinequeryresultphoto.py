@@ -28,7 +28,7 @@ from telegram._utils.types import JSONDict, ODVInput
 from telegram._utils.warnings_transition import (
     warn_about_deprecated_arg_return_new_arg,
     warn_about_deprecated_attr_in_property,
-    warn_about_required_thumb_param_passed_as_kwarg,
+    warn_about_required_renamed_param_passed_as_kwarg,
 )
 from telegram.constants import InlineQueryResultType
 
@@ -128,14 +128,18 @@ class InlineQueryResultPhoto(InlineQueryResult):
         "thumbnail_url",
     )
 
-    @warn_about_required_thumb_param_passed_as_kwarg
+    @warn_about_required_renamed_param_passed_as_kwarg(
+        deprecated_param_names=("thumb_url",),
+        new_param_names=("thumbnail_url",),
+        bot_api_version="6.6",
+    )
     def __init__(
         self,
         id: str,  # pylint: disable=redefined-builtin
         photo_url: str,
         # thumbnail_url is not optional in Telegram API, but we want to support thumb_url as well,
         # so thumbnail_url may not be passed.  We will raise TypeError manually if neither
-        # thumbnail_url or thumb_url are passed
+        # thumbnail_url nor thumb_url are passed
         thumbnail_url: str = None,
         photo_width: int = None,
         photo_height: int = None,

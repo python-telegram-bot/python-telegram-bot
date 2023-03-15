@@ -25,7 +25,7 @@ inside warnings.py.
 """
 import functools
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Tuple
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
@@ -98,19 +98,29 @@ warn_about_thumb_return_thumbnail = functools.partial(
 """
 
 
-def warn_about_required_thumb_param_passed_as_kwarg(func) -> Callable:  # type: ignore
-    """A wrapper that issues a warning when a required `thumb_url` param is passed as kwarg."""
+def warn_about_required_renamed_param_passed_as_kwarg(
+    deprecated_param_names: Tuple[str], new_param_names: Tuple[str], bot_api_version: str
+) -> Callable:
+    """Issues a warning when required to-be-renamed params are passed as kwargs. Use as decorator.
 
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs) -> Any:  # type: ignore
-        if "thumb_url" in kwargs:
-            warn(
-                "Bot API 6.6 renamed the argument 'thumb_url' to 'thumbnail_url'. Make sure you "
-                "rename it in your code.",
-                PTBDeprecationWarning,
-                stacklevel=3,
-            )
+    When API change means that a required parameter will be renamed, we have to make sure that the
+    user that passes it as a kwarg renames it.
+    """
 
-        return func(*args, **kwargs)
+    def decorator(func) -> Callable:  # type: ignore
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs) -> Any:  # type: ignore
+            for deprecated, new in zip(deprecated_param_names, new_param_names):
+                if deprecated in kwargs:
+                    warn(
+                        f"Bot API {bot_api_version} renamed the argument '{deprecated}' to '{new}'"
+                        ". Make sure you rename it in your code.",
+                        PTBDeprecationWarning,
+                        stacklevel=3,
+                    )
 
-    return wrapper
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
