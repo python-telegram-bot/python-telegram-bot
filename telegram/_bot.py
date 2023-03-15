@@ -43,6 +43,8 @@ from typing import (
     no_type_check,
 )
 
+from telegram._files.inputsticker import InputSticker
+
 try:
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
@@ -5630,12 +5632,21 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         user_id: Union[str, int],
         name: str,
         title: str,
-        emojis: str,
+        # Deprecated params since bot api 6.6
+        # ----
+        emojis: str = None,  # Was made optional for compatibility purposes
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
+        # ----
         sticker_type: str = None,
+        # New params since bot api 6.6
+        # ----
+        stickers: Sequence[InputSticker] = None,  # Actually a required param. Optional for compat.
+        sticker_format: str = None,  # Actually a required param. Optional for compat.
+        needs_repainting: bool = None,
+        # ----
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -5645,18 +5656,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> bool:
         """
         Use this method to create new sticker set owned by a user.
-        The bot will be able to edit the created sticker set.
-        You must use exactly one of the fields :paramref:`png_sticker`, :paramref:`tgs_sticker`,
-        or :paramref:`webm_sticker`.
-
-        Warning:
-            As of API 4.7 :paramref:`png_sticker` is an optional argument and therefore the order
-            of the arguments had to be changed. Use keyword arguments to make sure that the
-            arguments are passed correctly.
+        The bot will be able to edit the created sticker set thus created.
 
         .. versionchanged:: 20.0
             The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type`
             instead.
+
+        .. versionchanged:: NEXT.VERSION
+            Since Bot API 6.6, the parameters :paramref:`stickers` and :paramref:`sticker_format`
+            replace the parameters :paramref:`png_sticker`, :paramref:`tgs_sticker`,
+            :paramref:`webm_sticker`, :paramref:`emojis`, and :paramref:`mask_position`.
+
+        .. |api6_6_depr| replace:: Since Bot API 6.6, this argument is deprecated in favour of
+            :paramref:`stickers` and :paramref:`sticker_format`.
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -5669,6 +5681,35 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             title (:obj:`str`): Sticker set title,
                 :tg-const:`telegram.constants.StickerLimit.MIN_NAME_AND_TITLE`-
                 :tg-const:`telegram.constants.StickerLimit.MAX_NAME_AND_TITLE` characters.
+
+            stickers (Sequence[:class:`telegram.InputSticker`]): A sequence of
+                :tg-const:`telegram.constants.StickerSetLimit.MIN_INITIAL_STICKERS`-
+                :tg-const:`telegram.constants.StickerSetLimit.MAX_INITIAL_STICKERS` initial
+                stickers to be added to the sticker set.
+
+                .. versionadded:: NEXT.VERSION
+
+            sticker_format (:obj:`str`): Format of stickers in the set, must be one of
+                :attr:`~telegram.constants.StickerFormat.STATIC`,
+                :attr:`~telegram.constants.StickerFormat.ANIMATED` or
+                :attr:`~telegram.constants.StickerFormat.VIDEO`.
+
+                .. versionadded:: NEXT.VERSION
+
+            sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
+                :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`. Custom emoji
+                sticker sets can't be created via the Bot API at the moment. By default, a
+                regular sticker set is created.
+
+                .. versionadded:: 20.0
+
+            needs_repainting (:obj:`bool`, optional): Pass :obj:`True` if stickers in the sticker
+                set must be repainted to the color of text when used in messages, the accent color
+                if used as emoji status, white on chat photos, or another appropriate color based
+                on context; for custom emoji sticker sets only.
+
+                .. versionadded:: NEXT.VERSION
+
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
@@ -5681,6 +5722,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_6_depr|
+
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **TGS** animation with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#animation-requirements for technical
@@ -5692,6 +5737,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_6_depr|
+
             webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
                 optional): **WEBM** video with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#video-requirements for
@@ -5703,33 +5752,76 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-            emojis (:obj:`str`): One or more emoji corresponding to the sticker.
+                .. deprecated:: NEXT.VERSION
+                    |api6_6_depr|
+
+            emojis (:obj:`str`, optional): One or more emoji corresponding to the sticker.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_6_depr|
+
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
-            sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
-                :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`. Custom emoji
-                sticker sets can't be created via the Bot API at the moment. By default, a
-                regular sticker set is created.
 
-                .. versionadded:: 20.0
+                .. deprecated:: NEXT.VERSION
+                    |api6_6_depr|
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
         Raises:
-            :class:`telegram.error.TelegramError`
+            :exc:`TypeError`: Raised when: 1) ``stickers`` and ``sticker_format`` are passed
+                  together with the deprecated parameters. 2) If neither the new parameters or
+                  the deprecated parameters are passed.
 
+            :class:`telegram.error.TelegramError`: For other errors.
         """
+        pre_api_6_6_params = {
+            "emojis": emojis,
+            "png_sticker": png_sticker,
+            "mask_position": mask_position,
+            "tgs_sticker": tgs_sticker,
+            "webm_sticker": webm_sticker,
+        }
+
+        if not any(pre_api_6_6_params.values()) and not all((stickers, sticker_format)):
+            raise TypeError(
+                "Since Bot API 6.6, the parameters `stickers` and `sticker_format` "
+                "are required, please pass them as well."
+            )
+
+        if any(pre_api_6_6_params.values()) and any((stickers, sticker_format)):
+            raise TypeError(
+                "Since Bot API 6.6, the parameters `stickers` and `sticker_format` "
+                "are mutually exclusive with the deprecated parameters "
+                f"{set(pre_api_6_6_params)}. Please use the new parameter "
+                "`stickers` and `sticker_format` instead."
+            )
+            # If we had allowed this, the created sticker set would have used the newer parameters
+            # only, which would have been confusing.
+
+        if any(pre_api_6_6_params.values()):
+            warn(
+                f"Since Bot API 6.6, the parameters {set(pre_api_6_6_params)} for "
+                "`create_new_sticker_set` are deprecated. Please use the new parameter "
+                "`stickers` and `sticker_format` instead.",
+                stacklevel=4,
+            )
+
         data: JSONDict = {
             "user_id": user_id,
             "name": name,
             "title": title,
+            "stickers": stickers,
+            "sticker_format": sticker_format,
+            "sticker_type": sticker_type,
+            "needs_repainting": needs_repainting,
+            # Deprecated params since bot api 6.6
             "emojis": emojis,
             "png_sticker": self._parse_file_input(png_sticker) if png_sticker else None,
             "tgs_sticker": self._parse_file_input(tgs_sticker) if tgs_sticker else None,
             "webm_sticker": self._parse_file_input(webm_sticker) if webm_sticker else None,
             "mask_position": mask_position,
-            "sticker_type": sticker_type,
         }
 
         result = await self._post(
@@ -5749,11 +5841,16 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         user_id: Union[str, int],
         name: str,
-        emojis: str,
+        # Deprecated params since bot api 6.6
+        # ----
+        emojis: str = None,  # Was made optional for compatibility reasons
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
+        # ----
+        # New in bot api 6.6:
+        sticker: InputSticker = None,  # Actually a required param, but is optional for compat.
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -5762,21 +5859,36 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         api_kwargs: JSONDict = None,
     ) -> bool:
         """
-        Use this method to add a new sticker to a set created by the bot.
-        You **must** use exactly one of the fields :paramref:`png_sticker`, :paramref:`tgs_sticker`
-        or :paramref:`webm_sticker`. Animated stickers can be added to animated sticker sets and
-        only to them. Animated sticker sets can have up to 50 stickers. Static sticker sets can
-        have up to 120 stickers.
+        Use this method to add a new sticker to a set created by the bot. The format of the added
+        sticker must match the format of the other stickers in the set. Emoji sticker sets can have
+        up to :tg-const:`telegram.constants.StickerSetLimit.MAX_EMOJI_STICKERS` stickers. Animated
+        and video sticker sets can have up to
+        :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_STICKERS` stickers. Static
+        sticker sets can have up to
+        :tg-const:`telegram.constants.StickerSetLimit.MAX_STATIC_STICKERS` stickers.
 
-        Warning:
-            As of API 4.7 :paramref:`png_sticker` is an optional argument and therefore the order
-            of the arguments had to be changed. Use keyword arguments to make sure that the
-            arguments are passed correctly.
+        .. |api6_6| replace:: Since Bot API 6.6, this argument is deprecated in favour of
+            :paramref:`sticker`.
+
+        .. versionchanged:: NEXT.VERSION
+            Since Bot API 6.6, the parameter :paramref:`sticker` replace the parameters
+            :paramref:`png_sticker`, :paramref:`tgs_sticker`, :paramref:`webm_sticker`,
+            :paramref:`emojis`, and :paramref:`mask_position`.
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
             name (:obj:`str`): Sticker set name.
-            emojis (:obj:`str`): One or more emoji corresponding to the sticker.
+            sticker (:class:`telegram.InputSticker`): An object with information about the added
+                sticker. If exactly the same sticker had already been added to the set, then the
+                set isn't changed.
+
+                .. versionadded:: NEXT.VERSION
+
+            emojis (:obj:`str`, optional): One or more emoji corresponding to the sticker.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_6|
+
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
@@ -5789,8 +5901,16 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_6|
+
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_6|
+
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **TGS** animation with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#animation-requirements for technical
@@ -5802,6 +5922,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_6|
+
             webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
                 optional): **WEBM** video with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#video-requirements for
@@ -5813,16 +5937,54 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
+                .. deprecated:: NEXT.VERSION
+                    |api6_6|
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
         Raises:
-            :class:`telegram.error.TelegramError`
+            :exc:`TypeError`: Raised when: 1) ``sticker`` is passed
+                  together with the deprecated parameters. 2) If neither the new parameter or
+                  the deprecated parameters are passed.
+
+            :class:`telegram.error.TelegramError`: For other errors.
 
         """
+        pre_api_6_6_params = {
+            "emojis": emojis,
+            "png_sticker": png_sticker,
+            "mask_position": mask_position,
+            "tgs_sticker": tgs_sticker,
+            "webm_sticker": webm_sticker,
+        }
+
+        if not any(pre_api_6_6_params.values()) and not sticker:
+            raise TypeError(
+                "The parameter `sticker` is a required argument since Bot API 6.6 and"
+                " must be passed."
+            )
+
+        if any(pre_api_6_6_params.values()) and sticker:
+            raise TypeError(
+                "The parameters `sticker` and any of the deprecated parameters "
+                f"{set(pre_api_6_6_params)} are mutually exclusive. Please use "
+                "only `sticker`."
+            )
+
+        if any(pre_api_6_6_params.values()):
+            warn(
+                f"Since Bot API 6.6, the parameters {set(pre_api_6_6_params)} for "
+                "`add_sticker_to_set` are deprecated. Please use the new parameter `sticker` "
+                "instead.",
+                stacklevel=4,
+            )
+
         data: JSONDict = {
             "user_id": user_id,
             "name": name,
+            "sticker": sticker,
+            # Deprecated params since bot api 6.6:
             "emojis": emojis,
             "png_sticker": self._parse_file_input(png_sticker) if png_sticker else None,
             "tgs_sticker": self._parse_file_input(tgs_sticker) if tgs_sticker else None,

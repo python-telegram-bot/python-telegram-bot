@@ -74,7 +74,9 @@ __all__ = [
     "PollType",
     "ReplyLimit",
     "SUPPORTED_WEBHOOK_PORTS",
+    "StickerFormat",
     "StickerLimit",
+    "StickerSetLimit",
     "StickerType",
     "WebhookLimit",
     "UpdateType",
@@ -1266,6 +1268,23 @@ class ReplyLimit(IntEnum):
     """
 
 
+class StickerFormat(StringEnum):
+    """This enum contains the available formats of :class:`telegram.Sticker` in the set. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    STATIC = "static"
+    """:obj:`str`: Static sticker."""
+    ANIMATED = "animated"
+    """:obj:`str`: Animated sticker."""
+    VIDEO = "video"
+    """:obj:`str`: Video sticker."""
+
+
 class StickerLimit(IntEnum):
     """This enum contains limitations for various sticker methods, such as
     :meth:`telegram.Bot.create_new_sticker_set`.
@@ -1315,6 +1334,41 @@ class StickerLimit(IntEnum):
     :meth:`telegram.Bot.set_sticker_keywords`.
 
     .. versionadded:: NEXT.VERSION
+    """
+
+
+class StickerSetLimit(IntEnum):
+    """This enum contains limitations for various sticker set methods, such as
+    :meth:`telegram.Bot.create_new_sticker_set` and :meth:`telegram.Bot.add_sticker_to_set`.
+
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_INITIAL_STICKERS = 1
+    """:obj:`int`: Minimum number of stickers needed to create a sticker set, passed as the
+    :paramref:`~telegram.Bot.create_new_sticker_set.stickers` parameter of
+    :meth:`telegram.Bot.create_new_sticker_set`.
+    """
+    MAX_INITIAL_STICKERS = 50
+    """:obj:`int`: Maximum number of stickers allowed while creating a sticker set, passed as the
+    :paramref:`~telegram.Bot.create_new_sticker_set.stickers` parameter of
+    :meth:`telegram.Bot.create_new_sticker_set`.
+    """
+    MAX_EMOJI_STICKERS = 200
+    """:obj:`int`: Maximum number of stickers allowed in an emoji sticker set, as given in
+    :meth:`telegram.Bot.add_sticker_to_set`.
+    """
+    MAX_ANIMATED_STICKERS = 50
+    """:obj:`int`: Maximum number of stickers allowed in an animated or video sticker set, as given
+    in :meth:`telegram.Bot.add_sticker_to_set`.
+    """
+    MAX_STATIC_STICKERS = 120
+    """:obj:`int`: Maximum number of stickers allowed in a static sticker set, as given in
+    :meth:`telegram.Bot.add_sticker_to_set`.
     """
 
 

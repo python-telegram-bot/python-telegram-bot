@@ -24,6 +24,7 @@ from typing import List, Optional, Sequence, Tuple
 
 from telegram._files.inputfile import InputFile
 from telegram._files.inputmedia import InputMedia
+from telegram._files.inputsticker import InputSticker
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.enum import StringEnum
@@ -133,6 +134,16 @@ class RequestParameter:
                 return data, [value.media, thumbnail]
 
             return data, [value.media]
+        if isinstance(value, InputSticker) and isinstance(value.sticker, InputFile):
+            # We call to_dict and change the returned dict instead of overriding
+            # value.sticker in case the same value is reused for another request
+            data = value.to_dict()
+            if value.sticker.attach_uri:
+                data["sticker"] = value.sticker.attach_uri
+            else:
+                data.pop("sticker", None)
+            return data, [value.sticker]
+
         if isinstance(value, TelegramObject):
             # Needs to be last, because InputMedia is a subclass of TelegramObject
             return value.to_dict(), []

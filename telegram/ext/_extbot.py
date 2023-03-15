@@ -67,6 +67,7 @@ from telegram import (
     MessageId,
     PassportElementError,
     PhotoSize,
+    InputSticker,
     Poll,
     SentWebAppMessage,
     ShippingOption,
@@ -708,11 +709,16 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         user_id: Union[str, int],
         name: str,
-        emojis: str,
+        # Deprecated params since bot api 6.6
+        # ----
+        emojis: str = None,  # Was made optional for compatibility reasons
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
+        # ----
+        # New in bot api 6.6:
+        sticker: InputSticker = None,  # Actually a required param, but is optional for compat.
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -724,6 +730,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         return await super().add_sticker_to_set(
             user_id=user_id,
             name=name,
+            sticker=sticker,
             emojis=emojis,
             png_sticker=png_sticker,
             mask_position=mask_position,
@@ -1033,12 +1040,21 @@ class ExtBot(Bot, Generic[RLARGS]):
         user_id: Union[str, int],
         name: str,
         title: str,
-        emojis: str,
+        # Deprecated params since bot api 6.6
+        # ----
+        emojis: str = None,  # Was made optional for compatibility purposes
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
+        # ----
         sticker_type: str = None,
+        # New params since bot api 6.6
+        # ----
+        stickers: Sequence[InputSticker] = None,  # Actually a required param. Optional for compat.
+        sticker_format: str = None,  # Actually a required param. Optional for compat.
+        needs_repainting: bool = None,
+        # ----
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -1051,6 +1067,9 @@ class ExtBot(Bot, Generic[RLARGS]):
             user_id=user_id,
             name=name,
             title=title,
+            stickers=stickers,
+            sticker_format=sticker_format,
+            needs_repainting=needs_repainting,
             emojis=emojis,
             png_sticker=png_sticker,
             mask_position=mask_position,
