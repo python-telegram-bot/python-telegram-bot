@@ -119,7 +119,7 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
             expected_recwarn_length=3,
         )
 
-    def test_thumb_url_property_issues_warning_and_works_without_positional_arg(self, recwarn):
+    def test_thumb_url_issues_warning_and_works_without_positional_arg(self, recwarn):
         inline_query_result_photo = InlineQueryResultPhoto(
             TestInlineQueryResultPhotoBase.id_,
             TestInlineQueryResultPhotoBase.photo_url,
