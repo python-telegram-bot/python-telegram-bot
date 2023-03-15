@@ -9,7 +9,7 @@ line_length = 99
 [tool.ruff]
 line-length = 99
 target-version = "py37"
-select = ["E", "F", "I", "PL", "UP", "RUF"]
+select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE"]
 
 [tool.ruff.pylint]
 max-args = 100

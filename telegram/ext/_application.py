@@ -74,6 +74,7 @@ DEFAULT_GROUP: int = 0
 
 _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-name
 _STOP_SIGNAL = object()
+_DEFAULT_0 = DefaultValue(0)
 
 _logger = logging.getLogger(__name__)
 
@@ -1201,7 +1202,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]],
             Dict[int, Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]]],
         ],
-        group: Union[int, DefaultValue[int]] = DefaultValue(0),
+        group: Union[int, DefaultValue[int]] = _DEFAULT_0,
     ) -> None:
         """Registers multiple handlers at once. The order of the handlers in the passed
         sequence(s) matters. See :meth:`add_handler` for details.

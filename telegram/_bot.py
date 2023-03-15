@@ -2595,7 +2595,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         if current_offset is not None:
             # Convert the string input to integer
-            if current_offset == "":
+            if not current_offset:
                 current_offset_int = 0
             else:
                 current_offset_int = int(current_offset)
