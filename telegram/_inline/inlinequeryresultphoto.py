@@ -82,8 +82,8 @@ class InlineQueryResultPhoto(InlineQueryResult):
                |thumbargumentdeprecation| :paramref:`thumbnail_url`.
 
     Raises:
-        ValueError: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is supplied
-            or if both are supplied and are not equal.
+        :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
+            supplied or if both are supplied and are not equal.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.PHOTO`.
