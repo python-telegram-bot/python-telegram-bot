@@ -121,8 +121,83 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
         )
         assert inline_query_result_video.thumb_url == inline_query_result_video.thumbnail_url
         check_thumb_deprecation_warnings(
-            recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+            expected_recwarn_length=3,
         )
+
+    def test_thumb_url_issues_warning_and_works_without_positional_arg(self, recwarn):
+        inline_query_result_video = InlineQueryResultVideo(
+            TestInlineQueryResultVideoBase.id_,
+            TestInlineQueryResultVideoBase.video_url,
+            TestInlineQueryResultVideoBase.mime_type,
+            # Positional argument thumbnail_url should be here, but it's not. Code works fine.
+            # If user deletes thumb_url from positional arguments and replaces it with a keyword
+            # argument while keeping title as a positional argument, the code will break.
+            # But it should break, given the fact that the user now passes fewer positional
+            # arguments than they are expected to.
+            title=TestInlineQueryResultVideoBase.title,
+            video_width=TestInlineQueryResultVideoBase.video_width,
+            video_height=TestInlineQueryResultVideoBase.video_height,
+            video_duration=TestInlineQueryResultVideoBase.video_duration,
+            caption=TestInlineQueryResultVideoBase.caption,
+            parse_mode=TestInlineQueryResultVideoBase.parse_mode,
+            caption_entities=TestInlineQueryResultVideoBase.caption_entities,
+            description=TestInlineQueryResultVideoBase.description,
+            input_message_content=TestInlineQueryResultVideoBase.input_message_content,
+            reply_markup=TestInlineQueryResultVideoBase.reply_markup,
+            thumb_url=TestInlineQueryResultVideoBase.thumbnail_url,  # deprecated arg
+        )
+        assert inline_query_result_video.thumb_url == inline_query_result_video.thumbnail_url
+        check_thumb_deprecation_warnings(
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+            expected_recwarn_length=3,
+        )
+
+    def test_throws_type_error_with_title_not_passed_or_is_none(self):
+        # this test is needed because we had to make argument title optional in declaration of
+        # __init__() while it is not optional. This had to be done to deal with renaming of
+        # thumb_url.  Hence, we have to enforce `title` being required by checking it.
+        with pytest.raises(TypeError, match="argument: 'title'"):
+            InlineQueryResultVideo(
+                TestInlineQueryResultVideoBase.id_,
+                TestInlineQueryResultVideoBase.video_url,
+                TestInlineQueryResultVideoBase.mime_type,
+                TestInlineQueryResultVideoBase.thumbnail_url,
+                # title is missing
+                video_width=TestInlineQueryResultVideoBase.video_width,
+                video_height=TestInlineQueryResultVideoBase.video_height,
+                video_duration=TestInlineQueryResultVideoBase.video_duration,
+                caption=TestInlineQueryResultVideoBase.caption,
+                parse_mode=TestInlineQueryResultVideoBase.parse_mode,
+                caption_entities=TestInlineQueryResultVideoBase.caption_entities,
+                description=TestInlineQueryResultVideoBase.description,
+                input_message_content=TestInlineQueryResultVideoBase.input_message_content,
+                reply_markup=TestInlineQueryResultVideoBase.reply_markup,
+            )
+
+        with pytest.raises(TypeError, match="argument: 'title'"):
+            InlineQueryResultVideo(
+                TestInlineQueryResultVideoBase.id_,
+                TestInlineQueryResultVideoBase.video_url,
+                TestInlineQueryResultVideoBase.mime_type,
+                TestInlineQueryResultVideoBase.thumbnail_url,
+                title=None,  # the declaration of __init__ allows it, but we don't.
+                video_width=TestInlineQueryResultVideoBase.video_width,
+                video_height=TestInlineQueryResultVideoBase.video_height,
+                video_duration=TestInlineQueryResultVideoBase.video_duration,
+                caption=TestInlineQueryResultVideoBase.caption,
+                parse_mode=TestInlineQueryResultVideoBase.parse_mode,
+                caption_entities=TestInlineQueryResultVideoBase.caption_entities,
+                description=TestInlineQueryResultVideoBase.description,
+                input_message_content=TestInlineQueryResultVideoBase.input_message_content,
+                reply_markup=TestInlineQueryResultVideoBase.reply_markup,
+            )
 
     def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
         with pytest.raises(

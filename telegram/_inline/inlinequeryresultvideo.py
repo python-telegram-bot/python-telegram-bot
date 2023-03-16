@@ -28,6 +28,7 @@ from telegram._utils.types import JSONDict, ODVInput
 from telegram._utils.warnings_transition import (
     warn_about_deprecated_arg_return_new_arg,
     warn_about_deprecated_attr_in_property,
+    warn_about_required_renamed_param_passed_as_kwarg,
 )
 from telegram.constants import InlineQueryResultType
 
@@ -54,10 +55,23 @@ class InlineQueryResultVideo(InlineQueryResult):
             :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         video_url (:obj:`str`): A valid URL for the embedded video player or video file.
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
-        thumbnail_url (:obj:`str`): URL of the thumbnail (JPEG only) for the video.
+        thumbnail_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the video.
+
+            Warning:
+                In Bot API, this is **not** an optional argument. It is formally optional here
+                to allow you to pass the deprecated :paramref:`thumb_url` instead. If you pass
+                neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`, :class:`ValueError`
+                will be raised.
 
             .. versionadded:: NEXT.VERSION
-        title (:obj:`str`): Title for the result.
+        title (:obj:`str`, optional): Title for the result.
+
+            Warning:
+                In Bot API, this is **not** an optional argument. It is formally optional here
+                because of the renaming of :paramref:`thumb_url` to :paramref:`thumbnail_url`,
+                which required fpr :paramref:`thumbnail_url` to become optional to preserve
+                backwards compatibility.
+                :class:`TypeError` will be raised if no ``title`` is passed.
         caption (:obj:`str`, optional): Caption of the video to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
@@ -81,6 +95,11 @@ class InlineQueryResultVideo(InlineQueryResult):
 
             .. deprecated:: NEXT.VERSION
                |thumbargumentdeprecation| :paramref:`thumbnail_url`.
+
+    Raises:
+        :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
+            supplied or if both are supplied and are not equal.
+        :class:`TypeError`: If no :paramref:`title` is passed.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VIDEO`.
@@ -134,13 +153,23 @@ class InlineQueryResultVideo(InlineQueryResult):
         "thumbnail_url",
     )
 
+    @warn_about_required_renamed_param_passed_as_kwarg(
+        deprecated_param_names=("thumb_url",),
+        new_param_names=("thumbnail_url",),
+        bot_api_version="6.6",
+    )
     def __init__(
         self,
         id: str,  # pylint: disable=redefined-builtin
         video_url: str,
         mime_type: str,
-        thumbnail_url: str,
-        title: str,
+        # thumbnail_url and title are not optional in Telegram API, but we want to support
+        # thumb_url as well, so thumbnail_url may not be passed if thumb_url is passed.
+        # We will raise ValueError manually if neither thumbnail_url nor thumb_url are passed.
+        thumbnail_url: str = None,
+        # title had to be made optional because of thumbnail_url. This is compensated by raising
+        # ValueError manually if title is not passed.
+        title: str = None,
         caption: str = None,
         video_width: int = None,
         video_height: int = None,
@@ -157,6 +186,17 @@ class InlineQueryResultVideo(InlineQueryResult):
         *,
         api_kwargs: JSONDict = None,
     ):
+        if not (thumbnail_url or thumb_url):
+            raise ValueError(
+                "You must pass either 'thumbnail_url' or 'thumb_url'. Note that 'thumb_url' is "
+                "deprecated."
+            )
+
+        if title is None:
+            raise TypeError(
+                "InlineQueryResultVideo.__init__() missing 1 required argument: 'title'"
+            )
+
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
         with self._unfrozen():
