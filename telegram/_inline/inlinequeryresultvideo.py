@@ -194,7 +194,8 @@ class InlineQueryResultVideo(InlineQueryResult):
 
         if title is None:
             raise TypeError(
-                "InlineQueryResultVideo.__init__() missing 1 required argument: 'title'"
+                "InlineQueryResultVideo.__init__() missing a required argument: you forgot to pass"
+                " either 'title' or 'thumbnail_url'."
             )
 
         # Required
