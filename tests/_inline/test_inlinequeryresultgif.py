@@ -115,7 +115,11 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
         )
         assert inline_query_result_gif.thumb_url == inline_query_result_gif.thumbnail_url
         check_thumb_deprecation_warnings(
-            recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+            expected_recwarn_length=3,
         )
 
     def test_thumb_mime_type_property_deprecation_warning(self, recwarn):
@@ -140,6 +144,52 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_mime_type", new_name="thumbnail_mime_type"
         )
+
+    def test_thumb_url_issues_warning_and_works_without_positional_arg(self, recwarn):
+        inline_query_result_gif = InlineQueryResultGif(
+            TestInlineQueryResultGifBase.id_,
+            TestInlineQueryResultGifBase.gif_url,
+            TestInlineQueryResultGifBase.thumbnail_url,
+            # positional argument thumbnail_url should be here, but it's not
+            gif_width=TestInlineQueryResultGifBase.gif_width,
+            gif_height=TestInlineQueryResultGifBase.gif_height,
+            gif_duration=TestInlineQueryResultGifBase.gif_duration,
+            title=TestInlineQueryResultGifBase.title,
+            caption=TestInlineQueryResultGifBase.caption,
+            parse_mode=TestInlineQueryResultGifBase.parse_mode,
+            caption_entities=TestInlineQueryResultGifBase.caption_entities,
+            input_message_content=TestInlineQueryResultGifBase.input_message_content,
+            reply_markup=TestInlineQueryResultGifBase.reply_markup,
+            thumbnail_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,
+            thumb_url=TestInlineQueryResultGifBase.thumbnail_url,  # deprecated arg
+        )
+
+        assert inline_query_result_gif.thumb_url == inline_query_result_gif.thumbnail_url
+        check_thumb_deprecation_warnings(
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+            expected_recwarn_length=3,
+        )
+
+    def test_init_throws_error_without_thumbnail_url_and_thumb_url(self, recwarn):
+        with pytest.raises(ValueError, match="You must pass either"):
+            InlineQueryResultGif(
+                TestInlineQueryResultGifBase.id_,
+                TestInlineQueryResultGifBase.gif_url,
+                # no thumbnail_url or thumb_url
+                gif_width=TestInlineQueryResultGifBase.gif_width,
+                gif_height=TestInlineQueryResultGifBase.gif_height,
+                gif_duration=TestInlineQueryResultGifBase.gif_duration,
+                title=TestInlineQueryResultGifBase.title,
+                caption=TestInlineQueryResultGifBase.caption,
+                parse_mode=TestInlineQueryResultGifBase.parse_mode,
+                caption_entities=TestInlineQueryResultGifBase.caption_entities,
+                input_message_content=TestInlineQueryResultGifBase.input_message_content,
+                reply_markup=TestInlineQueryResultGifBase.reply_markup,
+                thumbnail_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,
+            )
 
     def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self, recwarn):
         with pytest.raises(

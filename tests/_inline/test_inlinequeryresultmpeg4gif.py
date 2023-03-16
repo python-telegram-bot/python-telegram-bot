@@ -117,7 +117,11 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
             inline_query_result_mpeg4_gif.thumb_url == inline_query_result_mpeg4_gif.thumbnail_url
         )
         check_thumb_deprecation_warnings(
-            recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+            expected_recwarn_length=3,
         )
 
     def test_thumb_mime_type_property_deprecation_warning(self, recwarn):
@@ -143,6 +147,53 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
         check_thumb_deprecation_warnings(
             recwarn, __file__, deprecated_name="thumb_mime_type", new_name="thumbnail_mime_type"
         )
+
+    def test_thumb_url_issues_warning_and_works_without_positional_arg(self, recwarn):
+        inline_query_result_mpeg4_gif = InlineQueryResultMpeg4Gif(
+            TestInlineQueryResultMpeg4GifBase.id_,
+            TestInlineQueryResultMpeg4GifBase.mpeg4_url,
+            # positional argument thumbnail_url should be here, but it's not
+            mpeg4_width=TestInlineQueryResultMpeg4GifBase.mpeg4_width,
+            mpeg4_height=TestInlineQueryResultMpeg4GifBase.mpeg4_height,
+            mpeg4_duration=TestInlineQueryResultMpeg4GifBase.mpeg4_duration,
+            title=TestInlineQueryResultMpeg4GifBase.title,
+            caption=TestInlineQueryResultMpeg4GifBase.caption,
+            parse_mode=TestInlineQueryResultMpeg4GifBase.parse_mode,
+            caption_entities=TestInlineQueryResultMpeg4GifBase.caption_entities,
+            input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
+            reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
+            thumbnail_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,
+            thumb_url=TestInlineQueryResultMpeg4GifBase.thumbnail_url,  # deprecated arg
+        )
+
+        assert (
+            inline_query_result_mpeg4_gif.thumb_url == inline_query_result_mpeg4_gif.thumbnail_url
+        )
+        check_thumb_deprecation_warnings(
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+            expected_recwarn_length=3,
+        )
+
+    def test_init_throws_error_without_thumbnail_url_and_thumb_url(self, recwarn):
+        with pytest.raises(ValueError, match="You must pass either"):
+            InlineQueryResultMpeg4Gif(
+                TestInlineQueryResultMpeg4GifBase.id_,
+                TestInlineQueryResultMpeg4GifBase.mpeg4_url,
+                # no thumbnail_url or thumb_url
+                mpeg4_width=TestInlineQueryResultMpeg4GifBase.mpeg4_width,
+                mpeg4_height=TestInlineQueryResultMpeg4GifBase.mpeg4_height,
+                mpeg4_duration=TestInlineQueryResultMpeg4GifBase.mpeg4_duration,
+                title=TestInlineQueryResultMpeg4GifBase.title,
+                caption=TestInlineQueryResultMpeg4GifBase.caption,
+                parse_mode=TestInlineQueryResultMpeg4GifBase.parse_mode,
+                caption_entities=TestInlineQueryResultMpeg4GifBase.caption_entities,
+                input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
+                reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
+                thumb_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,
+            )
 
     def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
         with pytest.raises(

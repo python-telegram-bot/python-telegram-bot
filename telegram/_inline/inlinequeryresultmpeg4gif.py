@@ -28,6 +28,7 @@ from telegram._utils.types import JSONDict, ODVInput
 from telegram._utils.warnings_transition import (
     warn_about_deprecated_arg_return_new_arg,
     warn_about_deprecated_attr_in_property,
+    warn_about_required_renamed_param_passed_as_kwarg,
 )
 from telegram.constants import InlineQueryResultType
 
@@ -55,6 +56,12 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         thumbnail_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail
             for the result.
 
+            Warning:
+                In Bot API, this is **not** an optional argument. It is formally optional here
+                to allow you to pass the deprecated :paramref:`thumb_url` instead. If you pass
+                neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`, :class:`ValueError`
+                will be raised.
+
             .. versionadded:: NEXT.VERSION
         thumbnail_mime_type (:obj:`str`, optional): MIME type of the thumbnail, must be one of
             ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
@@ -75,6 +82,10 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the video animation.
+
+    Raises:
+        :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
+            supplied or if both are supplied and are not equal.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.MPEG4GIF`.
@@ -127,11 +138,16 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         "thumbnail_url",
     )
 
+    @warn_about_required_renamed_param_passed_as_kwarg(
+        deprecated_param_names=("thumb_url",),
+        new_param_names=("thumbnail_url",),
+        bot_api_version="6.6",
+    )
     def __init__(
         self,
         id: str,  # pylint: disable=redefined-builtin
         mpeg4_url: str,
-        thumbnail_url: str,
+        thumbnail_url: str = None,
         mpeg4_width: int = None,
         mpeg4_height: int = None,
         title: str = None,
@@ -150,6 +166,12 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         *,
         api_kwargs: JSONDict = None,
     ):
+        if not (thumbnail_url or thumb_url):
+            raise ValueError(
+                "You must pass either 'thumbnail_url' or 'thumb_url'. Note that 'thumb_url' is "
+                "deprecated."
+            )
+
         # Required
         super().__init__(InlineQueryResultType.MPEG4GIF, id, api_kwargs=api_kwargs)
         with self._unfrozen():
