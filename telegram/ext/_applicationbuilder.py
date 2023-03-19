@@ -178,7 +178,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._get_updates_write_timeout: ODVInput[float] = DEFAULT_NONE
         self._get_updates_pool_timeout: ODVInput[float] = DEFAULT_NONE
         self._get_updates_request: DVInput["BaseRequest"] = DEFAULT_NONE
-        self._get_updates_http_version: DVInput[str] = DefaultValue("2")
+        self._get_updates_http_version: DVInput[str] = DefaultValue("1.1")
         self._private_key: ODVInput[bytes] = DEFAULT_NONE
         self._private_key_password: ODVInput[bytes] = DEFAULT_NONE
         self._defaults: ODVInput["Defaults"] = DEFAULT_NONE
@@ -204,7 +204,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_stop: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._rate_limiter: ODVInput["BaseRateLimiter"] = DEFAULT_NONE
-        self._http_version: DVInput[str] = DefaultValue("2")
+        self._http_version: DVInput[str] = DefaultValue("1.1")
 
     def _build_request(self, get_updates: bool) -> BaseRequest:
         prefix = "_get_updates_" if get_updates else "_"
@@ -232,7 +232,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             key: value for key, value in timeouts.items() if not isinstance(value, DefaultValue)
         }
 
-        http_version = DefaultValue.get_value(getattr(self, f"{prefix}http_version")) or "2"
+        http_version = DefaultValue.get_value(getattr(self, f"{prefix}http_version")) or "1.1"
 
         return HTTPXRequest(
             connection_pool_size=connection_pool_size,
@@ -564,15 +564,32 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def http_version(self: BuilderType, http_version: str) -> BuilderType:
         """Sets the HTTP protocol version which is used for the
         :paramref:`~telegram.request.HTTPXRequest.http_version` parameter of
-        :attr:`telegram.Bot.request`. By default, HTTP/2 is used.
+        :attr:`telegram.Bot.request`. By default, HTTP/1.1 is used.
 
         .. seealso:: :meth:`get_updates_http_version`
 
+        Note:
+            Users have observed stability issues with HTTP/2, which happen due to how the `h2
+            library handles <https://github.com/python-hyper/h2/issues/1181>` cancellations of
+            keepalive connections. See `#3556 <https://github.com/python-telegram-bot/
+            python-telegram-bot/issues/3556>`_ for a discussion.
+
+            If you want to use HTTP/2, you must install PTB with the optional requirement
+            ``http2``, i.e.
+            .. code-block:: bash
+
+               pip install python-telegram-bot[http2]
+
+            Keep in mind that the HTTP/1.1 implementation may be considered the `"more
+            robust option at this time" <https://www.python-httpx.org/http2#enabling-http2>`_.
+
         .. versionadded:: 20.1
+        .. versionchanged:: NEXT.VERSION
+            Reset the default version to 1.1.
 
         Args:
-            http_version (:obj:`str`): Pass ``"1.1"`` if you'd like to use HTTP/1.1 for making
-                requests to Telegram. Defaults to ``"2"``, in which case HTTP/2 is used.
+            http_version (:obj:`str`): Pass ``"2"`` if you'd like to use HTTP/2 for making
+                requests to Telegram. Defaults to ``"1.1"``, in which case HTTP/1.1 is used.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
@@ -705,15 +722,31 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_http_version(self: BuilderType, get_updates_http_version: str) -> BuilderType:
         """Sets the HTTP protocol version which is used for the
         :paramref:`~telegram.request.HTTPXRequest.http_version` parameter which is used in the
-        :meth:`telegram.Bot.get_updates` request. By default, HTTP/2 is used.
+        :meth:`telegram.Bot.get_updates` request. By default, HTTP/1.1 is used.
 
         .. seealso:: :meth:`http_version`
 
+        Note:
+            Users have observed stability issues with HTTP/2, which happen due to how the `h2
+            library handles <https://github.com/python-hyper/h2/issues/1181>` cancellations of
+            keepalive connections. See `#3556 <https://github.com/python-telegram-bot/
+            python-telegram-bot/issues/3556>`_ for a discussion.
+
+            You will also need to install the http2 dependency. Keep in mind that the HTTP/1.1
+            implementation may be considered the `"more robust option at this time"
+            <https://www.python-httpx.org/http2#enabling-http2>`_.
+
+            .. code-block:: bash
+
+               pip install httpx[http2]
+
         .. versionadded:: 20.1
+        .. versionchanged:: NEXT.VERSION
+            Reset the default version to 1.1.
 
         Args:
-            get_updates_http_version (:obj:`str`): Pass ``"1.1"`` if you'd like to use HTTP/1.1 for
-                making requests to Telegram. Defaults to ``"2"``, in which case HTTP/2 is used.
+            get_updates_http_version (:obj:`str`): Pass ``"2"`` if you'd like to use HTTP/2 for
+                making requests to Telegram. Defaults to ``"1.1"``, in which case HTTP/1.1 is used.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.

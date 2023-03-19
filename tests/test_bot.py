@@ -1648,6 +1648,33 @@ class TestBotWithoutRequest:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
+    async def test_http2_runtime_error(self, recwarn):
+        Bot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
+        Bot(
+            "12345:ABCDE",
+            base_url="http://",
+            get_updates_request=HTTPXRequest(http_version="2"),
+        )
+        Bot(
+            "12345:ABCDE",
+            base_url="http://",
+            request=HTTPXRequest(http_version="2"),
+            get_updates_request=HTTPXRequest(http_version="2"),
+        )
+        # this exists to make sure the error is also raised by extbot
+        ExtBot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
+        assert len(recwarn) == 4
+        assert "You set the HTTP version for the request HTTPXRequest instance" in str(
+            recwarn[0].message
+        )
+        assert "You set the HTTP version for the get_updates_request HTTPXRequest instance" in str(
+            recwarn[1].message
+        )
+        assert (
+            "You set the HTTP version for the get_updates_request and request HTTPXRequest "
+            "instance" in str(recwarn[2].message)
+        )
+
 
 class TestBotWithRequest:
     """

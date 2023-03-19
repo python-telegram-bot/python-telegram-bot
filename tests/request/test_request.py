@@ -74,12 +74,30 @@ async def httpx_request():
 @pytest.mark.skipif(
     TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
-class TestNoSocks:
+class TestNoSocksHTTP2WithoutRequest:
     async def test_init(self, bot):
         with pytest.raises(RuntimeError, match=r"python-telegram-bot\[socks\]"):
             HTTPXRequest(proxy_url="socks5://foo")
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[http2\]"):
+            HTTPXRequest(http_version="2")
 
 
+@pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")
+class TestHTTP2WithRequest:
+    async def test_http_2_response(self):
+        httpx_request = HTTPXRequest(http_version="2")
+        async with httpx_request:
+            resp = await httpx_request._client.request(
+                url="https://python-telegram-bot.org",
+                method="GET",
+                headers={"User-Agent": httpx_request.USER_AGENT},
+            )
+            assert resp.http_version == "HTTP/2"
+
+
+# I picked not TEST_XXX because that's the default, meaning it will run by default for an end-user
+# who runs pytest.
+@pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
 class TestRequestWithoutRequest:
     test_flag = None
 
@@ -321,6 +339,7 @@ class TestRequestWithoutRequest:
         assert self.test_flag == (1, 2, 3, 4)
 
 
+@pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
 class TestHTTPXRequestWithoutRequest:
     test_flag = None
 
@@ -345,7 +364,8 @@ class TestHTTPXRequestWithoutRequest:
         assert request._client.limits == httpx.Limits(
             max_connections=1, max_keepalive_connections=1
         )
-        assert request._client.http2 is True
+        assert request._client.http1 is True
+        assert not request._client.http2
 
         request = HTTPXRequest(
             connection_pool_size=42,
@@ -412,16 +432,6 @@ class TestHTTPXRequestWithoutRequest:
                 headers={"User-Agent": httpx_request.USER_AGENT},
             )
             assert resp.http_version == "HTTP/1.1"
-
-    async def test_http_2_response(self):
-        httpx_request = HTTPXRequest()
-        async with httpx_request:
-            resp = await httpx_request._client.request(
-                url="https://python-telegram-bot.org",
-                method="GET",
-                headers={"User-Agent": httpx_request.USER_AGENT},
-            )
-            assert resp.http_version == "HTTP/2"
 
     async def test_do_request_after_shutdown(self, httpx_request):
         await httpx_request.shutdown()
@@ -592,6 +602,7 @@ class TestHTTPXRequestWithoutRequest:
                 )
 
 
+@pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
 class TestHTTPXRequestWithRequest:
     async def test_do_request_wait_for_pool(self, httpx_request):
         """The pool logic is buried rather deeply in httpxcore, so we make actual requests here
