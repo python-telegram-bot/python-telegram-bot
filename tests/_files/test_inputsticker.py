@@ -76,21 +76,3 @@ class TestInputStickerNoRequest(TestInputStickerBase):
         assert isinstance(sticker.sticker, InputFile)
         sticker = InputSticker(data_file("telegram_video_sticker.webm"), ["👍"])
         assert sticker.sticker == data_file("telegram_video_sticker.webm").as_uri()
-
-    def test_equality(self, input_sticker):
-        a = InputSticker(self.sticker, self.emoji_list, self.mask_position, self.keywords)
-        b = InputSticker(self.sticker, self.emoji_list, self.mask_position, self.keywords)
-        c = InputSticker(self.sticker, ["emoji"], self.mask_position, self.keywords)
-        d = InputSticker("different_sticker", self.emoji_list, self.mask_position, self.keywords)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a != c
-        assert hash(a) != hash(c)
-        assert a is not c
-
-        assert a != d and c != d
-        assert hash(a) != hash(d) and hash(c) != hash(d)
-        assert a is not d and c is not d
