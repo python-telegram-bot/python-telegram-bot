@@ -76,8 +76,9 @@ def warn_about_deprecated_attr_in_property(
     bot_api_version: str,
     stacklevel: int = 3,
 ) -> None:
-    """A helper function for the transition in API when attribute is renamed.
-    It is meant to be called from properties that replace deprecated attributes in classes.
+    """A helper function for the transition in API when attribute is renamed. Call from properties.
+
+    The properties replace deprecated attributes in classes and issue these deprecation warnings.
     """
     warn(
         f"Bot API {bot_api_version} renamed the attribute '{deprecated_attr_name}' to "
