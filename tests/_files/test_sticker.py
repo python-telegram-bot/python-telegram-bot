@@ -835,6 +835,10 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         with pytest.raises(TypeError, match="The parameter `sticker` is a required"):
             await bot.add_sticker_to_set(chat_id, "name")
 
+    async def test_add_sticker_to_set_mutually_exclusive(self, bot, chat_id):
+        with pytest.raises(TypeError, match="mutually exclusive with the deprecated parameters"):
+            await bot.add_sticker_to_set(chat_id, "name", "emojis", sticker="something")
+
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_add_sticker_to_set_local_files(
         self, monkeypatch, bot, chat_id, local_mode, recwarn

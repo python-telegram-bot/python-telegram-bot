@@ -6024,9 +6024,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         if any(pre_api_6_6_params.values()) and sticker:
             raise TypeError(
-                "The parameters `sticker` and any of the deprecated parameters "
-                f"{set(pre_api_6_6_params)} are mutually exclusive. Please use "
-                "only `sticker`."
+                "Since Bot API 6.6, the parameter `sticker` "
+                "is mutually exclusive with the deprecated parameters "
+                f"{set(pre_api_6_6_params)}. Please use the new parameter "
+                "`sticker` instead."
             )
 
         if any(pre_api_6_6_params.values()):

@@ -140,8 +140,6 @@ class RequestParameter:
             data = value.to_dict()
             if value.sticker.attach_uri:
                 data["sticker"] = value.sticker.attach_uri
-            else:
-                data.pop("sticker", None)
             return data, [value.sticker]
 
         if isinstance(value, TelegramObject):

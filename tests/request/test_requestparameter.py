@@ -21,7 +21,7 @@ from typing import Sequence
 
 import pytest
 
-from telegram import InputFile, InputMediaPhoto, InputMediaVideo, MessageEntity
+from telegram import InputFile, InputMediaPhoto, InputMediaVideo, InputSticker, MessageEntity
 from telegram.constants import ChatType
 from telegram.request._requestparameter import RequestParameter
 from tests.auxil.files import data_file
@@ -161,6 +161,14 @@ class TestRequestParameterWithoutRequest:
         request_parameter = RequestParameter.from_input("key", input_media)
         assert request_parameter.value == {"type": "video"}
         assert request_parameter.input_files == [input_media.media, input_media.thumbnail]
+
+    def test_from_input_inputsticker(self):
+        input_sticker = InputSticker(data_file("telegram.png").read_bytes(), ["emoji"])
+        expected = input_sticker.to_dict()
+        expected.update({"sticker": input_sticker.sticker.attach_uri})
+        request_parameter = RequestParameter.from_input("key", input_sticker)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == [input_sticker.sticker]
 
     def test_from_input_str_and_bytes(self):
         input_str = "test_input"
