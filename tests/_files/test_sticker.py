@@ -27,11 +27,11 @@ from telegram import (
     Bot,
     File,
     InputFile,
+    InputSticker,
     MaskPosition,
     PhotoSize,
     Sticker,
     StickerSet,
-    InputSticker,
 )
 from telegram.constants import StickerFormat
 from telegram.error import BadRequest, TelegramError
@@ -932,18 +932,13 @@ class TestStickerSetWithRequest:
                     assert v
 
     async def test_delete_sticker_set(self, bot, chat_id, sticker_file):
-        try:
-            assert await bot.create_new_sticker_set(
-                chat_id,
-                name=f"temp_set_by_{bot.username}",
-                title="Stickerset delete Test",
-                stickers=[InputSticker(sticker_file, emoji_list=["😄"])],
-                sticker_format=StickerFormat.STATIC,
-            )
-        finally:
-            # Make sure that the sticker set is deleted even if the test fails
-            # so that it can be recreated in the next test run
-            assert await bot.delete_sticker_set(f"temp_set_by_{bot.username}")
+        assert await bot.create_new_sticker_set(
+            chat_id,
+            name=f"temp_set_by_{bot.username}",
+            title="Stickerset delete Test",
+            stickers=[InputSticker(sticker_file, emoji_list=["😄"])],
+            sticker_format=StickerFormat.STATIC,
+        )
 
     # Test add_sticker_to_set
     async def test_bot_methods_1_png(self, bot, chat_id, sticker_file):

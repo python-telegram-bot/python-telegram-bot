@@ -39,8 +39,8 @@ class InputSticker(TelegramObject):
 
     Args:
         sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`): The
-            added sticker. |fileinputbase| Animated and video stickers can't be uploaded via HTTP
-            URL.
+            added sticker. |uploadinputnopath| Animated and video stickers can't be uploaded via
+            HTTP URL.
         emoji_list (Sequence[:obj:`str`]): Sequence of
             :tg-const:`telegram.constants.StickerLimit.MIN_STICKER_EMOJI` -
             :tg-const:`telegram.constants.StickerLimit.MAX_STICKER_EMOJI` emoji associated with the
@@ -86,7 +86,11 @@ class InputSticker(TelegramObject):
 
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
-        self.sticker: Union[str, InputFile] = parse_file_input(sticker, local_mode=True)
+        self.sticker: Union[str, InputFile] = parse_file_input(
+            sticker,
+            local_mode=True,
+            attach=True,
+        )
         self.emoji_list: Tuple[str, ...] = parse_sequence_arg(emoji_list)
         self.mask_position: Optional[MaskPosition] = mask_position
         self.keywords: Tuple[str, ...] = parse_sequence_arg(keywords)
