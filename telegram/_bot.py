@@ -5613,7 +5613,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionadded:: NEXT.VERSION
 
-            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,
+            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional):
                 **PNG** image with the sticker, must be up to 512 kilobytes in size,
                 dimensions must not exceed 512px, and either width or height must be exactly 512px.

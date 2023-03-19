@@ -663,7 +663,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             await bot.upload_sticker_file(chat_id, sticker="something")
 
     async def test_upload_sticker_file_mutually_exclusive(self, bot, chat_id):
-        with pytest.raises(TypeError, match="mutually exclusive with the deprecated parameters"):
+        with pytest.raises(TypeError, match="mutually exclusive with the deprecated parameter"):
             await bot.upload_sticker_file(
                 chat_id, "png_sticker_file_id", sticker="s", sticker_format="static"
             )
