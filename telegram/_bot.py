@@ -53,7 +53,6 @@ except ImportError:
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
 
-
 from telegram._botcommand import BotCommand
 from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
@@ -5633,20 +5632,20 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         name: str,
         title: str,
         # Deprecated params since bot api 6.6
-        # ----
+        # <----
         emojis: str = None,  # Was made optional for compatibility purposes
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
-        # ----
+        # ---->
         sticker_type: str = None,
         # New params since bot api 6.6
-        # ----
+        # <----
         stickers: Sequence[InputSticker] = None,  # Actually a required param. Optional for compat.
         sticker_format: str = None,  # Actually a required param. Optional for compat.
         needs_repainting: bool = None,
-        # ----
+        # ---->
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -5771,7 +5770,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Raises:
             :exc:`TypeError`: Raised when: 1) ``stickers`` and ``sticker_format`` are passed
-                  together with the deprecated parameters. 2) If neither the new parameters or
+                  together with the deprecated parameters. 2) If neither the new parameters nor
                   the deprecated parameters are passed.
 
             :class:`telegram.error.TelegramError`: For other errors.
@@ -5945,7 +5944,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Raises:
             :exc:`TypeError`: Raised when: 1) ``sticker`` is passed
-                  together with the deprecated parameters. 2) If neither the new parameter or
+                  together with the deprecated parameters. 2) If neither the new parameter nor
                   the deprecated parameters are passed.
 
             :class:`telegram.error.TelegramError`: For other errors.
