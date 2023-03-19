@@ -932,13 +932,17 @@ class TestStickerSetWithRequest:
                     assert v
 
     async def test_delete_sticker_set(self, bot, chat_id, sticker_file):
-        assert await bot.create_new_sticker_set(
-            chat_id,
-            name=f"temp_set_by_{bot.username}",
-            title="Stickerset delete Test",
-            stickers=[InputSticker(sticker_file, emoji_list=["😄"])],
-            sticker_format=StickerFormat.STATIC,
-        )
+        try:
+            # try creating a new sticker set - just in case the last deletion test failed
+            assert await bot.create_new_sticker_set(
+                chat_id,
+                name=f"temp_set_by_{bot.username}",
+                title="Stickerset delete Test",
+                stickers=[InputSticker(sticker_file, emoji_list=["😄"])],
+                sticker_format=StickerFormat.STATIC,
+            )
+        finally:
+            assert await bot.delete_sticker_set(f"temp_set_by_{bot.username}")
 
     # Test add_sticker_to_set
     async def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
