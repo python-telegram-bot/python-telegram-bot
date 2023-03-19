@@ -149,7 +149,6 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
         inline_query_result_gif = InlineQueryResultGif(
             TestInlineQueryResultGifBase.id_,
             TestInlineQueryResultGifBase.gif_url,
-            TestInlineQueryResultGifBase.thumbnail_url,
             # positional argument thumbnail_url should be here, but it's not
             gif_width=TestInlineQueryResultGifBase.gif_width,
             gif_height=TestInlineQueryResultGifBase.gif_height,
