@@ -1385,6 +1385,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             Note that for data that should be available globally in all handler callbacks,
             independent of the chat/user, it is recommended use :attr:`bot_data` instead.
 
+        .. versionadded:: NEXT.VERSION
+
         Args:
             chat_ids (:obj:`int` | Collection[:obj:`int`], optional): Chat IDs to mark.
             user_ids (:obj:`int` | Collection[:obj:`int`], optional): User IDs to mark.
