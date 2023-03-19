@@ -43,8 +43,6 @@ from typing import (
     no_type_check,
 )
 
-from telegram._files.inputsticker import InputSticker
-
 try:
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
@@ -54,6 +52,7 @@ except ImportError:
     default_backend = None  # type: ignore[assignment]
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
+
 
 from telegram._botcommand import BotCommand
 from telegram._botcommandscope import BotCommandScope
@@ -70,6 +69,7 @@ from telegram._files.contact import Contact
 from telegram._files.document import Document
 from telegram._files.file import File
 from telegram._files.inputmedia import InputMedia
+from telegram._files.inputsticker import InputSticker
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import MaskPosition, Sticker, StickerSet
