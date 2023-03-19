@@ -43,10 +43,20 @@ IGNORED_PARAMETERS = {
 }
 
 ignored_param_requirements = {  # Ignore these since there's convenience params in them (eg. Venue)
+    # "method / TelegramObject": {"param_to_ignore", ...}
     "send_location": {"latitude", "longitude"},
     "edit_message_live_location": {"latitude", "longitude"},
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
+    # The following parameters that are required, but are optional for backward compatibility
+    # TODO: Remove this once we drop support for deprecated parameters
+    "upload_sticker_file": {"sticker", "sticker_format"},
+    "create_new_sticker_set": {"stickers", "sticker_format"},
+    "add_sticker_to_set": {"sticker"},
+    "InlineQueryResultPhoto": {"thumbnail_url"},
+    "InlineQueryResultGif": {"thumbnail_url"},
+    "InlineQueryResultMpeg4Gif": {"thumbnail_url"},
+    "InlineQueryResultVideo": {"thumbnail_url", "title"},
 }
 
 
@@ -79,12 +89,14 @@ def check_method(h4):
 
     checked = []
     for tg_parameter in table:  # Iterates through each row in the table
+        # Check if parameter is present in our method
         param = sig.parameters.get(
             tg_parameter[0]  # parameter[0] is first element (the param name)
         )
         assert param is not None, f"Parameter {tg_parameter[0]} not found in {method.__name__}"
 
         # TODO: Check type via docstring
+        # Now check if the parameter is required or not
         assert check_required_param(
             tg_parameter, param, method.__name__
         ), f"Param {param.name!r} of method {method.__name__!r} requirement mismatch!"
@@ -96,7 +108,12 @@ def check_method(h4):
 
         checked.append(tg_parameter[0])
 
+    # The following block of code checks that we don't have extra parameters in our methods
+    # that are not in the official docs.
+
+    # Some parameters are ignored for various reasons, so handle them here
     ignored = IGNORED_PARAMETERS.copy()
+    backward_compat_args = set()
     if name == "getUpdates":
         ignored -= {"timeout"}  # Has it's own timeout parameter that we do wanna check for
     elif name in (
@@ -123,13 +140,26 @@ def check_method(h4):
     elif name == "sendMediaGroup":
         # Added for ease of use
         ignored |= {"caption", "parse_mode", "caption_entities"}
+    elif name in {"createNewStickerSet", "addStickerToSet"}:  # Kept for backward compatibility
+        a = {"png_sticker", "emojis", "mask_position", "tgs_sticker", "webm_sticker"}
+        ignored |= a
+        backward_compat_args |= a
+    elif name == "uploadStickerFile":  # Kept for backward compatibility
+        ignored |= {"png_sticker"}
+        backward_compat_args |= {"png_sticker"}
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
     kw_or_positional_args = [
         p.name for p in sig.parameters.values() if p.kind != inspect.Parameter.KEYWORD_ONLY
     ]
-    assert set(kw_or_positional_args).difference(checked).difference(["self", "thumb"]) == set(), (
+    assert (
+        set(kw_or_positional_args)
+        .difference(checked)
+        .difference(["self", "thumb"])
+        .difference(backward_compat_args)
+        == set()
+    ), (
         f"In {method.__qualname__}, extra args should be keyword only "
         f"(compared to {name} in API)"
     )
