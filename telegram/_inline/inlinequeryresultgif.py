@@ -56,10 +56,10 @@ class InlineQueryResultGif(InlineQueryResult):
             for the result.
 
             Warning:
-                In Bot API, this is **not** an optional argument. It is formally optional here
-                to allow you to pass the deprecated :paramref:`thumb_url` instead. If you pass
-                neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`, :class:`ValueError`
-                will be raised.
+                The Bot API does **not** define this as an optional argument. It is formally
+                optional for backwards compatibility with the deprecated :paramref:`thumb_url`.
+                If you pass neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`,
+                :class:`ValueError` will be raised.
 
             .. versionadded:: NEXT.VERSION
         thumbnail_mime_type (:obj:`str`, optional): MIME type of the thumbnail, must be one of

@@ -53,10 +53,10 @@ class InlineQueryResultPhoto(InlineQueryResult):
         thumbnail_url (:obj:`str`, optional): URL of the thumbnail for the photo.
 
             Warning:
-                In Bot API, this is **not** an optional argument. It is formally optional here
-                to allow you to pass the deprecated :paramref:`thumb_url` instead. If you pass
-                neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`, :class:`ValueError`
-                will be raised.
+                The Bot API does **not** define this as an optional argument. It is formally
+                optional for backwards compatibility with the deprecated :paramref:`thumb_url`.
+                If you pass neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`,
+                :class:`ValueError` will be raised.
 
             .. versionadded:: NEXT.VERSION
         photo_width (:obj:`int`, optional): Width of the photo.

@@ -58,20 +58,19 @@ class InlineQueryResultVideo(InlineQueryResult):
         thumbnail_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the video.
 
             Warning:
-                In Bot API, this is **not** an optional argument. It is formally optional here
-                to allow you to pass the deprecated :paramref:`thumb_url` instead. If you pass
-                neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`, :class:`ValueError`
-                will be raised.
+                The Bot API does **not** define this as an optional argument. It is formally
+                optional for backwards compatibility with the deprecated :paramref:`thumb_url`.
+                If you pass neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`,
+                :class:`ValueError` will be raised.
 
             .. versionadded:: NEXT.VERSION
         title (:obj:`str`, optional): Title for the result.
 
             Warning:
-                In Bot API, this is **not** an optional argument. It is formally optional here
-                because of the renaming of :paramref:`thumb_url` to :paramref:`thumbnail_url`,
-                which required fpr :paramref:`thumbnail_url` to become optional to preserve
-                backwards compatibility.
-                :class:`TypeError` will be raised if no ``title`` is passed.
+                The Bot API does **not** define this as an optional argument. It is formally
+                optional to ensure backwards compatibility of :paramref:`thumbnail_url` with the
+                deprecated :paramref:`thumb_url`, which required that :paramref:`thumbnail_url`
+                become optional. :class:`TypeError` will be raised if no ``title`` is passed.
         caption (:obj:`str`, optional): Caption of the video to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
@@ -168,7 +167,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         # We will raise ValueError manually if neither thumbnail_url nor thumb_url are passed.
         thumbnail_url: str = None,
         # title had to be made optional because of thumbnail_url. This is compensated by raising
-        # ValueError manually if title is not passed.
+        # TypeError manually if title is not passed.
         title: str = None,
         caption: str = None,
         video_width: int = None,
@@ -179,7 +178,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence[MessageEntity] = None,
-        # thumbnail_url is not optional in Telegram API, but deprecated thumb_url will have to be.
+        # thumbnail_url is not optional in Telegram API, but it is here, along with thumb_url.
         # This way the user can pass thumbnail_url as a positional argument and thumb_url
         # as a keyword_argument
         thumb_url: str = None,
