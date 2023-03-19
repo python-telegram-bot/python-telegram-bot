@@ -5579,7 +5579,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def upload_sticker_file(
         self,
         user_id: Union[str, int],
-        png_sticker: FileInput,
+        png_sticker: FileInput = None,  # Deprecated since bot api 6.6. Optional for compatiblity.
+        # New parameters since bot api 6.6:
+        # <---
+        sticker: FileInput = None,  # Actually required, but optional for compatibility.
+        sticker_format: str = None,  # Actually required, but optional for compatibility.
+        # --->
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -5588,13 +5593,28 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         api_kwargs: JSONDict = None,
     ) -> File:
         """
-        Use this method to upload a ``.PNG`` file with a sticker for later use in
+        Use this method to upload a file with a sticker for later use in the
         :meth:`create_new_sticker_set` and :meth:`add_sticker_to_set` methods (can be used multiple
         times).
 
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
-            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`):
+            sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`):
+                A file with the sticker in the  ``".WEBP"``, ``".PNG"``, ``".TGS"`` or ``".WEBM"``
+                format. See `here <https://core.telegram.org/stickers>`_ for technical requirements
+                . |uploadinput|
+
+                .. versionadded:: NEXT.VERSION
+
+            sticker_format (:obj:`str`): Format of the sticker. Must be one of
+                :attr:`telegram.constants.StickerFormat.STATIC`,
+                :attr:`telegram.constants.StickerFormat.ANIMATED`,
+                :attr:`telegram.constants.StickerFormat.VIDEO`.
+
+                .. versionadded:: NEXT.VERSION
+
+            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,
+                optional):
                 **PNG** image with the sticker, must be up to 512 kilobytes in size,
                 dimensions must not exceed 512px, and either width or height must be exactly 512px.
                 |uploadinput|
@@ -5606,14 +5626,52 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
+                .. deprecated:: NEXT.VERSION
+                    Since Bot API 6.6, this parameter has been deprecated in favor of
+                    :paramref:`sticker` and :paramref:`sticker_format`.
+
         Returns:
             :class:`telegram.File`: On success, the uploaded File is returned.
 
         Raises:
-            :class:`telegram.error.TelegramError`
+            :exc:`TypeError`: Raised when: 1) ``sticker`` and ``sticker_format`` are passed
+                  together with ``png_sticker``. 2) If neither the new parameters nor
+                  the deprecated parameters are passed.
+
+            :class:`telegram.error.TelegramError`: For other errors.
 
         """
-        data: JSONDict = {"user_id": user_id, "png_sticker": self._parse_file_input(png_sticker)}
+        if not png_sticker and not all((sticker, sticker_format)):
+            raise TypeError(
+                "Since Bot API 6.6, the parameters `sticker` and `sticker_format` "
+                "are required, please pass them as well."
+            )
+
+        if png_sticker and any((sticker, sticker_format)):
+            raise TypeError(
+                "Since Bot API 6.6, the parameters `sticker` and `sticker_format` "
+                "are mutually exclusive with the deprecated parameter "
+                "`png_sticker`. Please use the new parameters "
+                "`sticker` and `sticker_format` instead."
+            )
+            # If we had allowed this, the created sticker set would have used the newer parameters
+            # only, which would have been confusing.
+
+        if png_sticker:
+            warn(
+                "Since Bot API 6.6, the parameter `png_sticker` for "
+                "`upload_sticker_file` is deprecated. Please use the new parameters "
+                "`sticker` and `sticker_format` instead.",
+                stacklevel=4,
+            )
+
+        data: JSONDict = {
+            "user_id": user_id,
+            "sticker": self._parse_file_input(sticker),  # type: ignore[arg-type]
+            "sticker_format": sticker_format,
+            # Deprecated param since bot api 6.6
+            "png_sticker": self._parse_file_input(png_sticker),  # type: ignore[arg-type]
+        }
         result = await self._post(
             "uploadStickerFile",
             data,

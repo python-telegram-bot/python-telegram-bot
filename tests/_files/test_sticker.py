@@ -645,8 +645,33 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert a != e
         assert hash(a) != hash(e)
 
+    async def test_upload_sticker_file_warning(self, bot, monkeypatch, chat_id, recwarn):
+        async def make_assertion(*args, **kwargs):
+            return {"file_id": "file_id", "file_unique_id": "file_unique_id"}
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+
+        await bot.upload_sticker_file(chat_id, "png_sticker_file_id")
+        assert len(recwarn) == 1
+        assert "Since Bot API 6.6, the parameter" in str(recwarn[0].message)
+        assert recwarn[0].filename == __file__
+
+    async def test_upload_sticker_file_missing_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError, match="are required, please pass them as well"):
+            await bot.upload_sticker_file(chat_id)
+        with pytest.raises(TypeError, match="are required, please pass them as well"):
+            await bot.upload_sticker_file(chat_id, sticker="something")
+
+    async def test_upload_sticker_file_mutually_exclusive(self, bot, chat_id):
+        with pytest.raises(TypeError, match="mutually exclusive with the deprecated parameters"):
+            await bot.upload_sticker_file(
+                chat_id, "png_sticker_file_id", sticker="s", sticker_format="static"
+            )
+
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_upload_sticker_file_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_upload_sticker_file_local_files(
+        self, monkeypatch, bot, chat_id, local_mode, recwarn
+    ):
         try:
             bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
@@ -657,13 +682,22 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             async def make_assertion(_, data, *args, **kwargs):
                 nonlocal test_flag
                 if local_mode:
-                    test_flag = data.get("png_sticker") == expected
+                    test_flag = (
+                        data.get("png_sticker") == expected or data.get("sticker") == expected
+                    )
                 else:
-                    test_flag = isinstance(data.get("png_sticker"), InputFile)
+                    test_flag = isinstance(data.get("png_sticker"), InputFile) or isinstance(
+                        data.get("sticker"), InputFile
+                    )
 
             monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.upload_sticker_file(chat_id, sticker=file, sticker_format="static")
+            assert test_flag
+            # Now test with the deprecated parameters
+            test_flag = False
             await bot.upload_sticker_file(chat_id, file)
             assert test_flag
+            assert len(recwarn) in (1, 2)  # second warning is for unclosed file
         finally:
             bot._local_mode = False
 
@@ -948,7 +982,9 @@ class TestStickerSetWithRequest:
     async def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
         with data_file("telegram_sticker.png").open("rb") as f:
             # chat_id was hardcoded as 95205500 but it stopped working for some reason
-            file = await bot.upload_sticker_file(chat_id, f)
+            file = await bot.upload_sticker_file(
+                chat_id, sticker=f, sticker_format=StickerFormat.STATIC
+            )
         assert file
 
         await asyncio.sleep(1)
