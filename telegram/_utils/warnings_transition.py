@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains classes used for transition warnings issued by this library.
+"""This module contains functionality used for transition warnings issued by this library.
 
 It was created to prevent circular imports that would be caused by creating the warnings
 inside warnings.py.
