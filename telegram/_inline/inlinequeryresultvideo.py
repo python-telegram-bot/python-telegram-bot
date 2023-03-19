@@ -28,7 +28,6 @@ from telegram._utils.types import JSONDict, ODVInput
 from telegram._utils.warnings_transition import (
     warn_about_deprecated_arg_return_new_arg,
     warn_about_deprecated_attr_in_property,
-    warn_about_required_renamed_param_passed_as_kwarg,
 )
 from telegram.constants import InlineQueryResultType
 
@@ -152,11 +151,6 @@ class InlineQueryResultVideo(InlineQueryResult):
         "thumbnail_url",
     )
 
-    @warn_about_required_renamed_param_passed_as_kwarg(
-        deprecated_param_names=("thumb_url",),
-        new_param_names=("thumbnail_url",),
-        bot_api_version="6.6",
-    )
     def __init__(
         self,
         id: str,  # pylint: disable=redefined-builtin
@@ -178,9 +172,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence[MessageEntity] = None,
-        # thumbnail_url is not optional in Telegram API, but it is here, along with thumb_url.
-        # This way the user can pass thumbnail_url as a positional argument and thumb_url
-        # as a keyword_argument
+        # thumb_url is not optional in Telegram API, but it is here, along with thumbnail_url.
         thumb_url: str = None,
         *,
         api_kwargs: JSONDict = None,

@@ -121,7 +121,6 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
             __file__,
             deprecated_name="thumb_url",
             new_name="thumbnail_url",
-            expected_recwarn_length=3,
         )
 
     def test_thumb_mime_type_property_deprecation_warning(self, recwarn):
@@ -174,7 +173,6 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
             __file__,
             deprecated_name="thumb_url",
             new_name="thumbnail_url",
-            expected_recwarn_length=3,
         )
 
     def test_init_throws_error_without_thumbnail_url_and_thumb_url(self, recwarn):
