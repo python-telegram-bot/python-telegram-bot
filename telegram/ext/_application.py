@@ -52,7 +52,7 @@ from typing import (
 
 from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
-from telegram._utils.types import DVType, ODVInput
+from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
@@ -1373,6 +1373,34 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             if job.user_id:
                 self._user_ids_to_be_updated_in_persistence.add(job.user_id)
 
+    def mark_data_for_update_persistence(
+        self, chat_ids: SCT[int] = None, user_ids: SCT[int] = None
+    ) -> None:
+        """Mark entries of :attr:`chat_data` and :attr:`user_data` to be updated on the next
+        run of :meth:`update_persistence`.
+
+        Tip:
+            Use this method sparingly. If you have to use this method, it likely means that you
+            access and modify ``context.application.chat/user_data[some_id]`` within a callback.
+            Note that for data that should be available globally in all handler callbacks,
+            independent of the chat/user, it is recommended use :attr:`bot_data` instead.
+
+        Args:
+            chat_ids (:obj:`int` | Collection[:obj:`int`], optional): Chat IDs to mark.
+            user_ids (:obj:`int` | Collection[:obj:`int`], optional): User IDs to mark.
+
+        """
+        if chat_ids:
+            if isinstance(chat_ids, int):
+                self._chat_ids_to_be_updated_in_persistence.add(chat_ids)
+            else:
+                self._chat_ids_to_be_updated_in_persistence.update(chat_ids)
+        if user_ids:
+            if isinstance(user_ids, int):
+                self._user_ids_to_be_updated_in_persistence.add(user_ids)
+            else:
+                self._user_ids_to_be_updated_in_persistence.update(user_ids)
+
     async def _persistence_updater(self) -> None:
         # Update the persistence in regular intervals. Exit only when the stop event has been set
         while not self.__update_persistence_event.is_set():
@@ -1399,8 +1427,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         along with :attr:`~telegram.ext.ExtBot.callback_data_cache` and the conversation states of
         any persistent :class:`~telegram.ext.ConversationHandler` registered for this application.
 
-        For :attr:`user_data`, :attr:`chat_data`, only entries used since the last run of this
-        method are updated.
+        For :attr:`user_data` and :attr:`chat_data`, only those entries are updated that were used
+        or manually marked via :meth:`mark_data_for_update_persistence` since the last run of this
+        method.
 
         Tip:
             This method will be called in regular intervals by the application. There is usually

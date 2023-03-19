@@ -950,6 +950,70 @@ class TestBasePersistence:
                 assert not papp.persistence.updated_chat_ids
             assert not papp.persistence.updated_conversations
 
+    @papp_store_all_or_none
+    async def test_update_persistence_loop_manual_mark_for_update_persistence(
+        self, papp: Application, chat_id
+    ):
+        async with papp:
+            papp.chat_data[1].update({"key": "value", "refreshed": True})
+            papp.user_data[1].update({"key": "value", "refreshed": True})
+            await papp.update_persistence()
+
+            # Since no update has been processed, nothing should be marked for update
+            # So we expect the persisted data to differ from the current data
+            assert not papp.persistence.chat_data
+            assert papp.persistence.chat_data is not papp.chat_data
+            assert not papp.persistence.user_data
+            assert papp.persistence.user_data is not papp.user_data
+
+            # Double checking that not marking data doesn't change anything
+            papp.mark_data_for_update_persistence()
+            await papp.update_persistence()
+            assert not papp.persistence.chat_data
+            assert papp.persistence.chat_data is not papp.chat_data
+            assert not papp.persistence.user_data
+            assert papp.persistence.user_data is not papp.user_data
+
+            # marking data should lead to the data being updated
+            papp.mark_data_for_update_persistence(chat_ids=1, user_ids=1)
+            await papp.update_persistence()
+
+            assert papp.persistence.chat_data is not papp.chat_data
+            if papp.persistence.store_data.chat_data:
+                assert papp.persistence.chat_data == {1: {"key": "value", "refreshed": True}}
+                assert papp.persistence.chat_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.chat_data
+
+            assert papp.persistence.user_data is not papp.user_data
+            if papp.persistence.store_data.user_data:
+                assert papp.persistence.user_data == {1: {"key": "value", "refreshed": True}}
+                assert papp.persistence.user_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.user_data
+
+            # Also testing passing collections
+            papp.chat_data[1].update({"key": "value", "refreshed": False})
+            papp.user_data[1].update({"key": "value", "refreshed": False})
+            papp.mark_data_for_update_persistence(chat_ids={1}, user_ids={1})
+            await papp.update_persistence()
+
+            # marking data should lead to the data being updated
+
+            assert papp.persistence.chat_data is not papp.chat_data
+            if papp.persistence.store_data.chat_data:
+                assert papp.persistence.chat_data == {1: {"key": "value", "refreshed": False}}
+                assert papp.persistence.chat_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.chat_data
+
+            assert papp.persistence.user_data is not papp.user_data
+            if papp.persistence.store_data.user_data:
+                assert papp.persistence.user_data == {1: {"key": "value", "refreshed": False}}
+                assert papp.persistence.user_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.user_data
+
     @filled_papp
     async def test_drop_chat_data(self, papp: Application):
         async with papp:
