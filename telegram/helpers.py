@@ -55,10 +55,9 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
             See the official API documentation for details. Only valid in combination with
             ``version=2``, will be ignored else.
     """
-    md_version_2 = 2
     if int(version) == 1:
         escape_chars = r"_*`["
-    elif int(version) == md_version_2:
+    elif int(version) == 2:
         if entity_type in ["pre", "code"]:
             escape_chars = r"\`"
         elif entity_type == "text_link":
@@ -164,16 +163,14 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
     Returns:
         :obj:`str`: An URL to start the bot with specific parameters.
     """
-    min_bot_username_length = 3
-    max_payload_length = 64
-    if bot_username is None or len(bot_username) <= min_bot_username_length:
+    if bot_username is None or len(bot_username) <= 3:
         raise ValueError("You must provide a valid bot_username.")
 
     base_url = f"https://t.me/{bot_username}"
     if not payload:
         return base_url
 
-    if len(payload) > max_payload_length:
+    if len(payload) > 64:
         raise ValueError("The deep-linking payload must not exceed 64 characters.")
 
     if not re.match(r"^[A-Za-z0-9_-]+$", payload):

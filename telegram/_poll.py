@@ -301,8 +301,7 @@ class Poll(TelegramObject):
             raise RuntimeError("This Poll has no 'explanation'.")
 
         # Is it a narrow build, if so we don't need to convert
-        max_value = 0xFFFF
-        if sys.maxunicode == max_value:
+        if sys.maxunicode == 0xFFFF:
             return self.explanation[entity.offset : entity.offset + entity.length]
         entity_text = self.explanation.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]

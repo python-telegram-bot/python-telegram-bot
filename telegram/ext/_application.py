@@ -500,8 +500,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         ):
             persistent_data = await self.persistence.get_callback_data()
             if persistent_data is not None:
-                data_length = 2
-                if not isinstance(persistent_data, tuple) or len(persistent_data) != data_length:
+                if not isinstance(persistent_data, tuple) or len(persistent_data) != 2:
                     raise ValueError("callback_data must be a tuple of length 2")
                 self.bot.callback_data_cache.load_persistence_data(  # type: ignore[attr-defined]
                     persistent_data
