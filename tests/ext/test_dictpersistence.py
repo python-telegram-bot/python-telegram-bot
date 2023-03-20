@@ -25,33 +25,33 @@ from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(autouse=True)
-def reset_callback_data_cache(cdc_bot):
+def _reset_callback_data_cache(cdc_bot):
     yield
     cdc_bot.callback_data_cache.clear_callback_data()
     cdc_bot.callback_data_cache.clear_callback_queries()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def bot_data():
     return {"test1": "test2", "test3": {"test4": "test5"}}
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def chat_data():
     return {-12345: {"test1": "test2", "test3": {"test4": "test5"}}, -67890: {3: "test4"}}
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def user_data():
     return {12345: {"test1": "test2", "test3": {"test4": "test5"}}, 67890: {3: "test4"}}
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def callback_data():
     return [("test1", 1000, {"button1": "test0", "button2": "test1"})], {"test1": "test2"}
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def conversations():
     return {
         "name1": {(123, 123): 3, (456, 654): 4},
@@ -60,27 +60,27 @@ def conversations():
     }
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def user_data_json(user_data):
     return json.dumps(user_data)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def chat_data_json(chat_data):
     return json.dumps(chat_data)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def bot_data_json(bot_data):
     return json.dumps(bot_data)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def callback_data_json(callback_data):
     return json.dumps(callback_data)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def conversations_json(conversations):
     return """{"name1": {"[123, 123]": 3, "[456, 654]": 4}, "name2":
               {"[123, 321]": 1, "[890, 890]": 2}, "name3":
@@ -303,7 +303,7 @@ class TestDictPersistence:
 
         conversation1 = await dict_persistence.get_conversations("name1")
         conversation1[(123, 123)] = 5
-        assert not dict_persistence.conversations["name1"] == conversation1
+        assert dict_persistence.conversations["name1"] != conversation1
         await dict_persistence.update_conversation("name1", (123, 123), 5)
         assert dict_persistence.conversations["name1"] == conversation1
         conversations["name1"][(123, 123)] = 5

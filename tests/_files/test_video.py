@@ -35,7 +35,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def video_file():
     with data_file("telegram.mp4").open("rb") as f:
         yield f
@@ -75,14 +75,14 @@ class TestVideoWithoutRequest(TestVideoBase):
         assert isinstance(video, Video)
         assert isinstance(video.file_id, str)
         assert isinstance(video.file_unique_id, str)
-        assert video.file_id != ""
-        assert video.file_unique_id != ""
+        assert video.file_id
+        assert video.file_unique_id
 
         assert isinstance(video.thumb, PhotoSize)
         assert isinstance(video.thumb.file_id, str)
         assert isinstance(video.thumb.file_unique_id, str)
-        assert video.thumb.file_id != ""
-        assert video.thumb.file_unique_id != ""
+        assert video.thumb.file_id
+        assert video.thumb.file_unique_id
 
     def test_expected_values(self, video):
         assert video.width == self.width
@@ -222,8 +222,8 @@ class TestVideoWithRequest(TestVideoBase):
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
         assert isinstance(message.video.file_unique_id, str)
-        assert message.video.file_id != ""
-        assert message.video.file_unique_id != ""
+        assert message.video.file_id
+        assert message.video.file_unique_id
         assert message.video.width == video.width
         assert message.video.height == video.height
         assert message.video.duration == video.duration
@@ -260,8 +260,8 @@ class TestVideoWithRequest(TestVideoBase):
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
         assert isinstance(message.video.file_unique_id, str)
-        assert message.video.file_id != ""
-        assert message.video.file_unique_id != ""
+        assert message.video.file_id
+        assert message.video.file_unique_id
         assert message.video.width == video.width
         assert message.video.height == video.height
         assert message.video.duration == video.duration
@@ -270,8 +270,8 @@ class TestVideoWithRequest(TestVideoBase):
         assert isinstance(message.video.thumb, PhotoSize)
         assert isinstance(message.video.thumb.file_id, str)
         assert isinstance(message.video.thumb.file_unique_id, str)
-        assert message.video.thumb.file_id != ""
-        assert message.video.thumb.file_unique_id != ""
+        assert message.video.thumb.file_id
+        assert message.video.thumb.file_unique_id
         assert message.video.thumb.width == 51  # This seems odd that it's not self.thumb_width
         assert message.video.thumb.height == 90  # Ditto
         assert message.video.thumb.file_size == 645  # same
@@ -336,7 +336,7 @@ class TestVideoWithRequest(TestVideoBase):
         assert not unprotected.has_protected_content
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -369,8 +369,8 @@ class TestVideoWithRequest(TestVideoBase):
                 )
 
     async def test_error_send_empty_file(self, bot, chat_id):
-        with pytest.raises(TelegramError):
-            await bot.send_video(chat_id, open(os.devnull, "rb"))
+        with Path(os.devnull).open("rb") as file, pytest.raises(TelegramError):
+            await bot.send_video(chat_id, file)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):

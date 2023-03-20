@@ -260,7 +260,7 @@ def build_conversation_handler(name: str, persistent: bool = True) -> BaseHandle
     return TrackingConversationHandler(name=name, persistent=persistent)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def papp(request, bot_info) -> Application:
     papp_input = request.param
     store_data = {}
@@ -359,10 +359,10 @@ class TestBasePersistence:
         slots = mro_slots(inst, only_parents=True)
         assert len(slots) == len(set(slots)), "duplicate slot"
 
-    @pytest.mark.parametrize("bot_data", (True, False))
-    @pytest.mark.parametrize("chat_data", (True, False))
-    @pytest.mark.parametrize("user_data", (True, False))
-    @pytest.mark.parametrize("callback_data", (True, False))
+    @pytest.mark.parametrize("bot_data", [True, False])
+    @pytest.mark.parametrize("chat_data", [True, False])
+    @pytest.mark.parametrize("user_data", [True, False])
+    @pytest.mark.parametrize("callback_data", [True, False])
     def test_init_store_data_update_interval(self, bot_data, chat_data, user_data, callback_data):
         store_data = PersistenceInput(
             bot_data=bot_data,
@@ -503,7 +503,7 @@ class TestBasePersistence:
         [PappInput(fill_data=True)],
         indirect=True,
     )
-    @pytest.mark.parametrize("callback_data", ("invalid", (1, 2, 3)))
+    @pytest.mark.parametrize("callback_data", ["invalid", (1, 2, 3)])
     async def test_initialization_invalid_callback_data(
         self, papp: Application, callback_data, monkeypatch
     ):
@@ -897,7 +897,7 @@ class TestBasePersistence:
             assert not papp.persistence.conversations
 
     @default_papp
-    @pytest.mark.parametrize("delay_type", ("job", "handler", "task"))
+    @pytest.mark.parametrize("delay_type", ["job", "handler", "task"])
     async def test_update_persistence_loop_async_logic(
         self, papp: Application, delay_type: str, chat_id
     ):
@@ -1069,7 +1069,7 @@ class TestBasePersistence:
 
     @default_papp
     @pytest.mark.parametrize(
-        "delay_type", ("job", "blocking_handler", "nonblocking_handler", "task")
+        "delay_type", ["job", "blocking_handler", "nonblocking_handler", "task"]
     )
     async def test_update_persistence_after_exception(
         self, papp: Application, delay_type: str, chat_id

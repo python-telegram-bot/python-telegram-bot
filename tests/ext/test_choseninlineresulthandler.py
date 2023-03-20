@@ -82,7 +82,7 @@ class TestChosenInlineResultHandler:
     test_flag = False
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = False
 
     def test_slot_behaviour(self):

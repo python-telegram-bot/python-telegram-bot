@@ -96,7 +96,7 @@ def chat_join_request(time, bot):
     return cjr
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def chat_join_request_update(bot, chat_join_request):
     return Update(0, chat_join_request=chat_join_request)
 
@@ -111,7 +111,7 @@ class TestChatJoinRequestHandler:
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = False
 
     async def callback(self, update, context):

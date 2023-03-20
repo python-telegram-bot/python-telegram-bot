@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import contextlib
 import subprocess
 import sys
 from pathlib import Path
@@ -30,7 +31,7 @@ from tests.auxil.files import TEST_DATA_PATH, data_file
 
 class TestFiles:
     @pytest.mark.parametrize(
-        "string,expected",
+        ("string", "expected"),
         [
             (str(data_file("game.gif")), True),
             (str(TEST_DATA_PATH), False),
@@ -46,7 +47,7 @@ class TestFiles:
         assert telegram._utils.files.is_local_file(string) == expected
 
     @pytest.mark.parametrize(
-        "string,expected_local,expected_non_local",
+        ("string", "expected_local", "expected_non_local"),
         [
             (data_file("game.gif"), data_file("game.gif").as_uri(), InputFile),
             (TEST_DATA_PATH, TEST_DATA_PATH, TEST_DATA_PATH),
@@ -76,7 +77,7 @@ class TestFiles:
                 telegram._utils.files.parse_file_input(string, local_mode=False), InputFile
             )
         elif expected_non_local is ValueError:
-            with pytest.raises(ValueError):
+            with pytest.raises(ValueError, match="but local mode is not enabled."):
                 telegram._utils.files.parse_file_input(string, local_mode=False)
         else:
             assert (
@@ -153,9 +154,7 @@ class TestFiles:
         assert out[0] is None
         assert out[1] == png_file.read_bytes()
 
-        try:
+        with contextlib.suppress(ProcessLookupError):
             proc.kill()
-        except ProcessLookupError:
             # This exception may be thrown if the process has finished before we had the chance
             # to kill it.
-            pass

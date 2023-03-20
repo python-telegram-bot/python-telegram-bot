@@ -37,7 +37,7 @@ class TestVersion:
         assert __version__ == str(__version_info__)
 
     @pytest.mark.parametrize(
-        "version,expected",
+        ("version", "expected"),
         [
             (Version(1, 2, 3, "alpha", 4), "1.2.3a4"),
             (Version(2, 3, 4, "beta", 5), "2.3.4b5"),
@@ -52,7 +52,7 @@ class TestVersion:
     def test_version_str(self, version, expected):
         assert str(version) == expected
 
-    @pytest.mark.parametrize("use_tuple", (True, False))
+    @pytest.mark.parametrize("use_tuple", [True, False])
     def test_version_info(self, use_tuple):
         version = Version(1, 2, 3, "beta", 4)
         assert isinstance(version, tuple)

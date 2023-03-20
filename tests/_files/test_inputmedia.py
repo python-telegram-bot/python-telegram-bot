@@ -52,7 +52,7 @@ from .test_audio import audio, audio_file  # noqa: F401
 from .test_document import document, document_file  # noqa: F401
 
 # noinspection PyUnresolvedReferences
-from .test_photo import _photo, photo, photo_file, thumb  # noqa: F401
+from .test_photo import photo, photo_file, photolist, thumb  # noqa: F401
 
 # noinspection PyUnresolvedReferences
 from .test_video import video, video_file  # noqa: F401
@@ -658,7 +658,7 @@ class TestSendMediaGroupWithRequest:
         assert all(i.message_thread_id == real_topic.message_thread_id for i in messages)
 
     @pytest.mark.parametrize(
-        "caption, parse_mode, caption_entities",
+        ("caption", "parse_mode", "caption_entities"),
         [
             # same combinations of caption options as in media_group fixture
             ("*photo* 1", "Markdown", None),
@@ -790,7 +790,7 @@ class TestSendMediaGroupWithRequest:
         assert isinstance(new_message, Message)
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -922,6 +922,7 @@ class TestSendMediaGroupWithRequest:
                 return InputMediaPhoto(photo, **kwargs)
             if med_type == "video":
                 return InputMediaVideo(video, **kwargs)
+            return None
 
         message = await default_bot.send_photo(chat_id, photo)
 

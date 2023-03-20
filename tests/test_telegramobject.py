@@ -322,7 +322,8 @@ class TestTelegramObject:
         # * the (now) added attribute `is_forum` does not affect the unpickling
         pp = PicklePersistence(data_file("20a5_modified_chat.pickle"))
         chat = (await pp.get_chat_data())[1]
-        assert chat.id == 1 and chat.type == Chat.PRIVATE
+        assert chat.id == 1
+        assert chat.type == Chat.PRIVATE
         assert chat.api_kwargs == {
             "all_members_are_administrators": True,
             "something": "Manually inserted",
@@ -356,13 +357,19 @@ class TestTelegramObject:
         assert new_msg is not msg
 
         # The same bot should be present when deepcopying.
-        assert new_msg.get_bot() == bot and new_msg.get_bot() is bot
+        assert new_msg.get_bot() == bot
+        assert new_msg.get_bot() is bot
 
-        assert new_msg.date == date and new_msg.date is not date
-        assert new_msg.chat == chat and new_msg.chat is not chat
-        assert new_msg.from_user == user and new_msg.from_user is not user
-        assert new_msg.photo[0] == photo and new_msg.photo[0] is not photo
-        assert new_msg.api_kwargs == {"foo": "bar"} and new_msg.api_kwargs is not msg.api_kwargs
+        assert new_msg.date == date
+        assert new_msg.date is not date
+        assert new_msg.chat == chat
+        assert new_msg.chat is not chat
+        assert new_msg.from_user == user
+        assert new_msg.from_user is not user
+        assert new_msg.photo[0] == photo
+        assert new_msg.photo[0] is not photo
+        assert new_msg.api_kwargs == {"foo": "bar"}
+        assert new_msg.api_kwargs is not msg.api_kwargs
 
         # check that deepcopy preserves the freezing status
         with pytest.raises(
@@ -380,7 +387,8 @@ class TestTelegramObject:
         d = deepcopy(s)
         assert d is not s
         assert d._private == s._private  # Can't test for identity since two equal strings is True
-        assert d._bot == s._bot and d._bot is s._bot
+        assert d._bot == s._bot
+        assert d._bot is s._bot
         assert d.normal == s.normal
 
     def test_string_representation(self):

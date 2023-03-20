@@ -75,7 +75,7 @@ class TestApplication:
     count = 0
 
     @pytest.fixture(autouse=True, name="reset")
-    def reset_fixture(self):
+    def _reset_fixture(self):
         self.reset()
 
     def reset(self):
@@ -121,8 +121,8 @@ class TestApplication:
     async def test_slot_behaviour(self, one_time_bot):
         async with ApplicationBuilder().bot(one_time_bot).build() as app:
             for at in app.__slots__:
-                at = f"_Application{at}" if at.startswith("__") and not at.endswith("__") else at
-                assert getattr(app, at, "err") != "err", f"got extra slot '{at}'"
+                attr = f"_Application{at}" if at.startswith("__") and not at.endswith("__") else at
+                assert getattr(app, attr, "err") != "err", f"got extra slot '{attr}'"
             assert len(mro_slots(app)) == len(set(mro_slots(app))), "duplicate slot"
 
     def test_manual_init_warning(self, recwarn, updater):
@@ -146,7 +146,7 @@ class TestApplication:
         assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
     @pytest.mark.parametrize(
-        "concurrent_updates, expected", [(0, 0), (4, 4), (False, 0), (True, 256)]
+        ("concurrent_updates", "expected"), [(0, 0), (4, 4), (False, 0), (True, 256)]
     )
     @pytest.mark.filterwarnings("ignore: `Application` instances should")
     def test_init(self, one_time_bot, concurrent_updates, expected):
@@ -239,7 +239,7 @@ class TestApplication:
         assert isinstance(application.chat_data[1], float)
         assert isinstance(application.bot_data, complex)
 
-    @pytest.mark.parametrize("updater", (True, False))
+    @pytest.mark.parametrize("updater", [True, False])
     async def test_initialize(self, one_time_bot, monkeypatch, updater):
         """Initialization of persistence is tested test_basepersistence"""
         self.test_flag = set()
@@ -266,7 +266,7 @@ class TestApplication:
             assert self.test_flag == {"bot"}
             await app.shutdown()
 
-    @pytest.mark.parametrize("updater", (True, False))
+    @pytest.mark.parametrize("updater", [True, False])
     async def test_shutdown(self, one_time_bot, monkeypatch, updater):
         """Shutdown of persistence is tested in test_basepersistence"""
         self.test_flag = set()
@@ -408,7 +408,7 @@ class TestApplication:
         builder_1.token(app.bot.token)
         builder_2.token(app.bot.token)
 
-    @pytest.mark.parametrize("job_queue", (True, False))
+    @pytest.mark.parametrize("job_queue", [True, False])
     @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     async def test_start_stop_processing_updates(self, one_time_bot, job_queue):
         # TODO: repeat a similar test for create_task, persistence processing and job queue
@@ -488,9 +488,8 @@ class TestApplication:
             if update.message.text == "test":
                 if context is not self.received:
                     pytest.fail("Expected same context object, got different")
-            else:
-                if context is self.received:
-                    pytest.fail("First handler was wrongly called")
+            elif context is self.received:
+                pytest.fail("First handler was wrongly called")
 
         async with app:
             app.add_handler(MessageHandler(filters.Regex("test"), one), group=1)
@@ -510,7 +509,7 @@ class TestApplication:
         with pytest.raises(TypeError, match="group is not int"):
             app.add_handler(handler, "one")
 
-    @pytest.mark.parametrize("group_empty", (True, False))
+    @pytest.mark.parametrize("group_empty", [True, False])
     async def test_add_remove_handler(self, app, group_empty):
         handler = MessageHandler(filters.ALL, self.callback_increase_count)
         app.add_handler(handler)
@@ -578,11 +577,9 @@ class TestApplication:
             await asyncio.sleep(0.05)  # sleep is required otherwise there is random behaviour
 
             # Test if handler was added to correct group with correct order-
-            assert (
-                self.count == 2
-                and len(app.handlers[1]) == 3
-                and app.handlers[1][0] is msg_handler_set_count
-            )
+            assert self.count == 2
+            assert len(app.handlers[1]) == 3
+            assert app.handlers[1][0] is msg_handler_set_count
 
             # Now lets test add_handlers when `handlers` is a dict-
             voice_filter_handler_to_check = MessageHandler(
@@ -606,18 +603,17 @@ class TestApplication:
             await app.update_queue.put(voice_update)
             await asyncio.sleep(0.05)
 
-            assert (
-                self.count == 4
-                and len(app.handlers[1]) == 5
-                and app.handlers[1][-1] is voice_filter_handler_to_check
-            )
+            assert self.count == 4
+            assert len(app.handlers[1]) == 5
+            assert app.handlers[1][-1] is voice_filter_handler_to_check
 
             await app.update_queue.put(
                 make_message_update(message=Message(5, None, None, caption="cap"))
             )
             await asyncio.sleep(0.05)
 
-            assert self.count == 2 and len(app.handlers[-1]) == 1
+            assert self.count == 2
+            assert len(app.handlers[-1]) == 1
 
             # Now lets test the errors which can be produced-
             with pytest.raises(ValueError, match="The `group` argument"):
@@ -781,7 +777,7 @@ class TestApplication:
             await app.process_update(update)
             assert passed == ["start1", "error", err, "start3"]
 
-    @pytest.mark.parametrize("block", (True, False))
+    @pytest.mark.parametrize("block", [True, False])
     async def test_error_handler(self, app, block):
         app.add_error_handler(self.error_handler_context)
         app.add_handler(TypeHandler(object, self.callback_raise_error("TestError"), block=block))
@@ -903,7 +899,7 @@ class TestApplication:
             assert self.received == (CustomContext, float, complex, int)
 
     @pytest.mark.parametrize(
-        "check,expected",
+        ("check", "expected"),
         [(True, True), (None, False), (False, False), ({}, True), ("", True), ("check", True)],
     )
     async def test_check_update_handling(self, app, check, expected):
@@ -994,7 +990,7 @@ class TestApplication:
                 )
                 await app.stop()
 
-    @pytest.mark.parametrize("handler_block", (True, False))
+    @pytest.mark.parametrize("handler_block", [True, False])
     async def test_non_blocking_error_handler(self, app, handler_block):
         event = asyncio.Event()
 
@@ -1021,12 +1017,12 @@ class TestApplication:
             assert self.received == "done"
             assert task.done()
 
-    @pytest.mark.parametrize("handler_block", (True, False))
+    @pytest.mark.parametrize("handler_block", [True, False])
     async def test_non_blocking_error_handler_applicationhandlerstop(
         self, app, recwarn, handler_block
     ):
         async def callback(update, context):
-            raise RuntimeError()
+            raise RuntimeError
 
         async def error_handler(update, context):
             raise ApplicationHandlerStop
@@ -1050,7 +1046,7 @@ class TestApplication:
             Path(recwarn[0].filename) == PROJECT_ROOT_PATH / "telegram" / "ext" / "_application.py"
         ), "incorrect stacklevel!"
 
-    @pytest.mark.parametrize(["block", "expected_output"], [(False, 0), (True, 5)])
+    @pytest.mark.parametrize(("block", "expected_output"), [(False, 0), (True, 5)])
     async def test_default_block_error_handler(self, bot_info, block, expected_output):
         async def error_handler(*args, **kwargs):
             await asyncio.sleep(0.1)
@@ -1067,7 +1063,7 @@ class TestApplication:
             await asyncio.sleep(0.1)
             assert self.count == 5
 
-    @pytest.mark.parametrize(["block", "expected_output"], [(False, 0), (True, 5)])
+    @pytest.mark.parametrize(("block", "expected_output"), [(False, 0), (True, 5)])
     async def test_default_block_handler(self, bot_info, block, expected_output):
         bot = make_bot(bot_info, defaults=Defaults(block=block))
         app = Application.builder().bot(bot).build()
@@ -1079,8 +1075,8 @@ class TestApplication:
             await asyncio.sleep(0.15)
             assert self.count == 5
 
-    @pytest.mark.parametrize("handler_block", (True, False))
-    @pytest.mark.parametrize("error_handler_block", (True, False))
+    @pytest.mark.parametrize("handler_block", [True, False])
+    @pytest.mark.parametrize("error_handler_block", [True, False])
     async def test_nonblocking_handler_raises_and_non_blocking_error_handler_raises(
         self, app, caplog, handler_block, error_handler_block
     ):
@@ -1155,7 +1151,7 @@ class TestApplication:
         assert app.chat_data[effective_new_chat_id]["key"] == "test"
 
     @pytest.mark.parametrize(
-        "c_id,expected",
+        ("c_id", "expected"),
         [(321, {222: "remove_me"}), (111, {321: {"not_empty": "no"}, 222: "remove_me"})],
         ids=["test chat_id removal", "test no key in data (no error)"],
     )
@@ -1165,7 +1161,7 @@ class TestApplication:
         assert app.chat_data == expected
 
     @pytest.mark.parametrize(
-        "u_id,expected",
+        ("u_id", "expected"),
         [(321, {222: "remove_me"}), (111, {321: {"not_empty": "no"}, 222: "remove_me"})],
         ids=["test user_id removal", "test no key in data (no error)"],
     )
@@ -1188,7 +1184,7 @@ class TestApplication:
         assert self.count == 42
         assert out == 43
 
-    @pytest.mark.parametrize("running", (True, False))
+    @pytest.mark.parametrize("running", [True, False])
     async def test_create_task_awaiting_warning(self, app, running, recwarn):
         async def callback():
             await asyncio.sleep(0.1)
@@ -1213,7 +1209,7 @@ class TestApplication:
                 assert not task.done()
                 await task
 
-    @pytest.mark.parametrize("update", (None, object()))
+    @pytest.mark.parametrize("update", [None, object()])
     async def test_create_task_error_handling(self, app, update):
         exception = RuntimeError("TestError")
 
@@ -1334,7 +1330,7 @@ class TestApplication:
 
             await app.stop()
 
-    @pytest.mark.parametrize("concurrent_updates", (15, 50, 100))
+    @pytest.mark.parametrize("concurrent_updates", [15, 50, 100])
     async def test_concurrent_updates(self, one_time_bot, concurrent_updates):
         # We don't test with `True` since the large number of parallel coroutines quickly leads
         # to test instabilities
@@ -2042,7 +2038,7 @@ class TestApplication:
             Updater, "shutdown", call_after(Updater.shutdown, after_shutdown("updater"))
         )
         app = ApplicationBuilder().bot(one_time_bot).build()
-        with pytest.raises(RuntimeError, match="Test Exception"):
+        with pytest.raises(RuntimeError, match="Test Exception"):  # noqa: PT012
             if "polling" in method:
                 app.run_polling(close_loop=False)
             else:
@@ -2064,7 +2060,7 @@ class TestApplication:
         monkeypatch.setattr(Application, "initialize", raise_method)
         app = ApplicationBuilder().bot(one_time_bot).build()
 
-        with pytest.raises(RuntimeError, match="Prevent Actually Running"):
+        with pytest.raises(RuntimeError, match="Prevent Actually Running"):  # noqa: PT012
             if "polling" in method:
                 app.run_polling(close_loop=False, stop_signals=(signal.SIGINT,))
             else:
@@ -2080,7 +2076,7 @@ class TestApplication:
         assert found
 
         recwarn.clear()
-        with pytest.raises(RuntimeError, match="Prevent Actually Running"):
+        with pytest.raises(RuntimeError, match="Prevent Actually Running"):  # noqa: PT012
             if "polling" in method:
                 app.run_polling(close_loop=False, stop_signals=None)
             else:

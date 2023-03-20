@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# TODO: Remove after the ruff noqa API 6.6 is merged:
+# ruff: noqa: SIM114
 import inspect
 import os
 from typing import List
@@ -51,9 +53,10 @@ ignored_param_requirements = {  # Ignore these since there's convenience params 
 def find_next_sibling_until(tag, name, until):
     for sibling in tag.next_siblings:
         if sibling is until:
-            return
+            return None
         if sibling.name == name:
             return sibling
+    return None
 
 
 def parse_table(h4) -> List[List[str]]:
@@ -147,10 +150,7 @@ def check_object(h4):
         if field == "from":
             field = "from_user"
         elif (
-            name.startswith("InlineQueryResult")
-            or name.startswith("InputMedia")
-            or name.startswith("BotCommandScope")
-            or name.startswith("MenuButton")
+            name.startswith(("InlineQueryResult", "InputMedia", "BotCommandScope", "MenuButton"))
         ) and field == "type":
             continue
         elif (name.startswith("ChatMember")) and field == "status":  # We autofill the status
@@ -203,10 +203,7 @@ def check_object(h4):
 def is_parameter_required_by_tg(field: str) -> bool:
     if field in {"Required", "Yes"}:
         return True
-    if field.split(".", 1)[0] == "Optional":  # splits the sentence and extracts first word
-        return False
-    else:
-        return True
+    return field.split(".", 1)[0] != "Optional"  # splits the sentence and extracts first word
 
 
 def check_required_param(
@@ -227,7 +224,7 @@ def check_required_param(
 
 
 def check_defaults_type(ptb_param: inspect.Parameter) -> bool:
-    return True if DefaultValue.get_value(ptb_param.default) is None else False
+    return DefaultValue.get_value(ptb_param.default) is None
 
 
 to_run = env_var_2_bool(os.getenv("TEST_OFFICIAL"))

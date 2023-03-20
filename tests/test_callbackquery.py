@@ -30,7 +30,7 @@ from tests.auxil.bot_method_checks import (
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function", params=["message", "inline"])
+@pytest.fixture(params=["message", "inline"])
 def callback_query(bot, request):
     cbq = CallbackQuery(
         TestCallbackQueryBase.id_,
@@ -297,8 +297,7 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
 
     async def test_stop_message_live_location(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
-            ids = self.check_passed_ids(callback_query, kwargs)
-            return ids
+            return self.check_passed_ids(callback_query, kwargs)
 
         assert check_shortcut_signature(
             CallbackQuery.stop_message_live_location,

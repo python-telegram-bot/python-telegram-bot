@@ -35,7 +35,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def document_file():
     with data_file("telegram.png").open("rb") as f:
         yield f
@@ -70,8 +70,8 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert isinstance(document, Document)
         assert isinstance(document.file_id, str)
         assert isinstance(document.file_unique_id, str)
-        assert document.file_id != ""
-        assert document.file_unique_id != ""
+        assert document.file_id
+        assert document.file_unique_id
 
     def test_expected_values(self, document):
         assert document.file_size == self.file_size
@@ -189,9 +189,8 @@ class TestDocumentWithoutRequest(TestDocumentBase):
 
 class TestDocumentWithRequest(TestDocumentBase):
     async def test_error_send_empty_file(self, bot, chat_id):
-        with open(os.devnull, "rb") as f:
-            with pytest.raises(TelegramError):
-                await bot.send_document(chat_id=chat_id, document=f)
+        with Path(os.devnull).open("rb") as f, pytest.raises(TelegramError):
+            await bot.send_document(chat_id=chat_id, document=f)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
@@ -230,9 +229,9 @@ class TestDocumentWithRequest(TestDocumentBase):
 
         assert isinstance(message.document, Document)
         assert isinstance(message.document.file_id, str)
-        assert message.document.file_id != ""
+        assert message.document.file_id
         assert isinstance(message.document.file_unique_id, str)
-        assert message.document.file_unique_id != ""
+        assert message.document.file_unique_id
         assert isinstance(message.document.thumb, PhotoSize)
         assert message.document.file_name == "telegram_custom.png"
         assert message.document.mime_type == document.mime_type
@@ -249,9 +248,9 @@ class TestDocumentWithRequest(TestDocumentBase):
 
         assert isinstance(document, Document)
         assert isinstance(document.file_id, str)
-        assert document.file_id != ""
+        assert document.file_id
         assert isinstance(message.document.file_unique_id, str)
-        assert message.document.file_unique_id != ""
+        assert message.document.file_unique_id
         assert isinstance(document.thumb, PhotoSize)
         assert document.file_name == "telegram.gif"
         assert document.mime_type == "image/gif"
@@ -311,7 +310,7 @@ class TestDocumentWithRequest(TestDocumentBase):
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),

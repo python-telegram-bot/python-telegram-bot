@@ -81,7 +81,7 @@ def chat_member_updated():
     )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def chat_member(bot, chat_member_updated):
     update = Update(0, my_chat_member=chat_member_updated)
     update._unfreeze()
@@ -98,7 +98,7 @@ class TestChatMemberHandler:
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = False
 
     async def callback(self, update, context):

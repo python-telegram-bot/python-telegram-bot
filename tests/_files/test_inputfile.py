@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import contextlib
 import subprocess
 import sys
 from io import BytesIO
@@ -49,12 +50,10 @@ class TestInputFileWithoutRequest:
         assert in_file.mimetype == "application/octet-stream"
         assert in_file.filename == "application.octet-stream"
 
-        try:
+        with contextlib.suppress(ProcessLookupError):
             proc.kill()
-        except ProcessLookupError:
             # This exception may be thrown if the process has finished before we had the chance
             # to kill it.
-            pass
 
     @pytest.mark.parametrize("attach", [True, False])
     def test_attach(self, attach):
