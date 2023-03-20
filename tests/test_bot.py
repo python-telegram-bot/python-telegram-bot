@@ -2794,7 +2794,8 @@ class TestBotWithRequest:
 
         assert len(messages) == 3  # Check if we sent 3 messages
 
-        assert all(await i for i in pinned_messages_tasks)  # Check if we pinned 3 messages
+        # Check if we pinned 3 messages
+        assert all([await i for i in pinned_messages_tasks])  # noqa: PIE802
         assert all(i.done() for i in pinned_messages_tasks)  # Check if all tasks are done
 
         chat = await bot.get_chat(super_group_id)  # get the chat to check the pinned message
