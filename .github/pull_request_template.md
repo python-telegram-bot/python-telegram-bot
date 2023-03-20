@@ -4,7 +4,7 @@ Hey! You're PRing? Cool! Please have a look at the below checklist. It's here to
 
 ### Checklist for PRs
 
-- [ ] Added `.. versionadded:: version`, `.. versionchanged:: version` or `.. deprecated:: version` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
+- [ ] Added `.. versionadded:: NEXT.VERSION`, `.. versionchanged:: NEXT.VERSION` or `.. deprecated:: NEXT.VERSION` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
 - [ ] Created new or adapted existing unit tests
 - [ ] Documented code changes according to the [CSI standard](https://standards.mousepawmedia.com/en/stable/csi.html)
 - [ ] Added myself alphabetically to `AUTHORS.rst` (optional)
