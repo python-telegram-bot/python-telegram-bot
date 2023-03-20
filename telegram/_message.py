@@ -829,11 +829,8 @@ class Message(TelegramObject):
         a private chat or normal group, returns a t.me link of the message.
         """
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
-            if self.chat.username:
-                to_link = self.chat.username
-            else:
-                # Get rid of leading -100 for supergroups
-                to_link = f"c/{str(self.chat.id)[4:]}"
+            # the else block gets rid of leading -100 for supergroups:
+            to_link = self.chat.username if self.chat.username else f"c/{str(self.chat.id)[4:]}"
             return f"https://t.me/{to_link}/{self.message_id}"
         return None
 
@@ -3468,10 +3465,7 @@ class Message(TelegramObject):
                 elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
                     insert = f"[{escaped_text}](tg://user?id={entity.user.id})"
                 elif entity.type == MessageEntity.URL and urled:
-                    if version == 1:
-                        link = text
-                    else:
-                        link = escaped_text
+                    link = text if version == 1 else escaped_text
                     insert = f"[{link}]({text})"
                 elif entity.type == MessageEntity.BOLD:
                     insert = f"*{escaped_text}*"

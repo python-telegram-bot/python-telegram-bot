@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Application class."""
 import asyncio
+import contextlib
 import inspect
 import itertools
 import logging
@@ -998,10 +999,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__create_task_tasks.discard(task)  # Discard from our set since we are done with it
         # We just retrieve the eventual exception so that asyncio doesn't complain in case
         # it's not retrieved somewhere else
-        try:
+        with contextlib.suppress(asyncio.CancelledError, asyncio.InvalidStateError):
             task.exception()
-        except (asyncio.CancelledError, asyncio.InvalidStateError):
-            pass
 
     async def __create_task_callback(
         self,

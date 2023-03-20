@@ -379,7 +379,7 @@ class _MergedFilter(UpdateFilter):
     def _merge(base_output: Union[bool, Dict], comp_output: Union[bool, Dict]) -> FilterDataDict:
         base = base_output if isinstance(base_output, dict) else {}
         comp = comp_output if isinstance(comp_output, dict) else {}
-        for k in comp.keys():
+        for k in comp:
             # Make sure comp values are lists
             comp_value = comp[k] if isinstance(comp[k], list) else []
             try:

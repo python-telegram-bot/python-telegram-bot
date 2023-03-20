@@ -654,7 +654,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 "timeout.",
                 exc_info=exc,
             )
-            return
+            return None
         return self._schedule_job(
             new_state=effective_new_state,
             application=application,
@@ -870,7 +870,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         if raise_dp_handler_stop:
             # Don't pass the new state here. If we're in a nested conversation, the parent is
             # expecting None as return value.
-            raise ApplicationHandlerStop()
+            raise ApplicationHandlerStop
         # Signals a possible parent conversation to stay in the current state
         return None
 
