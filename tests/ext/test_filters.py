@@ -2222,13 +2222,16 @@ class TestFilters:
                 self.data = data
 
             def filter(self, _):
-                return {"test": [self.data]}
+                return {"test": [self.data], "test2": {"test3": [self.data]}}
 
         result = (filters.COMMAND & DataFilter("blah")).check_update(update)
         assert result["test"] == ["blah"]
+        assert not result["test2"]
 
         result = (DataFilter("blah1") & DataFilter("blah2")).check_update(update)
         assert result["test"] == ["blah1", "blah2"]
+        assert isinstance(result["test2"], list)
+        assert result["test2"][0]["test3"] == ["blah1"]
 
         update.message.text = "test"
         update.message.entities = []
