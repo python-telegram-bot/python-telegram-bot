@@ -903,15 +903,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         finally:
             bot._local_mode = False
 
-    async def test_set_sticker_set_thumb_local_files_fails_with_different_thumb_and_thumbnail(
-        self, bot, chat_id
-    ):
-        file = data_file("telegram.jpg")
-        different_file = data_file("telegram_no_standard_header.jpg")
-
-        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
-            await bot.set_sticker_set_thumb("name", chat_id, thumbnail=file, thumb=different_file)
-
     async def test_get_file_instance_method(self, monkeypatch, sticker):
         async def make_assertion(*_, **kwargs):
             return kwargs["file_id"] == sticker.file_id

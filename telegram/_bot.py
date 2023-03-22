@@ -6236,7 +6236,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         name: str,
         user_id: Union[str, int],
         thumb: FileInput = None,
-        thumbnail: FileInput = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6268,22 +6267,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-
-                .. deprecated:: NEXT.VERSION
-                   |thumbargumentdeprecation| :paramref:`thumbnail`.
-            thumbnail (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): A **PNG** image with the thumbnail, must
-                be up to 128 kilobytes in size and have width and height exactly 100px, or a
-                **TGS** animation with the thumbnail up to 32 kilobytes in size; see
-                https://core.telegram.org/stickers#animation-requirements for animated
-                sticker technical requirements, or a **WEBM** video with the thumbnail up to 32
-                kilobytes in size; see
-                https://core.telegram.org/stickers#video-requirements for video sticker
-                technical requirements.
-                |fileinput|
-                Animated sticker set thumbnails can't be uploaded via HTTP URL.
-
-                .. versionadded:: NEXT.VERSION
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
@@ -6299,13 +6282,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             stacklevel=2,
         )
 
-        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb, new_arg=thumbnail
-        )
         return await self._set_sticker_set_thumbnail(
             name=name,
             user_id=user_id,
-            thumbnail=thumbnail_or_thumb,
+            thumbnail=thumb,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
