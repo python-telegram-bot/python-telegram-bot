@@ -32,9 +32,6 @@ class InputSticker(TelegramObject):
     """
     This object describes a sticker to be added to a sticker set.
 
-    Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`sticker` and :attr:`emoji_list` are equal.
-
     .. versionadded:: NEXT.VERSION
 
     Args:
@@ -94,7 +91,5 @@ class InputSticker(TelegramObject):
         self.emoji_list: Tuple[str, ...] = parse_sequence_arg(emoji_list)
         self.mask_position: Optional[MaskPosition] = mask_position
         self.keywords: Tuple[str, ...] = parse_sequence_arg(keywords)
-
-        self._id_attrs = (self.sticker, self.emoji_list)
 
         self._freeze()

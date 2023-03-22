@@ -53,7 +53,6 @@ except ImportError:
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
 
-
 from telegram._botcommand import BotCommand
 from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
@@ -1356,7 +1355,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Sticker`): Sticker to send.
-                |fileinput|
+                Pass a ``file_id`` as string to send a sticker that exists on the Telegram
+                servers (recommended), pass an HTTP URL as a string for Telegram to get a
+                ``".WEBP"`` sticker from the Internet, or upload a new ``".WEBP"`` or ``".TGS"``
+                sticker. Video stickers can only be sent by a ``file_id``. Animated stickers can't
+                be sent via an HTTP URL.
+
                 Lastly you can pass an existing :class:`telegram.Sticker` object to send.
 
                 .. versionchanged:: 13.2
@@ -5580,7 +5584,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def upload_sticker_file(
         self,
         user_id: Union[str, int],
-        png_sticker: FileInput,
+        png_sticker: FileInput = None,  # Deprecated since bot api 6.6. Optional for compatiblity.
+        # New parameters since bot api 6.6:
+        # <---
+        sticker: FileInput = None,  # Actually required, but optional for compatibility.
+        sticker_format: str = None,  # Actually required, but optional for compatibility.
+        # --->
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -5589,13 +5598,28 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         api_kwargs: JSONDict = None,
     ) -> File:
         """
-        Use this method to upload a ``.PNG`` file with a sticker for later use in
+        Use this method to upload a file with a sticker for later use in the
         :meth:`create_new_sticker_set` and :meth:`add_sticker_to_set` methods (can be used multiple
         times).
 
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
-            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`):
+            sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`):
+                A file with the sticker in the  ``".WEBP"``, ``".PNG"``, ``".TGS"`` or ``".WEBM"``
+                format. See `here <https://core.telegram.org/stickers>`_ for technical requirements
+                . |uploadinput|
+
+                .. versionadded:: NEXT.VERSION
+
+            sticker_format (:obj:`str`): Format of the sticker. Must be one of
+                :attr:`telegram.constants.StickerFormat.STATIC`,
+                :attr:`telegram.constants.StickerFormat.ANIMATED`,
+                :attr:`telegram.constants.StickerFormat.VIDEO`.
+
+                .. versionadded:: NEXT.VERSION
+
+            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
+                optional):
                 **PNG** image with the sticker, must be up to 512 kilobytes in size,
                 dimensions must not exceed 512px, and either width or height must be exactly 512px.
                 |uploadinput|
@@ -5607,14 +5631,52 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
+                .. deprecated:: NEXT.VERSION
+                    Since Bot API 6.6, this parameter has been deprecated in favor of
+                    :paramref:`sticker` and :paramref:`sticker_format`.
+
         Returns:
             :class:`telegram.File`: On success, the uploaded File is returned.
 
         Raises:
-            :class:`telegram.error.TelegramError`
+            :exc:`TypeError`: Raised when: 1) ``sticker`` and ``sticker_format`` are passed
+                  together with ``png_sticker``. 2) If neither the new parameters nor
+                  the deprecated parameters are passed.
+
+            :class:`telegram.error.TelegramError`: For other errors.
 
         """
-        data: JSONDict = {"user_id": user_id, "png_sticker": self._parse_file_input(png_sticker)}
+        if not png_sticker and not all((sticker, sticker_format)):
+            raise TypeError(
+                "Since Bot API 6.6, the parameters `sticker` and `sticker_format` "
+                "are required, please pass them as well."
+            )
+
+        if png_sticker and any((sticker, sticker_format)):
+            raise TypeError(
+                "Since Bot API 6.6, the parameters `sticker` and `sticker_format` "
+                "are mutually exclusive with the deprecated parameter "
+                "`png_sticker`. Please use the new parameters "
+                "`sticker` and `sticker_format` instead."
+            )
+            # If we had allowed this, the created sticker set would have used the newer parameters
+            # only, which would have been confusing.
+
+        if png_sticker:
+            warn(
+                "Since Bot API 6.6, the parameter `png_sticker` for "
+                "`upload_sticker_file` is deprecated. Please use the new parameters "
+                "`sticker` and `sticker_format` instead.",
+                stacklevel=4,
+            )
+
+        data: JSONDict = {
+            "user_id": user_id,
+            "sticker": self._parse_file_input(sticker),  # type: ignore[arg-type]
+            "sticker_format": sticker_format,
+            # Deprecated param since bot api 6.6
+            "png_sticker": self._parse_file_input(png_sticker),  # type: ignore[arg-type]
+        }
         result = await self._post(
             "uploadStickerFile",
             data,
@@ -5633,20 +5695,20 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         name: str,
         title: str,
         # Deprecated params since bot api 6.6
-        # ----
+        # <----
         emojis: str = None,  # Was made optional for compatibility purposes
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
-        # ----
+        # ---->
         sticker_type: str = None,
         # New params since bot api 6.6
-        # ----
+        # <----
         stickers: Sequence[InputSticker] = None,  # Actually a required param. Optional for compat.
         sticker_format: str = None,  # Actually a required param. Optional for compat.
         needs_repainting: bool = None,
-        # ----
+        # ---->
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -5771,7 +5833,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Raises:
             :exc:`TypeError`: Raised when: 1) ``stickers`` and ``sticker_format`` are passed
-                  together with the deprecated parameters. 2) If neither the new parameters or
+                  together with the deprecated parameters. 2) If neither the new parameters nor
                   the deprecated parameters are passed.
 
             :class:`telegram.error.TelegramError`: For other errors.
@@ -5945,7 +6007,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Raises:
             :exc:`TypeError`: Raised when: 1) ``sticker`` is passed
-                  together with the deprecated parameters. 2) If neither the new parameter or
+                  together with the deprecated parameters. 2) If neither the new parameter nor
                   the deprecated parameters are passed.
 
             :class:`telegram.error.TelegramError`: For other errors.
@@ -5967,9 +6029,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         if any(pre_api_6_6_params.values()) and sticker:
             raise TypeError(
-                "The parameters `sticker` and any of the deprecated parameters "
-                f"{set(pre_api_6_6_params)} are mutually exclusive. Please use "
-                "only `sticker`."
+                "Since Bot API 6.6, the parameter `sticker` "
+                "is mutually exclusive with the deprecated parameters "
+                f"{set(pre_api_6_6_params)}. Please use the new parameter "
+                "`sticker` instead."
             )
 
         if any(pre_api_6_6_params.values()):
@@ -6127,9 +6190,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
-        """Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set
-        for animated sticker sets only. Video thumbnails can be set only for video sticker sets
-        only.
+        """Use this method to set the thumbnail of a regular or mask sticker set. The format of the
+        thumbnail file must match the format of the stickers in the set.
 
         .. versionadded:: NEXT.VERSION
 
@@ -6137,16 +6199,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             name (:obj:`str`): Sticker set name
             user_id (:obj:`int`): User identifier of created sticker set owner.
             thumbnail (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): A **PNG** image with the thumbnail, must
-                be up to 128 kilobytes in size and have width and height exactly 100px, or a
-                **TGS** animation with the thumbnail up to 32 kilobytes in size; see
-                https://core.telegram.org/stickers#animation-requirements for animated
-                sticker technical requirements, or a **WEBM** video with the thumbnail up to 32
-                kilobytes in size; see
-                https://core.telegram.org/stickers#video-requirements for video sticker
+                optional): A **.WEBP** or **.PNG** image with the thumbnail, must
+                be up to 128 kilobytes in size and have width and height of exactly 100px, or a
+                **.TGS** animation with the thumbnail up to 32 kilobytes in size; see
+                `the docs <https://core.telegram.org/stickers#animation-requirements>`_ for
+                animated sticker technical requirements, or a **WEBM** video with the thumbnail up
+                to 32 kilobytes in size; see
+                `this <https://core.telegram.org/stickers#video-requirements>`_ for video sticker
                 technical requirements.
                 |fileinput|
-                Animated sticker set thumbnails can't be uploaded via HTTP URL.
+                Animated and video sticker set thumbnails can't be uploaded via HTTP URL. If
+                omitted, then the thumbnail is dropped and the first sticker is used as the
+                thumbnail.
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 

@@ -709,15 +709,11 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         user_id: Union[str, int],
         name: str,
-        # Deprecated params since bot api 6.6
-        # ----
         emojis: str = None,  # Was made optional for compatibility reasons
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
-        # ----
-        # New in bot api 6.6:
         sticker: InputSticker = None,  # Actually a required param, but is optional for compat.
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1040,21 +1036,15 @@ class ExtBot(Bot, Generic[RLARGS]):
         user_id: Union[str, int],
         name: str,
         title: str,
-        # Deprecated params since bot api 6.6
-        # ----
         emojis: str = None,  # Was made optional for compatibility purposes
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
-        # ----
         sticker_type: str = None,
-        # New params since bot api 6.6
-        # ----
         stickers: Sequence[InputSticker] = None,  # Actually a required param. Optional for compat.
         sticker_format: str = None,  # Actually a required param. Optional for compat.
         needs_repainting: bool = None,
-        # ----
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -3472,7 +3462,9 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def upload_sticker_file(
         self,
         user_id: Union[str, int],
-        png_sticker: FileInput,
+        png_sticker: FileInput = None,  # Deprecated since bot api 6.6. Optional for compatiblity.
+        sticker: FileInput = None,  # Actually required, but optional for compatibility.
+        sticker_format: str = None,  # Actually required, but optional for compatibility.
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -3483,6 +3475,8 @@ class ExtBot(Bot, Generic[RLARGS]):
     ) -> File:
         return await super().upload_sticker_file(
             user_id=user_id,
+            sticker=sticker,
+            sticker_format=sticker_format,
             png_sticker=png_sticker,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
