@@ -20,14 +20,13 @@ import asyncio
 import calendar
 import datetime as dtm
 import logging
-import os
 import platform
 import time
 
 import pytest
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
-from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
 
@@ -71,7 +70,7 @@ class TestNoJobQueue:
     not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
 )
 @pytest.mark.skipif(
-    bool(os.getenv("GITHUB_ACTIONS", "") and platform.system() in ["Windows", "Darwin"]),
+    bool(GITHUB_ACTION and platform.system() in ["Windows", "Darwin"]),
     reason="On Windows & MacOS precise timings are not accurate.",
 )
 @pytest.mark.flaky(10, 1)  # Timings aren't quite perfect
