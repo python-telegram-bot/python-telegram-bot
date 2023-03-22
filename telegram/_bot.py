@@ -5756,9 +5756,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: NEXT.VERSION
 
             sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
-                :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`. Custom emoji
-                sticker sets can't be created via the Bot API at the moment. By default, a
-                regular sticker set is created.
+                :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`, or
+                :attr:`telegram.Sticker.CUSTOM_EMOJI`. By default, a regular sticker set is created
 
                 .. versionadded:: 20.0
 
