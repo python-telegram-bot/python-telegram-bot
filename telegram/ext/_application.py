@@ -1441,7 +1441,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             Any data is deep copied with :func:`copy.deepcopy` before handing it over to the
             persistence in order to avoid race conditions, so all persisted data must be copyable.
 
-        .. seealso:: :attr:`telegram.ext.BasePersistence.update_interval`.
+        .. seealso:: :attr:`telegram.ext.BasePersistence.update_interval`,
+            :meth:`mark_data_for_update_persistence`
         """
         async with self.__update_persistence_lock:
             await self.__update_persistence()
