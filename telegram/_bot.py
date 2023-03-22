@@ -6313,7 +6313,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         }
 
         result = await self._post(
-            "setStickerSetThumb",
+            "setStickerSetThumbnail",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
