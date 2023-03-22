@@ -138,8 +138,7 @@ class RequestParameter:
             # We call to_dict and change the returned dict instead of overriding
             # value.sticker in case the same value is reused for another request
             data = value.to_dict()
-            if value.sticker.attach_uri:
-                data["sticker"] = value.sticker.attach_uri
+            data["sticker"] = value.sticker.attach_uri
             return data, [value.sticker]
 
         if isinstance(value, TelegramObject):
