@@ -1355,11 +1355,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Sticker`): Sticker to send.
-                Pass a ``file_id`` as string to send a sticker that exists on the Telegram
-                servers (recommended), pass an HTTP URL as a string for Telegram to get a
-                ``".WEBP"`` sticker from the Internet, or upload a new ``".WEBP"`` or ``".TGS"``
-                sticker. Video stickers can only be sent by a ``file_id``. Animated stickers can't
-                be sent via an HTTP URL.
+                |fileinput| Video stickers can only be sent by a ``file_id``. Animated stickers
+                can't be sent via an HTTP URL.
 
                 Lastly you can pass an existing :class:`telegram.Sticker` object to send.
 
@@ -6200,14 +6197,21 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             user_id (:obj:`int`): User identifier of created sticker set owner.
             thumbnail (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): A **.WEBP** or **.PNG** image with the thumbnail, must
-                be up to 128 kilobytes in size and have width and height of exactly 100px, or a
-                **.TGS** animation with the thumbnail up to 32 kilobytes in size; see
+                be up to :tg-const:`telegram.constants.StickerSetLimit.MAX_STATIC_THUMBNAIL_SIZE`
+                kilobytes in size and have width and height of exactly
+                :tg-const:`telegram.constants.StickerSetLimit.STATIC_THUMB_DIMENSIONS` px, or a
+                **.TGS** animation with the thumbnail up to
+                :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_THUMBNAIL_SIZE`
+                kilobytes in size; see
                 `the docs <https://core.telegram.org/stickers#animation-requirements>`_ for
-                animated sticker technical requirements, or a **WEBM** video with the thumbnail up
-                to 32 kilobytes in size; see
+                animated sticker technical requirements, or a **.WEBM** video with the thumbnail up
+                to :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_THUMBNAIL_SIZE`
+                kilobytes in size; see
                 `this <https://core.telegram.org/stickers#video-requirements>`_ for video sticker
                 technical requirements.
+
                 |fileinput|
+
                 Animated and video sticker set thumbnails can't be uploaded via HTTP URL. If
                 omitted, then the thumbnail is dropped and the first sticker is used as the
                 thumbnail.
