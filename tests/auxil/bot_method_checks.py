@@ -231,6 +231,7 @@ def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAUL
             kws[name] = True
         # Special casing for some methods where the parameter is actually required, but is optional
         # for compatibility reasons
+        # TODO: remove this once these arguments are marked as required
         elif name in {"sticker", "stickers", "sticker_format"}:
             kws[name] = "something passed"
         elif name == "until_date":
