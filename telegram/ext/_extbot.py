@@ -3256,8 +3256,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         name: str,
         user_id: Union[str, int],
         thumbnail: FileInput = None,
-        # Deprecated param `thumb` not included. Would be strange to allow someone to call
-        # the new method with an old param.
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
