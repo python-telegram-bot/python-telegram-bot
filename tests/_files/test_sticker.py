@@ -976,7 +976,7 @@ class TestStickerSetWithRequest:
         except BadRequest:
             assert await bot.create_new_sticker_set(
                 chat_id,
-                name=f"custom_emoji_set_by_{bot.username}",
+                name=ss_name,
                 title="Custom Emoji Sticker Set",
                 stickers=[InputSticker(animated_sticker_file, emoji_list=["😄"])],
                 sticker_format=StickerFormat.ANIMATED,
