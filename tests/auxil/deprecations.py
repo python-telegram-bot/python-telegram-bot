@@ -59,15 +59,6 @@ def check_thumb_deprecation_warnings(
         f". Contents: {[item.message for item in recwarn.list]}"
     )
     for i in range(expected_recwarn_length):
-        if recwarn[i].filename.endswith("python.py"):
-            # this is a wrapper
-            assert "Make sure you rename it in your code" in str(recwarn[i].message), (
-                f'Warning issued by file {recwarn[i].filename} ("{str(recwarn[i].message)}") '
-                "does not contain expected phrase: "
-                f"\"{names[i]} '{deprecated_name}' to '{new_name}'\""
-            )
-            continue
-
         assert issubclass(recwarn[i].category, PTBDeprecationWarning)
         assert f"{names[i]} '{deprecated_name}' to '{new_name}'" in str(recwarn[i].message), (
             f'Warning issued by file {recwarn[i].filename} ("{str(recwarn[i].message)}") '
