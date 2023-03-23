@@ -1370,6 +1370,15 @@ class StickerSetLimit(IntEnum):
     """:obj:`int`: Maximum number of stickers allowed in a static sticker set, as given in
     :meth:`telegram.Bot.add_sticker_to_set`.
     """
+    MAX_STATIC_THUMBNAIL_SIZE = 128
+    """:obj:`int`: Maximum size of the thumbnail if it is a **.WEBP** or **.PNG** in kilobytes,
+    as given in :meth:`telegram.Bot.set_sticker_set_thumbnail`."""
+    MAX_ANIMATED_THUMBNAIL_SIZE = 32
+    """:obj:`int`: Maximum size of the thumbnail if it is a **.TGS** or **.WEBM** in kilobytes,
+    as given in :meth:`telegram.Bot.set_sticker_set_thumbnail`."""
+    STATIC_THUMB_DIMENSIONS = 100
+    """:obj:`int`: Exact height and width of the thumbnail if it is a **.WEBP** or **.PNG** in
+    pixels, as given in :meth:`telegram.Bot.set_sticker_set_thumbnail`."""
 
 
 class StickerType(StringEnum):

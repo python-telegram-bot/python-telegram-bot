@@ -63,6 +63,11 @@ PTB_EXTRA_PARAMS = {
 
 
 def _get_params_base(object_name: str, search_dict: Dict[str, Set[str]]) -> Set[str]:
+    """Helper function for the *_params functions below.
+    Given an object name and a search dict, goes through the keys of the search dict and checks if
+    the object name matches any of the regexes (keys). The union of all the sets (values) of the
+    matching regexes is returned. `object_name` may be a CamelCase or snake_case name.
+    """
     out = set()
     for regex, params in search_dict.items():
         if re.fullmatch(regex, object_name):

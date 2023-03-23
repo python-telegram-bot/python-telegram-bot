@@ -475,13 +475,6 @@ class TestStickerWithRequest(TestStickerBase):
         assert emoji_sticker_list[0].file_size == 3678
         assert emoji_sticker_list[0].file_unique_id == "AgAD6gwAAoY06FM"
 
-    # async def test_set_custom_emoji_sticker_set_thumbnail(self, bot):
-    # custom_emoji_set = await bot.get_sticker_set("PTBStaticEmojiTestPack")
-    # Returns stickerset_invalid for some reason, even though we fetch one in the previous test
-    # assert await bot.set_custom_emoji_sticker_set_thumbnail(
-    #     "PTBStaticEmojiTestPack", custom_emoji_set.stickers[0].custom_emoji_id,
-    # )
-
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_sticker(chat_id, open(os.devnull, "rb"))
@@ -972,6 +965,24 @@ class TestStickerSetWithRequest:
             )
         finally:
             assert await bot.delete_sticker_set(f"temp_set_by_{bot.username}")
+
+    async def test_set_custom_emoji_sticker_set_thumbnail(
+        self, bot, chat_id, animated_sticker_file
+    ):
+        ss_name = f"custom_emoji_set_by_{bot.username}"
+        try:
+            ss = await bot.get_sticker_set(ss_name)
+            assert ss.sticker_type == Sticker.CUSTOM_EMOJI
+        except BadRequest:
+            assert await bot.create_new_sticker_set(
+                chat_id,
+                name=ss_name,
+                title="Custom Emoji Sticker Set",
+                stickers=[InputSticker(animated_sticker_file, emoji_list=["😄"])],
+                sticker_format=StickerFormat.ANIMATED,
+                sticker_type=Sticker.CUSTOM_EMOJI,
+            )
+        assert await bot.set_custom_emoji_sticker_set_thumbnail(ss_name, "")
 
     # Test add_sticker_to_set
     async def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
