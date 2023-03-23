@@ -75,11 +75,7 @@ def check_thumb_deprecation_warnings(
             f"\"{names[i]} '{deprecated_name}' to '{new_name}'\""
         )
 
-        assert (
-            # the warning could be issued by a decorator imported from warnings_transition
-            recwarn[i].filename
-            in (calling_file, warnings_transition.__file__)
-        ), (
+        assert recwarn[i].filename == calling_file, (
             f'Warning for {names[i]} ("{str(recwarn[i].message)}") was issued by file '
             f"{recwarn[i].filename}, expected {calling_file} or {warnings_transition.__file__}"
         )
