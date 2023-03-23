@@ -8021,11 +8021,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: NEXT.VERSION
 
         Args:
-            description (:obj:`str`): Optional. New bot description;
-                0- :tg-const:`telegram.constants.BotDescriptionLimit.MAX_DESCRIPTION_LENGTH`
+            description (:obj:`str`, optional): New bot description;
+                0-:tg-const:`telegram.constants.BotDescriptionLimit.MAX_DESCRIPTION_LENGTH`
                 characters. Pass an empty string to remove the dedicated description for the given
                 language.
-            language_code (:obj:`str`): Optional. A two-letter ISO 639-1 language code. If empty,
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
                 the description will be applied to all users for whose language there is no
                 dedicated description.
 
@@ -8067,11 +8067,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: NEXT.VERSION
 
         Args:
-            short_description (:obj:`str`): Optional. New short description for the bot;
-                0- :tg-const:`telegram.constants.BotDescriptionLimit.MAX_SHORT_DESCRIPTION_LENGTH`
+            short_description (:obj:`str`, optional): New short description for the bot;
+                0-:tg-const:`telegram.constants.BotDescriptionLimit.MAX_SHORT_DESCRIPTION_LENGTH`
                 characters. Pass an empty string to remove the dedicated description for the given
                 language.
-            language_code (:obj:`str`): Optional. A two-letter ISO 639-1 language code. If empty,
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
                 the description will be applied to all users for whose language there is no
                 dedicated description.
 
@@ -8109,7 +8109,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to get the current bot description for the given user language.
 
         Args:
-            language_code (:obj:`str`): Optional. A two-letter ISO 639-1 language code or an empty
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code or an empty
                 string.
 
         Returns:
@@ -8148,7 +8148,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to get the current bot short description for the given user language.
 
         Args:
-            language_code (:obj:`str`): Optional. A two-letter ISO 639-1 language code or an empty
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code or an empty
                 string.
 
         Returns:
