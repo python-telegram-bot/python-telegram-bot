@@ -23,7 +23,7 @@ from telegram._utils import warnings_transition
 from telegram.warnings import PTBDeprecationWarning
 
 
-def check_thumb_deprecation_warnings(
+def check_thumb_deprecation_warnings_for_args_and_attrs(
     recwarn: WarningsRecorder,
     calling_file: str,
     deprecated_name: str = "thumb",

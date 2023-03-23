@@ -31,7 +31,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -85,7 +85,7 @@ class TestDocumentWithoutRequest(TestDocumentBase):
     def test_thumb_property_deprecation_warning(self, recwarn):
         document = Document(file_id="file_id", file_unique_id="file_unique_id", thumb=object())
         assert document.thumb is document.thumbnail
-        check_thumb_deprecation_warnings(recwarn, __file__)
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_de_json(self, bot, document):
         json_dict = {

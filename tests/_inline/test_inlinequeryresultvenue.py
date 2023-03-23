@@ -25,7 +25,7 @@ from telegram import (
     InlineQueryResultVoice,
     InputTextMessageContent,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.slots import mro_slots
 
 
@@ -112,7 +112,7 @@ class TestInlineQueryResultVenueWithoutRequest(TestInlineQueryResultVenueBase):
             thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
         )
         assert inline_query_result_venue.thumb_url == inline_query_result_venue.thumbnail_url
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )
 
@@ -134,7 +134,7 @@ class TestInlineQueryResultVenueWithoutRequest(TestInlineQueryResultVenueBase):
             thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
         )
         assert inline_query_result_venue.thumb_height == inline_query_result_venue.thumbnail_height
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn, __file__, deprecated_name="thumb_height", new_name="thumbnail_height"
         )
 
@@ -156,7 +156,7 @@ class TestInlineQueryResultVenueWithoutRequest(TestInlineQueryResultVenueBase):
             thumb_width=TestInlineQueryResultVenueBase.thumbnail_width,  # deprecated arg
         )
         assert inline_query_result_venue.thumb_width == inline_query_result_venue.thumbnail_width
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
         )
 

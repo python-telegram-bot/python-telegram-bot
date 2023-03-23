@@ -26,7 +26,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.slots import mro_slots
 
 
@@ -109,7 +109,7 @@ class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentB
             thumbnail_width=TestInlineQueryResultDocumentBase.thumbnail_width,
         )
         assert inline_query_result_document.thumb_url == inline_query_result_document.thumbnail_url
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
         )
 
@@ -133,7 +133,7 @@ class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentB
             inline_query_result_document.thumb_height
             == inline_query_result_document.thumbnail_height
         )
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn, __file__, deprecated_name="thumb_height", new_name="thumbnail_height"
         )
 
@@ -157,7 +157,7 @@ class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentB
             inline_query_result_document.thumb_width
             == inline_query_result_document.thumbnail_width
         )
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
         )
 

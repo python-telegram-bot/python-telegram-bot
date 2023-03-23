@@ -45,7 +45,7 @@ from tests.auxil.slots import mro_slots
 # noinspection PyUnresolvedReferences
 from tests.test_forum import emoji_id, real_topic  # noqa: F401
 
-from ..auxil.deprecations import check_thumb_deprecation_warnings
+from ..auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 
 # noinspection PyUnresolvedReferences
 from .test_audio import audio, audio_file  # noqa: F401
@@ -165,7 +165,7 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
     def test_thumb_property_deprecation_warning(self, recwarn):
         input_media_video = InputMediaVideo(self.media, thumb=object())
         assert input_media_video.thumb is input_media_video.thumbnail
-        check_thumb_deprecation_warnings(recwarn, __file__)
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_video = InputMediaVideo(self.media)
@@ -309,7 +309,7 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
     def test_thumb_property_deprecation_warning(self, recwarn):
         input_media_animation = InputMediaAnimation(self.media, thumb=object())
         assert input_media_animation.thumb is input_media_animation.thumbnail
-        check_thumb_deprecation_warnings(recwarn, __file__)
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_animation = InputMediaAnimation(self.media)
@@ -392,7 +392,7 @@ class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
     def test_thumb_property_deprecation_warning(self, recwarn):
         input_media_audio = InputMediaAudio(self.media, thumb=object())
         assert input_media_audio.thumb is input_media_audio.thumbnail
-        check_thumb_deprecation_warnings(recwarn, __file__)
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_audio = InputMediaAudio(self.media)
@@ -476,7 +476,7 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
     def test_thumb_property_deprecation_warning(self, recwarn):
         input_media_document = InputMediaDocument(self.media, thumb=object())
         assert input_media_document.thumb is input_media_document.thumbnail
-        check_thumb_deprecation_warnings(recwarn, __file__)
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_document = InputMediaDocument(self.media)

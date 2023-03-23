@@ -26,7 +26,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.slots import mro_slots
 
 
@@ -116,7 +116,7 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
         assert (
             inline_query_result_mpeg4_gif.thumb_url == inline_query_result_mpeg4_gif.thumbnail_url
         )
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn,
             __file__,
             deprecated_name="thumb_url",
@@ -143,7 +143,7 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
             inline_query_result_mpeg4_gif.thumb_mime_type
             == inline_query_result_mpeg4_gif.thumbnail_mime_type
         )
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn, __file__, deprecated_name="thumb_mime_type", new_name="thumbnail_mime_type"
         )
 
@@ -168,7 +168,7 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
         assert (
             inline_query_result_mpeg4_gif.thumb_url == inline_query_result_mpeg4_gif.thumbnail_url
         )
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn,
             __file__,
             deprecated_name="thumb_url",

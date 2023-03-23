@@ -26,7 +26,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.slots import mro_slots
 
 
@@ -120,7 +120,7 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
             thumb_url=TestInlineQueryResultVideoBase.thumbnail_url,  # deprecated arg
         )
         assert inline_query_result_video.thumb_url == inline_query_result_video.thumbnail_url
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn,
             __file__,
             deprecated_name="thumb_url",
@@ -150,7 +150,7 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
             thumb_url=TestInlineQueryResultVideoBase.thumbnail_url,  # deprecated arg
         )
         assert inline_query_result_video.thumb_url == inline_query_result_video.thumbnail_url
-        check_thumb_deprecation_warnings(
+        check_thumb_deprecation_warnings_for_args_and_attrs(
             recwarn,
             __file__,
             deprecated_name="thumb_url",
