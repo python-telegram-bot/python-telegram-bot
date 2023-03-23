@@ -41,7 +41,10 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings
+from tests.auxil.deprecations import (
+    check_thumb_deprecation_warnings,
+    check_thumb_deprecation_warnings_for_bot_methods,
+)
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -893,6 +896,31 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             monkeypatch.setattr(bot, "_post", make_assertion)
             await bot.set_sticker_set_thumbnail("name", chat_id, thumbnail=file)
             assert test_flag
+        finally:
+            bot._local_mode = False
+
+    @pytest.mark.parametrize("local_mode", [True, False])
+    async def test_set_sticker_set_thumb_local_files_issues_warning(
+        self, monkeypatch, bot, chat_id, local_mode, recwarn
+    ):
+        try:
+            bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local bot API set up
+            test_flag = False
+            file = data_file("telegram.jpg")
+            expected = file.as_uri()
+
+            async def make_assertion(_, data, *args, **kwargs):
+                nonlocal test_flag
+                if local_mode:
+                    test_flag = data.get("thumbnail") == expected
+                else:
+                    test_flag = isinstance(data.get("thumbnail"), InputFile)
+
+            monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.set_sticker_set_thumb("name", chat_id, thumb=file)
+            assert test_flag
+            check_thumb_deprecation_warnings_for_bot_methods(recwarn)
         finally:
             bot._local_mode = False
 

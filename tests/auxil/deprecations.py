@@ -72,3 +72,40 @@ def check_thumb_deprecation_warnings(
         )
 
     return True
+
+
+def check_thumb_deprecation_warnings_for_bot_methods(recwarn: WarningsRecorder) -> bool:
+    """Check that the correct deprecation warning is issued for Bot method.
+
+    Args:
+        recwarn: pytest's recwarn fixture.
+
+    Returns:
+        True if the correct deprecation warnings were raised, False otherwise.
+
+    Raises:
+        AssertionError: If the correct deprecation warnings were not raised.
+    """
+
+    # ResourceWarning can be triggered by the test itself
+    actual_recwarn_length = len(
+        [w.message for w in recwarn.list if not isinstance(w.message, ResourceWarning)]
+    )
+
+    assert actual_recwarn_length == 1, (
+        f"expected recwarn length 1, actual length {actual_recwarn_length}"
+        f". Contents: {[item.message for item in recwarn.list]}"
+    )
+
+    warning = recwarn[0]
+    assert issubclass(warning.category, PTBDeprecationWarning)
+    assert "renamed the method" in str(warning.message), (
+        f'Warning issued by file {warning.filename} ("{str(warning.message)}") '
+        "does not contain expected phrase on the method being renamed."
+    )
+
+    assert warning.filename.endswith(
+        "_bot.py"
+    ), f'Warning "{str(warning.message)}" was issued by file {warning.filename}, expected _bot.py'
+
+    return True
