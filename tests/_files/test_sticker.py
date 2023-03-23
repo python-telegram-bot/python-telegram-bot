@@ -35,16 +35,15 @@ from telegram import (
 )
 from telegram.constants import StickerFormat
 from telegram.error import BadRequest, TelegramError
+from telegram.ext import ExtBot
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import (
-    check_thumb_deprecation_warnings_for_args_and_attrs,
-    check_thumb_deprecation_warnings_for_bot_methods,
-)
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -899,30 +898,34 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         finally:
             bot._local_mode = False
 
-    @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_set_sticker_set_thumb_local_files_issues_warning(
-        self, monkeypatch, bot, chat_id, local_mode, recwarn
+    async def test_set_sticker_set_thumb_deprecation_warning(
+        self, monkeypatch, bot, raw_bot, recwarn
     ):
-        try:
-            bot._local_mode = local_mode
-            # For just test that the correct paths are passed as we have no local bot API set up
-            test_flag = False
-            file = data_file("telegram.jpg")
-            expected = file.as_uri()
+        ext_bot = bot
 
-            async def make_assertion(_, data, *args, **kwargs):
-                nonlocal test_flag
-                if local_mode:
-                    test_flag = data.get("thumbnail") == expected
-                else:
-                    test_flag = isinstance(data.get("thumbnail"), InputFile)
+        async def _post(*args, **kwargs):
+            return True
 
-            monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.set_sticker_set_thumb("name", chat_id, thumb=file)
-            assert test_flag
-            check_thumb_deprecation_warnings_for_bot_methods(recwarn)
-        finally:
-            bot._local_mode = False
+        for bot in (ext_bot, raw_bot):
+            cls_name = bot.__class__.__name__
+            monkeypatch.setattr(bot, "_post", _post)
+            await bot.set_sticker_set_thumb("name", "user_id", "thumb")
+
+            if isinstance(bot, ExtBot):
+                # Unfortunately, warnings.catch_warnings doesn't play well with pytest apparently
+                assert len(recwarn) == 2, f"Wrong warning number for class {cls_name}!"
+            else:
+                assert len(recwarn) == 1, f"No warning for class {cls_name}!"
+
+            assert (
+                recwarn[0].category is PTBDeprecationWarning
+            ), f"Wrong warning for class {cls_name}!"
+            assert "renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail'" in str(
+                recwarn[0].message
+            ), f"Wrong message for class {cls_name}!"
+
+            assert recwarn[0].filename == __file__, f"incorrect stacklevel for class {cls_name}!"
+            recwarn.clear()
 
     async def test_get_file_instance_method(self, monkeypatch, sticker):
         async def make_assertion(*_, **kwargs):

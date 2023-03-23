@@ -6278,11 +6278,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
         warn(
-            "Bot API 6.6 renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail', "
-            "hence method 'set_sticker_set_thumb' was renamed to 'set_sticker_set_thumbnail' "
-            "in PTB. The old methods will be removed in the next major version of PTB.",
-            PTBDeprecationWarning,
-            stacklevel=2,
+            message=(
+                "Bot API 6.6 renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail', "
+                "hence method 'set_sticker_set_thumb' was renamed to 'set_sticker_set_thumbnail' "
+                "in PTB."
+            ),
+            category=PTBDeprecationWarning,
+            stacklevel=3,
         )
 
         return await self._set_sticker_set_thumbnail(

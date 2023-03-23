@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
+import warnings
 from copy import copy
 from datetime import datetime
 from typing import (
@@ -85,9 +86,11 @@ from telegram import (
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.warnings import warn
 from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.ext._utils.types import RLARGS
 from telegram.request import BaseRequest
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -3278,16 +3281,30 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
     ) -> bool:
-        return await super().set_sticker_set_thumb(
-            name=name,
-            user_id=user_id,
-            thumb=thumb,
-            read_timeout=read_timeout,
-            write_timeout=write_timeout,
-            connect_timeout=connect_timeout,
-            pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        # Manually issue deprecation here to get the stacklevel right
+        # Suppress the warning issued by super().set_sticker_set_thumb just in case
+        # the user explicitly enables deprecation warnings
+        # Unfortunately this is not entirely reliable (see tests), but it's a best effort solution
+        warn(
+            message=(
+                "Bot API 6.6 renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail', "
+                "hence method 'set_sticker_set_thumb' was renamed to 'set_sticker_set_thumbnail' "
+                "in PTB."
+            ),
+            category=PTBDeprecationWarning,
+            stacklevel=2,
         )
+        with warnings.catch_warnings():
+            return await super().set_sticker_set_thumb(
+                name=name,
+                user_id=user_id,
+                thumb=thumb,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            )
 
     async def set_webhook(
         self,
