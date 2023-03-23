@@ -3294,7 +3294,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             category=PTBDeprecationWarning,
             stacklevel=2,
         )
-        with warnings.catch_warnings():
+        with warnings.catch_warnings(category=PTBDeprecationWarning):
             return await super().set_sticker_set_thumb(
                 name=name,
                 user_id=user_id,
