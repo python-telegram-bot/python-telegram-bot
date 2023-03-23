@@ -31,10 +31,11 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict, ODVInput
-from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
+from telegram._utils.warnings_transition import (
+    warn_about_deprecated_attr_in_property,
+    warn_about_thumb_return_thumbnail,
+)
 from telegram.constants import InputMediaType
-from telegram.warnings import PTBDeprecationWarning
 
 MediaType = Union[Animation, Audio, Document, PhotoSize, Video]
 
@@ -241,10 +242,10 @@ class InputMediaAnimation(InputMedia):
         .. deprecated:: NEXT.VERSION
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
-        warn(
-            "Bot API 6.6 renamed the attribute 'thumb' to 'thumbnail'.",
-            PTBDeprecationWarning,
-            stacklevel=2,
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb",
+            new_attr_name="thumbnail",
+            bot_api_version="6.6",
         )
         return self.thumbnail
 
@@ -470,10 +471,10 @@ class InputMediaVideo(InputMedia):
         .. deprecated:: NEXT.VERSION
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
-        warn(
-            "Bot API 6.6 renamed the attribute 'thumb' to 'thumbnail'.",
-            PTBDeprecationWarning,
-            stacklevel=2,
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb",
+            new_attr_name="thumbnail",
+            bot_api_version="6.6",
         )
         return self.thumbnail
 
@@ -598,10 +599,10 @@ class InputMediaAudio(InputMedia):
         .. deprecated:: NEXT.VERSION
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
-        warn(
-            "Bot API 6.6 renamed the attribute 'thumb' to 'thumbnail'.",
-            PTBDeprecationWarning,
-            stacklevel=2,
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb",
+            new_attr_name="thumbnail",
+            bot_api_version="6.6",
         )
         return self.thumbnail
 
@@ -708,9 +709,9 @@ class InputMediaDocument(InputMedia):
         .. deprecated:: NEXT.VERSION
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
-        warn(
-            "Bot API 6.6 renamed the attribute 'thumb' to 'thumbnail'.",
-            PTBDeprecationWarning,
-            stacklevel=2,
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb",
+            new_attr_name="thumbnail",
+            bot_api_version="6.6",
         )
         return self.thumbnail
