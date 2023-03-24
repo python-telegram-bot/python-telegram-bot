@@ -20,7 +20,6 @@
 import asyncio
 import inspect
 import itertools
-import logging
 import platform
 import signal
 from collections import defaultdict
@@ -52,6 +51,7 @@ from typing import (
 
 from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
+from telegram._utils.logging import get_logger
 from telegram._utils.types import DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
@@ -75,7 +75,7 @@ DEFAULT_GROUP: int = 0
 _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-name
 _STOP_SIGNAL = object()
 
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__)
 
 
 class ApplicationHandlerStop(Exception):

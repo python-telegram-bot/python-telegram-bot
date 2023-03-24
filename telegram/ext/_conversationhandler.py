@@ -19,7 +19,6 @@
 """This module contains the ConversationHandler."""
 import asyncio
 import datetime
-import logging
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
@@ -38,6 +37,7 @@ from typing import (
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
+from telegram._utils.logging import get_logger
 from telegram._utils.types import DVType
 from telegram._utils.warnings import warn
 from telegram.ext._application import ApplicationHandlerStop
@@ -56,7 +56,7 @@ if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
 _CheckUpdateType = Tuple[object, ConversationKey, BaseHandler[Update, CCT], object]
 
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__, class_name="ConversationHandler")
 
 
 @dataclass

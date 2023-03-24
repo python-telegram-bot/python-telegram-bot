@@ -25,12 +25,13 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-import logging
 from pathlib import Path
 from types import FrameType
 from typing import Optional
 
-_logger = logging.getLogger(__name__)
+from telegram._utils.logging import get_logger
+
+_logger = get_logger(__name__)
 
 
 def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
