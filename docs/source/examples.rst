@@ -8,7 +8,7 @@ aspect of the Telegram Bot API while others focus on one of the
 mechanics of this library. Except for the
 :any:`examples.rawapibot` example, they all use the high-level
 framework this library provides with the
-:any:`telegram.ext <telegram.ext>` submodule.
+:mod:`telegram.ext` submodule.
 
 All examples are licensed under the `CC0
 License <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/LICENSE.txt>`__
