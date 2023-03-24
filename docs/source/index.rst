@@ -27,6 +27,7 @@
    :hidden:
    :caption: Project
 
+   stability_policy
    changelog
    Website <https://python-telegram-bot.org>
    GitHub Repository <https://github.com/python-telegram-bot/python-telegram-bot/>
