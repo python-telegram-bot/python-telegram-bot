@@ -25,6 +25,10 @@ from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.warnings_transition import (
+    warn_about_deprecated_arg_return_new_arg,
+    warn_about_deprecated_attr_in_property,
+)
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -63,8 +67,27 @@ class InlineQueryResultDocument(InlineQueryResult):
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the file.
         thumb_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the file.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail_url`.
         thumb_width (:obj:`int`, optional): Thumbnail width.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail_width`.
         thumb_height (:obj:`int`, optional): Thumbnail height.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail_height`.
+        thumbnail_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the file.
+
+            .. versionadded:: NEXT.VERSION
+        thumbnail_width (:obj:`int`, optional): Thumbnail width.
+
+            .. versionadded:: NEXT.VERSION
+        thumbnail_height (:obj:`int`, optional): Thumbnail height.
+
+            .. versionadded:: NEXT.VERSION
+
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.DOCUMENT`.
@@ -90,9 +113,15 @@ class InlineQueryResultDocument(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the file.
-        thumb_url (:obj:`str`): Optional. URL of the thumbnail (JPEG only) for the file.
-        thumb_width (:obj:`int`): Optional. Thumbnail width.
-        thumb_height (:obj:`int`): Optional. Thumbnail height.
+        thumbnail_url (:obj:`str`): Optional. URL of the thumbnail (JPEG only) for the file.
+
+            .. versionadded:: NEXT.VERSION
+        thumbnail_width (:obj:`int`): Optional. Thumbnail width.
+
+            .. versionadded:: NEXT.VERSION
+        thumbnail_height (:obj:`int`): Optional. Thumbnail height.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -100,14 +129,14 @@ class InlineQueryResultDocument(InlineQueryResult):
         "reply_markup",
         "caption_entities",
         "document_url",
-        "thumb_width",
-        "thumb_height",
+        "thumbnail_width",
+        "thumbnail_height",
         "caption",
         "title",
         "description",
         "parse_mode",
         "mime_type",
-        "thumb_url",
+        "thumbnail_url",
         "input_message_content",
     )
 
@@ -126,6 +155,9 @@ class InlineQueryResultDocument(InlineQueryResult):
         thumb_height: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence[MessageEntity] = None,
+        thumbnail_url: str = None,
+        thumbnail_width: int = None,
+        thumbnail_height: int = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -143,6 +175,66 @@ class InlineQueryResultDocument(InlineQueryResult):
             self.description: Optional[str] = description
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.thumb_url: Optional[str] = thumb_url
-            self.thumb_width: Optional[int] = thumb_width
-            self.thumb_height: Optional[int] = thumb_height
+            self.thumbnail_url: Optional[str] = warn_about_deprecated_arg_return_new_arg(
+                deprecated_arg=thumb_url,
+                new_arg=thumbnail_url,
+                deprecated_arg_name="thumb_url",
+                new_arg_name="thumbnail_url",
+                bot_api_version="6.6",
+            )
+            self.thumbnail_width: Optional[int] = warn_about_deprecated_arg_return_new_arg(
+                deprecated_arg=thumb_width,
+                new_arg=thumbnail_width,
+                deprecated_arg_name="thumb_width",
+                new_arg_name="thumbnail_width",
+                bot_api_version="6.6",
+            )
+            self.thumbnail_height: Optional[int] = warn_about_deprecated_arg_return_new_arg(
+                deprecated_arg=thumb_height,
+                new_arg=thumbnail_height,
+                deprecated_arg_name="thumb_height",
+                new_arg_name="thumbnail_height",
+                bot_api_version="6.6",
+            )
+
+    @property
+    def thumb_url(self) -> Optional[str]:
+        """:obj:`str`: Optional. URL of the thumbnail (JPEG only) for the file.
+
+        .. deprecated:: NEXT.VERSION
+           |thumbattributedeprecation| :attr:`thumbnail_url`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb_url",
+            new_attr_name="thumbnail_url",
+            bot_api_version="6.6",
+        )
+        return self.thumbnail_url
+
+    @property
+    def thumb_width(self) -> Optional[int]:
+        """:obj:`str`: Optional. Thumbnail width.
+
+        .. deprecated:: NEXT.VERSION
+           |thumbattributedeprecation| :attr:`thumbnail_width`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb_width",
+            new_attr_name="thumbnail_width",
+            bot_api_version="6.6",
+        )
+        return self.thumbnail_width
+
+    @property
+    def thumb_height(self) -> Optional[int]:
+        """:obj:`str`: Optional. Thumbnail height.
+
+        .. deprecated:: NEXT.VERSION
+           |thumbattributedeprecation| :attr:`thumbnail_height`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb_height",
+            new_attr_name="thumbnail_height",
+            bot_api_version="6.6",
+        )
+        return self.thumbnail_height

@@ -14,6 +14,10 @@
 
 .. |thumbdocstringnopath| replace:: |thumbdocstringbase| |uploadinputnopath|
 
+.. |thumbargumentdeprecation| replace:: As of Bot API 6.6 this argument is deprecated in favor of
+
+.. |thumbattributedeprecation| replace:: As of Bot API 6.6 this attribute is deprecated in favor of
+
 .. |editreplymarkup| replace:: It is currently only possible to edit messages without :attr:`telegram.Message.reply_markup` or with inline keyboards.
 
 .. |toapikwargsbase| replace:: These arguments are also considered by :meth:`~telegram.TelegramObject.to_dict` and :meth:`~telegram.TelegramObject.to_json`, i.e. when passing objects to Telegram. Passing them to Telegram is however not guaranteed to work for all kinds of objects, e.g. this will fail for objects that can not directly be JSON serialized.

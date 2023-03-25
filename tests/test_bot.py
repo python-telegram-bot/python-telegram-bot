@@ -33,6 +33,8 @@ from telegram import (
     Bot,
     BotCommand,
     BotCommandScopeChat,
+    BotDescription,
+    BotShortDescription,
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
@@ -3223,3 +3225,83 @@ class TestBotWithRequest:
         finally:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
+
+    async def test_set_get_my_description(self, bot):
+        default_description = f"{bot.username} - default - {dtm.datetime.utcnow().isoformat()}"
+        en_description = f"{bot.username} - en - {dtm.datetime.utcnow().isoformat()}"
+        de_description = f"{bot.username} - de - {dtm.datetime.utcnow().isoformat()}"
+
+        # Set the descriptions
+        assert all(
+            await asyncio.gather(
+                bot.set_my_description(default_description),
+                bot.set_my_description(en_description, language_code="en"),
+                bot.set_my_description(de_description, language_code="de"),
+            )
+        )
+
+        # Check that they were set correctly
+        assert await asyncio.gather(
+            bot.get_my_description(), bot.get_my_description("en"), bot.get_my_description("de")
+        ) == [
+            BotDescription(default_description),
+            BotDescription(en_description),
+            BotDescription(de_description),
+        ]
+
+        # Delete the descriptions
+        assert all(
+            await asyncio.gather(
+                bot.set_my_description(None),
+                bot.set_my_description(None, language_code="en"),
+                bot.set_my_description(None, language_code="de"),
+            )
+        )
+
+        # Check that they were deleted correctly
+        assert await asyncio.gather(
+            bot.get_my_description(), bot.get_my_description("en"), bot.get_my_description("de")
+        ) == 3 * [BotDescription("")]
+
+    async def test_set_get_my_short_description(self, bot):
+        default_short_description = (
+            f"{bot.username} - default - {dtm.datetime.utcnow().isoformat()}"
+        )
+        en_short_description = f"{bot.username} - en - {dtm.datetime.utcnow().isoformat()}"
+        de_short_description = f"{bot.username} - de - {dtm.datetime.utcnow().isoformat()}"
+
+        # Set the short_descriptions
+        assert all(
+            await asyncio.gather(
+                bot.set_my_short_description(default_short_description),
+                bot.set_my_short_description(en_short_description, language_code="en"),
+                bot.set_my_short_description(de_short_description, language_code="de"),
+            )
+        )
+
+        # Check that they were set correctly
+        assert await asyncio.gather(
+            bot.get_my_short_description(),
+            bot.get_my_short_description("en"),
+            bot.get_my_short_description("de"),
+        ) == [
+            BotShortDescription(default_short_description),
+            BotShortDescription(en_short_description),
+            BotShortDescription(de_short_description),
+        ]
+
+        # Delete the short_descriptions
+        assert all(
+            await asyncio.gather(
+                bot.set_my_short_description(None),
+                bot.set_my_short_description(None, language_code="en"),
+                bot.set_my_short_description(None, language_code="de"),
+            )
+        )
+
+        # Check that they were deleted correctly
+        assert await asyncio.gather(
+            bot.get_my_short_description(),
+            bot.get_my_short_description("en"),
+            bot.get_my_short_description("de"),
+        ) == 3 * [BotShortDescription("")]

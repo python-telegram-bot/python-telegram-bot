@@ -1374,6 +1374,7 @@ class Message(TelegramObject):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1421,6 +1422,7 @@ class Message(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            thumbnail=thumbnail,
         )
 
     async def reply_document(
@@ -1437,6 +1439,7 @@ class Message(TelegramObject):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1482,6 +1485,7 @@ class Message(TelegramObject):
             caption_entities=caption_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            thumbnail=thumbnail,
         )
 
     async def reply_animation(
@@ -1501,6 +1505,7 @@ class Message(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1550,6 +1555,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
+            thumbnail=thumbnail,
         )
 
     async def reply_sticker(
@@ -1561,6 +1567,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        emoji: str = None,
         *,
         quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1599,6 +1606,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            emoji=emoji,
         )
 
     async def reply_video(
@@ -1619,6 +1627,7 @@ class Message(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1668,6 +1677,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
+            thumbnail=thumbnail,
         )
 
     async def reply_video_note(
@@ -1682,6 +1692,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1726,6 +1737,7 @@ class Message(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            thumbnail=thumbnail,
         )
 
     async def reply_voice(
