@@ -34,6 +34,10 @@ class KeyboardButtonRequestUser(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`request_id` is equal.
 
+    .. seealso::
+        `Telegram Docs on requesting users \
+        <https://core.telegram.org/bots/features#chat-and-user-selection>`_
+
     .. versionadded:: 20.1
 
     Args:
@@ -86,6 +90,10 @@ class KeyboardButtonRequestChat(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`request_id` is equal.
+
+    .. seealso::
+        `Telegram Docs on requesting chats \
+        <https://core.telegram.org/bots/features#chat-and-user-selection>`_
 
     .. versionadded:: 20.1
 
