@@ -63,6 +63,8 @@ jobs:
           # worker. Increasing number of workers has little effect on test duration, but it seems
           # to increase flakyness, specially on python 3.7 with --dist=loadgroup.
           pytest -v --cov --cov-append -n auto --dist loadfile
+          # Rerun only failed tests (--lf), and don't run any tests if none failed (--lfnf=none)
+          pytest -v --cov --cov-append -n auto --dist loadfile --lf --lfnf=none
           status=$(( $? > status ? $? : status))
           exit ${status}
         env:
