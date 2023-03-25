@@ -19,7 +19,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 import datetime
-import sys
 from html import escape
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
 
@@ -3134,10 +3133,6 @@ class Message(TelegramObject):
         if not self.text:
             raise RuntimeError("This Message has no 'text'.")
 
-        # Is it a narrow build, if so we don't need to convert
-        if sys.maxunicode == 0xFFFF:
-            return self.text[entity.offset : entity.offset + entity.length]
-
         entity_text = self.text.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
         return entity_text.decode("utf-16-le")
@@ -3163,10 +3158,6 @@ class Message(TelegramObject):
         """
         if not self.caption:
             raise RuntimeError("This Message has no 'caption'.")
-
-        # Is it a narrow build, if so we don't need to convert
-        if sys.maxunicode == 0xFFFF:
-            return self.caption[entity.offset : entity.offset + entity.length]
 
         entity_text = self.caption.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
@@ -3244,8 +3235,7 @@ class Message(TelegramObject):
         if message_text is None:
             return None
 
-        if sys.maxunicode != 0xFFFF:
-            message_text = message_text.encode("utf-16-le")  # type: ignore
+        message_text = message_text.encode("utf-16-le")  # type: ignore
 
         html_text = ""
         last_offset = 0
@@ -3301,21 +3291,14 @@ class Message(TelegramObject):
                     insert = escaped_text
 
                 if offset == 0:
-                    if sys.maxunicode == 0xFFFF:
-                        html_text += (
-                            escape(message_text[last_offset : entity.offset - offset]) + insert
+                    html_text += (
+                        escape(
+                            message_text[  # type: ignore
+                                last_offset * 2 : (entity.offset - offset) * 2
+                            ].decode("utf-16-le")
                         )
-                    else:
-                        html_text += (
-                            escape(
-                                message_text[  # type: ignore
-                                    last_offset * 2 : (entity.offset - offset) * 2
-                                ].decode("utf-16-le")
-                            )
-                            + insert
-                        )
-                elif sys.maxunicode == 0xFFFF:
-                    html_text += message_text[last_offset : entity.offset - offset] + insert
+                        + insert
+                    )
                 else:
                     html_text += (
                         message_text[  # type: ignore
@@ -3327,14 +3310,9 @@ class Message(TelegramObject):
                 last_offset = entity.offset - offset + entity.length
 
         if offset == 0:
-            if sys.maxunicode == 0xFFFF:
-                html_text += escape(message_text[last_offset:])
-            else:
-                html_text += escape(
-                    message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
-                )
-        elif sys.maxunicode == 0xFFFF:
-            html_text += message_text[last_offset:]
+            html_text += escape(
+                message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+            )
         else:
             html_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
 
@@ -3429,8 +3407,7 @@ class Message(TelegramObject):
         if message_text is None:
             return None
 
-        if sys.maxunicode != 0xFFFF:
-            message_text = message_text.encode("utf-16-le")  # type: ignore
+        message_text = message_text.encode("utf-16-le")  # type: ignore
 
         markdown_text = ""
         last_offset = 0
@@ -3519,25 +3496,15 @@ class Message(TelegramObject):
                     insert = escaped_text
 
                 if offset == 0:
-                    if sys.maxunicode == 0xFFFF:
-                        markdown_text += (
-                            escape_markdown(
-                                message_text[last_offset : entity.offset - offset], version=version
-                            )
-                            + insert
+                    markdown_text += (
+                        escape_markdown(
+                            message_text[  # type: ignore
+                                last_offset * 2 : (entity.offset - offset) * 2
+                            ].decode("utf-16-le"),
+                            version=version,
                         )
-                    else:
-                        markdown_text += (
-                            escape_markdown(
-                                message_text[  # type: ignore
-                                    last_offset * 2 : (entity.offset - offset) * 2
-                                ].decode("utf-16-le"),
-                                version=version,
-                            )
-                            + insert
-                        )
-                elif sys.maxunicode == 0xFFFF:
-                    markdown_text += message_text[last_offset : entity.offset - offset] + insert
+                        + insert
+                    )
                 else:
                     markdown_text += (
                         message_text[  # type: ignore
@@ -3549,15 +3516,10 @@ class Message(TelegramObject):
                 last_offset = entity.offset - offset + entity.length
 
         if offset == 0:
-            if sys.maxunicode == 0xFFFF:
-                markdown_text += escape_markdown(message_text[last_offset:], version=version)
-            else:
-                markdown_text += escape_markdown(
-                    message_text[last_offset * 2 :].decode("utf-16-le"),  # type: ignore
-                    version=version,
-                )
-        elif sys.maxunicode == 0xFFFF:
-            markdown_text += message_text[last_offset:]
+            markdown_text += escape_markdown(
+                message_text[last_offset * 2 :].decode("utf-16-le"),  # type: ignore
+                version=version,
+            )
         else:
             markdown_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
 
