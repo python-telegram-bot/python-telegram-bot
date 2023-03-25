@@ -65,7 +65,8 @@ jobs:
           pytest -v --cov --cov-append -n auto --dist loadfile
           # Rerun only failed tests (--lf), and don't run any tests if none failed (--lfnf=none)
           pytest -v --cov --cov-append -n auto --dist loadfile --lf --lfnf=none
-          status=$(( $? > status ? $? : status))
+          # No tests were selected, exit with 0 status, else exit with the status of the last test
+          status=$(( $? == 5 ? 0 : $? > status ? $? : status ))
           exit ${status}
         env:
           JOB_INDEX: ${{ strategy.job-index }}
