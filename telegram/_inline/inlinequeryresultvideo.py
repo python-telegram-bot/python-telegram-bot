@@ -62,7 +62,7 @@ class InlineQueryResultVideo(InlineQueryResult):
                 If you pass neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`,
                 :class:`ValueError` will be raised.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         title (:obj:`str`, optional): Title for the result.
 
             Warning:
@@ -91,7 +91,7 @@ class InlineQueryResultVideo(InlineQueryResult):
             (e.g., a YouTube video).
         thumb_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the video.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail_url`.
 
     Raises:
@@ -108,7 +108,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumbnail_url (:obj:`str`): URL of the thumbnail (JPEG only) for the video.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`): Optional. Caption of the video to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
@@ -218,7 +218,7 @@ class InlineQueryResultVideo(InlineQueryResult):
     def thumb_url(self) -> str:
         """:obj:`str`: URL of the thumbnail (JPEG only) for the video.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail_url`.
         """
         warn_about_deprecated_attr_in_property(

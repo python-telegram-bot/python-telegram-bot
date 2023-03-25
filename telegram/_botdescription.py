@@ -27,7 +27,7 @@ class BotDescription(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`description` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.2
 
     Args:
         description (:obj:`str`): The bot's description.
@@ -54,7 +54,7 @@ class BotShortDescription(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`short_description` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.2
 
     Args:
         short_description (:obj:`str`): The bot's short description.

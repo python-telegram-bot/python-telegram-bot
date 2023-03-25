@@ -66,7 +66,7 @@ class Sticker(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
             ``.JPG`` format.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
         set_name (:obj:`str`, optional): Name of the sticker set to which the sticker belongs.
@@ -85,12 +85,12 @@ class Sticker(_BaseThumbedMedium):
         thumbnail (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
             ``.JPG`` format.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         needs_repainting (:obj:`bool`, optional): :obj:`True`, if the sticker must be repainted to
             a text color in messages, the color of the Telegram Premium badge in emoji status,
             white color on chat photos, or another appropriate color in other places.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -126,12 +126,12 @@ class Sticker(_BaseThumbedMedium):
         thumbnail (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the ``.WEBP`` or
             ``.JPG`` format.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         needs_repainting (:obj:`bool`): Optional. :obj:`True`, if the sticker must be repainted to
             a text color in messages, the color of the Telegram Premium badge in emoji status,
             white color on chat photos, or another appropriate color in other places.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
     """
 
     __slots__ = (
@@ -254,12 +254,12 @@ class StickerSet(TelegramObject):
         thumb (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         name (:obj:`str`): Sticker set name.
@@ -281,7 +281,7 @@ class StickerSet(TelegramObject):
         thumbnail (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
     """
 
     __slots__ = (
@@ -328,7 +328,7 @@ class StickerSet(TelegramObject):
         """:class:`telegram.PhotoSize`: Optional. Sticker set thumbnail in the ``.WEBP``,
         ``.TGS``, or ``.WEBM`` format.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn_about_deprecated_attr_in_property(

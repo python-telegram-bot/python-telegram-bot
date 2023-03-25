@@ -61,11 +61,11 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
                 If you pass neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`,
                 :class:`ValueError` will be raised.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         thumbnail_mime_type (:obj:`str`, optional): MIME type of the thumbnail, must be one of
             ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         title (:obj:`str`, optional): Title for the result.
         caption (:obj:`str`, optional): Caption of the MPEG-4 file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
@@ -98,11 +98,11 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         thumbnail_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail
             for the result.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         thumbnail_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
             ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         title (:obj:`str`): Optional. Title for the result.
         caption (:obj:`str`): Optional. Caption of the MPEG-4 file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
@@ -202,7 +202,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         """:obj:`str`: URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the
         result.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail_url`.
         """
         warn_about_deprecated_attr_in_property(
@@ -217,7 +217,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         """:obj:`str`: Optional. Optional. MIME type of the thumbnail, must be one of
         ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail_mime_type`.
         """
         warn_about_deprecated_attr_in_property(

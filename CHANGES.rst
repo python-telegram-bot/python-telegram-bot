@@ -2,6 +2,55 @@
 Changelog
 =========
 
+Version 20.2
+============
+*Released 2023-03-25*
+
+This is the technical changelog for version 20.2. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+- Full Support for API 6.6 (`#3584`_)
+- Revert to HTTP/1.1 as Default and make HTTP/2 an Optional Dependency (`#3576`_)
+
+Minor Changes, Documentation Improvements and CI
+------------------------------------------------
+- Documentation Improvements (`#3565`_, `#3600`_)
+- Handle Symbolic Links in ``was_called_by`` (`#3552`_)
+- Tidy Up Tests Directory (`#3553`_)
+- Enhance ``Application.create_task`` (`#3543`_)
+- Make Type Completeness Workflow Usable for ``PRs`` from Forks (`#3551`_)
+- Refactor and Overhaul the Test Suite (`#3426`_)
+
+Dependencies
+------------
+- Bump ``pytest-asyncio`` from 0.20.3 to 0.21.0 (`#3624`_)
+- Bump ``furo`` from 2022.12.7 to 2023.3.23 (`#3625`_)
+- Bump ``pytest-xdist`` from 3.2.0 to 3.2.1 (`#3606`_)
+- ``pre-commit`` autoupdate (`#3577`_)
+- Update ``apscheduler`` requirement from ~=3.10.0 to ~=3.10.1 (`#3572`_)
+- Bump ``pytest`` from 7.2.1 to 7.2.2 (`#3573`_)
+- Bump ``pytest-xdist`` from 3.1.0 to 3.2.0 (`#3550`_)
+- Bump ``sphinxcontrib-mermaid`` from 0.7.1 to 0.8 (`#3549`_)
+
+.. _`#3584`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3584
+.. _`#3576`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3576
+.. _`#3565`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3565
+.. _`#3600`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3600
+.. _`#3552`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3552
+.. _`#3553`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3553
+.. _`#3543`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3543
+.. _`#3551`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3551
+.. _`#3426`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3426
+.. _`#3624`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3624
+.. _`#3625`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3625
+.. _`#3606`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3606
+.. _`#3577`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3577
+.. _`#3572`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3572
+.. _`#3573`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3573
+.. _`#3550`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3550
+.. _`#3549`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3549
+
 Version 20.1
 ============
 *Released 2023-02-09*

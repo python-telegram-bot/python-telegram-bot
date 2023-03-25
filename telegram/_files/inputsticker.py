@@ -32,7 +32,7 @@ class InputSticker(TelegramObject):
     """
     This object describes a sticker to be added to a sticker set.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.2
 
     Args:
         sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`): The

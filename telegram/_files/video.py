@@ -41,14 +41,14 @@ class Video(_BaseThumbedMedium):
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of a file as defined by sender.
         file_size (:obj:`int`, optional): File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`, optional): Video thumbnail.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -64,7 +64,7 @@ class Video(_BaseThumbedMedium):
         file_size (:obj:`int`): Optional. File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
     """
 
     __slots__ = ("duration", "file_name", "height", "mime_type", "width")

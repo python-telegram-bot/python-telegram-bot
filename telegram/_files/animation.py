@@ -41,7 +41,7 @@ class Animation(_BaseThumbedMedium):
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`, optional): Animation thumbnail as defined by sender.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         file_name (:obj:`str`, optional): Original animation filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
@@ -49,7 +49,7 @@ class Animation(_BaseThumbedMedium):
         thumbnail (:class:`telegram.PhotoSize`, optional): Animation thumbnail as defined by
             sender.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -66,7 +66,7 @@ class Animation(_BaseThumbedMedium):
         thumbnail (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined by
             sender.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     """
 

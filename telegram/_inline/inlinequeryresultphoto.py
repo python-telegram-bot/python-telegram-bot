@@ -57,7 +57,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
                 If you pass neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`,
                 :class:`ValueError` will be raised.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         photo_width (:obj:`int`, optional): Width of the photo.
         photo_height (:obj:`int`, optional): Height of the photo.
         title (:obj:`str`, optional): Title for the result.
@@ -77,7 +77,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
             message to be sent instead of the photo.
         thumb_url (:obj:`str`, optional): URL of the thumbnail for the photo.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail_url`.
 
     Raises:
@@ -182,7 +182,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
     def thumb_url(self) -> Optional[str]:
         """:obj:`str`: URL of the thumbnail for the photo.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail_url`.
         """
         warn_about_deprecated_attr_in_property(

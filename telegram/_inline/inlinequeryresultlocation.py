@@ -68,25 +68,25 @@ class InlineQueryResultLocation(InlineQueryResult):
             message to be sent instead of the location.
         thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail_url`.
         thumb_width (:obj:`int`, optional): Thumbnail width.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail_width`.
         thumb_height (:obj:`int`, optional): Thumbnail height.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail_height`.
         thumbnail_url (:obj:`str`, optional): Url of the thumbnail for the result.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         thumbnail_width (:obj:`int`, optional): Thumbnail width.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         thumbnail_height (:obj:`int`, optional): Thumbnail height.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.LOCATION`.
@@ -118,13 +118,13 @@ class InlineQueryResultLocation(InlineQueryResult):
             message to be sent instead of the location.
         thumbnail_url (:obj:`str`): Optional. Url of the thumbnail for the result.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         thumbnail_width (:obj:`int`): Optional. Thumbnail width.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         thumbnail_height (:obj:`int`): Optional. Thumbnail height.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     """
 
@@ -206,7 +206,7 @@ class InlineQueryResultLocation(InlineQueryResult):
     def thumb_url(self) -> Optional[str]:
         """:obj:`str`: Optional. Url of the thumbnail for the result.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail_url`.
         """
         warn_about_deprecated_attr_in_property(
@@ -220,7 +220,7 @@ class InlineQueryResultLocation(InlineQueryResult):
     def thumb_width(self) -> Optional[int]:
         """:obj:`str`: Optional. Thumbnail width.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail_width`.
         """
         warn_about_deprecated_attr_in_property(
@@ -234,7 +234,7 @@ class InlineQueryResultLocation(InlineQueryResult):
     def thumb_height(self) -> Optional[int]:
         """:obj:`str`: Optional. Thumbnail height.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail_height`.
         """
         warn_about_deprecated_attr_in_property(

@@ -1137,12 +1137,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                    |thumbargumentdeprecation| :paramref:`thumbnail`.
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the audio, when uploading a
@@ -1276,12 +1276,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                    |thumbargumentdeprecation| :paramref:`thumbnail`.
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the document, when uploading a
@@ -1369,7 +1369,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             emoji (:obj:`str`, optional): Emoji associated with the sticker; only for just
                 uploaded stickers
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -1507,7 +1507,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                    |thumbargumentdeprecation| :paramref:`thumbnail`.
             has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the video needs to be covered
                 with a spoiler animation.
@@ -1516,7 +1516,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video, when uploading a
@@ -1644,12 +1644,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                    |thumbargumentdeprecation| :paramref:`thumbnail`.
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video note, when uploading a
@@ -1757,7 +1757,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                    |thumbargumentdeprecation| :paramref:`thumbnail`.
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
                 animations by file_id),
@@ -1790,7 +1790,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the animation, when uploading a
@@ -5606,14 +5606,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 format. See `here <https://core.telegram.org/stickers>`_ for technical requirements
                 . |uploadinput|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
             sticker_format (:obj:`str`): Format of the sticker. Must be one of
                 :attr:`telegram.constants.StickerFormat.STATIC`,
                 :attr:`telegram.constants.StickerFormat.ANIMATED`,
                 :attr:`telegram.constants.StickerFormat.VIDEO`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional):
@@ -5628,7 +5628,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     Since Bot API 6.6, this parameter has been deprecated in favor of
                     :paramref:`sticker` and :paramref:`sticker_format`.
 
@@ -5721,7 +5721,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type`
             instead.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.2
             Since Bot API 6.6, the parameters :paramref:`stickers` and :paramref:`sticker_format`
             replace the parameters :paramref:`png_sticker`, :paramref:`tgs_sticker`,
             :paramref:`webm_sticker`, :paramref:`emojis`, and :paramref:`mask_position`.
@@ -5746,14 +5746,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.constants.StickerSetLimit.MAX_INITIAL_STICKERS` initial
                 stickers to be added to the sticker set.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
             sticker_format (:obj:`str`): Format of stickers in the set, must be one of
                 :attr:`~telegram.constants.StickerFormat.STATIC`,
                 :attr:`~telegram.constants.StickerFormat.ANIMATED` or
                 :attr:`~telegram.constants.StickerFormat.VIDEO`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
             sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
                 :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`, or
@@ -5766,7 +5766,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 if used as emoji status, white on chat photos, or another appropriate color based
                 on context; for custom emoji sticker sets only.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **PNG** image with the sticker,
@@ -5781,7 +5781,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     |api6_6_depr|
 
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
@@ -5796,7 +5796,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     |api6_6_depr|
 
             webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
@@ -5810,18 +5810,18 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     |api6_6_depr|
 
             emojis (:obj:`str`, optional): One or more emoji corresponding to the sticker.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     |api6_6_depr|
 
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     |api6_6_depr|
 
         Returns:
@@ -5928,7 +5928,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. |api6_6| replace:: Since Bot API 6.6, this argument is deprecated in favour of
             :paramref:`sticker`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.2
             Since Bot API 6.6, the parameter :paramref:`sticker` replace the parameters
             :paramref:`png_sticker`, :paramref:`tgs_sticker`, :paramref:`webm_sticker`,
             :paramref:`emojis`, and :paramref:`mask_position`.
@@ -5940,11 +5940,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 sticker. If exactly the same sticker had already been added to the set, then the
                 set isn't changed.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.2
 
             emojis (:obj:`str`, optional): One or more emoji corresponding to the sticker.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     |api6_6|
 
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
@@ -5960,13 +5960,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     |api6_6|
 
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     |api6_6|
 
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
@@ -5981,7 +5981,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     |api6_6|
 
             webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
@@ -5995,7 +5995,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.2
                     |api6_6|
 
         Returns:
@@ -6149,7 +6149,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to delete a sticker set that was created by the bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
 
         Args:
             name (:obj:`str`): Sticker set name.
@@ -6189,7 +6189,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """Use this method to set the thumbnail of a regular or mask sticker set. The format of the
         thumbnail file must match the format of the stickers in the set.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
 
         Args:
             name (:obj:`str`): Sticker set name
@@ -6250,7 +6250,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         for animated sticker sets only. Video thumbnails can be set only for video sticker sets
         only.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            Bot API 6.6 renamed this method to :meth:`~Bot.set_sticker_set_thumbnail`.
 
         Args:
@@ -6344,7 +6344,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to set the title of a created sticker set.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
 
         Args:
             name (:obj:`str`): Sticker set name.
@@ -6387,7 +6387,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to change the list of emoji assigned to a regular or custom emoji sticker.
         The sticker must belong to a sticker set created by the bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
 
         Args:
             sticker (:obj:`str`): File identifier of the sticker.
@@ -6430,7 +6430,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to change search keywords assigned to a regular or custom emoji sticker.
         The sticker must belong to a sticker set created by the bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
 
         Args:
             sticker (:obj:`str`): File identifier of the sticker.
@@ -6473,7 +6473,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to change the mask position of a mask sticker.
         The sticker must belong to a sticker set that was created by the bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
 
         Args:
             sticker (:obj:`str`): File identifier of the sticker.
@@ -6514,7 +6514,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to set the thumbnail of a custom emoji sticker set.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
 
         Args:
             name (:obj:`str`): Sticker set name.
@@ -8025,7 +8025,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to change the bot's description, which is shown in the chat with the bot
         if the chat is empty.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
 
         Args:
             description (:obj:`str`, optional): New bot description;
@@ -8071,7 +8071,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to change the bot's short description, which is shown on the bot's profile
         page and is sent together with the link when users share the bot.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
 
         Args:
             short_description (:obj:`str`, optional): New short description for the bot;
@@ -8347,7 +8347,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     setStickerSetThumb = set_sticker_set_thumb
     """Alias for :meth:`set_sticker_set_thumb`
 
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 20.2
        Bot API 6.6 renamed this method to :meth:`~Bot.set_sticker_set_thumbnail`.
     """
     setStickerSetThumbnail = set_sticker_set_thumbnail

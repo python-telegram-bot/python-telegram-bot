@@ -306,7 +306,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
                 .. versionadded:: 20.0
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.2
                     Accepts :class:`asyncio.Future` and generator-based coroutine functions.
         Returns:
             :class:`telegram.ext.CallbackContext`

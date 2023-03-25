@@ -86,7 +86,7 @@ class HTTPXRequest(BaseRequest):
             Defaults to ``"1.1"``.
 
             .. versionadded:: 20.1
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.2
                 Reset the default version to 1.1.
 
     """
@@ -151,7 +151,7 @@ class HTTPXRequest(BaseRequest):
         """
         :obj:`str`: Used HTTP version, see :paramref:`http_version`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
         """
         return self._http_version
 

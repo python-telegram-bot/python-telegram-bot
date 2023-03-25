@@ -143,7 +143,7 @@ class InputMediaAnimation(InputMedia):
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         caption (:obj:`str`, optional): Caption of the animation to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
@@ -164,7 +164,7 @@ class InputMediaAnimation(InputMedia):
         thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATION`.
@@ -188,7 +188,7 @@ class InputMediaAnimation(InputMedia):
             .. versionadded:: 20.0
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
     """
 
     __slots__ = ("duration", "height", "width", "has_spoiler", "thumbnail")
@@ -239,7 +239,7 @@ class InputMediaAnimation(InputMedia):
     def thumb(self) -> Optional[Union[str, InputFile]]:
         """:class:`telegram.InputFile`: Optional. |thumbdocstringbase|
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn_about_deprecated_attr_in_property(
@@ -373,7 +373,7 @@ class InputMediaVideo(InputMedia):
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the video needs to be covered
             with a spoiler animation.
@@ -382,7 +382,7 @@ class InputMediaVideo(InputMedia):
         thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.VIDEO`.
@@ -408,7 +408,7 @@ class InputMediaVideo(InputMedia):
             .. versionadded:: 20.0
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
     """
 
     __slots__ = (
@@ -468,7 +468,7 @@ class InputMediaVideo(InputMedia):
     def thumb(self) -> Optional[Union[str, InputFile]]:
         """:class:`telegram.InputFile`: Optional. |thumbdocstringbase|
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn_about_deprecated_attr_in_property(
@@ -520,12 +520,12 @@ class InputMediaAudio(InputMedia):
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.AUDIO`.
@@ -546,7 +546,7 @@ class InputMediaAudio(InputMedia):
         title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     """
 
@@ -596,7 +596,7 @@ class InputMediaAudio(InputMedia):
     def thumb(self) -> Optional[Union[str, InputFile]]:
         """:class:`telegram.InputFile`: Optional. |thumbdocstringbase|
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn_about_deprecated_attr_in_property(
@@ -639,7 +639,7 @@ class InputMediaDocument(InputMedia):
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         disable_content_type_detection (:obj:`bool`, optional): Disables automatic server-side
             content type detection for files uploaded using multipart/form-data. Always
@@ -647,7 +647,7 @@ class InputMediaDocument(InputMedia):
         thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.DOCUMENT`.
@@ -667,7 +667,7 @@ class InputMediaDocument(InputMedia):
             :obj:`True`, if the document is sent as part of an album.
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
     """
 
     __slots__ = ("disable_content_type_detection", "thumbnail")
@@ -706,7 +706,7 @@ class InputMediaDocument(InputMedia):
     def thumb(self) -> Optional[Union[str, InputFile]]:
         """:class:`telegram.InputFile`: Optional. |thumbdocstringbase|
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn_about_deprecated_attr_in_property(
