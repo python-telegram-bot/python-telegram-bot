@@ -654,7 +654,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 "timeout.",
                 exc_info=exc,
             )
-            return
+            return None
         return self._schedule_job(
             new_state=effective_new_state,
             application=application,
@@ -813,13 +813,12 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         # 3. Default values of the bot
         if handler.block is not DEFAULT_TRUE:
             block = handler.block
+        elif self._block is not DEFAULT_TRUE:
+            block = self._block
+        elif isinstance(application.bot, ExtBot) and application.bot.defaults is not None:
+            block = application.bot.defaults.block
         else:
-            if self._block is not DEFAULT_TRUE:
-                block = self._block
-            elif isinstance(application.bot, ExtBot) and application.bot.defaults is not None:
-                block = application.bot.defaults.block
-            else:
-                block = DefaultValue.get_value(handler.block)
+            block = DefaultValue.get_value(handler.block)
 
         try:  # Now create task or await the callback
             if block:
@@ -847,20 +846,17 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                         "Ignoring `conversation_timeout` because the Applications JobQueue is "
                         "not running.",
                     )
-                else:
-                    # Add the new timeout job
-                    # checking if the new state is self.END is done in _schedule_job
-                    if isinstance(new_state, asyncio.Task):
-                        application.create_task(
-                            self._schedule_job_delayed(
-                                new_state, application, update, context, conversation_key
-                            ),
-                            update=update,
-                        )
-                    else:
-                        self._schedule_job(
+                # Add the new timeout job
+                # checking if the new state is self.END is done in _schedule_job
+                elif isinstance(new_state, asyncio.Task):
+                    application.create_task(
+                        self._schedule_job_delayed(
                             new_state, application, update, context, conversation_key
-                        )
+                        ),
+                        update=update,
+                    )
+                else:
+                    self._schedule_job(new_state, application, update, context, conversation_key)
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self._update_state(self.END, conversation_key, handler)
@@ -874,7 +870,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         if raise_dp_handler_stop:
             # Don't pass the new state here. If we're in a nested conversation, the parent is
             # expecting None as return value.
-            raise ApplicationHandlerStop()
+            raise ApplicationHandlerStop
         # Signals a possible parent conversation to stay in the current state
         return None
 

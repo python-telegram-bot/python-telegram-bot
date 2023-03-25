@@ -83,7 +83,6 @@ def message(bot):
 
 
 @pytest.fixture(
-    scope="function",
     params=[
         {"forward_from": User(99, "forward_user", False), "forward_date": datetime.utcnow()},
         {
@@ -524,19 +523,19 @@ class TestMessageWithoutRequest(TestMessageBase):
             MessageEntity(MessageEntity.BOLD, offset=0, length=4),
             MessageEntity(MessageEntity.ITALIC, offset=0, length=4),
         ]
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Nested entities are not supported for"):
             assert message.text_markdown
 
         message.entities = [MessageEntity(MessageEntity.UNDERLINE, offset=0, length=4)]
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Underline entities are not supported for"):
             message.text_markdown
 
         message.entities = [MessageEntity(MessageEntity.STRIKETHROUGH, offset=0, length=4)]
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Strikethrough entities are not supported for"):
             message.text_markdown
 
         message.entities = [MessageEntity(MessageEntity.SPOILER, offset=0, length=4)]
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Spoiler entities are not supported for"):
             message.text_markdown
 
         message.entities = []
@@ -783,7 +782,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert message.link == f"https://t.me/{message.chat.username}/{message.message_id}"
 
     @pytest.mark.parametrize(
-        "type_, id_", argvalues=[(Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)]
+        ("type_", "id_"), argvalues=[(Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)]
     )
     def test_link_with_id(self, message, type_, id_):
         message.chat.username = None
@@ -792,7 +791,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
         assert message.link == f"https://t.me/c/{3}/{message.message_id}"
 
-    @pytest.mark.parametrize("id_, username", argvalues=[(None, "username"), (-3, None)])
+    @pytest.mark.parametrize(("id_", "username"), argvalues=[(None, "username"), (-3, None)])
     def test_link_private_chats(self, message, id_, username):
         message.chat.type = Chat.PRIVATE
         message.chat.id = id_
@@ -1324,7 +1323,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             quote=True,
         )
 
-    @pytest.mark.parametrize("disable_notification,protected", [(False, True), (True, False)])
+    @pytest.mark.parametrize(("disable_notification", "protected"), [(False, True), (True, False)])
     async def test_forward(self, monkeypatch, message, disable_notification, protected):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs["chat_id"] == 123456
@@ -1346,7 +1345,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         )
         assert not await message.forward(635241)
 
-    @pytest.mark.parametrize("disable_notification,protected", [(True, False), (False, True)])
+    @pytest.mark.parametrize(("disable_notification", "protected"), [(True, False), (False, True)])
     async def test_copy(self, monkeypatch, message, disable_notification, protected):
         keyboard = [[1, 2]]
 
@@ -1387,7 +1386,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         )
         assert not await message.copy(635241)
 
-    @pytest.mark.parametrize("disable_notification,protected", [(True, False), (False, True)])
+    @pytest.mark.parametrize(("disable_notification", "protected"), [(True, False), (False, True)])
     async def test_reply_copy(self, monkeypatch, message, disable_notification, protected):
         keyboard = [[1, 2]]
 

@@ -23,14 +23,14 @@ from telegram.ext._utils.trackingdict import TrackingDict
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def td() -> TrackingDict:
     td = TrackingDict()
     td.update_no_track({1: 1})
     return td
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def data() -> dict:
     return {1: 1}
 
@@ -62,9 +62,9 @@ class TestTrackingDict:
         assert td != td_2
         assert td_2 != td
         assert td != 1
-        assert 1 != td
+        assert td != 1
         assert td != 5
-        assert 5 != td
+        assert td != 5
 
     def test_getitem(self, td):
         assert td[1] == 1

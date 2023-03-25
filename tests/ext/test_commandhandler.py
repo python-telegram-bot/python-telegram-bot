@@ -51,7 +51,7 @@ class BaseTest:
     SRE_TYPE = type(re.match("", ""))
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = False
 
     async def response(self, application, update):

@@ -165,13 +165,13 @@ def iter_args(instance: ChatMember, de_json_inst: ChatMember, include_optional: 
         inst_at, json_at = getattr(instance, param.name), getattr(de_json_inst, param.name)
         if isinstance(json_at, datetime.datetime):  # Convert datetime to int
             json_at = to_timestamp(json_at)
-        if param.default is not inspect.Parameter.empty and include_optional:
-            yield inst_at, json_at
-        elif param.default is inspect.Parameter.empty:
+        if (
+            param.default is not inspect.Parameter.empty and include_optional
+        ) or param.default is inspect.Parameter.empty:
             yield inst_at, json_at
 
 
-@pytest.fixture
+@pytest.fixture()
 def chat_member_type(request):
     return request.param()
 

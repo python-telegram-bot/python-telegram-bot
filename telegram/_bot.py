@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot."""
 import asyncio
+import contextlib
 import copy
 import functools
 import logging
@@ -152,7 +153,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
 
-    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+    .. seealso:: :wiki:`Your First Bot <Extensions---Your-first-Bot>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
 
     .. versionadded:: 13.2
@@ -411,10 +412,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             # 1)
             if isinstance(val, InputMedia):
                 # Copy object as not to edit it in-place
-                val = copy.copy(val)
-                with val._unfrozen():
-                    val.parse_mode = DefaultValue.get_value(val.parse_mode)
-                data[key] = val
+                new = copy.copy(val)
+                with new._unfrozen():
+                    new.parse_mode = DefaultValue.get_value(new.parse_mode)
+                data[key] = new
             elif key == "media" and isinstance(val, Sequence):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy.copy(media) for media in val]
@@ -479,10 +480,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             parameters=[RequestParameter.from_input(key, value) for key, value in data.items()],
         )
 
-        if endpoint == "getUpdates":
-            request = self._request[0]
-        else:
-            request = self._request[1]
+        request = self._request[0] if endpoint == "getUpdates" else self._request[1]
 
         return await request.post(
             url=f"{self._base_url}/{endpoint}",
@@ -861,7 +859,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         data: JSONDict = {"chat_id": chat_id, "message_id": message_id}
-        result = await self._post(
+        return await self._post(
             "deleteMessage",
             data,
             read_timeout=read_timeout,
@@ -870,7 +868,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def forward_message(
@@ -1998,7 +1995,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto`,\
                 :class:`telegram.InputMediaVideo`]): An array
                 describing messages to be sent, must include
-                :tg-const:`telegram.constants.MediaGroupLimit.MIN_MEDIA_LENGTH`–
+                :tg-const:`telegram.constants.MediaGroupLimit.MIN_MEDIA_LENGTH`-
                 :tg-const:`telegram.constants.MediaGroupLimit.MAX_MEDIA_LENGTH` items.
 
                 .. versionchanged:: 20.0
@@ -2676,7 +2673,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "action": action,
             "message_thread_id": message_thread_id,
         }
-        result = await self._post(
+        return await self._post(
             "sendChatAction",
             data,
             read_timeout=read_timeout,
@@ -2685,7 +2682,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     def _effective_inline_results(  # skipcq: PYL-R0201
         self,
@@ -2708,10 +2704,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         if current_offset is not None:
             # Convert the string input to integer
-            if current_offset == "":
-                current_offset_int = 0
-            else:
-                current_offset_int = int(current_offset)
+            current_offset_int = 0 if not current_offset else int(current_offset)
 
             # for now set to empty string, stating that there are no more results
             # might change later
@@ -2726,18 +2719,18 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     # the callback *might* return more results on the next call, so we increment
                     # the page count
                     next_offset = str(current_offset_int + 1)
+
+            elif len(results) > (current_offset_int + 1) * InlineQueryLimit.RESULTS:
+                # we expect more results for the next page
+                next_offset_int = current_offset_int + 1
+                next_offset = str(next_offset_int)
+                effective_results = results[
+                    current_offset_int
+                    * InlineQueryLimit.RESULTS : next_offset_int
+                    * InlineQueryLimit.RESULTS
+                ]
             else:
-                if len(results) > (current_offset_int + 1) * InlineQueryLimit.RESULTS:
-                    # we expect more results for the next page
-                    next_offset_int = current_offset_int + 1
-                    next_offset = str(next_offset_int)
-                    effective_results = results[
-                        current_offset_int
-                        * InlineQueryLimit.RESULTS : next_offset_int
-                        * InlineQueryLimit.RESULTS
-                    ]
-                else:
-                    effective_results = results[current_offset_int * InlineQueryLimit.RESULTS :]
+                effective_results = results[current_offset_int * InlineQueryLimit.RESULTS :]
         else:
             effective_results = results  # type: ignore[assignment]
 
@@ -2982,10 +2975,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        try:  # Try to get the file_id from the object
+        # Try to get the file_id from the object, if it fails, assume it's a string
+        with contextlib.suppress(AttributeError):
             file_id = file_id.file_id  # type: ignore[union-attr]
-        except AttributeError:  # If it fails, assume it's a string
-            pass
 
         data: JSONDict = {"file_id": file_id}
 
@@ -3059,7 +3051,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "until_date": until_date,
         }
 
-        result = await self._post(
+        return await self._post(
             "banChatMember",
             data,
             read_timeout=read_timeout,
@@ -3068,8 +3060,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def ban_chat_sender_chat(
@@ -3105,7 +3095,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         data: JSONDict = {"chat_id": chat_id, "sender_chat_id": sender_chat_id}
 
-        result = await self._post(
+        return await self._post(
             "banChatSenderChat",
             data,
             read_timeout=read_timeout,
@@ -3114,8 +3104,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def unban_chat_member(
@@ -3152,7 +3140,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id, "only_if_banned": only_if_banned}
 
-        result = await self._post(
+        return await self._post(
             "unbanChatMember",
             data,
             read_timeout=read_timeout,
@@ -3161,8 +3149,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def unban_chat_sender_chat(
@@ -3195,7 +3181,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         data: JSONDict = {"chat_id": chat_id, "sender_chat_id": sender_chat_id}
 
-        result = await self._post(
+        return await self._post(
             "unbanChatSenderChat",
             data,
             read_timeout=read_timeout,
@@ -3204,8 +3190,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def answer_callback_query(
@@ -3263,7 +3247,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "url": url,
         }
 
-        result = await self._post(
+        return await self._post(
             "answerCallbackQuery",
             data,
             read_timeout=read_timeout,
@@ -3272,8 +3256,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def edit_message_text(
@@ -3753,7 +3735,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "certificate": self._parse_file_input(certificate),  # type: ignore[arg-type]
         }
 
-        result = await self._post(
+        return await self._post(
             "setWebhook",
             data,
             read_timeout=read_timeout,
@@ -3762,8 +3744,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def delete_webhook(
@@ -3793,7 +3773,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         data = {"drop_pending_updates": drop_pending_updates}
 
-        result = await self._post(
+        return await self._post(
             "deleteWebhook",
             data,
             read_timeout=read_timeout,
@@ -3802,8 +3782,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def leave_chat(
@@ -3830,7 +3808,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         data: JSONDict = {"chat_id": chat_id}
 
-        result = await self._post(
+        return await self._post(
             "leaveChat",
             data,
             read_timeout=read_timeout,
@@ -3839,8 +3817,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def get_chat(
@@ -3949,7 +3925,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         data: JSONDict = {"chat_id": chat_id}
-        result = await self._post(
+        return await self._post(
             "getChatMemberCount",
             data,
             read_timeout=read_timeout,
@@ -3958,7 +3934,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def get_chat_member(
@@ -4024,7 +3999,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :obj:`bool`: On success, :obj:`True` is returned.
         """
         data: JSONDict = {"chat_id": chat_id, "sticker_set_name": sticker_set_name}
-        result = await self._post(
+        return await self._post(
             "setChatStickerSet",
             data,
             read_timeout=read_timeout,
@@ -4033,7 +4008,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def delete_chat_sticker_set(
@@ -4058,7 +4032,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
              :obj:`bool`: On success, :obj:`True` is returned.
         """
         data: JSONDict = {"chat_id": chat_id}
-        result = await self._post(
+        return await self._post(
             "deleteChatStickerSet",
             data,
             read_timeout=read_timeout,
@@ -4067,7 +4041,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def get_webhook_info(
@@ -4455,7 +4428,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "error_message": error_message,
         }
 
-        result = await self._post(
+        return await self._post(
             "answerShippingQuery",
             data,
             read_timeout=read_timeout,
@@ -4464,8 +4437,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def answer_pre_checkout_query(  # pylint: disable=invalid-name
@@ -4514,7 +4485,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "error_message": error_message,
         }
 
-        result = await self._post(
+        return await self._post(
             "answerPreCheckoutQuery",
             data,
             read_timeout=read_timeout,
@@ -4523,8 +4494,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def answer_web_app_query(
@@ -4637,7 +4606,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "use_independent_chat_permissions": use_independent_chat_permissions,
         }
 
-        result = await self._post(
+        return await self._post(
             "restrictChatMember",
             data,
             read_timeout=read_timeout,
@@ -4646,8 +4615,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def promote_chat_member(
@@ -4746,7 +4713,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "can_manage_topics": can_manage_topics,
         }
 
-        result = await self._post(
+        return await self._post(
             "promoteChatMember",
             data,
             read_timeout=read_timeout,
@@ -4755,8 +4722,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def set_chat_permissions(
@@ -4807,7 +4772,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "permissions": permissions,
             "use_independent_chat_permissions": use_independent_chat_permissions,
         }
-        result = await self._post(
+        return await self._post(
             "setChatPermissions",
             data,
             read_timeout=read_timeout,
@@ -4816,7 +4781,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def set_chat_administrator_custom_title(
@@ -4851,7 +4815,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id, "custom_title": custom_title}
 
-        result = await self._post(
+        return await self._post(
             "setChatAdministratorCustomTitle",
             data,
             read_timeout=read_timeout,
@@ -4860,8 +4824,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def export_chat_invite_link(
@@ -4897,7 +4859,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         data: JSONDict = {"chat_id": chat_id}
-        result = await self._post(
+        return await self._post(
             "exportChatInviteLink",
             data,
             read_timeout=read_timeout,
@@ -4906,7 +4868,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def create_chat_invite_link(
@@ -5139,7 +5100,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
 
-        result = await self._post(
+        return await self._post(
             "approveChatJoinRequest",
             data,
             read_timeout=read_timeout,
@@ -5148,8 +5109,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def decline_chat_join_request(
@@ -5182,7 +5141,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
 
-        result = await self._post(
+        return await self._post(
             "declineChatJoinRequest",
             data,
             read_timeout=read_timeout,
@@ -5191,8 +5150,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def set_chat_photo(
@@ -5231,7 +5188,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         data: JSONDict = {"chat_id": chat_id, "photo": self._parse_file_input(photo)}
-        result = await self._post(
+        return await self._post(
             "setChatPhoto",
             data,
             read_timeout=read_timeout,
@@ -5240,7 +5197,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def delete_chat_photo(
@@ -5269,7 +5225,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         data: JSONDict = {"chat_id": chat_id}
-        result = await self._post(
+        return await self._post(
             "deleteChatPhoto",
             data,
             read_timeout=read_timeout,
@@ -5278,7 +5234,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def set_chat_title(
@@ -5311,7 +5266,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         data: JSONDict = {"chat_id": chat_id, "title": title}
-        result = await self._post(
+        return await self._post(
             "setChatTitle",
             data,
             read_timeout=read_timeout,
@@ -5320,7 +5275,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def set_chat_description(
@@ -5354,7 +5308,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         data: JSONDict = {"chat_id": chat_id, "description": description}
 
-        result = await self._post(
+        return await self._post(
             "setChatDescription",
             data,
             read_timeout=read_timeout,
@@ -5363,7 +5317,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def pin_chat_message(
@@ -5882,7 +5835,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "mask_position": mask_position,
         }
 
-        result = await self._post(
+        return await self._post(
             "createNewStickerSet",
             data,
             read_timeout=read_timeout,
@@ -5891,8 +5844,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def add_sticker_to_set(
@@ -6051,7 +6002,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "mask_position": mask_position,
         }
 
-        result = await self._post(
+        return await self._post(
             "addStickerToSet",
             data,
             read_timeout=read_timeout,
@@ -6060,8 +6011,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def set_sticker_position_in_set(
@@ -6089,7 +6038,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
         data: JSONDict = {"sticker": sticker, "position": position}
-        result = await self._post(
+        return await self._post(
             "setStickerPositionInSet",
             data,
             read_timeout=read_timeout,
@@ -6098,7 +6047,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def delete_sticker_from_set(
@@ -6124,7 +6072,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
         data: JSONDict = {"sticker": sticker}
-        result = await self._post(
+        return await self._post(
             "deleteStickerFromSet",
             data,
             read_timeout=read_timeout,
@@ -6133,7 +6081,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def delete_sticker_set(
@@ -6162,7 +6109,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
         data: JSONDict = {"name": name}
-        result = await self._post(
+        return await self._post(
             "deleteStickerSet",
             data,
             read_timeout=read_timeout,
@@ -6171,7 +6118,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def set_sticker_set_thumbnail(
@@ -6317,7 +6263,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "thumbnail": self._parse_file_input(thumbnail) if thumbnail else None,
         }
 
-        result = await self._post(
+        return await self._post(
             "setStickerSetThumbnail",
             data,
             read_timeout=read_timeout,
@@ -6326,8 +6272,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def set_sticker_set_title(
@@ -6360,7 +6304,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
         data: JSONDict = {"name": name, "title": title}
-        result = await self._post(
+        return await self._post(
             "setStickerSetTitle",
             data,
             read_timeout=read_timeout,
@@ -6369,7 +6313,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def set_sticker_emoji_list(
@@ -6403,7 +6346,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"sticker": sticker, "emoji_list": emoji_list}
-        result = await self._post(
+        return await self._post(
             "setStickerEmojiList",
             data,
             read_timeout=read_timeout,
@@ -6412,7 +6355,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def set_sticker_keywords(
@@ -6446,7 +6388,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"sticker": sticker, "keywords": keywords}
-        result = await self._post(
+        return await self._post(
             "setStickerKeywords",
             data,
             read_timeout=read_timeout,
@@ -6455,7 +6397,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def set_sticker_mask_position(
@@ -6488,7 +6429,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {"sticker": sticker, "mask_position": mask_position}
-        result = await self._post(
+        return await self._post(
             "setStickerMaskPosition",
             data,
             read_timeout=read_timeout,
@@ -6497,7 +6438,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def set_custom_emoji_sticker_set_thumbnail(
@@ -6531,7 +6471,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         data: JSONDict = {"name": name, "custom_emoji_id": custom_emoji_id}
 
-        result = await self._post(
+        return await self._post(
             "setCustomEmojiStickerSetThumbnail",
             data,
             read_timeout=read_timeout,
@@ -6540,8 +6480,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def set_passport_data_errors(
@@ -6580,7 +6518,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
         data: JSONDict = {"user_id": user_id, "errors": errors}
-        result = await self._post(
+        return await self._post(
             "setPassportDataErrors",
             data,
             read_timeout=read_timeout,
@@ -6589,7 +6527,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        return result
 
     @_log
     async def send_poll(
@@ -6926,7 +6863,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         data: JSONDict = {"rights": rights, "for_channels": for_channels}
 
-        result = await self._post(
+        return await self._post(
             "setMyDefaultAdministratorRights",
             data,
             read_timeout=read_timeout,
@@ -6935,8 +6872,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def get_my_commands(
@@ -7047,7 +6982,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
         data: JSONDict = {"commands": cmds, "scope": scope, "language_code": language_code}
 
-        result = await self._post(
+        return await self._post(
             "setMyCommands",
             data,
             read_timeout=read_timeout,
@@ -7056,8 +6991,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def delete_my_commands(
@@ -7097,7 +7030,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         data: JSONDict = {"scope": scope, "language_code": language_code}
 
-        result = await self._post(
+        return await self._post(
             "deleteMyCommands",
             data,
             read_timeout=read_timeout,
@@ -7106,8 +7039,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-
-        return result
 
     @_log
     async def log_out(

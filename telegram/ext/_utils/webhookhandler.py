@@ -93,7 +93,7 @@ class WebhookAppClass(tornado.web.Application):
             "update_queue": update_queue,
             "secret_token": secret_token,
         }
-        handlers = [(rf"{webhook_path}/?", TelegramHandler, self.shared_objects)]  # noqa
+        handlers = [(rf"{webhook_path}/?", TelegramHandler, self.shared_objects)]
         tornado.web.Application.__init__(self, handlers)  # type: ignore
 
     def log_request(self, handler: tornado.web.RequestHandler) -> None:

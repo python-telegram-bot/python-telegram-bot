@@ -56,7 +56,7 @@ async def forum_topic_object(forum_group_id, emoji_id):
     )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def real_topic(bot, emoji_id, forum_group_id):
     result = await bot.create_forum_topic(
         chat_id=forum_group_id,
@@ -247,7 +247,9 @@ class TestForumMethodsWithRequest:
             msg = await coro
             pin_msg_tasks.add(asyncio.create_task(msg.pin()))
 
-        assert all([await task for task in pin_msg_tasks]) is True, "Message(s) were not pinned"
+        assert (
+            all([await task for task in pin_msg_tasks]) is True  # noqa: PIE802
+        ), "Message(s) were not pinned"
 
         # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
         result = await bot.unpin_all_forum_topic_messages(forum_group_id, message_thread_id)
@@ -420,7 +422,7 @@ class TestForumTopicEdited:
         # empty string
         json_dict = {"icon_custom_emoji_id": ""}
         action = ForumTopicEdited.de_json(json_dict, bot)
-        assert action.icon_custom_emoji_id == ""
+        assert not action.icon_custom_emoji_id
 
     def test_to_dict(self, topic_edited, emoji_id):
         action_dict = topic_edited.to_dict()

@@ -67,7 +67,7 @@ def false_update(request):
     return Update(update_id=2, **request.param)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def poll_answer(bot):
     return Update(0, poll_answer=PollAnswer(1, User(2, "test user", False), [0, 1]))
 
@@ -82,7 +82,7 @@ class TestPollAnswerHandler:
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = False
 
     async def callback(self, update, context):

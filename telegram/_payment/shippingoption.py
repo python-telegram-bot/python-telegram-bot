@@ -24,7 +24,7 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import LabeledPrice  # noqa
+    from telegram import LabeledPrice
 
 
 class ShippingOption(TelegramObject):

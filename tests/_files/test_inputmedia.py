@@ -54,7 +54,7 @@ from .test_audio import audio, audio_file  # noqa: F401
 from .test_document import document, document_file  # noqa: F401
 
 # noinspection PyUnresolvedReferences
-from .test_photo import _photo, photo, photo_file, thumb  # noqa: F401
+from .test_photo import photo, photo_file, photolist, thumb  # noqa: F401
 
 # noinspection PyUnresolvedReferences
 from .test_video import video, video_file  # noqa: F401
@@ -211,7 +211,7 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
         assert input_media_video.thumbnail == data_file("telegram.jpg").as_uri()
 
     def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="You passed different entities as 'thumb' and "):
             InputMediaVideo(
                 data_file("telegram.mp4"),
                 thumbnail=data_file("telegram.jpg"),
@@ -351,7 +351,7 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
         assert input_media_animation.thumbnail == data_file("telegram.jpg").as_uri()
 
     def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="You passed different entities as 'thumb' and "):
             InputMediaAnimation(
                 data_file("telegram.mp4"),
                 thumbnail=data_file("telegram.jpg"),
@@ -436,7 +436,7 @@ class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
         assert input_media_audio.thumbnail == data_file("telegram.jpg").as_uri()
 
     def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="You passed different entities as 'thumb' and "):
             InputMediaAudio(
                 data_file("telegram.mp4"),
                 thumbnail=data_file("telegram.jpg"),
@@ -518,7 +518,7 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
         assert input_media_document.thumbnail == data_file("telegram.jpg").as_uri()
 
     def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="You passed different entities as 'thumb' and "):
             InputMediaDocument(
                 data_file("telegram.mp4"),
                 thumbnail=data_file("telegram.jpg"),
@@ -526,7 +526,7 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
             )
 
 
-@pytest.fixture(scope="module")  # noqa: F811
+@pytest.fixture(scope="module")
 def media_group(photo, thumb):  # noqa: F811
     return [
         InputMediaPhoto(photo, caption="*photo* 1", parse_mode="Markdown"),
@@ -537,12 +537,12 @@ def media_group(photo, thumb):  # noqa: F811
     ]
 
 
-@pytest.fixture(scope="module")  # noqa: F811
+@pytest.fixture(scope="module")
 def media_group_no_caption_args(photo, thumb):  # noqa: F811
     return [InputMediaPhoto(photo), InputMediaPhoto(thumb), InputMediaPhoto(photo)]
 
 
-@pytest.fixture(scope="module")  # noqa: F811
+@pytest.fixture(scope="module")
 def media_group_no_caption_only_caption_entities(photo, thumb):  # noqa: F811
     return [
         InputMediaPhoto(photo, caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]),
@@ -550,7 +550,7 @@ def media_group_no_caption_only_caption_entities(photo, thumb):  # noqa: F811
     ]
 
 
-@pytest.fixture(scope="module")  # noqa: F811
+@pytest.fixture(scope="module")
 def media_group_no_caption_only_parse_mode(photo, thumb):  # noqa: F811
     return [
         InputMediaPhoto(photo, parse_mode="Markdown"),
@@ -720,7 +720,7 @@ class TestSendMediaGroupWithRequest:
         assert all(i.message_thread_id == real_topic.message_thread_id for i in messages)
 
     @pytest.mark.parametrize(
-        "caption, parse_mode, caption_entities",
+        ("caption", "parse_mode", "caption_entities"),
         [
             # same combinations of caption options as in media_group fixture
             ("*photo* 1", "Markdown", None),
@@ -852,7 +852,7 @@ class TestSendMediaGroupWithRequest:
         assert isinstance(new_message, Message)
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -984,6 +984,7 @@ class TestSendMediaGroupWithRequest:
                 return InputMediaPhoto(photo, **kwargs)
             if med_type == "video":
                 return InputMediaVideo(video, **kwargs)
+            return None
 
         message = await default_bot.send_photo(chat_id, photo)
 

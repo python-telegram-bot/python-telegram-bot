@@ -281,7 +281,7 @@ class TelegramObject:
 
         # Make sure that we have a `_bot` attribute. This is necessary, since __getstate__ omits
         # this as Bots are not pickable.
-        setattr(self, "_bot", None)
+        self._bot = None
 
         # get api_kwargs first because we may need to add entries to it (see try-except below)
         api_kwargs = cast(Dict[str, object], state.pop("api_kwargs", {}))
@@ -299,7 +299,7 @@ class TelegramObject:
         # and then set the rest as MappingProxyType attribute. Converting to MappingProxyType
         # is necessary, since __getstate__ converts it to a dict as MPT is not pickable.
         self._apply_api_kwargs(api_kwargs)
-        setattr(self, "api_kwargs", MappingProxyType(api_kwargs))
+        self.api_kwargs = MappingProxyType(api_kwargs)
 
         # Apply freezing if necessary
         # we .get(…) the setting for backwards compatibility with objects that were pickled
@@ -328,7 +328,7 @@ class TelegramObject:
         result = cls.__new__(cls)  # create a new instance
         memodict[id(self)] = result  # save the id of the object in the dict
 
-        setattr(result, "_frozen", False)  # unfreeze the new object for setting the attributes
+        result._frozen = False  # unfreeze the new object for setting the attributes
 
         # now we set the attributes in the deepcopied object
         for k in self._get_attrs_names(include_private=True):

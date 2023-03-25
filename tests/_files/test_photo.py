@@ -36,14 +36,14 @@ from tests.auxil.networking import expect_bad_request
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def photo_file():
     with data_file("telegram.jpg").open("rb") as f:
         yield f
 
 
 @pytest.fixture(scope="module")
-async def _photo(bot, chat_id):
+async def photolist(bot, chat_id):
     async def func():
         with data_file("telegram.jpg").open("rb") as f:
             return (await bot.send_photo(chat_id, photo=f, read_timeout=50)).photo
@@ -54,13 +54,13 @@ async def _photo(bot, chat_id):
 
 
 @pytest.fixture(scope="module")
-def thumb(_photo):
-    return _photo[0]
+def thumb(photolist):
+    return photolist[0]
 
 
 @pytest.fixture(scope="module")
-def photo(_photo):
-    return _photo[-1]
+def photo(photolist):
+    return photolist[-1]
 
 
 class TestPhotoBase:
@@ -84,14 +84,14 @@ class TestPhotoWithoutRequest(TestPhotoBase):
         assert isinstance(photo, PhotoSize)
         assert isinstance(photo.file_id, str)
         assert isinstance(photo.file_unique_id, str)
-        assert photo.file_id != ""
-        assert photo.file_unique_id != ""
+        assert photo.file_id
+        assert photo.file_unique_id
 
         assert isinstance(thumb, PhotoSize)
         assert isinstance(thumb.file_id, str)
         assert isinstance(thumb.file_unique_id, str)
-        assert thumb.file_id != ""
-        assert thumb.file_unique_id != ""
+        assert thumb.file_id
+        assert thumb.file_unique_id
 
     def test_expected_values(self, photo, thumb):
         assert photo.width == self.width
@@ -223,14 +223,14 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert isinstance(message.photo[-2], PhotoSize)
         assert isinstance(message.photo[-2].file_id, str)
         assert isinstance(message.photo[-2].file_unique_id, str)
-        assert message.photo[-2].file_id != ""
-        assert message.photo[-2].file_unique_id != ""
+        assert message.photo[-2].file_id
+        assert message.photo[-2].file_unique_id
 
         assert isinstance(message.photo[-1], PhotoSize)
         assert isinstance(message.photo[-1].file_id, str)
         assert isinstance(message.photo[-1].file_unique_id, str)
-        assert message.photo[-1].file_id != ""
-        assert message.photo[-1].file_unique_id != ""
+        assert message.photo[-1].file_id
+        assert message.photo[-1].file_unique_id
 
         assert message.caption == self.caption.replace("*", "")
         assert message.has_protected_content
@@ -243,14 +243,14 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert isinstance(message.photo[-2], PhotoSize)
         assert isinstance(message.photo[-2].file_id, str)
         assert isinstance(message.photo[-2].file_unique_id, str)
-        assert message.photo[-2].file_id != ""
-        assert message.photo[-2].file_unique_id != ""
+        assert message.photo[-2].file_id
+        assert message.photo[-2].file_unique_id
 
         assert isinstance(message.photo[-1], PhotoSize)
         assert isinstance(message.photo[-1].file_id, str)
         assert isinstance(message.photo[-1].file_unique_id, str)
-        assert message.photo[-1].file_id != ""
-        assert message.photo[-1].file_unique_id != ""
+        assert message.photo[-1].file_id
+        assert message.photo[-1].file_unique_id
 
         assert message.caption == self.caption.replace("*", "")
         assert len(message.caption_entities) == 1
@@ -262,14 +262,14 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert isinstance(message.photo[-2], PhotoSize)
         assert isinstance(message.photo[-2].file_id, str)
         assert isinstance(message.photo[-2].file_unique_id, str)
-        assert message.photo[-2].file_id != ""
-        assert message.photo[-2].file_unique_id != ""
+        assert message.photo[-2].file_id
+        assert message.photo[-2].file_unique_id
 
         assert isinstance(message.photo[-1], PhotoSize)
         assert isinstance(message.photo[-1].file_id, str)
         assert isinstance(message.photo[-1].file_unique_id, str)
-        assert message.photo[-1].file_id != ""
-        assert message.photo[-1].file_unique_id != ""
+        assert message.photo[-1].file_id
+        assert message.photo[-1].file_unique_id
 
         assert message.caption == self.caption.replace("<b>", "").replace("</b>", "")
         assert len(message.caption_entities) == 1
@@ -328,7 +328,7 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert not unprotected.has_protected_content
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -381,14 +381,14 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert isinstance(message.photo[-2], PhotoSize)
         assert isinstance(message.photo[-2].file_id, str)
         assert isinstance(message.photo[-2].file_unique_id, str)
-        assert message.photo[-2].file_id != ""
-        assert message.photo[-2].file_unique_id != ""
+        assert message.photo[-2].file_id
+        assert message.photo[-2].file_unique_id
 
         assert isinstance(message.photo[-1], PhotoSize)
         assert isinstance(message.photo[-1].file_id, str)
         assert isinstance(message.photo[-1].file_unique_id, str)
-        assert message.photo[-1].file_id != ""
-        assert message.photo[-1].file_unique_id != ""
+        assert message.photo[-1].file_id
+        assert message.photo[-1].file_unique_id
 
     async def test_send_url_png_file(self, bot, chat_id):
         message = await bot.send_photo(
@@ -400,8 +400,8 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert isinstance(photo, PhotoSize)
         assert isinstance(photo.file_id, str)
         assert isinstance(photo.file_unique_id, str)
-        assert photo.file_id != ""
-        assert photo.file_unique_id != ""
+        assert photo.file_id
+        assert photo.file_unique_id
 
     async def test_send_file_unicode_filename(self, bot, chat_id):
         """
@@ -415,8 +415,8 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert isinstance(photo, PhotoSize)
         assert isinstance(photo.file_id, str)
         assert isinstance(photo.file_unique_id, str)
-        assert photo.file_id != ""
-        assert photo.file_unique_id != ""
+        assert photo.file_id
+        assert photo.file_unique_id
 
     async def test_send_bytesio_jpg_file(self, bot, chat_id):
         filepath = data_file("telegram_no_standard_header.jpg")
@@ -438,8 +438,8 @@ class TestPhotoWithRequest(TestPhotoBase):
         photo = message.photo[-1]
         assert isinstance(photo.file_id, str)
         assert isinstance(photo.file_unique_id, str)
-        assert photo.file_id != ""
-        assert photo.file_unique_id != ""
+        assert photo.file_id
+        assert photo.file_unique_id
         assert isinstance(photo, PhotoSize)
         assert photo.width == 1280
         assert photo.height == 720
@@ -451,18 +451,18 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert isinstance(message.photo[-2], PhotoSize)
         assert isinstance(message.photo[-2].file_id, str)
         assert isinstance(message.photo[-2].file_unique_id, str)
-        assert message.photo[-2].file_id != ""
-        assert message.photo[-2].file_unique_id != ""
+        assert message.photo[-2].file_id
+        assert message.photo[-2].file_unique_id
 
         assert isinstance(message.photo[-1], PhotoSize)
         assert isinstance(message.photo[-1].file_id, str)
         assert isinstance(message.photo[-1].file_unique_id, str)
-        assert message.photo[-1].file_id != ""
-        assert message.photo[-1].file_unique_id != ""
+        assert message.photo[-1].file_id
+        assert message.photo[-1].file_unique_id
 
     async def test_error_send_empty_file(self, bot, chat_id):
-        with pytest.raises(TelegramError):
-            await bot.send_photo(chat_id=chat_id, photo=open(os.devnull, "rb"))
+        with Path(os.devnull).open("rb") as file, pytest.raises(TelegramError):
+            await bot.send_photo(chat_id=chat_id, photo=file)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):

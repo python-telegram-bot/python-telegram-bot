@@ -35,7 +35,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def video_note_file():
     with data_file("telegram2.mp4").open("rb") as f:
         yield f
@@ -70,14 +70,14 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         assert isinstance(video_note, VideoNote)
         assert isinstance(video_note.file_id, str)
         assert isinstance(video_note.file_unique_id, str)
-        assert video_note.file_id != ""
-        assert video_note.file_unique_id != ""
+        assert video_note.file_id
+        assert video_note.file_unique_id
 
         assert isinstance(video_note.thumbnail, PhotoSize)
         assert isinstance(video_note.thumbnail.file_id, str)
         assert isinstance(video_note.thumbnail.file_unique_id, str)
-        assert video_note.thumbnail.file_id != ""
-        assert video_note.thumbnail.file_unique_id != ""
+        assert video_note.thumbnail.file_id
+        assert video_note.thumbnail.file_unique_id
 
     def test_expected_values(self, video_note):
         assert video_note.length == self.length
@@ -221,8 +221,8 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         assert isinstance(message.video_note, VideoNote)
         assert isinstance(message.video_note.file_id, str)
         assert isinstance(message.video_note.file_unique_id, str)
-        assert message.video_note.file_id != ""
-        assert message.video_note.file_unique_id != ""
+        assert message.video_note.file_id
+        assert message.video_note.file_unique_id
         assert message.video_note.length == video_note.length
         assert message.video_note.duration == video_note.duration
         assert message.video_note.file_size == video_note.file_size
@@ -252,7 +252,7 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         assert message.video_note == video_note
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -295,8 +295,8 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         assert not unprotected.has_protected_content
 
     async def test_error_send_empty_file(self, bot, chat_id):
-        with pytest.raises(TelegramError):
-            await bot.send_video_note(chat_id, open(os.devnull, "rb"))
+        with Path(os.devnull).open("rb") as file, pytest.raises(TelegramError):
+            await bot.send_video_note(chat_id, file)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):

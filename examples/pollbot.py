@@ -48,6 +48,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+TOTAL_VOTER_COUNT = 3
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Inform user about what this bot can do"""
     await update.message.reply_text(
@@ -101,7 +104,7 @@ async def receive_poll_answer(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
     answered_poll["answers"] += 1
     # Close poll after three participants voted
-    if answered_poll["answers"] == 3:
+    if answered_poll["answers"] == TOTAL_VOTER_COUNT:
         await context.bot.stop_poll(answered_poll["chat_id"], answered_poll["message_id"])
 
 
@@ -123,7 +126,7 @@ async def receive_quiz_answer(update: Update, context: ContextTypes.DEFAULT_TYPE
     # the bot can receive closed poll updates we don't care about
     if update.poll.is_closed:
         return
-    if update.poll.total_voter_count == 3:
+    if update.poll.total_voter_count == TOTAL_VOTER_COUNT:
         try:
             quiz_data = context.bot_data[update.poll.id]
         # this means this poll answer update is from an old poll, we can't stop it then

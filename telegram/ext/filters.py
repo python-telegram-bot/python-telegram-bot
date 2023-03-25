@@ -244,7 +244,7 @@ class MessageFilter(BaseFilter):
 
     Please see :class:`BaseFilter` for details on how to create custom filters.
 
-    .. seealso:: :wiki:`Advanced Filters <Extensions-–-Advanced-Filters>`
+    .. seealso:: :wiki:`Advanced Filters <Extensions---Advanced-Filters>`
 
     """
 
@@ -379,7 +379,7 @@ class _MergedFilter(UpdateFilter):
     def _merge(base_output: Union[bool, Dict], comp_output: Union[bool, Dict]) -> FilterDataDict:
         base = base_output if isinstance(base_output, dict) else {}
         comp = comp_output if isinstance(comp_output, dict) else {}
-        for k in comp.keys():
+        for k in comp:
             # Make sure comp values are lists
             comp_value = comp[k] if isinstance(comp[k], list) else []
             try:
@@ -387,7 +387,7 @@ class _MergedFilter(UpdateFilter):
                 if isinstance(base[k], list):
                     base[k] += comp_value
                 else:
-                    base[k] = [base[k]] + comp_value
+                    base[k] = [base[k], *comp_value]
             except KeyError:
                 base[k] = comp_value
         return base

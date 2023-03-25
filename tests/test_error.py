@@ -87,12 +87,9 @@ class TestErrors:
             raise TimedOut
 
     def test_chat_migrated(self):
-        with pytest.raises(ChatMigrated, match="Group migrated to supergroup. New chat id: 1234"):
+        with pytest.raises(ChatMigrated, match="New chat id: 1234") as e:
             raise ChatMigrated(1234)
-        try:
-            raise ChatMigrated(1234)
-        except ChatMigrated as e:
-            assert e.new_chat_id == 1234
+        assert e.value.new_chat_id == 1234
 
     def test_retry_after(self):
         with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 12 seconds"):
@@ -103,7 +100,7 @@ class TestErrors:
             raise Conflict("Something something.")
 
     @pytest.mark.parametrize(
-        "exception, attributes",
+        ("exception", "attributes"),
         [
             (TelegramError("test message"), ["message"]),
             (Forbidden("test message"), ["message"]),
