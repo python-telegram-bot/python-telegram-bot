@@ -40,9 +40,15 @@ class Video(_BaseThumbedMedium):
         height (:obj:`int`): Video height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail`.
         file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of a file as defined by sender.
         file_size (:obj:`int`, optional): File size in bytes.
+        thumbnail (:class:`telegram.PhotoSize`, optional): Video thumbnail.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -53,11 +59,12 @@ class Video(_BaseThumbedMedium):
         width (:obj:`int`): Video width as defined by sender.
         height (:obj:`int`): Video height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
-        thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
         file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of a file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
 
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = ("duration", "file_name", "height", "mime_type", "width")
@@ -73,6 +80,7 @@ class Video(_BaseThumbedMedium):
         mime_type: str = None,
         file_size: int = None,
         file_name: str = None,
+        thumbnail: PhotoSize = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -81,6 +89,7 @@ class Video(_BaseThumbedMedium):
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
