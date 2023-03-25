@@ -21,7 +21,7 @@ from typing import Sequence
 
 import pytest
 
-from telegram import InputFile, InputMediaPhoto, InputMediaVideo, MessageEntity
+from telegram import InputFile, InputMediaPhoto, InputMediaVideo, InputSticker, MessageEntity
 from telegram.constants import ChatType
 from telegram.request._requestparameter import RequestParameter
 from tests.auxil.files import data_file
@@ -120,7 +120,7 @@ class TestRequestParameterWithoutRequest:
         input_media_no_thumb = InputMediaPhoto(media=data_file("telegram.jpg").read_bytes())
         input_media_thumb = InputMediaVideo(
             media=data_file("telegram.mp4").read_bytes(),
-            thumb=data_file("telegram.jpg").read_bytes(),
+            thumbnail=data_file("telegram.jpg").read_bytes(),
         )
 
         request_parameter = RequestParameter.from_input("key", input_media_no_thumb)
@@ -132,9 +132,12 @@ class TestRequestParameterWithoutRequest:
         request_parameter = RequestParameter.from_input("key", input_media_thumb)
         expected_thumb = input_media_thumb.to_dict()
         expected_thumb.update({"media": input_media_thumb.media.attach_uri})
-        expected_thumb.update({"thumb": input_media_thumb.thumb.attach_uri})
+        expected_thumb.update({"thumbnail": input_media_thumb.thumbnail.attach_uri})
         assert request_parameter.value == expected_thumb
-        assert request_parameter.input_files == [input_media_thumb.media, input_media_thumb.thumb]
+        assert request_parameter.input_files == [
+            input_media_thumb.media,
+            input_media_thumb.thumbnail,
+        ]
 
         request_parameter = RequestParameter.from_input(
             "key", [input_media_thumb, input_media_no_thumb]
@@ -142,7 +145,7 @@ class TestRequestParameterWithoutRequest:
         assert request_parameter.value == [expected_thumb, expected_no_thumb]
         assert request_parameter.input_files == [
             input_media_thumb.media,
-            input_media_thumb.thumb,
+            input_media_thumb.thumbnail,
             input_media_no_thumb.media,
         ]
 
@@ -150,14 +153,22 @@ class TestRequestParameterWithoutRequest:
         """This case will never happen, but we test it for completeness"""
         input_media = InputMediaVideo(
             data_file("telegram.png").read_bytes(),
-            thumb=data_file("telegram.png").read_bytes(),
+            thumbnail=data_file("telegram.png").read_bytes(),
             parse_mode=None,
         )
         input_media.media.attach_name = None
-        input_media.thumb.attach_name = None
+        input_media.thumbnail.attach_name = None
         request_parameter = RequestParameter.from_input("key", input_media)
         assert request_parameter.value == {"type": "video"}
-        assert request_parameter.input_files == [input_media.media, input_media.thumb]
+        assert request_parameter.input_files == [input_media.media, input_media.thumbnail]
+
+    def test_from_input_inputsticker(self):
+        input_sticker = InputSticker(data_file("telegram.png").read_bytes(), ["emoji"])
+        expected = input_sticker.to_dict()
+        expected.update({"sticker": input_sticker.sticker.attach_uri})
+        request_parameter = RequestParameter.from_input("key", input_sticker)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == [input_sticker.sticker]
 
     def test_from_input_str_and_bytes(self):
         input_str = "test_input"

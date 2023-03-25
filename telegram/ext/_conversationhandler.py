@@ -259,7 +259,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             when :attr:`per_message`, :attr:`per_chat`, :attr:`per_user` are all :obj:`False`.
 
     Attributes:
-        block (:obj:`bool`): Determines whether the callback will run in a blocking way.. Always
+        block (:obj:`bool`): Determines whether the callback will run in a blocking way. Always
             :obj:`True` since conversation handlers handle any non-blocking callbacks internally.
 
     """
