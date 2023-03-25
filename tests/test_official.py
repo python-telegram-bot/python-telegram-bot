@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# TODO: Remove after the ruff noqa API 6.6 is merged:
-# ruff: noqa: SIM114
 import inspect
 import os
 import re
