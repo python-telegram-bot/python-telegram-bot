@@ -46,12 +46,12 @@ class Audio(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
             which the music file belongs.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
             which the music file belongs.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -68,7 +68,7 @@ class Audio(_BaseThumbedMedium):
         thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
             which the music file belongs.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
 
     """

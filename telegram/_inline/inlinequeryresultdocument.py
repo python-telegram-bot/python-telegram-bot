@@ -68,25 +68,25 @@ class InlineQueryResultDocument(InlineQueryResult):
             message to be sent instead of the file.
         thumb_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the file.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail_url`.
         thumb_width (:obj:`int`, optional): Thumbnail width.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail_width`.
         thumb_height (:obj:`int`, optional): Thumbnail height.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail_height`.
         thumbnail_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the file.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         thumbnail_width (:obj:`int`, optional): Thumbnail width.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         thumbnail_height (:obj:`int`, optional): Thumbnail height.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
 
     Attributes:
@@ -115,13 +115,13 @@ class InlineQueryResultDocument(InlineQueryResult):
             message to be sent instead of the file.
         thumbnail_url (:obj:`str`): Optional. URL of the thumbnail (JPEG only) for the file.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         thumbnail_width (:obj:`int`): Optional. Thumbnail width.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
         thumbnail_height (:obj:`int`): Optional. Thumbnail height.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     """
 
@@ -201,7 +201,7 @@ class InlineQueryResultDocument(InlineQueryResult):
     def thumb_url(self) -> Optional[str]:
         """:obj:`str`: Optional. URL of the thumbnail (JPEG only) for the file.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail_url`.
         """
         warn_about_deprecated_attr_in_property(
@@ -215,7 +215,7 @@ class InlineQueryResultDocument(InlineQueryResult):
     def thumb_width(self) -> Optional[int]:
         """:obj:`str`: Optional. Thumbnail width.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail_width`.
         """
         warn_about_deprecated_attr_in_property(
@@ -229,7 +229,7 @@ class InlineQueryResultDocument(InlineQueryResult):
     def thumb_height(self) -> Optional[int]:
         """:obj:`str`: Optional. Thumbnail height.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail_height`.
         """
         warn_about_deprecated_attr_in_property(

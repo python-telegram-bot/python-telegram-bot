@@ -38,14 +38,14 @@ class Document(_BaseThumbedMedium):
             the same over time and for different bots. Can't be used to download or reuse the file.
         thumb (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by sender.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by sender.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -57,7 +57,7 @@ class Document(_BaseThumbedMedium):
         file_size (:obj:`int`): Optional. File size in bytes.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Document thumbnail as defined by sender.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     """
 

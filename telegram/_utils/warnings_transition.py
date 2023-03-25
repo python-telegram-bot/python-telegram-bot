@@ -21,7 +21,7 @@
 It was created to prevent circular imports that would be caused by creating the warnings
 inside warnings.py.
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 20.2
 """
 import functools
 from typing import Any

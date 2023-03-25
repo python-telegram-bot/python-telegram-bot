@@ -50,11 +50,11 @@ class _BaseThumbedMedium(_BaseMedium):
         file_size (:obj:`int`, optional): File size.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.2
                |thumbargumentdeprecation| :paramref:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     Attributes:
         file_id (:obj:`str`): File identifier.
@@ -64,7 +64,7 @@ class _BaseThumbedMedium(_BaseMedium):
         file_size (:obj:`int`): Optional. File size.
         thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.2
 
     """
 
@@ -100,7 +100,7 @@ class _BaseThumbedMedium(_BaseMedium):
     def thumb(self) -> Optional[PhotoSize]:
         """:class:`telegram.PhotoSize`: Optional. Thumbnail as defined by sender.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.2
            |thumbattributedeprecation| :attr:`thumbnail`.
         """
         warn_about_deprecated_attr_in_property(

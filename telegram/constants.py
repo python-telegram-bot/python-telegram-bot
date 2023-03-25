@@ -192,7 +192,7 @@ class BotDescriptionLimit(IntEnum):
     :meth:`telegram.Bot.set_my_short_description`. The enum members of this enumeration are
     instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.2
     """
 
     __slots__ = ()
@@ -1272,7 +1272,7 @@ class StickerFormat(StringEnum):
     """This enum contains the available formats of :class:`telegram.Sticker` in the set. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.2
     """
 
     __slots__ = ()
@@ -1312,28 +1312,28 @@ class StickerLimit(IntEnum):
     :paramref:`~telegram.Bot.setStickerEmojiList.emoji_list` parameter of
     :meth:`telegram.Bot.set_sticker_emoji_list`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.2
     """
     MAX_STICKER_EMOJI = 20
     """:obj:`int`: Maximum number of emojis associated with a sticker, passed as the
     :paramref:`~telegram.Bot.setStickerEmojiList.emoji_list` parameter of
     :meth:`telegram.Bot.set_sticker_emoji_list`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.2
     """
     MAX_SEARCH_KEYWORDS = 20
     """:obj:`int`: Maximum number of search keywords for a sticker, passed as the
     :paramref:`~telegram.Bot.set_sticker_keywords.keywords` parameter of
     :meth:`telegram.Bot.set_sticker_keywords`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.2
     """
     MAX_KEYWORD_LENGTH = 64
     """:obj:`int`: Maximum number of characters in a search keyword for a sticker, for each item in
     :paramref:`~telegram.Bot.set_sticker_keywords.keywords` sequence of
     :meth:`telegram.Bot.set_sticker_keywords`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.2
     """
 
 
@@ -1343,7 +1343,7 @@ class StickerSetLimit(IntEnum):
 
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.2
     """
 
     __slots__ = ()
