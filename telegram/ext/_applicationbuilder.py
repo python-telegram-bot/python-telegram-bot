@@ -570,12 +570,13 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Note:
             Users have observed stability issues with HTTP/2, which happen due to how the `h2
-            library handles <https://github.com/python-hyper/h2/issues/1181>` cancellations of
+            library handles <https://github.com/python-hyper/h2/issues/1181>`_ cancellations of
             keepalive connections. See `#3556 <https://github.com/python-telegram-bot/
             python-telegram-bot/issues/3556>`_ for a discussion.
 
             If you want to use HTTP/2, you must install PTB with the optional requirement
             ``http2``, i.e.
+
             .. code-block:: bash
 
                pip install python-telegram-bot[http2]
@@ -728,7 +729,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Note:
             Users have observed stability issues with HTTP/2, which happen due to how the `h2
-            library handles <https://github.com/python-hyper/h2/issues/1181>` cancellations of
+            library handles <https://github.com/python-hyper/h2/issues/1181>`_ cancellations of
             keepalive connections. See `#3556 <https://github.com/python-telegram-bot/
             python-telegram-bot/issues/3556>`_ for a discussion.
 
