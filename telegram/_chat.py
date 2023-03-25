@@ -1532,6 +1532,7 @@ class Chat(TelegramObject):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1572,6 +1573,7 @@ class Chat(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            thumbnail=thumbnail,
         )
 
     async def send_document(
@@ -1588,6 +1590,7 @@ class Chat(TelegramObject):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1620,6 +1623,7 @@ class Chat(TelegramObject):
             pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
             disable_content_type_detection=disable_content_type_detection,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1875,6 +1879,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1916,6 +1921,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
+            thumbnail=thumbnail,
         )
 
     async def send_sticker(
@@ -1927,6 +1933,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        emoji: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -1958,6 +1965,7 @@ class Chat(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            emoji=emoji,
         )
 
     async def send_venue(
@@ -2036,6 +2044,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2071,6 +2080,7 @@ class Chat(TelegramObject):
             parse_mode=parse_mode,
             supports_streaming=supports_streaming,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
@@ -2092,6 +2102,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2123,6 +2134,7 @@ class Chat(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             filename=filename,

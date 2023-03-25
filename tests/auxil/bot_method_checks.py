@@ -229,6 +229,11 @@ def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAUL
         # Some special casing for methods that have "exactly one of the optionals" type args
         elif name in ["location", "contact", "venue", "inline_message_id"]:
             kws[name] = True
+        # Special casing for some methods where the parameter is actually required, but is optional
+        # for compatibility reasons
+        # TODO: remove this once these arguments are marked as required
+        elif name in {"sticker", "stickers", "sticker_format"}:
+            kws[name] = "something passed"
         elif name == "until_date":
             if dfv == "non-None-value":
                 # Europe/Berlin

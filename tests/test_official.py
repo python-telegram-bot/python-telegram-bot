@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import inspect
 import os
-from typing import List
+import re
+from typing import Dict, List, Set
 
 import httpx
 import pytest
@@ -29,9 +30,8 @@ from telegram._utils.defaultvalue import DefaultValue
 from tests.auxil.envvars import env_var_2_bool
 
 IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
-IGNORED_PARAMETERS = {
+GLOBALLY_IGNORED_PARAMETERS = {
     "self",
-    "args",
     "read_timeout",
     "write_timeout",
     "connect_timeout",
@@ -40,12 +40,128 @@ IGNORED_PARAMETERS = {
     "api_kwargs",
 }
 
-ignored_param_requirements = {  # Ignore these since there's convenience params in them (eg. Venue)
+# Arguments *added* to the official API
+PTB_EXTRA_PARAMS = {
+    "send_contact": {"contact"},
+    "send_location": {"location"},
+    "edit_message_live_location": {"location"},
+    "send_venue": {"venue"},
+    "answer_inline_query": {"current_offset"},
+    "send_media_group": {"caption", "parse_mode", "caption_entities"},
+    "send_(animation|audio|document|photo|video(_note)?|voice)": {"filename"},
+    "InlineQueryResult": {"id", "type"},  # attributes common to all subclasses
+    "ChatMember": {"user", "status"},  # attributes common to all subclasses
+    "BotCommandScope": {"type"},  # attributes common to all subclasses
+    "MenuButton": {"type"},  # attributes common to all subclasses
+    "PassportFile": {"credentials"},
+    "EncryptedPassportElement": {"credentials"},
+    "PassportElementError": {"source", "type", "message"},
+    "InputMedia": {"caption", "caption_entities", "media", "media_type", "parse_mode"},
+    "InputMedia(Animation|Audio|Document|Photo|Video|VideoNote|Voice)": {"filename"},
+    "InputFile": {"attach", "filename", "obj"},
+}
+
+
+def _get_params_base(object_name: str, search_dict: Dict[str, Set[str]]) -> Set[str]:
+    """Helper function for the *_params functions below.
+    Given an object name and a search dict, goes through the keys of the search dict and checks if
+    the object name matches any of the regexes (keys). The union of all the sets (values) of the
+    matching regexes is returned. `object_name` may be a CamelCase or snake_case name.
+    """
+    out = set()
+    for regex, params in search_dict.items():
+        if re.fullmatch(regex, object_name):
+            out.update(params)
+        # also check the snake_case version
+        snake_case_name = re.sub(r"(?<!^)(?=[A-Z])", "_", object_name).lower()
+        if re.fullmatch(regex, snake_case_name):
+            out.update(params)
+    return out
+
+
+def ptb_extra_params(object_name) -> Set[str]:
+    return _get_params_base(object_name, PTB_EXTRA_PARAMS)
+
+
+# Arguments *removed* from the official API
+PTB_IGNORED_PARAMS = {
+    r"InlineQueryResult\w+": {"type"},
+    r"ChatMember\w+": {"status"},
+    r"PassportElementError\w+": {"source"},
+    "ForceReply": {"force_reply"},
+    "ReplyKeyboardRemove": {"remove_keyboard"},
+    r"BotCommandScope\w+": {"type"},
+    r"MenuButton\w+": {"type"},
+    r"InputMedia\w+": {"type"},
+}
+
+
+def ptb_ignored_params(object_name) -> Set[str]:
+    return _get_params_base(object_name, PTB_IGNORED_PARAMS)
+
+
+IGNORED_PARAM_REQUIREMENTS = {
+    # Ignore these since there's convenience params in them (eg. Venue)
+    # <----
     "send_location": {"latitude", "longitude"},
     "edit_message_live_location": {"latitude", "longitude"},
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
+    # ---->
+    # These are optional for now for backwards compatibility
+    # <----
+    "InlineQueryResult(Article|Photo|Gif|Mpeg4Gif|Video|Document|Location|Venue)": {
+        "thumbnail_url",
+    },
+    "InlineQueryResultVideo": {"title"},
+    # ---->
 }
+
+
+def ignored_param_requirements(object_name) -> Set[str]:
+    return _get_params_base(object_name, IGNORED_PARAM_REQUIREMENTS)
+
+
+# Arguments that are optional arguments for now for backwards compatibility
+BACKWARDS_COMPAT_KWARGS = {
+    "create_new_sticker_set": {
+        "stickers",
+        "sticker_format",
+        "emojis",
+        "png_sticker",
+        "tgs_sticker",
+        "mask_position",
+        "webm_sticker",
+    },
+    "add_sticker_to_set": {
+        "sticker",
+        "tgs_sticker",
+        "png_sticker",
+        "webm_sticker",
+        "mask_position",
+        "emojis",
+    },
+    "upload_sticker_file": {"sticker", "sticker_format", "png_sticker"},
+    "send_(animation|audio|document|video(_note)?)": {"thumb"},
+    "(Animation|Audio|Document|Photo|Sticker(Set)?|Video|VideoNote|Voice)": {"thumb"},
+    "InputMedia(Animation|Audio|Document|Video)": {"thumb"},
+    "Chat(MemberRestricted|Permissions)": {"can_send_media_messages"},
+    "InlineQueryResult(Article|Contact|Document|Location|Venue)": {
+        "thumb_height",
+        "thumb_width",
+    },
+    "InlineQueryResult(Article|Photo|Gif|Mpeg4Gif|Video|Contact|Document|Location|Venue)": {
+        "thumb_url",
+    },
+    "InlineQueryResult(Game|Gif|Mpeg4Gif)": {"thumb_mime_type"},
+}
+
+
+def backwards_compat_kwargs(object_name: str) -> Set[str]:
+    return _get_params_base(object_name, BACKWARDS_COMPAT_KWARGS)
+
+
+IGNORED_PARAM_REQUIREMENTS.update(BACKWARDS_COMPAT_KWARGS)
 
 
 def find_next_sibling_until(tag, name, until):
@@ -74,63 +190,49 @@ def check_method(h4):
 
     # Check arguments based on source
     sig = inspect.signature(method, follow_wrapped=True)
-
     checked = []
     for tg_parameter in table:  # Iterates through each row in the table
+        # Check if parameter is present in our method
         param = sig.parameters.get(
             tg_parameter[0]  # parameter[0] is first element (the param name)
         )
-        assert param is not None, f"Parameter {tg_parameter[0]} not found in {method.__name__}"
+        if param is None:
+            raise AssertionError(f"Parameter {tg_parameter[0]} not found in {method.__name__}")
 
         # TODO: Check type via docstring
-        assert check_required_param(
-            tg_parameter, param, method.__name__
-        ), f"Param {param.name!r} of method {method.__name__!r} requirement mismatch!"
+        # Now check if the parameter is required or not
+        if not check_required_param(tg_parameter, param, method.__name__):
+            raise AssertionError(
+                f"Param {param.name!r} of method {method.__name__!r} requirement mismatch!"
+            )
 
         # Now we will check that we don't pass default values if the parameter is not required.
         if param.default is not inspect.Parameter.empty:  # If there is a default argument...
             default_arg_none = check_defaults_type(param)  # check if it's None
-            assert default_arg_none, f"Param {param.name!r} of {method.__name__!r} should be None"
-
+            if not default_arg_none:
+                raise AssertionError(f"Param {param.name!r} of {method.__name__!r} should be None")
         checked.append(tg_parameter[0])
 
-    ignored = IGNORED_PARAMETERS.copy()
-    if name == "getUpdates":
-        ignored -= {"timeout"}  # Has it's own timeout parameter that we do wanna check for
-    elif name in (
-        f"send{media_type}"
-        for media_type in [
-            "Animation",
-            "Audio",
-            "Document",
-            "Photo",
-            "Video",
-            "VideoNote",
-            "Voice",
-        ]
-    ):
-        ignored |= {"filename"}  # Convenience parameter
-    elif name == "sendContact":
-        ignored |= {"contact"}  # Added for ease of use
-    elif name in ["sendLocation", "editMessageLiveLocation"]:
-        ignored |= {"location"}  # Added for ease of use
-    elif name == "sendVenue":
-        ignored |= {"venue"}  # Added for ease of use
-    elif name == "answerInlineQuery":
-        ignored |= {"current_offset"}  # Added for ease of use
-    elif name == "sendMediaGroup":
-        # Added for ease of use
-        ignored |= {"caption", "parse_mode", "caption_entities"}
+    expected_additional_args = GLOBALLY_IGNORED_PARAMETERS.copy()
+    expected_additional_args |= ptb_extra_params(name)
+    expected_additional_args |= backwards_compat_kwargs(name)
 
-    assert (sig.parameters.keys() ^ checked) - ignored == set()
+    unexpected_args = (sig.parameters.keys() ^ checked) - expected_additional_args
+    if unexpected_args != set():
+        raise AssertionError(
+            f"In {method.__qualname__}, unexpected args were found: {unexpected_args}."
+        )
 
     kw_or_positional_args = [
         p.name for p in sig.parameters.values() if p.kind != inspect.Parameter.KEYWORD_ONLY
     ]
-    assert set(kw_or_positional_args).difference(checked).difference(["self"]) == set(), (
-        f"In {method.__qualname__}, extra args should be keyword only "
-        f"(compared to {name} in API)"
-    )
+    non_kw_only_args = set(kw_or_positional_args).difference(checked).difference(["self"])
+    non_kw_only_args -= backwards_compat_kwargs(name)
+    if non_kw_only_args != set():
+        raise AssertionError(
+            f"In {method.__qualname__}, extra args should be keyword only "
+            f"(compared to {name} in API)"
+        )
 
 
 def check_object(h4):
@@ -142,62 +244,37 @@ def check_object(h4):
     sig = inspect.signature(obj.__init__, follow_wrapped=True)
 
     checked = set()
+    fields_removed_by_ptb = ptb_ignored_params(name)
     for tg_parameter in table:
         field: str = tg_parameter[0]  # From telegram docs
-        if field == "from":
-            field = "from_user"
-        elif (
-            name.startswith("InlineQueryResult")
-            or name.startswith("InputMedia")
-            or name.startswith("BotCommandScope")
-            or name.startswith("MenuButton")
-        ) and field == "type":
-            continue
-        elif (name.startswith("ChatMember")) and field == "status":  # We autofill the status
-            continue
-        elif (
-            name.startswith("PassportElementError") and field == "source"
-        ) or field == "remove_keyboard":
-            continue
-        elif name.startswith("ForceReply") and field == "force_reply":  # this param is always True
+
+        if field in fields_removed_by_ptb:
             continue
 
+        if field == "from":
+            field = "from_user"
+
         param = sig.parameters.get(field)
-        assert param is not None, f"Attribute {field} not found in {obj.__name__}"
+        if param is None:
+            raise AssertionError(f"Attribute {field} not found in {obj.__name__}")
         # TODO: Check type via docstring
-        assert check_required_param(
-            tg_parameter, param, obj.__name__
-        ), f"{obj.__name__!r} parameter {param.name!r} requirement mismatch"
+        if not check_required_param(tg_parameter, param, obj.__name__):
+            raise AssertionError(f"{obj.__name__!r} parameter {param.name!r} requirement mismatch")
 
         if param.default is not inspect.Parameter.empty:  # If there is a default argument...
             default_arg_none = check_defaults_type(param)  # check if its None
-            assert default_arg_none, f"Param {param.name!r} of {obj.__name__!r} should be `None`"
+            if not default_arg_none:
+                raise AssertionError(f"Param {param.name!r} of {obj.__name__!r} should be `None`")
 
         checked.add(field)
 
-    ignored = IGNORED_PARAMETERS.copy()
-    if name == "InputFile":
-        return
-    if name == "InlineQueryResult":
-        ignored |= {"id", "type"}  # attributes common to all subclasses
-    if name == "ChatMember":
-        ignored |= {"user", "status"}  # attributes common to all subclasses
-    if name == "BotCommandScope":
-        ignored |= {"type"}  # attributes common to all subclasses
-    if name == "MenuButton":
-        ignored |= {"type"}  # attributes common to all subclasses
-    elif name in ("PassportFile", "EncryptedPassportElement"):
-        ignored |= {"credentials"}
-    elif name == "PassportElementError":
-        ignored |= {"message", "type", "source"}
-    elif name == "InputMedia":
-        ignored |= {"caption", "caption_entities", "media", "media_type", "parse_mode"}
-    elif name.startswith("InputMedia"):
-        ignored |= {"filename"}  # Convenience parameter
-    elif name in ("ChatMemberRestricted", "ChatPermissions"):
-        ignored |= {"can_send_media_messages"}  # Depreciated param we keep
+    expected_additional_args = GLOBALLY_IGNORED_PARAMETERS.copy()
+    expected_additional_args |= ptb_extra_params(name)
+    expected_additional_args |= backwards_compat_kwargs(name)
 
-    assert (sig.parameters.keys() ^ checked) - ignored == set()
+    unexpected_args = (sig.parameters.keys() ^ checked) - expected_additional_args
+    if unexpected_args != set():
+        raise AssertionError(f"In {name}, unexpected args were found: {unexpected_args}.")
 
 
 def is_parameter_required_by_tg(field: str) -> bool:
@@ -221,7 +298,7 @@ def check_required_param(
     is_ours_required = param.default is inspect.Parameter.empty
     telegram_requires = is_parameter_required_by_tg(param_desc[2])
     # Handle cases where we provide convenience intentionally-
-    if param.name in ignored_param_requirements.get(method_or_obj_name, {}):
+    if param.name in ignored_param_requirements(method_or_obj_name):
         return True
     return telegram_requires is is_ours_required
 

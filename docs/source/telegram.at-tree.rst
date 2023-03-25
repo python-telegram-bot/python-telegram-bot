@@ -15,6 +15,8 @@ Available Types
     telegram.botcommandscopechatadministrators
     telegram.botcommandscopechatmember
     telegram.botcommandscopedefault
+    telegram.botdescription
+    telegram.botshortdescription
     telegram.callbackquery
     telegram.chat
     telegram.chatadministratorrights
@@ -53,6 +55,7 @@ Available Types
     telegram.inputmediadocument
     telegram.inputmediaphoto
     telegram.inputmediavideo
+    telegram.inputsticker
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat

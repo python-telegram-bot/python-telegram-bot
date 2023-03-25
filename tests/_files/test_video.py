@@ -31,6 +31,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -78,11 +79,11 @@ class TestVideoWithoutRequest(TestVideoBase):
         assert video.file_id != ""
         assert video.file_unique_id != ""
 
-        assert isinstance(video.thumb, PhotoSize)
-        assert isinstance(video.thumb.file_id, str)
-        assert isinstance(video.thumb.file_unique_id, str)
-        assert video.thumb.file_id != ""
-        assert video.thumb.file_unique_id != ""
+        assert isinstance(video.thumbnail, PhotoSize)
+        assert isinstance(video.thumbnail.file_id, str)
+        assert isinstance(video.thumbnail.file_unique_id, str)
+        assert video.thumbnail.file_id != ""
+        assert video.thumbnail.file_unique_id != ""
 
     def test_expected_values(self, video):
         assert video.width == self.width
@@ -90,6 +91,18 @@ class TestVideoWithoutRequest(TestVideoBase):
         assert video.duration == self.duration
         assert video.file_size == self.file_size
         assert video.mime_type == self.mime_type
+
+    def test_thumb_property_deprecation_warning(self, recwarn):
+        video = Video(
+            self.video_file_id,
+            self.video_file_unique_id,
+            self.width,
+            self.height,
+            self.duration,
+            thumb=object(),
+        )
+        assert video.thumb is video.thumbnail
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_de_json(self, bot):
         json_dict = {
@@ -178,17 +191,26 @@ class TestVideoWithoutRequest(TestVideoBase):
             async def make_assertion(_, data, *args, **kwargs):
                 nonlocal test_flag
                 if local_mode:
-                    test_flag = data.get("video") == expected and data.get("thumb") == expected
+                    test_flag = data.get("video") == expected and data.get("thumbnail") == expected
                 else:
                     test_flag = isinstance(data.get("video"), InputFile) and isinstance(
-                        data.get("thumb"), InputFile
+                        data.get("thumbnail"), InputFile
                     )
 
             monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_video(chat_id, file, thumb=file)
+            await bot.send_video(chat_id, file, thumbnail=file)
             assert test_flag
         finally:
             bot._local_mode = False
+
+    async def test_send_video_with_local_files_throws_exception_with_different_thumb_and_thumbnail(
+        self, bot, chat_id
+    ):
+        file = data_file("telegram.jpg")
+        different_file = data_file("telegram_no_standard_header.jpg")
+
+        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
+            await bot.send_video(chat_id, file, thumbnail=file, thumb=different_file)
 
     async def test_get_file_instance_method(self, monkeypatch, video):
         async def make_assertion(*_, **kwargs):
@@ -215,7 +237,7 @@ class TestVideoWithRequest(TestVideoBase):
             width=video.width,
             height=video.height,
             parse_mode="Markdown",
-            thumb=thumb_file,
+            thumbnail=thumb_file,
             has_spoiler=True,
         )
 
@@ -231,9 +253,9 @@ class TestVideoWithRequest(TestVideoBase):
 
         assert message.caption == self.caption.replace("*", "")
 
-        assert message.video.thumb.file_size == self.thumb_file_size
-        assert message.video.thumb.width == self.thumb_width
-        assert message.video.thumb.height == self.thumb_height
+        assert message.video.thumbnail.file_size == self.thumb_file_size
+        assert message.video.thumbnail.width == self.thumb_width
+        assert message.video.thumbnail.height == self.thumb_height
 
         assert message.video.file_name == self.file_name
         assert message.has_protected_content
@@ -267,14 +289,14 @@ class TestVideoWithRequest(TestVideoBase):
         assert message.video.duration == video.duration
         assert message.video.file_size == video.file_size
 
-        assert isinstance(message.video.thumb, PhotoSize)
-        assert isinstance(message.video.thumb.file_id, str)
-        assert isinstance(message.video.thumb.file_unique_id, str)
-        assert message.video.thumb.file_id != ""
-        assert message.video.thumb.file_unique_id != ""
-        assert message.video.thumb.width == 51  # This seems odd that it's not self.thumb_width
-        assert message.video.thumb.height == 90  # Ditto
-        assert message.video.thumb.file_size == 645  # same
+        assert isinstance(message.video.thumbnail, PhotoSize)
+        assert isinstance(message.video.thumbnail.file_id, str)
+        assert isinstance(message.video.thumbnail.file_unique_id, str)
+        assert message.video.thumbnail.file_id != ""
+        assert message.video.thumbnail.file_unique_id != ""
+        assert message.video.thumbnail.width == 51  # This seems odd that it's not self.thumb_width
+        assert message.video.thumbnail.height == 90  # Ditto
+        assert message.video.thumbnail.file_size == 645  # same
 
         assert message.caption == self.caption
 

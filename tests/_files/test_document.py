@@ -31,6 +31,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -77,15 +78,20 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert document.file_size == self.file_size
         assert document.mime_type == self.mime_type
         assert document.file_name == self.file_name
-        assert document.thumb.file_size == self.thumb_file_size
-        assert document.thumb.width == self.thumb_width
-        assert document.thumb.height == self.thumb_height
+        assert document.thumbnail.file_size == self.thumb_file_size
+        assert document.thumbnail.width == self.thumb_width
+        assert document.thumbnail.height == self.thumb_height
+
+    def test_thumb_property_deprecation_warning(self, recwarn):
+        document = Document(file_id="file_id", file_unique_id="file_unique_id", thumb=object())
+        assert document.thumb is document.thumbnail
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_de_json(self, bot, document):
         json_dict = {
             "file_id": self.document_file_id,
             "file_unique_id": self.document_file_unique_id,
-            "thumb": document.thumb.to_dict(),
+            "thumbnail": document.thumbnail.to_dict(),
             "file_name": self.file_name,
             "mime_type": self.mime_type,
             "file_size": self.file_size,
@@ -95,7 +101,7 @@ class TestDocumentWithoutRequest(TestDocumentBase):
 
         assert test_document.file_id == self.document_file_id
         assert test_document.file_unique_id == self.document_file_unique_id
-        assert test_document.thumb == document.thumb
+        assert test_document.thumbnail == document.thumbnail
         assert test_document.file_name == self.file_name
         assert test_document.mime_type == self.mime_type
         assert test_document.file_size == self.file_size
@@ -163,17 +169,28 @@ class TestDocumentWithoutRequest(TestDocumentBase):
             async def make_assertion(_, data, *args, **kwargs):
                 nonlocal test_flag
                 if local_mode:
-                    test_flag = data.get("document") == expected and data.get("thumb") == expected
+                    test_flag = (
+                        data.get("document") == expected and data.get("thumbnail") == expected
+                    )
                 else:
                     test_flag = isinstance(data.get("document"), InputFile) and isinstance(
-                        data.get("thumb"), InputFile
+                        data.get("thumbnail"), InputFile
                     )
 
             monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_document(chat_id, file, thumb=file)
+            await bot.send_document(chat_id, file, thumbnail=file)
             assert test_flag
         finally:
             bot._local_mode = False
+
+    async def test_send_document_with_local_files_throws_error_with_different_thumb_and_thumbnail(
+        self, bot, chat_id
+    ):
+        file = data_file("telegram.jpg")
+        different_file = data_file("telegram_no_standard_header.jpg")
+
+        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
+            await bot.send_document(chat_id, file, thumbnail=file, thumb=different_file)
 
     async def test_get_file_instance_method(self, monkeypatch, document):
         async def make_assertion(*_, **kwargs):
@@ -225,7 +242,7 @@ class TestDocumentWithRequest(TestDocumentBase):
             protect_content=True,
             filename="telegram_custom.png",
             parse_mode="Markdown",
-            thumb=thumb_file,
+            thumbnail=thumb_file,
         )
 
         assert isinstance(message.document, Document)
@@ -233,13 +250,13 @@ class TestDocumentWithRequest(TestDocumentBase):
         assert message.document.file_id != ""
         assert isinstance(message.document.file_unique_id, str)
         assert message.document.file_unique_id != ""
-        assert isinstance(message.document.thumb, PhotoSize)
+        assert isinstance(message.document.thumbnail, PhotoSize)
         assert message.document.file_name == "telegram_custom.png"
         assert message.document.mime_type == document.mime_type
         assert message.document.file_size == document.file_size
         assert message.caption == self.caption.replace("*", "")
-        assert message.document.thumb.width == self.thumb_width
-        assert message.document.thumb.height == self.thumb_height
+        assert message.document.thumbnail.width == self.thumb_width
+        assert message.document.thumbnail.height == self.thumb_height
         assert message.has_protected_content
 
     async def test_send_url_gif_file(self, bot, chat_id):
@@ -252,7 +269,7 @@ class TestDocumentWithRequest(TestDocumentBase):
         assert document.file_id != ""
         assert isinstance(message.document.file_unique_id, str)
         assert message.document.file_unique_id != ""
-        assert isinstance(document.thumb, PhotoSize)
+        assert isinstance(document.thumbnail, PhotoSize)
         assert document.file_name == "telegram.gif"
         assert document.mime_type == "image/gif"
         assert document.file_size == 3878

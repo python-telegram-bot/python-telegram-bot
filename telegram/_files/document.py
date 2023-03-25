@@ -37,19 +37,27 @@ class Document(_BaseThumbedMedium):
         file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
             the same over time and for different bots. Can't be used to download or reuse the file.
         thumb (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by sender.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail`.
         file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size in bytes.
+        thumbnail (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by sender.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
             the same over time and for different bots. Can't be used to download or reuse the file.
-        thumb (:class:`telegram.PhotoSize`): Optional. Document thumbnail as defined by sender.
         file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Document thumbnail as defined by sender.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -63,6 +71,7 @@ class Document(_BaseThumbedMedium):
         file_name: str = None,
         mime_type: str = None,
         file_size: int = None,
+        thumbnail: PhotoSize = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -71,6 +80,7 @@ class Document(_BaseThumbedMedium):
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
