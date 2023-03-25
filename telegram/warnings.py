@@ -47,7 +47,8 @@ class PTBRuntimeWarning(PTBUserWarning, RuntimeWarning):
 
 
 # https://www.python.org/dev/peps/pep-0565/ recommends using a custom warning class derived from
-# DeprecationWarning. We also subclass from TGUserWarning so users can easily 'switch off' warnings
+# DeprecationWarning. We also subclass from PTBUserWarning so users can easily 'switch off'
+# warnings
 class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
     """
     Custom warning class for deprecations in this library.

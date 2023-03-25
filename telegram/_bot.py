@@ -7018,6 +7018,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.constants.BotCommandLimit.MAX_COMMAND_NUMBER` commands can be
                 specified.
 
+                Note:
+                    If you pass in a sequence of :obj:`tuple`, the order of elements in each
+                    :obj:`tuple` must correspond to the order of positional arguments to create a
+                    :class:`BotCommand` instance.
+
                 .. versionchanged:: 20.0
                     |sequenceargs|
             scope (:class:`telegram.BotCommandScope`, optional): An object,

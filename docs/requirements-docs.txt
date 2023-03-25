@@ -3,5 +3,5 @@ sphinx-pypi-upload
 furo==2023.3.23
 git+https://github.com/harshil21/furo-sphinx-search@01efc7be422d7dc02390aab9be68d6f5ce1a5618#egg=furo-sphinx-search
 sphinx-paramlinks==0.5.4
-sphinxcontrib-mermaid==0.8
+sphinxcontrib-mermaid==0.8.1
 sphinx-copybutton==0.5.1
