@@ -26,6 +26,10 @@ from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings_transition import (
+    warn_about_deprecated_attr_in_property,
+    warn_about_thumb_return_thumbnail,
+)
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -61,6 +65,9 @@ class Sticker(_BaseThumbedMedium):
             .. versionadded:: 20.0
         thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
             ``.JPG`` format.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail`.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
         set_name (:obj:`str`, optional): Name of the sticker set to which the sticker belongs.
         mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the position
@@ -75,6 +82,15 @@ class Sticker(_BaseThumbedMedium):
             custom emoji.
 
             .. versionadded:: 20.0
+        thumbnail (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
+            ``.JPG`` format.
+
+            .. versionadded:: NEXT.VERSION
+        needs_repainting (:obj:`bool`, optional): :obj:`True`, if the sticker must be repainted to
+            a text color in messages, the color of the Telegram Premium badge in emoji status,
+            white color on chat photos, or another appropriate color in other places.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -93,8 +109,6 @@ class Sticker(_BaseThumbedMedium):
             format, which is determined by the fields :attr:`is_animated` and :attr:`is_video`.
 
             .. versionadded:: 20.0
-        thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the ``.WEBP`` or
-            ``.JPG`` format.
         emoji (:obj:`str`): Optional. Emoji associated with the sticker.
         set_name (:obj:`str`): Optional. Name of the sticker set to which the sticker belongs.
         mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
@@ -109,6 +123,15 @@ class Sticker(_BaseThumbedMedium):
             custom emoji.
 
             .. versionadded:: 20.0
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the ``.WEBP`` or
+            ``.JPG`` format.
+
+            .. versionadded:: NEXT.VERSION
+        needs_repainting (:obj:`bool`): Optional. :obj:`True`, if the sticker must be repainted to
+            a text color in messages, the color of the Telegram Premium badge in emoji status,
+            white color on chat photos, or another appropriate color in other places.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -122,6 +145,7 @@ class Sticker(_BaseThumbedMedium):
         "premium_animation",
         "type",
         "custom_emoji_id",
+        "needs_repainting",
     )
 
     def __init__(
@@ -140,6 +164,8 @@ class Sticker(_BaseThumbedMedium):
         mask_position: "MaskPosition" = None,
         premium_animation: "File" = None,
         custom_emoji_id: str = None,
+        thumbnail: PhotoSize = None,
+        needs_repainting: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -148,6 +174,7 @@ class Sticker(_BaseThumbedMedium):
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():
@@ -163,6 +190,7 @@ class Sticker(_BaseThumbedMedium):
             self.mask_position: Optional[MaskPosition] = mask_position
             self.premium_animation: Optional[File] = premium_animation
             self.custom_emoji_id: Optional[str] = custom_emoji_id
+            self.needs_repainting: Optional[bool] = needs_repainting
 
     REGULAR: ClassVar[str] = constants.StickerType.REGULAR
     """:const:`telegram.constants.StickerType.REGULAR`"""
@@ -179,11 +207,17 @@ class Sticker(_BaseThumbedMedium):
         if not data:
             return None
 
-        data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
+        data["thumbnail"] = PhotoSize.de_json(data.get("thumbnail"), bot)
         data["mask_position"] = MaskPosition.de_json(data.get("mask_position"), bot)
         data["premium_animation"] = File.de_json(data.get("premium_animation"), bot)
 
-        return super().de_json(data=data, bot=bot)
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if data.get("thumb") is not None:
+            api_kwargs["thumb"] = data.pop("thumb")
+
+        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
 
 class StickerSet(TelegramObject):
@@ -220,6 +254,13 @@ class StickerSet(TelegramObject):
         thumb (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail`.
+        thumbnail (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
+            ``.TGS``, or ``.WEBM`` format.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
@@ -237,9 +278,10 @@ class StickerSet(TelegramObject):
             :attr:`telegram.Sticker.CUSTOM_EMOJI`.
 
             .. versionadded:: 20.0
-        thumb (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -247,7 +289,7 @@ class StickerSet(TelegramObject):
         "is_video",
         "name",
         "stickers",
-        "thumb",
+        "thumbnail",
         "title",
         "sticker_type",
     )
@@ -261,6 +303,7 @@ class StickerSet(TelegramObject):
         is_video: bool,
         sticker_type: str,
         thumb: PhotoSize = None,
+        thumbnail: PhotoSize = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -272,11 +315,28 @@ class StickerSet(TelegramObject):
         self.stickers: Tuple[Sticker, ...] = parse_sequence_arg(stickers)
         self.sticker_type: str = sticker_type
         # Optional
-        self.thumb: Optional[PhotoSize] = thumb
 
+        self.thumbnail: Optional[PhotoSize] = warn_about_thumb_return_thumbnail(
+            deprecated_arg=thumb, new_arg=thumbnail
+        )
         self._id_attrs = (self.name,)
 
         self._freeze()
+
+    @property
+    def thumb(self) -> Optional[PhotoSize]:
+        """:class:`telegram.PhotoSize`: Optional. Sticker set thumbnail in the ``.WEBP``,
+        ``.TGS``, or ``.WEBM`` format.
+
+        .. deprecated:: NEXT.VERSION
+           |thumbattributedeprecation| :attr:`thumbnail`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb",
+            new_attr_name="thumbnail",
+            bot_api_version="6.6",
+        )
+        return self.thumbnail
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StickerSet"]:
@@ -284,14 +344,15 @@ class StickerSet(TelegramObject):
         if not data:
             return None
 
-        data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
+        data["thumbnail"] = PhotoSize.de_json(data.get("thumbnail"), bot)
         data["stickers"] = Sticker.de_list(data.get("stickers"), bot)
 
         api_kwargs = {}
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        if "contains_masks" in data:
-            api_kwargs["contains_masks"] = data.pop("contains_masks")
+        # These are deprecated fields that TG still returns for backwards compatibility
+        # Let's filter them out to speed up the de-json process
+        for deprecated_field in ("contains_masks", "thumb"):
+            if deprecated_field in data:
+                api_kwargs[deprecated_field] = data.pop(deprecated_field)
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 

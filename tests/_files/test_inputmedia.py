@@ -45,6 +45,8 @@ from tests.auxil.slots import mro_slots
 # noinspection PyUnresolvedReferences
 from tests.test_forum import emoji_id, real_topic  # noqa: F401
 
+from ..auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
+
 # noinspection PyUnresolvedReferences
 from .test_audio import audio, audio_file  # noqa: F401
 
@@ -68,7 +70,7 @@ def input_media_video(class_thumb_file):
         duration=TestInputMediaVideoBase.duration,
         parse_mode=TestInputMediaVideoBase.parse_mode,
         caption_entities=TestInputMediaVideoBase.caption_entities,
-        thumb=class_thumb_file,
+        thumbnail=class_thumb_file,
         supports_streaming=TestInputMediaVideoBase.supports_streaming,
         has_spoiler=TestInputMediaVideoBase.has_spoiler,
     )
@@ -94,7 +96,7 @@ def input_media_animation(class_thumb_file):
         caption_entities=TestInputMediaAnimationBase.caption_entities,
         width=TestInputMediaAnimationBase.width,
         height=TestInputMediaAnimationBase.height,
-        thumb=class_thumb_file,
+        thumbnail=class_thumb_file,
         duration=TestInputMediaAnimationBase.duration,
         has_spoiler=TestInputMediaAnimationBase.has_spoiler,
     )
@@ -108,7 +110,7 @@ def input_media_audio(class_thumb_file):
         duration=TestInputMediaAudioBase.duration,
         performer=TestInputMediaAudioBase.performer,
         title=TestInputMediaAudioBase.title,
-        thumb=class_thumb_file,
+        thumbnail=class_thumb_file,
         parse_mode=TestInputMediaAudioBase.parse_mode,
         caption_entities=TestInputMediaAudioBase.caption_entities,
     )
@@ -119,7 +121,7 @@ def input_media_document(class_thumb_file):
     return InputMediaDocument(
         media=TestInputMediaDocumentBase.media,
         caption=TestInputMediaDocumentBase.caption,
-        thumb=class_thumb_file,
+        thumbnail=class_thumb_file,
         parse_mode=TestInputMediaDocumentBase.parse_mode,
         caption_entities=TestInputMediaDocumentBase.caption_entities,
         disable_content_type_detection=TestInputMediaDocumentBase.disable_content_type_detection,
@@ -156,8 +158,14 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
         assert input_media_video.parse_mode == self.parse_mode
         assert input_media_video.caption_entities == tuple(self.caption_entities)
         assert input_media_video.supports_streaming == self.supports_streaming
-        assert isinstance(input_media_video.thumb, InputFile)
+        assert isinstance(input_media_video.thumbnail, InputFile)
+        assert input_media_video.thumb is input_media_video.thumbnail
         assert input_media_video.has_spoiler == self.has_spoiler
+
+    def test_thumb_property_deprecation_warning(self, recwarn):
+        input_media_video = InputMediaVideo(self.media, thumb=object())
+        assert input_media_video.thumb is input_media_video.thumbnail
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_video = InputMediaVideo(self.media)
@@ -197,10 +205,18 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
 
     def test_with_local_files(self):
         input_media_video = InputMediaVideo(
-            data_file("telegram.mp4"), thumb=data_file("telegram.jpg")
+            data_file("telegram.mp4"), thumbnail=data_file("telegram.jpg")
         )
         assert input_media_video.media == data_file("telegram.mp4").as_uri()
-        assert input_media_video.thumb == data_file("telegram.jpg").as_uri()
+        assert input_media_video.thumbnail == data_file("telegram.jpg").as_uri()
+
+    def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
+        with pytest.raises(ValueError):
+            InputMediaVideo(
+                data_file("telegram.mp4"),
+                thumbnail=data_file("telegram.jpg"),
+                thumb=data_file("telegram_no_standard_header.jpg"),
+            )
 
 
 class TestInputMediaPhotoBase:
@@ -286,8 +302,14 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
         assert input_media_animation.caption == self.caption
         assert input_media_animation.parse_mode == self.parse_mode
         assert input_media_animation.caption_entities == tuple(self.caption_entities)
-        assert isinstance(input_media_animation.thumb, InputFile)
+        assert isinstance(input_media_animation.thumbnail, InputFile)
+        assert input_media_animation.thumb is input_media_animation.thumbnail
         assert input_media_animation.has_spoiler == self.has_spoiler
+
+    def test_thumb_property_deprecation_warning(self, recwarn):
+        input_media_animation = InputMediaAnimation(self.media, thumb=object())
+        assert input_media_animation.thumb is input_media_animation.thumbnail
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_animation = InputMediaAnimation(self.media)
@@ -323,10 +345,18 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
 
     def test_with_local_files(self):
         input_media_animation = InputMediaAnimation(
-            data_file("telegram.mp4"), thumb=data_file("telegram.jpg")
+            data_file("telegram.mp4"), thumbnail=data_file("telegram.jpg")
         )
         assert input_media_animation.media == data_file("telegram.mp4").as_uri()
-        assert input_media_animation.thumb == data_file("telegram.jpg").as_uri()
+        assert input_media_animation.thumbnail == data_file("telegram.jpg").as_uri()
+
+    def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
+        with pytest.raises(ValueError):
+            InputMediaAnimation(
+                data_file("telegram.mp4"),
+                thumbnail=data_file("telegram.jpg"),
+                thumb=data_file("telegram_no_standard_header.jpg"),
+            )
 
 
 class TestInputMediaAudioBase:
@@ -356,7 +386,13 @@ class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
         assert input_media_audio.title == self.title
         assert input_media_audio.parse_mode == self.parse_mode
         assert input_media_audio.caption_entities == tuple(self.caption_entities)
-        assert isinstance(input_media_audio.thumb, InputFile)
+        assert isinstance(input_media_audio.thumbnail, InputFile)
+        assert input_media_audio.thumb is input_media_audio.thumbnail
+
+    def test_thumb_property_deprecation_warning(self, recwarn):
+        input_media_audio = InputMediaAudio(self.media, thumb=object())
+        assert input_media_audio.thumb is input_media_audio.thumbnail
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_audio = InputMediaAudio(self.media)
@@ -394,10 +430,18 @@ class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
 
     def test_with_local_files(self):
         input_media_audio = InputMediaAudio(
-            data_file("telegram.mp4"), thumb=data_file("telegram.jpg")
+            data_file("telegram.mp4"), thumbnail=data_file("telegram.jpg")
         )
         assert input_media_audio.media == data_file("telegram.mp4").as_uri()
-        assert input_media_audio.thumb == data_file("telegram.jpg").as_uri()
+        assert input_media_audio.thumbnail == data_file("telegram.jpg").as_uri()
+
+    def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
+        with pytest.raises(ValueError):
+            InputMediaAudio(
+                data_file("telegram.mp4"),
+                thumbnail=data_file("telegram.jpg"),
+                thumb=data_file("telegram_no_standard_header.jpg"),
+            )
 
 
 class TestInputMediaDocumentBase:
@@ -426,7 +470,13 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
             input_media_document.disable_content_type_detection
             == self.disable_content_type_detection
         )
-        assert isinstance(input_media_document.thumb, InputFile)
+        assert isinstance(input_media_document.thumbnail, InputFile)
+        assert input_media_document.thumb is input_media_document.thumbnail
+
+    def test_thumb_property_deprecation_warning(self, recwarn):
+        input_media_document = InputMediaDocument(self.media, thumb=object())
+        assert input_media_document.thumb is input_media_document.thumbnail
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_document = InputMediaDocument(self.media)
@@ -462,10 +512,18 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
 
     def test_with_local_files(self):
         input_media_document = InputMediaDocument(
-            data_file("telegram.mp4"), thumb=data_file("telegram.jpg")
+            data_file("telegram.mp4"), thumbnail=data_file("telegram.jpg")
         )
         assert input_media_document.media == data_file("telegram.mp4").as_uri()
-        assert input_media_document.thumb == data_file("telegram.jpg").as_uri()
+        assert input_media_document.thumbnail == data_file("telegram.jpg").as_uri()
+
+    def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
+        with pytest.raises(ValueError):
+            InputMediaDocument(
+                data_file("telegram.mp4"),
+                thumbnail=data_file("telegram.jpg"),
+                thumb=data_file("telegram_no_standard_header.jpg"),
+            )
 
 
 @pytest.fixture(scope="module")  # noqa: F811
@@ -557,12 +615,14 @@ class TestSendMediaGroupWithoutRequest:
             nonlocal input_video
             files = request_data.multipart_data
             video_check = files[input_video.media.attach_name] == input_video.media.field_tuple
-            thumb_check = files[input_video.thumb.attach_name] == input_video.thumb.field_tuple
+            thumb_check = (
+                files[input_video.thumbnail.attach_name] == input_video.thumbnail.field_tuple
+            )
             result = video_check and thumb_check
             raise Exception(f"Test was {'successful' if result else 'failing'}")
 
         monkeypatch.setattr(bot.request, "_request_wrapper", make_assertion)
-        input_video = InputMediaVideo(video_file, thumb=photo_file)
+        input_video = InputMediaVideo(video_file, thumbnail=photo_file)
         with pytest.raises(Exception, match="Test was successful"):
             await bot.send_media_group(chat_id, [input_video, input_video])
 
@@ -574,12 +634,14 @@ class TestSendMediaGroupWithoutRequest:
         ):
             files = request_data.multipart_data
             video_check = files[input_video.media.attach_name] == input_video.media.field_tuple
-            thumb_check = files[input_video.thumb.attach_name] == input_video.thumb.field_tuple
+            thumb_check = (
+                files[input_video.thumbnail.attach_name] == input_video.thumbnail.field_tuple
+            )
             result = video_check and thumb_check
             raise Exception(f"Test was {'successful' if result else 'failing'}")
 
         monkeypatch.setattr(bot.request, "_request_wrapper", make_assertion)
-        input_video = InputMediaVideo(video_file, thumb=photo_file)
+        input_video = InputMediaVideo(video_file, thumbnail=photo_file)
         with pytest.raises(Exception, match="Test was successful"):
             await bot.edit_message_media(chat_id=chat_id, message_id=123, media=input_video)
 

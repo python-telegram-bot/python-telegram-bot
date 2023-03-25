@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
+import warnings
 from copy import copy
 from datetime import datetime
 from typing import (
@@ -44,6 +45,8 @@ from telegram import (
     Bot,
     BotCommand,
     BotCommandScope,
+    BotDescription,
+    BotShortDescription,
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
@@ -58,6 +61,7 @@ from telegram import (
     GameHighScore,
     InlineKeyboardMarkup,
     InputMedia,
+    InputSticker,
     Location,
     MaskPosition,
     MenuButton,
@@ -82,9 +86,11 @@ from telegram import (
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.warnings import warn
 from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.ext._utils.types import RLARGS
 from telegram.request import BaseRequest
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -706,11 +712,12 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         user_id: Union[str, int],
         name: str,
-        emojis: str,
+        emojis: str = None,  # Was made optional for compatibility reasons
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
+        sticker: InputSticker = None,  # Actually a required param, but is optional for compat.
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -722,6 +729,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         return await super().add_sticker_to_set(
             user_id=user_id,
             name=name,
+            sticker=sticker,
             emojis=emojis,
             png_sticker=png_sticker,
             mask_position=mask_position,
@@ -1031,12 +1039,15 @@ class ExtBot(Bot, Generic[RLARGS]):
         user_id: Union[str, int],
         name: str,
         title: str,
-        emojis: str,
+        emojis: str = None,  # Was made optional for compatibility purposes
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
         sticker_type: str = None,
+        stickers: Sequence[InputSticker] = None,  # Actually a required param. Optional for compat.
+        sticker_format: str = None,  # Actually a required param. Optional for compat.
+        needs_repainting: bool = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -1049,6 +1060,9 @@ class ExtBot(Bot, Generic[RLARGS]):
             user_id=user_id,
             name=name,
             title=title,
+            stickers=stickers,
+            sticker_format=sticker_format,
+            needs_repainting=needs_repainting,
             emojis=emojis,
             png_sticker=png_sticker,
             mask_position=mask_position,
@@ -2150,6 +2164,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2176,6 +2191,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
+            thumbnail=thumbnail,
             filename=filename,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2201,6 +2217,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2226,6 +2243,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             caption_entities=caption_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            thumbnail=thumbnail,
             filename=filename,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2349,6 +2367,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2372,6 +2391,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             caption_entities=caption_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            thumbnail=thumbnail,
             filename=filename,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2724,6 +2744,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        emoji: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -2745,6 +2766,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            emoji=emoji,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
@@ -2817,6 +2839,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2844,6 +2867,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
+            thumbnail=thumbnail,
             filename=filename,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2865,6 +2889,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2886,6 +2911,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            thumbnail=thumbnail,
             filename=filename,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -3218,6 +3244,30 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def set_sticker_set_thumbnail(
+        self,
+        name: str,
+        user_id: Union[str, int],
+        thumbnail: FileInput = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_sticker_set_thumbnail(
+            name=name,
+            user_id=user_id,
+            thumbnail=thumbnail,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def set_sticker_set_thumb(
         self,
         name: str,
@@ -3231,16 +3281,30 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
     ) -> bool:
-        return await super().set_sticker_set_thumb(
-            name=name,
-            user_id=user_id,
-            thumb=thumb,
-            read_timeout=read_timeout,
-            write_timeout=write_timeout,
-            connect_timeout=connect_timeout,
-            pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        # Manually issue deprecation here to get the stacklevel right
+        # Suppress the warning issued by super().set_sticker_set_thumb just in case
+        # the user explicitly enables deprecation warnings
+        # Unfortunately this is not entirely reliable (see tests), but it's a best effort solution
+        warn(
+            message=(
+                "Bot API 6.6 renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail', "
+                "hence method 'set_sticker_set_thumb' was renamed to 'set_sticker_set_thumbnail' "
+                "in PTB."
+            ),
+            category=PTBDeprecationWarning,
+            stacklevel=2,
         )
+        with warnings.catch_warnings():
+            return await super().set_sticker_set_thumb(
+                name=name,
+                user_id=user_id,
+                thumb=thumb,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            )
 
     async def set_webhook(
         self,
@@ -3413,7 +3477,9 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def upload_sticker_file(
         self,
         user_id: Union[str, int],
-        png_sticker: FileInput,
+        png_sticker: FileInput = None,  # Deprecated since bot api 6.6. Optional for compatiblity.
+        sticker: FileInput = None,  # Actually required, but optional for compatibility.
+        sticker_format: str = None,  # Actually required, but optional for compatibility.
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -3424,7 +3490,223 @@ class ExtBot(Bot, Generic[RLARGS]):
     ) -> File:
         return await super().upload_sticker_file(
             user_id=user_id,
+            sticker=sticker,
+            sticker_format=sticker_format,
             png_sticker=png_sticker,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_my_description(
+        self,
+        description: str = None,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_my_description(
+            description=description,
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_my_short_description(
+        self,
+        short_description: str = None,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_my_short_description(
+            short_description=short_description,
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_my_description(
+        self,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> BotDescription:
+        return await super().get_my_description(
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_my_short_description(
+        self,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> BotShortDescription:
+        return await super().get_my_short_description(
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_custom_emoji_sticker_set_thumbnail(
+        self,
+        name: str,
+        custom_emoji_id: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_custom_emoji_sticker_set_thumbnail(
+            name=name,
+            custom_emoji_id=custom_emoji_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_sticker_set_title(
+        self,
+        name: str,
+        title: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_sticker_set_title(
+            name=name,
+            title=title,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def delete_sticker_set(
+        self,
+        name: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().delete_sticker_set(
+            name=name,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_sticker_emoji_list(
+        self,
+        sticker: str,
+        emoji_list: Sequence[str],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_sticker_emoji_list(
+            sticker=sticker,
+            emoji_list=emoji_list,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_sticker_keywords(
+        self,
+        sticker: str,
+        keywords: Sequence[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_sticker_keywords(
+            sticker=sticker,
+            keywords=keywords,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_sticker_mask_position(
+        self,
+        sticker: str,
+        mask_position: MaskPosition = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_sticker_mask_position(
+            sticker=sticker,
+            mask_position=mask_position,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3507,6 +3789,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     setStickerPositionInSet = set_sticker_position_in_set
     deleteStickerFromSet = delete_sticker_from_set
     setStickerSetThumb = set_sticker_set_thumb
+    setStickerSetThumbnail = set_sticker_set_thumbnail
     setPassportDataErrors = set_passport_data_errors
     sendPoll = send_poll
     stopPoll = stop_poll
@@ -3533,3 +3816,13 @@ class ExtBot(Bot, Generic[RLARGS]):
     reopenGeneralForumTopic = reopen_general_forum_topic
     hideGeneralForumTopic = hide_general_forum_topic
     unhideGeneralForumTopic = unhide_general_forum_topic
+    setMyDescription = set_my_description
+    getMyDescription = get_my_description
+    setMyShortDescription = set_my_short_description
+    getMyShortDescription = get_my_short_description
+    setCustomEmojiStickerSetThumbnail = set_custom_emoji_sticker_set_thumbnail
+    setStickerSetTitle = set_sticker_set_title
+    deleteStickerSet = delete_sticker_set
+    setStickerEmojiList = set_sticker_emoji_list
+    setStickerKeywords = set_sticker_keywords
+    setStickerMaskPosition = set_sticker_mask_position

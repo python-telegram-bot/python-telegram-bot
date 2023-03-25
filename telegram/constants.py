@@ -36,6 +36,7 @@ __all__ = [
     "BOT_API_VERSION_INFO",
     "BotCommandLimit",
     "BotCommandScopeType",
+    "BotDescriptionLimit",
     "CallbackQueryLimit",
     "ChatAction",
     "ChatID",
@@ -73,7 +74,9 @@ __all__ = [
     "PollType",
     "ReplyLimit",
     "SUPPORTED_WEBHOOK_PORTS",
+    "StickerFormat",
     "StickerLimit",
+    "StickerSetLimit",
     "StickerType",
     "WebhookLimit",
     "UpdateType",
@@ -111,7 +114,7 @@ class _BotAPIVersion(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=5)
+BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=6)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -182,6 +185,28 @@ class BotCommandScopeType(StringEnum):
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeChatAdministrators`."""
     CHAT_MEMBER = "chat_member"
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeChatMember`."""
+
+
+class BotDescriptionLimit(IntEnum):
+    """This enum contains limitations for the methods :meth:`telegram.Bot.set_my_description` and
+    :meth:`telegram.Bot.set_my_short_description`. The enum members of this enumeration are
+    instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_DESCRIPTION_LENGTH = 512
+    """:obj:`int`: Maximum length for the parameter
+    :paramref:`~telegram.Bot.set_my_description.description` of
+    :meth:`telegram.Bot.set_my_description`
+    """
+    MAX_SHORT_DESCRIPTION_LENGTH = 120
+    """:obj:`int`: Maximum length for the parameter
+    :paramref:`~telegram.Bot.set_my_short_description.short_description` of
+    :meth:`telegram.Bot.set_my_short_description`
+    """
 
 
 class CallbackQueryLimit(IntEnum):
@@ -1243,8 +1268,26 @@ class ReplyLimit(IntEnum):
     """
 
 
+class StickerFormat(StringEnum):
+    """This enum contains the available formats of :class:`telegram.Sticker` in the set. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    STATIC = "static"
+    """:obj:`str`: Static sticker."""
+    ANIMATED = "animated"
+    """:obj:`str`: Animated sticker."""
+    VIDEO = "video"
+    """:obj:`str`: Video sticker."""
+
+
 class StickerLimit(IntEnum):
-    """This enum contains limitations for :meth:`telegram.Bot.create_new_sticker_set`.
+    """This enum contains limitations for various sticker methods, such as
+    :meth:`telegram.Bot.create_new_sticker_set`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
@@ -1264,6 +1307,78 @@ class StickerLimit(IntEnum):
     :paramref:`~telegram.Bot.create_new_sticker_set.title` parameter of
     :meth:`telegram.Bot.create_new_sticker_set`.
     """
+    MIN_STICKER_EMOJI = 1
+    """:obj:`int`: Minimum number of emojis associated with a sticker, passed as the
+    :paramref:`~telegram.Bot.setStickerEmojiList.emoji_list` parameter of
+    :meth:`telegram.Bot.set_sticker_emoji_list`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MAX_STICKER_EMOJI = 20
+    """:obj:`int`: Maximum number of emojis associated with a sticker, passed as the
+    :paramref:`~telegram.Bot.setStickerEmojiList.emoji_list` parameter of
+    :meth:`telegram.Bot.set_sticker_emoji_list`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MAX_SEARCH_KEYWORDS = 20
+    """:obj:`int`: Maximum number of search keywords for a sticker, passed as the
+    :paramref:`~telegram.Bot.set_sticker_keywords.keywords` parameter of
+    :meth:`telegram.Bot.set_sticker_keywords`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MAX_KEYWORD_LENGTH = 64
+    """:obj:`int`: Maximum number of characters in a search keyword for a sticker, for each item in
+    :paramref:`~telegram.Bot.set_sticker_keywords.keywords` sequence of
+    :meth:`telegram.Bot.set_sticker_keywords`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+
+class StickerSetLimit(IntEnum):
+    """This enum contains limitations for various sticker set methods, such as
+    :meth:`telegram.Bot.create_new_sticker_set` and :meth:`telegram.Bot.add_sticker_to_set`.
+
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_INITIAL_STICKERS = 1
+    """:obj:`int`: Minimum number of stickers needed to create a sticker set, passed as the
+    :paramref:`~telegram.Bot.create_new_sticker_set.stickers` parameter of
+    :meth:`telegram.Bot.create_new_sticker_set`.
+    """
+    MAX_INITIAL_STICKERS = 50
+    """:obj:`int`: Maximum number of stickers allowed while creating a sticker set, passed as the
+    :paramref:`~telegram.Bot.create_new_sticker_set.stickers` parameter of
+    :meth:`telegram.Bot.create_new_sticker_set`.
+    """
+    MAX_EMOJI_STICKERS = 200
+    """:obj:`int`: Maximum number of stickers allowed in an emoji sticker set, as given in
+    :meth:`telegram.Bot.add_sticker_to_set`.
+    """
+    MAX_ANIMATED_STICKERS = 50
+    """:obj:`int`: Maximum number of stickers allowed in an animated or video sticker set, as given
+    in :meth:`telegram.Bot.add_sticker_to_set`.
+    """
+    MAX_STATIC_STICKERS = 120
+    """:obj:`int`: Maximum number of stickers allowed in a static sticker set, as given in
+    :meth:`telegram.Bot.add_sticker_to_set`.
+    """
+    MAX_STATIC_THUMBNAIL_SIZE = 128
+    """:obj:`int`: Maximum size of the thumbnail if it is a **.WEBP** or **.PNG** in kilobytes,
+    as given in :meth:`telegram.Bot.set_sticker_set_thumbnail`."""
+    MAX_ANIMATED_THUMBNAIL_SIZE = 32
+    """:obj:`int`: Maximum size of the thumbnail if it is a **.TGS** or **.WEBM** in kilobytes,
+    as given in :meth:`telegram.Bot.set_sticker_set_thumbnail`."""
+    STATIC_THUMB_DIMENSIONS = 100
+    """:obj:`int`: Exact height and width of the thumbnail if it is a **.WEBP** or **.PNG** in
+    pixels, as given in :meth:`telegram.Bot.set_sticker_set_thumbnail`."""
 
 
 class StickerType(StringEnum):

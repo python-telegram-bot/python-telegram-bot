@@ -39,7 +39,13 @@ class VideoNote(_BaseThumbedMedium):
             by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail`.
         file_size (:obj:`int`, optional): File size in bytes.
+        thumbnail (:class:`telegram.PhotoSize`, optional): Video thumbnail.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -50,8 +56,10 @@ class VideoNote(_BaseThumbedMedium):
         length (:obj:`int`): Video width and height (diameter of the video message) as defined
             by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
-        thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
         file_size (:obj:`int`): Optional. File size in bytes.
+        thumbnail (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -65,6 +73,7 @@ class VideoNote(_BaseThumbedMedium):
         duration: int,
         thumb: PhotoSize = None,
         file_size: int = None,
+        thumbnail: PhotoSize = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -73,6 +82,7 @@ class VideoNote(_BaseThumbedMedium):
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
+            thumbnail=thumbnail,
             api_kwargs=api_kwargs,
         )
         with self._unfrozen():

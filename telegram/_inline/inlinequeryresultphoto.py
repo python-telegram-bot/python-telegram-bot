@@ -25,6 +25,10 @@ from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.warnings_transition import (
+    warn_about_deprecated_arg_return_new_arg,
+    warn_about_deprecated_attr_in_property,
+)
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -45,7 +49,15 @@ class InlineQueryResultPhoto(InlineQueryResult):
             :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in JPEG format. Photo size
             must not exceed 5MB.
-        thumb_url (:obj:`str`): URL of the thumbnail for the photo.
+        thumbnail_url (:obj:`str`, optional): URL of the thumbnail for the photo.
+
+            Warning:
+                The Bot API does **not** define this as an optional argument. It is formally
+                optional for backwards compatibility with the deprecated :paramref:`thumb_url`.
+                If you pass neither :paramref:`thumbnail_url` nor :paramref:`thumb_url`,
+                :class:`ValueError` will be raised.
+
+            .. versionadded:: NEXT.VERSION
         photo_width (:obj:`int`, optional): Width of the photo.
         photo_height (:obj:`int`, optional): Height of the photo.
         title (:obj:`str`, optional): Title for the result.
@@ -63,6 +75,14 @@ class InlineQueryResultPhoto(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the photo.
+        thumb_url (:obj:`str`, optional): URL of the thumbnail for the photo.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail_url`.
+
+    Raises:
+        :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
+            supplied or if both are supplied and are not equal.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.PHOTO`.
@@ -71,7 +91,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
             :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in JPEG format. Photo size
             must not exceed 5MB.
-        thumb_url (:obj:`str`): URL of the thumbnail for the photo.
+        thumbnail_url (:obj:`str`): URL of the thumbnail for the photo.
         photo_width (:obj:`int`): Optional. Width of the photo.
         photo_height (:obj:`int`): Optional. Height of the photo.
         title (:obj:`str`): Optional. Title for the result.
@@ -104,14 +124,17 @@ class InlineQueryResultPhoto(InlineQueryResult):
         "parse_mode",
         "input_message_content",
         "photo_height",
-        "thumb_url",
+        "thumbnail_url",
     )
 
     def __init__(
         self,
         id: str,  # pylint: disable=redefined-builtin
         photo_url: str,
-        thumb_url: str,
+        # thumbnail_url is not optional in Telegram API, but we want to support thumb_url as well,
+        # so thumbnail_url may not be passed.  We will raise ValueError manually if neither
+        # thumbnail_url nor thumb_url are passed
+        thumbnail_url: str = None,
         photo_width: int = None,
         photo_height: int = None,
         title: str = None,
@@ -121,14 +144,28 @@ class InlineQueryResultPhoto(InlineQueryResult):
         input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence[MessageEntity] = None,
+        # thumb_url is not optional in Telegram API, but it is here, along with thumbnail_url.
+        thumb_url: str = None,
         *,
         api_kwargs: JSONDict = None,
     ):
+        if not (thumbnail_url or thumb_url):
+            raise ValueError(
+                "You must pass either 'thumbnail_url' or 'thumb_url'. Note that 'thumb_url' is "
+                "deprecated."
+            )
+
         # Required
         super().__init__(InlineQueryResultType.PHOTO, id, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.photo_url: str = photo_url
-            self.thumb_url: str = thumb_url
+            self.thumbnail_url: str = warn_about_deprecated_arg_return_new_arg(
+                deprecated_arg=thumb_url,
+                new_arg=thumbnail_url,
+                deprecated_arg_name="thumb_url",
+                new_arg_name="thumbnail_url",
+                bot_api_version="6.6",
+            )
 
             # Optionals
             self.photo_width: Optional[int] = photo_width
@@ -140,3 +177,17 @@ class InlineQueryResultPhoto(InlineQueryResult):
             self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
+
+    @property
+    def thumb_url(self) -> Optional[str]:
+        """:obj:`str`: URL of the thumbnail for the photo.
+
+        .. deprecated:: NEXT.VERSION
+           |thumbattributedeprecation| :attr:`thumbnail_url`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb_url",
+            new_attr_name="thumbnail_url",
+            bot_api_version="6.6",
+        )
+        return self.thumbnail_url

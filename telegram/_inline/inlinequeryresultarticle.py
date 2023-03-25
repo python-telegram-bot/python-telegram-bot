@@ -23,6 +23,10 @@ from typing import TYPE_CHECKING, Optional
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings_transition import (
+    warn_about_deprecated_arg_return_new_arg,
+    warn_about_deprecated_attr_in_property,
+)
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -49,8 +53,26 @@ class InlineQueryResultArticle(InlineQueryResult):
             in the message.
         description (:obj:`str`, optional): Short description of the result.
         thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail_url`.
         thumb_width (:obj:`int`, optional): Thumbnail width.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail_width`.
         thumb_height (:obj:`int`, optional): Thumbnail height.
+
+            .. deprecated:: NEXT.VERSION
+               |thumbargumentdeprecation| :paramref:`thumbnail_height`.
+        thumbnail_url (:obj:`str`, optional): Url of the thumbnail for the result.
+
+            .. versionadded:: NEXT.VERSION
+        thumbnail_width (:obj:`int`, optional): Thumbnail width.
+
+            .. versionadded:: NEXT.VERSION
+        thumbnail_height (:obj:`int`, optional): Thumbnail height.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.ARTICLE`.
@@ -66,22 +88,28 @@ class InlineQueryResultArticle(InlineQueryResult):
         hide_url (:obj:`bool`): Optional. Pass :obj:`True`, if you don't want the URL to be shown
             in the message.
         description (:obj:`str`): Optional. Short description of the result.
-        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
-        thumb_width (:obj:`int`): Optional. Thumbnail width.
-        thumb_height (:obj:`int`): Optional. Thumbnail height.
+        thumbnail_url (:obj:`str`): Optional. Url of the thumbnail for the result.
+
+            .. versionadded:: NEXT.VERSION
+        thumbnail_width (:obj:`int`): Optional. Thumbnail width.
+
+            .. versionadded:: NEXT.VERSION
+        thumbnail_height (:obj:`int`): Optional. Thumbnail height.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
     __slots__ = (
         "reply_markup",
-        "thumb_width",
-        "thumb_height",
         "hide_url",
         "url",
         "title",
         "description",
         "input_message_content",
-        "thumb_url",
+        "thumbnail_width",
+        "thumbnail_height",
+        "thumbnail_url",
     )
 
     def __init__(
@@ -96,6 +124,9 @@ class InlineQueryResultArticle(InlineQueryResult):
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,
+        thumbnail_url: str = None,
+        thumbnail_width: int = None,
+        thumbnail_height: int = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -110,6 +141,66 @@ class InlineQueryResultArticle(InlineQueryResult):
             self.url: Optional[str] = url
             self.hide_url: Optional[bool] = hide_url
             self.description: Optional[str] = description
-            self.thumb_url: Optional[str] = thumb_url
-            self.thumb_width: Optional[int] = thumb_width
-            self.thumb_height: Optional[int] = thumb_height
+            self.thumbnail_url: Optional[str] = warn_about_deprecated_arg_return_new_arg(
+                deprecated_arg=thumb_url,
+                new_arg=thumbnail_url,
+                deprecated_arg_name="thumb_url",
+                new_arg_name="thumbnail_url",
+                bot_api_version="6.6",
+            )
+            self.thumbnail_width: Optional[int] = warn_about_deprecated_arg_return_new_arg(
+                deprecated_arg=thumb_width,
+                new_arg=thumbnail_width,
+                deprecated_arg_name="thumb_width",
+                new_arg_name="thumbnail_width",
+                bot_api_version="6.6",
+            )
+            self.thumbnail_height: Optional[int] = warn_about_deprecated_arg_return_new_arg(
+                deprecated_arg=thumb_height,
+                new_arg=thumbnail_height,
+                deprecated_arg_name="thumb_height",
+                new_arg_name="thumbnail_height",
+                bot_api_version="6.6",
+            )
+
+    @property
+    def thumb_url(self) -> Optional[str]:
+        """:obj:`str`: Optional. Url of the thumbnail for the result.
+
+        .. deprecated:: NEXT.VERSION
+           |thumbattributedeprecation| :attr:`thumbnail_url`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb_url",
+            new_attr_name="thumbnail_url",
+            bot_api_version="6.6",
+        )
+        return self.thumbnail_url
+
+    @property
+    def thumb_width(self) -> Optional[int]:
+        """:obj:`str`: Optional. Thumbnail width.
+
+        .. deprecated:: NEXT.VERSION
+           |thumbattributedeprecation| :attr:`thumbnail_width`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb_width",
+            new_attr_name="thumbnail_width",
+            bot_api_version="6.6",
+        )
+        return self.thumbnail_width
+
+    @property
+    def thumb_height(self) -> Optional[int]:
+        """:obj:`str`: Optional. Thumbnail height.
+
+        .. deprecated:: NEXT.VERSION
+           |thumbattributedeprecation| :attr:`thumbnail_height`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="thumb_height",
+            new_attr_name="thumbnail_height",
+            bot_api_version="6.6",
+        )
+        return self.thumbnail_height
