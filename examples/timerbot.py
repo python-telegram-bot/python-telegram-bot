@@ -18,8 +18,8 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 
 Note:
-To use arbitrary callback data, you must install ptb via
-`pip install python-telegram-bot[callback-data]`
+To use the JobQueue, you must install PTB via
+`pip install python-telegram-bot[job-queue]`
 """
 
 import logging

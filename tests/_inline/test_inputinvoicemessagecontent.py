@@ -120,7 +120,7 @@ class TestInputInvoiceMessageContentWithoutRequest(TestInputInvoiceMessageConten
             currency=self.currency,
             prices=self.prices,
         )
-        assert input_invoice_message_content.suggested_tip_amounts == tuple()
+        assert input_invoice_message_content.suggested_tip_amounts == ()
 
     def test_to_dict(self, input_invoice_message_content):
         input_invoice_message_content_dict = input_invoice_message_content.to_dict()

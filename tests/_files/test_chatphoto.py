@@ -36,7 +36,7 @@ from tests.auxil.networking import expect_bad_request
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def chatphoto_file():
     with data_file("telegram.jpg").open("rb") as f:
         yield f
@@ -174,7 +174,8 @@ class TestChatPhotoWithRequest:
             await file.download_to_drive(jpg_file)
             assert jpg_file.is_file()
 
-        assert "small" in asserts and "big" in asserts
+        assert "small" in asserts
+        assert "big" in asserts
 
     async def test_send_all_args(self, bot, super_group_id, chatphoto_file):
         async def func():
@@ -185,9 +186,7 @@ class TestChatPhotoWithRequest:
         )
 
     async def test_error_send_empty_file(self, bot, super_group_id):
-        chatphoto_file = open(os.devnull, "rb")
-
-        with pytest.raises(TelegramError):
+        with Path(os.devnull).open("rb") as chatphoto_file, pytest.raises(TelegramError):
             await bot.set_chat_photo(chat_id=super_group_id, photo=chatphoto_file)
 
     async def test_error_send_empty_file_id(self, bot, super_group_id):

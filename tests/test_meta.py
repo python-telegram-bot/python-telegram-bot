@@ -23,13 +23,13 @@ import pytest
 from tests.auxil.envvars import env_var_2_bool
 
 skip_disabled = pytest.mark.skipif(
-    not env_var_2_bool(os.getenv("TEST_BUILD", False)), reason="TEST_BUILD not enabled"
+    not env_var_2_bool(os.getenv("TEST_BUILD", "")), reason="TEST_BUILD not enabled"
 )
 
 
 # To make the tests agnostic of the cwd
 @pytest.fixture(autouse=True)
-def change_test_dir(request, monkeypatch):
+def _change_test_dir(request, monkeypatch):
     monkeypatch.chdir(request.config.rootdir)
 
 

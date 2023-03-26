@@ -37,6 +37,8 @@ __all__ = (  # Keep this alphabetically ordered
     "BotCommandScopeChatAdministrators",
     "BotCommandScopeChatMember",
     "BotCommandScopeDefault",
+    "BotDescription",
+    "BotShortDescription",
     "CallbackGame",
     "CallbackQuery",
     "Chat",
@@ -114,6 +116,7 @@ __all__ = (  # Keep this alphabetically ordered
     "InputMediaPhoto",
     "InputMediaVideo",
     "InputMessageContent",
+    "InputSticker",
     "InputTextMessageContent",
     "InputVenueMessageContent",
     "Invoice",
@@ -200,6 +203,7 @@ from ._botcommandscope import (
     BotCommandScopeChatMember,
     BotCommandScopeDefault,
 )
+from ._botdescription import BotDescription, BotShortDescription
 from ._callbackquery import CallbackQuery
 from ._chat import Chat
 from ._chatadministratorrights import ChatAdministratorRights
@@ -234,6 +238,7 @@ from ._files.inputmedia import (
     InputMediaPhoto,
     InputMediaVideo,
 )
+from ._files.inputsticker import InputSticker
 from ._files.location import Location
 from ._files.photosize import PhotoSize
 from ._files.sticker import MaskPosition, Sticker, StickerSet

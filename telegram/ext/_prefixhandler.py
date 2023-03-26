@@ -132,15 +132,9 @@ class PrefixHandler(BaseHandler[Update, CCT]):
     ):
         super().__init__(callback=callback, block=block)
 
-        if isinstance(prefix, str):
-            prefixes = {prefix.lower()}
-        else:
-            prefixes = {x.lower() for x in prefix}
+        prefixes = {prefix.lower()} if isinstance(prefix, str) else {x.lower() for x in prefix}
 
-        if isinstance(command, str):
-            commands = {command.lower()}
-        else:
-            commands = {x.lower() for x in command}
+        commands = {command.lower()} if isinstance(command, str) else {x.lower() for x in command}
 
         self.commands: FrozenSet[str] = frozenset(
             p + c for p, c in itertools.product(prefixes, commands)

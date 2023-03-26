@@ -38,7 +38,7 @@ def inputfiles() -> Dict[bool, InputFile]:
 def input_media_video() -> InputMediaVideo:
     return InputMediaVideo(
         media=data_file("telegram.mp4").read_bytes(),
-        thumb=data_file("telegram.jpg").read_bytes(),
+        thumbnail=data_file("telegram.jpg").read_bytes(),
         parse_mode=None,
     )
 
@@ -92,7 +92,7 @@ def file_params(inputfiles, input_media_video, input_media_photo) -> Dict[str, A
 def file_jsons(inputfiles, input_media_video, input_media_photo) -> Dict[str, Any]:
     input_media_video_dict = input_media_video.to_dict()
     input_media_video_dict["media"] = input_media_video.media.attach_uri
-    input_media_video_dict["thumb"] = input_media_video.thumb.attach_uri
+    input_media_video_dict["thumbnail"] = input_media_video.thumbnail.attach_uri
     input_media_photo_dict = input_media_photo.to_dict()
     input_media_photo_dict["media"] = input_media_photo.media.attach_uri
     return {
@@ -152,7 +152,7 @@ class TestRequestDataWithoutRequest:
         }
         video_value = {
             "media": input_media_video.media.attach_uri,
-            "thumb": input_media_video.thumb.attach_uri,
+            "thumbnail": input_media_video.thumbnail.attach_uri,
             "type": input_media_video.type,
         }
         photo_value = {"media": input_media_photo.media.attach_uri, "type": input_media_photo.type}
@@ -196,7 +196,7 @@ class TestRequestDataWithoutRequest:
             "inputfile_no_attach": inputfiles[False].field_tuple,
             input_media_photo.media.attach_name: input_media_photo.media.field_tuple,
             input_media_video.media.attach_name: input_media_video.media.field_tuple,
-            input_media_video.thumb.attach_name: input_media_video.thumb.field_tuple,
+            input_media_video.thumbnail.attach_name: input_media_video.thumbnail.field_tuple,
         }
         assert simple_rqs.multipart_data == {}
         assert file_rqs.multipart_data == expected

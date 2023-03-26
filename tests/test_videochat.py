@@ -116,7 +116,7 @@ class TestVideoChatParticipantsInvitedWithoutRequest:
         assert video_chat_participants.users[0].id == user1.id
         assert video_chat_participants.users[1].id == user2.id
 
-    @pytest.mark.parametrize("use_users", (True, False))
+    @pytest.mark.parametrize("use_users", [True, False])
     def test_to_dict(self, user1, user2, use_users):
         video_chat_participants = VideoChatParticipantsInvited([user1, user2] if use_users else ())
         video_chat_dict = video_chat_participants.to_dict()

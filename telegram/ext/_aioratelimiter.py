@@ -203,7 +203,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
                 return await callback(*args, **kwargs)
 
     # mypy doesn't understand that the last run of the for loop raises an exception
-    async def process_request(  # type: ignore[return]
+    async def process_request(
         self,
         callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
         args: Any,
@@ -232,10 +232,8 @@ class AIORateLimiter(BaseRateLimiter[int]):
             chat = True
 
         # In case user passes integer chat id as string
-        try:
+        with contextlib.suppress(ValueError, TypeError):
             chat_id = int(chat_id)
-        except (ValueError, TypeError):
-            pass
 
         if (isinstance(chat_id, int) and chat_id < 0) or isinstance(chat_id, str):
             # string chat_id only works for channels and supergroups
@@ -262,3 +260,4 @@ class AIORateLimiter(BaseRateLimiter[int]):
             finally:
                 # Allow other requests to be processed
                 self._retry_after_event.set()
+        return None  # type: ignore[return-value]

@@ -19,7 +19,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 import datetime
-import sys
 from html import escape
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
 
@@ -829,11 +828,8 @@ class Message(TelegramObject):
         a private chat or normal group, returns a t.me link of the message.
         """
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
-            if self.chat.username:
-                to_link = self.chat.username
-            else:
-                # Get rid of leading -100 for supergroups
-                to_link = f"c/{str(self.chat.id)[4:]}"
+            # the else block gets rid of leading -100 for supergroups:
+            to_link = self.chat.username if self.chat.username else f"c/{str(self.chat.id)[4:]}"
             return f"https://t.me/{to_link}/{self.message_id}"
         return None
 
@@ -1374,6 +1370,7 @@ class Message(TelegramObject):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1421,6 +1418,7 @@ class Message(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            thumbnail=thumbnail,
         )
 
     async def reply_document(
@@ -1437,6 +1435,7 @@ class Message(TelegramObject):
         caption_entities: Sequence["MessageEntity"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1482,6 +1481,7 @@ class Message(TelegramObject):
             caption_entities=caption_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            thumbnail=thumbnail,
         )
 
     async def reply_animation(
@@ -1501,6 +1501,7 @@ class Message(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1550,6 +1551,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
+            thumbnail=thumbnail,
         )
 
     async def reply_sticker(
@@ -1561,6 +1563,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        emoji: str = None,
         *,
         quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1599,6 +1602,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            emoji=emoji,
         )
 
     async def reply_video(
@@ -1619,6 +1623,7 @@ class Message(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         has_spoiler: bool = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1668,6 +1673,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
+            thumbnail=thumbnail,
         )
 
     async def reply_video_note(
@@ -1682,6 +1688,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        thumbnail: FileInput = None,
         *,
         filename: str = None,
         quote: bool = None,
@@ -1726,6 +1733,7 @@ class Message(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            thumbnail=thumbnail,
         )
 
     async def reply_voice(
@@ -3125,10 +3133,6 @@ class Message(TelegramObject):
         if not self.text:
             raise RuntimeError("This Message has no 'text'.")
 
-        # Is it a narrow build, if so we don't need to convert
-        if sys.maxunicode == 0xFFFF:
-            return self.text[entity.offset : entity.offset + entity.length]
-
         entity_text = self.text.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
         return entity_text.decode("utf-16-le")
@@ -3154,10 +3158,6 @@ class Message(TelegramObject):
         """
         if not self.caption:
             raise RuntimeError("This Message has no 'caption'.")
-
-        # Is it a narrow build, if so we don't need to convert
-        if sys.maxunicode == 0xFFFF:
-            return self.caption[entity.offset : entity.offset + entity.length]
 
         entity_text = self.caption.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
@@ -3235,8 +3235,7 @@ class Message(TelegramObject):
         if message_text is None:
             return None
 
-        if sys.maxunicode != 0xFFFF:
-            message_text = message_text.encode("utf-16-le")  # type: ignore
+        message_text = message_text.encode("utf-16-le")  # type: ignore
 
         html_text = ""
         last_offset = 0
@@ -3256,78 +3255,66 @@ class Message(TelegramObject):
                 parsed_entities.extend(list(nested_entities.keys()))
 
                 orig_text = text
-                text = escape(text)
+                escaped_text = escape(text)
 
                 if nested_entities:
-                    text = Message._parse_html(
+                    escaped_text = Message._parse_html(
                         orig_text, nested_entities, urled=urled, offset=entity.offset
                     )
 
                 if entity.type == MessageEntity.TEXT_LINK:
-                    insert = f'<a href="{entity.url}">{text}</a>'
+                    insert = f'<a href="{entity.url}">{escaped_text}</a>'
                 elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = f'<a href="tg://user?id={entity.user.id}">{text}</a>'
+                    insert = f'<a href="tg://user?id={entity.user.id}">{escaped_text}</a>'
                 elif entity.type == MessageEntity.URL and urled:
-                    insert = f'<a href="{text}">{text}</a>'
+                    insert = f'<a href="{escaped_text}">{escaped_text}</a>'
                 elif entity.type == MessageEntity.BOLD:
-                    insert = f"<b>{text}</b>"
+                    insert = f"<b>{escaped_text}</b>"
                 elif entity.type == MessageEntity.ITALIC:
-                    insert = f"<i>{text}</i>"
+                    insert = f"<i>{escaped_text}</i>"
                 elif entity.type == MessageEntity.CODE:
-                    insert = f"<code>{text}</code>"
+                    insert = f"<code>{escaped_text}</code>"
                 elif entity.type == MessageEntity.PRE:
                     if entity.language:
-                        insert = f'<pre><code class="{entity.language}">{text}</code></pre>'
+                        insert = (
+                            f'<pre><code class="{entity.language}">{escaped_text}</code></pre>'
+                        )
                     else:
-                        insert = f"<pre>{text}</pre>"
+                        insert = f"<pre>{escaped_text}</pre>"
                 elif entity.type == MessageEntity.UNDERLINE:
-                    insert = f"<u>{text}</u>"
+                    insert = f"<u>{escaped_text}</u>"
                 elif entity.type == MessageEntity.STRIKETHROUGH:
-                    insert = f"<s>{text}</s>"
+                    insert = f"<s>{escaped_text}</s>"
                 elif entity.type == MessageEntity.SPOILER:
-                    insert = f'<span class="tg-spoiler">{text}</span>'
+                    insert = f'<span class="tg-spoiler">{escaped_text}</span>'
                 else:
-                    insert = text
+                    insert = escaped_text
 
                 if offset == 0:
-                    if sys.maxunicode == 0xFFFF:
-                        html_text += (
-                            escape(message_text[last_offset : entity.offset - offset]) + insert
-                        )
-                    else:
-                        html_text += (
-                            escape(
-                                message_text[  # type: ignore
-                                    last_offset * 2 : (entity.offset - offset) * 2
-                                ].decode("utf-16-le")
-                            )
-                            + insert
-                        )
-                else:
-                    if sys.maxunicode == 0xFFFF:
-                        html_text += message_text[last_offset : entity.offset - offset] + insert
-                    else:
-                        html_text += (
+                    html_text += (
+                        escape(
                             message_text[  # type: ignore
                                 last_offset * 2 : (entity.offset - offset) * 2
                             ].decode("utf-16-le")
-                            + insert
                         )
+                        + insert
+                    )
+                else:
+                    html_text += (
+                        message_text[  # type: ignore
+                            last_offset * 2 : (entity.offset - offset) * 2
+                        ].decode("utf-16-le")
+                        + insert
+                    )
 
                 last_offset = entity.offset - offset + entity.length
 
         if offset == 0:
-            if sys.maxunicode == 0xFFFF:
-                html_text += escape(message_text[last_offset:])
-            else:
-                html_text += escape(
-                    message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
-                )
+            html_text += escape(
+                message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+            )
         else:
-            if sys.maxunicode == 0xFFFF:
-                html_text += message_text[last_offset:]
-            else:
-                html_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+            html_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
 
         return html_text
 
@@ -3420,8 +3407,7 @@ class Message(TelegramObject):
         if message_text is None:
             return None
 
-        if sys.maxunicode != 0xFFFF:
-            message_text = message_text.encode("utf-16-le")  # type: ignore
+        message_text = message_text.encode("utf-16-le")  # type: ignore
 
         markdown_text = ""
         last_offset = 0
@@ -3440,8 +3426,7 @@ class Message(TelegramObject):
                 }
                 parsed_entities.extend(list(nested_entities.keys()))
 
-                orig_text = text
-                text = escape_markdown(text, version=version)
+                escaped_text = escape_markdown(text, version=version)
 
                 if nested_entities:
                     if version < 2:
@@ -3449,8 +3434,8 @@ class Message(TelegramObject):
                             "Nested entities are not supported for Markdown version 1"
                         )
 
-                    text = Message._parse_markdown(
-                        orig_text,
+                    escaped_text = Message._parse_markdown(
+                        text,
                         nested_entities,
                         urled=urled,
                         offset=entity.offset,
@@ -3465,105 +3450,78 @@ class Message(TelegramObject):
                         url = escape_markdown(
                             entity.url, version=version, entity_type=MessageEntity.TEXT_LINK
                         )
-                    insert = f"[{text}]({url})"
+                    insert = f"[{escaped_text}]({url})"
                 elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = f"[{text}](tg://user?id={entity.user.id})"
+                    insert = f"[{escaped_text}](tg://user?id={entity.user.id})"
                 elif entity.type == MessageEntity.URL and urled:
-                    if version == 1:
-                        link = orig_text
-                    else:
-                        link = text
-                    insert = f"[{link}]({orig_text})"
+                    link = text if version == 1 else escaped_text
+                    insert = f"[{link}]({text})"
                 elif entity.type == MessageEntity.BOLD:
-                    insert = f"*{text}*"
+                    insert = f"*{escaped_text}*"
                 elif entity.type == MessageEntity.ITALIC:
-                    insert = f"_{text}_"
+                    insert = f"_{escaped_text}_"
                 elif entity.type == MessageEntity.CODE:
                     # Monospace needs special escaping. Also can't have entities nested within
-                    insert = f"`{escape_markdown(orig_text, version, MessageEntity.CODE)}`"
+                    insert = f"`{escape_markdown(text, version, MessageEntity.CODE)}`"
 
                 elif entity.type == MessageEntity.PRE:
                     # Monospace needs special escaping. Also can't have entities nested within
-                    code = escape_markdown(
-                        orig_text, version=version, entity_type=MessageEntity.PRE
-                    )
+                    code = escape_markdown(text, version=version, entity_type=MessageEntity.PRE)
                     if entity.language:
                         prefix = f"```{entity.language}\n"
+                    elif code.startswith("\\"):
+                        prefix = "```"
                     else:
-                        if code.startswith("\\"):
-                            prefix = "```"
-                        else:
-                            prefix = "```\n"
+                        prefix = "```\n"
                     insert = f"{prefix}{code}```"
                 elif entity.type == MessageEntity.UNDERLINE:
                     if version == 1:
                         raise ValueError(
                             "Underline entities are not supported for Markdown version 1"
                         )
-                    insert = f"__{text}__"
+                    insert = f"__{escaped_text}__"
                 elif entity.type == MessageEntity.STRIKETHROUGH:
                     if version == 1:
                         raise ValueError(
                             "Strikethrough entities are not supported for Markdown version 1"
                         )
-                    insert = f"~{text}~"
+                    insert = f"~{escaped_text}~"
                 elif entity.type == MessageEntity.SPOILER:
                     if version == 1:
                         raise ValueError(
                             "Spoiler entities are not supported for Markdown version 1"
                         )
-                    insert = f"||{text}||"
+                    insert = f"||{escaped_text}||"
                 else:
-                    insert = text
+                    insert = escaped_text
 
                 if offset == 0:
-                    if sys.maxunicode == 0xFFFF:
-                        markdown_text += (
-                            escape_markdown(
-                                message_text[last_offset : entity.offset - offset], version=version
-                            )
-                            + insert
-                        )
-                    else:
-                        markdown_text += (
-                            escape_markdown(
-                                message_text[  # type: ignore
-                                    last_offset * 2 : (entity.offset - offset) * 2
-                                ].decode("utf-16-le"),
-                                version=version,
-                            )
-                            + insert
-                        )
-                else:
-                    if sys.maxunicode == 0xFFFF:
-                        markdown_text += (
-                            message_text[last_offset : entity.offset - offset] + insert
-                        )
-                    else:
-                        markdown_text += (
+                    markdown_text += (
+                        escape_markdown(
                             message_text[  # type: ignore
                                 last_offset * 2 : (entity.offset - offset) * 2
-                            ].decode("utf-16-le")
-                            + insert
+                            ].decode("utf-16-le"),
+                            version=version,
                         )
+                        + insert
+                    )
+                else:
+                    markdown_text += (
+                        message_text[  # type: ignore
+                            last_offset * 2 : (entity.offset - offset) * 2
+                        ].decode("utf-16-le")
+                        + insert
+                    )
 
                 last_offset = entity.offset - offset + entity.length
 
         if offset == 0:
-            if sys.maxunicode == 0xFFFF:
-                markdown_text += escape_markdown(message_text[last_offset:], version=version)
-            else:
-                markdown_text += escape_markdown(
-                    message_text[last_offset * 2 :].decode("utf-16-le"),  # type: ignore
-                    version=version,
-                )
+            markdown_text += escape_markdown(
+                message_text[last_offset * 2 :].decode("utf-16-le"),  # type: ignore
+                version=version,
+            )
         else:
-            if sys.maxunicode == 0xFFFF:
-                markdown_text += message_text[last_offset:]
-            else:
-                markdown_text += message_text[last_offset * 2 :].decode(  # type: ignore
-                    "utf-16-le"
-                )
+            markdown_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
 
         return markdown_text
 

@@ -93,7 +93,7 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
         assert inline_keyboard_button_dict["pay"] == inline_keyboard_button.pay
         assert (
             inline_keyboard_button_dict["login_url"] == inline_keyboard_button.login_url.to_dict()
-        )  # NOQA: E127
+        )
         assert inline_keyboard_button_dict["web_app"] == inline_keyboard_button.web_app.to_dict()
 
     def test_de_json(self, bot):

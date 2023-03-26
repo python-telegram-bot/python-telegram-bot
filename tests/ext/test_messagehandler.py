@@ -83,7 +83,7 @@ class TestMessageHandler:
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = False
 
     async def callback(self, update, context):

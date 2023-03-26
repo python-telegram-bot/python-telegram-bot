@@ -100,8 +100,7 @@ def event_loop(request):
     # https://github.com/python/cpython/issues/83413, https://github.com/encode/httpx/issues/914
     if sys.version_info[0] == 3 and sys.version_info[1] >= 8 and sys.platform.startswith("win"):
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
+    return asyncio.get_event_loop_policy().new_event_loop()
     # loop.close() # instead of closing here, do that at the every end of the test session
 
 
@@ -117,7 +116,7 @@ async def bot(bot_info):
         yield _bot
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def one_time_bot(bot_info):
     """A function scoped bot since the session bot would shutdown when `async with app` finishes"""
     return make_bot(bot_info)
@@ -199,7 +198,7 @@ def provider_token(bot_info):
     return bot_info["payment_provider_token"]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def app(bot_info):
     # We build a new bot each time so that we use `app` in a context manager without problems
     application = (
@@ -211,7 +210,7 @@ async def app(bot_info):
         await application.shutdown()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def updater(bot_info):
     # We build a new bot each time so that we use `updater` in a context manager without problems
     up = Updater(bot=make_bot(bot_info), update_queue=asyncio.Queue())
@@ -221,7 +220,7 @@ async def updater(bot_info):
         await up.shutdown()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def thumb_file():
     with data_file("thumb.jpg").open("rb") as f:
         yield f
@@ -266,7 +265,7 @@ def _get_false_update_fixture_decorator_params():
     return {"params": params, "ids": ids}
 
 
-@pytest.fixture(scope="function", **_get_false_update_fixture_decorator_params())
+@pytest.fixture(**_get_false_update_fixture_decorator_params())
 def false_update(request):
     return Update(update_id=1, **request.param)
 
@@ -275,9 +274,8 @@ def false_update(request):
 def tzinfo(request):
     if TEST_WITH_OPT_DEPS:
         return pytz.timezone(request.param)
-    else:
-        hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
-        return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
+    hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
+    return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
 
 
 @pytest.fixture(scope="session")

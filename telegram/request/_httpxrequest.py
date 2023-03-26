@@ -86,7 +86,7 @@ class HTTPXRequest(BaseRequest):
             Defaults to ``"1.1"``.
 
             .. versionadded:: 20.1
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.2
                 Reset the default version to 1.1.
 
     """
@@ -122,7 +122,7 @@ class HTTPXRequest(BaseRequest):
 
         # See https://github.com/python-telegram-bot/python-telegram-bot/pull/3542
         # for why we need to use `dict()` here.
-        self._client_kwargs = dict(  # pylint: disable=use-dict-literal
+        self._client_kwargs = dict(  # pylint: disable=use-dict-literal  # noqa: C408
             timeout=timeout,
             proxies=proxy_url,
             limits=limits,
@@ -151,7 +151,7 @@ class HTTPXRequest(BaseRequest):
         """
         :obj:`str`: Used HTTP version, see :paramref:`http_version`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.2
         """
         return self._http_version
 

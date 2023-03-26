@@ -107,15 +107,15 @@ class TestReplyKeyboardMarkupWithoutRequest(TestReplyKeyboardMarkupBase):
         assert hash(a) != hash(f)
 
     def test_wrong_keyboard_inputs(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="should be a sequence of sequences"):
             ReplyKeyboardMarkup([["button1"], 1])
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="should be a sequence of sequences"):
             ReplyKeyboardMarkup("strings_are_not_allowed")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="should be a sequence of sequences"):
             ReplyKeyboardMarkup(["strings_are_not_allowed_in_the_rows_either"])
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="should be a sequence of sequences"):
             ReplyKeyboardMarkup(KeyboardButton("button1"))
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="should be a sequence of sequences"):
             ReplyKeyboardMarkup([[["button1"]]])
 
     def test_from_button(self):
