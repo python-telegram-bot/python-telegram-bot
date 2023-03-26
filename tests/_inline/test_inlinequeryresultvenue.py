@@ -25,6 +25,7 @@ from telegram import (
     InlineQueryResultVoice,
     InputTextMessageContent,
 )
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.slots import mro_slots
 
 
@@ -38,9 +39,9 @@ def inline_query_result_venue():
         TestInlineQueryResultVenueBase.address,
         foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
         foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
-        thumb_url=TestInlineQueryResultVenueBase.thumb_url,
-        thumb_width=TestInlineQueryResultVenueBase.thumb_width,
-        thumb_height=TestInlineQueryResultVenueBase.thumb_height,
+        thumbnail_url=TestInlineQueryResultVenueBase.thumbnail_url,
+        thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
+        thumbnail_height=TestInlineQueryResultVenueBase.thumbnail_height,
         input_message_content=TestInlineQueryResultVenueBase.input_message_content,
         reply_markup=TestInlineQueryResultVenueBase.reply_markup,
         google_place_id=TestInlineQueryResultVenueBase.google_place_id,
@@ -59,9 +60,9 @@ class TestInlineQueryResultVenueBase:
     foursquare_type = "foursquare type"
     google_place_id = "google place id"
     google_place_type = "google place type"
-    thumb_url = "thumb url"
-    thumb_width = 10
-    thumb_height = 15
+    thumbnail_url = "thumb url"
+    thumbnail_width = 10
+    thumbnail_height = 15
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
@@ -84,14 +85,146 @@ class TestInlineQueryResultVenueWithoutRequest(TestInlineQueryResultVenueBase):
         assert inline_query_result_venue.foursquare_type == self.foursquare_type
         assert inline_query_result_venue.google_place_id == self.google_place_id
         assert inline_query_result_venue.google_place_type == self.google_place_type
-        assert inline_query_result_venue.thumb_url == self.thumb_url
-        assert inline_query_result_venue.thumb_width == self.thumb_width
-        assert inline_query_result_venue.thumb_height == self.thumb_height
+        assert inline_query_result_venue.thumbnail_url == self.thumbnail_url
+        assert inline_query_result_venue.thumbnail_width == self.thumbnail_width
+        assert inline_query_result_venue.thumbnail_height == self.thumbnail_height
         assert (
             inline_query_result_venue.input_message_content.to_dict()
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_venue.reply_markup.to_dict() == self.reply_markup.to_dict()
+
+    def test_thumb_url_property_deprecation_warning(self, recwarn):
+        inline_query_result_venue = InlineQueryResultVenue(
+            TestInlineQueryResultVenueBase.id_,
+            TestInlineQueryResultVenueBase.latitude,
+            TestInlineQueryResultVenueBase.longitude,
+            TestInlineQueryResultVenueBase.title,
+            TestInlineQueryResultVenueBase.address,
+            foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
+            foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
+            input_message_content=TestInlineQueryResultVenueBase.input_message_content,
+            reply_markup=TestInlineQueryResultVenueBase.reply_markup,
+            google_place_id=TestInlineQueryResultVenueBase.google_place_id,
+            google_place_type=TestInlineQueryResultVenueBase.google_place_type,
+            thumb_url=TestInlineQueryResultVenueBase.thumbnail_url,  # deprecated arg
+            thumbnail_height=TestInlineQueryResultVenueBase.thumbnail_height,
+            thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
+        )
+        assert inline_query_result_venue.thumb_url == inline_query_result_venue.thumbnail_url
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
+        )
+
+    def test_thumb_height_property_deprecation_warning(self, recwarn):
+        inline_query_result_venue = InlineQueryResultVenue(
+            TestInlineQueryResultVenueBase.id_,
+            TestInlineQueryResultVenueBase.latitude,
+            TestInlineQueryResultVenueBase.longitude,
+            TestInlineQueryResultVenueBase.title,
+            TestInlineQueryResultVenueBase.address,
+            foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
+            foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
+            input_message_content=TestInlineQueryResultVenueBase.input_message_content,
+            reply_markup=TestInlineQueryResultVenueBase.reply_markup,
+            google_place_id=TestInlineQueryResultVenueBase.google_place_id,
+            google_place_type=TestInlineQueryResultVenueBase.google_place_type,
+            thumbnail_url=TestInlineQueryResultVenueBase.thumbnail_url,
+            thumb_height=TestInlineQueryResultVenueBase.thumbnail_height,  # deprecated arg
+            thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
+        )
+        assert inline_query_result_venue.thumb_height == inline_query_result_venue.thumbnail_height
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn, __file__, deprecated_name="thumb_height", new_name="thumbnail_height"
+        )
+
+    def test_thumb_width_property_deprecation_warning(self, recwarn):
+        inline_query_result_venue = InlineQueryResultVenue(
+            TestInlineQueryResultVenueBase.id_,
+            TestInlineQueryResultVenueBase.latitude,
+            TestInlineQueryResultVenueBase.longitude,
+            TestInlineQueryResultVenueBase.title,
+            TestInlineQueryResultVenueBase.address,
+            foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
+            foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
+            input_message_content=TestInlineQueryResultVenueBase.input_message_content,
+            reply_markup=TestInlineQueryResultVenueBase.reply_markup,
+            google_place_id=TestInlineQueryResultVenueBase.google_place_id,
+            google_place_type=TestInlineQueryResultVenueBase.google_place_type,
+            thumbnail_url=TestInlineQueryResultVenueBase.thumbnail_url,
+            thumbnail_height=TestInlineQueryResultVenueBase.thumbnail_height,
+            thumb_width=TestInlineQueryResultVenueBase.thumbnail_width,  # deprecated arg
+        )
+        assert inline_query_result_venue.thumb_width == inline_query_result_venue.thumbnail_width
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
+        )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
+        with pytest.raises(
+            ValueError, match="different entities as 'thumb_url' and 'thumbnail_url'"
+        ):
+            InlineQueryResultVenue(
+                TestInlineQueryResultVenueBase.id_,
+                TestInlineQueryResultVenueBase.latitude,
+                TestInlineQueryResultVenueBase.longitude,
+                TestInlineQueryResultVenueBase.title,
+                TestInlineQueryResultVenueBase.address,
+                foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
+                foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
+                input_message_content=TestInlineQueryResultVenueBase.input_message_content,
+                reply_markup=TestInlineQueryResultVenueBase.reply_markup,
+                google_place_id=TestInlineQueryResultVenueBase.google_place_id,
+                google_place_type=TestInlineQueryResultVenueBase.google_place_type,
+                thumbnail_url=TestInlineQueryResultVenueBase.thumbnail_url,
+                thumb_url="some other url",
+                thumbnail_height=TestInlineQueryResultVenueBase.thumbnail_height,
+                thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_height(self):
+        with pytest.raises(
+            ValueError, match="different entities as 'thumb_height' and 'thumbnail_height'"
+        ):
+            InlineQueryResultVenue(
+                TestInlineQueryResultVenueBase.id_,
+                TestInlineQueryResultVenueBase.latitude,
+                TestInlineQueryResultVenueBase.longitude,
+                TestInlineQueryResultVenueBase.title,
+                TestInlineQueryResultVenueBase.address,
+                foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
+                foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
+                input_message_content=TestInlineQueryResultVenueBase.input_message_content,
+                reply_markup=TestInlineQueryResultVenueBase.reply_markup,
+                google_place_id=TestInlineQueryResultVenueBase.google_place_id,
+                google_place_type=TestInlineQueryResultVenueBase.google_place_type,
+                thumbnail_url=TestInlineQueryResultVenueBase.thumbnail_url,
+                thumbnail_height=TestInlineQueryResultVenueBase.thumbnail_height,
+                thumb_height=TestInlineQueryResultVenueBase.thumbnail_height + 1,
+                thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_width(self):
+        with pytest.raises(
+            ValueError, match="different entities as 'thumb_width' and 'thumbnail_width'"
+        ):
+            InlineQueryResultVenue(
+                TestInlineQueryResultVenueBase.id_,
+                TestInlineQueryResultVenueBase.latitude,
+                TestInlineQueryResultVenueBase.longitude,
+                TestInlineQueryResultVenueBase.title,
+                TestInlineQueryResultVenueBase.address,
+                foursquare_id=TestInlineQueryResultVenueBase.foursquare_id,
+                foursquare_type=TestInlineQueryResultVenueBase.foursquare_type,
+                input_message_content=TestInlineQueryResultVenueBase.input_message_content,
+                reply_markup=TestInlineQueryResultVenueBase.reply_markup,
+                google_place_id=TestInlineQueryResultVenueBase.google_place_id,
+                google_place_type=TestInlineQueryResultVenueBase.google_place_type,
+                thumbnail_url=TestInlineQueryResultVenueBase.thumbnail_url,
+                thumbnail_height=TestInlineQueryResultVenueBase.thumbnail_height,
+                thumbnail_width=TestInlineQueryResultVenueBase.thumbnail_width,
+                thumb_width=TestInlineQueryResultVenueBase.thumbnail_width + 1,
+            )
 
     def test_to_dict(self, inline_query_result_venue):
         inline_query_result_venue_dict = inline_query_result_venue.to_dict()
@@ -119,13 +252,17 @@ class TestInlineQueryResultVenueWithoutRequest(TestInlineQueryResultVenueBase):
             inline_query_result_venue_dict["google_place_type"]
             == inline_query_result_venue.google_place_type
         )
-        assert inline_query_result_venue_dict["thumb_url"] == inline_query_result_venue.thumb_url
         assert (
-            inline_query_result_venue_dict["thumb_width"] == inline_query_result_venue.thumb_width
+            inline_query_result_venue_dict["thumbnail_url"]
+            == inline_query_result_venue.thumbnail_url
         )
         assert (
-            inline_query_result_venue_dict["thumb_height"]
-            == inline_query_result_venue.thumb_height
+            inline_query_result_venue_dict["thumbnail_width"]
+            == inline_query_result_venue.thumbnail_width
+        )
+        assert (
+            inline_query_result_venue_dict["thumbnail_height"]
+            == inline_query_result_venue.thumbnail_height
         )
         assert (
             inline_query_result_venue_dict["input_message_content"]

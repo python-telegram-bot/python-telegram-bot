@@ -37,7 +37,7 @@ class TestDefaultValue:
         assert df_1 != df_2
 
     @pytest.mark.parametrize(
-        "value,expected",
+        ("value", "expected"),
         [
             ({}, False),
             ({1: 2}, True),
@@ -67,8 +67,7 @@ class TestDefaultValue:
         def foo(arg=default_one):
             if arg is default_one:
                 return 1
-            else:
-                return 2
+            return 2
 
         assert foo() == 1
         assert foo(None) == 2

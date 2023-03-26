@@ -157,6 +157,23 @@
       - Used for getting the number of members in a chat
     * - :meth:`~telegram.Bot.get_chat_member`
       - Used for getting a member of a chat
+    * - :meth:`~telegram.Bot.leave_chat`
+      - Used for leaving a chat
+
+.. raw:: html
+
+   </details>
+   <br>
+
+.. raw:: html
+
+   <details>
+   <summary>Bot settings</summary>
+
+.. list-table::
+    :align: left
+    :widths: 1 4
+
     * - :meth:`~telegram.Bot.set_my_commands`
       - Used for setting the list of commands
     * - :meth:`~telegram.Bot.delete_my_commands`
@@ -171,8 +188,14 @@
       - Used for obtaining the menu button of a private chat or the default menu button
     * - :meth:`~telegram.Bot.set_chat_menu_button`
       - Used for setting the menu button of a private chat or the default menu button
-    * - :meth:`~telegram.Bot.leave_chat`
-      - Used for leaving a chat
+    * - :meth:`~telegram.Bot.set_my_description`
+      - Used for setting the description of the bot
+    * - :meth:`~telegram.Bot.get_my_description`
+      - Used for obtaining the description of the bot
+    * - :meth:`~telegram.Bot.set_my_short_description`
+      - Used for setting the short description of the bot
+    * - :meth:`~telegram.Bot.get_my_short_description`
+      - Used for obtaining the short description of the bot
 
 .. raw:: html
 
@@ -194,14 +217,26 @@
       - Used for deleting a sticker from a set
     * - :meth:`~telegram.Bot.create_new_sticker_set`
       - Used for creating a new sticker set
+    * - :meth:`~telegram.Bot.delete_sticker_set`
+      - Used for deleting a sticker set made by a bot
     * - :meth:`~telegram.Bot.set_chat_sticker_set`
-      - Used for setting a sticker set
+      - Used for setting a sticker set of a chat
     * - :meth:`~telegram.Bot.delete_chat_sticker_set`
-      - Used for deleting the set sticker set
+      - Used for deleting the set sticker set of a chat
     * - :meth:`~telegram.Bot.set_sticker_position_in_set`
       - Used for moving a sticker's position in the set
+    * - :meth:`~telegram.Bot.set_sticker_set_title`
+      - Used for setting the title of a sticker set
+    * - :meth:`~telegram.Bot.set_sticker_emoji_list`
+      - Used for setting the emoji list of a sticker
+    * - :meth:`~telegram.Bot.set_sticker_keywords`
+      - Used for setting the keywords of a sticker
+    * - :meth:`~telegram.Bot.set_sticker_mask_position`
+      - Used for setting the mask position of a mask sticker
     * - :meth:`~telegram.Bot.set_sticker_set_thumb`
       - Used for setting the thumbnail of a sticker set
+    * - :meth:`~telegram.Bot.set_custom_emoji_sticker_set_thumbnail`
+      - Used for setting the thumbnail of a custom emoji sticker set
     * - :meth:`~telegram.Bot.get_sticker_set`
       - Used for getting a sticker set
     * - :meth:`~telegram.Bot.upload_sticker_file`

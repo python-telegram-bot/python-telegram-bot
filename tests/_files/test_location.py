@@ -136,8 +136,7 @@ class TestLocationWithoutRequest(TestLocationBase):
     # TODO: Needs improvement with in inline sent live location.
     async def test_stop_live_inline_message(self, monkeypatch, bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            id_ = request_data.json_parameters["inline_message_id"] == "1234"
-            return id_
+            return request_data.json_parameters["inline_message_id"] == "1234"
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.stop_message_live_location(inline_message_id=1234)
@@ -163,7 +162,7 @@ class TestLocationWithoutRequest(TestLocationBase):
 
 class TestLocationWithRequest:
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -205,7 +204,7 @@ class TestLocationWithRequest:
         assert protected.has_protected_content
         assert not unprotected.has_protected_content
 
-    @pytest.mark.xfail
+    @pytest.mark.xfail()
     async def test_send_live_location(self, bot, chat_id):
         message = await bot.send_location(
             chat_id=chat_id,
@@ -218,8 +217,8 @@ class TestLocationWithRequest:
             protect_content=True,
         )
         assert message.location
-        assert 52.223880 == pytest.approx(message.location.latitude, rel=1e-5)
-        assert 5.166146 == pytest.approx(message.location.longitude, rel=1e-5)
+        assert pytest.approx(message.location.latitude, rel=1e-5) == 52.223880
+        assert pytest.approx(message.location.longitude, rel=1e-5) == 5.166146
         assert message.location.live_period == 80
         assert message.location.horizontal_accuracy == 50
         assert message.location.heading == 90
@@ -236,8 +235,8 @@ class TestLocationWithRequest:
             proximity_alert_radius=500,
         )
 
-        assert 52.223098 == pytest.approx(message2.location.latitude, rel=1e-5)
-        assert 5.164306 == pytest.approx(message2.location.longitude, rel=1e-5)
+        assert pytest.approx(message2.location.latitude, rel=1e-5) == 52.223098
+        assert pytest.approx(message2.location.longitude, rel=1e-5) == 5.164306
         assert message2.location.horizontal_accuracy == 30
         assert message2.location.heading == 10
         assert message2.location.proximity_alert_radius == 500

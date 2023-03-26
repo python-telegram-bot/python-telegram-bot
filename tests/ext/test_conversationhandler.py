@@ -103,7 +103,7 @@ class TestConversationHandler:
 
     # Test related
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.raise_app_handler_stop = False
         self.test_flag = False
         self.current_state = {}
@@ -1106,7 +1106,7 @@ class TestConversationHandler:
 
         async def raise_error(*a, **kw):
             if test_type == "none":
-                return None
+                return
             raise error
 
         handler = ConversationHandler(
@@ -1316,7 +1316,7 @@ class TestConversationHandler:
         )
 
         def timeout(*args, **kwargs):
-            raise ApplicationHandlerStop()
+            raise ApplicationHandlerStop
 
         self.states.update({ConversationHandler.TIMEOUT: [TypeHandler(Update, timeout)]})
         app.add_handler(handler)
@@ -2130,10 +2130,7 @@ class TestConversationHandler:
             handler = CommandHandler("start", callback=callback)
             fallback = MessageHandler(filters.ALL, callback, block=handler_block)
 
-        if default_block is not None:
-            defaults = Defaults(block=default_block)
-        else:
-            defaults = None
+        defaults = Defaults(block=default_block) if default_block is not None else None
 
         if ch_block is not None:
             conv_handler = ConversationHandler(

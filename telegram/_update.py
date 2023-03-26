@@ -34,7 +34,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, Chat, User  # noqa
+    from telegram import Bot, Chat, User
 
 
 class Update(TelegramObject):
@@ -46,7 +46,7 @@ class Update(TelegramObject):
     Note:
         At most one of the optional parameters can be present in any given update.
 
-    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`
+    .. seealso:: :wiki:`Your First Bot <Extensions---Your-first-Bot>`
 
     Args:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a

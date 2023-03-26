@@ -27,5 +27,5 @@ def env_var_2_bool(env_var: object) -> bool:
     return env_var.lower().strip() == "true"
 
 
-GITHUB_ACTION = os.getenv("GITHUB_ACTION", False)
-TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+GITHUB_ACTION = os.getenv("GITHUB_ACTION", "")
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", "true"))

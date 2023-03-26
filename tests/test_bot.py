@@ -33,6 +33,8 @@ from telegram import (
     Bot,
     BotCommand,
     BotCommandScopeChat,
+    BotDescription,
+    BotShortDescription,
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
@@ -91,7 +93,7 @@ def to_camel_case(snake_str):
     return components[0] + "".join(x.title() for x in components[1:])
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def message(bot, chat_id):  # mostly used in tests for edit_message
     out = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
@@ -198,8 +200,8 @@ class TestBotWithoutRequest:
 
     test_flag = None
 
-    @pytest.fixture(scope="function", autouse=True)
-    def reset(self):
+    @pytest.fixture(autouse=True)
+    def _reset(self):
         self.test_flag = None
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
@@ -445,12 +447,9 @@ class TestBotWithoutRequest:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
-        if bot_method_name.lower().replace("_", "") == "getme":
-            # Mocking get_me within check_defaults_handling messes with the cached values like
-            # Bot.{bot, username, id, …}` unless we return the expected User object.
-            return_value = bot.bot
-        else:
-            return_value = None
+        # Mocking get_me within check_defaults_handling messes with the cached values like
+        # Bot.{bot, username, id, …}` unless we return the expected User object.
+        return_value = bot.bot if bot_method_name.lower().replace("_", "") == "getme" else None
 
         # Check that ExtBot does the right thing
         bot_method = getattr(bot, bot_method_name)
@@ -524,8 +523,7 @@ class TestBotWithoutRequest:
                     "id": "1",
                 },
             }
-            web_app_msg = SentWebAppMessage("321").to_dict()
-            return web_app_msg
+            return SentWebAppMessage("321").to_dict()
 
         # We test different result types more thoroughly for answer_inline_query, so we just
         # use the one type here
@@ -556,7 +554,7 @@ class TestBotWithoutRequest:
         indirect=True,
     )
     @pytest.mark.parametrize(
-        "ilq_result,expected_params",
+        ("ilq_result", "expected_params"),
         [
             (
                 InlineQueryResultArticle("1", "title", InputTextMessageContent("text")),
@@ -630,8 +628,7 @@ class TestBotWithoutRequest:
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             nonlocal params
             params = request_data.parameters == expected_params
-            web_app_msg = SentWebAppMessage("321").to_dict()
-            return web_app_msg
+            return SentWebAppMessage("321").to_dict()
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
 
@@ -906,7 +903,7 @@ class TestBotWithoutRequest:
                 )
 
     @pytest.mark.parametrize(
-        "current_offset,num_results,id_offset,expected_next_offset",
+        ("current_offset", "num_results", "id_offset", "expected_next_offset"),
         [
             ("", InlineQueryLimit.RESULTS, 1, 1),
             (1, InlineQueryLimit.RESULTS, 51, 2),
@@ -959,7 +956,7 @@ class TestBotWithoutRequest:
             results = data["results"]
             length_matches = len(results) == 30
             ids_match = all(int(res["id"]) == 1 + i for i, res in enumerate(results))
-            next_offset_matches = data["next_offset"] == ""
+            next_offset_matches = not data["next_offset"]
             return length_matches and ids_match and next_offset_matches
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
@@ -986,7 +983,7 @@ class TestBotWithoutRequest:
             data = request_data.parameters
             results = data["results"]
             length = results == []
-            next_offset = data["next_offset"] == ""
+            next_offset = not data["next_offset"]
             return length and next_offset
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
@@ -1409,7 +1406,7 @@ class TestBotWithoutRequest:
     # here we test more extensively.
 
     @pytest.mark.parametrize(
-        "acd_in,maxsize",
+        ("acd_in", "maxsize"),
         [(True, 1024), (False, 1024), (0, 0), (None, None)],
     )
     async def test_callback_data_maxsize(self, bot_info, acd_in, maxsize):
@@ -1907,10 +1904,11 @@ class TestBotWithRequest:
         assert message_quiz.poll.is_closed
         assert message_quiz.poll.explanation == "Here is a link"
         assert message_quiz.poll.explanation_entities == tuple(explanation_entities)
-        assert poll_task.done() and quiz_task.done()
+        assert poll_task.done()
+        assert quiz_task.done()
 
     @pytest.mark.parametrize(
-        ["open_period", "close_date"], [(5, None), (None, True)], ids=["open_period", "close_date"]
+        ("open_period", "close_date"), [(5, None), (None, True)], ids=["open_period", "close_date"]
     )
     async def test_send_open_period(self, bot, super_group_id, open_period, close_date):
         question = "Is this a test?"
@@ -2032,7 +2030,7 @@ class TestBotWithRequest:
         assert message3.poll.explanation_entities == ()
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -2083,7 +2081,7 @@ class TestBotWithRequest:
         assert protected_poll.has_protected_content
         assert not unprotect_poll.has_protected_content
 
-    @pytest.mark.parametrize("emoji", Dice.ALL_EMOJI + [None])
+    @pytest.mark.parametrize("emoji", [*Dice.ALL_EMOJI, None])
     async def test_send_dice(self, bot, chat_id, emoji):
         message = await bot.send_dice(chat_id, emoji=emoji, protect_content=True)
 
@@ -2095,7 +2093,7 @@ class TestBotWithRequest:
             assert message.dice.emoji == emoji
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -2365,7 +2363,7 @@ class TestBotWithRequest:
         await bot.delete_webhook()
         await asyncio.sleep(1)
         info = await bot.get_webhook_info()
-        assert info.url == ""
+        assert not info.url
         assert info.ip_address is None
         assert info.has_custom_certificate is False
 
@@ -2417,14 +2415,14 @@ class TestBotWithRequest:
         assert message.game.description == (
             "A no-op test game, for python-telegram-bot bot framework testing."
         )
-        assert message.game.animation.file_id != ""
+        assert message.game.animation.file_id
         # We added some test bots later and for some reason the file size is not the same for them
         # so we accept three different sizes here. Shouldn't be too much of
         assert message.game.photo[0].file_size in [851, 4928, 850]
         assert message.has_protected_content
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -2460,7 +2458,7 @@ class TestBotWithRequest:
                 )
 
     @pytest.mark.parametrize(
-        "default_bot,val",
+        ("default_bot", "val"),
         [({"protect_content": True}, True), ({"protect_content": False}, None)],
         indirect=["default_bot"],
     )
@@ -2627,7 +2625,7 @@ class TestBotWithRequest:
         # Each link is unique apparently
         invite_link = await bot.export_chat_invite_link(channel_id)
         assert isinstance(invite_link, str)
-        assert invite_link != ""
+        assert invite_link
 
     async def test_edit_revoke_chat_invite_link_passing_link_objects(self, bot, channel_id):
         invite_link = await bot.create_chat_invite_link(chat_id=channel_id)
@@ -2681,7 +2679,7 @@ class TestBotWithRequest:
         invite_link = await bot.create_chat_invite_link(
             channel_id, expire_date=expire_time, member_limit=10
         )
-        assert invite_link.invite_link != ""
+        assert invite_link.invite_link
         assert not invite_link.invite_link.endswith("...")
         assert abs(invite_link.expire_date - aware_time_in_future) < dtm.timedelta(seconds=1)
         assert invite_link.member_limit == 10
@@ -2732,7 +2730,7 @@ class TestBotWithRequest:
         invite_link = await tz_bot.create_chat_invite_link(
             channel_id, expire_date=time_in_future, member_limit=10
         )
-        assert invite_link.invite_link != ""
+        assert invite_link.invite_link
         assert not invite_link.invite_link.endswith("...")
         assert abs(invite_link.expire_date - aware_expire_date) < dtm.timedelta(seconds=1)
         assert invite_link.member_limit == 10
@@ -2825,8 +2823,9 @@ class TestBotWithRequest:
 
         assert len(messages) == 3  # Check if we sent 3 messages
 
-        assert all([await i for i in pinned_messages_tasks])  # Check if we pinned 3 messages
-        assert all([i.done() for i in pinned_messages_tasks])  # Check if all tasks are done
+        # Check if we pinned 3 messages
+        assert all([await i for i in pinned_messages_tasks])  # noqa: PIE802
+        assert all(i.done() for i in pinned_messages_tasks)  # Check if all tasks are done
 
         chat = await bot.get_chat(super_group_id)  # get the chat to check the pinned message
         assert chat.pinned_message in messages
@@ -2846,7 +2845,7 @@ class TestBotWithRequest:
             bot.unpin_chat_message(chat_id=super_group_id, read_timeout=10),  # unpins most recent
         )
         assert all(await tasks)
-        assert all([i.done() for i in tasks])
+        assert all(i.done() for i in tasks)
         assert await bot.unpin_all_chat_messages(super_group_id, read_timeout=10)
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
@@ -2900,7 +2899,7 @@ class TestBotWithRequest:
         assert not no_protect.has_protected_content
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -3223,3 +3222,83 @@ class TestBotWithRequest:
         finally:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
+
+    async def test_set_get_my_description(self, bot):
+        default_description = f"{bot.username} - default - {dtm.datetime.utcnow().isoformat()}"
+        en_description = f"{bot.username} - en - {dtm.datetime.utcnow().isoformat()}"
+        de_description = f"{bot.username} - de - {dtm.datetime.utcnow().isoformat()}"
+
+        # Set the descriptions
+        assert all(
+            await asyncio.gather(
+                bot.set_my_description(default_description),
+                bot.set_my_description(en_description, language_code="en"),
+                bot.set_my_description(de_description, language_code="de"),
+            )
+        )
+
+        # Check that they were set correctly
+        assert await asyncio.gather(
+            bot.get_my_description(), bot.get_my_description("en"), bot.get_my_description("de")
+        ) == [
+            BotDescription(default_description),
+            BotDescription(en_description),
+            BotDescription(de_description),
+        ]
+
+        # Delete the descriptions
+        assert all(
+            await asyncio.gather(
+                bot.set_my_description(None),
+                bot.set_my_description(None, language_code="en"),
+                bot.set_my_description(None, language_code="de"),
+            )
+        )
+
+        # Check that they were deleted correctly
+        assert await asyncio.gather(
+            bot.get_my_description(), bot.get_my_description("en"), bot.get_my_description("de")
+        ) == 3 * [BotDescription("")]
+
+    async def test_set_get_my_short_description(self, bot):
+        default_short_description = (
+            f"{bot.username} - default - {dtm.datetime.utcnow().isoformat()}"
+        )
+        en_short_description = f"{bot.username} - en - {dtm.datetime.utcnow().isoformat()}"
+        de_short_description = f"{bot.username} - de - {dtm.datetime.utcnow().isoformat()}"
+
+        # Set the short_descriptions
+        assert all(
+            await asyncio.gather(
+                bot.set_my_short_description(default_short_description),
+                bot.set_my_short_description(en_short_description, language_code="en"),
+                bot.set_my_short_description(de_short_description, language_code="de"),
+            )
+        )
+
+        # Check that they were set correctly
+        assert await asyncio.gather(
+            bot.get_my_short_description(),
+            bot.get_my_short_description("en"),
+            bot.get_my_short_description("de"),
+        ) == [
+            BotShortDescription(default_short_description),
+            BotShortDescription(en_short_description),
+            BotShortDescription(de_short_description),
+        ]
+
+        # Delete the short_descriptions
+        assert all(
+            await asyncio.gather(
+                bot.set_my_short_description(None),
+                bot.set_my_short_description(None, language_code="en"),
+                bot.set_my_short_description(None, language_code="de"),
+            )
+        )
+
+        # Check that they were deleted correctly
+        assert await asyncio.gather(
+            bot.get_my_short_description(),
+            bot.get_my_short_description("en"),
+            bot.get_my_short_description("de"),
+        ) == 3 * [BotShortDescription("")]

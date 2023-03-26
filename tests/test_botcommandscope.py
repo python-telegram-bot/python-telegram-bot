@@ -111,7 +111,7 @@ def scope_class_and_type(request):
 def bot_command_scope(scope_class_and_type, chat_id):
     # we use de_json here so that we don't have to worry about which class needs which arguments
     return scope_class_and_type[0].de_json(
-        dict(type=scope_class_and_type[1], chat_id=chat_id, user_id=42), bot=None
+        {"type": scope_class_and_type[1], "chat_id": chat_id, "user_id": 42}, bot=None
     )
 
 

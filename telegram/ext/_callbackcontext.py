@@ -41,7 +41,7 @@ from telegram.ext._utils.types import BD, BT, CD, UD
 if TYPE_CHECKING:
     from asyncio import Future, Queue
 
-    from telegram.ext import Application, Job, JobQueue  # noqa: F401
+    from telegram.ext import Application, Job, JobQueue
     from telegram.ext._utils.types import CCT
 
 _STORING_DATA_WIKI = (

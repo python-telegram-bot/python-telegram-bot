@@ -81,8 +81,8 @@ class TestAdmonitionInserter:
                 )
 
     @pytest.mark.parametrize(
-        "admonition_type, cls, link",
-        (
+        ("admonition_type", "cls", "link"),
+        [
             (
                 "available_in",
                 telegram.ChatMember,
@@ -171,7 +171,7 @@ class TestAdmonitionInserter:
                 telegram.ext.PicklePersistence,  # subclass
                 ":meth:`telegram.ext.ApplicationBuilder.persistence`",
             ),
-        ),
+        ],
     )
     def test_check_presence(self, admonition_inserter, admonition_type, cls, link):
         """Checks if a given link is present in the admonition of a given type for a given
@@ -199,8 +199,8 @@ class TestAdmonitionInserter:
         )
 
     @pytest.mark.parametrize(
-        "admonition_type, cls, link",
-        (
+        ("admonition_type", "cls", "link"),
+        [
             (
                 "returned_in",
                 telegram.ext.CallbackContext,
@@ -208,7 +208,7 @@ class TestAdmonitionInserter:
                 # In this case classes inside square brackets must not be parsed
                 ":meth:`telegram.ext.ApplicationBuilder.build`",
             ),
-        ),
+        ],
     )
     def test_check_absence(self, admonition_inserter, admonition_type, cls, link):
         """Checks if a given link is **absent** in the admonition of a given type for a given

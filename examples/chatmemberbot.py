@@ -103,13 +103,12 @@ async def track_chats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         elif was_member and not is_member:
             logger.info("%s removed the bot from the group %s", cause_name, chat.title)
             context.bot_data.setdefault("group_ids", set()).discard(chat.id)
-    else:
-        if not was_member and is_member:
-            logger.info("%s added the bot to the channel %s", cause_name, chat.title)
-            context.bot_data.setdefault("channel_ids", set()).add(chat.id)
-        elif was_member and not is_member:
-            logger.info("%s removed the bot from the channel %s", cause_name, chat.title)
-            context.bot_data.setdefault("channel_ids", set()).discard(chat.id)
+    elif not was_member and is_member:
+        logger.info("%s added the bot to the channel %s", cause_name, chat.title)
+        context.bot_data.setdefault("channel_ids", set()).add(chat.id)
+    elif was_member and not is_member:
+        logger.info("%s removed the bot from the channel %s", cause_name, chat.title)
+        context.bot_data.setdefault("channel_ids", set()).discard(chat.id)
 
 
 async def show_chats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

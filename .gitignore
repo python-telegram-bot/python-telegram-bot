@@ -51,6 +51,8 @@ nosetests.xml
 coverage.xml
 *,cover
 .coveralls.yml
+.testmondata
+.testmondata-journal
 
 # Translations
 *.mo

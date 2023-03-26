@@ -31,11 +31,12 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def animation_file():
     with data_file("game.gif").open("rb") as f:
         yield f
@@ -45,7 +46,7 @@ def animation_file():
 async def animation(bot, chat_id):
     with data_file("game.gif").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
         return (
-            await bot.send_animation(chat_id, animation=f, read_timeout=50, thumb=thumb)
+            await bot.send_animation(chat_id, animation=f, read_timeout=50, thumbnail=thumb)
         ).animation
 
 
@@ -74,13 +75,25 @@ class TestAnimationWithoutRequest(TestAnimationBase):
         assert isinstance(animation, Animation)
         assert isinstance(animation.file_id, str)
         assert isinstance(animation.file_unique_id, str)
-        assert animation.file_id != ""
-        assert animation.file_unique_id != ""
+        assert animation.file_id
+        assert animation.file_unique_id
 
     def test_expected_values(self, animation):
         assert animation.mime_type == self.mime_type
         assert animation.file_name.startswith("game.gif") == self.file_name.startswith("game.gif")
-        assert isinstance(animation.thumb, PhotoSize)
+        assert isinstance(animation.thumbnail, PhotoSize)
+
+    def test_thumb_property_deprecation_warning(self, recwarn):
+        animation = Animation(
+            self.animation_file_id,
+            self.animation_file_unique_id,
+            thumb=object(),
+            width=self.width,
+            height=self.height,
+            duration=self.duration,
+        )
+        assert animation.thumb is animation.thumbnail
+        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_de_json(self, bot, animation):
         json_dict = {
@@ -89,7 +102,7 @@ class TestAnimationWithoutRequest(TestAnimationBase):
             "width": self.width,
             "height": self.height,
             "duration": self.duration,
-            "thumb": animation.thumb.to_dict(),
+            "thumbnail": animation.thumbnail.to_dict(),
             "file_name": self.file_name,
             "mime_type": self.mime_type,
             "file_size": self.file_size,
@@ -111,7 +124,7 @@ class TestAnimationWithoutRequest(TestAnimationBase):
         assert animation_dict["width"] == animation.width
         assert animation_dict["height"] == animation.height
         assert animation_dict["duration"] == animation.duration
-        assert animation_dict["thumb"] == animation.thumb.to_dict()
+        assert animation_dict["thumbnail"] == animation.thumbnail.to_dict()
         assert animation_dict["file_name"] == animation.file_name
         assert animation_dict["mime_type"] == animation.mime_type
         assert animation_dict["file_size"] == animation.file_size
@@ -157,14 +170,16 @@ class TestAnimationWithoutRequest(TestAnimationBase):
             async def make_assertion(_, data, *args, **kwargs):
                 nonlocal test_flag
                 if local_mode:
-                    test_flag = data.get("animation") == expected and data.get("thumb") == expected
+                    test_flag = (
+                        data.get("animation") == expected and data.get("thumbnail") == expected
+                    )
                 else:
                     test_flag = isinstance(data.get("animation"), InputFile) and isinstance(
-                        data.get("thumb"), InputFile
+                        data.get("thumbnail"), InputFile
                     )
 
             monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.send_animation(chat_id, file, thumb=file)
+            await bot.send_animation(chat_id, file, thumbnail=file)
             assert test_flag
         finally:
             bot._local_mode = False
@@ -175,6 +190,15 @@ class TestAnimationWithoutRequest(TestAnimationBase):
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_animation(animation=animation, chat_id=chat_id)
+
+    async def test_send_animation_with_local_files_throws_error_with_different_thumb_and_thumbnail(
+        self, bot, chat_id
+    ):
+        file = data_file("telegram.jpg")
+        different_file = data_file("telegram_no_standard_header.jpg")
+
+        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
+            await bot.send_animation(chat_id, file, thumbnail=file, thumb=different_file)
 
     async def test_get_file_instance_method(self, monkeypatch, animation):
         async def make_assertion(*_, **kwargs):
@@ -200,20 +224,20 @@ class TestAnimationWithRequest(TestAnimationBase):
             parse_mode="Markdown",
             disable_notification=False,
             protect_content=True,
-            thumb=thumb_file,
+            thumbnail=thumb_file,
             has_spoiler=True,
         )
 
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
         assert isinstance(message.animation.file_unique_id, str)
-        assert message.animation.file_id != ""
-        assert message.animation.file_unique_id != ""
+        assert message.animation.file_id
+        assert message.animation.file_unique_id
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
-        assert message.animation.thumb.width == self.width
-        assert message.animation.thumb.height == self.height
+        assert message.animation.thumbnail.width == self.width
+        assert message.animation.thumbnail.height == self.height
         assert message.has_protected_content
         try:
             assert message.has_media_spoiler
@@ -242,8 +266,8 @@ class TestAnimationWithRequest(TestAnimationBase):
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
         assert isinstance(message.animation.file_unique_id, str)
-        assert message.animation.file_id != ""
-        assert message.animation.file_unique_id != ""
+        assert message.animation.file_id
+        assert message.animation.file_unique_id
 
         assert message.animation.duration == animation.duration
         assert message.animation.file_name.startswith(
@@ -297,7 +321,7 @@ class TestAnimationWithRequest(TestAnimationBase):
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -344,9 +368,7 @@ class TestAnimationWithRequest(TestAnimationBase):
         assert message.animation == animation
 
     async def test_error_send_empty_file(self, bot, chat_id):
-        animation_file = open(os.devnull, "rb")
-
-        with pytest.raises(TelegramError):
+        with Path(os.devnull).open("rb") as animation_file, pytest.raises(TelegramError):
             await bot.send_animation(chat_id=chat_id, animation=animation_file)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):

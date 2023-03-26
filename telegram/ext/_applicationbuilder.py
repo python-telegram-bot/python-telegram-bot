@@ -114,7 +114,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
           use :class:`telegram.ext.ExtBot` for the bot.
 
-    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+    .. seealso:: :wiki:`Your First Bot <Extensions---Your-first-Bot>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern
@@ -584,7 +584,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             robust option at this time" <https://www.python-httpx.org/http2#enabling-http2>`_.
 
         .. versionadded:: 20.1
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.2
             Reset the default version to 1.1.
 
         Args:
@@ -741,7 +741,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                pip install httpx[http2]
 
         .. versionadded:: 20.1
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.2
             Reset the default version to 1.1.
 
         Args:

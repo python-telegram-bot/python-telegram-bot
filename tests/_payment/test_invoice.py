@@ -90,7 +90,7 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
         # parameters correctly because #2526 went unnoticed for 3 years …
         async def make_assertion(*args, **_):
             kwargs = args[1]
-            return all([kwargs[key] == key for key in kwargs])
+            return all(kwargs[key] == key for key in kwargs)
 
         monkeypatch.setattr(bot, "_send_message", make_assertion)
         assert await bot.send_invoice(
@@ -123,7 +123,7 @@ class TestInvoiceWithoutRequest(TestInvoiceBase):
     async def test_send_all_args_create_invoice_link(self, bot, monkeypatch):
         async def make_assertion(*args, **_):
             kwargs = args[1]
-            return all([kwargs[i] == i for i in kwargs])
+            return all(kwargs[i] == i for i in kwargs)
 
         monkeypatch.setattr(bot, "_post", make_assertion)
         assert await bot.create_invoice_link(
@@ -196,7 +196,7 @@ class TestInvoiceWithRequest(TestInvoiceBase):
         )
 
         assert message.invoice.currency == self.currency
-        assert message.invoice.start_parameter == ""
+        assert not message.invoice.start_parameter
         assert message.invoice.description == self.description
         assert message.invoice.title == self.title
         assert message.invoice.total_amount == self.total_amount
@@ -211,7 +211,7 @@ class TestInvoiceWithRequest(TestInvoiceBase):
         )
 
         assert isinstance(link, str)
-        assert link != ""
+        assert link
 
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_invoice_default_protect_content(
@@ -237,7 +237,7 @@ class TestInvoiceWithRequest(TestInvoiceBase):
         assert not unprotected.has_protected_content
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),

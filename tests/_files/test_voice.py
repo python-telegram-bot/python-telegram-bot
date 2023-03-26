@@ -35,7 +35,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def voice_file():
     with data_file("telegram.ogg").open("rb") as f:
         yield f
@@ -68,8 +68,8 @@ class TestVoiceWithoutRequest(TestVoiceBase):
         assert isinstance(voice, Voice)
         assert isinstance(voice.file_id, str)
         assert isinstance(voice.file_unique_id, str)
-        assert voice.file_id != ""
-        assert voice.file_unique_id != ""
+        assert voice.file_id
+        assert voice.file_unique_id
 
     def test_expected_values(self, voice):
         assert voice.duration == self.duration
@@ -191,8 +191,8 @@ class TestVoiceWithRequest(TestVoiceBase):
         assert isinstance(message.voice, Voice)
         assert isinstance(message.voice.file_id, str)
         assert isinstance(message.voice.file_unique_id, str)
-        assert message.voice.file_id != ""
-        assert message.voice.file_unique_id != ""
+        assert message.voice.file_id
+        assert message.voice.file_unique_id
         assert message.voice.duration == voice.duration
         assert message.voice.mime_type == voice.mime_type
         assert message.voice.file_size == voice.file_size
@@ -220,8 +220,8 @@ class TestVoiceWithRequest(TestVoiceBase):
         assert isinstance(message.voice, Voice)
         assert isinstance(message.voice.file_id, str)
         assert isinstance(message.voice.file_unique_id, str)
-        assert message.voice.file_id != ""
-        assert message.voice.file_unique_id != ""
+        assert message.voice.file_id
+        assert message.voice.file_unique_id
         assert message.voice.duration == voice.duration
         assert message.voice.mime_type == voice.mime_type
         assert message.voice.file_size == voice.file_size
@@ -285,7 +285,7 @@ class TestVoiceWithRequest(TestVoiceBase):
         assert not unprotected.has_protected_content
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -318,8 +318,8 @@ class TestVoiceWithRequest(TestVoiceBase):
                 )
 
     async def test_error_send_empty_file(self, bot, chat_id):
-        with pytest.raises(TelegramError):
-            await bot.sendVoice(chat_id, open(os.devnull, "rb"))
+        with Path(os.devnull).open("rb") as file, pytest.raises(TelegramError):
+            await bot.sendVoice(chat_id, file)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):

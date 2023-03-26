@@ -26,6 +26,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.slots import mro_slots
 
 
@@ -40,9 +41,9 @@ def inline_query_result_document():
         parse_mode=TestInlineQueryResultDocumentBase.parse_mode,
         caption_entities=TestInlineQueryResultDocumentBase.caption_entities,
         description=TestInlineQueryResultDocumentBase.description,
-        thumb_url=TestInlineQueryResultDocumentBase.thumb_url,
-        thumb_width=TestInlineQueryResultDocumentBase.thumb_width,
-        thumb_height=TestInlineQueryResultDocumentBase.thumb_height,
+        thumbnail_url=TestInlineQueryResultDocumentBase.thumbnail_url,
+        thumbnail_width=TestInlineQueryResultDocumentBase.thumbnail_width,
+        thumbnail_height=TestInlineQueryResultDocumentBase.thumbnail_height,
         input_message_content=TestInlineQueryResultDocumentBase.input_message_content,
         reply_markup=TestInlineQueryResultDocumentBase.reply_markup,
     )
@@ -58,9 +59,9 @@ class TestInlineQueryResultDocumentBase:
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     mime_type = "mime type"
     description = "description"
-    thumb_url = "thumb url"
-    thumb_width = 10
-    thumb_height = 15
+    thumbnail_url = "thumb url"
+    thumbnail_width = 10
+    thumbnail_height = 15
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
@@ -82,14 +83,149 @@ class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentB
         assert inline_query_result_document.caption_entities == tuple(self.caption_entities)
         assert inline_query_result_document.mime_type == self.mime_type
         assert inline_query_result_document.description == self.description
-        assert inline_query_result_document.thumb_url == self.thumb_url
-        assert inline_query_result_document.thumb_width == self.thumb_width
-        assert inline_query_result_document.thumb_height == self.thumb_height
+        assert inline_query_result_document.thumbnail_url == self.thumbnail_url
+        assert inline_query_result_document.thumbnail_width == self.thumbnail_width
+        assert inline_query_result_document.thumbnail_height == self.thumbnail_height
         assert (
             inline_query_result_document.input_message_content.to_dict()
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_document.reply_markup.to_dict() == self.reply_markup.to_dict()
+
+    def test_thumb_url_property_deprecation_warning(self, recwarn):
+        inline_query_result_document = InlineQueryResultDocument(
+            TestInlineQueryResultDocumentBase.id_,
+            TestInlineQueryResultDocumentBase.document_url,
+            TestInlineQueryResultDocumentBase.title,
+            TestInlineQueryResultDocumentBase.mime_type,
+            caption=TestInlineQueryResultDocumentBase.caption,
+            parse_mode=TestInlineQueryResultDocumentBase.parse_mode,
+            caption_entities=TestInlineQueryResultDocumentBase.caption_entities,
+            description=TestInlineQueryResultDocumentBase.description,
+            input_message_content=TestInlineQueryResultDocumentBase.input_message_content,
+            reply_markup=TestInlineQueryResultDocumentBase.reply_markup,
+            thumb_url=TestInlineQueryResultDocumentBase.thumbnail_url,  # deprecated arg
+            thumbnail_height=TestInlineQueryResultDocumentBase.thumbnail_height,
+            thumbnail_width=TestInlineQueryResultDocumentBase.thumbnail_width,
+        )
+        assert inline_query_result_document.thumb_url == inline_query_result_document.thumbnail_url
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn, __file__, deprecated_name="thumb_url", new_name="thumbnail_url"
+        )
+
+    def test_thumb_height_property_deprecation_warning(self, recwarn):
+        inline_query_result_document = InlineQueryResultDocument(
+            TestInlineQueryResultDocumentBase.id_,
+            TestInlineQueryResultDocumentBase.document_url,
+            TestInlineQueryResultDocumentBase.title,
+            TestInlineQueryResultDocumentBase.mime_type,
+            caption=TestInlineQueryResultDocumentBase.caption,
+            parse_mode=TestInlineQueryResultDocumentBase.parse_mode,
+            caption_entities=TestInlineQueryResultDocumentBase.caption_entities,
+            description=TestInlineQueryResultDocumentBase.description,
+            input_message_content=TestInlineQueryResultDocumentBase.input_message_content,
+            reply_markup=TestInlineQueryResultDocumentBase.reply_markup,
+            thumbnail_url=TestInlineQueryResultDocumentBase.thumbnail_url,
+            thumb_height=TestInlineQueryResultDocumentBase.thumbnail_height,  # deprecated arg
+            thumbnail_width=TestInlineQueryResultDocumentBase.thumbnail_width,
+        )
+        assert (
+            inline_query_result_document.thumb_height
+            == inline_query_result_document.thumbnail_height
+        )
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn, __file__, deprecated_name="thumb_height", new_name="thumbnail_height"
+        )
+
+    def test_thumb_width_property_deprecation_warning(self, recwarn):
+        inline_query_result_document = InlineQueryResultDocument(
+            TestInlineQueryResultDocumentBase.id_,
+            TestInlineQueryResultDocumentBase.document_url,
+            TestInlineQueryResultDocumentBase.title,
+            TestInlineQueryResultDocumentBase.mime_type,
+            caption=TestInlineQueryResultDocumentBase.caption,
+            parse_mode=TestInlineQueryResultDocumentBase.parse_mode,
+            caption_entities=TestInlineQueryResultDocumentBase.caption_entities,
+            description=TestInlineQueryResultDocumentBase.description,
+            input_message_content=TestInlineQueryResultDocumentBase.input_message_content,
+            reply_markup=TestInlineQueryResultDocumentBase.reply_markup,
+            thumbnail_url=TestInlineQueryResultDocumentBase.thumbnail_url,
+            thumbnail_height=TestInlineQueryResultDocumentBase.thumbnail_height,
+            thumb_width=TestInlineQueryResultDocumentBase.thumbnail_width,  # deprecated arg
+        )
+        assert (
+            inline_query_result_document.thumb_width
+            == inline_query_result_document.thumbnail_width
+        )
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn, __file__, deprecated_name="thumb_width", new_name="thumbnail_width"
+        )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
+        with pytest.raises(
+            ValueError,
+            match="different entities as 'thumb_url' and 'thumbnail_url'",
+        ):
+            InlineQueryResultDocument(
+                TestInlineQueryResultDocumentBase.id_,
+                TestInlineQueryResultDocumentBase.document_url,
+                TestInlineQueryResultDocumentBase.title,
+                TestInlineQueryResultDocumentBase.mime_type,
+                caption=TestInlineQueryResultDocumentBase.caption,
+                parse_mode=TestInlineQueryResultDocumentBase.parse_mode,
+                caption_entities=TestInlineQueryResultDocumentBase.caption_entities,
+                description=TestInlineQueryResultDocumentBase.description,
+                input_message_content=TestInlineQueryResultDocumentBase.input_message_content,
+                reply_markup=TestInlineQueryResultDocumentBase.reply_markup,
+                thumbnail_url=TestInlineQueryResultDocumentBase.thumbnail_url,
+                thumb_url="some other url",
+                thumbnail_height=TestInlineQueryResultDocumentBase.thumbnail_height,
+                thumbnail_width=TestInlineQueryResultDocumentBase.thumbnail_width,
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_height(self):
+        with pytest.raises(
+            ValueError,
+            match="different entities as 'thumb_height' and 'thumbnail_height'",
+        ):
+            InlineQueryResultDocument(
+                TestInlineQueryResultDocumentBase.id_,
+                TestInlineQueryResultDocumentBase.document_url,
+                TestInlineQueryResultDocumentBase.title,
+                TestInlineQueryResultDocumentBase.mime_type,
+                caption=TestInlineQueryResultDocumentBase.caption,
+                parse_mode=TestInlineQueryResultDocumentBase.parse_mode,
+                caption_entities=TestInlineQueryResultDocumentBase.caption_entities,
+                description=TestInlineQueryResultDocumentBase.description,
+                input_message_content=TestInlineQueryResultDocumentBase.input_message_content,
+                reply_markup=TestInlineQueryResultDocumentBase.reply_markup,
+                thumbnail_url=TestInlineQueryResultDocumentBase.thumbnail_url,
+                thumbnail_height=TestInlineQueryResultDocumentBase.thumbnail_height,
+                thumb_height=TestInlineQueryResultDocumentBase.thumbnail_height + 1,
+                thumbnail_width=TestInlineQueryResultDocumentBase.thumbnail_width,
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_width(self):
+        with pytest.raises(
+            ValueError,
+            match="different entities as 'thumb_width' and 'thumbnail_width'",
+        ):
+            InlineQueryResultDocument(
+                TestInlineQueryResultDocumentBase.id_,
+                TestInlineQueryResultDocumentBase.document_url,
+                TestInlineQueryResultDocumentBase.title,
+                TestInlineQueryResultDocumentBase.mime_type,
+                caption=TestInlineQueryResultDocumentBase.caption,
+                parse_mode=TestInlineQueryResultDocumentBase.parse_mode,
+                caption_entities=TestInlineQueryResultDocumentBase.caption_entities,
+                description=TestInlineQueryResultDocumentBase.description,
+                input_message_content=TestInlineQueryResultDocumentBase.input_message_content,
+                reply_markup=TestInlineQueryResultDocumentBase.reply_markup,
+                thumbnail_url=TestInlineQueryResultDocumentBase.thumbnail_url,
+                thumbnail_height=TestInlineQueryResultDocumentBase.thumbnail_height,
+                thumbnail_width=TestInlineQueryResultDocumentBase.thumbnail_width,
+                thumb_width=TestInlineQueryResultDocumentBase.thumbnail_width + 1,
+            )
 
     def test_caption_entities_always_tuple(self):
         result = InlineQueryResultDocument(self.id_, self.document_url, self.title, self.mime_type)
@@ -123,16 +259,16 @@ class TestInlineQueryResultDocumentWithoutRequest(TestInlineQueryResultDocumentB
             == inline_query_result_document.description
         )
         assert (
-            inline_query_result_document_dict["thumb_url"]
-            == inline_query_result_document.thumb_url
+            inline_query_result_document_dict["thumbnail_url"]
+            == inline_query_result_document.thumbnail_url
         )
         assert (
-            inline_query_result_document_dict["thumb_width"]
-            == inline_query_result_document.thumb_width
+            inline_query_result_document_dict["thumbnail_width"]
+            == inline_query_result_document.thumbnail_width
         )
         assert (
-            inline_query_result_document_dict["thumb_height"]
-            == inline_query_result_document.thumb_height
+            inline_query_result_document_dict["thumbnail_height"]
+            == inline_query_result_document.thumbnail_height
         )
         assert (
             inline_query_result_document_dict["input_message_content"]
