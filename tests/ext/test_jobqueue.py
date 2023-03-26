@@ -20,14 +20,13 @@ import asyncio
 import calendar
 import datetime as dtm
 import logging
-import os
 import platform
 import time
 
 import pytest
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
-from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
 
@@ -45,7 +44,7 @@ class CustomContext(CallbackContext):
     pass
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def job_queue(app):
     jq = JobQueue()
     jq.set_application(app)
@@ -71,7 +70,7 @@ class TestNoJobQueue:
     not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
 )
 @pytest.mark.skipif(
-    os.getenv("GITHUB_ACTIONS", False) and platform.system() in ["Windows", "Darwin"],
+    bool(GITHUB_ACTION and platform.system() in ["Windows", "Darwin"]),
     reason="On Windows & MacOS precise timings are not accurate.",
 )
 @pytest.mark.flaky(10, 1)  # Timings aren't quite perfect
@@ -86,7 +85,7 @@ class TestJobQueue:
     )
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.result = 0
         self.job_time = 0
         self.received_error = None
@@ -362,7 +361,7 @@ class TestJobQueue:
         assert str(recwarn[0].message) == self.expected_warning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
-    @pytest.mark.parametrize("weekday", (0, 1, 2, 3, 4, 5, 6))
+    @pytest.mark.parametrize("weekday", [0, 1, 2, 3, 4, 5, 6])
     async def test_run_daily_days_of_week(self, job_queue, recwarn, weekday):
         delta, now = 1, dtm.datetime.now(UTC)
         time_of_day = (now + dtm.timedelta(seconds=delta)).time()
@@ -592,7 +591,7 @@ class TestJobQueue:
         ):
             job.error
 
-    @pytest.mark.parametrize("wait", (True, False))
+    @pytest.mark.parametrize("wait", [True, False])
     async def test_wait_on_shut_down(self, job_queue, wait):
         ready_event = asyncio.Event()
 

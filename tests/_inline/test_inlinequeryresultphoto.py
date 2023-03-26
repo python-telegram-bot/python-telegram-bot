@@ -26,6 +26,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.slots import mro_slots
 
 
@@ -34,7 +35,7 @@ def inline_query_result_photo():
     return InlineQueryResultPhoto(
         TestInlineQueryResultPhotoBase.id_,
         TestInlineQueryResultPhotoBase.photo_url,
-        TestInlineQueryResultPhotoBase.thumb_url,
+        TestInlineQueryResultPhotoBase.thumbnail_url,
         photo_width=TestInlineQueryResultPhotoBase.photo_width,
         photo_height=TestInlineQueryResultPhotoBase.photo_height,
         title=TestInlineQueryResultPhotoBase.title,
@@ -53,7 +54,7 @@ class TestInlineQueryResultPhotoBase:
     photo_url = "photo url"
     photo_width = 10
     photo_height = 15
-    thumb_url = "thumb url"
+    thumbnail_url = "thumb url"
     title = "title"
     description = "description"
     caption = "caption"
@@ -77,7 +78,7 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
         assert inline_query_result_photo.photo_url == self.photo_url
         assert inline_query_result_photo.photo_width == self.photo_width
         assert inline_query_result_photo.photo_height == self.photo_height
-        assert inline_query_result_photo.thumb_url == self.thumb_url
+        assert inline_query_result_photo.thumbnail_url == self.thumbnail_url
         assert inline_query_result_photo.title == self.title
         assert inline_query_result_photo.description == self.description
         assert inline_query_result_photo.caption == self.caption
@@ -90,8 +91,94 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
         assert inline_query_result_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_caption_entities_always_tuple(self):
-        result = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
+        result = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumbnail_url)
         assert result.caption_entities == ()
+
+    def test_thumb_url_property_deprecation_warning(self, recwarn):
+        inline_query_result_photo = InlineQueryResultPhoto(
+            TestInlineQueryResultPhotoBase.id_,
+            TestInlineQueryResultPhotoBase.photo_url,
+            TestInlineQueryResultPhotoBase.thumbnail_url,
+            photo_width=TestInlineQueryResultPhotoBase.photo_width,
+            photo_height=TestInlineQueryResultPhotoBase.photo_height,
+            title=TestInlineQueryResultPhotoBase.title,
+            description=TestInlineQueryResultPhotoBase.description,
+            caption=TestInlineQueryResultPhotoBase.caption,
+            parse_mode=TestInlineQueryResultPhotoBase.parse_mode,
+            caption_entities=TestInlineQueryResultPhotoBase.caption_entities,
+            input_message_content=TestInlineQueryResultPhotoBase.input_message_content,
+            reply_markup=TestInlineQueryResultPhotoBase.reply_markup,
+            thumb_url=TestInlineQueryResultPhotoBase.thumbnail_url,  # deprecated arg
+        )
+        assert inline_query_result_photo.thumb_url == inline_query_result_photo.thumbnail_url
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+        )
+
+    def test_thumb_url_issues_warning_and_works_without_positional_arg(self, recwarn):
+        inline_query_result_photo = InlineQueryResultPhoto(
+            TestInlineQueryResultPhotoBase.id_,
+            TestInlineQueryResultPhotoBase.photo_url,
+            # positional argument thumbnail_url should be here, but it's not
+            photo_width=TestInlineQueryResultPhotoBase.photo_width,
+            photo_height=TestInlineQueryResultPhotoBase.photo_height,
+            title=TestInlineQueryResultPhotoBase.title,
+            description=TestInlineQueryResultPhotoBase.description,
+            caption=TestInlineQueryResultPhotoBase.caption,
+            parse_mode=TestInlineQueryResultPhotoBase.parse_mode,
+            caption_entities=TestInlineQueryResultPhotoBase.caption_entities,
+            input_message_content=TestInlineQueryResultPhotoBase.input_message_content,
+            reply_markup=TestInlineQueryResultPhotoBase.reply_markup,
+            thumb_url=TestInlineQueryResultPhotoBase.thumbnail_url,  # deprecated arg
+        )
+        assert inline_query_result_photo.thumb_url == inline_query_result_photo.thumbnail_url
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+        )
+
+    def test_init_throws_error_without_thumbnail_url_and_thumb_url(self, recwarn):
+        with pytest.raises(ValueError, match="You must pass either"):
+            InlineQueryResultPhoto(
+                TestInlineQueryResultPhotoBase.id_,
+                TestInlineQueryResultPhotoBase.photo_url,
+                # no thumbnail_url or thumb_url
+                photo_width=TestInlineQueryResultPhotoBase.photo_width,
+                photo_height=TestInlineQueryResultPhotoBase.photo_height,
+                title=TestInlineQueryResultPhotoBase.title,
+                description=TestInlineQueryResultPhotoBase.description,
+                caption=TestInlineQueryResultPhotoBase.caption,
+                parse_mode=TestInlineQueryResultPhotoBase.parse_mode,
+                caption_entities=TestInlineQueryResultPhotoBase.caption_entities,
+                input_message_content=TestInlineQueryResultPhotoBase.input_message_content,
+                reply_markup=TestInlineQueryResultPhotoBase.reply_markup,
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self):
+        with pytest.raises(
+            ValueError,
+            match="different entities as 'thumb_url' and 'thumbnail_url'",
+        ):
+            InlineQueryResultPhoto(
+                TestInlineQueryResultPhotoBase.id_,
+                TestInlineQueryResultPhotoBase.photo_url,
+                TestInlineQueryResultPhotoBase.thumbnail_url,
+                photo_width=TestInlineQueryResultPhotoBase.photo_width,
+                photo_height=TestInlineQueryResultPhotoBase.photo_height,
+                title=TestInlineQueryResultPhotoBase.title,
+                description=TestInlineQueryResultPhotoBase.description,
+                caption=TestInlineQueryResultPhotoBase.caption,
+                parse_mode=TestInlineQueryResultPhotoBase.parse_mode,
+                caption_entities=TestInlineQueryResultPhotoBase.caption_entities,
+                input_message_content=TestInlineQueryResultPhotoBase.input_message_content,
+                reply_markup=TestInlineQueryResultPhotoBase.reply_markup,
+                thumb_url="some other url",
+            )
 
     def test_to_dict(self, inline_query_result_photo):
         inline_query_result_photo_dict = inline_query_result_photo.to_dict()
@@ -107,7 +194,10 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
             inline_query_result_photo_dict["photo_height"]
             == inline_query_result_photo.photo_height
         )
-        assert inline_query_result_photo_dict["thumb_url"] == inline_query_result_photo.thumb_url
+        assert (
+            inline_query_result_photo_dict["thumbnail_url"]
+            == inline_query_result_photo.thumbnail_url
+        )
         assert inline_query_result_photo_dict["title"] == inline_query_result_photo.title
         assert (
             inline_query_result_photo_dict["description"] == inline_query_result_photo.description
@@ -127,10 +217,10 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
         )
 
     def test_equality(self):
-        a = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
-        b = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
-        c = InlineQueryResultPhoto(self.id_, "", self.thumb_url)
-        d = InlineQueryResultPhoto("", self.photo_url, self.thumb_url)
+        a = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumbnail_url)
+        b = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumbnail_url)
+        c = InlineQueryResultPhoto(self.id_, "", self.thumbnail_url)
+        d = InlineQueryResultPhoto("", self.photo_url, self.thumbnail_url)
         e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b

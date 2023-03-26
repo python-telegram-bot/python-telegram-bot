@@ -180,7 +180,7 @@ class PassportElementErrorFiles(PassportElementError):
         with self._unfrozen():
             self.file_hashes: str = file_hashes
 
-            self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
+            self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
 
 
 class PassportElementErrorFrontSide(PassportElementError):
@@ -362,7 +362,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
         with self._unfrozen():
             self.file_hashes: str = file_hashes
 
-            self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
+            self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
 
 
 class PassportElementErrorUnspecified(PassportElementError):

@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Updater, which tries to make creating Telegram bots intuitive."""
 import asyncio
+import contextlib
 import logging
 import ssl
 from pathlib import Path
@@ -746,11 +747,9 @@ class Updater(AsyncContextManager["Updater"]):
             self._logger.debug("Waiting background polling task to finish up.")
             self.__polling_task.cancel()
 
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self.__polling_task
-            except asyncio.CancelledError:
-                # This only happens in rare edge-cases, e.g. when `stop()` is called directly
+                # It only fails in rare edge-cases, e.g. when `stop()` is called directly
                 # after start_polling(), but lets better be safe than sorry ...
-                pass
 
             self.__polling_task = None

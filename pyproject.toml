@@ -9,3 +9,7 @@ line_length = 99
 [tool.ruff]
 line-length = 99
 target-version = "py37"
+show-fixes = true
+ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915"]
+select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
+          "G", "ISC", "PT"]

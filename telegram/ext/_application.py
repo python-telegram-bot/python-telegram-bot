@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Application class."""
 import asyncio
+import contextlib
 import inspect
 import itertools
 import logging
@@ -74,6 +75,7 @@ DEFAULT_GROUP: int = 0
 
 _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-name
 _STOP_SIGNAL = object()
+_DEFAULT_0 = DefaultValue(0)
 
 _logger = logging.getLogger(__name__)
 
@@ -137,7 +139,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     Examples:
         :any:`Echo Bot <examples.echobot>`
 
-    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+    .. seealso:: :wiki:`Your First Bot <Extensions---Your-first-Bot>`,
         :wiki:`Architecture Overview <Architecture>`
 
     .. versionchanged:: 20.0
@@ -997,10 +999,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__create_task_tasks.discard(task)  # Discard from our set since we are done with it
         # We just retrieve the eventual exception so that asyncio doesn't complain in case
         # it's not retrieved somewhere else
-        try:
+        with contextlib.suppress(asyncio.CancelledError, asyncio.InvalidStateError):
             task.exception()
-        except (asyncio.CancelledError, asyncio.InvalidStateError):
-            pass
 
     async def __create_task_callback(
         self,
@@ -1200,7 +1200,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]],
             Dict[int, Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]]],
         ],
-        group: Union[int, DefaultValue[int]] = DefaultValue(0),
+        group: Union[int, DefaultValue[int]] = _DEFAULT_0,
     ) -> None:
         """Registers multiple handlers at once. The order of the handlers in the passed
         sequence(s) matters. See :meth:`add_handler` for details.

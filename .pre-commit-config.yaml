@@ -80,11 +80,11 @@ repos:
         - --diff
         - --check
 -   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.254'
+    rev: 'v0.0.259'
     hooks:
     -   id: ruff
         name: ruff
-        files: ^(telegram|examples)/.*\.py$
+        files: ^(telegram|examples|tests)/.*\.py$
         additional_dependencies:
           - httpx~=0.23.3
           - tornado~=6.2

@@ -26,6 +26,7 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
+from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.slots import mro_slots
 
 
@@ -34,7 +35,7 @@ def inline_query_result_gif():
     return InlineQueryResultGif(
         TestInlineQueryResultGifBase.id_,
         TestInlineQueryResultGifBase.gif_url,
-        TestInlineQueryResultGifBase.thumb_url,
+        TestInlineQueryResultGifBase.thumbnail_url,
         gif_width=TestInlineQueryResultGifBase.gif_width,
         gif_height=TestInlineQueryResultGifBase.gif_height,
         gif_duration=TestInlineQueryResultGifBase.gif_duration,
@@ -44,7 +45,7 @@ def inline_query_result_gif():
         caption_entities=TestInlineQueryResultGifBase.caption_entities,
         input_message_content=TestInlineQueryResultGifBase.input_message_content,
         reply_markup=TestInlineQueryResultGifBase.reply_markup,
-        thumb_mime_type=TestInlineQueryResultGifBase.thumb_mime_type,
+        thumbnail_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,
     )
 
 
@@ -55,8 +56,8 @@ class TestInlineQueryResultGifBase:
     gif_width = 10
     gif_height = 15
     gif_duration = 1
-    thumb_url = "thumb url"
-    thumb_mime_type = "image/jpeg"
+    thumbnail_url = "thumb url"
+    thumbnail_mime_type = "image/jpeg"
     title = "title"
     caption = "caption"
     parse_mode = "HTML"
@@ -73,7 +74,7 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_caption_entities_always_tuple(self):
-        result = InlineQueryResultGif(self.id_, self.gif_url, self.thumb_url)
+        result = InlineQueryResultGif(self.id_, self.gif_url, self.thumbnail_url)
         assert result.caption_entities == ()
 
     def test_expected_values(self, inline_query_result_gif):
@@ -83,8 +84,8 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
         assert inline_query_result_gif.gif_width == self.gif_width
         assert inline_query_result_gif.gif_height == self.gif_height
         assert inline_query_result_gif.gif_duration == self.gif_duration
-        assert inline_query_result_gif.thumb_url == self.thumb_url
-        assert inline_query_result_gif.thumb_mime_type == self.thumb_mime_type
+        assert inline_query_result_gif.thumbnail_url == self.thumbnail_url
+        assert inline_query_result_gif.thumbnail_mime_type == self.thumbnail_mime_type
         assert inline_query_result_gif.title == self.title
         assert inline_query_result_gif.caption == self.caption
         assert inline_query_result_gif.parse_mode == self.parse_mode
@@ -94,6 +95,141 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
+
+    def test_thumb_url_property_deprecation_warning(self, recwarn):
+        inline_query_result_gif = InlineQueryResultGif(
+            TestInlineQueryResultGifBase.id_,
+            TestInlineQueryResultGifBase.gif_url,
+            TestInlineQueryResultGifBase.thumbnail_url,
+            gif_width=TestInlineQueryResultGifBase.gif_width,
+            gif_height=TestInlineQueryResultGifBase.gif_height,
+            gif_duration=TestInlineQueryResultGifBase.gif_duration,
+            title=TestInlineQueryResultGifBase.title,
+            caption=TestInlineQueryResultGifBase.caption,
+            parse_mode=TestInlineQueryResultGifBase.parse_mode,
+            caption_entities=TestInlineQueryResultGifBase.caption_entities,
+            input_message_content=TestInlineQueryResultGifBase.input_message_content,
+            reply_markup=TestInlineQueryResultGifBase.reply_markup,
+            thumbnail_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,
+            thumb_url=TestInlineQueryResultGifBase.thumbnail_url,  # deprecated arg
+        )
+        assert inline_query_result_gif.thumb_url == inline_query_result_gif.thumbnail_url
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+        )
+
+    def test_thumb_mime_type_property_deprecation_warning(self, recwarn):
+        inline_query_result_gif = InlineQueryResultGif(
+            TestInlineQueryResultGifBase.id_,
+            TestInlineQueryResultGifBase.gif_url,
+            TestInlineQueryResultGifBase.thumbnail_url,
+            gif_width=TestInlineQueryResultGifBase.gif_width,
+            gif_height=TestInlineQueryResultGifBase.gif_height,
+            gif_duration=TestInlineQueryResultGifBase.gif_duration,
+            title=TestInlineQueryResultGifBase.title,
+            caption=TestInlineQueryResultGifBase.caption,
+            parse_mode=TestInlineQueryResultGifBase.parse_mode,
+            caption_entities=TestInlineQueryResultGifBase.caption_entities,
+            input_message_content=TestInlineQueryResultGifBase.input_message_content,
+            reply_markup=TestInlineQueryResultGifBase.reply_markup,
+            thumb_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,  # deprecated arg
+        )
+        assert (
+            inline_query_result_gif.thumb_mime_type == inline_query_result_gif.thumbnail_mime_type
+        )
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn, __file__, deprecated_name="thumb_mime_type", new_name="thumbnail_mime_type"
+        )
+
+    def test_thumb_url_issues_warning_and_works_without_positional_arg(self, recwarn):
+        inline_query_result_gif = InlineQueryResultGif(
+            TestInlineQueryResultGifBase.id_,
+            TestInlineQueryResultGifBase.gif_url,
+            # positional argument thumbnail_url should be here, but it's not
+            gif_width=TestInlineQueryResultGifBase.gif_width,
+            gif_height=TestInlineQueryResultGifBase.gif_height,
+            gif_duration=TestInlineQueryResultGifBase.gif_duration,
+            title=TestInlineQueryResultGifBase.title,
+            caption=TestInlineQueryResultGifBase.caption,
+            parse_mode=TestInlineQueryResultGifBase.parse_mode,
+            caption_entities=TestInlineQueryResultGifBase.caption_entities,
+            input_message_content=TestInlineQueryResultGifBase.input_message_content,
+            reply_markup=TestInlineQueryResultGifBase.reply_markup,
+            thumbnail_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,
+            thumb_url=TestInlineQueryResultGifBase.thumbnail_url,  # deprecated arg
+        )
+
+        assert inline_query_result_gif.thumb_url == inline_query_result_gif.thumbnail_url
+        check_thumb_deprecation_warnings_for_args_and_attrs(
+            recwarn,
+            __file__,
+            deprecated_name="thumb_url",
+            new_name="thumbnail_url",
+        )
+
+    def test_init_throws_error_without_thumbnail_url_and_thumb_url(self, recwarn):
+        with pytest.raises(ValueError, match="You must pass either"):
+            InlineQueryResultGif(
+                TestInlineQueryResultGifBase.id_,
+                TestInlineQueryResultGifBase.gif_url,
+                # no thumbnail_url or thumb_url
+                gif_width=TestInlineQueryResultGifBase.gif_width,
+                gif_height=TestInlineQueryResultGifBase.gif_height,
+                gif_duration=TestInlineQueryResultGifBase.gif_duration,
+                title=TestInlineQueryResultGifBase.title,
+                caption=TestInlineQueryResultGifBase.caption,
+                parse_mode=TestInlineQueryResultGifBase.parse_mode,
+                caption_entities=TestInlineQueryResultGifBase.caption_entities,
+                input_message_content=TestInlineQueryResultGifBase.input_message_content,
+                reply_markup=TestInlineQueryResultGifBase.reply_markup,
+                thumbnail_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_url(self, recwarn):
+        with pytest.raises(
+            ValueError, match="different entities as 'thumb_url' and 'thumbnail_url'"
+        ):
+            InlineQueryResultGif(
+                TestInlineQueryResultGifBase.id_,
+                TestInlineQueryResultGifBase.gif_url,
+                TestInlineQueryResultGifBase.thumbnail_url,
+                gif_width=TestInlineQueryResultGifBase.gif_width,
+                gif_height=TestInlineQueryResultGifBase.gif_height,
+                gif_duration=TestInlineQueryResultGifBase.gif_duration,
+                title=TestInlineQueryResultGifBase.title,
+                caption=TestInlineQueryResultGifBase.caption,
+                parse_mode=TestInlineQueryResultGifBase.parse_mode,
+                caption_entities=TestInlineQueryResultGifBase.caption_entities,
+                input_message_content=TestInlineQueryResultGifBase.input_message_content,
+                reply_markup=TestInlineQueryResultGifBase.reply_markup,
+                thumbnail_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,
+                thumb_url="some other url",
+            )
+
+    def test_throws_value_error_with_different_deprecated_and_new_arg_thumb_mime_type(self):
+        with pytest.raises(
+            ValueError,
+            match="different entities as 'thumb_mime_type' and 'thumbnail_mime_type'",
+        ):
+            InlineQueryResultGif(
+                TestInlineQueryResultGifBase.id_,
+                TestInlineQueryResultGifBase.gif_url,
+                TestInlineQueryResultGifBase.thumbnail_url,
+                gif_width=TestInlineQueryResultGifBase.gif_width,
+                gif_height=TestInlineQueryResultGifBase.gif_height,
+                gif_duration=TestInlineQueryResultGifBase.gif_duration,
+                title=TestInlineQueryResultGifBase.title,
+                caption=TestInlineQueryResultGifBase.caption,
+                parse_mode=TestInlineQueryResultGifBase.parse_mode,
+                caption_entities=TestInlineQueryResultGifBase.caption_entities,
+                input_message_content=TestInlineQueryResultGifBase.input_message_content,
+                reply_markup=TestInlineQueryResultGifBase.reply_markup,
+                thumbnail_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,
+                thumb_mime_type="video/mp4",
+            )
 
     def test_to_dict(self, inline_query_result_gif):
         inline_query_result_gif_dict = inline_query_result_gif.to_dict()
@@ -105,10 +241,12 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
         assert inline_query_result_gif_dict["gif_width"] == inline_query_result_gif.gif_width
         assert inline_query_result_gif_dict["gif_height"] == inline_query_result_gif.gif_height
         assert inline_query_result_gif_dict["gif_duration"] == inline_query_result_gif.gif_duration
-        assert inline_query_result_gif_dict["thumb_url"] == inline_query_result_gif.thumb_url
         assert (
-            inline_query_result_gif_dict["thumb_mime_type"]
-            == inline_query_result_gif.thumb_mime_type
+            inline_query_result_gif_dict["thumbnail_url"] == inline_query_result_gif.thumbnail_url
+        )
+        assert (
+            inline_query_result_gif_dict["thumbnail_mime_type"]
+            == inline_query_result_gif.thumbnail_mime_type
         )
         assert inline_query_result_gif_dict["title"] == inline_query_result_gif.title
         assert inline_query_result_gif_dict["caption"] == inline_query_result_gif.caption
@@ -126,10 +264,10 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
         )
 
     def test_equality(self):
-        a = InlineQueryResultGif(self.id_, self.gif_url, self.thumb_url)
-        b = InlineQueryResultGif(self.id_, self.gif_url, self.thumb_url)
-        c = InlineQueryResultGif(self.id_, "", self.thumb_url)
-        d = InlineQueryResultGif("", self.gif_url, self.thumb_url)
+        a = InlineQueryResultGif(self.id_, self.gif_url, self.thumbnail_url)
+        b = InlineQueryResultGif(self.id_, self.gif_url, self.thumbnail_url)
+        c = InlineQueryResultGif(self.id_, "", self.thumbnail_url)
+        d = InlineQueryResultGif("", self.gif_url, self.thumbnail_url)
         e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b

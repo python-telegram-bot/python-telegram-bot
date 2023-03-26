@@ -92,11 +92,10 @@ def make_bot(bot_info=None, **kwargs):
     token = kwargs.pop("token", (bot_info or {}).get("token"))
     private_key = kwargs.pop("private_key", PRIVATE_KEY)
     kwargs.pop("token", None)
-    _bot = PytestExtBot(
+    return PytestExtBot(
         token=token,
         private_key=private_key if TEST_WITH_OPT_DEPS else None,
         request=NonchalantHttpxRequest(8),
         get_updates_request=NonchalantHttpxRequest(1),
         **kwargs,
     )
-    return _bot

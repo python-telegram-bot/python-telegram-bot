@@ -45,7 +45,7 @@ class TestDefault:
     def test_data_assignment(self):
         defaults = Defaults()
 
-        for name, val in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
+        for name, _val in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
             with pytest.raises(AttributeError):
                 setattr(defaults, name, True)
 

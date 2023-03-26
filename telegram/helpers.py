@@ -162,6 +162,11 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
 
     Returns:
         :obj:`str`: An URL to start the bot with specific parameters.
+
+    Raises:
+        :exc:`ValueError`: If the length of the :paramref:`payload` exceeds 64 characters,
+            contains invalid characters, or if the :paramref:`bot_username` is less than 4
+            characters.
     """
     if bot_username is None or len(bot_username) <= 3:
         raise ValueError("You must provide a valid bot_username.")
@@ -179,9 +184,6 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
             "URLs: A-Z, a-z, 0-9, _ and -"
         )
 
-    if group:
-        key = "startgroup"
-    else:
-        key = "start"
+    key = "startgroup" if group else "start"
 
     return f"{base_url}?{key}={payload}"

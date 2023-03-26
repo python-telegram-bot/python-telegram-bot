@@ -68,7 +68,7 @@ def false_update(request):
     return Update(update_id=2, **request.param)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def inline_query(bot):
     update = Update(
         0,
@@ -95,7 +95,7 @@ class TestInlineQueryHandler:
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = False
 
     async def callback(self, update, context):
@@ -154,7 +154,7 @@ class TestInlineQueryHandler:
 
     @pytest.mark.parametrize("chat_types", [[Chat.SENDER], [Chat.SENDER, Chat.SUPERGROUP], []])
     @pytest.mark.parametrize(
-        "chat_type,result", [(Chat.SENDER, True), (Chat.CHANNEL, False), (None, False)]
+        ("chat_type", "result"), [(Chat.SENDER, True), (Chat.CHANNEL, False), (None, False)]
     )
     async def test_chat_types(self, app, inline_query, chat_types, chat_type, result):
         try:

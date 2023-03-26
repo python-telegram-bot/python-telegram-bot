@@ -93,7 +93,7 @@ class TestConstantsWithoutRequest:
         assert StrEnumTest.FOO == "foo"
         assert StrEnumTest.FOO != StrEnumTest.BAR
         assert StrEnumTest.FOO != "bar"
-        assert StrEnumTest.FOO != object()
+        assert object() != StrEnumTest.FOO
 
         assert hash(StrEnumTest.FOO) == hash("foo")
 
@@ -105,14 +105,15 @@ class TestConstantsWithoutRequest:
         assert IntEnumTest.FOO == 1
         assert IntEnumTest.FOO != IntEnumTest.BAR
         assert IntEnumTest.FOO != 2
-        assert IntEnumTest.FOO != object()
+        assert object() != IntEnumTest.FOO
 
         assert hash(IntEnumTest.FOO) == hash(1)
 
     def test_bot_api_version_and_info(self):
-        assert constants.BOT_API_VERSION == str(constants.BOT_API_VERSION_INFO)
-        assert constants.BOT_API_VERSION_INFO == tuple(
-            int(x) for x in constants.BOT_API_VERSION.split(".")
+        assert str(constants.BOT_API_VERSION_INFO) == constants.BOT_API_VERSION
+        assert (
+            tuple(int(x) for x in constants.BOT_API_VERSION.split("."))
+            == constants.BOT_API_VERSION_INFO
         )
 
     def test_bot_api_version_info(self):
@@ -139,7 +140,8 @@ class TestConstantsWithRequest:
         )
         good_msg, bad_msg = await tasks
         assert good_msg.text == good_text
-        assert isinstance(bad_msg, BadRequest) and "Message is too long" in str(bad_msg)
+        assert isinstance(bad_msg, BadRequest)
+        assert "Message is too long" in str(bad_msg)
 
     async def test_max_caption_length(self, bot, chat_id):
         good_caption = "a" * constants.MessageLimit.CAPTION_LENGTH
@@ -151,4 +153,5 @@ class TestConstantsWithRequest:
         )
         good_msg, bad_msg = await tasks
         assert good_msg.caption == good_caption
-        assert isinstance(bad_msg, BadRequest) and "Message caption is too long" in str(bad_msg)
+        assert isinstance(bad_msg, BadRequest)
+        assert "Message caption is too long" in str(bad_msg)
