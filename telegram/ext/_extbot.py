@@ -157,7 +157,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     __slots__ = ("_callback_data_cache", "_defaults", "_rate_limiter")
 
-    _LOGGER = get_logger(__name__)
+    _LOGGER = get_logger(__name__, class_name="ExtBot")
 
     # using object() would be a tiny bit safer, but a string plays better with the typing setup
     __RL_KEY = uuid4().hex

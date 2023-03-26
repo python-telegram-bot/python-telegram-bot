@@ -377,10 +377,13 @@ class TestBotWithoutRequest:
             re.match(rf"\s*\@\_log\s*async def {bot_method_name}", source)
         ), f"{bot_method_name} is missing the @_log decorator"
 
-    async def test_log_decorator(self, bot: PytestExtBot, caplog):
+    @pytest.mark.parametrize(
+        ("cls", "logger_name"), [(Bot, "telegram.Bot"), (ExtBot, "telegram.ext.ExtBot")]
+    )
+    async def test_log_decorator(self, bot: PytestExtBot, cls, logger_name, caplog):
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
-            await ExtBot(bot.token).get_me()
+            await cls(bot.token).get_me()
             # Only for stabilizing this test-
             if len(caplog.records) == 4:
                 for idx, record in enumerate(caplog.records):
@@ -390,6 +393,8 @@ class TestBotWithoutRequest:
                     if record.getMessage().startswith("Task exception was never retrieved"):
                         caplog.records.pop(idx)
             assert len(caplog.records) == 3
+
+            assert all(caplog.records[i].name == logger_name for i in [-1, 0])
             assert caplog.records[0].getMessage().startswith("Entering: get_me")
             assert caplog.records[-1].getMessage().startswith("Exiting: get_me")
 
@@ -963,7 +968,7 @@ class TestBotWithoutRequest:
 
         assert await bot.answer_inline_query(1234, results=inline_results, current_offset=0)
 
-    async def test_answer_inline_query_current_offset_callback(self, monkeypatch, bot, caplog):
+    async def test_answer_inline_query_current_offset_callback(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.parameters
