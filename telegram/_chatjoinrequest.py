@@ -56,6 +56,10 @@ class ChatJoinRequest(TelegramObject):
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
         from_user (:class:`telegram.User`): User that sent the join request.
         date (:class:`datetime.datetime`): Date the request was sent.
+
+            .. versionchanged:: NEXT.VERSION
+                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
+                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
         user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
             request. This number may have more than 32 significant bits and some programming
             languages may have difficulty/silent defects in interpreting it. But it has at most 52
@@ -73,6 +77,10 @@ class ChatJoinRequest(TelegramObject):
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
         from_user (:class:`telegram.User`): User that sent the join request.
         date (:class:`datetime.datetime`): Date the request was sent.
+
+            .. versionchanged:: NEXT.VERSION
+                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
+                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
         user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
             request. This number may have more than 32 significant bits and some programming
             languages may have difficulty/silent defects in interpreting it. But it has at most 52

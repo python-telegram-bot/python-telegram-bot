@@ -54,6 +54,10 @@ class ChatInviteLink(TelegramObject):
         is_revoked (:obj:`bool`): :obj:`True`, if the link is revoked.
         expire_date (:class:`datetime.datetime`, optional): Date when the link will expire or
             has been expired.
+
+            .. versionchanged:: NEXT.VERSION
+                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
+                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
         member_limit (:obj:`int`, optional): Maximum number of users that can be members of the
             chat simultaneously after joining the chat via this invite link;
             :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
@@ -78,6 +82,10 @@ class ChatInviteLink(TelegramObject):
         is_revoked (:obj:`bool`): :obj:`True`, if the link is revoked.
         expire_date (:class:`datetime.datetime`): Optional. Date when the link will expire or
             has been expired.
+
+            .. versionchanged:: NEXT.VERSION
+                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
+                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
         member_limit (:obj:`int`): Optional. Maximum number of users that can be members
             of the chat simultaneously after joining the chat via this invite link;
             :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-

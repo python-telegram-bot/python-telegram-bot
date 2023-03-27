@@ -173,6 +173,10 @@ class Poll(TelegramObject):
         close_date (:obj:`datetime.datetime`, optional): Point in time (Unix timestamp) when the
             poll will be automatically closed. Converted to :obj:`datetime.datetime`.
 
+            .. versionchanged:: NEXT.VERSION
+                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
+                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+
     Attributes:
         id (:obj:`str`): Unique poll identifier.
         question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
@@ -205,6 +209,10 @@ class Poll(TelegramObject):
             after creation.
         close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
             automatically closed.
+
+            .. versionchanged:: NEXT.VERSION
+                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
+                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
 
     """
 

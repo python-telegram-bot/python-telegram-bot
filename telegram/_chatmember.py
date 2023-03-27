@@ -389,6 +389,10 @@ class ChatMemberRestricted(ChatMember):
             .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
+
+            .. versionchanged:: NEXT.VERSION
+                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
+                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
         can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
 
             .. versionadded:: 20.1
@@ -441,6 +445,10 @@ class ChatMemberRestricted(ChatMember):
             .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
+
+            .. versionchanged:: NEXT.VERSION
+                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
+                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
         can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
 
             .. versionadded:: 20.1
@@ -568,12 +576,20 @@ class ChatMemberBanned(ChatMember):
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
+            .. versionchanged:: NEXT.VERSION
+                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
+                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+
     Attributes:
         status (:obj:`str`): The member's status in the chat,
             always :tg-const:`telegram.ChatMember.BANNED`.
         user (:class:`telegram.User`): Information about the user.
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
+
+            .. versionchanged:: NEXT.VERSION
+                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
+                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
 
     """
 
