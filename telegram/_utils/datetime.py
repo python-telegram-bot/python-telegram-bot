@@ -29,7 +29,10 @@ Warning:
 """
 import datetime as dtm  # skipcq: PYL-W0406
 import time
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 # pytz is only available if it was installed as dependency of APScheduler, so we make a little
 # workaround here
@@ -182,6 +185,16 @@ def from_timestamp(unixtime: Optional[int], tzinfo: dtm.tzinfo = UTC) -> Optiona
     if tzinfo is not None:
         return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
     return dtm.datetime.utcfromtimestamp(unixtime)
+
+
+def extract_tzinfo_from_defaults(bot: "Bot") -> Union[dtm.tzinfo, None]:
+    """
+    Extracts the timezone info from the default values of the bot.
+    If the bot has no default values, None is returned.
+    """
+    if hasattr(bot, "defaults") and bot.defaults:
+        return bot.defaults.tzinfo
+    return None
 
 
 def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
