@@ -167,7 +167,7 @@ def to_timestamp(
 
 def from_timestamp(
     unixtime: Optional[int],
-    tzinfo: Optional[dtm.tzinfo] = UTC,
+    tzinfo: Optional[dtm.tzinfo] = None,
 ) -> Optional[dtm.datetime]:
     """
     Converts an (integer) unix timestamp to a timezone aware datetime object.
@@ -176,7 +176,8 @@ def from_timestamp(
     Args:
         unixtime (:obj:`int`): Integer POSIX timestamp.
         tzinfo (:obj:`datetime.tzinfo`, optional): The timezone to which the timestamp is to be
-            converted to. Defaults to UTC.
+            converted to. Defaults to :obj:`None`, in which case the returned datetime object will
+            be timezone aware and in UTC.
 
     Returns:
         Timezone aware equivalent :obj:`datetime.datetime` value if :paramref:`unixtime` is not
@@ -185,9 +186,7 @@ def from_timestamp(
     if unixtime is None:
         return None
 
-    if tzinfo is not None:
-        return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
-    return dtm.datetime.utcfromtimestamp(unixtime)
+    return dtm.datetime.fromtimestamp(unixtime, tz=UTC if tzinfo is None else tzinfo)
 
 
 def extract_tzinfo_from_defaults(bot: "Bot") -> Union[dtm.tzinfo, None]:
