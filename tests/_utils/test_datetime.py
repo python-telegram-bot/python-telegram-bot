@@ -162,7 +162,7 @@ class TestDatetime:
         assert tg_dtm.from_timestamp(None) is None
 
     def test_from_timestamp_naive(self):
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=None)
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=dtm.timezone.utc)
         assert tg_dtm.from_timestamp(1573431976, tzinfo=None) == datetime
 
     def test_from_timestamp_aware(self, timezone):
