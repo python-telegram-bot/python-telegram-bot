@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -125,7 +125,10 @@ class ChatMember(TelegramObject):
 
         data["user"] = User.de_json(data.get("user"), bot)
         if "until_date" in data:
-            data["until_date"] = from_timestamp(data["until_date"])
+            # Get the local timezone from the bot if it has defaults
+            loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
+            data["until_date"] = from_timestamp(data["until_date"], tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 

@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.datetime import from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -178,6 +178,9 @@ class VideoChatScheduled(TelegramObject):
         if not data:
             return None
 
-        data["start_date"] = from_timestamp(data["start_date"])
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
+        data["start_date"] = from_timestamp(data["start_date"], tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)

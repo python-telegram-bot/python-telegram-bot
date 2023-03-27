@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.datetime import from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -154,9 +154,12 @@ class WebhookInfo(TelegramObject):
         if not data:
             return None
 
-        data["last_error_date"] = from_timestamp(data.get("last_error_date"))
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
+        data["last_error_date"] = from_timestamp(data.get("last_error_date"), tzinfo=loc_tzinfo)
         data["last_synchronization_error_date"] = from_timestamp(
-            data.get("last_synchronization_error_date")
+            data.get("last_synchronization_error_date"), tzinfo=loc_tzinfo
         )
 
         return super().de_json(data=data, bot=bot)

@@ -165,7 +165,10 @@ def to_timestamp(
     )
 
 
-def from_timestamp(unixtime: Optional[int], tzinfo: dtm.tzinfo = UTC) -> Optional[dtm.datetime]:
+def from_timestamp(
+    unixtime: Optional[int],
+    tzinfo: Optional[dtm.tzinfo] = UTC,
+) -> Optional[dtm.datetime]:
     """
     Converts an (integer) unix timestamp to a timezone aware datetime object.
     :obj:`None` s are left alone (i.e. ``from_timestamp(None)`` is :obj:`None`).

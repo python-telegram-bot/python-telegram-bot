@@ -26,7 +26,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.datetime import from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -271,9 +271,12 @@ class Poll(TelegramObject):
         if not data:
             return None
 
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
         data["options"] = [PollOption.de_json(option, bot) for option in data["options"]]
         data["explanation_entities"] = MessageEntity.de_list(data.get("explanation_entities"), bot)
-        data["close_date"] = from_timestamp(data.get("close_date"))
+        data["close_date"] = from_timestamp(data.get("close_date"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 
