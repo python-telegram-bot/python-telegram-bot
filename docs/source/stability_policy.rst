@@ -1,7 +1,7 @@
 Stability Policy
 ================
 
-The ``python-telegram-bot`` library (PTB) tries to provides a stable interface to it’s users.
+The ``python-telegram-bot`` library (PTB) tries to provides a stable interface to its users.
 As both the user base and the complexity of the library has grown significantly since PTBs conception, we introduced below explicit stability Policy with version NEXT.VERSION.
 
 Large parts of the :mod:`telegram` package are the Python representations of the Telegram Bot API, the stability policy of which PTB can not influence.
@@ -10,16 +10,10 @@ This policy hence includes some special cases for those parts.
 What does this policy cover?
 ----------------------------
 
-Non-Bot API Functionality
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
 This policy includes any API or behavior that is documented in this documentation.
 This covers both the :mod:`telegram` package and the :mod:`telegram.ext` package.
 
-Bot API Functionality
-~~~~~~~~~~~~~~~~~~~~~
-
-What doesn’t this policy cover?
+What doesn't this policy cover?
 -------------------------------
 
 Introduction of new features or changes of flavors of comparable behavior (e.g. the default for the used HTTP protocol version) are not covered by this policy.
@@ -76,9 +70,9 @@ Given a version of PTB X.Y.Z,
    This is incremented when backwards incompatible changes are introduced.
 -  Y indicates the minor version number.
    This is incremented when new functionality or backwards compatible changes are introduced by PTB.
-   *This is also incremented when PTB adds support for a new Bot API version, which may include backwards incompatible changes in some cases.*
+   *This is also incremented when PTB adds support for a new Bot API version, which may include backwards incompatible changes in some cases as outlined* :ref:`below <bot-api-versioning>`.
 -  Z is the patch version.
-   This is incremented for backwards incompatible changes or other major changes.
+   This is incremented if backwards compatible bug fixes or smaller changes are introduced.
 
 Deprecation
 ~~~~~~~~~~~
@@ -87,15 +81,13 @@ From time to time we will want to change the behavior of an API or remove it ent
 In those cases, we follow a deprecation schedule as detailed below.
 
 Functionality is marked as deprecated by a corresponding note in the release notes and the documentation.
-Were possible, a :class:`~telegram.warnings.PTBDeprecationWarning` is issued when deprecated functionality is used, but this is not mandatory.
+Where possible, a :class:`~telegram.warnings.PTBDeprecationWarning` is issued when deprecated functionality is used, but this is not mandatory.
 
 From time to time, we may decide to deprecate an API that is particularly widely used.
 In these cases, we may decide to provide an extended deprecation period, at our discretion.
 
 With version 20.0.0, PTB introduced majorly structural breaking changes without the above deprecation period.
 Should a similarly big change ever be deemed necessary by the development team and should a deprecation period prove too much additional effort, this violation of the stability policy will be announced well ahead of the release in our channel.
-
-.. _non-bot-api-functionality-1:
 
 Non-Bot API Functionality
 #########################
@@ -104,11 +96,11 @@ Starting with version NEXT.VERSION, deprecated functionality will stay available
 More precisely:
 
 -  In PTB X.Y.Z the feature exists
--  In PTB X.Y.(Z + 1) or X.(Y + 1).\* the feature is marked as deprecated
--  In PTB (X + 1).\ *.* the feature is marked as deprecated
+-  In PTB X.Y.(Z + 1) or X.(Y + 1).* the feature is marked as deprecated
+-  In PTB (X + 1).*.* the feature is marked as deprecated
 -  In PTB (X + 2).0.0 the feature is removed or changed
 
-.. _bot-api-functionality-2:
+.. _bot-api-versioning:
 
 Bot API Functionality
 #####################
@@ -132,6 +124,6 @@ Case 2
 
 -  In PTB X.Y.Z the feature exists
 -  Bot API version N.M is released and deprecates the feature
--  In PTB X.(Y + 1).0 adds support for Bot API A.B and the feature is marked as deprecated
+-  PTB X.(Y + 1).0 adds support for Bot API N.M and the feature is marked as deprecated
 -  Bot API version N.(M + 1) is released
 -  In PTB X.(Y + 2).0 adds support for Bot API N.(M + 1) and the feature is removed or changed
