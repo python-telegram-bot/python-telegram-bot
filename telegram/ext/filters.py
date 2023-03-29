@@ -514,7 +514,7 @@ class Caption(MessageFilter):
     allow those whose caption is appearing in the given list.
 
     Examples:
-        ``MessageHandler(filters.Caption(['PTB rocks!', 'PTB'], callback_method_2)``
+        ``MessageHandler(filters.Caption(['PTB rocks!', 'PTB']), callback_method_2)``
 
     .. seealso::
         :attr:`telegram.ext.filters.CAPTION`
