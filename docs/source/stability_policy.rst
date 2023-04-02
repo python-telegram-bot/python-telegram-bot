@@ -30,6 +30,9 @@ This also applies to functions or attributes marked as final in the sense of `PE
 PTB has dependencies to 3rd party packages.
 The versions that PTB uses of these 3rd party packages may change if that does not change PTBs public API.
 
+PTB does not give guarantees about which Python versions are supported.
+In general, we will try to support all Python versions that have not yet reached their end of life, but we reserve ourselves the option to drop support for Python versions earlier if that benefits the advancement of the library.
+
 .. _bot-api-functionality-1:
 
 Bot API Functionality
