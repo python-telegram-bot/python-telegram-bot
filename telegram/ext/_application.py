@@ -1382,8 +1382,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         Tip:
             Use this method sparingly. If you have to use this method, it likely means that you
             access and modify ``context.application.chat/user_data[some_id]`` within a callback.
-            Note that for data that should be available globally in all handler callbacks,
-            independent of the chat/user, it is recommended use :attr:`bot_data` instead.
+            Note that for data which should be available globally in all handler callbacks
+            independent of the chat/user, it is recommended to use :attr:`bot_data` instead.
 
         .. versionadded:: NEXT.VERSION
 
@@ -1429,9 +1429,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         along with :attr:`~telegram.ext.ExtBot.callback_data_cache` and the conversation states of
         any persistent :class:`~telegram.ext.ConversationHandler` registered for this application.
 
-        For :attr:`user_data` and :attr:`chat_data`, only those entries are updated that were used
-        or manually marked via :meth:`mark_data_for_update_persistence` since the last run of this
-        method.
+        For :attr:`user_data` and :attr:`chat_data`, only those entries are updated which either
+        were used or have been manually marked via :meth:`mark_data_for_update_persistence` since
+        the last run of this method.
 
         Tip:
             This method will be called in regular intervals by the application. There is usually
