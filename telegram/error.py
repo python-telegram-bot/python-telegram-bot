@@ -55,6 +55,12 @@ class TelegramError(Exception):
     """
     Base class for Telegram errors.
 
+    Tip:
+        Objects of this type can be serialized via Pythons :mod:`pickle` module and pickled
+        objects from one version of PTB are usually loadable in future versions. However, we can
+        not guarantee that this compatibility can always be provided. At least a manual one-time
+        conversation of the data may be needed on major updates of the library.
+
     .. seealso:: :wiki:`Exceptions, Warnings and Logging <Exceptions%2C-Warnings-and-Logging>`
     """
 

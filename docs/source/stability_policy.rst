@@ -22,8 +22,6 @@ The internal structure of classes in PTB, i.e. things like the result of ``dir(o
 Objects are in general not guaranteed to be pickleable (unless stated otherwise) and pickled objects from one version of PTB may not be loadable in future versions.
 We may provide a way to convert pickled objects from one version to another, but this is not guaranteed.
 
--  ☐ Document pickle stability for :class:`~telegram.TelegramObject` and error classes
-
 Functionality that is part of PTBs API but is explicitly documented to not be intended to be used directly by users (e.g. :meth:`telegram.request.BaseRequest.do_request`) may change.
 This also applies to functions or attributes marked as final in the sense of `PEP 591 <https://www.python.org/dev/peps/pep-0591/>`__.
 
