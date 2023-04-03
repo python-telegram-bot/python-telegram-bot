@@ -838,7 +838,6 @@ class Message(TelegramObject):
             # adds the thread for topics and replies
             if (self.is_topic_message and self.message_thread_id) or self.reply_to_message:
                 baselink = f"{baselink}?thread={self.message_thread_id}"
-
             return baselink
         return None
 
