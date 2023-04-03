@@ -836,7 +836,7 @@ class Message(TelegramObject):
             baselink = f"https://t.me/{to_link}/{self.message_id}"
 
             if self.is_topic_message and self.message_thread_id:
-                baselink += f"?thread={self.message_thread_id}"
+                baselink = f"{baselink}?thread={self.message_thread_id}"
 
             return baselink
         return None
