@@ -835,8 +835,9 @@ class Message(TelegramObject):
             to_link = self.chat.username if self.chat.username else f"c/{str(self.chat.id)[4:]}"
             baselink = f"https://t.me/{to_link}/{self.message_id}"
 
-            if self.is_topic_message and self.message_thread_id:
-                baselink += f"?thread={self.message_thread_id}"
+            # adds the thread for topics and replies
+            if (self.is_topic_message and self.message_thread_id) or self.reply_to_message:
+                baselink = f"{baselink}?thread={self.message_thread_id}"
 
             return baselink
         return None
