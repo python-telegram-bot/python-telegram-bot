@@ -41,7 +41,7 @@ def get_logger(file_name: str, class_name: str = None) -> logging.Logger:
         :class:`logging.Logger`: The logger.
     """
     parts = file_name.split("_")
-    if parts[1].startswith("utils"):
+    if parts[1].startswith("utils") and class_name is None:
         name = parts[0].rstrip(".")
     else:
         name = f"{parts[0]}{class_name or parts[1].capitalize()}"

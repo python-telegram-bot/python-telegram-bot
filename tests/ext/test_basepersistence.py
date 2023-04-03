@@ -405,7 +405,7 @@ class TestBasePersistence:
         assert bot.callback_data_cache is None
         assert papp.persistence.set_bot(bot) is None
 
-    def test_construction_with_bad_persistence(self, caplog, bot):
+    def test_construction_with_bad_persistence(self, bot):
         class MyPersistence:
             def __init__(self):
                 self.store_data = PersistenceInput(False, False, False, False)
@@ -1128,6 +1128,7 @@ class TestBasePersistence:
         assert len(caplog.records) == 6
         assert test_flag == [True, True, True, True, True, True]
         for record in caplog.records:
+            assert record.name == "telegram.ext.Application"
             message = record.getMessage()
             assert message.startswith("An error was raised and an uncaught")
 
@@ -1371,6 +1372,7 @@ class TestBasePersistence:
         found_record = None
         for record in caplog.records:
             if record.getMessage().startswith("A ConversationHandlers state was not yet resolved"):
+                assert record.name == "telegram.ext.Application"
                 found_record = record
                 break
         assert found_record is not None
