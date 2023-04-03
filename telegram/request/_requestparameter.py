@@ -31,7 +31,7 @@ from telegram._utils.enum import StringEnum
 from telegram._utils.types import UploadFileDict
 
 
-@dataclass(repr=False, eq=False, order=False, frozen=True)
+@dataclass(repr=True, eq=False, order=False, frozen=True)
 class RequestParameter:
     """Instances of this class represent a single parameter to be sent along with a request to
     the Bot API.
