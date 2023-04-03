@@ -74,6 +74,7 @@ Given a version of PTB X.Y.Z,
    *This is also incremented when PTB adds support for a new Bot API version, which may include backwards incompatible changes in some cases as outlined* :ref:`below <bot-api-versioning>`.
 -  Z is the patch version.
    This is incremented if backwards compatible bug fixes or smaller changes are introduced.
+   If this number is 0, it can be omitted, i.e. we just write X.Y instead of X.Y.0.
 
 Deprecation
 ~~~~~~~~~~~
@@ -94,12 +95,12 @@ Non-Bot API Functionality
 #########################
 
 Starting with version NEXT.VERSION, deprecated functionality will stay available for the current and the next major version.
-More precisely:
+Let's see an example:
 
--  In PTB X.Y.Z the feature exists
--  In PTB X.Y.(Z + 1) or X.(Y + 1).* the feature is marked as deprecated
--  In PTB (X + 1).*.* the feature is marked as deprecated
--  In PTB (X + 2).0.0 the feature is removed or changed
+-  In PTB v20.1.1 the feature exists
+-  In PTB v20.1.2 or v20.2.0 the feature is marked as deprecated
+-  In PTB v21.*.* the feature is marked as deprecated
+-  In PTB v22.0 the feature is removed or changed
 
 .. _bot-api-versioning:
 
@@ -108,23 +109,24 @@ Bot API Functionality
 
 As PTB has no control over deprecations introduced by Telegram and the schedule of these deprecations rarely coincides with PTBs deprecation schedule, we have a special policy for Bot API functionality.
 
-Starting with NEXT.VERSION, deprecated Bot API functionality will stay available for the current and the next major version *or* until the next version of the Bot API.
-More precisely, two cases are possible.
+Starting with NEXT.VERSION, deprecated Bot API functionality will stay available for the current and the next major version of PTB *or* until the next version of the Bot API.
+More precisely, two cases are possible, for which we show examples below.
 
 Case 1
 ^^^^^^
 
--  In PTB X.Y.Z the feature exists
--  Bot API version N.M is released and deprecates the feature
--  In PTB X.(Y + 1).0 adds support for Bot API A.B and the feature is
+-  In PTB v20.1 the feature exists
+-  Bot API version 6.6 is released and deprecates the feature
+-  In PTB v20.2 adds support for Bot API 6.6 and the feature is
    marked as deprecated
--  In PTB (X + 1).0.0 the feature is removed or changed
+-  In PTB v21.0 the feature is removed or changed
 
 Case 2
 ^^^^^^
 
--  In PTB X.Y.Z the feature exists
--  Bot API version N.M is released and deprecates the feature
--  PTB X.(Y + 1).0 adds support for Bot API N.M and the feature is marked as deprecated
--  Bot API version N.(M + 1) is released
--  In PTB X.(Y + 2).0 adds support for Bot API N.(M + 1) and the feature is removed or changed
+-  In PTB v20.1 the feature exists
+-  Bot API version 6.6 is released and deprecates the feature
+-  PTB v20.2 adds support for Bot API version 6.6 and the feature is marked as deprecated
+-  In PTB v20.2.* and v20.3.* the feature is marked as deprecated
+-  Bot API version 6.7 is released
+-  PTB v20.4 adds support for Bot API version 6.7 and the feature is removed or changed
