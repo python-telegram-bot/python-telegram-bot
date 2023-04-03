@@ -67,7 +67,7 @@ Here's how to make a one-off code change.
       $ git checkout -b your-branch-name
 
 3. **Make a commit to your feature branch**. Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made.
-   We also have a check-list for PRs below.
+   We also have a check-list for PRs `below`_.
 
    - You can refer to relevant issues in the commit message by writing, e.g., "#105".
 
@@ -312,3 +312,4 @@ break the API classes. For example:
 .. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html
 .. _`section`: #documenting
 .. _`testing page`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/tests/README.rst
+.. _`below`: #check-list-for-prs
