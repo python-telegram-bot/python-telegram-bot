@@ -391,8 +391,7 @@ class ChatMemberRestricted(ChatMember):
            will be lifted for this user.
 
             .. versionchanged:: NEXT.VERSION
-                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
-                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+                |datetime_localization|
         can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
 
             .. versionadded:: 20.1
@@ -447,8 +446,7 @@ class ChatMemberRestricted(ChatMember):
            will be lifted for this user.
 
             .. versionchanged:: NEXT.VERSION
-                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
-                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+                |datetime_localization|
         can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
 
             .. versionadded:: 20.1
@@ -577,8 +575,7 @@ class ChatMemberBanned(ChatMember):
            will be lifted for this user.
 
             .. versionchanged:: NEXT.VERSION
-                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
-                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+                |datetime_localization|
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -588,8 +585,7 @@ class ChatMemberBanned(ChatMember):
            will be lifted for this user.
 
             .. versionchanged:: NEXT.VERSION
-                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
-                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+                |datetime_localization|
 
     """
 

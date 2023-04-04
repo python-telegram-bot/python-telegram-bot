@@ -151,15 +151,13 @@ class VideoChatScheduled(TelegramObject):
             chat is supposed to be started by a chat administrator
 
             .. versionchanged:: NEXT.VERSION
-                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
-                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+                |datetime_localization|
     Attributes:
         start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the video
             chat is supposed to be started by a chat administrator
 
             .. versionchanged:: NEXT.VERSION
-                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
-                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+                |datetime_localization|
 
     """
 

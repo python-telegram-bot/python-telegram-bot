@@ -174,8 +174,7 @@ class Poll(TelegramObject):
             poll will be automatically closed. Converted to :obj:`datetime.datetime`.
 
             .. versionchanged:: NEXT.VERSION
-                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
-                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+                |datetime_localization|
 
     Attributes:
         id (:obj:`str`): Unique poll identifier.
@@ -211,8 +210,7 @@ class Poll(TelegramObject):
             automatically closed.
 
             .. versionchanged:: NEXT.VERSION
-                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
-                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+                |datetime_localization|
 
     """
 

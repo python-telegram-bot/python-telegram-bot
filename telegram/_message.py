@@ -123,8 +123,7 @@ class Message(TelegramObject):
             :class:`datetime.datetime`.
 
             .. versionchanged:: NEXT.VERSION
-                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
-                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+                |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`, optional): For forwarded messages, sender of
             the original message.
@@ -344,8 +343,7 @@ class Message(TelegramObject):
             :class:`datetime.datetime`.
 
             .. versionchanged:: NEXT.VERSION
-                :class:`datetime.datetime` is now timezone aware. The default timezone of the bot
-                will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+                |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`): Optional. For forwarded messages, sender of the
             original message.
