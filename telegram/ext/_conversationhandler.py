@@ -846,9 +846,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                         "Ignoring `conversation_timeout` because the Applications JobQueue is "
                         "not running.",
                     )
-                # Add the new timeout job
-                # checking if the new state is self.END is done in _schedule_job
                 elif isinstance(new_state, asyncio.Task):
+                    # Add the new timeout job
+                    # checking if the new state is self.END is done in _schedule_job
                     application.create_task(
                         self._schedule_job_delayed(
                             new_state, application, update, context, conversation_key
@@ -856,7 +856,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                         update=update,
                     )
                 else:
-                    self._schedule_job(new_state, application, update, context, conversation_key)
+                    self._schedule_job(
+                        new_state, application, update, context, conversation_key
+                    )
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self._update_state(self.END, conversation_key, handler)
