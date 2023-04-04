@@ -174,3 +174,8 @@ class TestDatetime:
             tg_dtm.from_timestamp(1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
             == datetime
         )
+
+    def test_extract_tzinfo_from_defaults(self, tz_bot, bot, raw_bot):
+        assert tg_dtm.extract_tzinfo_from_defaults(tz_bot) == tz_bot.defaults.tzinfo
+        assert tg_dtm.extract_tzinfo_from_defaults(bot) is None
+        assert tg_dtm.extract_tzinfo_from_defaults(raw_bot) is None
