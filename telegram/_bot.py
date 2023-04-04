@@ -100,6 +100,7 @@ from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnai
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit
 from telegram.error import InvalidToken
+from telegram.ext._typing import Typing
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
@@ -731,6 +732,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         self._bot_user = User.de_json(result, self)
         return self._bot_user  # type: ignore[return-value]
+
+    @_log
+    def typing(self, chat_id: Union[int, str]) -> Typing:
+        """Use this method to create a context manager to send typing action.
+
+        .. code:: python
+            async with context.bot.typing():
+                # code
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+
+        Returns:
+            :class:`telegram.ext.Typing`: typing context manager instance.
+
+        """
+        return Typing(self, chat_id)
 
     @_log
     async def send_message(
