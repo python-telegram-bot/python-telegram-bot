@@ -27,7 +27,8 @@ import logging
 
 
 def get_logger(file_name: str, class_name: str = None) -> logging.Logger:
-    """Returns a logger with an appropriate name. Use as follows::
+    """Returns a logger with an appropriate name.
+    Use as follows::
 
         logger = get_logger(__name__)
 

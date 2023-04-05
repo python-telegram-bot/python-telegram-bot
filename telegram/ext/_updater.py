@@ -345,8 +345,8 @@ class Updater(AsyncContextManager["Updater"]):
             if updates:
                 if not self.running:
                     _LOGGER.critical(
-                        "Updater stopped unexpectedly. Pulled updates will be ignored and again "
-                        "on restart."
+                        "Updater stopped unexpectedly. Pulled updates will be ignored and pulled "
+                        "again on restart."
                     )
                 else:
                     for update in updates:
