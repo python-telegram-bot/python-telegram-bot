@@ -247,9 +247,7 @@ class TestForumMethodsWithRequest:
             msg = await coro
             pin_msg_tasks.add(asyncio.create_task(msg.pin()))
 
-        assert (
-            all([await task for task in pin_msg_tasks]) is True  # noqa: PIE802
-        ), "Message(s) were not pinned"
+        assert all([await task for task in pin_msg_tasks]) is True, "Message(s) were not pinned"
 
         # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
         result = await bot.unpin_all_forum_topic_messages(forum_group_id, message_thread_id)
