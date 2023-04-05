@@ -48,7 +48,7 @@ else:
         yield None
 
 
-_logger = get_logger(__name__, class_name="AIORateLimiter")
+_LOGGER = get_logger(__name__, class_name="AIORateLimiter")
 
 
 class AIORateLimiter(BaseRateLimiter[int]):
@@ -248,13 +248,13 @@ class AIORateLimiter(BaseRateLimiter[int]):
                 )
             except RetryAfter as exc:
                 if i == max_retries:
-                    _logger.exception(
+                    _LOGGER.exception(
                         "Rate limit hit after maximum of %d retries", max_retries, exc_info=exc
                     )
                     raise exc
 
                 sleep = exc.retry_after + 0.1
-                _logger.info("Rate limit hit. Retrying after %f seconds", sleep)
+                _LOGGER.info("Rate limit hit. Retrying after %f seconds", sleep)
                 # Make sure we don't allow other requests to be processed
                 self._retry_after_event.clear()
                 await asyncio.sleep(sleep)

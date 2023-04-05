@@ -51,7 +51,7 @@ if TYPE_CHECKING:
 
 
 _UpdaterType = TypeVar("_UpdaterType", bound="Updater")  # pylint: disable=invalid-name
-_logger = get_logger(__name__)
+_LOGGER = get_logger(__name__)
 
 
 class Updater(AsyncContextManager["Updater"]):
@@ -134,7 +134,7 @@ class Updater(AsyncContextManager["Updater"]):
             :meth:`shutdown`
         """
         if self._initialized:
-            _logger.debug("This Updater is already initialized.")
+            _LOGGER.debug("This Updater is already initialized.")
             return
 
         await self.bot.initialize()
@@ -154,12 +154,12 @@ class Updater(AsyncContextManager["Updater"]):
             raise RuntimeError("This Updater is still running!")
 
         if not self._initialized:
-            _logger.debug("This Updater is already shut down. Returning.")
+            _LOGGER.debug("This Updater is already shut down. Returning.")
             return
 
         await self.bot.shutdown()
         self._initialized = False
-        _logger.debug("Shut down of Updater complete")
+        _LOGGER.debug("Shut down of Updater complete")
 
     async def __aenter__(self: _UpdaterType) -> _UpdaterType:
         """Simple context manager which initializes the Updater."""
@@ -278,9 +278,9 @@ class Updater(AsyncContextManager["Updater"]):
                     error_callback=error_callback,
                 )
 
-                _logger.debug("Waiting for polling to start")
+                _LOGGER.debug("Waiting for polling to start")
                 await polling_ready.wait()
-                _logger.debug("Polling updates from Telegram started")
+                _LOGGER.debug("Polling updates from Telegram started")
 
                 return self.update_queue
             except Exception as exc:
@@ -301,7 +301,7 @@ class Updater(AsyncContextManager["Updater"]):
         ready: asyncio.Event,
         error_callback: Optional[Callable[[TelegramError], None]],
     ) -> None:
-        _logger.debug("Updater started (polling)")
+        _LOGGER.debug("Updater started (polling)")
 
         # the bootstrapping phase does two things:
         # 1) make sure there is no webhook set
@@ -313,7 +313,7 @@ class Updater(AsyncContextManager["Updater"]):
             allowed_updates=None,
         )
 
-        _logger.debug("Bootstrap done")
+        _LOGGER.debug("Bootstrap done")
 
         async def polling_action_cb() -> bool:
             try:
@@ -335,7 +335,7 @@ class Updater(AsyncContextManager["Updater"]):
                 raise exc
             except Exception as exc:
                 # Other exceptions should not. Let's log them for now.
-                _logger.critical(
+                _LOGGER.critical(
                     "Something went wrong processing the data received from Telegram. "
                     "Received data was *not* processed!",
                     exc_info=exc,
@@ -344,7 +344,7 @@ class Updater(AsyncContextManager["Updater"]):
 
             if updates:
                 if not self.running:
-                    _logger.critical(
+                    _LOGGER.critical(
                         "Updater stopped unexpectedly. Pulled updates will be ignored and again "
                         "on restart."
                     )
@@ -356,7 +356,7 @@ class Updater(AsyncContextManager["Updater"]):
             return True  # Keep fetching updates & don't quit. Polls with poll_interval.
 
         def default_error_callback(exc: TelegramError) -> None:
-            _logger.exception("Exception happened while polling for updates.", exc_info=exc)
+            _LOGGER.exception("Exception happened while polling for updates.", exc_info=exc)
 
         # Start task that runs in background, pulls
         # updates from Telegram and inserts them in the update queue of the
@@ -495,9 +495,9 @@ class Updater(AsyncContextManager["Updater"]):
                     secret_token=secret_token,
                 )
 
-                _logger.debug("Waiting for webhook server to start")
+                _LOGGER.debug("Waiting for webhook server to start")
                 await webhook_ready.wait()
-                _logger.debug("Webhook server started")
+                _LOGGER.debug("Webhook server started")
             except Exception as exc:
                 self._running = False
                 raise exc
@@ -521,7 +521,7 @@ class Updater(AsyncContextManager["Updater"]):
         max_connections: int = 40,
         secret_token: str = None,
     ) -> None:
-        _logger.debug("Updater thread started (webhook)")
+        _LOGGER.debug("Updater thread started (webhook)")
 
         if not url_path.startswith("/"):
             url_path = f"/{url_path}"
@@ -599,7 +599,7 @@ class Updater(AsyncContextManager["Updater"]):
                 `action_cb`.
 
         """
-        _logger.debug("Start network loop retry %s", description)
+        _LOGGER.debug("Start network loop retry %s", description)
         cur_interval = interval
         while self.running:
             try:
@@ -607,17 +607,17 @@ class Updater(AsyncContextManager["Updater"]):
                     if not await action_cb():
                         break
                 except RetryAfter as exc:
-                    _logger.info("%s", exc)
+                    _LOGGER.info("%s", exc)
                     cur_interval = 0.5 + exc.retry_after
                 except TimedOut as toe:
-                    _logger.debug("Timed out %s: %s", description, toe)
+                    _LOGGER.debug("Timed out %s: %s", description, toe)
                     # If failure is due to timeout, we should retry asap.
                     cur_interval = 0
                 except InvalidToken as pex:
-                    _logger.error("Invalid token; aborting")
+                    _LOGGER.error("Invalid token; aborting")
                     raise pex
                 except TelegramError as telegram_exc:
-                    _logger.error("Error while %s: %s", description, telegram_exc)
+                    _LOGGER.error("Error while %s: %s", description, telegram_exc)
                     on_err_cb(telegram_exc)
 
                     # increase waiting times on subsequent errors up to 30secs
@@ -629,7 +629,7 @@ class Updater(AsyncContextManager["Updater"]):
                     await asyncio.sleep(cur_interval)
 
             except asyncio.CancelledError:
-                _logger.debug("Network loop retry %s was cancelled", description)
+                _LOGGER.debug("Network loop retry %s was cancelled", description)
                 break
 
     async def _bootstrap(
@@ -651,16 +651,16 @@ class Updater(AsyncContextManager["Updater"]):
         retries = 0
 
         async def bootstrap_del_webhook() -> bool:
-            _logger.debug("Deleting webhook")
+            _LOGGER.debug("Deleting webhook")
             if drop_pending_updates:
-                _logger.debug("Dropping pending updates from Telegram server")
+                _LOGGER.debug("Dropping pending updates from Telegram server")
             await self.bot.delete_webhook(drop_pending_updates=drop_pending_updates)
             return False
 
         async def bootstrap_set_webhook() -> bool:
-            _logger.debug("Setting webhook")
+            _LOGGER.debug("Setting webhook")
             if drop_pending_updates:
-                _logger.debug("Dropping pending updates from Telegram server")
+                _LOGGER.debug("Dropping pending updates from Telegram server")
             await self.bot.set_webhook(
                 url=webhook_url,
                 certificate=cert,
@@ -679,11 +679,11 @@ class Updater(AsyncContextManager["Updater"]):
 
             if not isinstance(exc, InvalidToken) and (max_retries < 0 or retries < max_retries):
                 retries += 1
-                _logger.warning(
+                _LOGGER.warning(
                     "Failed bootstrap phase; try=%s max_retries=%s", retries, max_retries
                 )
             else:
-                _logger.error("Failed bootstrap phase after %s retries (%s)", retries, exc)
+                _LOGGER.error("Failed bootstrap phase after %s retries (%s)", retries, exc)
                 raise exc
 
         # Dropping pending updates from TG can be efficiently done with the drop_pending_updates
@@ -724,26 +724,26 @@ class Updater(AsyncContextManager["Updater"]):
             if not self.running:
                 raise RuntimeError("This Updater is not running!")
 
-            _logger.debug("Stopping Updater")
+            _LOGGER.debug("Stopping Updater")
 
             self._running = False
 
             await self._stop_httpd()
             await self._stop_polling()
 
-            _logger.debug("Updater.stop() is complete")
+            _LOGGER.debug("Updater.stop() is complete")
 
     async def _stop_httpd(self) -> None:
         """Stops the Webhook server by calling ``WebhookServer.shutdown()``"""
         if self._httpd:
-            _logger.debug("Waiting for current webhook connection to be closed.")
+            _LOGGER.debug("Waiting for current webhook connection to be closed.")
             await self._httpd.shutdown()
             self._httpd = None
 
     async def _stop_polling(self) -> None:
         """Stops the polling task by awaiting it."""
         if self.__polling_task:
-            _logger.debug("Waiting background polling task to finish up.")
+            _LOGGER.debug("Waiting background polling task to finish up.")
             self.__polling_task.cancel()
 
             with contextlib.suppress(asyncio.CancelledError):

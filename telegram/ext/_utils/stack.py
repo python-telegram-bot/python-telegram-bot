@@ -31,7 +31,7 @@ from typing import Optional
 
 from telegram._utils.logging import get_logger
 
-_logger = get_logger(__name__)
+_LOGGER = get_logger(__name__)
 
 
 def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
@@ -58,7 +58,7 @@ def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
     try:
         return _was_called_by(frame, caller)
     except Exception as exc:
-        _logger.debug(
+        _LOGGER.debug(
             "Failed to check if frame was called by `caller`. Assuming that it was not.",
             exc_info=exc,
         )

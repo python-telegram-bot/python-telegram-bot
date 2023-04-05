@@ -33,7 +33,7 @@ from telegram.request._requestdata import RequestData
 # https://www.python-httpx.org/contributing/#development-proxy-setup (also saved on archive.org)
 # That also works with socks5. Just pass `--mode socks5` to mitmproxy
 
-_logger = get_logger(__name__, "HTTPXRequest")
+_LOGGER = get_logger(__name__, "HTTPXRequest")
 
 
 class HTTPXRequest(BaseRequest):
@@ -166,7 +166,7 @@ class HTTPXRequest(BaseRequest):
     async def shutdown(self) -> None:
         """See :meth:`BaseRequest.shutdown`."""
         if self._client.is_closed:
-            _logger.debug("This HTTPXRequest is already shut down. Returning.")
+            _LOGGER.debug("This HTTPXRequest is already shut down. Returning.")
             return
 
         await self._client.aclose()

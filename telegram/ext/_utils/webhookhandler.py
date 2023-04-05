@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 # This module is not visible to users, so we log as Updater
-_logger = get_logger(__name__, class_name="Updater")
+_LOGGER = get_logger(__name__, class_name="Updater")
 
 
 class WebhookServer:
@@ -70,17 +70,17 @@ class WebhookServer:
             if ready is not None:
                 ready.set()
 
-            _logger.debug("Webhook Server started.")
+            _LOGGER.debug("Webhook Server started.")
 
     async def shutdown(self) -> None:
         async with self._shutdown_lock:
             if not self.is_running:
-                _logger.debug("Webhook Server is already shut down. Returning")
+                _LOGGER.debug("Webhook Server is already shut down. Returning")
                 return
             self.is_running = False
             self._http_server.stop()
             await self._http_server.close_all_connections()
-            _logger.debug("Webhook Server stopped")
+            _LOGGER.debug("Webhook Server stopped")
 
 
 class WebhookAppClass(tornado.web.Application):
@@ -116,7 +116,7 @@ class TelegramHandler(tornado.web.RequestHandler):
         self.update_queue = update_queue  # skipcq: PYL-W0201
         self.secret_token = secret_token  # skipcq: PYL-W0201
         if secret_token:
-            _logger.debug(
+            _LOGGER.debug(
                 "The webhook server has a secret token, expecting it in incoming requests now"
             )
 
@@ -126,25 +126,25 @@ class TelegramHandler(tornado.web.RequestHandler):
 
     async def post(self) -> None:
         """Handle incoming POST request"""
-        _logger.debug("Webhook triggered")
+        _LOGGER.debug("Webhook triggered")
         self._validate_post()
 
         json_string = self.request.body.decode()
         data = json.loads(json_string)
         self.set_status(HTTPStatus.OK)
-        _logger.debug("Webhook received data: %s", json_string)
+        _LOGGER.debug("Webhook received data: %s", json_string)
 
         try:
             update = Update.de_json(data, self.bot)
         except Exception as exc:
-            _logger.critical(
+            _LOGGER.critical(
                 "Something went wrong processing the data received from Telegram. "
                 "Received data was *not* processed!",
                 exc_info=exc,
             )
 
         if update:
-            _logger.debug(
+            _LOGGER.debug(
                 "Received Update with ID %d on Webhook",
                 # For some reason pylint thinks update is a general TelegramObject
                 update.update_id,  # pylint: disable=no-member
@@ -165,12 +165,12 @@ class TelegramHandler(tornado.web.RequestHandler):
         if self.secret_token is not None:
             token = self.request.headers.get("X-Telegram-Bot-Api-Secret-Token")
             if not token:
-                _logger.debug("Request did not include the secret token")
+                _LOGGER.debug("Request did not include the secret token")
                 raise tornado.web.HTTPError(
                     HTTPStatus.FORBIDDEN, reason="Request did not include the secret token"
                 )
             if token != self.secret_token:
-                _logger.debug("Request had the wrong secret token: %s", token)
+                _LOGGER.debug("Request had the wrong secret token: %s", token)
                 raise tornado.web.HTTPError(
                     HTTPStatus.FORBIDDEN, reason="Request had the wrong secret token"
                 )
@@ -182,7 +182,7 @@ class TelegramHandler(tornado.web.RequestHandler):
         tb: Optional[TracebackType],
     ) -> None:
         """Override the default logging and instead use our custom logging."""
-        _logger.debug(
+        _LOGGER.debug(
             "%s - %s",
             self.request.remote_ip,
             "Exception in TelegramHandler",
