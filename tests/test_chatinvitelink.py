@@ -21,18 +21,8 @@ import datetime
 import pytest
 
 from telegram import ChatInviteLink, User
-from telegram._utils.datetime import to_timestamp
+from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.slots import mro_slots
-
-# pytz is only available if it was installed as dependency of APScheduler, so we make a little
-# workaround here
-DTM_UTC = datetime.timezone.utc
-try:
-    import pytz
-
-    UTC = pytz.utc
-except ImportError:
-    UTC = DTM_UTC  # type: ignore[assignment]
 
 
 @pytest.fixture(scope="module")
