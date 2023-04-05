@@ -24,6 +24,16 @@ from telegram import ChatInviteLink, User
 from telegram._utils.datetime import to_timestamp
 from tests.auxil.slots import mro_slots
 
+# pytz is only available if it was installed as dependency of APScheduler, so we make a little
+# workaround here
+DTM_UTC = datetime.timezone.utc
+try:
+    import pytz
+
+    UTC = pytz.utc
+except ImportError:
+    UTC = DTM_UTC  # type: ignore[assignment]
+
 
 @pytest.fixture(scope="module")
 def creator():
@@ -106,6 +116,33 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
         assert invite_link.member_limit == self.member_limit
         assert invite_link.name == self.name
         assert invite_link.pending_join_request_count == self.pending_join_request_count
+
+    def test_de_json_localization(self, tz_bot, bot, raw_bot, creator):
+        json_dict = {
+            "invite_link": self.link,
+            "creator": creator.to_dict(),
+            "creates_join_request": self.creates_join_request,
+            "is_primary": self.primary,
+            "is_revoked": self.revoked,
+            "expire_date": to_timestamp(self.expire_date),
+            "member_limit": self.member_limit,
+            "name": self.name,
+            "pending_join_request_count": str(self.pending_join_request_count),
+        }
+
+        invite_link_raw = ChatInviteLink.de_json(json_dict, raw_bot)
+        invite_link_bot = ChatInviteLink.de_json(json_dict, bot)
+        invite_link_tz = ChatInviteLink.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        invite_offset = datetime.datetime.utcoffset(invite_link_tz.expire_date)
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            invite_link_tz.expire_date.replace(tzinfo=None)
+        )
+
+        assert invite_link_raw.expire_date.tzinfo == UTC
+        assert invite_link_bot.expire_date.tzinfo == UTC
+        assert invite_offset == tz_bot_offset
 
     def test_to_dict(self, invite_link):
         invite_link_dict = invite_link.to_dict()
