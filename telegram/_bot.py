@@ -206,6 +206,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
     """
 
+    # This is a class variable since we want to override the logger name in ExtBot
+    # without having to change all places where this is used
     _LOGGER = get_logger(__name__)
 
     __slots__ = (
