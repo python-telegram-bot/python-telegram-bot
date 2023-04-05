@@ -60,7 +60,7 @@ DVInput = Union["DefaultValue[DVValueType]", DVValueType, "DefaultValue[None]"]
 as ``Union[DefaultValue[type], type, DefaultValue[None]]``."""
 
 RT = TypeVar("RT")
-SCT = Union[RT, Collection[RT]]
+SCT = Union[RT, Collection[RT]]  # pylint: disable=invalid-name
 """Single instance or collection of instances."""
 
 ReplyMarkup = Union[
