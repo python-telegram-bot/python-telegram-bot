@@ -248,7 +248,7 @@ class TestForumMethodsWithRequest:
             pin_msg_tasks.add(asyncio.create_task(msg.pin()))
 
         assert (
-            all([await task for task in pin_msg_tasks]) is True  # noqa: PIE802
+            all([await task for task in pin_msg_tasks]) is True
         ), "Message(s) were not pinned"
 
         # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
