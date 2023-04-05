@@ -56,6 +56,7 @@ from telegram import (
     Voice,
     WebAppData,
 )
+from telegram._utils.datetime import UTC
 from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
 from tests._passport.test_passport import RAW_PASSPORT_DATA
@@ -364,6 +365,19 @@ class TestMessageWithoutRequest(TestMessageBase):
         # every single case
         for slot in new.__slots__:
             assert not isinstance(new[slot], dict)
+
+    def test_de_json_localization(self, bot, raw_bot, tz_bot, message):
+        message_raw = Message.de_json(message.to_dict(), raw_bot)
+        message_bot = Message.de_json(message.to_dict(), bot)
+        message_tz = Message.de_json(message.to_dict(), tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        message_offset = datetime.utcoffset(message_tz.date)
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(message_tz.date.replace(tzinfo=None))
+
+        assert message_raw.date.tzinfo == UTC
+        assert message_bot.date.tzinfo == UTC
+        assert message_offset == tz_bot_offset
 
     def test_equality(self):
         id_ = 1
