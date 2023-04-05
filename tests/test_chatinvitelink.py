@@ -125,7 +125,7 @@ class TestChatInviteLinkWithoutRequest(TestChatInviteLinkBase):
         invite_link_tz = ChatInviteLink.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
-        invite_offset = datetime.datetime.utcoffset(invite_link_tz.expire_date)
+        invite_offset = invite_link_tz.expire_date.utcoffset()
         tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
             invite_link_tz.expire_date.replace(tzinfo=None)
         )

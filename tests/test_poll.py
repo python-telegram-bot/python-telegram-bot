@@ -229,7 +229,7 @@ class TestPollWithoutRequest(TestPollBase):
         poll_bot_tz = Poll.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
-        poll_bot_tz_offset = datetime.utcoffset(poll_bot_tz.close_date)
+        poll_bot_tz_offset = poll_bot_tz.close_date.utcoffset()
         tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
             poll_bot_tz.close_date.replace(tzinfo=None)
         )

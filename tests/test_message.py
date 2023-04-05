@@ -372,7 +372,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         message_tz = Message.de_json(message.to_dict(), tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
-        message_offset = datetime.utcoffset(message_tz.date)
+        message_offset = message_tz.date.utcoffset()
         tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(message_tz.date.replace(tzinfo=None))
 
         assert message_raw.date.tzinfo == UTC

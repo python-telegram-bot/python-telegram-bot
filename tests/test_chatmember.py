@@ -227,7 +227,7 @@ class TestChatMemberTypesWithoutRequest:
             chatmember_tz = ChatMember.de_json(json_dict, tz_bot)
 
             # comparing utcoffsets because comparing timezones is unpredicatable
-            chatmember_offset = datetime.datetime.utcoffset(chatmember_tz.until_date)
+            chatmember_offset = chatmember_tz.until_date.utcoffset()
             tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
                 chatmember_tz.until_date.replace(tzinfo=None)
             )

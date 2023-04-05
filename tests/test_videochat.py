@@ -178,7 +178,7 @@ class TestVideoChatScheduledWithoutRequest:
         videochat_tz = VideoChatScheduled.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
-        videochat_offset = dtm.datetime.utcoffset(videochat_tz.start_date)
+        videochat_offset = videochat_tz.start_date.utcoffset()
         tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
             videochat_tz.start_date.replace(tzinfo=None)
         )

@@ -111,7 +111,7 @@ class TestChatJoinRequestWithoutRequest(TestChatJoinRequestBase):
         chatjoin_req_tz = ChatJoinRequest.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
-        chatjoin_req_offset = datetime.datetime.utcoffset(chatjoin_req_tz.date)
+        chatjoin_req_offset = chatjoin_req_tz.date.utcoffset()
         tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(chatjoin_req_tz.date.replace(tzinfo=None))
 
         assert chatjoin_req_raw.date.tzinfo == UTC
