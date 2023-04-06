@@ -828,7 +828,8 @@ class Message(TelegramObject):
         a private chat or normal group, returns a t.me link of the message.
 
             .. versionchanged:: NEXT.VERSION
-                For messages that are replies or part of a forum topic, the link now points to the corresponding thread view.
+                For messages that are replies or part of a forum topic, the link now points
+                to the corresponding thread view.
         """
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
             # the else block gets rid of leading -100 for supergroups:
