@@ -51,6 +51,9 @@ class WebhookInfo(TelegramObject):
         ip_address (:obj:`str`, optional): Currently used webhook IP address.
         last_error_date (:obj:`int`, optional): Unix time for the most recent error that happened
             when trying to deliver an update via webhook.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         last_error_message (:obj:`str`, optional): Error message in human-readable format for the
             most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
@@ -66,6 +69,9 @@ class WebhookInfo(TelegramObject):
             that happened when trying to synchronize available updates with Telegram datacenters.
 
             .. versionadded:: 20.0
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
     Attributes:
         url (:obj:`str`): Webhook URL, may be empty if webhook is not set up.
         has_custom_certificate (:obj:`bool`): :obj:`True`, if a custom certificate was provided for
@@ -74,6 +80,9 @@ class WebhookInfo(TelegramObject):
         ip_address (:obj:`str`): Optional. Currently used webhook IP address.
         last_error_date (:obj:`int`): Optional. Unix time for the most recent error that happened
             when trying to deliver an update via webhook.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         last_error_message (:obj:`str`): Optional. Error message in human-readable format for the
             most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
@@ -90,6 +99,9 @@ class WebhookInfo(TelegramObject):
             that happened when trying to synchronize available updates with Telegram datacenters.
 
             .. versionadded:: 20.0
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
     """
 
     __slots__ = (

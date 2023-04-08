@@ -135,6 +135,9 @@ class Message(TelegramObject):
             users who disallow adding a link to their account in forwarded messages.
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         is_automatic_forward (:obj:`bool`, optional): :obj:`True`, if the message is a channel
             post that was automatically forwarded to the connected discussion group.
 
@@ -144,6 +147,9 @@ class Message(TelegramObject):
             ``reply_to_message`` fields even if it itself is a reply.
         edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         has_protected_content (:obj:`bool`, optional): :obj:`True`, if the message can't be
             forwarded.
 
@@ -353,6 +359,9 @@ class Message(TelegramObject):
             the original message in the channel.
         forward_date (:class:`datetime.datetime`): Optional. For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         is_automatic_forward (:obj:`bool`): Optional. :obj:`True`, if the message is a channel
             post that was automatically forwarded to the connected discussion group.
 
@@ -362,6 +371,9 @@ class Message(TelegramObject):
             ``reply_to_message`` fields even if it itself is a reply.
         edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         has_protected_content (:obj:`bool`): Optional. :obj:`True`, if the message can't be
             forwarded.
 

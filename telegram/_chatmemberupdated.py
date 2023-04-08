@@ -52,6 +52,9 @@ class ChatMemberUpdated(TelegramObject):
         from_user (:class:`telegram.User`): Performer of the action, which resulted in the change.
         date (:class:`datetime.datetime`): Date the change was done in Unix time. Converted to
             :class:`datetime.datetime`.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         old_chat_member (:class:`telegram.ChatMember`): Previous information about the chat member.
         new_chat_member (:class:`telegram.ChatMember`): New information about the chat member.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link, which was used
@@ -62,6 +65,9 @@ class ChatMemberUpdated(TelegramObject):
         from_user (:class:`telegram.User`): Performer of the action, which resulted in the change.
         date (:class:`datetime.datetime`): Date the change was done in Unix time. Converted to
             :class:`datetime.datetime`.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         old_chat_member (:class:`telegram.ChatMember`): Previous information about the chat member.
         new_chat_member (:class:`telegram.ChatMember`): New information about the chat member.
         invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link, which was used
