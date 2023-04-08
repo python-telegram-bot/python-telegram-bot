@@ -1200,8 +1200,8 @@ class TestBasePersistence:
                 assert not papp.persistence.updated_chat_ids
             assert not papp.persistence.updated_conversations
 
-    async def test_non_blocking_conversations(self, bot):
-        papp = build_papp(token=bot.token)
+    async def test_non_blocking_conversations(self, bot, caplog):
+        papp = build_papp(token=bot.token, update_interval=100)
         event = asyncio.Event()
 
         async def callback(_, __):
@@ -1221,6 +1221,7 @@ class TestBasePersistence:
         papp.add_handler(conversation)
 
         async with papp:
+            await papp.start()
             assert papp.persistence.updated_conversations == {}
 
             await papp.process_update(
@@ -1228,18 +1229,42 @@ class TestBasePersistence:
             )
             assert papp.persistence.updated_conversations == {}
 
-            await papp.update_persistence()
-            await asyncio.sleep(0.01)
-            # Conversation should have been updated with the current state, i.e. None
-            assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
-            assert papp.persistence.conversations == {"conv": {(1, 1): None}}
+            with caplog.at_level(logging.DEBUG):
+                await papp.update_persistence()
+                await asyncio.sleep(0.01)
+                # Conversation should have been updated with the current state, i.e. None
+                assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
+                assert papp.persistence.conversations == {"conv": {(1, 1): None}}
+
+            # Ensure that we warn the user about this!
+            found_record = None
+            for record in caplog.records:
+                message = record.getMessage()
+                if message.startswith("A ConversationHandlers state was not yet resolved"):
+                    assert "Will check again on next run" in record.getMessage()
+                    assert record.name == "telegram.ext.Application"
+                    found_record = record
+                    break
+            assert found_record is not None
+
+            caplog.clear()
 
             papp.persistence.reset_tracking()
             event.set()
             await asyncio.sleep(0.01)
-            await papp.update_persistence()
+            with caplog.at_level(logging.DEBUG):
+                await papp.update_persistence()
+
+            # Conversation should have been updated with the resolved state now and hence
+            # there should be no warning
+            assert not any(
+                record.getMessage().startswith("A ConversationHandlers state was not yet")
+                for record in caplog.records
+            )
             assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
             assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.STATE_1}}
+
+            await papp.stop()
 
     async def test_non_blocking_conversations_raises_Exception(self, bot):
         papp = build_papp(token=bot.token)
@@ -1372,6 +1397,7 @@ class TestBasePersistence:
         found_record = None
         for record in caplog.records:
             if record.getMessage().startswith("A ConversationHandlers state was not yet resolved"):
+                assert "will check again" not in record.getMessage()
                 assert record.name == "telegram.ext.Application"
                 found_record = record
                 break
