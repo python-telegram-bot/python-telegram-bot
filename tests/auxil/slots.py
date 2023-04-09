@@ -28,10 +28,7 @@ def mro_slots(obj, only_parents: bool = False):
     """
     cls = obj if inspect.isclass(obj) else obj.__class__
 
-    if only_parents:
-        classes = cls.__mro__[1:]
-    else:
-        classes = cls.__mro__
+    classes = cls.__mro__[1:] if only_parents else cls.__mro__
 
     return [
         attr

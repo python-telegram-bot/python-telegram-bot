@@ -36,7 +36,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def audio_file():
     with data_file("telegram.mp3").open("rb") as f:
         yield f
@@ -77,8 +77,8 @@ class TestAudioWithoutRequest(TestAudioBase):
         assert isinstance(audio, Audio)
         assert isinstance(audio.file_id, str)
         assert isinstance(audio.file_unique_id, str)
-        assert audio.file_id != ""
-        assert audio.file_unique_id != ""
+        assert audio.file_id
+        assert audio.file_unique_id
 
     def test_expected_values(self, audio):
         assert audio.duration == self.duration
@@ -331,9 +331,7 @@ class TestAudioWithRequest(TestAudioBase):
         assert message.audio == audio
 
     async def test_error_send_empty_file(self, bot, chat_id):
-        audio_file = open(os.devnull, "rb")
-
-        with pytest.raises(TelegramError):
+        with Path(os.devnull).open("rb") as audio_file, pytest.raises(TelegramError):
             await bot.send_audio(chat_id=chat_id, audio=audio_file)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):

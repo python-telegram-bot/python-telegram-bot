@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Application class."""
 import asyncio
+import contextlib
 import inspect
 import itertools
 import logging
@@ -54,7 +55,7 @@ from typing import (
 
 from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
-from telegram._utils.types import DVType, ODVInput
+from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
@@ -76,6 +77,7 @@ DEFAULT_GROUP: int = 0
 
 _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-name
 _STOP_SIGNAL = object()
+_DEFAULT_0 = DefaultValue(0)
 
 _logger = logging.getLogger(__name__)
 
@@ -139,7 +141,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     Examples:
         :any:`Echo Bot <examples.echobot>`
 
-    .. seealso:: :wiki:`Your First Bot <Extensions-–-Your-first-Bot>`,
+    .. seealso:: :wiki:`Your First Bot <Extensions---Your-first-Bot>`,
         :wiki:`Architecture Overview <Architecture>`
 
     .. versionchanged:: 20.0
@@ -1009,10 +1011,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__create_task_tasks.discard(task)  # Discard from our set since we are done with it
         # We just retrieve the eventual exception so that asyncio doesn't complain in case
         # it's not retrieved somewhere else
-        try:
+        with contextlib.suppress(asyncio.CancelledError, asyncio.InvalidStateError):
             task.exception()
-        except (asyncio.CancelledError, asyncio.InvalidStateError):
-            pass
 
     async def __create_task_callback(
         self,
@@ -1216,7 +1216,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]],
             Dict[int, Union[List[BaseHandler[Any, CCT]], Tuple[BaseHandler[Any, CCT]]]],
         ],
-        group: Union[int, DefaultValue[int]] = DefaultValue(0),
+        group: Union[int, DefaultValue[int]] = _DEFAULT_0,
     ) -> None:
         """Registers multiple handlers at once. The order of the handlers in the passed
         sequence(s) matters. See :meth:`add_handler` for details.
@@ -1389,6 +1389,36 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             if job.user_id:
                 self._user_ids_to_be_updated_in_persistence.add(job.user_id)
 
+    def mark_data_for_update_persistence(
+        self, chat_ids: SCT[int] = None, user_ids: SCT[int] = None
+    ) -> None:
+        """Mark entries of :attr:`chat_data` and :attr:`user_data` to be updated on the next
+        run of :meth:`update_persistence`.
+
+        Tip:
+            Use this method sparingly. If you have to use this method, it likely means that you
+            access and modify ``context.application.chat/user_data[some_id]`` within a callback.
+            Note that for data which should be available globally in all handler callbacks
+            independent of the chat/user, it is recommended to use :attr:`bot_data` instead.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_ids (:obj:`int` | Collection[:obj:`int`], optional): Chat IDs to mark.
+            user_ids (:obj:`int` | Collection[:obj:`int`], optional): User IDs to mark.
+
+        """
+        if chat_ids:
+            if isinstance(chat_ids, int):
+                self._chat_ids_to_be_updated_in_persistence.add(chat_ids)
+            else:
+                self._chat_ids_to_be_updated_in_persistence.update(chat_ids)
+        if user_ids:
+            if isinstance(user_ids, int):
+                self._user_ids_to_be_updated_in_persistence.add(user_ids)
+            else:
+                self._user_ids_to_be_updated_in_persistence.update(user_ids)
+
     async def _persistence_updater(self) -> None:
         # Update the persistence in regular intervals. Exit only when the stop event has been set
         while not self.__update_persistence_event.is_set():
@@ -1415,8 +1445,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         along with :attr:`~telegram.ext.ExtBot.callback_data_cache` and the conversation states of
         any persistent :class:`~telegram.ext.ConversationHandler` registered for this application.
 
-        For :attr:`user_data`, :attr:`chat_data`, only entries used since the last run of this
-        method are updated.
+        For :attr:`user_data` and :attr:`chat_data`, only those entries are updated which either
+        were used or have been manually marked via :meth:`mark_data_for_update_persistence` since
+        the last run of this method.
 
         Tip:
             This method will be called in regular intervals by the application. There is usually
@@ -1426,7 +1457,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             Any data is deep copied with :func:`copy.deepcopy` before handing it over to the
             persistence in order to avoid race conditions, so all persisted data must be copyable.
 
-        .. seealso:: :attr:`telegram.ext.BasePersistence.update_interval`.
+        .. seealso:: :attr:`telegram.ext.BasePersistence.update_interval`,
+            :meth:`mark_data_for_update_persistence`
         """
         async with self.__update_persistence_lock:
             await self.__update_persistence()

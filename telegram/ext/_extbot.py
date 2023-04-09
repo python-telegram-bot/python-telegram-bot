@@ -385,10 +385,10 @@ class ExtBot(Bot, Generic[RLARGS]):
             # 3)
             elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:
                 # Copy object as not to edit it in-place
-                val = copy(val)
-                with val._unfrozen():
-                    val.parse_mode = self.defaults.parse_mode if self.defaults else None
-                data[key] = val
+                copied_val = copy(val)
+                with copied_val._unfrozen():
+                    copied_val.parse_mode = self.defaults.parse_mode if self.defaults else None
+                data[key] = copied_val
             elif key == "media" and isinstance(val, Sequence):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy(media) for media in val]

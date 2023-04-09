@@ -96,7 +96,7 @@ class TestDatetime:
 
     def test_to_float_timestamp_absolute_no_reference(self):
         """A reference timestamp is only relevant for relative time specifications"""
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="while reference_timestamp is not None"):
             tg_dtm.to_float_timestamp(dtm.datetime(2019, 11, 11), reference_timestamp=123)
 
     # see note on parametrization at the top of this file

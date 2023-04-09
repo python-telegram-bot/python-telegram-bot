@@ -48,7 +48,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def sticker_file():
     with data_file("telegram.webp").open("rb") as file:
         yield file
@@ -64,7 +64,7 @@ async def sticker(bot, chat_id):
         return sticker
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def animated_sticker_file():
     with data_file("telegram_animated_sticker.tgs").open("rb") as f:
         yield f
@@ -76,7 +76,7 @@ async def animated_sticker(bot, chat_id):
         return (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def video_sticker_file():
     with data_file("telegram_video_sticker.webm").open("rb") as f:
         yield f
@@ -126,13 +126,13 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert isinstance(sticker, Sticker)
         assert isinstance(sticker.file_id, str)
         assert isinstance(sticker.file_unique_id, str)
-        assert sticker.file_id != ""
-        assert sticker.file_unique_id != ""
+        assert sticker.file_id
+        assert sticker.file_unique_id
         assert isinstance(sticker.thumbnail, PhotoSize)
         assert isinstance(sticker.thumbnail.file_id, str)
         assert isinstance(sticker.thumbnail.file_unique_id, str)
-        assert sticker.thumbnail.file_id != ""
-        assert sticker.thumbnail.file_unique_id != ""
+        assert sticker.thumbnail.file_id
+        assert sticker.thumbnail.file_unique_id
         assert isinstance(sticker.needs_repainting, bool)
 
     def test_expected_values(self, sticker):
@@ -312,8 +312,8 @@ class TestStickerWithRequest(TestStickerBase):
         assert isinstance(message.sticker, Sticker)
         assert isinstance(message.sticker.file_id, str)
         assert isinstance(message.sticker.file_unique_id, str)
-        assert message.sticker.file_id != ""
-        assert message.sticker.file_unique_id != ""
+        assert message.sticker.file_id
+        assert message.sticker.file_unique_id
         assert message.sticker.width == sticker.width
         assert message.sticker.height == sticker.height
         assert message.sticker.is_animated == sticker.is_animated
@@ -327,8 +327,8 @@ class TestStickerWithRequest(TestStickerBase):
         assert isinstance(message.sticker.thumbnail, PhotoSize)
         assert isinstance(message.sticker.thumbnail.file_id, str)
         assert isinstance(message.sticker.thumbnail.file_unique_id, str)
-        assert message.sticker.thumbnail.file_id != ""
-        assert message.sticker.thumbnail.file_unique_id != ""
+        assert message.sticker.thumbnail.file_id
+        assert message.sticker.thumbnail.file_unique_id
         assert message.sticker.thumbnail.width == sticker.thumbnail.width
         assert message.sticker.thumbnail.height == sticker.thumbnail.height
         assert message.sticker.thumbnail.file_size == sticker.thumbnail.file_size
@@ -372,8 +372,8 @@ class TestStickerWithRequest(TestStickerBase):
         assert isinstance(message.sticker, Sticker)
         assert isinstance(message.sticker.file_id, str)
         assert isinstance(message.sticker.file_unique_id, str)
-        assert message.sticker.file_id != ""
-        assert message.sticker.file_unique_id != ""
+        assert message.sticker.file_id
+        assert message.sticker.file_unique_id
         assert message.sticker.width == sticker.width
         assert message.sticker.height == sticker.height
         assert message.sticker.is_animated == sticker.is_animated
@@ -384,14 +384,14 @@ class TestStickerWithRequest(TestStickerBase):
         assert isinstance(message.sticker.thumbnail, PhotoSize)
         assert isinstance(message.sticker.thumbnail.file_id, str)
         assert isinstance(message.sticker.thumbnail.file_unique_id, str)
-        assert message.sticker.thumbnail.file_id != ""
-        assert message.sticker.thumbnail.file_unique_id != ""
+        assert message.sticker.thumbnail.file_id
+        assert message.sticker.thumbnail.file_unique_id
         assert message.sticker.thumbnail.width == sticker.thumbnail.width
         assert message.sticker.thumbnail.height == sticker.thumbnail.height
         assert message.sticker.thumbnail.file_size == sticker.thumbnail.file_size
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -442,7 +442,7 @@ class TestStickerWithRequest(TestStickerBase):
         premium_sticker = premium_sticker_set.stickers[20]
         assert premium_sticker.premium_animation.file_unique_id == "AQADOBwAAifPOElr"
         assert isinstance(premium_sticker.premium_animation.file_id, str)
-        assert premium_sticker.premium_animation.file_id != ""
+        assert premium_sticker.premium_animation.file_id
         premium_sticker_dict = {
             "file_unique_id": "AQADOBwAAifPOElr",
             "file_id": premium_sticker.premium_animation.file_id,
@@ -478,15 +478,15 @@ class TestStickerWithRequest(TestStickerBase):
         assert emoji_sticker_list[0].file_unique_id == "AgAD6gwAAoY06FM"
 
     async def test_error_send_empty_file(self, bot, chat_id):
-        with pytest.raises(TelegramError):
-            await bot.send_sticker(chat_id, open(os.devnull, "rb"))
+        with Path(os.devnull).open("rb") as file, pytest.raises(TelegramError):
+            await bot.send_sticker(chat_id, file)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_sticker(chat_id, "")
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def sticker_set(bot):
     ss = await bot.get_sticker_set(f"test_by_{bot.username}")
     if len(ss.stickers) > 100:
@@ -496,11 +496,11 @@ async def sticker_set(bot):
         except BadRequest as e:
             if e.message == "Stickerset_not_modified":
                 return ss
-            raise Exception("stickerset is growing too large.")
+            raise Exception("stickerset is growing too large.") from None
     return ss
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def animated_sticker_set(bot):
     ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
     if len(ss.stickers) > 100:
@@ -510,11 +510,11 @@ async def animated_sticker_set(bot):
         except BadRequest as e:
             if e.message == "Stickerset_not_modified":
                 return ss
-            raise Exception("stickerset is growing too large.")
+            raise Exception("stickerset is growing too large.") from None
     return ss
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def video_sticker_set(bot):
     ss = await bot.get_sticker_set(f"video_test_by_{bot.username}")
     if len(ss.stickers) > 100:
@@ -524,11 +524,11 @@ async def video_sticker_set(bot):
         except BadRequest as e:
             if e.message == "Stickerset_not_modified":
                 return ss
-            raise Exception("stickerset is growing too large.")
+            raise Exception("stickerset is growing too large.") from None
     return ss
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def sticker_set_thumb_file():
     with data_file("sticker_set_thumb.png").open("rb") as file:
         yield file

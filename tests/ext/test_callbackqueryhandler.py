@@ -65,7 +65,7 @@ def false_update(request):
     return Update(update_id=2, **request.param)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def callback_query(bot):
     update = Update(0, callback_query=CallbackQuery(2, User(1, "", False), None, data="test data"))
     update._unfreeze()
@@ -83,7 +83,7 @@ class TestCallbackQueryHandler:
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = False
 
     def callback_basic(self, update, context):

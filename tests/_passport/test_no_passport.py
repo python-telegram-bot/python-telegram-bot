@@ -29,7 +29,7 @@ with the TEST_WITH_OPT_DEPS environment variable set to False in addition to the
 import pytest
 
 from telegram import _bot as bot
-from telegram._passport import credentials as credentials
+from telegram._passport import credentials
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 
 

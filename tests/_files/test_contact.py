@@ -129,7 +129,7 @@ class TestContactWithoutRequest(TestContactBase):
 
 class TestContactWithRequest(TestContactBase):
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),

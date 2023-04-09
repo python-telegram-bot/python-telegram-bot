@@ -296,10 +296,7 @@ class BaseRequest(
         response_data = self.parse_json_payload(payload)
 
         description = response_data.get("description")
-        if description:
-            message = description
-        else:
-            message = "Unknown HTTPError"
+        message = description if description else "Unknown HTTPError"
 
         # In some special cases, we can raise more informative exceptions:
         # see https://core.telegram.org/bots/api#responseparameters and

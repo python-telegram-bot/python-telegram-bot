@@ -36,7 +36,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def animation_file():
     with data_file("game.gif").open("rb") as f:
         yield f
@@ -75,8 +75,8 @@ class TestAnimationWithoutRequest(TestAnimationBase):
         assert isinstance(animation, Animation)
         assert isinstance(animation.file_id, str)
         assert isinstance(animation.file_unique_id, str)
-        assert animation.file_id != ""
-        assert animation.file_unique_id != ""
+        assert animation.file_id
+        assert animation.file_unique_id
 
     def test_expected_values(self, animation):
         assert animation.mime_type == self.mime_type
@@ -231,8 +231,8 @@ class TestAnimationWithRequest(TestAnimationBase):
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
         assert isinstance(message.animation.file_unique_id, str)
-        assert message.animation.file_id != ""
-        assert message.animation.file_unique_id != ""
+        assert message.animation.file_id
+        assert message.animation.file_unique_id
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
@@ -266,8 +266,8 @@ class TestAnimationWithRequest(TestAnimationBase):
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
         assert isinstance(message.animation.file_unique_id, str)
-        assert message.animation.file_id != ""
-        assert message.animation.file_unique_id != ""
+        assert message.animation.file_id
+        assert message.animation.file_unique_id
 
         assert message.animation.duration == animation.duration
         assert message.animation.file_name.startswith(
@@ -321,7 +321,7 @@ class TestAnimationWithRequest(TestAnimationBase):
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -368,9 +368,7 @@ class TestAnimationWithRequest(TestAnimationBase):
         assert message.animation == animation
 
     async def test_error_send_empty_file(self, bot, chat_id):
-        animation_file = open(os.devnull, "rb")
-
-        with pytest.raises(TelegramError):
+        with Path(os.devnull).open("rb") as animation_file, pytest.raises(TelegramError):
             await bot.send_animation(chat_id=chat_id, animation=animation_file)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):

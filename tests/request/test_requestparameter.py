@@ -47,7 +47,7 @@ class TestRequestParameterWithoutRequest:
         assert request_parameter.input_files is None
 
     @pytest.mark.parametrize(
-        "value, expected",
+        ("value", "expected"),
         [
             (1, "1"),
             ("one", "one"),

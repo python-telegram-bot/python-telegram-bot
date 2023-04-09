@@ -486,8 +486,7 @@ class TestChatWithoutRequest(TestChatBase):
 
     async def test_delete_photo(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
-            chat_id = kwargs["chat_id"] == chat.id
-            return chat_id
+            return kwargs["chat_id"] == chat.id
 
         assert check_shortcut_signature(Chat.delete_photo, Bot.delete_chat_photo, ["chat_id"], [])
         assert await check_shortcut_call(chat.delete_photo, chat.get_bot(), "delete_chat_photo")
@@ -1182,8 +1181,8 @@ class TestChatWithoutRequest(TestChatBase):
         assert await chat.unhide_general_forum_topic()
 
     def test_mention_html(self):
+        chat = Chat(id=1, type="foo")
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
-            chat = Chat(id=1, type="foo")
             chat.mention_html()
 
         expected = '<a href="tg://user?id={}">{}</a>'
@@ -1192,10 +1191,10 @@ class TestChatWithoutRequest(TestChatBase):
         )
         assert chat.mention_html("the_name*\u2022") == expected.format(chat.id, "the_name*\u2022")
         assert chat.mention_html() == expected.format(chat.id, chat.full_name)
+        chat = Chat(id=1, type=Chat.PRIVATE, last_name="last\u2022name")
         with pytest.raises(
             TypeError, match="Can not create a mention to a private chat without first name"
         ):
-            chat = Chat(id=1, type=Chat.PRIVATE, last_name="last\u2022name")
             chat.mention_html()
 
         expected = '<a href="https://t.me/{}">{}</a>'
@@ -1204,15 +1203,15 @@ class TestChatWithoutRequest(TestChatBase):
             chat.username, "the_name*\u2022"
         )
         assert chat.mention_html() == expected.format(chat.username, chat.title)
+        chat = Chat(id=1, type="foo", username="user\u2022name")
         with pytest.raises(
             TypeError, match="Can not create a mention to a public chat without title"
         ):
-            chat = Chat(id=1, type="foo", username="user\u2022name")
             chat.mention_html()
 
     def test_mention_markdown(self):
+        chat = Chat(id=1, type="foo")
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
-            chat = Chat(id=1, type="foo")
             chat.mention_markdown()
 
         expected = "[{}](tg://user?id={})"
@@ -1223,10 +1222,10 @@ class TestChatWithoutRequest(TestChatBase):
             "the_name*\u2022", chat.id
         )
         assert chat.mention_markdown() == expected.format(chat.full_name, chat.id)
+        chat = Chat(id=1, type=Chat.PRIVATE, last_name="last\u2022name")
         with pytest.raises(
             TypeError, match="Can not create a mention to a private chat without first name"
         ):
-            chat = Chat(id=1, type=Chat.PRIVATE, last_name="last\u2022name")
             chat.mention_markdown()
 
         expected = "[{}](https://t.me/{})"
@@ -1235,15 +1234,15 @@ class TestChatWithoutRequest(TestChatBase):
             "the_name*\u2022", chat.username
         )
         assert chat.mention_markdown() == expected.format(chat.title, chat.username)
+        chat = Chat(id=1, type="foo", username="user\u2022name")
         with pytest.raises(
             TypeError, match="Can not create a mention to a public chat without title"
         ):
-            chat = Chat(id=1, type="foo", username="user\u2022name")
             chat.mention_markdown()
 
     def test_mention_markdown_v2(self):
+        chat = Chat(id=1, type="foo")
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
-            chat = Chat(id=1, type="foo")
             chat.mention_markdown_v2()
 
         expected = "[{}](tg://user?id={})"
@@ -1254,10 +1253,10 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.mention_markdown_v2() == expected.format(
             escape_markdown(chat.full_name, version=2), chat.id
         )
+        chat = Chat(id=1, type=Chat.PRIVATE, last_name="last_name")
         with pytest.raises(
             TypeError, match="Can not create a mention to a private chat without first name"
         ):
-            chat = Chat(id=1, type=Chat.PRIVATE, last_name="last_name")
             chat.mention_markdown_v2()
 
         expected = "[{}](https://t.me/{})"
@@ -1268,8 +1267,8 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.mention_markdown_v2() == expected.format(
             escape_markdown(chat.title, version=2), chat.username
         )
+        chat = Chat(id=1, type="foo", username="user\u2022name")
         with pytest.raises(
             TypeError, match="Can not create a mention to a public chat without title"
         ):
-            chat = Chat(id=1, type="foo", username="user\u2022name")
             chat.mention_markdown_v2()

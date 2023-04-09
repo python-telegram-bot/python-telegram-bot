@@ -38,7 +38,7 @@ from telegram.ext import filters
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def update():
     update = Update(
         0,
@@ -64,7 +64,7 @@ def update():
     return update
 
 
-@pytest.fixture(scope="function", params=MessageEntity.ALL_TYPES)
+@pytest.fixture(params=MessageEntity.ALL_TYPES)
 def message_entity(request):
     return MessageEntity(request.param, 0, 0, url="", user=User(1, "first_name", False))
 
@@ -87,7 +87,7 @@ class TestFilters:
         """
 
         def filter_class(obj):
-            return True if inspect.isclass(obj) and "filters" in repr(obj) else False
+            return bool(inspect.isclass(obj) and "filters" in repr(obj))
 
         # The total no. of filters is about 72 as of 31/10/21.
         # Gather all the filters to test using DFS-
@@ -98,7 +98,7 @@ class TestFilters:
             cls = stack[-1][-1]  # get last element and its class
             for inner_cls in inspect.getmembers(
                 cls,  # Get inner filters
-                lambda a: inspect.isclass(a) and not issubclass(a, cls.__class__),
+                lambda a: inspect.isclass(a) and not issubclass(a, cls.__class__),  # noqa: B023
             ):
                 if inner_cls[1] not in visited:
                     stack.append(inner_cls)
@@ -1096,7 +1096,7 @@ class TestFilters:
         assert not filters.Entity(message_entity.type).check_update(update)
 
     @pytest.mark.parametrize(
-        "chat_type, results",
+        ("chat_type", "results"),
         [
             (Chat.PRIVATE, (True, False, False, False, False)),
             (Chat.GROUP, (False, True, False, True, False)),
@@ -1252,7 +1252,8 @@ class TestFilters:
         f.add_usernames("@barfoo")
         assert str(f).startswith("filters.User(")
         # we don't know th exact order
-        assert "barfoo" in str(f) and "foobar" in str(f)
+        assert "barfoo" in str(f)
+        assert "foobar" in str(f)
 
         with pytest.raises(RuntimeError, match="Cannot set name"):
             f.name = "foo"
@@ -1411,7 +1412,8 @@ class TestFilters:
         f.add_usernames("@barfoo")
         assert str(f).startswith("filters.Chat(")
         # we don't know th exact order
-        assert "barfoo" in str(f) and "foobar" in str(f)
+        assert "barfoo" in str(f)
+        assert "foobar" in str(f)
 
         with pytest.raises(RuntimeError, match="Cannot set name"):
             f.name = "foo"
@@ -1661,7 +1663,8 @@ class TestFilters:
         f.add_usernames("@barfoo")
         assert str(f).startswith("filters.ForwardedFrom(")
         # we don't know the exact order
-        assert "barfoo" in str(f) and "foobar" in str(f)
+        assert "barfoo" in str(f)
+        assert "foobar" in str(f)
 
         with pytest.raises(RuntimeError, match="Cannot set name"):
             f.name = "foo"
@@ -1808,7 +1811,8 @@ class TestFilters:
         f.add_usernames("@barfoo")
         assert str(f).startswith("filters.SenderChat(")
         # we don't know th exact order
-        assert "barfoo" in str(f) and "foobar" in str(f)
+        assert "barfoo" in str(f)
+        assert "foobar" in str(f)
 
         with pytest.raises(RuntimeError, match="Cannot set name"):
             f.name = "foo"
@@ -1879,7 +1883,8 @@ class TestFilters:
     @pytest.mark.parametrize("emoji", Dice.ALL_EMOJI)
     def test_filters_dice(self, update, emoji):
         update.message.dice = Dice(4, emoji)
-        assert filters.Dice.ALL.check_update(update) and filters.Dice().check_update(update)
+        assert filters.Dice.ALL.check_update(update)
+        assert filters.Dice().check_update(update)
 
         to_camel = emoji.name.title().replace("_", "")
         assert repr(filters.Dice.ALL) == "filters.Dice.ALL"
@@ -2217,13 +2222,16 @@ class TestFilters:
                 self.data = data
 
             def filter(self, _):
-                return {"test": [self.data]}
+                return {"test": [self.data], "test2": {"test3": [self.data]}}
 
         result = (filters.COMMAND & DataFilter("blah")).check_update(update)
         assert result["test"] == ["blah"]
+        assert not result["test2"]
 
         result = (DataFilter("blah1") & DataFilter("blah2")).check_update(update)
         assert result["test"] == ["blah1", "blah2"]
+        assert isinstance(result["test2"], list)
+        assert result["test2"][0]["test3"] == ["blah1"]
 
         update.message.text = "test"
         update.message.entities = []
@@ -2390,7 +2398,8 @@ class TestFilters:
         f.add_usernames("@barfoo")
         assert str(f).startswith("filters.ViaBot(")
         # we don't know th exact order
-        assert "barfoo" in str(f) and "foobar" in str(f)
+        assert "barfoo" in str(f)
+        assert "foobar" in str(f)
 
         with pytest.raises(RuntimeError, match="Cannot set name"):
             f.name = "foo"

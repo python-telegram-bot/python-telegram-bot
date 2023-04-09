@@ -260,7 +260,7 @@ def build_conversation_handler(name: str, persistent: bool = True) -> BaseHandle
     return TrackingConversationHandler(name=name, persistent=persistent)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def papp(request, bot_info) -> Application:
     papp_input = request.param
     store_data = {}
@@ -359,10 +359,10 @@ class TestBasePersistence:
         slots = mro_slots(inst, only_parents=True)
         assert len(slots) == len(set(slots)), "duplicate slot"
 
-    @pytest.mark.parametrize("bot_data", (True, False))
-    @pytest.mark.parametrize("chat_data", (True, False))
-    @pytest.mark.parametrize("user_data", (True, False))
-    @pytest.mark.parametrize("callback_data", (True, False))
+    @pytest.mark.parametrize("bot_data", [True, False])
+    @pytest.mark.parametrize("chat_data", [True, False])
+    @pytest.mark.parametrize("user_data", [True, False])
+    @pytest.mark.parametrize("callback_data", [True, False])
     def test_init_store_data_update_interval(self, bot_data, chat_data, user_data, callback_data):
         store_data = PersistenceInput(
             bot_data=bot_data,
@@ -503,7 +503,7 @@ class TestBasePersistence:
         [PappInput(fill_data=True)],
         indirect=True,
     )
-    @pytest.mark.parametrize("callback_data", ("invalid", (1, 2, 3)))
+    @pytest.mark.parametrize("callback_data", ["invalid", (1, 2, 3)])
     async def test_initialization_invalid_callback_data(
         self, papp: Application, callback_data, monkeypatch
     ):
@@ -897,7 +897,7 @@ class TestBasePersistence:
             assert not papp.persistence.conversations
 
     @default_papp
-    @pytest.mark.parametrize("delay_type", ("job", "handler", "task"))
+    @pytest.mark.parametrize("delay_type", ["job", "handler", "task"])
     async def test_update_persistence_loop_async_logic(
         self, papp: Application, delay_type: str, chat_id
     ):
@@ -949,6 +949,70 @@ class TestBasePersistence:
             else:
                 assert not papp.persistence.updated_chat_ids
             assert not papp.persistence.updated_conversations
+
+    @papp_store_all_or_none
+    async def test_update_persistence_loop_manual_mark_for_update_persistence(
+        self, papp: Application, chat_id
+    ):
+        async with papp:
+            papp.chat_data[1].update({"key": "value", "refreshed": True})
+            papp.user_data[1].update({"key": "value", "refreshed": True})
+            await papp.update_persistence()
+
+            # Since no update has been processed, nothing should be marked for update
+            # So we expect the persisted data to differ from the current data
+            assert not papp.persistence.chat_data
+            assert papp.persistence.chat_data is not papp.chat_data
+            assert not papp.persistence.user_data
+            assert papp.persistence.user_data is not papp.user_data
+
+            # Double checking that not marking data doesn't change anything
+            papp.mark_data_for_update_persistence()
+            await papp.update_persistence()
+            assert not papp.persistence.chat_data
+            assert papp.persistence.chat_data is not papp.chat_data
+            assert not papp.persistence.user_data
+            assert papp.persistence.user_data is not papp.user_data
+
+            # marking data should lead to the data being updated
+            papp.mark_data_for_update_persistence(chat_ids=1, user_ids=1)
+            await papp.update_persistence()
+
+            assert papp.persistence.chat_data is not papp.chat_data
+            if papp.persistence.store_data.chat_data:
+                assert papp.persistence.chat_data == {1: {"key": "value", "refreshed": True}}
+                assert papp.persistence.chat_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.chat_data
+
+            assert papp.persistence.user_data is not papp.user_data
+            if papp.persistence.store_data.user_data:
+                assert papp.persistence.user_data == {1: {"key": "value", "refreshed": True}}
+                assert papp.persistence.user_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.user_data
+
+            # Also testing passing collections
+            papp.chat_data[1].update({"key": "value", "refreshed": False})
+            papp.user_data[1].update({"key": "value", "refreshed": False})
+            papp.mark_data_for_update_persistence(chat_ids={1}, user_ids={1})
+            await papp.update_persistence()
+
+            # marking data should lead to the data being updated
+
+            assert papp.persistence.chat_data is not papp.chat_data
+            if papp.persistence.store_data.chat_data:
+                assert papp.persistence.chat_data == {1: {"key": "value", "refreshed": False}}
+                assert papp.persistence.chat_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.chat_data
+
+            assert papp.persistence.user_data is not papp.user_data
+            if papp.persistence.store_data.user_data:
+                assert papp.persistence.user_data == {1: {"key": "value", "refreshed": False}}
+                assert papp.persistence.user_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.user_data
 
     @filled_papp
     async def test_drop_chat_data(self, papp: Application):
@@ -1069,7 +1133,7 @@ class TestBasePersistence:
 
     @default_papp
     @pytest.mark.parametrize(
-        "delay_type", ("job", "blocking_handler", "nonblocking_handler", "task")
+        "delay_type", ["job", "blocking_handler", "nonblocking_handler", "task"]
     )
     async def test_update_persistence_after_exception(
         self, papp: Application, delay_type: str, chat_id

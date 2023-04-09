@@ -26,7 +26,7 @@ from telegram.constants import MessageType
 
 class TestHelpers:
     @pytest.mark.parametrize(
-        "test_str,expected",
+        ("test_str", "expected"),
         [
             ("*bold*", r"\*bold\*"),
             ("_italic_", r"\_italic\_"),
@@ -39,7 +39,7 @@ class TestHelpers:
         assert expected == helpers.escape_markdown(test_str)
 
     @pytest.mark.parametrize(
-        "test_str, expected",
+        ("test_str", "expected"),
         [
             (r"a_b*c[d]e", r"a\_b\*c\[d\]e"),
             (r"(fg) ", r"\(fg\) "),
@@ -52,7 +52,7 @@ class TestHelpers:
         assert expected == helpers.escape_markdown(test_str, version=2)
 
     @pytest.mark.parametrize(
-        "test_str, expected",
+        ("test_str", "expected"),
         [
             (r"mono/pre:", r"mono/pre:"),
             ("`abc`", r"\`abc\`"),
@@ -101,27 +101,27 @@ class TestHelpers:
         payload = None
         assert expected == helpers.create_deep_linked_url(username, payload)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Only the following characters"):
             helpers.create_deep_linked_url(username, "text with spaces")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="must not exceed 64"):
             helpers.create_deep_linked_url(username, "0" * 65)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="valid bot_username"):
             helpers.create_deep_linked_url(None, None)
-        with pytest.raises(ValueError):  # too short username (4 is minimum)
+        with pytest.raises(ValueError, match="valid bot_username"):  # too short username, 4 is min
             helpers.create_deep_linked_url("abc", None)
 
     @pytest.mark.parametrize("message_type", list(MessageType))
     @pytest.mark.parametrize("entity_type", [Update, Message])
     def test_effective_message_type(self, message_type, entity_type):
         def build_test_message(kwargs):
-            config = dict(
-                message_id=1,
-                from_user=None,
-                date=None,
-                chat=None,
-            )
+            config = {
+                "message_id": 1,
+                "from_user": None,
+                "date": None,
+                "chat": None,
+            }
             config.update(**kwargs)
             return Message(**config)
 
@@ -133,7 +133,7 @@ class TestHelpers:
         assert helpers.effective_message_type(empty_update) is None
 
     def test_effective_message_type_wrong_type(self):
-        entity = dict()
+        entity = {}
         with pytest.raises(
             TypeError, match=re.escape(f"neither Message nor Update (got: {type(entity)})")
         ):
@@ -145,7 +145,7 @@ class TestHelpers:
         assert expected == helpers.mention_html(1, "the name")
 
     @pytest.mark.parametrize(
-        "test_str, expected",
+        ("test_str", "expected"),
         [
             ("the name", "[the name](tg://user?id=1)"),
             ("under_score", "[under_score](tg://user?id=1)"),

@@ -58,7 +58,7 @@ async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     """Handle the inline query. This is run when you type: @botusername <query>"""
     query = update.inline_query.query
 
-    if query == "":
+    if not query:  # empty query should not be handled
         return
 
     results = [
