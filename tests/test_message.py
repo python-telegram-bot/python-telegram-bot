@@ -366,18 +366,45 @@ class TestMessageWithoutRequest(TestMessageBase):
         for slot in new.__slots__:
             assert not isinstance(new[slot], dict)
 
-    def test_de_json_localization(self, bot, raw_bot, tz_bot, message):
-        message_raw = Message.de_json(message.to_dict(), raw_bot)
-        message_bot = Message.de_json(message.to_dict(), bot)
-        message_tz = Message.de_json(message.to_dict(), tz_bot)
+    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+        json_dict = {
+            "message_id": 12,
+            "from_user": None,
+            "date": int(datetime.now().timestamp()),
+            "chat": None,
+            "edit_date": int(datetime.now().timestamp()),
+            "forward_date": int(datetime.now().timestamp()),
+        }
+
+        message_raw = Message.de_json(json_dict, raw_bot)
+        message_bot = Message.de_json(json_dict, bot)
+        message_tz = Message.de_json(json_dict, tz_bot)
 
         # comparing utcoffsets because comparing timezones is unpredicatable
-        message_offset = message_tz.date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(message_tz.date.replace(tzinfo=None))
+        date_offset = message_tz.date.utcoffset()
+        date_tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(message_tz.date.replace(tzinfo=None))
+
+        edit_date_offset = message_tz.edit_date.utcoffset()
+        edit_date_tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            message_tz.edit_date.replace(tzinfo=None)
+        )
+
+        forward_date_offset = message_tz.forward_date.utcoffset()
+        forward_date_tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            message_tz.forward_date.replace(tzinfo=None)
+        )
 
         assert message_raw.date.tzinfo == UTC
         assert message_bot.date.tzinfo == UTC
-        assert message_offset == tz_bot_offset
+        assert date_offset == date_tz_bot_offset
+
+        assert message_raw.edit_date.tzinfo == UTC
+        assert message_bot.edit_date.tzinfo == UTC
+        assert edit_date_offset == edit_date_tz_bot_offset
+
+        assert message_raw.forward_date.tzinfo == UTC
+        assert message_bot.forward_date.tzinfo == UTC
+        assert forward_date_offset == forward_date_tz_bot_offset
 
     def test_equality(self):
         id_ = 1
