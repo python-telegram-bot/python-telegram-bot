@@ -49,8 +49,8 @@ class WebhookInfo(TelegramObject):
             webhook certificate checks.
         pending_update_count (:obj:`int`): Number of updates awaiting delivery.
         ip_address (:obj:`str`, optional): Currently used webhook IP address.
-        last_error_date (:obj:`int`, optional): Unix time for the most recent error that happened
-            when trying to deliver an update via webhook.
+        last_error_date (:class:`datetime.datetime`): Optional. Datetime for the most recent
+            error that happened when trying to deliver an update via webhook.
 
             .. versionchanged:: NEXT.VERSION
                 |datetime_localization|
@@ -65,8 +65,9 @@ class WebhookInfo(TelegramObject):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        last_synchronization_error_date (:obj:`int`, optional): Unix time of the most recent error
-            that happened when trying to synchronize available updates with Telegram datacenters.
+        last_synchronization_error_date (:class:`datetime.datetime`, optional): Datetime of the
+            most recent error that happened when trying to synchronize available updates with
+            Telegram datacenters.
 
             .. versionadded:: 20.0
 
@@ -78,8 +79,8 @@ class WebhookInfo(TelegramObject):
             webhook certificate checks.
         pending_update_count (:obj:`int`): Number of updates awaiting delivery.
         ip_address (:obj:`str`): Optional. Currently used webhook IP address.
-        last_error_date (:obj:`int`): Optional. Unix time for the most recent error that happened
-            when trying to deliver an update via webhook.
+        last_error_date (:class:`datetime.datetime`): Optional. Datetime for the most recent
+            error that happened when trying to deliver an update via webhook.
 
             .. versionchanged:: NEXT.VERSION
                 |datetime_localization|
@@ -95,8 +96,9 @@ class WebhookInfo(TelegramObject):
 
                 * |tupleclassattrs|
                 * |alwaystuple|
-        last_synchronization_error_date (:obj:`int`): Optional. Unix time of the most recent error
-            that happened when trying to synchronize available updates with Telegram datacenters.
+        last_synchronization_error_date (:class:`datetime.datetime`, optional): Datetime of the
+            most recent error that happened when trying to synchronize available updates with
+            Telegram datacenters.
 
             .. versionadded:: 20.0
 
