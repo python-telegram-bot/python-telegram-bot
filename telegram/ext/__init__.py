@@ -25,6 +25,7 @@ __all__ = (
     "ApplicationHandlerStop",
     "BaseHandler",
     "BasePersistence",
+    "BaseProcessor",
     "BaseRateLimiter",
     "CallbackContext",
     "CallbackDataCache",
@@ -59,7 +60,7 @@ __all__ = (
 
 from . import filters
 from ._aioratelimiter import AIORateLimiter
-from ._application import Application, ApplicationHandlerStop
+from ._application import Application, ApplicationHandlerStop, BaseProcessor
 from ._applicationbuilder import ApplicationBuilder
 from ._basepersistence import BasePersistence, PersistenceInput
 from ._baseratelimiter import BaseRateLimiter

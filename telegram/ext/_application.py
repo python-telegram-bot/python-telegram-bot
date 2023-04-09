@@ -23,6 +23,8 @@ import itertools
 import logging
 import platform
 import signal
+from abc import abstractmethod
+from asyncio import BoundedSemaphore
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -257,7 +259,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update_queue: "asyncio.Queue[object]",
         updater: Optional[Updater],
         job_queue: JQ,
-        concurrent_updates: Union[bool, int],
+        concurrent_updates: Union[bool, int, "BaseProcessor"],
         persistence: Optional[BasePersistence[UD, CD, BD]],
         context_types: ContextTypes[CCT, UD, CD, BD],
         post_init: Optional[
@@ -295,14 +297,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.post_stop: Optional[
             Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
         ] = post_stop
-
-        if isinstance(concurrent_updates, int) and concurrent_updates < 0:
-            raise ValueError("`concurrent_updates` must be a non-negative integer!")
         if concurrent_updates is True:
             concurrent_updates = 256
-        self._concurrent_updates_sem = asyncio.BoundedSemaphore(concurrent_updates or 1)
-        self._concurrent_updates: int = concurrent_updates or 0
-
+        if isinstance(concurrent_updates, int):
+            if concurrent_updates < 0:
+                raise ValueError("`concurrent_updates` must be a non-negative integer!")
+            concurrent_updates = SimpleProcessor(concurrent_updates)
+        self._concurrent_updates_sem = asyncio.BoundedSemaphore(
+            concurrent_updates.max_concurrent_updates or 1
+        )
+        self._concurrent_updates: BaseProcessor = concurrent_updates
         self.bot_data: BD = self.context_types.bot_data()
         self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
         self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
@@ -359,7 +363,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         .. seealso:: :wiki:`Concurrency`
         """
-        return self._concurrent_updates
+        return self._concurrent_updates.max_concurrent_updates
 
     @property
     def job_queue(self) -> Optional["JobQueue[CCT]"]:
@@ -376,6 +380,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 stacklevel=2,
             )
         return self._job_queue
+
+    @property
+    def processor(self) -> Optional["BaseProcessor"]:
+        """:class:`telegram.ext.BaseProcessor`: The processor used by this application.
+
+        .. seealso:: :wiki:`Concurrency`
+        """
+        return self._concurrent_updates
 
     async def initialize(self) -> None:
         """Initializes the Application by initializing:
@@ -1047,7 +1059,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         # Continuously fetch updates from the queue. Exit only once the signal object is found.
         while True:
             update = await self.update_queue.get()
-
             if update is _STOP_SIGNAL:
                 _logger.debug("Dropping pending updates")
                 while not self.update_queue.empty():
@@ -1061,7 +1072,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
             if self._concurrent_updates:
                 # We don't await the below because it has to be run concurrently
-                self.create_task(self.__process_update_wrapper(update), update=update)
+                self.create_task(
+                    self._concurrent_updates.do_process_update(
+                        update, self.process_update(update)
+                    ),
+                    update=update,
+                )
             else:
                 await self.__process_update_wrapper(update)
 
@@ -1640,3 +1656,64 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         _logger.exception("No error handlers are registered, logging exception.", exc_info=error)
         return False
+
+
+class BaseProcessor:
+    def __init__(self, max_concurrent_updates: int):
+        self.max_concurrent_updates = max_concurrent_updates
+        self.semaphore = BoundedSemaphore(self.max_concurrent_updates or 1)
+
+    @abstractmethod
+    async def process_update(
+        self,
+        update: object,
+        coroutine: "Awaitable[Any]",
+    ) -> None:
+        pass
+
+    @abstractmethod
+    async def initialize(self) -> None:
+        pass
+
+    @abstractmethod
+    async def shutdown(self) -> None:
+        pass
+
+    async def do_process_update(
+        self,
+        update: object,
+        coroutine: "Awaitable[Any]",
+    ) -> None:
+        async with self.semaphore:
+            await self.process_update(update, coroutine)
+
+    async def __aenter__(self) -> "BaseProcessor":
+        try:
+            await self.initialize()
+            return self
+        except Exception as exc:
+            await self.shutdown()
+            raise exc
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        await self.shutdown()
+
+
+class SimpleProcessor(BaseProcessor):
+    async def process_update(
+        self,
+        update: object,
+        coroutine: "Awaitable[Any]",
+    ) -> None:
+        await coroutine
+
+    async def initialize(self) -> None:
+        pass
+
+    async def shutdown(self) -> None:
+        pass

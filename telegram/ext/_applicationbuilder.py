@@ -35,7 +35,7 @@ from typing import (
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, DVType, FilePathInput, ODVInput
-from telegram.ext._application import Application
+from telegram.ext._application import Application, BaseProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._jobqueue import JobQueue
@@ -198,7 +198,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._context_types: DVType[ContextTypes] = DefaultValue(ContextTypes())
         self._application_class: DVType[Type[Application]] = DefaultValue(Application)
         self._application_kwargs: Dict[str, object] = {}
-        self._concurrent_updates: Union[int, DefaultValue[bool]] = DEFAULT_FALSE
+        self._concurrent_updates: Union[int, DefaultValue[bool], "BaseProcessor"] = DEFAULT_FALSE
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
@@ -901,7 +901,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._update_queue = update_queue
         return self
 
-    def concurrent_updates(self: BuilderType, concurrent_updates: Union[bool, int]) -> BuilderType:
+    def concurrent_updates(
+        self: BuilderType, concurrent_updates: Union[bool, int, "BaseProcessor"]
+    ) -> BuilderType:
         """Specifies if and how many updates may be processed concurrently instead of one by one.
         If not called, updates will be processed one by one.
 
@@ -916,9 +918,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         .. seealso:: :attr:`telegram.ext.Application.concurrent_updates`
 
         Args:
-            concurrent_updates (:obj:`bool` | :obj:`int`): Passing :obj:`True` will allow for
-                ``256`` updates to be processed concurrently. Pass an integer to specify a
-                different number of updates that may be processed concurrently.
+            concurrent_updates (:obj:`bool` | :obj:`int` | :class:`BaseProcessor`): Passing
+            :obj:`True` will allow for `256`` updates to be processed concurrently. Pass an
+            integer to specify a different number of updates that may be processed
+            concurrently. Pass an instance of `BaseProcessor` to use that instance
+            for handling updates concurrently.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
