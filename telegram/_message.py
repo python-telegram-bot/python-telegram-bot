@@ -826,11 +826,20 @@ class Message(TelegramObject):
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If the chat of the message is not
         a private chat or normal group, returns a t.me link of the message.
+
+            .. versionchanged:: NEXT.VERSION
+                For messages that are replies or part of a forum topic, the link now points
+                to the corresponding thread view.
         """
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
             # the else block gets rid of leading -100 for supergroups:
             to_link = self.chat.username if self.chat.username else f"c/{str(self.chat.id)[4:]}"
-            return f"https://t.me/{to_link}/{self.message_id}"
+            baselink = f"https://t.me/{to_link}/{self.message_id}"
+
+            # adds the thread for topics and replies
+            if (self.is_topic_message and self.message_thread_id) or self.reply_to_message:
+                baselink = f"{baselink}?thread={self.message_thread_id}"
+            return baselink
         return None
 
     @classmethod
