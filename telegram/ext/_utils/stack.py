@@ -25,12 +25,13 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-import logging
 from pathlib import Path
 from types import FrameType
 from typing import Optional
 
-_logger = logging.getLogger(__name__)
+from telegram._utils.logging import get_logger
+
+_LOGGER = get_logger(__name__)
 
 
 def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
@@ -57,7 +58,7 @@ def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
     try:
         return _was_called_by(frame, caller)
     except Exception as exc:
-        _logger.debug(
+        _LOGGER.debug(
             "Failed to check if frame was called by `caller`. Assuming that it was not.",
             exc_info=exc,
         )

@@ -56,6 +56,7 @@ class TestStack:
             assert not was_called_by(inspect.currentframe(), None)
 
         assert len(caplog.records) == 1
+        assert caplog.records[0].name == "telegram.ext"
         assert caplog.records[0].levelno == logging.DEBUG
         assert caplog.records[0].getMessage().startswith("Failed to check")
         assert caplog.records[0].exc_info[0] is RuntimeError
