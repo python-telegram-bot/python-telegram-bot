@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InputFile."""
 
-import logging
 import mimetypes
 from typing import IO, Optional, Union
 from uuid import uuid4
@@ -27,7 +26,6 @@ from telegram._utils.files import load_file
 from telegram._utils.types import FieldTuple
 
 _DEFAULT_MIME_TYPE = "application/octet-stream"
-logger = logging.getLogger(__name__)
 
 
 class InputFile:

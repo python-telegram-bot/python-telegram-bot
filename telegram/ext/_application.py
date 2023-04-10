@@ -21,7 +21,6 @@ import asyncio
 import contextlib
 import inspect
 import itertools
-import logging
 import platform
 import signal
 from collections import defaultdict
@@ -53,6 +52,7 @@ from typing import (
 
 from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
+from telegram._utils.logging import get_logger
 from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
@@ -77,7 +77,7 @@ _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-n
 _STOP_SIGNAL = object()
 _DEFAULT_0 = DefaultValue(0)
 
-_logger = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__)
 
 
 class ApplicationHandlerStop(Exception):
@@ -393,7 +393,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             :meth:`shutdown`
         """
         if self._initialized:
-            _logger.debug("This Application is already initialized.")
+            _LOGGER.debug("This Application is already initialized.")
             return
 
         await self.bot.initialize()
@@ -443,7 +443,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             raise RuntimeError("This Application is still running!")
 
         if not self._initialized:
-            _logger.debug("This Application is already shut down. Returning.")
+            _LOGGER.debug("This Application is already shut down. Returning.")
             return
 
         await self.bot.shutdown()
@@ -451,10 +451,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             await self.updater.shutdown()
 
         if self.persistence:
-            _logger.debug("Updating & flushing persistence before shutdown")
+            _LOGGER.debug("Updating & flushing persistence before shutdown")
             await self.update_persistence()
             await self.persistence.flush()
-            _logger.debug("Updated and flushed persistence")
+            _LOGGER.debug("Updated and flushed persistence")
 
         self._initialized = False
 
@@ -557,18 +557,18 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     # TODO: Add this once we drop py3.7
                     # name=f'Application:{self.bot.id}:persistence_updater'
                 )
-                _logger.debug("Loop for updating persistence started")
+                _LOGGER.debug("Loop for updating persistence started")
 
             if self._job_queue:
                 await self._job_queue.start()  # type: ignore[union-attr]
-                _logger.debug("JobQueue started")
+                _LOGGER.debug("JobQueue started")
 
             self.__update_fetcher_task = asyncio.create_task(
                 self._update_fetcher(),
                 # TODO: Add this once we drop py3.7
                 # name=f'Application:{self.bot.id}:update_fetcher'
             )
-            _logger.info("Application started")
+            _LOGGER.info("Application started")
 
         except Exception as exc:
             self._running = False
@@ -601,32 +601,32 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             raise RuntimeError("This Application is not running!")
 
         self._running = False
-        _logger.info("Application is stopping. This might take a moment.")
+        _LOGGER.info("Application is stopping. This might take a moment.")
 
         # Stop listening for new updates and handle all pending ones
         await self.update_queue.put(_STOP_SIGNAL)
-        _logger.debug("Waiting for update_queue to join")
+        _LOGGER.debug("Waiting for update_queue to join")
         await self.update_queue.join()
         if self.__update_fetcher_task:
             await self.__update_fetcher_task
-        _logger.debug("Application stopped fetching of updates.")
+        _LOGGER.debug("Application stopped fetching of updates.")
 
         if self._job_queue:
-            _logger.debug("Waiting for running jobs to finish")
+            _LOGGER.debug("Waiting for running jobs to finish")
             await self._job_queue.stop(wait=True)  # type: ignore[union-attr]
-            _logger.debug("JobQueue stopped")
+            _LOGGER.debug("JobQueue stopped")
 
-        _logger.debug("Waiting for `create_task` calls to be processed")
+        _LOGGER.debug("Waiting for `create_task` calls to be processed")
         await asyncio.gather(*self.__create_task_tasks, return_exceptions=True)
 
         # Make sure that this is the *last* step of stopping the application!
         if self.persistence and self.__update_persistence_task:
-            _logger.debug("Waiting for persistence loop to finish")
+            _LOGGER.debug("Waiting for persistence loop to finish")
             self.__update_persistence_event.set()
             await self.__update_persistence_task
             self.__update_persistence_event.clear()
 
-        _logger.info("Application.stop() complete")
+        _LOGGER.info("Application.stop() complete")
 
     def run_polling(
         self,
@@ -1026,7 +1026,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
             # Avoid infinite recursion of error handlers.
             elif is_error_handler:
-                _logger.exception(
+                _LOGGER.exception(
                     "An error was raised and an uncaught error was raised while "
                     "handling the error with an error_handler.",
                     exc_info=exception,
@@ -1049,7 +1049,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             update = await self.update_queue.get()
 
             if update is _STOP_SIGNAL:
-                _logger.debug("Dropping pending updates")
+                _LOGGER.debug("Dropping pending updates")
                 while not self.update_queue.empty():
                     self.update_queue.task_done()
 
@@ -1057,7 +1057,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 self.update_queue.task_done()
                 return
 
-            _logger.debug("Processing update %s", update)
+            _LOGGER.debug("Processing update %s", update)
 
             if self._concurrent_updates:
                 # We don't await the below because it has to be run concurrently
@@ -1117,13 +1117,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
             # Stop processing with any other handler.
             except ApplicationHandlerStop:
-                _logger.debug("Stopping further handlers due to ApplicationHandlerStop")
+                _LOGGER.debug("Stopping further handlers due to ApplicationHandlerStop")
                 break
 
             # Dispatch any error.
             except Exception as exc:
                 if await self.process_error(update=update, error=exc):
-                    _logger.debug("Error handler stopped further handlers.")
+                    _LOGGER.debug("Error handler stopped further handlers.")
                     break
 
         if any_blocking:
@@ -1451,7 +1451,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         if not self.persistence:
             return
 
-        _logger.debug("Starting next run of updating the persistence.")
+        _LOGGER.debug("Starting next run of updating the persistence.")
 
         coroutines: Set[Coroutine] = set()
 
@@ -1519,13 +1519,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 # *all* tasks will be done.
                 if not new_state.done():
                     if self.running:
-                        _logger.debug(
+                        _LOGGER.debug(
                             "A ConversationHandlers state was not yet resolved. Updating the "
                             "persistence with the current state. Will check again on next run of "
                             "Application.update_persistence."
                         )
                     else:
-                        _logger.warning(
+                        _LOGGER.warning(
                             "A ConversationHandlers state was not yet resolved. Updating the "
                             "persistence with the current state."
                         )
@@ -1545,7 +1545,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             )
 
         results = await asyncio.gather(*coroutines, return_exceptions=True)
-        _logger.debug("Finished updating persistence.")
+        _LOGGER.debug("Finished updating persistence.")
 
         # dispatch any errors
         await asyncio.gather(
@@ -1586,7 +1586,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 :meth:`process_error`. Defaults to :obj:`True`.
         """
         if callback in self.error_handlers:
-            _logger.warning("The callback is already registered as an error handler. Ignoring.")
+            _LOGGER.warning("The callback is already registered as an error handler. Ignoring.")
             return
 
         self.error_handlers[callback] = block
@@ -1663,12 +1663,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     except ApplicationHandlerStop:
                         return True
                     except Exception as exc:
-                        _logger.exception(
+                        _LOGGER.exception(
                             "An error was raised and an uncaught error was raised while "
                             "handling the error with an error_handler.",
                             exc_info=exc,
                         )
             return False
 
-        _logger.exception("No error handlers are registered, logging exception.", exc_info=error)
+        _LOGGER.exception("No error handlers are registered, logging exception.", exc_info=error)
         return False
