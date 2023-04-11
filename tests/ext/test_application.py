@@ -803,6 +803,7 @@ class TestApplication:
         with caplog.at_level(logging.DEBUG):
             app.add_error_handler(self.error_handler_context)
             assert len(caplog.records) == 1
+            assert caplog.records[-1].name == "telegram.ext.Application"
             assert caplog.records[-1].getMessage().startswith("The callback is already registered")
 
     async def test_error_handler_that_raises_errors(self, app, caplog):
@@ -826,11 +827,11 @@ class TestApplication:
                 assert self.count == 0
                 assert self.received is None
                 assert len(caplog.records) > 0
-                log_messages = (record.getMessage() for record in caplog.records)
                 assert any(
                     "uncaught error was raised while handling the error with an error_handler"
-                    in message
-                    for message in log_messages
+                    in record.getMessage()
+                    and record.name == "telegram.ext.Application"
+                    for record in caplog.records
                 )
 
                 await app.update_queue.put("1")
@@ -988,6 +989,7 @@ class TestApplication:
                 assert (
                     caplog.records[-1].getMessage().startswith("No error handlers are registered")
                 )
+                assert caplog.records[-1].name == "telegram.ext.Application"
                 await app.stop()
 
     @pytest.mark.parametrize("handler_block", [True, False])
@@ -1090,6 +1092,7 @@ class TestApplication:
                 await app.update_queue.put(1)
                 await asyncio.sleep(0.05)
                 assert len(caplog.records) == 1
+                assert caplog.records[-1].name == "telegram.ext.Application"
                 assert (
                     caplog.records[-1]
                     .getMessage()

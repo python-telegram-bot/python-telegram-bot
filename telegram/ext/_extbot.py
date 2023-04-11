@@ -85,6 +85,7 @@ from telegram import (
 )
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
+from telegram._utils.logging import get_logger
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram._utils.warnings import warn
 from telegram.ext._callbackdatacache import CallbackDataCache
@@ -155,6 +156,8 @@ class ExtBot(Bot, Generic[RLARGS]):
     """
 
     __slots__ = ("_callback_data_cache", "_defaults", "_rate_limiter")
+
+    _LOGGER = get_logger(__name__, class_name="ExtBot")
 
     # using object() would be a tiny bit safer, but a string plays better with the typing setup
     __RL_KEY = uuid4().hex
@@ -324,7 +327,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             "connect_timeout": connect_timeout,
             "pool_timeout": pool_timeout,
         }
-        self._logger.debug(
+        self._LOGGER.debug(
             "Passing request through rate limiter of type %s with rate_limit_args %s",
             type(self.rate_limiter),
             rate_limit_args,
