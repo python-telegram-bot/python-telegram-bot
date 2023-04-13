@@ -1193,11 +1193,13 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self  # type: ignore[return-value]
 
 
-InitApplicationBuilder = ApplicationBuilder[
-    ExtBot[None],
-    ContextTypes.DEFAULT_TYPE,
-    Dict[Any, Any],
-    Dict[Any, Any],
-    Dict[Any, Any],
-    JobQueue[ContextTypes.DEFAULT_TYPE],
-]  # This is defined all the way down here so that its type is inferred  # by Pylance correctly.
+InitApplicationBuilder = (  # This is defined all the way down here so that its type is inferred
+    ApplicationBuilder[  # by Pylance correctly.
+        ExtBot[None],
+        ContextTypes.DEFAULT_TYPE,
+        Dict[Any, Any],
+        Dict[Any, Any],
+        Dict[Any, Any],
+        JobQueue[ContextTypes.DEFAULT_TYPE],
+    ]
+)
