@@ -36,7 +36,7 @@ from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, DVType, FilePathInput, ODVInput
 from telegram.ext._application import Application
-from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
+from telegram.ext._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._jobqueue import JobQueue
@@ -309,7 +309,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             bot=bot,
             update_queue=update_queue,
             updater=updater,
-            concurrent_updates=DefaultValue.get_value(self._concurrent_updates),
+            update_processor=DefaultValue.get_value(self._concurrent_updates),
             job_queue=job_queue,
             persistence=persistence,
             context_types=DefaultValue.get_value(self._context_types),
@@ -930,15 +930,31 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Args:
             concurrent_updates (:obj:`bool` | :obj:`int` | :class:`BaseUpdateProcessor`): Passing
-            :obj:`True` will allow for `256`` updates to be processed concurrently. Pass an
-            integer to specify a different number of updates that may be processed
-            concurrently. Pass an instance of :class:`telegram.ext.BaseUpdateProcessor` to use
-            that instance for handling updates concurrently.
+            :obj:`True` will allow for ``256`` updates to be processed concurrently. Pass an
+            integer to specify a different number of updates that may be processed concurrently,
+            in that case :class:`telegram.ext.SimpleUpdateProcessor` is used to handle updates.
+            Pass an instance of :class:`telegram.ext.BaseUpdateProcessor` to use that instance
+            for handling updates concurrently.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        self._concurrent_updates = concurrent_updates
+        # Check if concurrent updates is bool and convert to integer
+        if concurrent_updates is True:
+            concurrent_updates = 256
+        elif concurrent_updates is False:
+            concurrent_updates = 0
+
+        # If `concurrent_updates` is an integer, create a `SimpleUpdateProcessor`
+        # instance with that integer value; otherwise, raise an error if the value
+        # is negative or not an integer.
+        if isinstance(concurrent_updates, int):
+            if concurrent_updates < 0:
+                raise ValueError("`concurrent_updates` must be a non-negative integer!")
+            concurrent_updates = SimpleUpdateProcessor(concurrent_updates)
+
+        # Assign the value of `concurrent_updates` to `_concurrent_updates`
+        self._concurrent_updates: BaseUpdateProcessor = concurrent_updates
         return self
 
     def job_queue(

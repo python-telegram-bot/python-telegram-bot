@@ -22,6 +22,8 @@ from asyncio import BoundedSemaphore
 from types import TracebackType
 from typing import Any, Awaitable, Optional, Type
 
+from telegram.ext import Application
+
 
 class BaseUpdateProcessor:
     """An abstract base class for update processors. You can use this class to implement
@@ -84,6 +86,7 @@ class BaseUpdateProcessor:
         self,
         update: object,
         coroutine: "Awaitable[Any]",
+        application: Application,
     ) -> None:
         """Calls :meth:`process_update` with a semaphore to limit the number of concurrent
         updates.
@@ -91,9 +94,11 @@ class BaseUpdateProcessor:
         Args:
             update (:obj:`object`): The update to be processed.
             coroutine (:obj:`Awaitable`): The coroutine that will be awaited to process the update.
+            application (:class:`telegram.ext.Application`): The application instance.
         """
         async with self._semaphore:
             await self.process_update(update, coroutine)
+            application.update_queue.task_done()
 
     async def __aenter__(self) -> "BaseUpdateProcessor":
         """Simple context manager which initializes the Processor."""
@@ -129,7 +134,7 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
         await coroutine
 
     async def initialize(self) -> None:
-        pass
+        """Does nothing."""
 
     async def shutdown(self) -> None:
-        pass
+        """Does nothing."""

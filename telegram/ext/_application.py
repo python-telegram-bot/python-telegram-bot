@@ -57,7 +57,7 @@ from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
-from telegram.ext._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
+from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._handler import BaseHandler
@@ -260,7 +260,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update_queue: "asyncio.Queue[object]",
         updater: Optional[Updater],
         job_queue: JQ,
-        concurrent_updates: Union[bool, int, "BaseUpdateProcessor"],
+        update_processor: "BaseUpdateProcessor",
         persistence: Optional[BasePersistence[UD, CD, BD]],
         context_types: ContextTypes[CCT, UD, CD, BD],
         post_init: Optional[
@@ -299,16 +299,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.post_stop: Optional[
             Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
         ] = post_stop
-        if concurrent_updates is True:
-            concurrent_updates = 256
-        if isinstance(concurrent_updates, int):
-            if concurrent_updates < 0:
-                raise ValueError("`concurrent_updates` must be a non-negative integer!")
-            concurrent_updates = SimpleUpdateProcessor(concurrent_updates)
         self._concurrent_updates_sem = asyncio.BoundedSemaphore(
-            concurrent_updates.max_concurrent_updates or 1
+            update_processor.max_concurrent_updates or 1
         )
-        self._update_processor: BaseUpdateProcessor = concurrent_updates
+        self._update_processor = update_processor
         self.bot_data: BD = self.context_types.bot_data()
         self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
         self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
@@ -1076,7 +1070,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             if self._update_processor:
                 # We don't await the below because it has to be run concurrently
                 self.create_task(
-                    self._update_processor.do_process_update(update, self.process_update(update)),
+                    self._update_processor.do_process_update(
+                        update, self.process_update(update), self
+                    ),
                     update=update,
                 )
             else:

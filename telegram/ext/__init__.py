@@ -52,6 +52,7 @@ __all__ = (
     "PreCheckoutQueryHandler",
     "PrefixHandler",
     "ShippingQueryHandler",
+    "SimpleUpdateProcessor",
     "StringCommandHandler",
     "StringRegexHandler",
     "TypeHandler",
@@ -64,7 +65,7 @@ from ._application import Application, ApplicationHandlerStop
 from ._applicationbuilder import ApplicationBuilder
 from ._basepersistence import BasePersistence, PersistenceInput
 from ._baseratelimiter import BaseRateLimiter
-from ._baseupdateprocessor import BaseUpdateProcessor
+from ._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
 from ._callbackcontext import CallbackContext
 from ._callbackdatacache import CallbackDataCache, InvalidCallbackData
 from ._callbackqueryhandler import CallbackQueryHandler
