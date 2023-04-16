@@ -2,27 +2,28 @@ Stability Policy
 ================
 
 The ``python-telegram-bot`` library (PTB) tries to provides a stable interface to its users.
-As both the user base and the complexity of the library has grown significantly since PTBs conception, we introduced below explicit stability Policy with version NEXT.VERSION.
+As both the user base and the complexity of the library has grown significantly since PTBs conception, we introduced below explicit stability policy with version NEXT.VERSION.
 
-Large parts of the :mod:`telegram` package are the Python representations of the Telegram Bot API, the stability policy of which PTB can not influence.
+Large parts of the :mod:`telegram` package are the Python representations of the Telegram Bot API, whose stability policy PTB can not influence.
 This policy hence includes some special cases for those parts.
 
 What does this policy cover?
 ----------------------------
 
-This policy includes any API or behavior that is documented in this documentation.
+This policy includes any API or behavior that is covered in this documentation.
 This covers both the :mod:`telegram` package and the :mod:`telegram.ext` package.
 
 What doesn't this policy cover?
 -------------------------------
 
-Introduction of new features or changes of flavors of comparable behavior (e.g. the default for the used HTTP protocol version) are not covered by this policy.
+Introduction of new features or changes of flavors of comparable behavior (e.g. the default for the HTTP protocol version being used) are not covered by this policy.
+
 The internal structure of classes in PTB, i.e. things like the result of ``dir(obj))`` or the contents of ``obj.__dict__``, may change.
 
 Objects are in general not guaranteed to be pickleable (unless stated otherwise) and pickled objects from one version of PTB may not be loadable in future versions.
 We may provide a way to convert pickled objects from one version to another, but this is not guaranteed.
 
-Functionality that is part of PTBs API but is explicitly documented to not be intended to be used directly by users (e.g. :meth:`telegram.request.BaseRequest.do_request`) may change.
+Functionality that is part of PTBs API but is explicitly documented as not to be intended to be used directly by users (e.g. :meth:`telegram.request.BaseRequest.do_request`) may change.
 This also applies to functions or attributes marked as final in the sense of `PEP 591 <https://www.python.org/dev/peps/pep-0591/>`__.
 
 PTB has dependencies to 3rd party packages.
@@ -36,10 +37,10 @@ In general, we will try to support all Python versions that have not yet reached
 Bot API Functionality
 ~~~~~~~~~~~~~~~~~~~~~
 
-Comparison of equality of the classe in the :mod:`telegram` package is subject to change and the PTB team will update the behavior to best reflect updates in the Bot API.
+Comparison of equality of instances of the classes in the :mod:`telegram` package is subject to change and the PTB team will update the behavior to best reflect updates in the Bot API.
 
-When arguments of the Bot API methods change order or become optional/mandatory due to changes in the Bot API, PTB will always try to reflect these changes.
-While we try to make such changes backwards compatible, this is not always possible or only with significant effort.
+When the order of arguments of the Bot API methods changes or they become optional/mandatory due to changes in the Bot API, PTB will always try to reflect these changes.
+While we try to make such changes backward compatible, this is not always possible or only with significant effort.
 In such cases we will find a trade-off between backwards compatibility and fully complying with the Bot API, which may result in breaking changes.
 We highly recommend using keyword arguments, which can help to make such changes non-breaking on your end.
 
@@ -51,7 +52,7 @@ Since attributes of the classes in the :mod:`telegram` package are not writable,
 Development Versions
 ~~~~~~~~~~~~~~~~~~~~
 
-Before a feature is in a release, it is not covered by this policy and may change.
+Before a feature is in a release, i.e. the feature was merged into the ``master`` branch but not released yet, it is not covered by this policy and may change.
 Pre-Release marked as alpha, beta or release candidate are not covered by this policy either.
 
 Security
@@ -88,14 +89,14 @@ Where possible, a :class:`~telegram.warnings.PTBDeprecationWarning` is issued wh
 From time to time, we may decide to deprecate an API that is particularly widely used.
 In these cases, we may decide to provide an extended deprecation period, at our discretion.
 
-With version 20.0.0, PTB introduced majorly structural breaking changes without the above deprecation period.
-Should a similarly big change ever be deemed necessary by the development team and should a deprecation period prove too much additional effort, this violation of the stability policy will be announced well ahead of the release in our channel.
+With version 20.0.0, PTB introduced major structural breaking changes without the above deprecation period.
+Should a similarly big change ever be deemed necessary again by the development team and should a deprecation period prove too much additional effort, this violation of the stability policy will be announced well ahead of the release in our channel.
 
 Non-Bot API Functionality
 #########################
 
 Starting with version NEXT.VERSION, deprecated functionality will stay available for the current and the next major version.
-Let's see an example:
+For example:
 
 -  In PTB v20.1.1 the feature exists
 -  In PTB v20.1.2 or v20.2.0 the feature is marked as deprecated
@@ -117,7 +118,7 @@ Case 1
 
 -  In PTB v20.1 the feature exists
 -  Bot API version 6.6 is released and deprecates the feature
--  In PTB v20.2 adds support for Bot API 6.6 and the feature is
+-  PTB v20.2 adds support for Bot API 6.6 and the feature is
    marked as deprecated
 -  In PTB v21.0 the feature is removed or changed
 
