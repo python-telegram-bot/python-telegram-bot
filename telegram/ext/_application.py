@@ -1066,7 +1066,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 else:
                     await self.__process_update_wrapper(update)
             except asyncio.CancelledError:
-                _LOGGER.debug(
+                _LOGGER.warning(
                     "Fetching updates got a asyncio.CancelledError. Ignoring as this task may only"
                     "be closed via `Application.stop`."
                 )
