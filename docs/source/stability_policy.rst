@@ -5,7 +5,7 @@ Stability Policy
 
     This stability policy is in place since version NEXT.VERSION.
     While earlier versions of ``python-telegram-bot`` also had stable interfaces, they had no explicit stability policy and hence did not follow the rules outlined below in all detail.
-    Please also refer to the :ref:`changelog <changelog>`.
+    Please also refer to the :ref:`changelog <ptb-changelog>`.
 
 .. caution::
 

@@ -1,3 +1,5 @@
+.. _ptb-changelog:
+
 =========
 Changelog
 =========
