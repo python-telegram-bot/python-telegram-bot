@@ -1,11 +1,16 @@
 Stability Policy
 ================
 
-The ``python-telegram-bot`` library (PTB) tries to provides a stable interface to its users.
-As both the user base and the complexity of the library has grown significantly since PTBs conception, we introduced below explicit stability policy with version NEXT.VERSION.
+.. important::
 
-Large parts of the :mod:`telegram` package are the Python representations of the Telegram Bot API, whose stability policy PTB can not influence.
-This policy hence includes some special cases for those parts.
+    This stability policy is in place since version NEXT.VERSION.
+    While also earlier version of ``python-telegram-bot`` had stable interfaces, they had no explicit stability policy and hence did not follow the rules outlined below in all details.
+    Please also refer to the :ref:`changelog <changelog>`.
+
+.. caution::
+
+    Large parts of the :mod:`telegram` package are the Python representations of the Telegram Bot API, whose stability policy PTB can not influence.
+    This policy hence includes some special cases for those parts.
 
 What does this policy cover?
 ----------------------------
@@ -43,6 +48,41 @@ When the order of arguments of the Bot API methods changes or they become option
 While we try to make such changes backward compatible, this is not always possible or only with significant effort.
 In such cases we will find a trade-off between backwards compatibility and fully complying with the Bot API, which may result in breaking changes.
 We highly recommend using keyword arguments, which can help to make such changes non-breaking on your end.
+
+..
+    We have documented a few common cases and possible backwards compatible solutions here in the wiki for reference for the dev team.
+
+To be moved to the wiki before merge:
+
+A few cases can happen when Telegram makes changes to arguments of classes and methods.
+Here are a few hints on how these can be handled in a compatible way that is backward compatible or at least minimizes the impact of the change.
+Whether these hints are applied or the change is just implemented in a breaking way may be decided by the dev team on a case by case basis.
+This depends e.g. on the currently available capacity.
+
+1. Optional arguments become mandatory
+
+   1. Keep the argument optional in the method signature
+   2. If the argument is not passed, raise a ``ValueError`` with a helpful message
+
+   That way it's still a breaking change, but at least passed values are not randomly assigned to the wrong argument.
+
+2. New positional argument is added and changes the order of the arguments
+
+   1. Add it as optional argument
+   2. If the argument is not passed, raise a ``ValueError`` with a helpful message
+
+2. Optional argument is renamed
+
+   1. Keep the old argument name in the method signature
+   2. If the old argument is passed, issue a deprecation warning with a helpful message
+   3. If both the old and the new argument are passed, raise a ``ValueError`` with a helpful message.
+
+3. Mandatory argument is renamed
+
+   1. Keep the old argument name in the method signature and make it optional
+   2. If the old argument is passed, issue a deprecation warning with a helpful message
+   3. If neither the old nor the new argument is not passed, raise a ``ValueError`` with a helpful message
+   4. If the old argument is not the first mandatory argument, make the ones before optional as well and raise a ``ValueError`` if they are not passed
 
 When the Bot API changes attributes of classes, the method :meth:`telegram.TelegramObject.to_dict` will change as necessary to reflect these changes.
 In particular, attributes deprecated by Telegram will be removed from the returned dictionary.
