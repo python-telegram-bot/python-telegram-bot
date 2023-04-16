@@ -399,8 +399,11 @@ class TestUpdater:
                         assert self.received == error
                     else:
                         assert len(caplog.records) > 0
-                        records = (record.getMessage() for record in caplog.records)
-                        assert "Error while getting Updates: TestMessage" in records
+                        assert any(
+                            "Error while getting Updates: TestMessage" in record.getMessage()
+                            and record.name == "telegram.ext.Updater"
+                            for record in caplog.records
+                        )
 
                 # Make sure that get_updates was called
                 assert get_updates_event.is_set()
@@ -418,8 +421,11 @@ class TestUpdater:
                     assert self.received == error
                 else:
                     assert len(caplog.records) > 0
-                    records = (record.getMessage() for record in caplog.records)
-                    assert "Error while getting Updates: TestMessage" in records
+                    assert any(
+                        "Error while getting Updates: TestMessage" in record.getMessage()
+                        and record.name == "telegram.ext.Updater"
+                        for record in caplog.records
+                    )
             await updater.stop()
 
     async def test_start_polling_unexpected_shutdown(self, updater, monkeypatch, caplog):
@@ -451,8 +457,11 @@ class TestUpdater:
 
                 await asyncio.sleep(0.1)
                 assert caplog.records
-                records = (record.getMessage() for record in caplog.records)
-                assert any("Updater stopped unexpectedly." in record for record in records)
+                assert any(
+                    "Updater stopped unexpectedly." in record.getMessage()
+                    and record.name == "telegram.ext.Updater"
+                    for record in caplog.records
+                )
 
         # Make sure that the update_id offset wasn't increased
         assert self.message_count == 2
@@ -503,6 +512,7 @@ class TestUpdater:
             assert len(caplog.records) > 0
             for record in caplog.records:
                 assert record.getMessage().startswith("Something went wrong processing")
+                assert record.name == "telegram.ext.Updater"
 
             # Make sure that everything works fine again when receiving proper updates
             raise_exception = False
@@ -914,6 +924,7 @@ class TestUpdater:
 
             assert len(caplog.records) == 1
             assert caplog.records[-1].getMessage().startswith("Something went wrong processing")
+            assert caplog.records[-1].name == "telegram.ext.Updater"
 
             # Make sure that everything works fine again when receiving proper updates
             caplog.clear()
