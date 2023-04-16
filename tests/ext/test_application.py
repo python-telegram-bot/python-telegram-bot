@@ -1997,13 +1997,14 @@ class TestApplication:
             time.sleep(0.1)
             os.kill(os.getpid(), signal.SIGINT)
 
-        with caplog.at_level(logging.WARNING):
-            thread = Thread(target=thread_target)
-            thread.start()
-            await app.start()
-            assert thread.is_alive()
-            await app.stop()
-            thread.join()
+        async with app:
+            with caplog.at_level(logging.WARNING):
+                thread = Thread(target=thread_target)
+                thread.start()
+                await app.start()
+                assert thread.is_alive()
+                await app.stop()
+                thread.join()
 
         assert not thread.is_alive()
         assert not app.running
