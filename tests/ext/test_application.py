@@ -1985,6 +1985,7 @@ class TestApplication:
 
         monkeypatch.setattr(one_time_bot, "get_updates", get_updates)
         app = ApplicationBuilder().bot(one_time_bot).build()
+        event = asyncio.Event()
 
         def thread_target():
             waited = 0
@@ -1996,6 +1997,7 @@ class TestApplication:
 
             time.sleep(0.1)
             os.kill(os.getpid(), signal.SIGINT)
+            event.set()
 
         async with app:
             with caplog.at_level(logging.WARNING):
@@ -2003,6 +2005,7 @@ class TestApplication:
                 thread.start()
                 await app.start()
                 assert thread.is_alive()
+                await event.wait()
                 await app.stop()
                 thread.join()
 
