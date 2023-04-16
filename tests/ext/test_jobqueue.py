@@ -557,6 +557,7 @@ class TestJobQueue:
             await job.run(app)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
+        assert rec.name == "telegram.ext.Application"
         assert "No error handlers are registered" in rec.getMessage()
 
     async def test_custom_context(self, bot, job_queue):

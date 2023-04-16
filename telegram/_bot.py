@@ -22,7 +22,6 @@ import asyncio
 import contextlib
 import copy
 import functools
-import logging
 import pickle
 from datetime import datetime
 from types import TracebackType
@@ -94,6 +93,7 @@ from telegram._userprofilephotos import UserProfilePhotos
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
+from telegram._utils.logging import get_logger
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram._utils.warnings import warn
 from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
@@ -206,6 +206,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
     """
 
+    # This is a class variable since we want to override the logger name in ExtBot
+    # without having to change all places where this is used
+    _LOGGER = get_logger(__name__)
+
     __slots__ = (
         "_token",
         "_base_url",
@@ -213,7 +217,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         "_private_key",
         "_bot_user",
         "_request",
-        "_logger",
         "_initialized",
         "_local_mode",
     )
@@ -239,7 +242,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self._local_mode: bool = local_mode
         self._bot_user: Optional[User] = None
         self._private_key: Optional[bytes] = None
-        self._logger = logging.getLogger(__name__)
         self._initialized = False
 
         self._request: Tuple[BaseRequest, BaseRequest] = (
@@ -361,14 +363,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
     # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
     def _log(func: Any):  # type: ignore[no-untyped-def] # skipcq: PY-D0003
-        logger = logging.getLogger(func.__module__)
-
         @functools.wraps(func)
-        async def decorator(*args, **kwargs):  # type: ignore[no-untyped-def]
-            logger.debug("Entering: %s", func.__name__)
-            result = await func(*args, **kwargs)  # skipcq: PYL-E1102
-            logger.debug(result)
-            logger.debug("Exiting: %s", func.__name__)
+        async def decorator(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+            # pylint: disable=protected-access
+            self._LOGGER.debug("Entering: %s", func.__name__)
+            result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+            self._LOGGER.debug(result)
+            self._LOGGER.debug("Exiting: %s", func.__name__)
             return result
 
         return decorator
@@ -569,7 +570,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         .. versionadded:: 20.0
         """
         if self._initialized:
-            self._logger.debug("This Bot is already initialized.")
+            self._LOGGER.debug("This Bot is already initialized.")
             return
 
         await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
@@ -590,7 +591,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         .. versionadded:: 20.0
         """
         if not self._initialized:
-            self._logger.debug("This Bot is already shut down. Returning.")
+            self._LOGGER.debug("This Bot is already shut down. Returning.")
             return
 
         await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())
@@ -3614,9 +3615,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
 
         if result:
-            self._logger.debug("Getting updates: %s", [u["update_id"] for u in result])
+            self._LOGGER.debug("Getting updates: %s", [u["update_id"] for u in result])
         else:
-            self._logger.debug("No new updates found.")
+            self._LOGGER.debug("No new updates found.")
 
         return Update.de_list(result, self)
 

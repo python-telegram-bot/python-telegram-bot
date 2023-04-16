@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install -U codecov pytest-cov
+          python -W ignore -m pip install -U pytest-cov
           python -W ignore -m pip install -r requirements.txt
           python -W ignore -m pip install -r requirements-dev.txt
           python -W ignore -m pip install pytest-xdist[psutil]
