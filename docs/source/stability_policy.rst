@@ -4,7 +4,7 @@ Stability Policy
 .. important::
 
     This stability policy is in place since version NEXT.VERSION.
-    While also earlier version of ``python-telegram-bot`` had stable interfaces, they had no explicit stability policy and hence did not follow the rules outlined below in all details.
+    While earlier versions of ``python-telegram-bot`` also had stable interfaces, they had no explicit stability policy and hence did not follow the rules outlined below in all detail.
     Please also refer to the :ref:`changelog <changelog>`.
 
 .. caution::
@@ -71,13 +71,13 @@ This depends e.g. on the currently available capacity.
    1. Add it as optional argument
    2. If the argument is not passed, raise a ``ValueError`` with a helpful message
 
-2. Optional argument is renamed
+3. Optional argument is renamed
 
    1. Keep the old argument name in the method signature
    2. If the old argument is passed, issue a deprecation warning with a helpful message
    3. If both the old and the new argument are passed, raise a ``ValueError`` with a helpful message.
 
-3. Mandatory argument is renamed
+4. Mandatory argument is renamed
 
    1. Keep the old argument name in the method signature and make it optional
    2. If the old argument is passed, issue a deprecation warning with a helpful message
