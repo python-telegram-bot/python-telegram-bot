@@ -75,7 +75,7 @@ This depends e.g. on the currently available capacity.
 
    1. Keep the old argument name in the method signature
    2. If the old argument is passed, issue a deprecation warning with a helpful message
-   3. If both the old and the new argument are passed, raise a ``TypeError`` with a helpful message.
+   3. If both the old and the new argument are passed, raise a ``ValueError`` with a helpful message.
 
 4. Mandatory argument is renamed
 
