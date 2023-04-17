@@ -412,12 +412,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         # Code below tests if it's okay to set a Request object. Only okay if no other request args
         # or instances containing a Request were set previously
-        for attr in (
-            "connect_timeout",
-            "read_timeout",
-            "write_timeout",
-            "pool_timeout",
-        ):
+        for attr in ("connect_timeout", "read_timeout", "write_timeout", "pool_timeout"):
             if not isinstance(getattr(self, f"_{prefix}{attr}"), DefaultValue):
                 raise RuntimeError(_TWO_ARGS_REQ.format(name, attr))
 
@@ -450,10 +445,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                 )
             )
 
-        if self._updater not in (
-            DEFAULT_NONE,
-            None,
-        ):  # disallow request args for updater(has bot)
+        if self._updater not in (DEFAULT_NONE, None):  # disallow request args for updater(has bot)
             raise RuntimeError(
                 _TWO_ARGS_REQ.format(f"get_updates_{name}" if get_updates else name, "updater")
             )
@@ -947,13 +939,14 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         # If `concurrent_updates` is an integer, create a `SimpleUpdateProcessor`
         # instance with that integer value; otherwise, raise an error if the value
-        # is negative or not an integer.
+        # is negative
         if isinstance(concurrent_updates, int):
             if concurrent_updates < 0:
                 raise ValueError("`concurrent_updates` must be a non-negative integer!")
             concurrent_updates = SimpleUpdateProcessor(concurrent_updates)
 
-        # Assign the value of `concurrent_updates` to `_concurrent_updates`
+        # Assign default value of concurrent_updates if it is instance of
+        # `BaseUpdateProcessor`
         self._concurrent_updates: BaseUpdateProcessor = concurrent_updates
         return self
 
@@ -1111,8 +1104,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def post_shutdown(
-        self: BuilderType,
-        post_shutdown: Callable[[Application], Coroutine[Any, Any, None]],
+        self: BuilderType, post_shutdown: Callable[[Application], Coroutine[Any, Any, None]]
     ) -> BuilderType:
         """
         Sets a callback to be executed by :meth:`Application.run_polling` and

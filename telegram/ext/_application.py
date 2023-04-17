@@ -274,8 +274,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         ],
     ):
         if not was_called_by(
-            inspect.currentframe(),
-            Path(__file__).parent.resolve() / "_applicationbuilder.py",
+            inspect.currentframe(), Path(__file__).parent.resolve() / "_applicationbuilder.py"
         ):
             warn(
                 "`Application` instances should be built via the `ApplicationBuilder`.",
@@ -1056,6 +1055,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         # Continuously fetch updates from the queue. Exit only once the signal object is found.
         while True:
             update = await self.update_queue.get()
+
             if update is _STOP_SIGNAL:
                 _LOGGER.debug("Dropping pending updates")
                 while not self.update_queue.empty():
@@ -1067,7 +1067,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
             _LOGGER.debug("Processing update %s", update)
 
-            if self._update_processor:
+            if self._update_processor and self._update_processor.max_concurrent_updates > 0:
                 # We don't await the below because it has to be run concurrently
                 self.create_task(
                     self._update_processor.do_process_update(
@@ -1310,10 +1310,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self._user_ids_to_be_deleted_in_persistence.add(user_id)
 
     def migrate_chat_data(
-        self,
-        message: "Message" = None,
-        old_chat_id: int = None,
-        new_chat_id: int = None,
+        self, message: "Message" = None, old_chat_id: int = None, new_chat_id: int = None
     ) -> None:
         """Moves the contents of :attr:`chat_data` at key :paramref:`old_chat_id` to the key
         :paramref:`new_chat_id`. Also marks the entries to be updated accordingly in the next run
