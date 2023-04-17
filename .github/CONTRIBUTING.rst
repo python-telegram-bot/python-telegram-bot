@@ -162,7 +162,7 @@ Feel free to copy (parts of) the checklist to the PR description to remind you o
 - Documented code changes according to the `CSI standard <https://standards.mousepawmedia.com/en/stable/csi.html>`__
 - Added myself alphabetically to ``AUTHORS.rst`` (optional)
 - Added new classes & modules to the docs and all suitable ``__all__`` s
-- Checked the `Stability Policy <https://docs.python-telegram-bot.org/stability_policy.html>`_ in case of deprecations or changes to documented behaviour
+- Checked the `Stability Policy <https://docs.python-telegram-bot.org/stability_policy.html>`_ in case of deprecations or changes to documented behavior
 
 **If the PR contains API changes (otherwise, you can ignore this passage)**
 
@@ -183,7 +183,7 @@ Feel free to copy (parts of) the checklist to the PR description to remind you o
 -  If relevant:
 
    - Added new constants at :mod:`telegram.constants` and shortcuts to them as class variables
-   - Link new and existing constants in docstrings instead of hard coded number and strings
+   - Link new and existing constants in docstrings instead of hard-coded numbers and strings
    - Add new message types to :attr:`telegram.Message.effective_attachment`
    - Added new handlers for new update types
 

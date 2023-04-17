@@ -28,11 +28,11 @@ The internal structure of classes in PTB, i.e. things like the result of ``dir(o
 Objects are in general not guaranteed to be pickleable (unless stated otherwise) and pickled objects from one version of PTB may not be loadable in future versions.
 We may provide a way to convert pickled objects from one version to another, but this is not guaranteed.
 
-Functionality that is part of PTBs API but is explicitly documented as not to be intended to be used directly by users (e.g. :meth:`telegram.request.BaseRequest.do_request`) may change.
+Functionality that is part of PTBs API but is explicitly documented as not being intended to be used directly by users (e.g. :meth:`telegram.request.BaseRequest.do_request`) may change.
 This also applies to functions or attributes marked as final in the sense of `PEP 591 <https://www.python.org/dev/peps/pep-0591/>`__.
 
-PTB has dependencies to 3rd party packages.
-The versions that PTB uses of these 3rd party packages may change if that does not change PTBs public API.
+PTB has dependencies to third-party packages.
+The versions that PTB uses of these third-party packages may change if that does not change PTBs public API.
 
 PTB does not give guarantees about which Python versions are supported.
 In general, we will try to support all Python versions that have not yet reached their end of life, but we reserve ourselves the option to drop support for Python versions earlier if that benefits the advancement of the library.
@@ -46,17 +46,17 @@ Comparison of equality of instances of the classes in the :mod:`telegram` packag
 
 When the order of arguments of the Bot API methods changes or they become optional/mandatory due to changes in the Bot API, PTB will always try to reflect these changes.
 While we try to make such changes backward compatible, this is not always possible or only with significant effort.
-In such cases we will find a trade-off between backwards compatibility and fully complying with the Bot API, which may result in breaking changes.
-We highly recommend using keyword arguments, which can help to make such changes non-breaking on your end.
+In such cases we will find a trade-off between backward compatibility and fully complying with the Bot API, which may result in breaking changes.
+We highly recommend using keyword arguments, which can help make such changes non-breaking on your end.
 
 ..
-    We have documented a few common cases and possible backwards compatible solutions here in the wiki for reference for the dev team.
+    We have documented a few common cases and possible backwards compatible solutions here in the wiki as a reference for the dev team.
 
 To be moved to the wiki before merge:
 
 A few cases can happen when Telegram makes changes to arguments of classes and methods.
 Here are a few hints on how these can be handled in a compatible way that is backward compatible or at least minimizes the impact of the change.
-Whether these hints are applied or the change is just implemented in a breaking way may be decided by the dev team on a case by case basis.
+Whether these hints are applied or the change is just implemented in a breaking way may be decided by the dev team on a case-by-case basis.
 This depends e.g. on the currently available capacity.
 
 1. Optional arguments become mandatory
@@ -81,7 +81,7 @@ This depends e.g. on the currently available capacity.
 
    1. Keep the old argument name in the method signature and make it optional
    2. If the old argument is passed, issue a deprecation warning with a helpful message
-   3. If neither the old nor the new argument is not passed, raise a ``ValueError`` with a helpful message
+   3. If neither the old nor the new argument is passed, raise a ``ValueError`` with a helpful message
    4. If the old argument is not the first mandatory argument, make the ones before optional as well and raise a ``ValueError`` if they are not passed
 
 When the Bot API changes attributes of classes, the method :meth:`telegram.TelegramObject.to_dict` will change as necessary to reflect these changes.
@@ -93,7 +93,7 @@ Development Versions
 ~~~~~~~~~~~~~~~~~~~~
 
 Before a feature is in a release, i.e. the feature was merged into the ``master`` branch but not released yet, it is not covered by this policy and may change.
-Pre-Release marked as alpha, beta or release candidate are not covered by this policy either.
+Pre-releases marked as alpha, beta or release candidate are not covered by this policy either.
 
 Security
 ~~~~~~~~
@@ -109,12 +109,12 @@ PTB uses a versioning scheme that roughly follows `https://semver.org/ <https://
 Given a version of PTB X.Y.Z,
 
 -  X indicates the major version number.
-   This is incremented when backwards incompatible changes are introduced.
+   This is incremented when backward incompatible changes are introduced.
 -  Y indicates the minor version number.
-   This is incremented when new functionality or backwards compatible changes are introduced by PTB.
-   *This is also incremented when PTB adds support for a new Bot API version, which may include backwards incompatible changes in some cases as outlined* :ref:`below <bot-api-versioning>`.
+   This is incremented when new functionality or backward compatible changes are introduced by PTB.
+   *This is also incremented when PTB adds support for a new Bot API version, which may include backward incompatible changes in some cases as outlined* :ref:`below <bot-api-versioning>`.
 -  Z is the patch version.
-   This is incremented if backwards compatible bug fixes or smaller changes are introduced.
+   This is incremented if backward compatible bug fixes or smaller changes are introduced.
    If this number is 0, it can be omitted, i.e. we just write X.Y instead of X.Y.0.
 
 Deprecation
