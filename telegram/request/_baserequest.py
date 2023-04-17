@@ -26,6 +26,7 @@ from typing import AsyncContextManager, ClassVar, List, Optional, Tuple, Type, T
 
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.defaultvalue import DefaultValue
+from telegram._utils.logging import get_logger
 from telegram._utils.types import JSONDict, ODVInput
 from telegram._version import __version__ as ptb_ver
 from telegram.error import (
@@ -41,6 +42,8 @@ from telegram.error import (
 from telegram.request._requestdata import RequestData
 
 RT = TypeVar("RT", bound="BaseRequest")
+
+_LOGGER = get_logger(__name__, class_name="BaseRequest")
 
 
 class BaseRequest(
@@ -351,6 +354,7 @@ class BaseRequest(
         try:
             return json.loads(decoded_s)
         except ValueError as exc:
+            _LOGGER.error('Can not load invalid JSON data: "%s"', decoded_s)
             raise TelegramError("Invalid server response") from exc
 
     @abc.abstractmethod

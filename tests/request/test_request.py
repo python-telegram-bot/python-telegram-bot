@@ -20,6 +20,7 @@
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import asyncio
 import json
+import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from http import HTTPStatus
@@ -172,14 +173,21 @@ class TestRequestWithoutRequest:
         # not only implicitly.
         assert httpx_request.parse_json_payload(server_response) == {"result": "test_string�"}
 
-    async def test_illegal_json_response(self, monkeypatch, httpx_request: HTTPXRequest):
+    async def test_illegal_json_response(self, monkeypatch, httpx_request: HTTPXRequest, caplog):
         # for proper JSON it should be `"result":` instead of `result:`
         server_response = b'{result: "test_string"}'
 
         monkeypatch.setattr(httpx_request, "do_request", mocker_factory(response=server_response))
 
-        with pytest.raises(TelegramError, match="Invalid server response"):
+        with pytest.raises(TelegramError, match="Invalid server response"), caplog.at_level(
+            logging.ERROR
+        ):
             await httpx_request.post(None, None, None)
+
+        assert len(caplog.records) == 1
+        record = caplog.records[0]
+        assert record.name == "telegram.request.BaseRequest"
+        assert record.getMessage().endswith(f'invalid JSON data: "{server_response.decode()}"')
 
     async def test_chat_migrated(self, monkeypatch, httpx_request: HTTPXRequest):
         server_response = b'{"ok": "False", "parameters": {"migrate_to_chat_id": 123}}'
