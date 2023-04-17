@@ -62,27 +62,27 @@ This depends e.g. on the currently available capacity.
 1. Optional arguments become mandatory
 
    1. Keep the argument optional in the method signature
-   2. If the argument is not passed, raise a ``ValueError`` with a helpful message
+   2. If the argument is not passed, raise a ``TypeError`` with a helpful message
 
    That way it's still a breaking change, but at least passed values are not randomly assigned to the wrong argument.
 
 2. New positional argument is added and changes the order of the arguments
 
    1. Add it as optional argument
-   2. If the argument is not passed, raise a ``ValueError`` with a helpful message
+   2. If the argument is not passed, raise a ``TypeError`` with a helpful message
 
 3. Optional argument is renamed
 
    1. Keep the old argument name in the method signature
    2. If the old argument is passed, issue a deprecation warning with a helpful message
-   3. If both the old and the new argument are passed, raise a ``ValueError`` with a helpful message.
+   3. If both the old and the new argument are passed, raise a ``TypeError`` with a helpful message.
 
 4. Mandatory argument is renamed
 
    1. Keep the old argument name in the method signature and make it optional
    2. If the old argument is passed, issue a deprecation warning with a helpful message
-   3. If neither the old nor the new argument is passed, raise a ``ValueError`` with a helpful message
-   4. If the old argument is not the first mandatory argument, make the ones before optional as well and raise a ``ValueError`` if they are not passed
+   3. If neither the old nor the new argument is passed, raise a ``TypeError`` with a helpful message
+   4. If the old argument is not the first mandatory argument, make the ones before optional as well and raise a ``TypeError`` if they are not passed
 
 When the Bot API changes attributes of classes, the method :meth:`telegram.TelegramObject.to_dict` will change as necessary to reflect these changes.
 In particular, attributes deprecated by Telegram will be removed from the returned dictionary.
