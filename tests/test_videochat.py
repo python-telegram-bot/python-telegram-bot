@@ -27,7 +27,7 @@ from telegram import (
     VideoChatScheduled,
     VideoChatStarted,
 )
-from telegram._utils.datetime import to_timestamp
+from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.slots import mro_slots
 
 
@@ -169,6 +169,23 @@ class TestVideoChatScheduledWithoutRequest:
         assert video_chat_scheduled.api_kwargs == {}
 
         assert abs(video_chat_scheduled.start_date - self.start_date) < dtm.timedelta(seconds=1)
+
+    def test_de_json_localization(self, tz_bot, bot, raw_bot):
+        json_dict = {"start_date": to_timestamp(self.start_date)}
+
+        videochat_raw = VideoChatScheduled.de_json(json_dict, raw_bot)
+        videochat_bot = VideoChatScheduled.de_json(json_dict, bot)
+        videochat_tz = VideoChatScheduled.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        videochat_offset = videochat_tz.start_date.utcoffset()
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            videochat_tz.start_date.replace(tzinfo=None)
+        )
+
+        assert videochat_raw.start_date.tzinfo == UTC
+        assert videochat_bot.start_date.tzinfo == UTC
+        assert videochat_offset == tz_bot_offset
 
     def test_to_dict(self):
         video_chat_scheduled = VideoChatScheduled(self.start_date)

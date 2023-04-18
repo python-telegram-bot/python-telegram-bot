@@ -72,6 +72,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Li-aung Yip <https://github.com/LiaungYip>`_
 - `Loo Zheng Yuan <https://github.com/loozhengyuan>`_
 - `LRezende <https://github.com/lrezende>`_
+- `Luca Bellanti <https://github.com/Trifase>`_
 - `macrojames <https://github.com/macrojames>`_
 - `Matheus Lemos <https://github.com/mlemosf>`_
 - `Michael Dix <https://github.com/Eisberge>`_
