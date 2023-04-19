@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -54,6 +54,9 @@ class ChatInviteLink(TelegramObject):
         is_revoked (:obj:`bool`): :obj:`True`, if the link is revoked.
         expire_date (:class:`datetime.datetime`, optional): Date when the link will expire or
             has been expired.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         member_limit (:obj:`int`, optional): Maximum number of users that can be members of the
             chat simultaneously after joining the chat via this invite link;
             :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
@@ -78,6 +81,9 @@ class ChatInviteLink(TelegramObject):
         is_revoked (:obj:`bool`): :obj:`True`, if the link is revoked.
         expire_date (:class:`datetime.datetime`): Optional. Date when the link will expire or
             has been expired.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         member_limit (:obj:`int`): Optional. Maximum number of users that can be members
             of the chat simultaneously after joining the chat via this invite link;
             :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
@@ -152,7 +158,10 @@ class ChatInviteLink(TelegramObject):
         if not data:
             return None
 
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
         data["creator"] = User.de_json(data.get("creator"), bot)
-        data["expire_date"] = from_timestamp(data.get("expire_date", None))
+        data["expire_date"] = from_timestamp(data.get("expire_date", None), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)

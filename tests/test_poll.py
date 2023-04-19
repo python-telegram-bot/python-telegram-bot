@@ -20,7 +20,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from telegram import MessageEntity, Poll, PollAnswer, PollOption, User
-from telegram._utils.datetime import to_timestamp
+from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
 from tests.auxil.slots import mro_slots
 
@@ -207,6 +207,36 @@ class TestPollWithoutRequest(TestPollBase):
         assert poll.open_period == self.open_period
         assert abs(poll.close_date - self.close_date) < timedelta(seconds=1)
         assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)
+
+    def test_de_json_localization(self, tz_bot, bot, raw_bot):
+        json_dict = {
+            "id": self.id_,
+            "question": self.question,
+            "options": [o.to_dict() for o in self.options],
+            "total_voter_count": self.total_voter_count,
+            "is_closed": self.is_closed,
+            "is_anonymous": self.is_anonymous,
+            "type": self.type,
+            "allows_multiple_answers": self.allows_multiple_answers,
+            "explanation": self.explanation,
+            "explanation_entities": [self.explanation_entities[0].to_dict()],
+            "open_period": self.open_period,
+            "close_date": to_timestamp(self.close_date),
+        }
+
+        poll_raw = Poll.de_json(json_dict, raw_bot)
+        poll_bot = Poll.de_json(json_dict, bot)
+        poll_bot_tz = Poll.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        poll_bot_tz_offset = poll_bot_tz.close_date.utcoffset()
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            poll_bot_tz.close_date.replace(tzinfo=None)
+        )
+
+        assert poll_raw.close_date.tzinfo == UTC
+        assert poll_bot.close_date.tzinfo == UTC
+        assert poll_bot_tz_offset == tz_bot_offset
 
     def test_to_dict(self, poll):
         poll_dict = poll.to_dict()

@@ -137,6 +137,32 @@ class TestChatMemberUpdatedWithoutRequest(TestChatMemberUpdatedBase):
         assert chat_member_updated.new_chat_member == new_chat_member
         assert chat_member_updated.invite_link == invite_link
 
+    def test_de_json_localization(
+        self, bot, raw_bot, tz_bot, user, chat, old_chat_member, new_chat_member, time, invite_link
+    ):
+        json_dict = {
+            "chat": chat.to_dict(),
+            "from": user.to_dict(),
+            "date": to_timestamp(time),
+            "old_chat_member": old_chat_member.to_dict(),
+            "new_chat_member": new_chat_member.to_dict(),
+            "invite_link": invite_link.to_dict(),
+        }
+
+        chat_member_updated_bot = ChatMemberUpdated.de_json(json_dict, bot)
+        chat_member_updated_raw = ChatMemberUpdated.de_json(json_dict, raw_bot)
+        chat_member_updated_tz = ChatMemberUpdated.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        message_offset = chat_member_updated_tz.date.utcoffset()
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            chat_member_updated_tz.date.replace(tzinfo=None)
+        )
+
+        assert chat_member_updated_raw.date.tzinfo == UTC
+        assert chat_member_updated_bot.date.tzinfo == UTC
+        assert message_offset == tz_bot_offset
+
     def test_to_dict(self, chat_member_updated):
         chat_member_updated_dict = chat_member_updated.to_dict()
         assert isinstance(chat_member_updated_dict, dict)

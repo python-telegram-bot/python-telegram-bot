@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -125,7 +125,10 @@ class ChatMember(TelegramObject):
 
         data["user"] = User.de_json(data.get("user"), bot)
         if "until_date" in data:
-            data["until_date"] = from_timestamp(data["until_date"])
+            # Get the local timezone from the bot if it has defaults
+            loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
+            data["until_date"] = from_timestamp(data["until_date"], tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 
@@ -386,6 +389,9 @@ class ChatMemberRestricted(ChatMember):
             .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
 
             .. versionadded:: 20.1
@@ -438,6 +444,9 @@ class ChatMemberRestricted(ChatMember):
             .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
 
             .. versionadded:: 20.1
@@ -565,12 +574,18 @@ class ChatMemberBanned(ChatMember):
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
+
     Attributes:
         status (:obj:`str`): The member's status in the chat,
             always :tg-const:`telegram.ChatMember.BANNED`.
         user (:class:`telegram.User`): Information about the user.
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
 
     """
 
