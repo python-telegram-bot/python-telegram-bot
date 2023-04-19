@@ -34,18 +34,18 @@ class BaseUpdateProcessor:
     .. versionadded:: NEXT.VERSION
 
     Args:
-        max_concurrent_updates (:obj:`int`): The maximum number of concurrent updates to be
-            processed. If this number is exceeded, new updates will be queued until the number of
-            currently processed updates decreases.
+        max_concurrent_updates (:obj:`int`): The maximum number of updates to be processed
+        concurrently. If this number is exceeded, new updates will be queued until the number
+        of currently processed updates decreases.
 
     Raises:
-        :exc:`ValueError`: If `max_concurrent_updates` is a negative integer.
+        :exc:`ValueError`: If :paramref:`max_concurrent_updates` is a negative integer.
     """
 
     def __init__(self, max_concurrent_updates: int):
         self._max_concurrent_updates = max_concurrent_updates
         if self.max_concurrent_updates < 0:
-            raise ValueError("`max_concurrent_updates` must be a non-negative integer!")
+            raise ValueError("`max_concurrent_updates` must be a positive integer!")
         self._semaphore = BoundedSemaphore(self.max_concurrent_updates or 1)
 
     @property
@@ -53,13 +53,23 @@ class BaseUpdateProcessor:
         """:obj:`int`: The maximum number of updates that can be processed concurrently."""
         return self._max_concurrent_updates
 
+    @property
+    def semaphore(self) -> BoundedSemaphore:
+        """:class:`asyncio.BoundedSemaphore`: The semaphore used to limit the number of
+        concurrent updates."""
+        return self._semaphore
+
     @abstractmethod
     async def process_update(
         self,
         update: object,
         coroutine: "Awaitable[Any]",
     ) -> None:
-        """Custom implementation of how to process an update.
+        """Custom implementation of how to process an update. Must be implemented by a subclass.
+
+        Warning:
+            This method will be called by :meth:`do_process_update`. It should *not* be called
+            manually.
 
         Args:
             update (:obj:`object`): The update to be processed.
@@ -68,7 +78,8 @@ class BaseUpdateProcessor:
 
     @abstractmethod
     async def initialize(self) -> None:
-        """Initializes the Processor so resources can be allocated.
+        """Initializes the processor so resources can be allocated. Must be implemented by a
+        subclass.
 
         .. seealso::
             :meth:`shutdown`
@@ -76,7 +87,7 @@ class BaseUpdateProcessor:
 
     @abstractmethod
     async def shutdown(self) -> None:
-        """Shutdown the Processor so resources can be freed.
+        """Shutdown the processor so resources can be freed. Must be implemented by a subclass.
 
         .. seealso::
             :meth:`initialize`
@@ -96,7 +107,7 @@ class BaseUpdateProcessor:
             coroutine (:obj:`Awaitable`): The coroutine that will be awaited to process the update.
             application (:class:`telegram.ext.Application`): The application instance.
         """
-        async with self._semaphore:
+        async with self.semaphore:
             await self.process_update(update, coroutine)
             application.update_queue.task_done()
 

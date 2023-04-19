@@ -230,7 +230,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         "_chat_ids_to_be_deleted_in_persistence",
         "_chat_ids_to_be_updated_in_persistence",
         "_concurrent_updates",
-        "_concurrent_updates_sem",
         "_conversation_handler_conversations",
         "_initialized",
         "_job_queue",
@@ -298,9 +297,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.post_stop: Optional[
             Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
         ] = post_stop
-        self._concurrent_updates_sem = asyncio.BoundedSemaphore(
-            update_processor.max_concurrent_updates or 1
-        )
         self._update_processor = update_processor
         self.bot_data: BD = self.context_types.bot_data()
         self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
@@ -356,8 +352,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         """:obj:`int`: The number of concurrent updates that will be processed in parallel. A
         value of ``0`` indicates updates are *not* being processed concurrently.
 
-        Note:
-            This is now just a shortcut to `processor.max_concurrent_updates`.
+        .. verisonchanged:: NEXT.VERSION
+            This is now just a shortcut to ``update_processor.max_concurrent_updates``.
 
         .. seealso:: :wiki:`Concurrency`
         """
@@ -380,8 +376,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         return self._job_queue
 
     @property
-    def processor(self) -> Optional["BaseUpdateProcessor"]:
-        """:class:`telegram.ext.BaseProcessor`: The processor used by this application.
+    def update_processor(self) -> Optional["BaseUpdateProcessor"]:
+        """:class:`telegram.ext.BaseUpdateProcessor`: The update processor used by this
+        application.
 
         .. seealso:: :wiki:`Concurrency`
         """
@@ -1079,7 +1076,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 await self.__process_update_wrapper(update)
 
     async def __process_update_wrapper(self, update: object) -> None:
-        async with self._concurrent_updates_sem:
+        async with self._update_processor.semaphore:
             await self.process_update(update)
             self.update_queue.task_done()
 

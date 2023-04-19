@@ -128,7 +128,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_base_file_url",
         "_base_url",
         "_bot",
-        "_concurrent_updates",
+        "_update_processor",
         "_connect_timeout",
         "_connection_pool_size",
         "_context_types",
@@ -199,9 +199,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._context_types: DVType[ContextTypes] = DefaultValue(ContextTypes())
         self._application_class: DVType[Type[Application]] = DefaultValue(Application)
         self._application_kwargs: Dict[str, object] = {}
-        self._concurrent_updates: Union[
-            int, DefaultValue[bool], "BaseUpdateProcessor"
-        ] = DEFAULT_FALSE
+        self._update_processor: "BaseUpdateProcessor" = SimpleUpdateProcessor(
+            max_concurrent_updates=1
+        )
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
@@ -309,7 +309,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             bot=bot,
             update_queue=update_queue,
             updater=updater,
-            update_processor=DefaultValue.get_value(self._concurrent_updates),
+            update_processor=self._update_processor,
             job_queue=job_queue,
             persistence=persistence,
             context_types=DefaultValue.get_value(self._context_types),
@@ -922,11 +922,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Args:
             concurrent_updates (:obj:`bool` | :obj:`int` | :class:`BaseUpdateProcessor`): Passing
-            :obj:`True` will allow for ``256`` updates to be processed concurrently. Pass an
-            integer to specify a different number of updates that may be processed concurrently,
-            in that case :class:`telegram.ext.SimpleUpdateProcessor` is used to handle updates.
-            Pass an instance of :class:`telegram.ext.BaseUpdateProcessor` to use that instance
-            for handling updates concurrently.
+            :obj:`True` will allow for ``256`` updates to be processed concurrently using
+            :class:`telegram.ext.SimpleUpdateProcessor`. Pass an integer to specify a different
+            number of updates that may be processed concurrently. Pass an instance of
+            :class:`telegram.ext.BaseUpdateProcessor` to use that instance for handling updates
+            concurrently.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
@@ -935,19 +935,19 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         if concurrent_updates is True:
             concurrent_updates = 256
         elif concurrent_updates is False:
-            concurrent_updates = 0
+            concurrent_updates = 1
 
         # If `concurrent_updates` is an integer, create a `SimpleUpdateProcessor`
         # instance with that integer value; otherwise, raise an error if the value
         # is negative
         if isinstance(concurrent_updates, int):
-            if concurrent_updates < 0:
-                raise ValueError("`concurrent_updates` must be a non-negative integer!")
+            if concurrent_updates < 1:
+                raise ValueError("`concurrent_updates` must be a positive integer!")
             concurrent_updates = SimpleUpdateProcessor(concurrent_updates)
 
         # Assign default value of concurrent_updates if it is instance of
         # `BaseUpdateProcessor`
-        self._concurrent_updates: BaseUpdateProcessor = concurrent_updates
+        self._update_processor: BaseUpdateProcessor = concurrent_updates  # type: ignore[no-redef]
         return self
 
     def job_queue(
