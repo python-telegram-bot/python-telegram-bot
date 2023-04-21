@@ -16,7 +16,7 @@ cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=39.0.1 # passport
 aiolimiter~=1.0.0 # rate-limiter!ext
 
 # tornado is rather stable, but let's not allow the next mayor release without prior testing
-tornado~=6.2 # webhooks!ext
+tornado~=6.3 # webhooks!ext
 
 # Cachetools and APS don't have a strict stability policy.
 # Let's be cautious for now.
