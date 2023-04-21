@@ -5619,6 +5619,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 "`upload_sticker_file` is deprecated. Please use the new parameters "
                 "`sticker` and `sticker_format` instead.",
                 stacklevel=4,
+                category=PTBDeprecationWarning,
             )
 
         data: JSONDict = {
@@ -5818,6 +5819,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 "`create_new_sticker_set` are deprecated. Please use the new parameter "
                 "`stickers` and `sticker_format` instead.",
                 stacklevel=4,
+                category=PTBDeprecationWarning,
             )
 
         data: JSONDict = {
@@ -5989,6 +5991,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 "`add_sticker_to_set` are deprecated. Please use the new parameter `sticker` "
                 "instead.",
                 stacklevel=4,
+                category=PTBDeprecationWarning,
             )
 
         data: JSONDict = {
