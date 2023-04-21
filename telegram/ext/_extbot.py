@@ -61,6 +61,7 @@ from telegram import (
     ForumTopic,
     GameHighScore,
     InlineKeyboardMarkup,
+    InlineQueryResultsButton,
     InputMedia,
     InputSticker,
     Location,
@@ -785,6 +786,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         next_offset: str = None,
         switch_pm_text: str = None,
         switch_pm_parameter: str = None,
+        button: InlineQueryResultsButton = None,
         *,
         current_offset: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -807,6 +809,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            button=button,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 

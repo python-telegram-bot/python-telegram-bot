@@ -80,6 +80,7 @@ from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
@@ -2789,8 +2790,15 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         cache_time: int = None,
         is_personal: bool = None,
         next_offset: str = None,
+        # Deprecated params since bot api 6.7
+        # <----
         switch_pm_text: str = None,
         switch_pm_parameter: str = None,
+        # --->
+        # New params since bot api 6.7
+        # <----
+        button: InlineQueryResultsButton = None,
+        # --->
         *,
         current_offset: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2810,6 +2818,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             take care of passing the correct value.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. |api6_7_depr| replace:: Since Bot API 6.7, this argument is deprecated in favour of
+            :paramref:`button`.
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
@@ -2831,11 +2842,21 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             switch_pm_text (:obj:`str`, optional): If passed, clients will display a button with
                 specified text that switches the user to a private chat with the bot and sends the
                 bot a start message with the parameter :paramref:`switch_pm_parameter`.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_7_depr|
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the
                 :guilabel:`/start` message sent to the bot when user presses the switch button.
                 :tg-const:`telegram.InlineQuery.MIN_SWITCH_PM_TEXT_LENGTH`-
                 :tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
                 only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_7_depr|
+            button (:class:`telegram.InlineQueryResultsButton`, optional): A button to be shown
+                above the inline query results.
+
+                .. versionadded:: NEXT.VERISON
 
         Keyword Args:
             current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
@@ -2850,6 +2871,26 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
+        if (switch_pm_text or switch_pm_parameter) and button:
+            raise TypeError(
+                "Since Bot API 6.7, the parameter `button is mutually exclusive to the deprecated "
+                "parameters `switch_pm_text` and `switch_pm_parameter`. Please use the new "
+                "parameter `button`."
+            )
+
+        if switch_pm_text and switch_pm_parameter:
+            warn(
+                "Since Bot API 6.7, the parameters `switch_pm_text` and `switch_pm_parameter` are "
+                "deprecated in favour of the new parameter `button`. Please use the new parameter "
+                "`button` instead.",
+                category=PTBDeprecationWarning,
+                stacklevel=4,
+            )
+            button = InlineQueryResultsButton(
+                text=switch_pm_text,
+                start_parameter=switch_pm_parameter,
+            )
+
         effective_results, next_offset = self._effective_inline_results(
             results=results, next_offset=next_offset, current_offset=current_offset
         )
@@ -2865,8 +2906,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "next_offset": next_offset,
             "cache_time": cache_time,
             "is_personal": is_personal,
-            "switch_pm_text": switch_pm_text,
-            "switch_pm_parameter": switch_pm_parameter,
+            "button": button,
         }
 
         return await self._post(
