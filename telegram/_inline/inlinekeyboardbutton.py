@@ -114,7 +114,7 @@ class InlineKeyboardButton(TelegramObject):
             returned to the chat they switched from, skipping the chat selection screen.
 
             Tip:
-                This does the same as :paramref:`switch_inline_query_current_chat`, but for some
+                This does the same as :paramref:`switch_inline_query_chosen_chat`, but for some
                 reason, Telegram has not deprecated this field.
         switch_inline_query_current_chat (:obj:`str`, optional): If set, pressing the button will
             insert the bot's username and the specified inline query in the current chat's input
@@ -135,7 +135,7 @@ class InlineKeyboardButton(TelegramObject):
             .. versionadded:: NEXT.VERSION
 
             Tip:
-                This does the same as :paramref:`switch_inline_query`, but gives more control on
+                This is similar to :paramref:`switch_inline_query`, but gives more control on
                 which chats can be selected.
 
             Caution:
@@ -175,7 +175,7 @@ class InlineKeyboardButton(TelegramObject):
             returned to the chat they switched from, skipping the chat selection screen.
 
             Tip:
-                This does the same as :attr:`switch_inline_query_current_chat`, but for some
+                This does the same as :attr:`switch_inline_query_chosen_chat`, but for some
                 reason, Telegram has not deprecated this field.
         switch_inline_query_current_chat (:obj:`str`): Optional. If set, pressing the button will
             insert the bot's username and the specified inline query in the current chat's input
@@ -196,7 +196,7 @@ class InlineKeyboardButton(TelegramObject):
             .. versionadded:: NEXT.VERSION
 
             Tip:
-                This does the same as :attr:`switch_inline_query`, but gives more control on
+                This is similar to :attr:`switch_inline_query`, but gives more control on
                 which chats can be selected.
 
             Caution:
