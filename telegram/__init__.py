@@ -103,6 +103,7 @@ __all__ = (  # Keep this alphabetically ordered
     "InlineQueryResultLocation",
     "InlineQueryResultMpeg4Gif",
     "InlineQueryResultPhoto",
+    "InlineQueryResultsButton",
     "InlineQueryResultVenue",
     "InlineQueryResultVideo",
     "InlineQueryResultVoice",
@@ -282,6 +283,7 @@ from ._inline.inlinequeryresultgif import InlineQueryResultGif
 from ._inline.inlinequeryresultlocation import InlineQueryResultLocation
 from ._inline.inlinequeryresultmpeg4gif import InlineQueryResultMpeg4Gif
 from ._inline.inlinequeryresultphoto import InlineQueryResultPhoto
+from ._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from ._inline.inlinequeryresultvenue import InlineQueryResultVenue
 from ._inline.inlinequeryresultvideo import InlineQueryResultVideo
 from ._inline.inlinequeryresultvoice import InlineQueryResultVoice
