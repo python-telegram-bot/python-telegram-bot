@@ -649,6 +649,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         await bot.upload_sticker_file(chat_id, "png_sticker_file_id")
         assert len(recwarn) == 1
         assert "Since Bot API 6.6, the parameter" in str(recwarn[0].message)
+        assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__
 
     async def test_upload_sticker_file_missing_required_args(self, bot, chat_id):
@@ -665,7 +666,11 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_upload_sticker_file_local_files(
-        self, monkeypatch, bot, chat_id, local_mode, recwarn
+        self,
+        monkeypatch,
+        bot,
+        chat_id,
+        local_mode,
     ):
         try:
             bot._local_mode = local_mode
@@ -705,6 +710,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         await bot.create_new_sticker_set(chat_id, "name", "title", "some_str_emoji")
         assert len(recwarn) == 1
         assert "Since Bot API 6.6, the parameters" in str(recwarn[0].message)
+        assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__
 
     async def test_create_new_sticker_set_missing_required_args(self, bot, chat_id):
@@ -720,9 +726,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_create_new_sticker_set_local_files(
-        self, monkeypatch, bot, chat_id, local_mode, recwarn
-    ):
+    async def test_create_new_sticker_set_local_files(self, monkeypatch, bot, chat_id, local_mode):
         monkeypatch.setattr(bot, "_local_mode", local_mode)
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -769,9 +773,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert test_flag
         assert len(recwarn) in (1, 2)
 
-    async def test_create_new_sticker_all_params(
-        self, monkeypatch, bot, chat_id, mask_position, recwarn
-    ):
+    async def test_create_new_sticker_all_params(self, monkeypatch, bot, chat_id, mask_position):
         async def make_assertion_old_params(_, data, *args, **kwargs):
             assert data["user_id"] == chat_id
             assert data["name"] == "name"
@@ -804,6 +806,9 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             sticker_type=Sticker.MASK,
         )
         assert len(recwarn) == 1
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert str(recwarn[0]) == "udaitrne"
         monkeypatch.setattr(bot, "_post", make_assertion_new_params)
         await bot.create_new_sticker_set(
             chat_id,
@@ -824,6 +829,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         await bot.add_sticker_to_set(chat_id, "name", "emoji", "fake_file_id")
         assert len(recwarn) == 1
         assert "Since Bot API 6.6, the parameters" in str(recwarn[0].message)
+        assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__
 
     async def test_add_sticker_to_set_missing_required_arg(self, bot, chat_id):
@@ -835,9 +841,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             await bot.add_sticker_to_set(chat_id, "name", "emojis", sticker="something")
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_add_sticker_to_set_local_files(
-        self, monkeypatch, bot, chat_id, local_mode, recwarn
-    ):
+    async def test_add_sticker_to_set_local_files(self, monkeypatch, bot, chat_id, local_mode):
         monkeypatch.setattr(bot, "_local_mode", local_mode)
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False

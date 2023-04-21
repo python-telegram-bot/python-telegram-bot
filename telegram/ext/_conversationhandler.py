@@ -840,11 +840,13 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 if application.job_queue is None:
                     warn(
                         "Ignoring `conversation_timeout` because the Application has no JobQueue.",
+                        stacklevel=1,
                     )
                 elif not application.job_queue.scheduler.running:
                     warn(
                         "Ignoring `conversation_timeout` because the Applications JobQueue is "
                         "not running.",
+                        stacklevel=1,
                     )
                 elif isinstance(new_state, asyncio.Task):
                     # Add the new timeout job
@@ -931,6 +933,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                     warn(
                         "ApplicationHandlerStop in TIMEOUT state of "
                         "ConversationHandler has no effect. Ignoring.",
+                        stacklevel=2,
                     )
 
         self._update_state(self.END, ctxt.conversation_key)

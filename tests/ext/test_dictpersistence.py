@@ -91,7 +91,7 @@ class TestDictPersistence:
     """Just tests the DictPersistence interface. Integration of persistence into Applictation
     is tested in TestBasePersistence!"""
 
-    async def test_slot_behaviour(self, recwarn):
+    async def test_slot_behaviour(self):
         inst = DictPersistence()
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

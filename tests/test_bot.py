@@ -26,6 +26,7 @@ import re
 import socket
 import time
 from collections import defaultdict
+from pathlib import Path
 
 import pytest
 
@@ -76,10 +77,11 @@ from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
+from telegram.warnings import PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
-from tests.auxil.files import data_file
+from tests.auxil.files import PROJECT_ROOT_PATH, data_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
@@ -1676,6 +1678,13 @@ class TestBotWithoutRequest:
             "You set the HTTP version for the get_updates_request and request HTTPXRequest "
             "instance" in str(recwarn[2].message)
         )
+        for warning in recwarn:
+            print()
+            print(warning)
+            assert (
+                Path(warning.filename) == PROJECT_ROOT_PATH / "telegram" / "ext" / "_extbot.py"
+            ), "wrong stacklevel!"
+            assert warning.category is PTBUserWarning
 
 
 class TestBotWithRequest:
