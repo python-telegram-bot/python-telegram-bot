@@ -26,6 +26,7 @@ import re
 import socket
 import time
 from collections import defaultdict
+from uuid import uuid4
 
 import pytest
 
@@ -34,6 +35,7 @@ from telegram import (
     BotCommand,
     BotCommandScopeChat,
     BotDescription,
+    BotName,
     BotShortDescription,
     CallbackQuery,
     Chat,
@@ -3307,3 +3309,40 @@ class TestBotWithRequest:
             bot.get_my_short_description("en"),
             bot.get_my_short_description("de"),
         ) == 3 * [BotShortDescription("")]
+
+    async def test_set_get_my_name(self, bot):
+        default_name = uuid4().hex
+        en_name = uuid4().hex
+        de_name = uuid4().hex
+
+        # Set the names
+        assert all(
+            await asyncio.gather(
+                bot.set_my_name(default_name),
+                bot.set_my_name(en_name, language_code="en"),
+                bot.set_my_name(de_name, language_code="de"),
+            )
+        )
+
+        # Check that they were set correctly
+        assert await asyncio.gather(
+            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
+        ) == [
+            BotName(default_name),
+            BotName(en_name),
+            BotName(de_name),
+        ]
+
+        # Delete the names
+        assert all(
+            await asyncio.gather(
+                bot.set_my_name(None),
+                bot.set_my_name(None, language_code="en"),
+                bot.set_my_name(None, language_code="de"),
+            )
+        )
+
+        # Check that they were deleted correctly
+        assert await asyncio.gather(
+            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
+        ) == 3 * [BotName("")]

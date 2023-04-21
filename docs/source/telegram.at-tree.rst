@@ -16,6 +16,7 @@ Available Types
     telegram.botcommandscopechatmember
     telegram.botcommandscopedefault
     telegram.botdescription
+    telegram.botname
     telegram.botshortdescription
     telegram.callbackquery
     telegram.chat

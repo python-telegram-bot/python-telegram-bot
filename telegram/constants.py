@@ -37,6 +37,7 @@ __all__ = [
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
+    "BotNameLimit",
     "CallbackQueryLimit",
     "ChatAction",
     "ChatID",
@@ -206,6 +207,21 @@ class BotDescriptionLimit(IntEnum):
     """:obj:`int`: Maximum length for the parameter
     :paramref:`~telegram.Bot.set_my_short_description.short_description` of
     :meth:`telegram.Bot.set_my_short_description`
+    """
+
+
+class BotNameLimit(IntEnum):
+    """This enum contains limitations for the methods :meth:`telegram.Bot.set_my_name`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_NAME_LENGTH = 64
+    """:obj:`int`: Maximum length for the parameter :paramref:`~telegram.Bot.set_my_name.name` of
+    :meth:`telegram.Bot.set_my_name`
     """
 
 

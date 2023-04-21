@@ -56,6 +56,7 @@ except ImportError:
 from telegram._botcommand import BotCommand
 from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
+from telegram._botname import BotName
 from telegram._chat import Chat
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._chatinvitelink import ChatInviteLink
@@ -8112,6 +8113,90 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    @_log
+    async def set_my_name(
+        self,
+        name: str = None,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to change the bot's name.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            name (:obj:`str`, optional): New bot name;
+                0-:tg-const:`telegram.constants.BotNameLimit.MAX_NAME_LENGTH`
+                characters. Pass an empty string to remove the dedicated name for the given
+                language.
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
+                the name will be applied to all users for whose language there is no
+                dedicated name.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"name": name, "language_code": language_code}
+
+        return await self._post(
+            "setMyName",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def get_my_name(
+        self,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> BotName:
+        """
+        Use this method to get the current bot name for the given user language.
+
+        Args:
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code or an empty
+                string.
+
+        Returns:
+            :class:`telegram.BotName`: On success, the bot name is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data = {"language_code": language_code}
+        return BotName.de_json(  # type: ignore[return-value]
+            await self._post(
+                "getMyName",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            bot=self,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # skipcq: PYL-W0613
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -8356,3 +8441,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`set_sticker_keywords`"""
     setStickerMaskPosition = set_sticker_mask_position
     """Alias for :meth:`set_sticker_mask_position`"""
+    setMyName = set_my_name
+    """Alias for :meth:`set_my_name`"""
+    getMyName = get_my_name
+    """Alias for :meth:`get_my_name`"""

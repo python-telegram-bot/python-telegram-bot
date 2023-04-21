@@ -46,6 +46,7 @@ from telegram import (
     BotCommand,
     BotCommandScope,
     BotDescription,
+    BotName,
     BotShortDescription,
     CallbackQuery,
     Chat,
@@ -3587,6 +3588,48 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def set_my_name(
+        self,
+        name: str = None,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> bool:
+        return await super().set_my_name(
+            name=name,
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_my_name(
+        self,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> BotName:
+        return await super().get_my_name(
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def set_custom_emoji_sticker_set_thumbnail(
         self,
         name: str,
@@ -3829,3 +3872,5 @@ class ExtBot(Bot, Generic[RLARGS]):
     setStickerEmojiList = set_sticker_emoji_list
     setStickerKeywords = set_sticker_keywords
     setStickerMaskPosition = set_sticker_mask_position
+    setMyName = set_my_name
+    getMyName = get_my_name
