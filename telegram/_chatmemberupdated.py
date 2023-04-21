@@ -59,6 +59,10 @@ class ChatMemberUpdated(TelegramObject):
         new_chat_member (:class:`telegram.ChatMember`): New information about the chat member.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link, which was used
             by the user to join the chat. For joining by invite link events only.
+        via_chat_folder_invite_link (:obj:`bool`, optional): :obj:`True`, if the user joined the
+            chat via a chat folder invite link
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         chat (:class:`telegram.Chat`): Chat the user belongs to.
@@ -72,6 +76,10 @@ class ChatMemberUpdated(TelegramObject):
         new_chat_member (:class:`telegram.ChatMember`): New information about the chat member.
         invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link, which was used
             by the user to join the chat. For joining by invite link events only.
+        via_chat_folder_invite_link (:obj:`bool`): Optional. :obj:`True`, if the user joined the
+            chat via a chat folder invite link
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -82,6 +90,7 @@ class ChatMemberUpdated(TelegramObject):
         "old_chat_member",
         "new_chat_member",
         "invite_link",
+        "via_chat_folder_invite_link",
     )
 
     def __init__(
@@ -92,6 +101,7 @@ class ChatMemberUpdated(TelegramObject):
         old_chat_member: ChatMember,
         new_chat_member: ChatMember,
         invite_link: ChatInviteLink = None,
+        via_chat_folder_invite_link: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -102,6 +112,7 @@ class ChatMemberUpdated(TelegramObject):
         self.date: datetime.datetime = date
         self.old_chat_member: ChatMember = old_chat_member
         self.new_chat_member: ChatMember = new_chat_member
+        self.via_chat_folder_invite_link: Optional[bool] = via_chat_folder_invite_link
 
         # Optionals
         self.invite_link: Optional[ChatInviteLink] = invite_link
