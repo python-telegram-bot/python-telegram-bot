@@ -3405,3 +3405,6 @@ class TestBotWithRequest:
         assert await asyncio.gather(
             bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
         ) == 3 * [BotName("")]
+
+        # Reset to original name
+        assert await bot.set_my_name(bot.first_name)
