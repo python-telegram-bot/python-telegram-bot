@@ -26,7 +26,6 @@ import re
 import socket
 import time
 from collections import defaultdict
-from pathlib import Path
 
 import pytest
 
@@ -81,7 +80,7 @@ from telegram.warnings import PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
-from tests.auxil.files import PROJECT_ROOT_PATH, data_file
+from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
@@ -1681,9 +1680,7 @@ class TestBotWithoutRequest:
         for warning in recwarn:
             print()
             print(warning)
-            assert (
-                Path(warning.filename) == PROJECT_ROOT_PATH / "telegram" / "ext" / "_extbot.py"
-            ), "wrong stacklevel!"
+            assert warning.filename == __file__, "wrong stacklevel!"
             assert warning.category is PTBUserWarning
 
 

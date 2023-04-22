@@ -35,7 +35,6 @@ from telegram import (
 )
 from telegram.constants import StickerFormat
 from telegram.error import BadRequest, TelegramError
-from telegram.ext import ExtBot
 from telegram.request import RequestData
 from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
@@ -666,11 +665,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_upload_sticker_file_local_files(
-        self,
-        monkeypatch,
-        bot,
-        chat_id,
-        local_mode,
+        self, monkeypatch, bot, chat_id, local_mode, recwarn
     ):
         try:
             bot._local_mode = local_mode
@@ -697,7 +692,14 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             test_flag = False
             await bot.upload_sticker_file(chat_id, file)
             assert test_flag
-            assert len(recwarn) in (1, 2)  # second warning is for unclosed file
+
+            warnings = [w for w in recwarn if w.category is not ResourceWarning]
+            assert len(warnings) == 1
+            assert warnings[0].category is PTBDeprecationWarning
+            assert warnings[0].filename == __file__
+            assert str(warnings[0].message).startswith(
+                "Since Bot API 6.6, the parameter `png_sticker` for "
+            )
         finally:
             bot._local_mode = False
 
@@ -726,7 +728,9 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             )
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_create_new_sticker_set_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_create_new_sticker_set_local_files(
+        self, monkeypatch, bot, chat_id, local_mode, recwarn
+    ):
         monkeypatch.setattr(bot, "_local_mode", local_mode)
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -771,9 +775,17 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             sticker_format=StickerFormat.STATIC,
         )
         assert test_flag
-        assert len(recwarn) in (1, 2)
 
-    async def test_create_new_sticker_all_params(self, monkeypatch, bot, chat_id, mask_position):
+        warnings = [w for w in recwarn if w.category is not ResourceWarning]
+        assert len(warnings) == 1
+        assert warnings[0].category is PTBDeprecationWarning
+        assert warnings[0].filename == __file__
+        assert str(warnings[0].message).startswith("Since Bot API 6.6, the parameters")
+        assert "for `create_new_sticker_set` are deprecated" in str(warnings[0].message)
+
+    async def test_create_new_sticker_all_params(
+        self, monkeypatch, bot, chat_id, mask_position, recwarn
+    ):
         async def make_assertion_old_params(_, data, *args, **kwargs):
             assert data["user_id"] == chat_id
             assert data["name"] == "name"
@@ -808,7 +820,10 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert len(recwarn) == 1
         assert recwarn[0].filename == __file__, "wrong stacklevel"
         assert recwarn[0].category is PTBDeprecationWarning
-        assert str(recwarn[0]) == "udaitrne"
+        assert str(recwarn[0].message).startswith("Since Bot API 6.6, the parameters")
+        assert "for `create_new_sticker_set` are deprecated" in str(recwarn[0].message)
+
+        recwarn.clear()
         monkeypatch.setattr(bot, "_post", make_assertion_new_params)
         await bot.create_new_sticker_set(
             chat_id,
@@ -818,7 +833,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             sticker_format=StickerFormat.STATIC,
             needs_repainting=True,
         )
-        assert len(recwarn) == 1
+        assert len(recwarn) == 0
 
     async def test_add_sticker_to_set_warning(self, bot, monkeypatch, chat_id, recwarn):
         async def make_assertion(*args, **kwargs):
@@ -841,7 +856,9 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             await bot.add_sticker_to_set(chat_id, "name", "emojis", sticker="something")
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_add_sticker_to_set_local_files(self, monkeypatch, bot, chat_id, local_mode):
+    async def test_add_sticker_to_set_local_files(
+        self, monkeypatch, bot, chat_id, local_mode, recwarn
+    ):
         monkeypatch.setattr(bot, "_local_mode", local_mode)
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -876,7 +893,13 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             chat_id, "name", sticker=InputSticker(sticker=file, emoji_list=["this"])
         )
         assert test_flag
-        assert len(recwarn) in (1, 2)
+
+        warnings = [w for w in recwarn if w.category is not ResourceWarning]
+        assert len(warnings) == 1
+        assert warnings[0].category is PTBDeprecationWarning
+        assert warnings[0].filename == __file__
+        assert str(warnings[0].message).startswith("Since Bot API 6.6, the parameters")
+        assert "for `add_sticker_to_set` are deprecated" in str(warnings[0].message)
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_set_sticker_set_thumbnail_local_files(
@@ -902,34 +925,27 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         finally:
             bot._local_mode = False
 
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
     async def test_set_sticker_set_thumb_deprecation_warning(
-        self, monkeypatch, bot, raw_bot, recwarn
+        self, monkeypatch, bot, raw_bot, recwarn, bot_class
     ):
-        ext_bot = bot
+        bot = bot if bot_class == "ExtBot" else raw_bot
 
         async def _post(*args, **kwargs):
             return True
 
-        for bot in (ext_bot, raw_bot):
-            cls_name = bot.__class__.__name__
-            monkeypatch.setattr(bot, "_post", _post)
-            await bot.set_sticker_set_thumb("name", "user_id", "thumb")
+        cls_name = bot.__class__.__name__
+        monkeypatch.setattr(bot, "_post", _post)
+        await bot.set_sticker_set_thumb("name", "user_id", "thumb")
 
-            if isinstance(bot, ExtBot):
-                # Unfortunately, warnings.catch_warnings doesn't play well with pytest apparently
-                assert len(recwarn) == 2, f"Wrong warning number for class {cls_name}!"
-            else:
-                assert len(recwarn) == 1, f"No warning for class {cls_name}!"
+        assert len(recwarn) == 1, f"No warning for class {cls_name}!"
+        assert recwarn[0].category is PTBDeprecationWarning, f"Wrong warning for class {cls_name}!"
+        assert "renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail'" in str(
+            recwarn[0].message
+        ), f"Wrong message for class {cls_name}!"
 
-            assert (
-                recwarn[0].category is PTBDeprecationWarning
-            ), f"Wrong warning for class {cls_name}!"
-            assert "renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail'" in str(
-                recwarn[0].message
-            ), f"Wrong message for class {cls_name}!"
-
-            assert recwarn[0].filename == __file__, f"incorrect stacklevel for class {cls_name}!"
-            recwarn.clear()
+        assert recwarn[0].filename == __file__, f"incorrect stacklevel for class {cls_name}!"
+        recwarn.clear()
 
     async def test_get_file_instance_method(self, monkeypatch, sticker):
         async def make_assertion(*_, **kwargs):
