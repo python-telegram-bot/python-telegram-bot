@@ -1165,7 +1165,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb, new_arg=thumbnail, warn_callback=self._warn
+            deprecated_arg=thumb,
+            new_arg=thumbnail,
+            warn_callback=self._warn,
         )
         data: JSONDict = {
             "chat_id": chat_id,

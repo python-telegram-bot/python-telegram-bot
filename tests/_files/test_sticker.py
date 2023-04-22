@@ -639,10 +639,14 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_upload_sticker_file_warning(self, bot, monkeypatch, chat_id, recwarn):
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_upload_sticker_file_warning(
+        self, bot, raw_bot, monkeypatch, chat_id, recwarn, bot_class
+    ):
         async def make_assertion(*args, **kwargs):
             return {"file_id": "file_id", "file_unique_id": "file_unique_id"}
 
+        bot = raw_bot if bot_class == "Bot" else bot
         monkeypatch.setattr(bot, "_post", make_assertion)
 
         await bot.upload_sticker_file(chat_id, "png_sticker_file_id")
@@ -703,10 +707,14 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         finally:
             bot._local_mode = False
 
-    async def test_create_new_sticker_set_warning(self, bot, monkeypatch, chat_id, recwarn):
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_create_new_sticker_set_warning(
+        self, bot, raw_bot, bot_class, monkeypatch, chat_id, recwarn
+    ):
         async def make_assertion(*args, **kwargs):
             return True
 
+        bot = raw_bot if bot_class == "Bot" else bot
         monkeypatch.setattr(bot, "_post", make_assertion)
 
         await bot.create_new_sticker_set(chat_id, "name", "title", "some_str_emoji")
@@ -835,10 +843,14 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         )
         assert len(recwarn) == 0
 
-    async def test_add_sticker_to_set_warning(self, bot, monkeypatch, chat_id, recwarn):
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_add_sticker_to_set_warning(
+        self, bot, raw_bot, monkeypatch, bot_class, chat_id, recwarn
+    ):
         async def make_assertion(*args, **kwargs):
             return True
 
+        bot = raw_bot if bot_class == "Bot" else bot
         monkeypatch.setattr(bot, "_post", make_assertion)
 
         await bot.add_sticker_to_set(chat_id, "name", "emoji", "fake_file_id")
@@ -934,17 +946,16 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         async def _post(*args, **kwargs):
             return True
 
-        cls_name = bot.__class__.__name__
         monkeypatch.setattr(bot, "_post", _post)
         await bot.set_sticker_set_thumb("name", "user_id", "thumb")
 
-        assert len(recwarn) == 1, f"No warning for class {cls_name}!"
-        assert recwarn[0].category is PTBDeprecationWarning, f"Wrong warning for class {cls_name}!"
+        assert len(recwarn) == 1
+        assert recwarn[0].category is PTBDeprecationWarning
         assert "renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail'" in str(
             recwarn[0].message
-        ), f"Wrong message for class {cls_name}!"
+        )
 
-        assert recwarn[0].filename == __file__, f"incorrect stacklevel for class {cls_name}!"
+        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
         recwarn.clear()
 
     async def test_get_file_instance_method(self, monkeypatch, sticker):

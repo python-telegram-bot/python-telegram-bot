@@ -93,6 +93,7 @@ warn_about_thumb_return_thumbnail = functools.partial(
     deprecated_arg_name="thumb",
     new_arg_name="thumbnail",
     bot_api_version="6.6",
+    stacklevel=4,
 )
 """A helper function to warn about using a deprecated 'thumb' argument and return it or the new
 'thumbnail' argument, introduced in API 6.6.

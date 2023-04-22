@@ -72,3 +72,16 @@ def check_thumb_deprecation_warnings_for_args_and_attrs(
         )
 
     return True
+
+
+def check_thumb_deprececation_warning_for_method_args(
+    recwarn: WarningsRecorder,
+    calling_file: str,
+    deprecated_name: str = "thumb",
+    new_name: str = "thumbnail",
+):
+    """Similar as `check_thumb_deprecation_warnings_for_args_and_attrs`, but for bot methods."""
+    assert len(recwarn) == 1
+    assert recwarn[0].category is PTBDeprecationWarning
+    assert recwarn[0].filename == calling_file
+    assert f"argument '{deprecated_name}' to '{new_name}'" in str(recwarn[0].message)
