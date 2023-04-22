@@ -1050,20 +1050,8 @@ class TestConversationHandler:
             await asyncio.sleep(0.5)
             if jq:
                 assert len(recwarn) == 1
-                assert (
-                    Path(recwarn[0].filename)
-                    == PROJECT_ROOT_PATH / "telegram" / "ext" / "_conversationhandler.py"
-                ), "wrong stacklevel!"
             else:
                 assert len(recwarn) == 2
-                assert (
-                    Path(recwarn[0].filename)
-                    == PROJECT_ROOT_PATH / "telegram" / "ext" / "_conversationhandler.py"
-                ), "wrong stacklevel!"
-                assert (
-                    Path(recwarn[1].filename)
-                    == PROJECT_ROOT_PATH / "telegram" / "ext" / "_conversationhandler.py"
-                ), "wrong stacklevel!"
 
             assert str(recwarn[0].message if jq else recwarn[1].message).startswith(
                 "Ignoring `conversation_timeout`"
@@ -1071,6 +1059,10 @@ class TestConversationHandler:
             assert ("is not running" if jq else "No `JobQueue` set up.") in str(recwarn[0].message)
             for warning in recwarn:
                 assert warning.category is PTBUserWarning
+                assert (
+                    Path(warning.filename)
+                    == PROJECT_ROOT_PATH / "telegram" / "ext" / "_conversationhandler.py"
+                ), "wrong stacklevel!"
             # now set app.job_queue back to it's original value
 
     async def test_schedule_job_exception(self, app, bot, user1, monkeypatch, caplog):

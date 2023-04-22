@@ -892,7 +892,6 @@ class TestPicklePersistence:
         await pickle_persistence.update_chat_data(12345, data_with_bot)
         assert len(recwarn) == 1
         assert recwarn[-1].category is PTBUserWarning
-        assert recwarn[-1].category is PTBUserWarning
         assert str(recwarn[-1].message).startswith("Unknown bot instance found.")
         assert (
             Path(recwarn[-1].filename)
