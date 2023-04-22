@@ -35,12 +35,12 @@ class WriteAccessAllowed(TelegramObject):
     Args:
         web_app_name (:obj:`str`, optional): Name of the Web App which was launched from a link.
 
-        .. versionadded:: NEXT.VERSION
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         web_app_name (:obj:`str`): Optional. Name of the Web App which was launched from a link.
 
-        .. versionadded:: NEXT.VERSION
+            .. versionadded:: NEXT.VERSION
 
     """
 
