@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Callable, ClassVar, Optional, Sequence, Union
 
 from telegram import constants
 from telegram._files.location import Location
+from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -146,6 +147,7 @@ class InlineQuery(TelegramObject):
         next_offset: str = None,
         switch_pm_text: str = None,
         switch_pm_parameter: str = None,
+        button: InlineQueryResultsButton = None,
         *,
         current_offset: str = None,
         auto_pagination: bool = False,
@@ -192,6 +194,7 @@ class InlineQuery(TelegramObject):
             next_offset=next_offset,
             switch_pm_text=switch_pm_text,
             switch_pm_parameter=switch_pm_parameter,
+            button=button,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

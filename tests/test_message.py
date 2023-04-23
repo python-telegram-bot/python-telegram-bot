@@ -694,7 +694,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "text_html_urled",
         ],
     )
-    def test_text_custom_emoji(self, type_):
+    def test_text_custom_emoji_html(self, type_):
         text = "Look a custom emoji: 😎"
         expected = 'Look a custom emoji: <tg-emoji emoji-id="5472409228461217725">😎</tg-emoji>'
         emoji_entity = MessageEntity(

@@ -348,6 +348,9 @@ class TestBotWithoutRequest:
             await bot.shutdown()
 
     async def test_get_me_and_properties(self, bot):
+        if dtm.date.today() < dtm.date(2023, 4, 25):
+            pytest.xfail("Depending on skipped test `test_set_get_my_name`")
+
         get_me_bot = await ExtBot(bot.token).get_me()
 
         assert isinstance(get_me_bot, User)
@@ -829,10 +832,8 @@ class TestBotWithoutRequest:
                     },
                 ],
                 "next_offset": "42",
-                "switch_pm_parameter": "start_pm",
                 "inline_query_id": 1234,
                 "is_personal": True,
-                "switch_pm_text": "switch pm",
             }
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
@@ -857,8 +858,6 @@ class TestBotWithoutRequest:
             cache_time=300,
             is_personal=True,
             next_offset="42",
-            switch_pm_text="switch pm",
-            switch_pm_parameter="start_pm",
         )
         # make sure that the results were not edited in-place
         assert results == copied_results
@@ -922,10 +921,8 @@ class TestBotWithoutRequest:
                     },
                 ],
                 "next_offset": "42",
-                "switch_pm_parameter": "start_pm",
                 "inline_query_id": 1234,
                 "is_personal": True,
-                "switch_pm_text": "switch pm",
             }
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
@@ -950,8 +947,6 @@ class TestBotWithoutRequest:
             cache_time=300,
             is_personal=True,
             next_offset="42",
-            switch_pm_text="switch pm",
-            switch_pm_parameter="start_pm",
         )
         # make sure that the results were not edited in-place
         assert results == copied_results
@@ -3369,6 +3364,11 @@ class TestBotWithRequest:
             bot.get_my_short_description("de"),
         ) == 3 * [BotShortDescription("")]
 
+    # TODO: Remove this once the 24h flood limit is fixed
+    @pytest.mark.skipif(
+        dtm.date.today() < dtm.date(2023, 4, 25),
+        reason="Skipping b/c of 24h flood limit. Waiting for that once will hopefully fix the CI.",
+    )
     async def test_set_get_my_name(self, bot):
         default_name = uuid4().hex
         en_name = uuid4().hex
