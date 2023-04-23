@@ -98,6 +98,26 @@ class TestChatJoinRequestWithoutRequest(TestChatJoinRequestBase):
         assert chat_join_request.bio == self.bio
         assert chat_join_request.invite_link == self.invite_link
 
+    def test_de_json_localization(self, tz_bot, bot, raw_bot, time):
+        json_dict = {
+            "chat": self.chat.to_dict(),
+            "from": self.from_user.to_dict(),
+            "date": to_timestamp(time),
+            "user_chat_id": self.from_user.id,
+        }
+
+        chatjoin_req_raw = ChatJoinRequest.de_json(json_dict, raw_bot)
+        chatjoin_req_bot = ChatJoinRequest.de_json(json_dict, bot)
+        chatjoin_req_tz = ChatJoinRequest.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        chatjoin_req_offset = chatjoin_req_tz.date.utcoffset()
+        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(chatjoin_req_tz.date.replace(tzinfo=None))
+
+        assert chatjoin_req_raw.date.tzinfo == UTC
+        assert chatjoin_req_bot.date.tzinfo == UTC
+        assert chatjoin_req_offset == tz_bot_offset
+
     def test_to_dict(self, chat_join_request, time):
         chat_join_request_dict = chat_join_request.to_dict()
 

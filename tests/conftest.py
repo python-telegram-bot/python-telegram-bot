@@ -134,7 +134,7 @@ async def raw_bot(bot_info):
     """Makes an regular Bot instance with the given bot_info"""
     async with PytestBot(
         bot_info["token"],
-        private_key=PRIVATE_KEY,
+        private_key=PRIVATE_KEY if TEST_WITH_OPT_DEPS else None,
         request=NonchalantHttpxRequest(8),
         get_updates_request=NonchalantHttpxRequest(1),
     ) as _bot:
