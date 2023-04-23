@@ -1168,7 +1168,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             deprecated_arg=thumb,
             new_arg=thumbnail,
             warn_callback=self._warn,
-            stacklevel=4,
+            stacklevel=3,
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1308,7 +1308,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             deprecated_arg=thumb,
             new_arg=thumbnail,
             warn_callback=self._warn,
-            stacklevel=4,
+            stacklevel=3,
         )
 
         data: JSONDict = {
@@ -1548,7 +1548,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             deprecated_arg=thumb,
             new_arg=thumbnail,
             warn_callback=self._warn,
-            stacklevel=4,
+            stacklevel=3,
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1684,7 +1684,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             deprecated_arg=thumb,
             new_arg=thumbnail,
             warn_callback=self._warn,
-            stacklevel=4,
+            stacklevel=3,
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1828,7 +1828,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             deprecated_arg=thumb,
             new_arg=thumbnail,
             warn_callback=self._warn,
-            stacklevel=4,
+            stacklevel=3,
         )
         data: JSONDict = {
             "chat_id": chat_id,
