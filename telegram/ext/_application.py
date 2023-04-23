@@ -1066,6 +1066,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 else:
                     await self.__process_update_wrapper(update)
             except asyncio.CancelledError:
+                # This may happen if the application is manually run via application.start() and
+                # then a KeyboardInterrupt is sent. We must prevent this loop to die since
+                # application.stop() will wait for it's clean shutdown.
                 _LOGGER.warning(
                     "Fetching updates got a asyncio.CancelledError. Ignoring as this task may only"
                     "be closed via `Application.stop`."
