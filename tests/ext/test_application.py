@@ -1979,46 +1979,69 @@ class TestApplication:
     async def test_cancellation_error_does_not_stop_polling(
         self, one_time_bot, monkeypatch, caplog
     ):
+        """
+        Ensures that hitting CTRL+C while polling *without* run_polling doesn't kill
+        the update_fetcher loop such that a shutdown is still possible.
+        This test is far from perfect, but it's the closest we can come with sane effort.
+        """
+
         async def get_updates(*args, **kwargs):
             await asyncio.sleep(0)
-            return []
+            return [None]
 
         monkeypatch.setattr(one_time_bot, "get_updates", get_updates)
         app = ApplicationBuilder().bot(one_time_bot).build()
-        event = asyncio.Event()
+
+        original_get = app.update_queue.get
+        raise_cancelled_error = threading.Event()
+
+        async def get(*arg, **kwargs):
+            await asyncio.sleep(0.05)
+            if raise_cancelled_error.is_set():
+                raise_cancelled_error.clear()
+                raise asyncio.CancelledError("Mocked CancelledError")
+            return await original_get(*arg, **kwargs)
+
+        monkeypatch.setattr(app.update_queue, "get", get)
 
         def thread_target():
             waited = 0
             while not app.running:
                 time.sleep(0.05)
                 waited += 0.05
+                print("waiting for app to start", waited)
                 if waited > 5:
                     pytest.fail("App apparently won't start")
 
             time.sleep(0.1)
-            os.kill(os.getpid(), signal.SIGINT)
-            event.set()
+            raise_cancelled_error.set()
 
         async with app:
             with caplog.at_level(logging.WARNING):
                 thread = Thread(target=thread_target)
-                thread.start()
                 await app.start()
+                thread.start()
                 assert thread.is_alive()
-                await event.wait()
+                raise_cancelled_error.wait()
+
+                # The exit should have been caught and the app should still be running
+                assert not thread.is_alive()
+                assert app.running
+
+                # Explicit shutdown is required
                 await app.stop()
                 thread.join()
 
         assert not thread.is_alive()
         assert not app.running
 
+        # Make sure that we were warned about the necessity of a manual shutdown
         assert len(caplog.records) == 1
         record = caplog.records[0]
         assert record.name == "telegram.ext.Application"
         assert record.getMessage().startswith(
             "Fetching updates got a asyncio.CancelledError. Ignoring"
         )
-        assert record.filename == str(__file__)
 
     def test_run_without_updater(self, one_time_bot):
         app = ApplicationBuilder().bot(one_time_bot).updater(None).build()
