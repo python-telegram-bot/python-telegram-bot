@@ -342,7 +342,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     def _warn(
         cls, message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0
     ) -> None:
-        """Convencience method to issue a warning. This method is here mostly to make it easier
+        """Convenience method to issue a warning. This method is here mostly to make it easier
         for ExtBot to add 1 level to all warning calls."""
         warn(message=message, category=category, stacklevel=stacklevel + 1)
 
