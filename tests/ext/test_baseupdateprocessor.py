@@ -31,9 +31,9 @@ class TestBaseUpdateProcessor:
         processor = BaseUpdateProcessor(3)
         assert processor.max_concurrent_updates == 3
 
-    async def test_do_process_update(self, one_time_bot):
+    async def test_process_update(self, one_time_bot):
         class MockProcessor(BaseUpdateProcessor):
-            async def process_update(self, update, coroutine):
+            async def do_process_update(self, update, coroutine):
                 pass
 
         processor = MockProcessor(5)
@@ -43,18 +43,20 @@ class TestBaseUpdateProcessor:
         async def coroutine():
             pass
 
-        await processor.do_process_update(update, coroutine(), application)
+        await application.update_queue.put(1)
+        await processor.process_update(update, coroutine, application)
+        assert not application.update_queue.empty()
 
 
 class TestSimpleUpdateProcessor:
-    async def test_process_update(self):
+    async def test_do_process_update(self):
         processor = SimpleUpdateProcessor(1)
         update = Update(1, None)
 
         async def coroutine():
             pass
 
-        await processor.process_update(update, coroutine())
+        await processor.do_process_update(update, coroutine())
 
     async def test_equality(self):
         processor1 = SimpleUpdateProcessor(1)

@@ -922,11 +922,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Args:
             concurrent_updates (:obj:`bool` | :obj:`int` | :class:`BaseUpdateProcessor`): Passing
-            :obj:`True` will allow for ``256`` updates to be processed concurrently using
-            :class:`telegram.ext.SimpleUpdateProcessor`. Pass an integer to specify a different
-            number of updates that may be processed concurrently. Pass an instance of
-            :class:`telegram.ext.BaseUpdateProcessor` to use that instance for handling updates
-            concurrently.
+                :obj:`True` will allow for ``256`` updates to be processed concurrently using
+                :class:`telegram.ext.SimpleUpdateProcessor`. Pass an integer to specify a different
+                number of updates that may be processed concurrently. Pass an instance of
+                :class:`telegram.ext.BaseUpdateProcessor` to use that instance for handling updates
+                concurrently.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.

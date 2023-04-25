@@ -1075,7 +1075,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             if self._update_processor and self._update_processor.max_concurrent_updates > 1:
                 # We don't await the below because it has to be run concurrently
                 self.create_task(
-                    self._update_processor.do_process_update(
+                    self._update_processor.process_update(
                         update, self.process_update(update), self
                     ),
                     update=update,

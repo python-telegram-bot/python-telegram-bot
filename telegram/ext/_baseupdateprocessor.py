@@ -36,8 +36,8 @@ class BaseUpdateProcessor:
 
     Args:
         max_concurrent_updates (:obj:`int`): The maximum number of updates to be processed
-        concurrently. If this number is exceeded, new updates will be queued until the number
-        of currently processed updates decreases.
+            concurrently. If this number is exceeded, new updates will be queued until the number
+            of currently processed updates decreases.
 
     Raises:
         :exc:`ValueError`: If :paramref:`max_concurrent_updates` is a negative integer.
@@ -55,7 +55,7 @@ class BaseUpdateProcessor:
         return self._max_concurrent_updates
 
     @abstractmethod
-    async def process_update(
+    async def do_process_update(
         self,
         update: object,
         coroutine: "Awaitable[Any]",
@@ -63,7 +63,7 @@ class BaseUpdateProcessor:
         """Custom implementation of how to process an update. Must be implemented by a subclass.
 
         Warning:
-            This method will be called by :meth:`do_process_update`. It should *not* be called
+            This method will be called by :meth:`process_update`. It should *not* be called
             manually.
 
         Args:
@@ -88,13 +88,13 @@ class BaseUpdateProcessor:
             :meth:`initialize`
         """
 
-    async def do_process_update(
+    async def process_update(
         self,
         update: object,
         coroutine: "Awaitable[Any]",
         application: "Application",
     ) -> None:
-        """Calls :meth:`process_update` with a semaphore to limit the number of concurrent
+        """Calls :meth:`do_process_update` with a semaphore to limit the number of concurrent
         updates.
 
         Args:
@@ -103,7 +103,7 @@ class BaseUpdateProcessor:
             application (:class:`telegram.ext.Application`): The application instance.
         """
         async with self._semaphore:
-            await self.process_update(update, coroutine)
+            await self.do_process_update(update, coroutine)
             application.update_queue.task_done()
 
     async def __aenter__(self) -> "BaseUpdateProcessor":
@@ -134,7 +134,7 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
     considered equal, if their :paramref:`max_concurrent_updates` is equal.
     """
 
-    async def process_update(
+    async def do_process_update(
         self,
         update: object,
         coroutine: "Awaitable[Any]",
@@ -147,14 +147,17 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
         """
         await coroutine
 
+    async def initialize(self) -> None:
+        """Does nothing."""
+
+    async def shutdown(self) -> None:
+        """Does nothing."""
+
     def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, self.__class__)
             and other.max_concurrent_updates == self.max_concurrent_updates
         )
 
-    async def initialize(self) -> None:
-        """Does nothing."""
-
-    async def shutdown(self) -> None:
-        """Does nothing."""
+    def __hash__(self) -> int:
+        return hash(self.max_concurrent_updates)
