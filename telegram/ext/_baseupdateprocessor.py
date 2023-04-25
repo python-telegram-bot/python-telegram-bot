@@ -20,9 +20,10 @@
 from abc import abstractmethod
 from asyncio import BoundedSemaphore
 from types import TracebackType
-from typing import Any, Awaitable, Optional, Type
+from typing import TYPE_CHECKING, Any, Awaitable, Optional, Type
 
-from telegram.ext import Application
+if TYPE_CHECKING:
+    from telegram.ext import Application
 
 
 class BaseUpdateProcessor:
@@ -44,20 +45,14 @@ class BaseUpdateProcessor:
 
     def __init__(self, max_concurrent_updates: int):
         self._max_concurrent_updates = max_concurrent_updates
-        if self.max_concurrent_updates < 0:
+        if self.max_concurrent_updates < 1:
             raise ValueError("`max_concurrent_updates` must be a positive integer!")
-        self._semaphore = BoundedSemaphore(self.max_concurrent_updates or 1)
+        self._semaphore = BoundedSemaphore(self.max_concurrent_updates)
 
     @property
     def max_concurrent_updates(self) -> int:
         """:obj:`int`: The maximum number of updates that can be processed concurrently."""
         return self._max_concurrent_updates
-
-    @property
-    def semaphore(self) -> BoundedSemaphore:
-        """:class:`asyncio.BoundedSemaphore`: The semaphore used to limit the number of
-        concurrent updates."""
-        return self._semaphore
 
     @abstractmethod
     async def process_update(
@@ -97,7 +92,7 @@ class BaseUpdateProcessor:
         self,
         update: object,
         coroutine: "Awaitable[Any]",
-        application: Application,
+        application: "Application",
     ) -> None:
         """Calls :meth:`process_update` with a semaphore to limit the number of concurrent
         updates.
@@ -107,7 +102,7 @@ class BaseUpdateProcessor:
             coroutine (:obj:`Awaitable`): The coroutine that will be awaited to process the update.
             application (:class:`telegram.ext.Application`): The application instance.
         """
-        async with self.semaphore:
+        async with self._semaphore:
             await self.process_update(update, coroutine)
             application.update_queue.task_done()
 
@@ -131,6 +126,14 @@ class BaseUpdateProcessor:
 
 
 class SimpleUpdateProcessor(BaseUpdateProcessor):
+    """Instance of :class:`telegram.ext.BaseUpdateProcessor` that immediately awaits the
+    coroutine, i.e. does not apply any additional processing. This is used by default when
+    :attr:`telegram.ext.ApplicationBuilder.concurrent_updates` is :obj:`int`.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :paramref:`max_concurrent_updates` is equal.
+    """
+
     async def process_update(
         self,
         update: object,
@@ -143,6 +146,12 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
             coroutine (:obj:`Awaitable`): The coroutine that will be awaited to process the update.
         """
         await coroutine
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, self.__class__)
+            and other.max_concurrent_updates == self.max_concurrent_updates
+        )
 
     async def initialize(self) -> None:
         """Does nothing."""

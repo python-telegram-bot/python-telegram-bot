@@ -229,11 +229,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         "_chat_data",
         "_chat_ids_to_be_deleted_in_persistence",
         "_chat_ids_to_be_updated_in_persistence",
-        "_concurrent_updates",
         "_conversation_handler_conversations",
         "_initialized",
         "_job_queue",
         "_running",
+        "_update_processor",
         "_user_data",
         "_user_ids_to_be_deleted_in_persistence",
         "_user_ids_to_be_updated_in_persistence",
@@ -352,12 +352,20 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         """:obj:`int`: The number of concurrent updates that will be processed in parallel. A
         value of ``0`` indicates updates are *not* being processed concurrently.
 
-        .. verisonchanged:: NEXT.VERSION
-            This is now just a shortcut to ``update_processor.max_concurrent_updates``.
+        .. versionchanged:: NEXT.VERSION
+            This is now just a shortcut to :attr:`update_processor.max_concurrent_updates
+            <telegram.ext.BaseUpdateProcessor.max_concurrent_updates>`.
 
         .. seealso:: :wiki:`Concurrency`
         """
         return self._update_processor.max_concurrent_updates
+
+    @property
+    def active_updates(self) -> int:
+        """:obj:`int`: The number of active updates that are currently being processed by the
+        update processor.
+        """
+        return self.update_processor._semaphore._value  # pylint: disable=protected-access
 
     @property
     def job_queue(self) -> Optional["JobQueue[CCT]"]:
@@ -376,7 +384,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         return self._job_queue
 
     @property
-    def update_processor(self) -> Optional["BaseUpdateProcessor"]:
+    def update_processor(self) -> "BaseUpdateProcessor":
         """:class:`telegram.ext.BaseUpdateProcessor`: The update processor used by this
         application.
 
@@ -1064,7 +1072,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
             _LOGGER.debug("Processing update %s", update)
 
-            if self._update_processor and self._update_processor.max_concurrent_updates > 0:
+            if self._update_processor and self._update_processor.max_concurrent_updates > 1:
                 # We don't await the below because it has to be run concurrently
                 self.create_task(
                     self._update_processor.do_process_update(
@@ -1076,7 +1084,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 await self.__process_update_wrapper(update)
 
     async def __process_update_wrapper(self, update: object) -> None:
-        async with self._update_processor.semaphore:
+        async with self._update_processor._semaphore:  # pylint: disable=protected-access
             await self.process_update(update)
             self.update_queue.task_done()
 
