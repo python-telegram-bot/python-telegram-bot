@@ -43,6 +43,8 @@ class BaseUpdateProcessor:
         :exc:`ValueError`: If :paramref:`max_concurrent_updates` is a negative integer.
     """
 
+    __slots__ = ("_max_concurrent_updates", "_semaphore")
+
     def __init__(self, max_concurrent_updates: int):
         self._max_concurrent_updates = max_concurrent_updates
         if self.max_concurrent_updates < 1:
@@ -133,6 +135,8 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :paramref:`max_concurrent_updates` is equal.
     """
+
+    __slots__ = ()
 
     async def do_process_update(
         self,
