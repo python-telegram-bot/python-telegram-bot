@@ -8166,6 +8166,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 0-:tg-const:`telegram.constants.BotNameLimit.MAX_NAME_LENGTH`
                 characters. Pass an empty string to remove the dedicated name for the given
                 language.
+
+                Caution:
+                    If :paramref:`language_code` is not specified, a :paramref:`name` *must*
+                    be specified.
             language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
                 the name will be applied to all users for whose language there is no
                 dedicated name.

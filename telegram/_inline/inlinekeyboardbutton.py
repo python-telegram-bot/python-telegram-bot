@@ -115,7 +115,7 @@ class InlineKeyboardButton(TelegramObject):
 
             Tip:
                 This is similar to the new parameter :paramref:`switch_inline_query_chosen_chat`,
-                but for some reason, Telegram has not deprecated this parameter.
+                but gives no control over which chats can be selected.
         switch_inline_query_current_chat (:obj:`str`, optional): If set, pressing the button will
             insert the bot's username and the specified inline query in the current chat's input
             field. Can be empty, in which case only the bot's username will be inserted. This

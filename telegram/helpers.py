@@ -54,11 +54,10 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
         entity_type (:obj:`str`, optional): For the entity types
             :tg-const:`telegram.MessageEntity.PRE`, :tg-const:`telegram.MessageEntity.CODE` and
             the link part of :tg-const:`telegram.MessageEntity.TEXT_LINK` and
-            :tg-const:`telegram.MessageEntity.CUSTOM_EMOJI`, only certain characters
-            need to be escaped in :tg-const:`telegram.constants.ParseMode.MARKDOWN_V2`.
-            See the `official API documentation <https://core.telegram.org/bots/api
-            #formatting-options>`__ for details. Only valid in
-            combination with ``version=2``, will be ignored else.
+            :tg-const:`telegram.MessageEntity.CUSTOM_EMOJI`, only certain characters need to be
+            escaped in :tg-const:`telegram.constants.ParseMode.MARKDOWN_V2`. See the `official API
+            documentation <https://core.telegram.org/bots/api#formatting-options>`_ for details.
+            Only valid in combination with ``version=2``, will be ignored else.
     """
     if int(version) == 1:
         escape_chars = r"_*`["

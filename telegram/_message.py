@@ -59,6 +59,7 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.warnings import warn
 from telegram._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -69,6 +70,7 @@ from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
 from telegram.constants import MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -580,6 +582,11 @@ class Message(TelegramObject):
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
         function. Instead, the supplied replacement for the emoji will be used.
+
+    .. |custom_emoji_md1_deprecation| replace:: Since custom emoji entities are not supported by
+       :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method will raise a
+       :exc:`ValueError` in future versions instead of falling back to the supplied replacement
+       for the emoji.
     """
 
     # fmt: on
@@ -3530,6 +3537,13 @@ class Message(TelegramObject):
                     if version == 1:
                         # this ensures compatibility to previous PTB versions
                         insert = escaped_text
+                        warn(
+                            "Custom emoji entities are not supported for Markdown version 1. "
+                            "Future version of PTB will raise a ValueError instead of falling "
+                            "back to the alternative standard emoji.",
+                            stacklevel=3,
+                            category=PTBDeprecationWarning,
+                        )
                     else:
                         # This should never be needed because ids are numeric but the documentation
                         # specifically mentions it so here we are
@@ -3587,6 +3601,9 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
+        .. deprecated:: NEXT.VERSION
+            |custom_emoji_md1_deprecation|
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
@@ -3631,6 +3648,9 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
+        .. deprecated:: NEXT.VERSION
+            |custom_emoji_md1_deprecation|
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
@@ -3674,6 +3694,9 @@ class Message(TelegramObject):
               instead.
 
             * |custom_emoji_formatting_note|
+
+        .. deprecated:: NEXT.VERSION
+            |custom_emoji_md1_deprecation|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -3720,6 +3743,9 @@ class Message(TelegramObject):
               :meth:`caption_markdown_v2_urled` instead.
 
             * |custom_emoji_formatting_note|
+
+        .. deprecated:: NEXT.VERSION
+            |custom_emoji_md1_deprecation|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
