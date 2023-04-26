@@ -2009,7 +2009,6 @@ class TestApplication:
             while not app.running:
                 time.sleep(0.05)
                 waited += 0.05
-                print("waiting for app to start", waited)
                 if waited > 5:
                     pytest.fail("App apparently won't start")
 
