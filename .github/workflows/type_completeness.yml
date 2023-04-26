@@ -3,9 +3,11 @@ on:
   pull_request:
     branches:
       - master
+      - api-6.7
   push:
     branches:
       - master
+      - api-6.7
 
 jobs:
   test-type-completeness:
