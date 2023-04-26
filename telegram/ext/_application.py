@@ -333,7 +333,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self._initialized = False
         self._running = False
         self._job_queue: JQ = job_queue
-        self.__update_fetcher_task: Optional[asyncio.Future] = None
+        self.__update_fetcher_task: Optional[asyncio.Task] = None
         self.__update_persistence_task: Optional[asyncio.Task] = None
         self.__update_persistence_event = asyncio.Event()
         self.__update_persistence_lock = asyncio.Lock()
@@ -563,15 +563,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 await self._job_queue.start()  # type: ignore[union-attr]
                 _LOGGER.debug("JobQueue started")
 
-            # The shield is necessary if the application is manually run via application.start()
-            # and then a KeyboardInterrupt is sent. We must prevent this loop to die since
-            # application.stop() will wait for it's clean shutdown.
-            self.__update_fetcher_task = asyncio.shield(
-                asyncio.create_task(
-                    self._update_fetcher(),
-                    # TODO: Add this once we drop py3.7
-                    # name=f'Application:{self.bot.id}:update_fetcher'
-                )
+            self.__update_fetcher_task = asyncio.create_task(
+                self._update_fetcher(),
+                # TODO: Add this once we drop py3.7
+                # name=f'Application:{self.bot.id}:update_fetcher'
             )
             _LOGGER.info("Application started")
 
@@ -1051,24 +1046,33 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     async def _update_fetcher(self) -> None:
         # Continuously fetch updates from the queue. Exit only once the signal object is found.
         while True:
-            update = await self.update_queue.get()
+            try:
+                update = await self.update_queue.get()
 
-            if update is _STOP_SIGNAL:
-                _LOGGER.debug("Dropping pending updates")
-                while not self.update_queue.empty():
+                if update is _STOP_SIGNAL:
+                    _LOGGER.debug("Dropping pending updates")
+                    while not self.update_queue.empty():
+                        self.update_queue.task_done()
+
+                    # For the _STOP_SIGNAL
                     self.update_queue.task_done()
+                    return
 
-                # For the _STOP_SIGNAL
-                self.update_queue.task_done()
-                return
+                _LOGGER.debug("Processing update %s", update)
 
-            _LOGGER.debug("Processing update %s", update)
-
-            if self._concurrent_updates:
-                # We don't await the below because it has to be run concurrently
-                self.create_task(self.__process_update_wrapper(update), update=update)
-            else:
-                await self.__process_update_wrapper(update)
+                if self._concurrent_updates:
+                    # We don't await the below because it has to be run concurrently
+                    self.create_task(self.__process_update_wrapper(update), update=update)
+                else:
+                    await self.__process_update_wrapper(update)
+            except asyncio.CancelledError:
+                # This may happen if the application is manually run via application.start() and
+                # then a KeyboardInterrupt is sent. We must prevent this loop to die since
+                # application.stop() will wait for it's clean shutdown.
+                _LOGGER.warning(
+                    "Fetching updates got a asyncio.CancelledError. Ignoring as this task may only"
+                    "be closed via `Application.stop`."
+                )
 
     async def __process_update_wrapper(self, update: object) -> None:
         async with self._concurrent_updates_sem:
