@@ -239,7 +239,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         cls, message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0
     ) -> None:
         """We override this method to add one more level to the stacklevel, so that the warning
-        points to the user's code, not to the PTB code."""
+        points to the user's code, not to the PTB code.
+        """
         super()._warn(message=message, category=category, stacklevel=stacklevel + 2)
 
     @property
