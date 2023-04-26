@@ -26,7 +26,6 @@ import re
 import socket
 import time
 from collections import defaultdict
-from uuid import uuid4
 
 import pytest
 
@@ -1730,6 +1729,80 @@ class TestBotWithoutRequest:
             "instance" in str(recwarn[2].message)
         )
 
+    async def test_set_get_my_name(self, bot, monkeypatch):
+        """We only test that we pass the correct values to TG since this endpoint is heavily
+        rate limited which makes automated tests rather infeasible."""
+        default_name = "default_bot_name"
+        en_name = "en_bot_name"
+        de_name = "de_bot_name"
+
+        # We predefine the responses that we would TG expect to send us
+        set_stack = asyncio.Queue()
+        get_stack = asyncio.Queue()
+        await set_stack.put({"name": default_name})
+        await set_stack.put({"name": en_name, "language_code": "en"})
+        await set_stack.put({"name": de_name, "language_code": "de"})
+        await get_stack.put({"name": default_name, "language_code": None})
+        await get_stack.put({"name": en_name, "language_code": "en"})
+        await get_stack.put({"name": de_name, "language_code": "de"})
+
+        await set_stack.put({"name": default_name})
+        await set_stack.put({"language_code": "en"})
+        await set_stack.put({"language_code": "de"})
+        await get_stack.put({"name": default_name, "language_code": None})
+        await get_stack.put({"name": default_name, "language_code": "en"})
+        await get_stack.put({"name": default_name, "language_code": "de"})
+
+        async def post(url, request_data: RequestData, *args, **kwargs):
+            # The mock-post now just fetches the predefined responses from the queues
+            if "setMyName" in url:
+                expected = await set_stack.get()
+                assert request_data.json_parameters == expected
+                set_stack.task_done()
+                return True
+
+            bot_name = await get_stack.get()
+            if "language_code" in request_data.json_parameters:
+                assert request_data.json_parameters == {"language_code": bot_name["language_code"]}
+            else:
+                assert request_data.json_parameters == {}
+            get_stack.task_done()
+            return bot_name
+
+        monkeypatch.setattr(bot.request, "post", post)
+
+        # Set the names
+        assert all(
+            await asyncio.gather(
+                bot.set_my_name(default_name),
+                bot.set_my_name(en_name, language_code="en"),
+                bot.set_my_name(de_name, language_code="de"),
+            )
+        )
+
+        # Check that they were set correctly
+        assert await asyncio.gather(
+            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
+        ) == [
+            BotName(default_name),
+            BotName(en_name),
+            BotName(de_name),
+        ]
+
+        # Delete the names
+        assert all(
+            await asyncio.gather(
+                bot.set_my_name(default_name),
+                bot.set_my_name(None, language_code="en"),
+                bot.set_my_name(None, language_code="de"),
+            )
+        )
+
+        # Check that they were deleted correctly
+        assert await asyncio.gather(
+            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
+        ) == 3 * [BotName(default_name)]
+
 
 class TestBotWithRequest:
     """
@@ -3360,45 +3433,3 @@ class TestBotWithRequest:
             bot.get_my_short_description("en"),
             bot.get_my_short_description("de"),
         ) == 3 * [BotShortDescription("")]
-
-    # TODO: Mock this test
-    @pytest.mark.skip(reason="Must be converted to mocked test")
-    async def test_set_get_my_name(self, bot):
-        default_name = uuid4().hex
-        en_name = uuid4().hex
-        de_name = uuid4().hex
-
-        # Set the names
-        assert all(
-            await asyncio.gather(
-                bot.set_my_name(default_name),
-                bot.set_my_name(en_name, language_code="en"),
-                bot.set_my_name(de_name, language_code="de"),
-            )
-        )
-
-        # Check that they were set correctly
-        assert await asyncio.gather(
-            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
-        ) == [
-            BotName(default_name),
-            BotName(en_name),
-            BotName(de_name),
-        ]
-
-        # Delete the names
-        assert all(
-            await asyncio.gather(
-                bot.set_my_name(None),
-                bot.set_my_name(None, language_code="en"),
-                bot.set_my_name(None, language_code="de"),
-            )
-        )
-
-        # Check that they were deleted correctly
-        assert await asyncio.gather(
-            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
-        ) == 3 * [BotName("")]
-
-        # Reset to original name
-        assert await bot.set_my_name(bot.first_name)
