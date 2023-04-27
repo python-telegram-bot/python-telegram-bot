@@ -31,6 +31,7 @@ from telegram import (
 )
 from telegram.error import TelegramError
 from telegram.ext import ApplicationBuilder, CallbackContext, Job
+from telegram.warnings import PTBUserWarning
 from tests.auxil.slots import mro_slots
 
 """
@@ -72,6 +73,7 @@ class TestCallbackContext:
         assert callback_context.job_queue is None
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_from_update(self, app):

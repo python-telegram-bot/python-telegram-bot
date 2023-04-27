@@ -275,7 +275,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 warning_string = "request"
 
         if warning_string:
-            warn(
+            self._warn(
                 f"You set the HTTP version for the {warning_string} HTTPXRequest instance to "
                 f"HTTP/2. The self hosted bot api instances only support HTTP/1.1. You should "
                 f"either run a HTTP proxy in front of it which supports HTTP/2 or use HTTP/1.1.",
@@ -339,6 +339,15 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         .. versionadded:: 20.0
         """
         return self._private_key
+
+    @classmethod
+    def _warn(
+        cls, message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0
+    ) -> None:
+        """Convenience method to issue a warning. This method is here mostly to make it easier
+        for ExtBot to add 1 level to all warning calls.
+        """
+        warn(message=message, category=category, stacklevel=stacklevel + 1)
 
     def __reduce__(self) -> NoReturn:
         """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
@@ -1159,7 +1168,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb, new_arg=thumbnail
+            deprecated_arg=thumb,
+            new_arg=thumbnail,
+            warn_callback=self._warn,
+            stacklevel=3,
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1296,7 +1308,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb, new_arg=thumbnail
+            deprecated_arg=thumb,
+            new_arg=thumbnail,
+            warn_callback=self._warn,
+            stacklevel=3,
         )
 
         data: JSONDict = {
@@ -1533,7 +1548,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb, new_arg=thumbnail
+            deprecated_arg=thumb,
+            new_arg=thumbnail,
+            warn_callback=self._warn,
+            stacklevel=3,
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1666,7 +1684,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb, new_arg=thumbnail
+            deprecated_arg=thumb,
+            new_arg=thumbnail,
+            warn_callback=self._warn,
+            stacklevel=3,
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -1809,6 +1830,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
             deprecated_arg=thumb,
             new_arg=thumbnail,
+            warn_callback=self._warn,
+            stacklevel=3,
         )
         data: JSONDict = {
             "chat_id": chat_id,
@@ -5646,11 +5669,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             # only, which would have been confusing.
 
         if png_sticker:
-            warn(
+            self._warn(
                 "Since Bot API 6.6, the parameter `png_sticker` for "
                 "`upload_sticker_file` is deprecated. Please use the new parameters "
                 "`sticker` and `sticker_format` instead.",
-                stacklevel=4,
+                stacklevel=3,
+                category=PTBDeprecationWarning,
             )
 
         data: JSONDict = {
@@ -5845,11 +5869,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             # only, which would have been confusing.
 
         if any(pre_api_6_6_params.values()):
-            warn(
+            self._warn(
                 f"Since Bot API 6.6, the parameters {set(pre_api_6_6_params)} for "
                 "`create_new_sticker_set` are deprecated. Please use the new parameter "
                 "`stickers` and `sticker_format` instead.",
-                stacklevel=4,
+                stacklevel=3,
+                category=PTBDeprecationWarning,
             )
 
         data: JSONDict = {
@@ -6016,11 +6041,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             )
 
         if any(pre_api_6_6_params.values()):
-            warn(
+            self._warn(
                 f"Since Bot API 6.6, the parameters {set(pre_api_6_6_params)} for "
                 "`add_sticker_to_set` are deprecated. Please use the new parameter `sticker` "
                 "instead.",
-                stacklevel=4,
+                stacklevel=3,
+                category=PTBDeprecationWarning,
             )
 
         data: JSONDict = {
@@ -6256,7 +6282,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        warn(
+        self._warn(
             message=(
                 "Bot API 6.6 renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail', "
                 "hence method 'set_sticker_set_thumb' was renamed to 'set_sticker_set_thumbnail' "

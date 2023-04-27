@@ -31,7 +31,10 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
+from tests.auxil.deprecations import (
+    check_thumb_deprecation_warning_for_method_args,
+    check_thumb_deprecation_warnings_for_args_and_attrs,
+)
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -157,6 +160,19 @@ class TestAudioWithoutRequest(TestAudioBase):
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_audio(audio=audio, chat_id=chat_id)
+
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_send_audio_thumb_deprecation_warning(
+        self, recwarn, monkeypatch, bot_class, bot, raw_bot, chat_id, audio
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return True
+
+        bot = raw_bot if bot_class == "Bot" else bot
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        await bot.send_audio(chat_id, audio, thumb="thumb")
+        check_thumb_deprecation_warning_for_method_args(recwarn, __file__)
 
     async def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
