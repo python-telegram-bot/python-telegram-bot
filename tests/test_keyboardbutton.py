@@ -26,6 +26,7 @@ from telegram import (
     KeyboardButtonRequestUser,
     WebAppInfo,
 )
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -141,3 +142,5 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
             "In v21, granular media settings will be considered as well when comparing"
             " ChatPermissions instances."
         )
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert recwarn[0].filename == __file__, "wrong stacklevel"

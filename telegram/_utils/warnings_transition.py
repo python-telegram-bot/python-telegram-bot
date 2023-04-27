@@ -23,8 +23,7 @@ inside warnings.py.
 
 .. versionadded:: 20.2
 """
-import functools
-from typing import Any
+from typing import Any, Callable, Type
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
@@ -38,7 +37,8 @@ def warn_about_deprecated_arg_return_new_arg(
     deprecated_arg_name: str,
     new_arg_name: str,
     bot_api_version: str,
-    stacklevel: int = 3,
+    stacklevel: int = 2,
+    warn_callback: Callable[[str, Type[Warning], int], None] = warn,
 ) -> Any:
     """A helper function for the transition in API when argument is renamed.
 
@@ -58,11 +58,11 @@ def warn_about_deprecated_arg_return_new_arg(
         )
 
     if deprecated_arg:
-        warn(
+        warn_callback(
             f"Bot API {bot_api_version} renamed the argument '{deprecated_arg_name}' to "
             f"'{new_arg_name}'.",
             PTBDeprecationWarning,
-            stacklevel=stacklevel,
+            stacklevel + 1,
         )
         return deprecated_arg
 
@@ -73,7 +73,7 @@ def warn_about_deprecated_attr_in_property(
     deprecated_attr_name: str,
     new_attr_name: str,
     bot_api_version: str,
-    stacklevel: int = 3,
+    stacklevel: int = 2,
 ) -> None:
     """A helper function for the transition in API when attribute is renamed. Call from properties.
 
@@ -83,16 +83,25 @@ def warn_about_deprecated_attr_in_property(
         f"Bot API {bot_api_version} renamed the attribute '{deprecated_attr_name}' to "
         f"'{new_attr_name}'.",
         PTBDeprecationWarning,
-        stacklevel=stacklevel,
+        stacklevel=stacklevel + 1,
     )
 
 
-warn_about_thumb_return_thumbnail = functools.partial(
-    warn_about_deprecated_arg_return_new_arg,
-    deprecated_arg_name="thumb",
-    new_arg_name="thumbnail",
-    bot_api_version="6.6",
-)
-"""A helper function to warn about using a deprecated 'thumb' argument and return it or the new
-'thumbnail' argument, introduced in API 6.6.
-"""
+def warn_about_thumb_return_thumbnail(
+    deprecated_arg: Any,
+    new_arg: Any,
+    stacklevel: int = 2,
+    warn_callback: Callable[[str, Type[Warning], int], None] = warn,
+) -> Any:
+    """A helper function to warn about using a deprecated 'thumb' argument and return it or the
+    new 'thumbnail' argument, introduced in API 6.6.
+    """
+    return warn_about_deprecated_arg_return_new_arg(
+        deprecated_arg=deprecated_arg,
+        new_arg=new_arg,
+        warn_callback=warn_callback,
+        deprecated_arg_name="thumb",
+        new_arg_name="thumbnail",
+        bot_api_version="6.6",
+        stacklevel=stacklevel + 1,
+    )
