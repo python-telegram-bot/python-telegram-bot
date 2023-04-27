@@ -23,7 +23,7 @@ What doesn't this policy cover?
 
 Introduction of new features or changes of flavors of comparable behavior (e.g. the default for the HTTP protocol version being used) are not covered by this policy.
 
-The internal structure of classes in PTB, i.e. things like the result of ``dir(obj))`` or the contents of ``obj.__dict__``, may change.
+The internal structure of classes in PTB, i.e. things like the result of ``dir(obj))`` or the contents of ``obj.__dict__``, is not covered by this policy.
 
 Objects are in general not guaranteed to be pickleable (unless stated otherwise) and pickled objects from one version of PTB may not be loadable in future versions.
 We may provide a way to convert pickled objects from one version to another, but this is not guaranteed.
@@ -32,7 +32,7 @@ Functionality that is part of PTBs API but is explicitly documented as not being
 This also applies to functions or attributes marked as final in the sense of `PEP 591 <https://www.python.org/dev/peps/pep-0591/>`__.
 
 PTB has dependencies to third-party packages.
-The versions that PTB uses of these third-party packages may change if that does not change PTBs public API.
+The versions that PTB uses of these third-party packages may change if that does not affect PTBs public API.
 
 PTB does not give guarantees about which Python versions are supported.
 In general, we will try to support all Python versions that have not yet reached their end of life, but we reserve ourselves the option to drop support for Python versions earlier if that benefits the advancement of the library.
@@ -130,7 +130,7 @@ From time to time, we may decide to deprecate an API that is particularly widely
 In these cases, we may decide to provide an extended deprecation period, at our discretion.
 
 With version 20.0.0, PTB introduced major structural breaking changes without the above deprecation period.
-Should a similarly big change ever be deemed necessary again by the development team and should a deprecation period prove too much additional effort, this violation of the stability policy will be announced well ahead of the release in our channel.
+Should a similarly big change ever be deemed necessary again by the development team and should a deprecation period prove too much additional effort, this violation of the stability policy will be announced well ahead of the release in our channel, `as was done for v20 <https://t.me/pythontelegrambotchannel/94>`_.
 
 Non-Bot API Functionality
 #########################
