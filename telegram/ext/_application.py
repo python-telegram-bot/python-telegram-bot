@@ -365,7 +365,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         """:obj:`int`: The number of active updates that are currently being processed by the
         update processor.
         """
-        return self.update_processor._semaphore._value  # pylint: disable=protected-access
+        return self._update_processor._semaphore._value  # pylint: disable=protected-access
 
     @property
     def job_queue(self) -> Optional["JobQueue[CCT]"]:

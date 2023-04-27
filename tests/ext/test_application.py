@@ -210,6 +210,21 @@ class TestApplication:
         assert str(recwarn[0].message) == expected_warning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
+    def test_concurrent_updates(self, one_time_bot):
+        application = ApplicationBuilder().bot(one_time_bot).concurrent_updates(2).build()
+        assert application.concurrent_updates == (
+            application.update_processor.max_concurrent_updates
+        )
+
+    def test_active_updates(self, one_time_bot):
+        application = ApplicationBuilder().bot(one_time_bot).concurrent_updates(2).build()
+        assert application.active_updates == application.update_processor._semaphore._value
+
+    def test_update_processor_property(self, one_time_bot):
+        processor = SimpleUpdateProcessor(2)
+        application = ApplicationBuilder().bot(one_time_bot).concurrent_updates(processor).build()
+        assert application.update_processor is processor
+
     def test_custom_context_init(self, one_time_bot):
         cc = ContextTypes(
             context=CustomContext,

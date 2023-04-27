@@ -62,3 +62,4 @@ class TestSimpleUpdateProcessor:
         processor1 = SimpleUpdateProcessor(1)
         processor2 = SimpleUpdateProcessor(1)
         assert processor1 == processor2
+        assert hash(processor1) == hash(processor1)
