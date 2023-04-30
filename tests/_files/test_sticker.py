@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import os
+import random
+import string
 from pathlib import Path
 
 import pytest
@@ -1016,17 +1018,22 @@ class TestStickerSetWithRequest:
                     assert v
 
     async def test_delete_sticker_set(self, bot, chat_id, sticker_file):
-        try:
-            # try creating a new sticker set - just in case the last deletion test failed
-            assert await bot.create_new_sticker_set(
-                chat_id,
-                name=f"temp_set_by_{bot.username}",
-                title="Stickerset delete Test",
-                stickers=[InputSticker(sticker_file, emoji_list=["😄"])],
-                sticker_format=StickerFormat.STATIC,
-            )
-        finally:
-            assert await bot.delete_sticker_set(f"temp_set_by_{bot.username}")
+        # there is currently an issue in the API where this function claims it successfully
+        # creates an already deleted sticker set while it does not. This happens when calling it
+        # too soon after deleting the set. This then leads to delete_sticker_set failing since the
+        # pack does not exist. Making the name random prevents this issue.
+        name = f"{''.join(random.choices(string.ascii_lowercase, k=5))}_temp_set_by_{bot.username}"
+        assert await bot.create_new_sticker_set(
+            chat_id,
+            name=name,
+            title="Stickerset delete Test",
+            stickers=[InputSticker(sticker_file, emoji_list=["😄"])],
+            sticker_format=StickerFormat.STATIC,
+        )
+        # this prevents a second issue when calling delete too soon after creating the set leads
+        # to it failing as well
+        await asyncio.sleep(1)
+        assert await bot.delete_sticker_set(name)
 
     async def test_set_custom_emoji_sticker_set_thumbnail(
         self, bot, chat_id, animated_sticker_file
