@@ -19,6 +19,7 @@
 """Persistence of conversations is tested in test_basepersistence.py"""
 import asyncio
 import logging
+from pathlib import Path
 from warnings import filterwarnings
 
 import pytest
@@ -58,6 +59,7 @@ from telegram.ext import (
 )
 from telegram.warnings import PTBUserWarning
 from tests.auxil.build_messages import make_command_message
+from tests.auxil.files import PROJECT_ROOT_PATH
 from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.slots import mro_slots
 
@@ -458,6 +460,7 @@ class TestConversationHandler:
 
         # this for loop checks if the correct stacklevel is used when generating the warning
         for warning in recwarn:
+            assert warning.category is PTBUserWarning
             assert warning.filename == __file__, "incorrect stacklevel!"
 
     @pytest.mark.parametrize(
@@ -676,6 +679,11 @@ class TestConversationHandler:
                 print(exc)
                 raise exc
             assert len(recwarn) == 1
+            assert recwarn[0].category is PTBUserWarning
+            assert (
+                Path(recwarn[0].filename)
+                == PROJECT_ROOT_PATH / "telegram" / "ext" / "_conversationhandler.py"
+            ), "wrong stacklevel!"
             assert str(recwarn[0].message) == (
                 "'callback' returned state 69 which is unknown to the ConversationHandler xyz."
             )
@@ -1044,10 +1052,17 @@ class TestConversationHandler:
                 assert len(recwarn) == 1
             else:
                 assert len(recwarn) == 2
+
             assert str(recwarn[0].message if jq else recwarn[1].message).startswith(
                 "Ignoring `conversation_timeout`"
             )
             assert ("is not running" if jq else "No `JobQueue` set up.") in str(recwarn[0].message)
+            for warning in recwarn:
+                assert warning.category is PTBUserWarning
+                assert (
+                    Path(warning.filename)
+                    == PROJECT_ROOT_PATH / "telegram" / "ext" / "_conversationhandler.py"
+                ), "wrong stacklevel!"
             # now set app.job_queue back to it's original value
 
     async def test_schedule_job_exception(self, app, bot, user1, monkeypatch, caplog):
@@ -1363,6 +1378,11 @@ class TestConversationHandler:
             assert handler.check_update(Update(0, message=message))
             assert len(recwarn) == 1
             assert str(recwarn[0].message).startswith("ApplicationHandlerStop in TIMEOUT")
+            assert recwarn[0].category is PTBUserWarning
+            assert (
+                Path(recwarn[0].filename)
+                == PROJECT_ROOT_PATH / "telegram" / "ext" / "_jobqueue.py"
+            ), "wrong stacklevel!"
 
             await app.stop()
 

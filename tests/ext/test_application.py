@@ -143,6 +143,7 @@ class TestApplication:
             str(recwarn[-1].message)
             == "`Application` instances should be built via the `ApplicationBuilder`."
         )
+        assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
     @pytest.mark.parametrize(
@@ -223,6 +224,7 @@ class TestApplication:
         assert application.job_queue is None
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_custom_context_init(self, one_time_bot):
@@ -1207,6 +1209,7 @@ class TestApplication:
                 assert task.result() == 43
             else:
                 assert len(recwarn) == 1
+                assert recwarn[0].category is PTBUserWarning
                 assert "won't be automatically awaited" in str(recwarn[0].message)
                 assert recwarn[0].filename == __file__, "wrong stacklevel!"
                 assert not task.done()
@@ -2074,6 +2077,7 @@ class TestApplication:
         for record in recwarn:
             print(record)
             if str(record.message).startswith("Could not add signal handlers for the stop"):
+                assert record.category is PTBUserWarning
                 assert record.filename == __file__, "stacklevel is incorrect!"
                 found = True
         assert found
