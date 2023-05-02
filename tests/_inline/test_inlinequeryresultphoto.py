@@ -142,7 +142,7 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
             new_name="thumbnail_url",
         )
 
-    def test_init_throws_error_without_thumbnail_url_and_thumb_url(self, recwarn):
+    def test_init_throws_error_without_thumbnail_url_and_thumb_url(self):
         with pytest.raises(ValueError, match="You must pass either"):
             InlineQueryResultPhoto(
                 TestInlineQueryResultPhotoBase.id_,

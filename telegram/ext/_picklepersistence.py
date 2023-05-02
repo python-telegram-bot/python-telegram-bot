@@ -98,7 +98,10 @@ class _BotPickler(pickle.Pickler):
         if obj is self._bot:
             return _REPLACED_KNOWN_BOT
         if isinstance(obj, Bot):
-            warn("Unknown bot instance found. Will be replaced by `None` during unpickling")
+            warn(
+                "Unknown bot instance found. Will be replaced by `None` during unpickling",
+                stacklevel=2,
+            )
             return _REPLACED_UNKNOWN_BOT
         return None  # pickles as usual
 

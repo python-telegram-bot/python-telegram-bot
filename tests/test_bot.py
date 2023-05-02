@@ -76,6 +76,7 @@ from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
+from telegram.warnings import PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
@@ -1650,22 +1651,21 @@ class TestBotWithoutRequest:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    async def test_http2_runtime_error(self, recwarn):
-        Bot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
-        Bot(
+    @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
+    async def test_http2_runtime_error(self, recwarn, bot_class):
+        bot_class("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
+        bot_class(
             "12345:ABCDE",
             base_url="http://",
             get_updates_request=HTTPXRequest(http_version="2"),
         )
-        Bot(
+        bot_class(
             "12345:ABCDE",
             base_url="http://",
             request=HTTPXRequest(http_version="2"),
             get_updates_request=HTTPXRequest(http_version="2"),
         )
-        # this exists to make sure the error is also raised by extbot
-        ExtBot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
-        assert len(recwarn) == 4
+        assert len(recwarn) == 3
         assert "You set the HTTP version for the request HTTPXRequest instance" in str(
             recwarn[0].message
         )
@@ -1676,6 +1676,9 @@ class TestBotWithoutRequest:
             "You set the HTTP version for the get_updates_request and request HTTPXRequest "
             "instance" in str(recwarn[2].message)
         )
+        for warning in recwarn:
+            assert warning.filename == __file__, "wrong stacklevel!"
+            assert warning.category is PTBUserWarning
 
 
 class TestBotWithRequest:

@@ -28,6 +28,7 @@ import pytest
 
 from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
 from telegram.ext import PicklePersistence
+from telegram.warnings import PTBUserWarning
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -222,6 +223,7 @@ class TestTelegramObject:
         assert a == b
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_meaningful_comparison(self, recwarn):
