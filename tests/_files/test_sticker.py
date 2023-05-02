@@ -35,7 +35,6 @@ from telegram import (
 )
 from telegram.constants import StickerFormat
 from telegram.error import BadRequest, TelegramError
-from telegram.ext import ExtBot
 from telegram.request import RequestData
 from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
@@ -48,7 +47,7 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def sticker_file():
     with data_file("telegram.webp").open("rb") as file:
         yield file
@@ -64,7 +63,7 @@ async def sticker(bot, chat_id):
         return sticker
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def animated_sticker_file():
     with data_file("telegram_animated_sticker.tgs").open("rb") as f:
         yield f
@@ -76,7 +75,7 @@ async def animated_sticker(bot, chat_id):
         return (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def video_sticker_file():
     with data_file("telegram_video_sticker.webm").open("rb") as f:
         yield f
@@ -126,13 +125,13 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert isinstance(sticker, Sticker)
         assert isinstance(sticker.file_id, str)
         assert isinstance(sticker.file_unique_id, str)
-        assert sticker.file_id != ""
-        assert sticker.file_unique_id != ""
+        assert sticker.file_id
+        assert sticker.file_unique_id
         assert isinstance(sticker.thumbnail, PhotoSize)
         assert isinstance(sticker.thumbnail.file_id, str)
         assert isinstance(sticker.thumbnail.file_unique_id, str)
-        assert sticker.thumbnail.file_id != ""
-        assert sticker.thumbnail.file_unique_id != ""
+        assert sticker.thumbnail.file_id
+        assert sticker.thumbnail.file_unique_id
         assert isinstance(sticker.needs_repainting, bool)
 
     def test_expected_values(self, sticker):
@@ -312,8 +311,8 @@ class TestStickerWithRequest(TestStickerBase):
         assert isinstance(message.sticker, Sticker)
         assert isinstance(message.sticker.file_id, str)
         assert isinstance(message.sticker.file_unique_id, str)
-        assert message.sticker.file_id != ""
-        assert message.sticker.file_unique_id != ""
+        assert message.sticker.file_id
+        assert message.sticker.file_unique_id
         assert message.sticker.width == sticker.width
         assert message.sticker.height == sticker.height
         assert message.sticker.is_animated == sticker.is_animated
@@ -327,8 +326,8 @@ class TestStickerWithRequest(TestStickerBase):
         assert isinstance(message.sticker.thumbnail, PhotoSize)
         assert isinstance(message.sticker.thumbnail.file_id, str)
         assert isinstance(message.sticker.thumbnail.file_unique_id, str)
-        assert message.sticker.thumbnail.file_id != ""
-        assert message.sticker.thumbnail.file_unique_id != ""
+        assert message.sticker.thumbnail.file_id
+        assert message.sticker.thumbnail.file_unique_id
         assert message.sticker.thumbnail.width == sticker.thumbnail.width
         assert message.sticker.thumbnail.height == sticker.thumbnail.height
         assert message.sticker.thumbnail.file_size == sticker.thumbnail.file_size
@@ -372,8 +371,8 @@ class TestStickerWithRequest(TestStickerBase):
         assert isinstance(message.sticker, Sticker)
         assert isinstance(message.sticker.file_id, str)
         assert isinstance(message.sticker.file_unique_id, str)
-        assert message.sticker.file_id != ""
-        assert message.sticker.file_unique_id != ""
+        assert message.sticker.file_id
+        assert message.sticker.file_unique_id
         assert message.sticker.width == sticker.width
         assert message.sticker.height == sticker.height
         assert message.sticker.is_animated == sticker.is_animated
@@ -384,14 +383,14 @@ class TestStickerWithRequest(TestStickerBase):
         assert isinstance(message.sticker.thumbnail, PhotoSize)
         assert isinstance(message.sticker.thumbnail.file_id, str)
         assert isinstance(message.sticker.thumbnail.file_unique_id, str)
-        assert message.sticker.thumbnail.file_id != ""
-        assert message.sticker.thumbnail.file_unique_id != ""
+        assert message.sticker.thumbnail.file_id
+        assert message.sticker.thumbnail.file_unique_id
         assert message.sticker.thumbnail.width == sticker.thumbnail.width
         assert message.sticker.thumbnail.height == sticker.thumbnail.height
         assert message.sticker.thumbnail.file_size == sticker.thumbnail.file_size
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -442,7 +441,7 @@ class TestStickerWithRequest(TestStickerBase):
         premium_sticker = premium_sticker_set.stickers[20]
         assert premium_sticker.premium_animation.file_unique_id == "AQADOBwAAifPOElr"
         assert isinstance(premium_sticker.premium_animation.file_id, str)
-        assert premium_sticker.premium_animation.file_id != ""
+        assert premium_sticker.premium_animation.file_id
         premium_sticker_dict = {
             "file_unique_id": "AQADOBwAAifPOElr",
             "file_id": premium_sticker.premium_animation.file_id,
@@ -478,15 +477,15 @@ class TestStickerWithRequest(TestStickerBase):
         assert emoji_sticker_list[0].file_unique_id == "AgAD6gwAAoY06FM"
 
     async def test_error_send_empty_file(self, bot, chat_id):
-        with pytest.raises(TelegramError):
-            await bot.send_sticker(chat_id, open(os.devnull, "rb"))
+        with Path(os.devnull).open("rb") as file, pytest.raises(TelegramError):
+            await bot.send_sticker(chat_id, file)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_sticker(chat_id, "")
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def sticker_set(bot):
     ss = await bot.get_sticker_set(f"test_by_{bot.username}")
     if len(ss.stickers) > 100:
@@ -496,11 +495,11 @@ async def sticker_set(bot):
         except BadRequest as e:
             if e.message == "Stickerset_not_modified":
                 return ss
-            raise Exception("stickerset is growing too large.")
+            raise Exception("stickerset is growing too large.") from None
     return ss
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def animated_sticker_set(bot):
     ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
     if len(ss.stickers) > 100:
@@ -510,11 +509,11 @@ async def animated_sticker_set(bot):
         except BadRequest as e:
             if e.message == "Stickerset_not_modified":
                 return ss
-            raise Exception("stickerset is growing too large.")
+            raise Exception("stickerset is growing too large.") from None
     return ss
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def video_sticker_set(bot):
     ss = await bot.get_sticker_set(f"video_test_by_{bot.username}")
     if len(ss.stickers) > 100:
@@ -524,11 +523,11 @@ async def video_sticker_set(bot):
         except BadRequest as e:
             if e.message == "Stickerset_not_modified":
                 return ss
-            raise Exception("stickerset is growing too large.")
+            raise Exception("stickerset is growing too large.") from None
     return ss
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def sticker_set_thumb_file():
     with data_file("sticker_set_thumb.png").open("rb") as file:
         yield file
@@ -640,15 +639,20 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_upload_sticker_file_warning(self, bot, monkeypatch, chat_id, recwarn):
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_upload_sticker_file_warning(
+        self, bot, raw_bot, monkeypatch, chat_id, recwarn, bot_class
+    ):
         async def make_assertion(*args, **kwargs):
             return {"file_id": "file_id", "file_unique_id": "file_unique_id"}
 
+        bot = raw_bot if bot_class == "Bot" else bot
         monkeypatch.setattr(bot, "_post", make_assertion)
 
         await bot.upload_sticker_file(chat_id, "png_sticker_file_id")
         assert len(recwarn) == 1
         assert "Since Bot API 6.6, the parameter" in str(recwarn[0].message)
+        assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__
 
     async def test_upload_sticker_file_missing_required_args(self, bot, chat_id):
@@ -692,19 +696,31 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             test_flag = False
             await bot.upload_sticker_file(chat_id, file)
             assert test_flag
-            assert len(recwarn) in (1, 2)  # second warning is for unclosed file
+
+            warnings = [w for w in recwarn if w.category is not ResourceWarning]
+            assert len(warnings) == 1
+            assert warnings[0].category is PTBDeprecationWarning
+            assert warnings[0].filename == __file__
+            assert str(warnings[0].message).startswith(
+                "Since Bot API 6.6, the parameter `png_sticker` for "
+            )
         finally:
             bot._local_mode = False
 
-    async def test_create_new_sticker_set_warning(self, bot, monkeypatch, chat_id, recwarn):
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_create_new_sticker_set_warning(
+        self, bot, raw_bot, bot_class, monkeypatch, chat_id, recwarn
+    ):
         async def make_assertion(*args, **kwargs):
             return True
 
+        bot = raw_bot if bot_class == "Bot" else bot
         monkeypatch.setattr(bot, "_post", make_assertion)
 
         await bot.create_new_sticker_set(chat_id, "name", "title", "some_str_emoji")
         assert len(recwarn) == 1
         assert "Since Bot API 6.6, the parameters" in str(recwarn[0].message)
+        assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__
 
     async def test_create_new_sticker_set_missing_required_args(self, bot, chat_id):
@@ -767,7 +783,13 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             sticker_format=StickerFormat.STATIC,
         )
         assert test_flag
-        assert len(recwarn) in (1, 2)
+
+        warnings = [w for w in recwarn if w.category is not ResourceWarning]
+        assert len(warnings) == 1
+        assert warnings[0].category is PTBDeprecationWarning
+        assert warnings[0].filename == __file__
+        assert str(warnings[0].message).startswith("Since Bot API 6.6, the parameters")
+        assert "for `create_new_sticker_set` are deprecated" in str(warnings[0].message)
 
     async def test_create_new_sticker_all_params(
         self, monkeypatch, bot, chat_id, mask_position, recwarn
@@ -804,6 +826,12 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             sticker_type=Sticker.MASK,
         )
         assert len(recwarn) == 1
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert str(recwarn[0].message).startswith("Since Bot API 6.6, the parameters")
+        assert "for `create_new_sticker_set` are deprecated" in str(recwarn[0].message)
+
+        recwarn.clear()
         monkeypatch.setattr(bot, "_post", make_assertion_new_params)
         await bot.create_new_sticker_set(
             chat_id,
@@ -813,17 +841,22 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             sticker_format=StickerFormat.STATIC,
             needs_repainting=True,
         )
-        assert len(recwarn) == 1
+        assert len(recwarn) == 0
 
-    async def test_add_sticker_to_set_warning(self, bot, monkeypatch, chat_id, recwarn):
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_add_sticker_to_set_warning(
+        self, bot, raw_bot, monkeypatch, bot_class, chat_id, recwarn
+    ):
         async def make_assertion(*args, **kwargs):
             return True
 
+        bot = raw_bot if bot_class == "Bot" else bot
         monkeypatch.setattr(bot, "_post", make_assertion)
 
         await bot.add_sticker_to_set(chat_id, "name", "emoji", "fake_file_id")
         assert len(recwarn) == 1
         assert "Since Bot API 6.6, the parameters" in str(recwarn[0].message)
+        assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__
 
     async def test_add_sticker_to_set_missing_required_arg(self, bot, chat_id):
@@ -872,7 +905,13 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             chat_id, "name", sticker=InputSticker(sticker=file, emoji_list=["this"])
         )
         assert test_flag
-        assert len(recwarn) in (1, 2)
+
+        warnings = [w for w in recwarn if w.category is not ResourceWarning]
+        assert len(warnings) == 1
+        assert warnings[0].category is PTBDeprecationWarning
+        assert warnings[0].filename == __file__
+        assert str(warnings[0].message).startswith("Since Bot API 6.6, the parameters")
+        assert "for `add_sticker_to_set` are deprecated" in str(warnings[0].message)
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_set_sticker_set_thumbnail_local_files(
@@ -898,34 +937,26 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         finally:
             bot._local_mode = False
 
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
     async def test_set_sticker_set_thumb_deprecation_warning(
-        self, monkeypatch, bot, raw_bot, recwarn
+        self, monkeypatch, bot, raw_bot, recwarn, bot_class
     ):
-        ext_bot = bot
+        bot = bot if bot_class == "ExtBot" else raw_bot
 
         async def _post(*args, **kwargs):
             return True
 
-        for bot in (ext_bot, raw_bot):
-            cls_name = bot.__class__.__name__
-            monkeypatch.setattr(bot, "_post", _post)
-            await bot.set_sticker_set_thumb("name", "user_id", "thumb")
+        monkeypatch.setattr(bot, "_post", _post)
+        await bot.set_sticker_set_thumb("name", "user_id", "thumb")
 
-            if isinstance(bot, ExtBot):
-                # Unfortunately, warnings.catch_warnings doesn't play well with pytest apparently
-                assert len(recwarn) == 2, f"Wrong warning number for class {cls_name}!"
-            else:
-                assert len(recwarn) == 1, f"No warning for class {cls_name}!"
+        assert len(recwarn) == 1
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert "renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail'" in str(
+            recwarn[0].message
+        )
 
-            assert (
-                recwarn[0].category is PTBDeprecationWarning
-            ), f"Wrong warning for class {cls_name}!"
-            assert "renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail'" in str(
-                recwarn[0].message
-            ), f"Wrong message for class {cls_name}!"
-
-            assert recwarn[0].filename == __file__, f"incorrect stacklevel for class {cls_name}!"
-            recwarn.clear()
+        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
+        recwarn.clear()
 
     async def test_get_file_instance_method(self, monkeypatch, sticker):
         async def make_assertion(*_, **kwargs):

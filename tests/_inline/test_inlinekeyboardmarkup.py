@@ -179,17 +179,17 @@ class TestInlineKeyboardMarkupWithoutRequest(TestInlineKeyboardMarkupBase):
         )
 
     def test_wrong_keyboard_inputs(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="should be a sequence of sequences"):
             InlineKeyboardMarkup(
                 [[InlineKeyboardButton("b1", "1")], InlineKeyboardButton("b2", "2")]
             )
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="should be a sequence of sequences"):
             InlineKeyboardMarkup("strings_are_not_allowed")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="should be a sequence of sequences"):
             InlineKeyboardMarkup(["strings_are_not_allowed_in_the_rows_either"])
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="should be a sequence of sequences"):
             InlineKeyboardMarkup(InlineKeyboardButton("b1", "1"))
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="should be a sequence of sequences"):
             InlineKeyboardMarkup([[[InlineKeyboardButton("only_2d_array_is_allowed", "1")]]])
 
     async def test_expected_values_empty_switch(self, inline_keyboard_markup, bot, monkeypatch):

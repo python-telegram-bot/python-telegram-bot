@@ -55,3 +55,5 @@
 .. |sequenceargs| replace:: Accepts any :class:`collections.abc.Sequence` as input instead of just a list.
 
 .. |captionentitiesattr| replace:: Tuple of special entities that appear in the caption, which can be specified instead of ``parse_mode``.
+
+.. |datetime_localization| replace:: The default timezone of the bot is used for localization, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.

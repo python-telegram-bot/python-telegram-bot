@@ -41,6 +41,9 @@ if TYPE_CHECKING:
     from telegram.ext import Application
 
 
+_ALL_DAYS = tuple(range(7))
+
+
 class JobQueue(Generic[CCT]):
     """This class allows you to periodically perform tasks with the bot. It is a convenience
     wrapper for the APScheduler library.
@@ -448,7 +451,7 @@ class JobQueue(Generic[CCT]):
         self,
         callback: JobCallback[CCT],
         time: datetime.time,
-        days: Tuple[int, ...] = tuple(range(7)),
+        days: Tuple[int, ...] = _ALL_DAYS,
         data: object = None,
         name: str = None,
         chat_id: int = None,

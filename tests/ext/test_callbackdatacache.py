@@ -31,7 +31,7 @@ from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def callback_data_cache(bot):
     return CallbackDataCache(bot)
 
@@ -80,12 +80,12 @@ class TestKeyboardData:
 class TestCallbackDataCache:
     def test_slot_behaviour(self, callback_data_cache):
         for attr in callback_data_cache.__slots__:
-            attr = (
+            at = (
                 f"_CallbackDataCache{attr}"
                 if attr.startswith("__") and not attr.endswith("__")
                 else attr
             )
-            assert getattr(callback_data_cache, attr, "err") != "err", f"got extra slot '{attr}'"
+            assert getattr(callback_data_cache, at, "err") != "err", f"got extra slot '{at}'"
         assert len(mro_slots(callback_data_cache)) == len(
             set(mro_slots(callback_data_cache))
         ), "duplicate slot"
@@ -327,7 +327,7 @@ class TestCallbackDataCache:
         callback_data_cache.drop_data(callback_query)
         assert callback_data_cache.persistence_data == ([], {})
 
-    @pytest.mark.parametrize("method", ("callback_data", "callback_queries"))
+    @pytest.mark.parametrize("method", ["callback_data", "callback_queries"])
     def test_clear_all(self, callback_data_cache, method):
         changing_button_1 = InlineKeyboardButton("changing", callback_data="some data 1")
         changing_button_2 = InlineKeyboardButton("changing", callback_data="some data 2")
@@ -401,4 +401,4 @@ class TestCallbackDataCache:
         callback_data = [
             list(data[2].values())[0] for data in callback_data_cache.persistence_data[0]
         ]
-        assert callback_data == list(str(i) for i in range(50, 100))
+        assert callback_data == [str(i) for i in range(50, 100)]

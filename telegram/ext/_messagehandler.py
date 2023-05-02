@@ -47,7 +47,7 @@ class MessageHandler(BaseHandler[Update, CCT]):
             operators (& for and, | for or, ~ for not). Passing :obj:`None` is a shortcut
             to passing :class:`telegram.ext.filters.ALL`.
 
-            .. seealso:: :wiki:`Advanced Filters <Extensions-–-Advanced-Filters>`
+            .. seealso:: :wiki:`Advanced Filters <Extensions---Advanced-Filters>`
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::

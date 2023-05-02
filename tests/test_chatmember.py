@@ -33,7 +33,7 @@ from telegram import (
     Dice,
     User,
 )
-from telegram._utils.datetime import to_timestamp
+from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.slots import mro_slots
 
 ignored = ["self", "api_kwargs"]
@@ -165,13 +165,13 @@ def iter_args(instance: ChatMember, de_json_inst: ChatMember, include_optional: 
         inst_at, json_at = getattr(instance, param.name), getattr(de_json_inst, param.name)
         if isinstance(json_at, datetime.datetime):  # Convert datetime to int
             json_at = to_timestamp(json_at)
-        if param.default is not inspect.Parameter.empty and include_optional:
-            yield inst_at, json_at
-        elif param.default is inspect.Parameter.empty:
+        if (
+            param.default is not inspect.Parameter.empty and include_optional
+        ) or param.default is inspect.Parameter.empty:
             yield inst_at, json_at
 
 
-@pytest.fixture
+@pytest.fixture()
 def chat_member_type(request):
     return request.param()
 
@@ -217,6 +217,24 @@ class TestChatMemberTypesWithoutRequest:
         assert isinstance(const_chat_member, chat_member_type.__class__)
         for c_mem_type_at, const_c_mem_at in iter_args(chat_member_type, const_chat_member, True):
             assert c_mem_type_at == const_c_mem_at
+
+    def test_de_json_chatmemberbanned_localization(self, chat_member_type, tz_bot, bot, raw_bot):
+        # We only test two classes because the other three don't have datetimes in them.
+        if isinstance(chat_member_type, (ChatMemberBanned, ChatMemberRestricted)):
+            json_dict = make_json_dict(chat_member_type, include_optional_args=True)
+            chatmember_raw = ChatMember.de_json(json_dict, raw_bot)
+            chatmember_bot = ChatMember.de_json(json_dict, bot)
+            chatmember_tz = ChatMember.de_json(json_dict, tz_bot)
+
+            # comparing utcoffsets because comparing timezones is unpredicatable
+            chatmember_offset = chatmember_tz.until_date.utcoffset()
+            tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+                chatmember_tz.until_date.replace(tzinfo=None)
+            )
+
+            assert chatmember_raw.until_date.tzinfo == UTC
+            assert chatmember_bot.until_date.tzinfo == UTC
+            assert chatmember_offset == tz_bot_offset
 
     def test_de_json_invalid_status(self, chat_member_type, bot):
         json_dict = {"status": "invalid", "user": CMDefaults.user.to_dict()}

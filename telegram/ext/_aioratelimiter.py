@@ -21,7 +21,6 @@ library.
 """
 import asyncio
 import contextlib
-import logging
 import sys
 from typing import Any, AsyncIterator, Callable, Coroutine, Dict, List, Optional, Union
 
@@ -32,6 +31,7 @@ try:
 except ImportError:
     AIO_LIMITER_AVAILABLE = False
 
+from telegram._utils.logging import get_logger
 from telegram._utils.types import JSONDict
 from telegram.error import RetryAfter
 from telegram.ext._baseratelimiter import BaseRateLimiter
@@ -46,6 +46,9 @@ else:
     @contextlib.asynccontextmanager
     async def null_context() -> AsyncIterator[None]:
         yield None
+
+
+_LOGGER = get_logger(__name__, class_name="AIORateLimiter")
 
 
 class AIORateLimiter(BaseRateLimiter[int]):
@@ -118,7 +121,6 @@ class AIORateLimiter(BaseRateLimiter[int]):
         "_group_limiters",
         "_group_max_rate",
         "_group_time_period",
-        "_logger",
         "_max_retries",
         "_retry_after_event",
     )
@@ -152,7 +154,6 @@ class AIORateLimiter(BaseRateLimiter[int]):
 
         self._group_limiters: Dict[Union[str, int], AsyncLimiter] = {}
         self._max_retries: int = max_retries
-        self._logger = logging.getLogger(__name__)
         self._retry_after_event = asyncio.Event()
         self._retry_after_event.set()
 
@@ -203,7 +204,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
                 return await callback(*args, **kwargs)
 
     # mypy doesn't understand that the last run of the for loop raises an exception
-    async def process_request(  # type: ignore[return]
+    async def process_request(
         self,
         callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
         args: Any,
@@ -232,10 +233,8 @@ class AIORateLimiter(BaseRateLimiter[int]):
             chat = True
 
         # In case user passes integer chat id as string
-        try:
+        with contextlib.suppress(ValueError, TypeError):
             chat_id = int(chat_id)
-        except (ValueError, TypeError):
-            pass
 
         if (isinstance(chat_id, int) and chat_id < 0) or isinstance(chat_id, str):
             # string chat_id only works for channels and supergroups
@@ -249,16 +248,17 @@ class AIORateLimiter(BaseRateLimiter[int]):
                 )
             except RetryAfter as exc:
                 if i == max_retries:
-                    self._logger.exception(
+                    _LOGGER.exception(
                         "Rate limit hit after maximum of %d retries", max_retries, exc_info=exc
                     )
                     raise exc
 
                 sleep = exc.retry_after + 0.1
-                self._logger.info("Rate limit hit. Retrying after %f seconds", sleep)
+                _LOGGER.info("Rate limit hit. Retrying after %f seconds", sleep)
                 # Make sure we don't allow other requests to be processed
                 self._retry_after_event.clear()
                 await asyncio.sleep(sleep)
             finally:
                 # Allow other requests to be processed
                 self._retry_after_event.set()
+        return None  # type: ignore[return-value]

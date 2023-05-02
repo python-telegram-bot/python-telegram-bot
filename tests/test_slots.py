@@ -54,5 +54,4 @@ def test_class_has_slots_and_no_dict():
 
 
 def get_slots(_class):
-    slots = [attr for cls in _class.__mro__ if hasattr(cls, "__slots__") for attr in cls.__slots__]
-    return slots
+    return [attr for cls in _class.__mro__ if hasattr(cls, "__slots__") for attr in cls.__slots__]

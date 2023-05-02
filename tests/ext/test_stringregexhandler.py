@@ -80,7 +80,7 @@ class TestStringRegexHandler:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = False
 
     async def callback(self, update, context):
@@ -98,7 +98,7 @@ class TestStringRegexHandler:
         if context.matches[0].groupdict():
             self.test_flag = context.matches[0].groupdict() == {"begin": "t", "end": " message"}
 
-    @pytest.mark.parametrize("compile", (True, False))
+    @pytest.mark.parametrize("compile", [True, False])
     async def test_basic(self, app, compile):
         pattern = "(?P<begin>.*)est(?P<end>.*)"
         if compile:

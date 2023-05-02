@@ -25,7 +25,7 @@ from telegram._chatinvitelink import ChatInviteLink
 from telegram._chatmember import ChatMember
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -52,6 +52,9 @@ class ChatMemberUpdated(TelegramObject):
         from_user (:class:`telegram.User`): Performer of the action, which resulted in the change.
         date (:class:`datetime.datetime`): Date the change was done in Unix time. Converted to
             :class:`datetime.datetime`.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         old_chat_member (:class:`telegram.ChatMember`): Previous information about the chat member.
         new_chat_member (:class:`telegram.ChatMember`): New information about the chat member.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link, which was used
@@ -62,6 +65,9 @@ class ChatMemberUpdated(TelegramObject):
         from_user (:class:`telegram.User`): Performer of the action, which resulted in the change.
         date (:class:`datetime.datetime`): Date the change was done in Unix time. Converted to
             :class:`datetime.datetime`.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
         old_chat_member (:class:`telegram.ChatMember`): Previous information about the chat member.
         new_chat_member (:class:`telegram.ChatMember`): New information about the chat member.
         invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link, which was used
@@ -118,9 +124,12 @@ class ChatMemberUpdated(TelegramObject):
         if not data:
             return None
 
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
         data["chat"] = Chat.de_json(data.get("chat"), bot)
         data["from_user"] = User.de_json(data.pop("from", None), bot)
-        data["date"] = from_timestamp(data.get("date"))
+        data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
         data["old_chat_member"] = ChatMember.de_json(data.get("old_chat_member"), bot)
         data["new_chat_member"] = ChatMember.de_json(data.get("new_chat_member"), bot)
         data["invite_link"] = ChatInviteLink.de_json(data.get("invite_link"), bot)

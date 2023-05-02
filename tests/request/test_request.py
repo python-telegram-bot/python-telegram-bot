@@ -20,6 +20,7 @@
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import asyncio
 import json
+import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from http import HTTPStatus
@@ -65,7 +66,7 @@ def mocker_factory(
     return make_assertion
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def httpx_request():
     async with HTTPXRequest() as rq:
         yield rq
@@ -102,7 +103,7 @@ class TestRequestWithoutRequest:
     test_flag = None
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = None
 
     async def test_init_import_errors(self, monkeypatch):
@@ -120,9 +121,8 @@ class TestRequestWithoutRequest:
     def test_slot_behaviour(self):
         inst = HTTPXRequest()
         for attr in inst.__slots__:
-            if attr.startswith("__"):
-                attr = f"_{inst.__class__.__name__}{attr}"
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+            at = f"_{inst.__class__.__name__}{attr}" if attr.startswith("__") else attr
+            assert getattr(inst, at, "err") != "err", f"got extra slot '{at}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     async def test_context_manager(self, monkeypatch):
@@ -173,14 +173,21 @@ class TestRequestWithoutRequest:
         # not only implicitly.
         assert httpx_request.parse_json_payload(server_response) == {"result": "test_string�"}
 
-    async def test_illegal_json_response(self, monkeypatch, httpx_request: HTTPXRequest):
+    async def test_illegal_json_response(self, monkeypatch, httpx_request: HTTPXRequest, caplog):
         # for proper JSON it should be `"result":` instead of `result:`
         server_response = b'{result: "test_string"}'
 
         monkeypatch.setattr(httpx_request, "do_request", mocker_factory(response=server_response))
 
-        with pytest.raises(TelegramError, match="Invalid server response"):
+        with pytest.raises(TelegramError, match="Invalid server response"), caplog.at_level(
+            logging.ERROR
+        ):
             await httpx_request.post(None, None, None)
+
+        assert len(caplog.records) == 1
+        record = caplog.records[0]
+        assert record.name == "telegram.request.BaseRequest"
+        assert record.getMessage().endswith(f'invalid JSON data: "{server_response.decode()}"')
 
     async def test_chat_migrated(self, monkeypatch, httpx_request: HTTPXRequest):
         server_response = b'{"ok": "False", "parameters": {"migrate_to_chat_id": 123}}'
@@ -257,7 +264,7 @@ class TestRequestWithoutRequest:
                 await httpx_request.post(None, None, None)
 
     @pytest.mark.parametrize(
-        "code, exception_class",
+        ("code", "exception_class"),
         [
             (HTTPStatus.FORBIDDEN, Forbidden),
             (HTTPStatus.NOT_FOUND, InvalidToken),
@@ -283,7 +290,7 @@ class TestRequestWithoutRequest:
             await httpx_request.post("", None, None)
 
     @pytest.mark.parametrize(
-        ["exception", "catch_class", "match"],
+        ("exception", "catch_class", "match"),
         [
             (TelegramError("TelegramError"), TelegramError, "TelegramError"),
             (
@@ -344,7 +351,7 @@ class TestHTTPXRequestWithoutRequest:
     test_flag = None
 
     @pytest.fixture(autouse=True)
-    def reset(self):
+    def _reset(self):
         self.test_flag = None
 
     def test_init(self, monkeypatch):
@@ -564,7 +571,7 @@ class TestHTTPXRequestWithoutRequest:
         assert content == b"content"
 
     @pytest.mark.parametrize(
-        ["raised_class", "expected_class", "expected_message"],
+        ("raised_class", "expected_class", "expected_message"),
         [
             (httpx.TimeoutException, TimedOut, "Timed out"),
             (httpx.ReadError, NetworkError, "httpx.ReadError: message"),
@@ -594,8 +601,8 @@ class TestHTTPXRequestWithoutRequest:
 
         monkeypatch.setattr(httpx.AsyncClient, "request", request)
 
-        with pytest.raises(TimedOut, match="Pool timeout"):
-            async with HTTPXRequest(pool_timeout=0.02) as httpx_request:
+        async with HTTPXRequest(pool_timeout=0.02) as httpx_request:
+            with pytest.raises(TimedOut, match="Pool timeout"):
                 await asyncio.gather(
                     httpx_request.do_request(method="GET", url="URL"),
                     httpx_request.do_request(method="GET", url="URL"),

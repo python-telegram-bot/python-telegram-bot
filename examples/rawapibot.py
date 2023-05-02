@@ -7,6 +7,7 @@ on the telegram.ext bot framework.
 This program is dedicated to the public domain under the CC0 license.
 """
 import asyncio
+import contextlib
 import logging
 from typing import NoReturn
 
@@ -72,7 +73,5 @@ async def echo(bot: Bot, update_id: int) -> int:
 
 
 if __name__ == "__main__":
-    try:
+    with contextlib.suppress(KeyboardInterrupt):  # Ignore exception when Ctrl-C is pressed
         asyncio.run(main())
-    except KeyboardInterrupt:  # Ignore exception when Ctrl-C is pressed
-        pass

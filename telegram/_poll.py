@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Poll."""
 import datetime
-import sys
 from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional, Sequence, Tuple
 
 from telegram import constants
@@ -27,7 +26,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.datetime import from_timestamp
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -174,6 +173,9 @@ class Poll(TelegramObject):
         close_date (:obj:`datetime.datetime`, optional): Point in time (Unix timestamp) when the
             poll will be automatically closed. Converted to :obj:`datetime.datetime`.
 
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
+
     Attributes:
         id (:obj:`str`): Unique poll identifier.
         question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
@@ -206,6 +208,9 @@ class Poll(TelegramObject):
             after creation.
         close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
             automatically closed.
+
+            .. versionchanged:: NEXT.VERSION
+                |datetime_localization|
 
     """
 
@@ -272,9 +277,12 @@ class Poll(TelegramObject):
         if not data:
             return None
 
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
         data["options"] = [PollOption.de_json(option, bot) for option in data["options"]]
         data["explanation_entities"] = MessageEntity.de_list(data.get("explanation_entities"), bot)
-        data["close_date"] = from_timestamp(data.get("close_date"))
+        data["close_date"] = from_timestamp(data.get("close_date"), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
 
@@ -300,9 +308,6 @@ class Poll(TelegramObject):
         if not self.explanation:
             raise RuntimeError("This Poll has no 'explanation'.")
 
-        # Is it a narrow build, if so we don't need to convert
-        if sys.maxunicode == 0xFFFF:
-            return self.explanation[entity.offset : entity.offset + entity.length]
         entity_text = self.explanation.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 

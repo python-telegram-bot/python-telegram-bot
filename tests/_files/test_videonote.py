@@ -30,12 +30,15 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
+from tests.auxil.deprecations import (
+    check_thumb_deprecation_warning_for_method_args,
+    check_thumb_deprecation_warnings_for_args_and_attrs,
+)
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def video_note_file():
     with data_file("telegram2.mp4").open("rb") as f:
         yield f
@@ -70,14 +73,14 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         assert isinstance(video_note, VideoNote)
         assert isinstance(video_note.file_id, str)
         assert isinstance(video_note.file_unique_id, str)
-        assert video_note.file_id != ""
-        assert video_note.file_unique_id != ""
+        assert video_note.file_id
+        assert video_note.file_unique_id
 
         assert isinstance(video_note.thumbnail, PhotoSize)
         assert isinstance(video_note.thumbnail.file_id, str)
         assert isinstance(video_note.thumbnail.file_unique_id, str)
-        assert video_note.thumbnail.file_id != ""
-        assert video_note.thumbnail.file_unique_id != ""
+        assert video_note.thumbnail.file_id
+        assert video_note.thumbnail.file_unique_id
 
     def test_expected_values(self, video_note):
         assert video_note.length == self.length
@@ -148,6 +151,19 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_video_note(chat_id, video_note=video_note)
+
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_send_video_note_thumb_deprecation_warning(
+        self, recwarn, monkeypatch, bot_class, bot, raw_bot, chat_id, video_note
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return True
+
+        bot = raw_bot if bot_class == "Bot" else bot
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        await bot.send_video_note(chat_id, video_note, thumb="thumb")
+        check_thumb_deprecation_warning_for_method_args(recwarn, __file__)
 
     async def test_send_video_note_custom_filename(
         self, bot, chat_id, video_note_file, monkeypatch
@@ -221,8 +237,8 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         assert isinstance(message.video_note, VideoNote)
         assert isinstance(message.video_note.file_id, str)
         assert isinstance(message.video_note.file_unique_id, str)
-        assert message.video_note.file_id != ""
-        assert message.video_note.file_unique_id != ""
+        assert message.video_note.file_id
+        assert message.video_note.file_unique_id
         assert message.video_note.length == video_note.length
         assert message.video_note.duration == video_note.duration
         assert message.video_note.file_size == video_note.file_size
@@ -252,7 +268,7 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         assert message.video_note == video_note
 
     @pytest.mark.parametrize(
-        "default_bot,custom",
+        ("default_bot", "custom"),
         [
             ({"allow_sending_without_reply": True}, None),
             ({"allow_sending_without_reply": False}, None),
@@ -295,8 +311,8 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         assert not unprotected.has_protected_content
 
     async def test_error_send_empty_file(self, bot, chat_id):
-        with pytest.raises(TelegramError):
-            await bot.send_video_note(chat_id, open(os.devnull, "rb"))
+        with Path(os.devnull).open("rb") as file, pytest.raises(TelegramError):
+            await bot.send_video_note(chat_id, file)
 
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):

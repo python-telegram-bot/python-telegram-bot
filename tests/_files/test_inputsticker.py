@@ -51,7 +51,8 @@ class TestInputStickerNoRequest(TestInputStickerBase):
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_sticker):
-        assert input_sticker.sticker == self.sticker and isinstance(input_sticker.sticker, str)
+        assert input_sticker.sticker == self.sticker
+        assert isinstance(input_sticker.sticker, str)
         assert input_sticker.emoji_list == self.emoji_list
         assert input_sticker.mask_position == self.mask_position
         assert input_sticker.keywords == self.keywords
@@ -60,7 +61,8 @@ class TestInputStickerNoRequest(TestInputStickerBase):
         assert isinstance(input_sticker.keywords, tuple)
         assert isinstance(input_sticker.emoji_list, tuple)
         a = InputSticker("sticker", ["emoji"])
-        assert isinstance(a.emoji_list, tuple) and a.keywords == ()
+        assert isinstance(a.emoji_list, tuple)
+        assert a.keywords == ()
 
     def test_to_dict(self, input_sticker):
         input_sticker_dict = input_sticker.to_dict()

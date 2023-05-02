@@ -56,6 +56,7 @@ from telegram import (
     Voice,
     WebAppData,
 )
+from telegram._utils.datetime import UTC
 from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
 from tests._passport.test_passport import RAW_PASSPORT_DATA
@@ -83,7 +84,6 @@ def message(bot):
 
 
 @pytest.fixture(
-    scope="function",
     params=[
         {"forward_from": User(99, "forward_user", False), "forward_date": datetime.utcnow()},
         {
@@ -366,6 +366,46 @@ class TestMessageWithoutRequest(TestMessageBase):
         for slot in new.__slots__:
             assert not isinstance(new[slot], dict)
 
+    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+        json_dict = {
+            "message_id": 12,
+            "from_user": None,
+            "date": int(datetime.now().timestamp()),
+            "chat": None,
+            "edit_date": int(datetime.now().timestamp()),
+            "forward_date": int(datetime.now().timestamp()),
+        }
+
+        message_raw = Message.de_json(json_dict, raw_bot)
+        message_bot = Message.de_json(json_dict, bot)
+        message_tz = Message.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing timezones is unpredicatable
+        date_offset = message_tz.date.utcoffset()
+        date_tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(message_tz.date.replace(tzinfo=None))
+
+        edit_date_offset = message_tz.edit_date.utcoffset()
+        edit_date_tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            message_tz.edit_date.replace(tzinfo=None)
+        )
+
+        forward_date_offset = message_tz.forward_date.utcoffset()
+        forward_date_tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
+            message_tz.forward_date.replace(tzinfo=None)
+        )
+
+        assert message_raw.date.tzinfo == UTC
+        assert message_bot.date.tzinfo == UTC
+        assert date_offset == date_tz_bot_offset
+
+        assert message_raw.edit_date.tzinfo == UTC
+        assert message_bot.edit_date.tzinfo == UTC
+        assert edit_date_offset == edit_date_tz_bot_offset
+
+        assert message_raw.forward_date.tzinfo == UTC
+        assert message_bot.forward_date.tzinfo == UTC
+        assert forward_date_offset == forward_date_tz_bot_offset
+
     def test_equality(self):
         id_ = 1
         a = Message(id_, self.date, self.chat, from_user=self.from_user)
@@ -524,19 +564,19 @@ class TestMessageWithoutRequest(TestMessageBase):
             MessageEntity(MessageEntity.BOLD, offset=0, length=4),
             MessageEntity(MessageEntity.ITALIC, offset=0, length=4),
         ]
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Nested entities are not supported for"):
             assert message.text_markdown
 
         message.entities = [MessageEntity(MessageEntity.UNDERLINE, offset=0, length=4)]
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Underline entities are not supported for"):
             message.text_markdown
 
         message.entities = [MessageEntity(MessageEntity.STRIKETHROUGH, offset=0, length=4)]
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Strikethrough entities are not supported for"):
             message.text_markdown
 
         message.entities = [MessageEntity(MessageEntity.SPOILER, offset=0, length=4)]
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Spoiler entities are not supported for"):
             message.text_markdown
 
         message.entities = []
@@ -783,7 +823,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert message.link == f"https://t.me/{message.chat.username}/{message.message_id}"
 
     @pytest.mark.parametrize(
-        "type_, id_", argvalues=[(Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)]
+        ("type_", "id_"), argvalues=[(Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)]
     )
     def test_link_with_id(self, message, type_, id_):
         message.chat.username = None
@@ -792,7 +832,21 @@ class TestMessageWithoutRequest(TestMessageBase):
         # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
         assert message.link == f"https://t.me/c/{3}/{message.message_id}"
 
-    @pytest.mark.parametrize("id_, username", argvalues=[(None, "username"), (-3, None)])
+    def test_link_with_topics(self, message):
+        message.chat.username = None
+        message.chat.id = -1003
+        message.is_topic_message = True
+        message.message_thread_id = 123
+        assert message.link == f"https://t.me/c/3/{message.message_id}?thread=123"
+
+    def test_link_with_reply(self, message):
+        message.chat.username = None
+        message.chat.id = -1003
+        message.reply_to_message = Message(7, self.from_user, self.date, self.chat, text="Reply")
+        message.message_thread_id = 123
+        assert message.link == f"https://t.me/c/3/{message.message_id}?thread=123"
+
+    @pytest.mark.parametrize(("id_", "username"), argvalues=[(None, "username"), (-3, None)])
     def test_link_private_chats(self, message, id_, username):
         message.chat.type = Chat.PRIVATE
         message.chat.id = id_
@@ -1324,7 +1378,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             quote=True,
         )
 
-    @pytest.mark.parametrize("disable_notification,protected", [(False, True), (True, False)])
+    @pytest.mark.parametrize(("disable_notification", "protected"), [(False, True), (True, False)])
     async def test_forward(self, monkeypatch, message, disable_notification, protected):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs["chat_id"] == 123456
@@ -1346,7 +1400,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         )
         assert not await message.forward(635241)
 
-    @pytest.mark.parametrize("disable_notification,protected", [(True, False), (False, True)])
+    @pytest.mark.parametrize(("disable_notification", "protected"), [(True, False), (False, True)])
     async def test_copy(self, monkeypatch, message, disable_notification, protected):
         keyboard = [[1, 2]]
 
@@ -1387,7 +1441,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         )
         assert not await message.copy(635241)
 
-    @pytest.mark.parametrize("disable_notification,protected", [(True, False), (False, True)])
+    @pytest.mark.parametrize(("disable_notification", "protected"), [(True, False), (False, True)])
     async def test_reply_copy(self, monkeypatch, message, disable_notification, protected):
         keyboard = [[1, 2]]
 

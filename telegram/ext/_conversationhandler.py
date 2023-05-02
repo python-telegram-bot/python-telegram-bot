@@ -19,7 +19,6 @@
 """This module contains the ConversationHandler."""
 import asyncio
 import datetime
-import logging
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
@@ -38,6 +37,7 @@ from typing import (
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
+from telegram._utils.logging import get_logger
 from telegram._utils.types import DVType
 from telegram._utils.warnings import warn
 from telegram.ext._application import ApplicationHandlerStop
@@ -56,7 +56,7 @@ if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
 _CheckUpdateType = Tuple[object, ConversationKey, BaseHandler[Update, CCT], object]
 
-_logger = logging.getLogger(__name__)
+_LOGGER = get_logger(__name__, class_name="ConversationHandler")
 
 
 @dataclass
@@ -102,7 +102,7 @@ class PendingState:
 
         exc = self.task.exception()
         if exc:
-            _logger.exception(
+            _LOGGER.exception(
                 "Task function raised exception. Falling back to old state %s",
                 self.old_state,
             )
@@ -649,12 +649,12 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         try:
             effective_new_state = await new_state
         except Exception as exc:
-            _logger.debug(
+            _LOGGER.debug(
                 "Non-blocking handler callback raised exception. Not scheduling conversation "
                 "timeout.",
                 exc_info=exc,
             )
-            return
+            return None
         return self._schedule_job(
             new_state=effective_new_state,
             application=application,
@@ -684,7 +684,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 data=_ConversationTimeoutContext(conversation_key, update, application, context),
             )
         except Exception as exc:
-            _logger.exception("Failed to schedule timeout.", exc_info=exc)
+            _LOGGER.exception("Failed to schedule timeout.", exc_info=exc)
 
     # pylint: disable=too-many-return-statements
     def check_update(self, update: object) -> Optional[_CheckUpdateType[CCT]]:
@@ -719,7 +719,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
 
         # Resolve futures
         if isinstance(state, PendingState):
-            _logger.debug("Waiting for asyncio Task to finish ...")
+            _LOGGER.debug("Waiting for asyncio Task to finish ...")
 
             # check if future is finished or not
             if state.done():
@@ -741,7 +741,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                         return self.WAITING, key, handler_, check
                 return None
 
-        _logger.debug("Selecting conversation %s with state %s", str(key), str(state))
+        _LOGGER.debug("Selecting conversation %s with state %s", str(key), str(state))
 
         handler: Optional[BaseHandler] = None
 
@@ -813,13 +813,12 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         # 3. Default values of the bot
         if handler.block is not DEFAULT_TRUE:
             block = handler.block
+        elif self._block is not DEFAULT_TRUE:
+            block = self._block
+        elif isinstance(application.bot, ExtBot) and application.bot.defaults is not None:
+            block = application.bot.defaults.block
         else:
-            if self._block is not DEFAULT_TRUE:
-                block = self._block
-            elif isinstance(application.bot, ExtBot) and application.bot.defaults is not None:
-                block = application.bot.defaults.block
-            else:
-                block = DefaultValue.get_value(handler.block)
+            block = DefaultValue.get_value(handler.block)
 
         try:  # Now create task or await the callback
             if block:
@@ -841,26 +840,25 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 if application.job_queue is None:
                     warn(
                         "Ignoring `conversation_timeout` because the Application has no JobQueue.",
+                        stacklevel=1,
                     )
                 elif not application.job_queue.scheduler.running:
                     warn(
                         "Ignoring `conversation_timeout` because the Applications JobQueue is "
                         "not running.",
+                        stacklevel=1,
                     )
-                else:
+                elif isinstance(new_state, asyncio.Task):
                     # Add the new timeout job
                     # checking if the new state is self.END is done in _schedule_job
-                    if isinstance(new_state, asyncio.Task):
-                        application.create_task(
-                            self._schedule_job_delayed(
-                                new_state, application, update, context, conversation_key
-                            ),
-                            update=update,
-                        )
-                    else:
-                        self._schedule_job(
+                    application.create_task(
+                        self._schedule_job_delayed(
                             new_state, application, update, context, conversation_key
-                        )
+                        ),
+                        update=update,
+                    )
+                else:
+                    self._schedule_job(new_state, application, update, context, conversation_key)
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self._update_state(self.END, conversation_key, handler)
@@ -874,7 +872,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         if raise_dp_handler_stop:
             # Don't pass the new state here. If we're in a nested conversation, the parent is
             # expecting None as return value.
-            raise ApplicationHandlerStop()
+            raise ApplicationHandlerStop
         # Signals a possible parent conversation to stay in the current state
         return None
 
@@ -909,7 +907,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         job = cast("Job", context.job)
         ctxt = cast(_ConversationTimeoutContext, job.data)
 
-        _logger.debug(
+        _LOGGER.debug(
             "Conversation timeout was triggered for conversation %s!", ctxt.conversation_key
         )
 
@@ -935,6 +933,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                     warn(
                         "ApplicationHandlerStop in TIMEOUT state of "
                         "ConversationHandler has no effect. Ignoring.",
+                        stacklevel=2,
                     )
 
         self._update_state(self.END, ctxt.conversation_key)

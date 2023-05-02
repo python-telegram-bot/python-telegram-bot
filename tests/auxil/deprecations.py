@@ -19,7 +19,6 @@
 
 from _pytest.recwarn import WarningsRecorder
 
-from telegram._utils import warnings_transition
 from telegram.warnings import PTBDeprecationWarning
 
 
@@ -68,7 +67,20 @@ def check_thumb_deprecation_warnings_for_args_and_attrs(
 
         assert recwarn[i].filename == calling_file, (
             f'Warning for {names[i]} ("{str(recwarn[i].message)}") was issued by file '
-            f"{recwarn[i].filename}, expected {calling_file} or {warnings_transition.__file__}"
+            f"{recwarn[i].filename}, expected {calling_file}"
         )
 
     return True
+
+
+def check_thumb_deprecation_warning_for_method_args(
+    recwarn: WarningsRecorder,
+    calling_file: str,
+    deprecated_name: str = "thumb",
+    new_name: str = "thumbnail",
+):
+    """Similar as `check_thumb_deprecation_warnings_for_args_and_attrs`, but for bot methods."""
+    assert len(recwarn) == 1
+    assert recwarn[0].category is PTBDeprecationWarning
+    assert recwarn[0].filename == calling_file
+    assert f"argument '{deprecated_name}' to '{new_name}'" in str(recwarn[0].message)

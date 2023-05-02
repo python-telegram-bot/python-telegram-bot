@@ -56,7 +56,7 @@ async def forum_topic_object(forum_group_id, emoji_id):
     )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def real_topic(bot, emoji_id, forum_group_id):
     result = await bot.create_forum_topic(
         chat_id=forum_group_id,
@@ -420,7 +420,7 @@ class TestForumTopicEdited:
         # empty string
         json_dict = {"icon_custom_emoji_id": ""}
         action = ForumTopicEdited.de_json(json_dict, bot)
-        assert action.icon_custom_emoji_id == ""
+        assert not action.icon_custom_emoji_id
 
     def test_to_dict(self, topic_edited, emoji_id):
         action_dict = topic_edited.to_dict()

@@ -96,7 +96,7 @@ class TestDatetime:
 
     def test_to_float_timestamp_absolute_no_reference(self):
         """A reference timestamp is only relevant for relative time specifications"""
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="while reference_timestamp is not None"):
             tg_dtm.to_float_timestamp(dtm.datetime(2019, 11, 11), reference_timestamp=123)
 
     # see note on parametrization at the top of this file
@@ -162,7 +162,7 @@ class TestDatetime:
         assert tg_dtm.from_timestamp(None) is None
 
     def test_from_timestamp_naive(self):
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=None)
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=dtm.timezone.utc)
         assert tg_dtm.from_timestamp(1573431976, tzinfo=None) == datetime
 
     def test_from_timestamp_aware(self, timezone):
@@ -174,3 +174,8 @@ class TestDatetime:
             tg_dtm.from_timestamp(1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
             == datetime
         )
+
+    def test_extract_tzinfo_from_defaults(self, tz_bot, bot, raw_bot):
+        assert tg_dtm.extract_tzinfo_from_defaults(tz_bot) == tz_bot.defaults.tzinfo
+        assert tg_dtm.extract_tzinfo_from_defaults(bot) is None
+        assert tg_dtm.extract_tzinfo_from_defaults(raw_bot) is None

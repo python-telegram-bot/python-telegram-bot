@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
-import warnings
 from copy import copy
 from datetime import datetime
 from typing import (
@@ -31,6 +30,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    Type,
     TypeVar,
     Union,
     cast,
@@ -85,12 +85,12 @@ from telegram import (
 )
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
+from telegram._utils.logging import get_logger
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
-from telegram._utils.warnings import warn
 from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.ext._utils.types import RLARGS
 from telegram.request import BaseRequest
-from telegram.warnings import PTBDeprecationWarning
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -155,6 +155,8 @@ class ExtBot(Bot, Generic[RLARGS]):
     """
 
     __slots__ = ("_callback_data_cache", "_defaults", "_rate_limiter")
+
+    _LOGGER = get_logger(__name__, class_name="ExtBot")
 
     # using object() would be a tiny bit safer, but a string plays better with the typing setup
     __RL_KEY = uuid4().hex
@@ -231,6 +233,15 @@ class ExtBot(Bot, Generic[RLARGS]):
                 maxsize = 1024
 
             self._callback_data_cache = CallbackDataCache(bot=self, maxsize=maxsize)
+
+    @classmethod
+    def _warn(
+        cls, message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0
+    ) -> None:
+        """We override this method to add one more level to the stacklevel, so that the warning
+        points to the user's code, not to the PTB code.
+        """
+        super()._warn(message=message, category=category, stacklevel=stacklevel + 2)
 
     @property
     def callback_data_cache(self) -> Optional[CallbackDataCache]:
@@ -324,7 +335,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             "connect_timeout": connect_timeout,
             "pool_timeout": pool_timeout,
         }
-        self._logger.debug(
+        self._LOGGER.debug(
             "Passing request through rate limiter of type %s with rate_limit_args %s",
             type(self.rate_limiter),
             rate_limit_args,
@@ -385,10 +396,10 @@ class ExtBot(Bot, Generic[RLARGS]):
             # 3)
             elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:
                 # Copy object as not to edit it in-place
-                val = copy(val)
-                with val._unfrozen():
-                    val.parse_mode = self.defaults.parse_mode if self.defaults else None
-                data[key] = val
+                copied_val = copy(val)
+                with copied_val._unfrozen():
+                    copied_val.parse_mode = self.defaults.parse_mode if self.defaults else None
+                data[key] = copied_val
             elif key == "media" and isinstance(val, Sequence):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy(media) for media in val]
@@ -3281,30 +3292,16 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
     ) -> bool:
-        # Manually issue deprecation here to get the stacklevel right
-        # Suppress the warning issued by super().set_sticker_set_thumb just in case
-        # the user explicitly enables deprecation warnings
-        # Unfortunately this is not entirely reliable (see tests), but it's a best effort solution
-        warn(
-            message=(
-                "Bot API 6.6 renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail', "
-                "hence method 'set_sticker_set_thumb' was renamed to 'set_sticker_set_thumbnail' "
-                "in PTB."
-            ),
-            category=PTBDeprecationWarning,
-            stacklevel=2,
+        return await super().set_sticker_set_thumb(
+            name=name,
+            user_id=user_id,
+            thumb=thumb,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
-        with warnings.catch_warnings():
-            return await super().set_sticker_set_thumb(
-                name=name,
-                user_id=user_id,
-                thumb=thumb,
-                read_timeout=read_timeout,
-                write_timeout=write_timeout,
-                connect_timeout=connect_timeout,
-                pool_timeout=pool_timeout,
-                api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
-            )
 
     async def set_webhook(
         self,

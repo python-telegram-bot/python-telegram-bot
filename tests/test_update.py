@@ -95,7 +95,7 @@ all_types = (
     "chat_join_request",
 )
 
-ids = all_types + ("callback_query_without_message",)
+ids = (*all_types, "callback_query_without_message")
 
 
 @pytest.fixture(scope="module", params=params, ids=ids)
