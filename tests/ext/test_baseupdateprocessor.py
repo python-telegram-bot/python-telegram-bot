@@ -20,6 +20,7 @@ import pytest
 
 from telegram import Update
 from telegram.ext import ApplicationBuilder, BaseUpdateProcessor, SimpleUpdateProcessor
+from tests.auxil.asyncio_helpers import call_after
 
 
 class TestBaseUpdateProcessor:
@@ -38,7 +39,7 @@ class TestBaseUpdateProcessor:
 
         processor = MockProcessor(5)
         application = ApplicationBuilder().concurrent_updates(processor).bot(one_time_bot).build()
-        update = Update(1, None)
+        update = Update(1)
 
         async def coroutine():
             pass
@@ -47,11 +48,41 @@ class TestBaseUpdateProcessor:
         await processor.process_update(update, coroutine, application)
         assert not application.update_queue.empty()
 
+    async def test_context_manager(self, monkeypatch):
+        class MockProcessor(BaseUpdateProcessor):
+            async def do_process_update(self, update, coroutine):
+                pass
+
+        processor = MockProcessor(5)
+        self.test_flag = set()
+
+        async def after_initialize(*args, **kwargs):
+            self.test_flag.add("initialize")
+
+        async def after_shutdown(*args, **kwargs):
+            self.test_flag.add("stop")
+
+        monkeypatch.setattr(
+            BaseUpdateProcessor,
+            "initialize",
+            call_after(BaseUpdateProcessor.initialize, after_initialize),
+        )
+        monkeypatch.setattr(
+            BaseUpdateProcessor,
+            "shutdown",
+            call_after(BaseUpdateProcessor.shutdown, after_shutdown),
+        )
+
+        async with processor:
+            pass
+
+        assert self.test_flag == {"initialize", "stop"}
+
 
 class TestSimpleUpdateProcessor:
     async def test_do_process_update(self):
         processor = SimpleUpdateProcessor(1)
-        update = Update(1, None)
+        update = Update(1)
 
         async def coroutine():
             pass

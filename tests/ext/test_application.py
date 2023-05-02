@@ -34,13 +34,14 @@ from threading import Thread
 
 import pytest
 
-from telegram import Bot, Chat, Message, MessageEntity, User
+from telegram import Bot, Chat, Message, MessageEntity, Update, User
 from telegram.error import TelegramError
 from telegram.ext import (
     Application,
     ApplicationBuilder,
     ApplicationHandlerStop,
     BaseHandler,
+    BaseUpdateProcessor,
     CallbackContext,
     CommandHandler,
     ContextTypes,
@@ -216,9 +217,21 @@ class TestApplication:
             application.update_processor.max_concurrent_updates
         )
 
-    def test_active_updates(self, one_time_bot):
-        application = ApplicationBuilder().bot(one_time_bot).concurrent_updates(2).build()
-        assert application.active_updates == application.update_processor._semaphore._value
+    async def test_active_updates(self, one_time_bot):
+        class MockProcessor(BaseUpdateProcessor):
+            async def do_process_update(self, update, coroutine) -> None:
+                pass
+
+        processor = MockProcessor(2)
+
+        async def coroutine():
+            pass
+
+        application = ApplicationBuilder().bot(one_time_bot).concurrent_updates(processor).build()
+        assert application.active_updates == processor._semaphore._value
+        await application.update_queue.put(1)
+        await processor.process_update(Update(1), coroutine, application)
+        assert application.active_updates == processor._semaphore._value
 
     def test_update_processor_property(self, one_time_bot):
         processor = SimpleUpdateProcessor(2)
