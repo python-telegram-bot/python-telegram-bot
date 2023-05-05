@@ -2879,7 +2879,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             button (:class:`telegram.InlineQueryResultsButton`, optional): A button to be shown
                 above the inline query results.
 
-                .. versionadded:: NEXT.VERISON
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
