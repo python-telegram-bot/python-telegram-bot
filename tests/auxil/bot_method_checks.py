@@ -19,7 +19,7 @@
 import datetime
 import functools
 import inspect
-from typing import Any, Callable, Dict, Iterable, List
+from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import pytest
 
@@ -117,8 +117,8 @@ async def check_shortcut_call(
     shortcut_method: Callable,
     bot: ExtBot,
     bot_method_name: str,
-    skip_params: Iterable[str] = None,
-    shortcut_kwargs: Iterable[str] = None,
+    skip_params: Optional[Iterable[str]] = None,
+    shortcut_kwargs: Optional[Iterable[str]] = None,
 ) -> bool:
     """
     Checks that a shortcut passes all the existing arguments to the underlying bot method. Use as::

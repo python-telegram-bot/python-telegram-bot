@@ -19,6 +19,7 @@
 import asyncio
 import copy
 from collections.abc import Sequence
+from typing import Optional
 
 import pytest
 
@@ -630,7 +631,7 @@ class TestSendMediaGroupWithoutRequest:
         self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
     ):
         async def make_assertion(
-            method: str, url: str, request_data: RequestData = None, *args, **kwargs
+            method: str, url: str, request_data: Optional[RequestData] = None, *args, **kwargs
         ):
             files = request_data.multipart_data
             video_check = files[input_video.media.attach_name] == input_video.media.field_tuple

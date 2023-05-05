@@ -42,7 +42,7 @@ class VideoChatStarted(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None) -> None:
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()
@@ -75,7 +75,7 @@ class VideoChatEnded(TelegramObject):
         self,
         duration: int,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.duration: int = duration
@@ -115,7 +115,7 @@ class VideoChatParticipantsInvited(TelegramObject):
         self,
         users: Sequence[User],
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.users: Tuple[User, ...] = parse_sequence_arg(users)
@@ -167,7 +167,7 @@ class VideoChatScheduled(TelegramObject):
         self,
         start_date: dtm.datetime,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         self.start_date: dtm.datetime = start_date

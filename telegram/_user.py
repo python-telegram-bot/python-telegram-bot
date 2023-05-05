@@ -133,16 +133,16 @@ class User(TelegramObject):
         id: int,
         first_name: str,
         is_bot: bool,
-        last_name: str = None,
-        username: str = None,
-        language_code: str = None,
-        can_join_groups: bool = None,
-        can_read_all_group_messages: bool = None,
-        supports_inline_queries: bool = None,
-        is_premium: bool = None,
-        added_to_attachment_menu: bool = None,
+        last_name: Optional[str] = None,
+        username: Optional[str] = None,
+        language_code: Optional[str] = None,
+        can_join_groups: Optional[bool] = None,
+        can_read_all_group_messages: Optional[bool] = None,
+        supports_inline_queries: Optional[bool] = None,
+        is_premium: Optional[bool] = None,
+        added_to_attachment_menu: Optional[bool] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -192,14 +192,14 @@ class User(TelegramObject):
 
     async def get_profile_photos(
         self,
-        offset: int = None,
-        limit: int = None,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> Optional["UserProfilePhotos"]:
         """Shortcut for::
 
@@ -220,7 +220,7 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    def mention_markdown(self, name: str = None) -> str:
+    def mention_markdown(self, name: Optional[str] = None) -> str:
         """
         Note:
             :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
@@ -238,7 +238,7 @@ class User(TelegramObject):
             return helpers_mention_markdown(self.id, name)
         return helpers_mention_markdown(self.id, self.full_name)
 
-    def mention_markdown_v2(self, name: str = None) -> str:
+    def mention_markdown_v2(self, name: Optional[str] = None) -> str:
         """
         Args:
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
@@ -251,7 +251,7 @@ class User(TelegramObject):
             return helpers_mention_markdown(self.id, name, version=2)
         return helpers_mention_markdown(self.id, self.full_name, version=2)
 
-    def mention_html(self, name: str = None) -> str:
+    def mention_html(self, name: Optional[str] = None) -> str:
         """
         Args:
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
@@ -264,7 +264,7 @@ class User(TelegramObject):
             return helpers_mention_html(self.id, name)
         return helpers_mention_html(self.id, self.full_name)
 
-    def mention_button(self, name: str = None) -> InlineKeyboardButton:
+    def mention_button(self, name: Optional[str] = None) -> InlineKeyboardButton:
         """Shortcut for::
 
             InlineKeyboardButton(text=name, url=f"tg://user?id={update.effective_user.id}")
@@ -288,7 +288,7 @@ class User(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 
@@ -316,13 +316,13 @@ class User(TelegramObject):
 
     async def unpin_message(
         self,
-        message_id: int = None,
+        message_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 
@@ -354,7 +354,7 @@ class User(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 
@@ -385,18 +385,18 @@ class User(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Sequence["MessageEntity"] = None,
+        entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -433,23 +433,23 @@ class User(TelegramObject):
     async def send_photo(
         self,
         photo: Union[FileInput, "PhotoSize"],
-        caption: str = None,
+        caption: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        has_spoiler: bool = None,
+        message_thread_id: Optional[int] = None,
+        has_spoiler: Optional[bool] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -491,19 +491,19 @@ class User(TelegramObject):
             Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
+        reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
     ) -> Tuple["Message", ...]:
         """Shortcut for::
 
@@ -540,27 +540,27 @@ class User(TelegramObject):
     async def send_audio(
         self,
         audio: Union[FileInput, "Audio"],
-        duration: int = None,
-        performer: str = None,
-        title: str = None,
-        caption: str = None,
+        duration: Optional[int] = None,
+        performer: Optional[str] = None,
+        title: Optional[str] = None,
+        caption: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: FileInput = None,
+        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        thumbnail: FileInput = None,
+        message_thread_id: Optional[int] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -603,13 +603,13 @@ class User(TelegramObject):
     async def send_chat_action(
         self,
         action: str,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 
@@ -640,23 +640,23 @@ class User(TelegramObject):
 
     async def send_contact(
         self,
-        phone_number: str = None,
-        first_name: str = None,
-        last_name: str = None,
+        phone_number: Optional[str] = None,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        vcard: str = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        vcard: Optional[str] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
-        contact: "Contact" = None,
+        contact: Optional["Contact"] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -694,18 +694,18 @@ class User(TelegramObject):
     async def send_dice(
         self,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        emoji: str = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        emoji: Optional[str] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -739,25 +739,25 @@ class User(TelegramObject):
     async def send_document(
         self,
         document: Union[FileInput, "Document"],
-        caption: str = None,
+        caption: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: FileInput = None,
-        disable_content_type_detection: bool = None,
+        thumb: Optional[FileInput] = None,
+        disable_content_type_detection: Optional[bool] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        thumbnail: FileInput = None,
+        message_thread_id: Optional[int] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -799,17 +799,17 @@ class User(TelegramObject):
         self,
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: "InlineKeyboardMarkup" = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -848,33 +848,33 @@ class User(TelegramObject):
         provider_token: str,
         currency: str,
         prices: Sequence["LabeledPrice"],
-        start_parameter: str = None,
-        photo_url: str = None,
-        photo_size: int = None,
-        photo_width: int = None,
-        photo_height: int = None,
-        need_name: bool = None,
-        need_phone_number: bool = None,
-        need_email: bool = None,
-        need_shipping_address: bool = None,
-        is_flexible: bool = None,
+        start_parameter: Optional[str] = None,
+        photo_url: Optional[str] = None,
+        photo_size: Optional[int] = None,
+        photo_width: Optional[int] = None,
+        photo_height: Optional[int] = None,
+        need_name: Optional[bool] = None,
+        need_phone_number: Optional[bool] = None,
+        need_email: Optional[bool] = None,
+        need_shipping_address: Optional[bool] = None,
+        is_flexible: Optional[bool] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: "InlineKeyboardMarkup" = None,
-        provider_data: Union[str, object] = None,
-        send_phone_number_to_provider: bool = None,
-        send_email_to_provider: bool = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        provider_data: Optional[Union[str, object]] = None,
+        send_phone_number_to_provider: Optional[bool] = None,
+        send_email_to_provider: Optional[bool] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        max_tip_amount: int = None,
-        suggested_tip_amounts: Sequence[int] = None,
+        max_tip_amount: Optional[int] = None,
+        suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -937,25 +937,25 @@ class User(TelegramObject):
 
     async def send_location(
         self,
-        latitude: float = None,
-        longitude: float = None,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        live_period: int = None,
-        horizontal_accuracy: float = None,
-        heading: int = None,
-        proximity_alert_radius: int = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        live_period: Optional[int] = None,
+        horizontal_accuracy: Optional[float] = None,
+        heading: Optional[int] = None,
+        proximity_alert_radius: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
-        location: "Location" = None,
+        location: Optional["Location"] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -995,28 +995,28 @@ class User(TelegramObject):
     async def send_animation(
         self,
         animation: Union[FileInput, "Animation"],
-        duration: int = None,
-        width: int = None,
-        height: int = None,
-        thumb: FileInput = None,
-        caption: str = None,
+        duration: Optional[int] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        thumb: Optional[FileInput] = None,
+        caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        has_spoiler: bool = None,
-        thumbnail: FileInput = None,
+        message_thread_id: Optional[int] = None,
+        has_spoiler: Optional[bool] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -1061,18 +1061,18 @@ class User(TelegramObject):
         self,
         sticker: Union[FileInput, "Sticker"],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        emoji: str = None,
+        message_thread_id: Optional[int] = None,
+        emoji: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -1107,29 +1107,29 @@ class User(TelegramObject):
     async def send_video(
         self,
         video: Union[FileInput, "Video"],
-        duration: int = None,
-        caption: str = None,
+        duration: Optional[int] = None,
+        caption: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        width: int = None,
-        height: int = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        supports_streaming: bool = None,
-        thumb: FileInput = None,
+        supports_streaming: Optional[bool] = None,
+        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        has_spoiler: bool = None,
-        thumbnail: FileInput = None,
+        message_thread_id: Optional[int] = None,
+        has_spoiler: Optional[bool] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -1173,27 +1173,27 @@ class User(TelegramObject):
 
     async def send_venue(
         self,
-        latitude: float = None,
-        longitude: float = None,
-        title: str = None,
-        address: str = None,
-        foursquare_id: str = None,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None,
+        title: Optional[str] = None,
+        address: Optional[str] = None,
+        foursquare_id: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        foursquare_type: str = None,
-        google_place_id: str = None,
-        google_place_type: str = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        foursquare_type: Optional[str] = None,
+        google_place_id: Optional[str] = None,
+        google_place_type: Optional[str] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
-        venue: "Venue" = None,
+        venue: Optional["Venue"] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -1235,23 +1235,23 @@ class User(TelegramObject):
     async def send_video_note(
         self,
         video_note: Union[FileInput, "VideoNote"],
-        duration: int = None,
-        length: int = None,
+        duration: Optional[int] = None,
+        length: Optional[int] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        thumb: FileInput = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        thumbnail: FileInput = None,
+        message_thread_id: Optional[int] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -1290,23 +1290,23 @@ class User(TelegramObject):
     async def send_voice(
         self,
         voice: Union[FileInput, "Voice"],
-        duration: int = None,
-        caption: str = None,
+        duration: Optional[int] = None,
+        caption: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -1346,28 +1346,28 @@ class User(TelegramObject):
         self,
         question: str,
         options: Sequence[str],
-        is_anonymous: bool = None,
-        type: str = None,
-        allows_multiple_answers: bool = None,
-        correct_option_id: int = None,
-        is_closed: bool = None,
+        is_anonymous: Optional[bool] = None,
+        type: Optional[str] = None,
+        allows_multiple_answers: Optional[bool] = None,
+        correct_option_id: Optional[int] = None,
+        is_closed: Optional[bool] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        explanation: str = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        open_period: int = None,
-        close_date: Union[int, datetime] = None,
+        open_period: Optional[int] = None,
+        close_date: Optional[Union[int, datetime]] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        explanation_entities: Sequence["MessageEntity"] = None,
+        explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -1413,21 +1413,21 @@ class User(TelegramObject):
         self,
         from_chat_id: Union[str, int],
         message_id: int,
-        caption: str = None,
+        caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
+        reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "MessageId":
         """Shortcut for::
 
@@ -1466,21 +1466,21 @@ class User(TelegramObject):
         self,
         chat_id: Union[int, str],
         message_id: int,
-        caption: str = None,
+        caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
+        reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "MessageId":
         """Shortcut for::
 
@@ -1523,7 +1523,7 @@ class User(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 
@@ -1559,7 +1559,7 @@ class User(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 
@@ -1589,13 +1589,13 @@ class User(TelegramObject):
 
     async def set_menu_button(
         self,
-        menu_button: MenuButton = None,
+        menu_button: Optional[MenuButton] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 
@@ -1631,7 +1631,7 @@ class User(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> MenuButton:
         """Shortcut for::
 

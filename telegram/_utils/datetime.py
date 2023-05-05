@@ -54,8 +54,8 @@ def _localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
 
 def to_float_timestamp(
     time_object: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time],
-    reference_timestamp: float = None,
-    tzinfo: dtm.tzinfo = None,
+    reference_timestamp: Optional[float] = None,
+    tzinfo: Optional[dtm.tzinfo] = None,
 ) -> float:
     """
     Converts a given time object to a float POSIX timestamp.
@@ -149,8 +149,8 @@ def to_float_timestamp(
 
 def to_timestamp(
     dt_obj: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time, None],
-    reference_timestamp: float = None,
-    tzinfo: dtm.tzinfo = None,
+    reference_timestamp: Optional[float] = None,
+    tzinfo: Optional[dtm.tzinfo] = None,
 ) -> Optional[int]:
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated

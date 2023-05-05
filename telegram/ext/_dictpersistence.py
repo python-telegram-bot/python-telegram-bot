@@ -90,7 +90,7 @@ class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, 
 
     def __init__(
         self,
-        store_data: PersistenceInput = None,
+        store_data: Optional[PersistenceInput] = None,
         user_data_json: str = "",
         chat_data_json: str = "",
         bot_data_json: str = "",

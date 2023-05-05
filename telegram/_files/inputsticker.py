@@ -74,10 +74,10 @@ class InputSticker(TelegramObject):
         self,
         sticker: FileInput,
         emoji_list: Sequence[str],
-        mask_position: MaskPosition = None,
-        keywords: Sequence[str] = None,
+        mask_position: Optional[MaskPosition] = None,
+        keywords: Optional[Sequence[str]] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 

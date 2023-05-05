@@ -53,12 +53,12 @@ class OrderInfo(TelegramObject):
 
     def __init__(
         self,
-        name: str = None,
-        phone_number: str = None,
-        email: str = None,
-        shipping_address: str = None,
+        name: Optional[str] = None,
+        phone_number: Optional[str] = None,
+        email: Optional[str] = None,
+        shipping_address: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.name: Optional[str] = name

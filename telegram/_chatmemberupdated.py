@@ -91,9 +91,9 @@ class ChatMemberUpdated(TelegramObject):
         date: datetime.datetime,
         old_chat_member: ChatMember,
         new_chat_member: ChatMember,
-        invite_link: ChatInviteLink = None,
+        invite_link: Optional[ChatInviteLink] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required

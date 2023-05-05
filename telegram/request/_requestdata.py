@@ -18,7 +18,7 @@
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that holds the parameters of a request to the Bot API."""
 import json
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urlencode
 
 from telegram._utils.types import UploadFileDict
@@ -43,7 +43,7 @@ class RequestData:
 
     __slots__ = ("_parameters", "contains_files")
 
-    def __init__(self, parameters: List[RequestParameter] = None):
+    def __init__(self, parameters: Optional[List[RequestParameter]] = None):
         self._parameters: List[RequestParameter] = parameters or []
         self.contains_files: bool = any(param.input_files for param in self._parameters)
 
@@ -76,7 +76,7 @@ class RequestData:
             if param.json_value is not None
         }
 
-    def url_encoded_parameters(self, encode_kwargs: Dict[str, Any] = None) -> str:
+    def url_encoded_parameters(self, encode_kwargs: Optional[Dict[str, Any]] = None) -> str:
         """Encodes the parameters with :func:`urllib.parse.urlencode`.
 
         Args:
@@ -87,7 +87,7 @@ class RequestData:
             return urlencode(self.json_parameters, **encode_kwargs)
         return urlencode(self.json_parameters)
 
-    def parametrized_url(self, url: str, encode_kwargs: Dict[str, Any] = None) -> str:
+    def parametrized_url(self, url: str, encode_kwargs: Optional[Dict[str, Any]] = None) -> str:
         """Shortcut for attaching the return value of :meth:`url_encoded_parameters` to the
         :paramref:`url`.
 

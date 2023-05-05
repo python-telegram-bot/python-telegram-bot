@@ -118,12 +118,12 @@ class ChatInviteLink(TelegramObject):
         creates_join_request: bool,
         is_primary: bool,
         is_revoked: bool,
-        expire_date: datetime.datetime = None,
-        member_limit: int = None,
-        name: str = None,
-        pending_join_request_count: int = None,
+        expire_date: Optional[datetime.datetime] = None,
+        member_limit: Optional[int] = None,
+        name: Optional[str] = None,
+        pending_join_request_count: Optional[int] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required

@@ -157,17 +157,17 @@ class Sticker(_BaseThumbedMedium):
         is_animated: bool,
         is_video: bool,
         type: str,  # pylint: disable=redefined-builtin
-        thumb: PhotoSize = None,
-        emoji: str = None,
-        file_size: int = None,
-        set_name: str = None,
-        mask_position: "MaskPosition" = None,
-        premium_animation: "File" = None,
-        custom_emoji_id: str = None,
-        thumbnail: PhotoSize = None,
-        needs_repainting: bool = None,
+        thumb: Optional[PhotoSize] = None,
+        emoji: Optional[str] = None,
+        file_size: Optional[int] = None,
+        set_name: Optional[str] = None,
+        mask_position: Optional["MaskPosition"] = None,
+        premium_animation: Optional["File"] = None,
+        custom_emoji_id: Optional[str] = None,
+        thumbnail: Optional[PhotoSize] = None,
+        needs_repainting: Optional[bool] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -302,10 +302,10 @@ class StickerSet(TelegramObject):
         stickers: Sequence[Sticker],
         is_video: bool,
         sticker_type: str,
-        thumb: PhotoSize = None,
-        thumbnail: PhotoSize = None,
+        thumb: Optional[PhotoSize] = None,
+        thumbnail: Optional[PhotoSize] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.name: str = name
@@ -406,7 +406,7 @@ class MaskPosition(TelegramObject):
         y_shift: float,
         scale: float,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.point: str = point

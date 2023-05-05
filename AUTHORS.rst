@@ -77,6 +77,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Matheus Lemos <https://github.com/mlemosf>`_
 - `Michael Dix <https://github.com/Eisberge>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
+- `Miguel C. R. <https://github.com/MiguelX413>`_
 - `miles <https://github.com/miles170>`_
 - `Mischa Krüger <https://github.com/Makman2>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_

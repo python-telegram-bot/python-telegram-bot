@@ -190,9 +190,9 @@ class Updater(AsyncContextManager["Updater"]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        allowed_updates: List[str] = None,
-        drop_pending_updates: bool = None,
-        error_callback: Callable[[TelegramError], None] = None,
+        allowed_updates: Optional[List[str]] = None,
+        drop_pending_updates: Optional[bool] = None,
+        error_callback: Optional[Callable[[TelegramError], None]] = None,
     ) -> "asyncio.Queue[object]":
         """Starts polling updates from Telegram.
 
@@ -378,15 +378,15 @@ class Updater(AsyncContextManager["Updater"]):
         listen: str = "127.0.0.1",
         port: int = 80,
         url_path: str = "",
-        cert: Union[str, Path] = None,
-        key: Union[str, Path] = None,
+        cert: Optional[Union[str, Path]] = None,
+        key: Optional[Union[str, Path]] = None,
         bootstrap_retries: int = 0,
-        webhook_url: str = None,
-        allowed_updates: List[str] = None,
-        drop_pending_updates: bool = None,
-        ip_address: str = None,
+        webhook_url: Optional[str] = None,
+        allowed_updates: Optional[List[str]] = None,
+        drop_pending_updates: Optional[bool] = None,
+        ip_address: Optional[str] = None,
         max_connections: int = 40,
-        secret_token: str = None,
+        secret_token: Optional[str] = None,
     ) -> "asyncio.Queue[object]":
         """
         Starts a small http server to listen for updates via webhook. If :paramref:`cert`
@@ -512,14 +512,14 @@ class Updater(AsyncContextManager["Updater"]):
         url_path: str,
         bootstrap_retries: int,
         allowed_updates: Optional[List[str]],
-        cert: Union[str, Path] = None,
-        key: Union[str, Path] = None,
-        drop_pending_updates: bool = None,
-        webhook_url: str = None,
-        ready: asyncio.Event = None,
-        ip_address: str = None,
+        cert: Optional[Union[str, Path]] = None,
+        key: Optional[Union[str, Path]] = None,
+        drop_pending_updates: Optional[bool] = None,
+        webhook_url: Optional[str] = None,
+        ready: Optional[asyncio.Event] = None,
+        ip_address: Optional[str] = None,
         max_connections: int = 40,
-        secret_token: str = None,
+        secret_token: Optional[str] = None,
     ) -> None:
         _LOGGER.debug("Updater thread started (webhook)")
 
@@ -637,12 +637,12 @@ class Updater(AsyncContextManager["Updater"]):
         max_retries: int,
         webhook_url: Optional[str],
         allowed_updates: Optional[List[str]],
-        drop_pending_updates: bool = None,
+        drop_pending_updates: Optional[bool] = None,
         cert: Optional[bytes] = None,
         bootstrap_interval: float = 1,
-        ip_address: str = None,
+        ip_address: Optional[str] = None,
         max_connections: int = 40,
-        secret_token: str = None,
+        secret_token: Optional[str] = None,
     ) -> None:
         """Prepares the setup for fetching updates: delete or set the webhook and drop pending
         updates if appropriate. If there are unsuccessful attempts, this will retry as specified by

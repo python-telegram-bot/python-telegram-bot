@@ -101,14 +101,14 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         title: str,
         document_file_id: str,
-        description: str = None,
-        caption: str = None,
-        reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: "InputMessageContent" = None,
+        description: Optional[str] = None,
+        caption: Optional[str] = None,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        input_message_content: Optional["InputMessageContent"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.DOCUMENT, id, api_kwargs=api_kwargs)

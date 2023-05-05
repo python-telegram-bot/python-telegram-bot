@@ -56,7 +56,7 @@ class PollOption(TelegramObject):
 
     __slots__ = ("voter_count", "text")
 
-    def __init__(self, text: str, voter_count: int, *, api_kwargs: JSONDict = None):
+    def __init__(self, text: str, voter_count: int, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)
         self.text: str = text
         self.voter_count: int = voter_count
@@ -107,7 +107,12 @@ class PollAnswer(TelegramObject):
     __slots__ = ("option_ids", "user", "poll_id")
 
     def __init__(
-        self, poll_id: str, user: User, option_ids: Sequence[int], *, api_kwargs: JSONDict = None
+        self,
+        poll_id: str,
+        user: User,
+        option_ids: Sequence[int],
+        *,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.poll_id: str = poll_id
@@ -240,13 +245,13 @@ class Poll(TelegramObject):
         is_anonymous: bool,
         type: str,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool,
-        correct_option_id: int = None,
-        explanation: str = None,
-        explanation_entities: Sequence[MessageEntity] = None,
-        open_period: int = None,
-        close_date: datetime.datetime = None,
+        correct_option_id: Optional[int] = None,
+        explanation: Optional[str] = None,
+        explanation_entities: Optional[Sequence[MessageEntity]] = None,
+        open_period: Optional[int] = None,
+        close_date: Optional[datetime.datetime] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id  # pylint: disable=invalid-name
@@ -313,7 +318,9 @@ class Poll(TelegramObject):
 
         return entity_text.decode("utf-16-le")
 
-    def parse_explanation_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
+    def parse_explanation_entities(
+        self, types: Optional[List[str]] = None
+    ) -> Dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this polls explanation filtered by their ``type`` attribute as
