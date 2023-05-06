@@ -38,7 +38,7 @@ repos:
           - aiolimiter~=1.0.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.1.1
+    rev: v1.2.0
     hooks:
     -   id: mypy
         name: mypy-ptb
@@ -65,7 +65,7 @@ repos:
         - cachetools~=5.3.0
         - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
+    rev: v3.3.2
     hooks:
     -   id: pyupgrade
         files: ^(telegram|examples|tests|docs)/.*\.py$
@@ -80,7 +80,7 @@ repos:
         - --diff
         - --check
 -   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.261'
+    rev: 'v0.0.263'
     hooks:
     -   id: ruff
         name: ruff
