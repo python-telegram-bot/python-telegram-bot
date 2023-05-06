@@ -141,7 +141,7 @@ class BaseFilter:
 
     Also works with more than two filters::
 
-        filters.TEXT & (filters.Entity(URL) | filters.Entity(TEXT_LINK))
+        filters.TEXT & (filters.Entity("url") | filters.Entity("text_link"))
         filters.TEXT & (~ filters.FORWARDED)
 
     Note:
