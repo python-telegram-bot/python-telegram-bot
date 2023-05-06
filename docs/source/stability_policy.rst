@@ -50,39 +50,7 @@ In such cases we will find a trade-off between backward compatibility and fully 
 We highly recommend using keyword arguments, which can help make such changes non-breaking on your end.
 
 ..
-    We have documented a few common cases and possible backwards compatible solutions here in the wiki as a reference for the dev team.
-
-To be moved to the wiki before merge:
-
-A few cases can happen when Telegram makes changes to arguments of classes and methods.
-Here are a few hints on how these can be handled in a compatible way that is backward compatible or at least minimizes the impact of the change.
-Whether these hints are applied or the change is just implemented in a breaking way may be decided by the dev team on a case-by-case basis.
-This depends e.g. on the currently available capacity.
-
-1. Optional arguments become mandatory
-
-   1. Keep the argument optional in the method signature
-   2. If the argument is not passed, raise a ``TypeError`` with a helpful message
-
-   That way it's still a breaking change, but at least passed values are not randomly assigned to the wrong argument.
-
-2. New positional argument is added and changes the order of the arguments
-
-   1. Add it as optional argument
-   2. If the argument is not passed, raise a ``TypeError`` with a helpful message
-
-3. Optional argument is renamed
-
-   1. Keep the old argument name in the method signature
-   2. If the old argument is passed, issue a deprecation warning with a helpful message
-   3. If both the old and the new argument are passed, raise a ``ValueError`` with a helpful message.
-
-4. Mandatory argument is renamed
-
-   1. Keep the old argument name in the method signature and make it optional
-   2. If the old argument is passed, issue a deprecation warning with a helpful message
-   3. If neither the old nor the new argument is passed, raise a ``TypeError`` with a helpful message
-   4. If the old argument is not the first mandatory argument, make the ones before optional as well and raise a ``TypeError`` if they are not passed
+    We have documented a few common cases and possible backwards compatible solutions in the wiki as a reference for the dev team: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Bot-API-Backward-Compatibility
 
 When the Bot API changes attributes of classes, the method :meth:`telegram.TelegramObject.to_dict` will change as necessary to reflect these changes.
 In particular, attributes deprecated by Telegram will be removed from the returned dictionary.
