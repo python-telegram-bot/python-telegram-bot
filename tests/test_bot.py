@@ -26,7 +26,6 @@ import re
 import socket
 import time
 from collections import defaultdict
-from uuid import uuid4
 
 import pytest
 
@@ -79,7 +78,7 @@ from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
-from telegram.warnings import PTBDeprecationWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
@@ -767,9 +766,14 @@ class TestBotWithoutRequest:
 
             monkeypatch.delattr(bot.request, "post")
 
-    async def test_answer_inline_query_deprecated_args(self, monkeypatch, bot, recwarn):
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_answer_inline_query_deprecated_args(
+        self, monkeypatch, recwarn, bot_class, bot, raw_bot
+    ):
         async def mock_post(*args, **kwargs):
             return True
+
+        bot = raw_bot if bot_class == "Bot" else bot
 
         monkeypatch.setattr(bot.request, "post", mock_post)
 
@@ -1703,22 +1707,21 @@ class TestBotWithoutRequest:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    async def test_http2_runtime_error(self, recwarn):
-        Bot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
-        Bot(
+    @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
+    async def test_http2_runtime_error(self, recwarn, bot_class):
+        bot_class("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
+        bot_class(
             "12345:ABCDE",
             base_url="http://",
             get_updates_request=HTTPXRequest(http_version="2"),
         )
-        Bot(
+        bot_class(
             "12345:ABCDE",
             base_url="http://",
             request=HTTPXRequest(http_version="2"),
             get_updates_request=HTTPXRequest(http_version="2"),
         )
-        # this exists to make sure the error is also raised by extbot
-        ExtBot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
-        assert len(recwarn) == 4
+        assert len(recwarn) == 3
         assert "You set the HTTP version for the request HTTPXRequest instance" in str(
             recwarn[0].message
         )
@@ -1729,6 +1732,83 @@ class TestBotWithoutRequest:
             "You set the HTTP version for the get_updates_request and request HTTPXRequest "
             "instance" in str(recwarn[2].message)
         )
+        for warning in recwarn:
+            assert warning.filename == __file__, "wrong stacklevel!"
+            assert warning.category is PTBUserWarning
+
+    async def test_set_get_my_name(self, bot, monkeypatch):
+        """We only test that we pass the correct values to TG since this endpoint is heavily
+        rate limited which makes automated tests rather infeasible."""
+        default_name = "default_bot_name"
+        en_name = "en_bot_name"
+        de_name = "de_bot_name"
+
+        # We predefine the responses that we would TG expect to send us
+        set_stack = asyncio.Queue()
+        get_stack = asyncio.Queue()
+        await set_stack.put({"name": default_name})
+        await set_stack.put({"name": en_name, "language_code": "en"})
+        await set_stack.put({"name": de_name, "language_code": "de"})
+        await get_stack.put({"name": default_name, "language_code": None})
+        await get_stack.put({"name": en_name, "language_code": "en"})
+        await get_stack.put({"name": de_name, "language_code": "de"})
+
+        await set_stack.put({"name": default_name})
+        await set_stack.put({"language_code": "en"})
+        await set_stack.put({"language_code": "de"})
+        await get_stack.put({"name": default_name, "language_code": None})
+        await get_stack.put({"name": default_name, "language_code": "en"})
+        await get_stack.put({"name": default_name, "language_code": "de"})
+
+        async def post(url, request_data: RequestData, *args, **kwargs):
+            # The mock-post now just fetches the predefined responses from the queues
+            if "setMyName" in url:
+                expected = await set_stack.get()
+                assert request_data.json_parameters == expected
+                set_stack.task_done()
+                return True
+
+            bot_name = await get_stack.get()
+            if "language_code" in request_data.json_parameters:
+                assert request_data.json_parameters == {"language_code": bot_name["language_code"]}
+            else:
+                assert request_data.json_parameters == {}
+            get_stack.task_done()
+            return bot_name
+
+        monkeypatch.setattr(bot.request, "post", post)
+
+        # Set the names
+        assert all(
+            await asyncio.gather(
+                bot.set_my_name(default_name),
+                bot.set_my_name(en_name, language_code="en"),
+                bot.set_my_name(de_name, language_code="de"),
+            )
+        )
+
+        # Check that they were set correctly
+        assert await asyncio.gather(
+            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
+        ) == [
+            BotName(default_name),
+            BotName(en_name),
+            BotName(de_name),
+        ]
+
+        # Delete the names
+        assert all(
+            await asyncio.gather(
+                bot.set_my_name(default_name),
+                bot.set_my_name(None, language_code="en"),
+                bot.set_my_name(None, language_code="de"),
+            )
+        )
+
+        # Check that they were deleted correctly
+        assert await asyncio.gather(
+            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
+        ) == 3 * [BotName(default_name)]
 
 
 class TestBotWithRequest:
@@ -3360,45 +3440,3 @@ class TestBotWithRequest:
             bot.get_my_short_description("en"),
             bot.get_my_short_description("de"),
         ) == 3 * [BotShortDescription("")]
-
-    # TODO: Mock this test
-    @pytest.mark.skip(reason="Must be converted to mocked test")
-    async def test_set_get_my_name(self, bot):
-        default_name = uuid4().hex
-        en_name = uuid4().hex
-        de_name = uuid4().hex
-
-        # Set the names
-        assert all(
-            await asyncio.gather(
-                bot.set_my_name(default_name),
-                bot.set_my_name(en_name, language_code="en"),
-                bot.set_my_name(de_name, language_code="de"),
-            )
-        )
-
-        # Check that they were set correctly
-        assert await asyncio.gather(
-            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
-        ) == [
-            BotName(default_name),
-            BotName(en_name),
-            BotName(de_name),
-        ]
-
-        # Delete the names
-        assert all(
-            await asyncio.gather(
-                bot.set_my_name(None),
-                bot.set_my_name(None, language_code="en"),
-                bot.set_my_name(None, language_code="de"),
-            )
-        )
-
-        # Check that they were deleted correctly
-        assert await asyncio.gather(
-            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
-        ) == 3 * [BotName("")]
-
-        # Reset to original name
-        assert await bot.set_my_name(bot.first_name)

@@ -24,8 +24,8 @@ Inline Mode
     telegram.inlinequeryresultlocation
     telegram.inlinequeryresultmpeg4gif
     telegram.inlinequeryresultphoto
-    telegram.inlinequeryresultvenue
     telegram.inlinequeryresultsbutton
+    telegram.inlinequeryresultvenue
     telegram.inlinequeryresultvideo
     telegram.inlinequeryresultvoice
     telegram.inputmessagecontent

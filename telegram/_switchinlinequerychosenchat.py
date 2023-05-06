@@ -29,14 +29,14 @@ class SwitchInlineQueryChosenChat(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`query`, :attr:`allow_user_chats`, :attr:`allow_bot_chats`,
-    :attr:`allow_group_chats` and :attr:`allow_channel_chats` are equal.
+    :attr:`allow_group_chats`, and :attr:`allow_channel_chats` are equal.
 
     .. versionadded:: NEXT.VERSION
 
     Caution:
         The PTB team has discovered that you must pass at least one of
-        :paramref:`allow_user_chats`, :paramref:`allow_bot_chats`, :paramref:`allow_group_chats` or
-        :paramref:`allow_channel_chats` to Telegram. Otherwise, an error will be raised.
+        :paramref:`allow_user_chats`, :paramref:`allow_bot_chats`, :paramref:`allow_group_chats`,
+        or :paramref:`allow_channel_chats` to Telegram. Otherwise, an error will be raised.
 
     Args:
         query (:obj:`str`, optional): The default inline query to be inserted in the input field.

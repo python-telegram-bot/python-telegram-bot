@@ -29,8 +29,6 @@ class WriteAccessAllowed(TelegramObject):
     adding the bot to the attachment menu or launching a Web App from a link.
 
     .. versionadded:: 20.0
-    .. versionchanged:: NEXT.VERSION
-        Added the optional :attr:`web_app_name` attribute.
 
     Args:
         web_app_name (:obj:`str`, optional): Name of the Web App which was launched from a link.
