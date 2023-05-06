@@ -26,6 +26,7 @@ import time
 import pytest
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
+from telegram.warnings import PTBUserWarning
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
@@ -359,6 +360,7 @@ class TestJobQueue:
         job_queue.run_daily(self.job_run_once, time_of_day, days=(0, 1, 2, 3))
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == self.expected_warning
+        assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     @pytest.mark.parametrize("weekday", [0, 1, 2, 3, 4, 5, 6])
@@ -376,6 +378,7 @@ class TestJobQueue:
         assert scheduled_time == pytest.approx(expected_reschedule_time)
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == self.expected_warning
+        assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     async def test_run_monthly(self, job_queue, timezone):

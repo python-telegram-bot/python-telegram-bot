@@ -31,7 +31,10 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
+from tests.auxil.deprecations import (
+    check_thumb_deprecation_warning_for_method_args,
+    check_thumb_deprecation_warnings_for_args_and_attrs,
+)
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -156,6 +159,19 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         )
 
         assert message
+
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_send_document_thumb_deprecation_warning(
+        self, recwarn, monkeypatch, bot_class, bot, raw_bot, chat_id, document
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return True
+
+        bot = raw_bot if bot_class == "Bot" else bot
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        await bot.send_document(chat_id, document, thumb="thumb")
+        check_thumb_deprecation_warning_for_method_args(recwarn, __file__)
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_document_local_files(self, monkeypatch, bot, chat_id, local_mode):
