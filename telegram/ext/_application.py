@@ -1046,24 +1046,33 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     async def _update_fetcher(self) -> None:
         # Continuously fetch updates from the queue. Exit only once the signal object is found.
         while True:
-            update = await self.update_queue.get()
+            try:
+                update = await self.update_queue.get()
 
-            if update is _STOP_SIGNAL:
-                _LOGGER.debug("Dropping pending updates")
-                while not self.update_queue.empty():
+                if update is _STOP_SIGNAL:
+                    _LOGGER.debug("Dropping pending updates")
+                    while not self.update_queue.empty():
+                        self.update_queue.task_done()
+
+                    # For the _STOP_SIGNAL
                     self.update_queue.task_done()
+                    return
 
-                # For the _STOP_SIGNAL
-                self.update_queue.task_done()
-                return
+                _LOGGER.debug("Processing update %s", update)
 
-            _LOGGER.debug("Processing update %s", update)
-
-            if self._concurrent_updates:
-                # We don't await the below because it has to be run concurrently
-                self.create_task(self.__process_update_wrapper(update), update=update)
-            else:
-                await self.__process_update_wrapper(update)
+                if self._concurrent_updates:
+                    # We don't await the below because it has to be run concurrently
+                    self.create_task(self.__process_update_wrapper(update), update=update)
+                else:
+                    await self.__process_update_wrapper(update)
+            except asyncio.CancelledError:
+                # This may happen if the application is manually run via application.start() and
+                # then a KeyboardInterrupt is sent. We must prevent this loop to die since
+                # application.stop() will wait for it's clean shutdown.
+                _LOGGER.warning(
+                    "Fetching updates got a asyncio.CancelledError. Ignoring as this task may only"
+                    "be closed via `Application.stop`."
+                )
 
     async def __process_update_wrapper(self, update: object) -> None:
         async with self._concurrent_updates_sem:
