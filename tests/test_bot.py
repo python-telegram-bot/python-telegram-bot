@@ -766,9 +766,14 @@ class TestBotWithoutRequest:
 
             monkeypatch.delattr(bot.request, "post")
 
-    async def test_answer_inline_query_deprecated_args(self, monkeypatch, bot, recwarn):
+    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
+    async def test_answer_inline_query_deprecated_args(
+        self, monkeypatch, recwarn, bot_class, bot, raw_bot
+    ):
         async def mock_post(*args, **kwargs):
             return True
+
+        bot = raw_bot if bot_class == "Bot" else bot
 
         monkeypatch.setattr(bot.request, "post", mock_post)
 

@@ -2902,12 +2902,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             )
 
         if switch_pm_text and switch_pm_parameter:
-            warn(
+            self._warn(
                 "Since Bot API 6.7, the parameters `switch_pm_text` and `switch_pm_parameter` are "
                 "deprecated in favour of the new parameter `button`. Please use the new parameter "
                 "`button` instead.",
                 category=PTBDeprecationWarning,
-                stacklevel=4,
+                stacklevel=3,
             )
             button = InlineQueryResultsButton(
                 text=switch_pm_text,
