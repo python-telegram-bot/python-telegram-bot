@@ -17,6 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represent a Telegram bots name."""
+from typing import ClassVar
+
+from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -46,3 +49,6 @@ class BotName(TelegramObject):
         self._id_attrs = (self.name,)
 
         self._freeze()
+
+    MAX_LENGTH: ClassVar[int] = constants.BotNameLimit.MAX_NAME_LENGTH
+    """:const:`telegram.constants.BotNameLimit.MAX_NAME_LENGTH`"""
