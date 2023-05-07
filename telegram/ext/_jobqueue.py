@@ -157,6 +157,10 @@ class JobQueue(Generic[CCT]):
         if application is not None:
             return application
         raise RuntimeError("The application instance is no longer alive.")
+    
+    @staticmethod
+    async def run_job(job_queue: "JobQueue", job: "Job") -> None:
+        await job.run(job_queue.application)
 
     def run_once(
         self,
@@ -230,11 +234,11 @@ class JobQueue(Generic[CCT]):
         date_time = self._parse_time_input(when, shift_day=True)
 
         j = self.scheduler.add_job(
-            job.run,
+            self.run_job,
             name=name,
             trigger="date",
             run_date=date_time,
-            args=(self.application,),
+            args=(self, job),
             timezone=date_time.tzinfo or self.scheduler.timezone,
             **job_kwargs,
         )
@@ -344,9 +348,9 @@ class JobQueue(Generic[CCT]):
             interval = interval.total_seconds()
 
         j = self.scheduler.add_job(
-            job.run,
+            self.run_job,
             trigger="interval",
-            args=(self.application,),
+            args=(self, job),
             start_date=dt_first,
             end_date=dt_last,
             seconds=interval,
@@ -421,9 +425,9 @@ class JobQueue(Generic[CCT]):
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         j = self.scheduler.add_job(
-            job.run,
+            self.run_job,
             trigger="cron",
-            args=(self.application,),
+            args=(self, job),
             name=name,
             day="last" if day == -1 else day,
             hour=when.hour,
@@ -511,9 +515,9 @@ class JobQueue(Generic[CCT]):
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         j = self.scheduler.add_job(
-            job.run,
+            self.run_job,
             name=name,
-            args=(self.application,),
+            args=(self, job),
             trigger="cron",
             day_of_week=",".join([self._CRON_MAPPING[d] for d in days]),
             hour=time.hour,
@@ -573,7 +577,7 @@ class JobQueue(Generic[CCT]):
         name = name or callback.__name__
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
-        j = self.scheduler.add_job(job.run, args=(self.application,), name=name, **job_kwargs)
+        j = self.scheduler.add_job(self.run_job, args=(self, job), name=name, **job_kwargs)
 
         job._job = j  # pylint: disable=protected-access
         return job
@@ -810,7 +814,9 @@ class Job(Generic[CCT]):
 
     @classmethod
     def _from_aps_job(cls, job: "APSJob") -> "Job[CCT]":
-        return job.func.__self__
+        job_ = job.args[1]
+        job_._job = job  # pylint: disable=protected-access
+        return job_
 
     def __getattr__(self, item: str) -> object:
         try:
