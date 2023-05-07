@@ -79,7 +79,7 @@ def invite_link(user):
 
 @pytest.fixture(scope="module")
 def chat_member_updated(user, chat, old_chat_member, new_chat_member, invite_link, time):
-    return ChatMemberUpdated(chat, user, time, old_chat_member, new_chat_member, invite_link)
+    return ChatMemberUpdated(chat, user, time, old_chat_member, new_chat_member, invite_link, True)
 
 
 class TestChatMemberUpdatedBase:
@@ -113,6 +113,7 @@ class TestChatMemberUpdatedWithoutRequest(TestChatMemberUpdatedBase):
         assert chat_member_updated.old_chat_member == old_chat_member
         assert chat_member_updated.new_chat_member == new_chat_member
         assert chat_member_updated.invite_link is None
+        assert chat_member_updated.via_chat_folder_invite_link is None
 
     def test_de_json_all_args(
         self, bot, user, time, invite_link, chat, old_chat_member, new_chat_member
@@ -124,6 +125,7 @@ class TestChatMemberUpdatedWithoutRequest(TestChatMemberUpdatedBase):
             "old_chat_member": old_chat_member.to_dict(),
             "new_chat_member": new_chat_member.to_dict(),
             "invite_link": invite_link.to_dict(),
+            "via_chat_folder_invite_link": True,
         }
 
         chat_member_updated = ChatMemberUpdated.de_json(json_dict, bot)
@@ -136,6 +138,7 @@ class TestChatMemberUpdatedWithoutRequest(TestChatMemberUpdatedBase):
         assert chat_member_updated.old_chat_member == old_chat_member
         assert chat_member_updated.new_chat_member == new_chat_member
         assert chat_member_updated.invite_link == invite_link
+        assert chat_member_updated.via_chat_folder_invite_link is True
 
     def test_de_json_localization(
         self, bot, raw_bot, tz_bot, user, chat, old_chat_member, new_chat_member, time, invite_link
@@ -178,6 +181,10 @@ class TestChatMemberUpdatedWithoutRequest(TestChatMemberUpdatedBase):
             == chat_member_updated.new_chat_member.to_dict()
         )
         assert chat_member_updated_dict["invite_link"] == chat_member_updated.invite_link.to_dict()
+        assert (
+            chat_member_updated_dict["via_chat_folder_invite_link"]
+            == chat_member_updated.via_chat_folder_invite_link
+        )
 
     def test_equality(self, time, old_chat_member, new_chat_member, invite_link):
         a = ChatMemberUpdated(

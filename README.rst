@@ -14,7 +14,7 @@
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-6.6-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-6.7-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -46,8 +46,8 @@
    :target: https://app.codacy.com/gh/python-telegram-bot/python-telegram-bot/dashboard
    :alt: Code quality: Codacy
 
-.. image:: https://deepsource.io/gh/python-telegram-bot/python-telegram-bot.svg/?label=active+issues
-   :target: https://deepsource.io/gh/python-telegram-bot/python-telegram-bot/?ref=repository-badge
+.. image:: https://app.deepsource.com/gh/python-telegram-bot/python-telegram-bot.svg/?label=active+issues
+   :target: https://app.deepsource.com/gh/python-telegram-bot/python-telegram-bot/?ref=repository-badge
    :alt: Code quality: DeepSource
 
 .. image:: https://results.pre-commit.ci/badge/github/python-telegram-bot/python-telegram-bot/master.svg
@@ -93,7 +93,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **6.6** are supported.
+All types and methods of the Telegram Bot API **6.7** are supported.
 
 Installing
 ==========

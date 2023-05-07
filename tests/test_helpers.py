@@ -32,8 +32,9 @@ class TestHelpers:
             ("_italic_", r"\_italic\_"),
             ("`code`", r"\`code\`"),
             ("[text_link](https://github.com/)", r"\[text\_link](https://github.com/)"),
+            ("![👍](tg://emoji?id=1)", r"!\[👍](tg://emoji?id=1)"),
         ],
-        ids=["bold", "italic", "code", "text_link"],
+        ids=["bold", "italic", "code", "text_link", "custom_emoji_id"],
     )
     def test_escape_markdown(self, test_str, expected):
         assert expected == helpers.escape_markdown(test_str)
@@ -68,12 +69,15 @@ class TestHelpers:
             test_str, version=2, entity_type=MessageEntity.CODE
         )
 
-    def test_escape_markdown_v2_text_link(self):
+    def test_escape_markdown_v2_links(self):
         test_str = "https://url.containing/funny)cha)\\ra\\)cter\\s"
         expected_str = "https://url.containing/funny\\)cha\\)\\\\ra\\\\\\)cter\\\\s"
 
         assert expected_str == helpers.escape_markdown(
             test_str, version=2, entity_type=MessageEntity.TEXT_LINK
+        )
+        assert expected_str == helpers.escape_markdown(
+            test_str, version=2, entity_type=MessageEntity.CUSTOM_EMOJI
         )
 
     def test_markdown_invalid_version(self):
