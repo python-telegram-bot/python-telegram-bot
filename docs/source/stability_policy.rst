@@ -3,7 +3,7 @@ Stability Policy
 
 .. important::
 
-    This stability policy is in place since version NEXT.VERSION.
+    This stability policy is in place since version 20.3.
     While earlier versions of ``python-telegram-bot`` also had stable interfaces, they had no explicit stability policy and hence did not follow the rules outlined below in all detail.
     Please also refer to the :ref:`changelog <ptb-changelog>`.
 
@@ -105,7 +105,7 @@ Should a similarly big change ever be deemed necessary again by the development 
 Non-Bot API Functionality
 #########################
 
-Starting with version NEXT.VERSION, deprecated functionality will stay available for the current and the next major version.
+Starting with version 20.3, deprecated functionality will stay available for the current and the next major version.
 For example:
 
 -  In PTB v20.1.1 the feature exists
@@ -120,7 +120,7 @@ Bot API Functionality
 
 As PTB has no control over deprecations introduced by Telegram and the schedule of these deprecations rarely coincides with PTBs deprecation schedule, we have a special policy for Bot API functionality.
 
-Starting with NEXT.VERSION, deprecated Bot API functionality will stay available for the current and the next major version of PTB *or* until the next version of the Bot API.
+Starting with 20.3, deprecated Bot API functionality will stay available for the current and the next major version of PTB *or* until the next version of the Bot API.
 More precisely, two cases are possible, for which we show examples below.
 
 Case 1

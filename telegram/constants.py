@@ -215,7 +215,7 @@ class BotNameLimit(IntEnum):
     """This enum contains limitations for the methods :meth:`telegram.Bot.set_my_name`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.3
     """
 
     __slots__ = ()
@@ -754,7 +754,7 @@ class InlineQueryLimit(IntEnum):
     :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
     :meth:`telegram.Bot.answer_inline_query`.
 
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 20.3
         Deprecated in favor of :attr:`InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH`.
     """
     MAX_SWITCH_PM_TEXT_LENGTH = 64
@@ -762,7 +762,7 @@ class InlineQueryLimit(IntEnum):
     :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
     :meth:`telegram.Bot.answer_inline_query`.
 
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 20.3
         Deprecated in favor of :attr:`InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`.
     """
 
@@ -792,7 +792,7 @@ class InlineQueryResultsButtonLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.InlineQueryResultsButton`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.3
     """
 
     __slots__ = ()

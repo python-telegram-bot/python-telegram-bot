@@ -52,7 +52,7 @@ class WebhookInfo(TelegramObject):
         last_error_date (:class:`datetime.datetime`): Optional. Datetime for the most recent
             error that happened when trying to deliver an update via webhook.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         last_error_message (:obj:`str`, optional): Error message in human-readable format for the
             most recent error that happened when trying to deliver an update via webhook.
@@ -71,7 +71,7 @@ class WebhookInfo(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
     Attributes:
         url (:obj:`str`): Webhook URL, may be empty if webhook is not set up.
@@ -82,7 +82,7 @@ class WebhookInfo(TelegramObject):
         last_error_date (:class:`datetime.datetime`): Optional. Datetime for the most recent
             error that happened when trying to deliver an update via webhook.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         last_error_message (:obj:`str`): Optional. Error message in human-readable format for the
             most recent error that happened when trying to deliver an update via webhook.
@@ -102,7 +102,7 @@ class WebhookInfo(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
     """
 

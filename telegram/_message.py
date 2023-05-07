@@ -124,7 +124,7 @@ class Message(TelegramObject):
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`, optional): For forwarded messages, sender of
@@ -138,7 +138,7 @@ class Message(TelegramObject):
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         is_automatic_forward (:obj:`bool`, optional): :obj:`True`, if the message is a channel
             post that was automatically forwarded to the connected discussion group.
@@ -150,7 +150,7 @@ class Message(TelegramObject):
         edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         has_protected_content (:obj:`bool`, optional): :obj:`True`, if the message can't be
             forwarded.
@@ -350,7 +350,7 @@ class Message(TelegramObject):
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`): Optional. For forwarded messages, sender of the
@@ -362,7 +362,7 @@ class Message(TelegramObject):
         forward_date (:class:`datetime.datetime`): Optional. For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         is_automatic_forward (:obj:`bool`): Optional. :obj:`True`, if the message is a channel
             post that was automatically forwarded to the connected discussion group.
@@ -374,7 +374,7 @@ class Message(TelegramObject):
         edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         has_protected_content (:obj:`bool`): Optional. :obj:`True`, if the message can't be
             forwarded.
@@ -852,7 +852,7 @@ class Message(TelegramObject):
         """:obj:`str`: Convenience property. If the chat of the message is not
         a private chat or normal group, returns a t.me link of the message.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 For messages that are replies or part of a forum topic, the link now points
                 to the corresponding thread view.
         """
@@ -3369,7 +3369,7 @@ class Message(TelegramObject):
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
         Returns:
@@ -3388,7 +3388,7 @@ class Message(TelegramObject):
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
         Returns:
@@ -3408,7 +3408,7 @@ class Message(TelegramObject):
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
         Returns:
@@ -3427,7 +3427,7 @@ class Message(TelegramObject):
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
         Returns:
@@ -3601,7 +3601,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.3
             |custom_emoji_md1_deprecation|
 
         Returns:
@@ -3625,7 +3625,7 @@ class Message(TelegramObject):
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
         Returns:
@@ -3648,7 +3648,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.3
             |custom_emoji_md1_deprecation|
 
         Returns:
@@ -3672,7 +3672,7 @@ class Message(TelegramObject):
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
         Returns:
@@ -3695,7 +3695,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.3
             |custom_emoji_md1_deprecation|
 
         Returns:
@@ -3719,7 +3719,7 @@ class Message(TelegramObject):
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
         Returns:
@@ -3744,7 +3744,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.3
             |custom_emoji_md1_deprecation|
 
         Returns:
@@ -3768,7 +3768,7 @@ class Message(TelegramObject):
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
         Returns:

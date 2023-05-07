@@ -4,6 +4,78 @@
 Changelog
 =========
 
+Version 20.3
+============
+*Released 2023-05-07*
+
+This is the technical changelog for version 20.3. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full support for API 6.7 (`#3673`_)
+- Add a Stability Policy (`#3622`_)
+
+New Features
+------------
+
+- Add ``Application.mark_data_for_update_persistence`` (`#3607`_)
+- Make ``Message.link`` Point to Thread View Where Possible (`#3640`_)
+- Localize Received ``datetime`` Objects According to ``Defaults.tzinfo`` (`#3632`_)
+
+Minor Changes, Documentation Improvements and CI
+------------------------------------------------
+
+- Empower ``ruff`` (`#3594`_)
+- Drop Usage of ``sys.maxunicode`` (`#3630`_)
+- Add String Representation for ``RequestParameter`` (`#3634`_)
+- Stabilize CI by Rerunning Failed Tests (`#3631`_)
+- Give Loggers Better Names (`#3623`_)
+- Add Logging for Invalid JSON Data in ``BasePersistence.parse_json_payload`` (`#3668`_)
+- Improve Warning Categories & Stacklevels (`#3674`_)
+- Stabilize ``test_delete_sticker_set`` (`#3685`_)
+- Shield Update Fetcher Task in ``Application.start`` (`#3657`_)
+- Recover 100% Type Completeness (`#3676`_)
+- Documentation Improvements (`#3628`_, `#3636`_, `#3694`_)
+
+Dependencies
+------------
+
+- Bump ``actions/stale`` from 7 to 8 (`#3644`_)
+- Bump ``furo`` from 2023.3.23 to 2023.3.27 (`#3643`_)
+- ``pre-commit`` autoupdate (`#3646`_, `#3688`_)
+- Remove Deprecated ``codecov`` Package from CI (`#3664`_)
+- Bump ``sphinx-copybutton`` from 0.5.1 to 0.5.2 (`#3662`_)
+- Update ``httpx`` requirement from ~=0.23.3 to ~=0.24.0 (`#3660`_)
+- Bump ``pytest`` from 7.2.2 to 7.3.1 (`#3661`_)
+
+.. _`#3673`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3673
+.. _`#3622`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3622
+.. _`#3607`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3607
+.. _`#3640`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3640
+.. _`#3632`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3632
+.. _`#3594`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3594
+.. _`#3630`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3630
+.. _`#3634`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3634
+.. _`#3631`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3631
+.. _`#3623`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3623
+.. _`#3668`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3668
+.. _`#3674`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3674
+.. _`#3685`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3685
+.. _`#3657`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3657
+.. _`#3676`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3676
+.. _`#3628`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3628
+.. _`#3636`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3636
+.. _`#3694`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3694
+.. _`#3644`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3644
+.. _`#3643`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3643
+.. _`#3646`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3646
+.. _`#3688`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3688
+.. _`#3664`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3664
+.. _`#3662`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3662
+.. _`#3660`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3660
+.. _`#3661`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3661
+
 Version 20.2
 ============
 *Released 2023-03-25*

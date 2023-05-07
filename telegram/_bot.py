@@ -2866,7 +2866,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 specified text that switches the user to a private chat with the bot and sends the
                 bot a start message with the parameter :paramref:`switch_pm_parameter`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.3
                     |api6_7_depr|
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the
                 :guilabel:`/start` message sent to the bot when user presses the switch button.
@@ -2874,12 +2874,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
                 only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.3
                     |api6_7_depr|
             button (:class:`telegram.InlineQueryResultsButton`, optional): A button to be shown
                 above the inline query results.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.3
 
         Keyword Args:
             current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
@@ -8185,7 +8185,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to change the bot's name.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.3
 
         Args:
             name (:obj:`str`, optional): New bot name;

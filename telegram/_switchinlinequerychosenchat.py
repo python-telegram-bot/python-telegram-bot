@@ -31,7 +31,7 @@ class SwitchInlineQueryChosenChat(TelegramObject):
     considered equal, if their :attr:`query`, :attr:`allow_user_chats`, :attr:`allow_bot_chats`,
     :attr:`allow_group_chats`, and :attr:`allow_channel_chats` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.3
 
     Caution:
         The PTB team has discovered that you must pass at least one of

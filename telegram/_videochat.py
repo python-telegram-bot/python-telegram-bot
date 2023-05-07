@@ -150,13 +150,13 @@ class VideoChatScheduled(TelegramObject):
         start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the video
             chat is supposed to be started by a chat administrator
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
     Attributes:
         start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the video
             chat is supposed to be started by a chat administrator
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
 
     """

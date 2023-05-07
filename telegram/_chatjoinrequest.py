@@ -57,7 +57,7 @@ class ChatJoinRequest(TelegramObject):
         from_user (:class:`telegram.User`): User that sent the join request.
         date (:class:`datetime.datetime`): Date the request was sent.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
             request. This number may have more than 32 significant bits and some programming
@@ -77,7 +77,7 @@ class ChatJoinRequest(TelegramObject):
         from_user (:class:`telegram.User`): User that sent the join request.
         date (:class:`datetime.datetime`): Date the request was sent.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
             request. This number may have more than 32 significant bits and some programming

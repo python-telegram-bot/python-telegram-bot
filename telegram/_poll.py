@@ -173,7 +173,7 @@ class Poll(TelegramObject):
         close_date (:obj:`datetime.datetime`, optional): Point in time (Unix timestamp) when the
             poll will be automatically closed. Converted to :obj:`datetime.datetime`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
 
     Attributes:
@@ -209,7 +209,7 @@ class Poll(TelegramObject):
         close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
             automatically closed.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
 
     """
