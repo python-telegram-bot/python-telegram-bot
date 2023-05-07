@@ -23,21 +23,24 @@ from telegram.ext import ApplicationBuilder, BaseUpdateProcessor, SimpleUpdatePr
 from tests.auxil.asyncio_helpers import call_after
 
 
-class TestBaseUpdateProcessor:
-    def test_init_with_negative_max_concurrent_updates(self):
-        with pytest.raises(ValueError, match="must be a positive integer"):
-            BaseUpdateProcessor(-1)
+def mock_processor():
+    class MockProcessor(BaseUpdateProcessor):
+        async def do_process_update(self, update, coroutine):
+            pass
 
-    def test_max_concurrent_updates_property(self):
+    return MockProcessor(5)
+
+
+class TestBaseUpdateProcessor:
+    @pytest.mark.parametrize("concurrent_updates", [0, -1])
+    def test_init(self, concurrent_updates):
         processor = BaseUpdateProcessor(3)
         assert processor.max_concurrent_updates == 3
+        with pytest.raises(ValueError, match="must be a positive integer"):
+            BaseUpdateProcessor(concurrent_updates)
 
     async def test_process_update(self, one_time_bot):
-        class MockProcessor(BaseUpdateProcessor):
-            async def do_process_update(self, update, coroutine):
-                pass
-
-        processor = MockProcessor(5)
+        processor = mock_processor()
         application = ApplicationBuilder().concurrent_updates(processor).bot(one_time_bot).build()
         update = Update(1)
 
@@ -49,11 +52,7 @@ class TestBaseUpdateProcessor:
         assert not application.update_queue.empty()
 
     async def test_context_manager(self, monkeypatch):
-        class MockProcessor(BaseUpdateProcessor):
-            async def do_process_update(self, update, coroutine):
-                pass
-
-        processor = MockProcessor(5)
+        processor = mock_processor()
         self.test_flag = set()
 
         async def after_initialize(*args, **kwargs):
@@ -78,6 +77,22 @@ class TestBaseUpdateProcessor:
 
         assert self.test_flag == {"initialize", "stop"}
 
+    async def test_context_manager_exception_on_init(self, monkeypatch):
+        async def initialize(*args, **kwargs):
+            raise RuntimeError("initialize")
+
+        async def shutdown(*args, **kwargs):
+            self.test_flag = "shutdown"
+
+        monkeypatch.setattr(BaseUpdateProcessor, "initialize", initialize)
+        monkeypatch.setattr(BaseUpdateProcessor, "shutdown", shutdown)
+
+        with pytest.raises(RuntimeError, match="initialize"):
+            async with mock_processor():
+                pass
+
+        assert self.test_flag == "shutdown"
+
 
 class TestSimpleUpdateProcessor:
     async def test_do_process_update(self):
@@ -88,9 +103,3 @@ class TestSimpleUpdateProcessor:
             pass
 
         await processor.do_process_update(update, coroutine())
-
-    async def test_equality(self):
-        processor1 = SimpleUpdateProcessor(1)
-        processor2 = SimpleUpdateProcessor(1)
-        assert processor1 == processor2
-        assert hash(processor1) == hash(processor1)

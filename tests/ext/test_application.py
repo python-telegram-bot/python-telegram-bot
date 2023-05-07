@@ -213,12 +213,6 @@ class TestApplication:
         assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
-    def test_concurrent_updates(self, one_time_bot):
-        application = ApplicationBuilder().bot(one_time_bot).concurrent_updates(2).build()
-        assert application.concurrent_updates == (
-            application.update_processor.max_concurrent_updates
-        )
-
     async def test_active_updates(self, one_time_bot):
         class MockProcessor(BaseUpdateProcessor):
             async def do_process_update(self, update, coroutine) -> None:
@@ -234,11 +228,6 @@ class TestApplication:
         await application.update_queue.put(1)
         await processor.process_update(Update(1), coroutine, application)
         assert application.active_updates == processor._semaphore._value
-
-    def test_update_processor_property(self, one_time_bot):
-        processor = SimpleUpdateProcessor(2)
-        application = ApplicationBuilder().bot(one_time_bot).concurrent_updates(processor).build()
-        assert application.update_processor is processor
 
     def test_custom_context_init(self, one_time_bot):
         cc = ContextTypes(

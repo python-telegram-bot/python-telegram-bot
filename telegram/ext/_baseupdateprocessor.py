@@ -20,10 +20,7 @@
 from abc import abstractmethod
 from asyncio import BoundedSemaphore
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Awaitable, Optional, Type
-
-if TYPE_CHECKING:
-    from telegram.ext import Application
+from typing import Any, Awaitable, Optional, Type
 
 
 class BaseUpdateProcessor:
@@ -94,7 +91,6 @@ class BaseUpdateProcessor:
         self,
         update: object,
         coroutine: "Awaitable[Any]",
-        application: "Application",
     ) -> None:
         """Calls :meth:`do_process_update` with a semaphore to limit the number of concurrent
         updates.
@@ -102,11 +98,9 @@ class BaseUpdateProcessor:
         Args:
             update (:obj:`object`): The update to be processed.
             coroutine (:obj:`Awaitable`): The coroutine that will be awaited to process the update.
-            application (:class:`telegram.ext.Application`): The application instance.
         """
         async with self._semaphore:
             await self.do_process_update(update, coroutine)
-            application.update_queue.task_done()
 
     async def __aenter__(self) -> "BaseUpdateProcessor":
         """Simple context manager which initializes the Processor."""
@@ -131,9 +125,6 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
     """Instance of :class:`telegram.ext.BaseUpdateProcessor` that immediately awaits the
     coroutine, i.e. does not apply any additional processing. This is used by default when
     :attr:`telegram.ext.ApplicationBuilder.concurrent_updates` is :obj:`int`.
-
-    Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :paramref:`max_concurrent_updates` is equal.
     """
 
     __slots__ = ()
@@ -156,12 +147,3 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
 
     async def shutdown(self) -> None:
         """Does nothing."""
-
-    def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, self.__class__)
-            and other.max_concurrent_updates == self.max_concurrent_updates
-        )
-
-    def __hash__(self) -> int:
-        return hash(self.max_concurrent_updates)

@@ -57,7 +57,7 @@ from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
-from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
+from telegram.ext._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._handler import BaseHandler
@@ -398,6 +398,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         * The :attr:`bot`, by calling :meth:`telegram.Bot.initialize`.
         * The :attr:`updater`, by calling :meth:`telegram.ext.Updater.initialize`.
         * The :attr:`persistence`, by loading persistent conversations and data.
+        * The :attr:`update_processor` by calling :meth:`telegram.ext.BaseUpdateProcessor.\
+            initialize`.
 
         Does *not* call :attr:`post_init` - that is only done by :meth:`run_polling` and
         :meth:`run_webhook`.
@@ -410,6 +412,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             return
 
         await self.bot.initialize()
+        if isinstance(self._update_processor, BaseUpdateProcessor) and not isinstance(
+            self._update_processor, SimpleUpdateProcessor
+        ):
+            await self._update_processor.initialize()
+
         if self.updater:
             await self.updater.initialize()
 
@@ -442,6 +449,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         * :attr:`updater` by calling :meth:`telegram.ext.Updater.shutdown`
         * :attr:`persistence` by calling :meth:`update_persistence` and
           :meth:`BasePersistence.flush`
+        * :attr:`update_processor` by calling :meth:`telegram.ext.BaseUpdateProcessor.shutdown`
 
         Does *not* call :attr:`post_shutdown` - that is only done by :meth:`run_polling` and
         :meth:`run_webhook`.
@@ -460,6 +468,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             return
 
         await self.bot.shutdown()
+        if isinstance(self._update_processor, BaseUpdateProcessor) and not isinstance(
+            self._update_processor, SimpleUpdateProcessor
+        ):
+            await self._update_processor.shutdown()
+
         if self.updater:
             await self.updater.shutdown()
 
@@ -1073,17 +1086,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
                 _LOGGER.debug("Processing update %s", update)
 
-                if self._update_processor and self._update_processor.max_concurrent_updates > 1:
+                if self._update_processor.max_concurrent_updates > 1:
                     # We don't await the below because it has to be run concurrently
                     self.create_task(
-                        self._update_processor.process_update(
-                            update, self.process_update(update), self
-                        ),
+                        self.__process_update_wrapper(update),
                         update=update,
                     )
                 else:
                     await self.__process_update_wrapper(update)
-                
+
             except asyncio.CancelledError:
                 # This may happen if the application is manually run via application.start() and
                 # then a KeyboardInterrupt is sent. We must prevent this loop to die since
@@ -1094,9 +1105,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 )
 
     async def __process_update_wrapper(self, update: object) -> None:
-        async with self._update_processor._semaphore:  # pylint: disable=protected-access
-            await self.process_update(update)
-            self.update_queue.task_done()
+        await self._update_processor.process_update(update, self.process_update(update))
+        self.update_queue.task_done()
 
     async def process_update(self, update: object) -> None:
         """Processes a single update and marks the update to be updated by the persistence later.

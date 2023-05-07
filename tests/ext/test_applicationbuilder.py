@@ -376,8 +376,9 @@ class TestApplicationBuilder:
             (True, SimpleUpdateProcessor(256)),
         ],
     )
+    @pytest.mark.parametrize("conc_updates", [0, -1])
     def test_all_application_args_custom(
-        self, builder, bot, monkeypatch, concurrent_updates, expected
+        self, builder, bot, monkeypatch, concurrent_updates, expected, conc_updates
     ):
         job_queue = JobQueue()
         persistence = PicklePersistence("file_path")
@@ -415,6 +416,7 @@ class TestApplicationBuilder:
         assert app.updater.bot is app.bot
         assert app.context_types is context_types
         assert app.update_processor == expected
+        assert app.concurrent_updates == (app.update_processor.max_concurrent_updates)
         assert app.post_init is post_init
         assert app.post_shutdown is post_shutdown
         assert app.post_stop is post_stop
@@ -433,7 +435,7 @@ class TestApplicationBuilder:
                 .persistence(persistence)
                 .update_queue(update_queue)
                 .context_types(context_types)
-                .concurrent_updates(-1)
+                .concurrent_updates(conc_updates)
                 .post_init(post_init)
                 .post_shutdown(post_shutdown)
                 .post_stop(post_stop)
