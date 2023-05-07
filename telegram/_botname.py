@@ -44,7 +44,7 @@ class BotName(TelegramObject):
 
     def __init__(self, name: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.name = name
+        self.name: str = name
 
         self._id_attrs = (self.name,)
 

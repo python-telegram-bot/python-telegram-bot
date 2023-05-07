@@ -244,7 +244,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self._local_mode: bool = local_mode
         self._bot_user: Optional[User] = None
         self._private_key: Optional[bytes] = None
-        self._initialized = False
+        self._initialized: bool = False
 
         self._request: Tuple[BaseRequest, BaseRequest] = (
             HTTPXRequest() if get_updates_request is None else get_updates_request,
@@ -375,7 +375,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
     def _log(func: Any):  # type: ignore[no-untyped-def] # skipcq: PY-D0003
         @functools.wraps(func)
-        async def decorator(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        async def decorator(self: "Bot", *args: Any, **kwargs: Any) -> Any:
             # pylint: disable=protected-access
             self._LOGGER.debug("Entering: %s", func.__name__)
             result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
