@@ -16,6 +16,7 @@ Available Types
     telegram.botcommandscopechatmember
     telegram.botcommandscopedefault
     telegram.botdescription
+    telegram.botname
     telegram.botshortdescription
     telegram.callbackquery
     telegram.chat
@@ -78,6 +79,7 @@ Available Types
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
     telegram.sentwebappmessage
+    telegram.switchinlinequerychosenchat
     telegram.telegramobject
     telegram.update
     telegram.user

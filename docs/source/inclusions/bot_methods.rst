@@ -196,6 +196,10 @@
       - Used for setting the short description of the bot
     * - :meth:`~telegram.Bot.get_my_short_description`
       - Used for obtaining the short description of the bot
+    * - :meth:`~telegram.Bot.set_my_name`
+      - Used for setting the name of the bot
+    * - :meth:`~telegram.Bot.get_my_name`
+      - Used for obtaining the name of the bot
 
 .. raw:: html
 

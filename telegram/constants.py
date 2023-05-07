@@ -37,6 +37,7 @@ __all__ = [
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
+    "BotNameLimit",
     "CallbackQueryLimit",
     "ChatAction",
     "ChatID",
@@ -57,6 +58,7 @@ __all__ = [
     "InlineKeyboardMarkupLimit",
     "InlineQueryLimit",
     "InlineQueryResultLimit",
+    "InlineQueryResultsButtonLimit",
     "InlineQueryResultType",
     "InputMediaType",
     "InvoiceLimit",
@@ -114,7 +116,7 @@ class _BotAPIVersion(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=6)
+BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=7)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -206,6 +208,21 @@ class BotDescriptionLimit(IntEnum):
     """:obj:`int`: Maximum length for the parameter
     :paramref:`~telegram.Bot.set_my_short_description.short_description` of
     :meth:`telegram.Bot.set_my_short_description`
+    """
+
+
+class BotNameLimit(IntEnum):
+    """This enum contains limitations for the methods :meth:`telegram.Bot.set_my_name`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_NAME_LENGTH = 64
+    """:obj:`int`: Maximum length for the parameter :paramref:`~telegram.Bot.set_my_name.name` of
+    :meth:`telegram.Bot.set_my_name`
     """
 
 
@@ -735,11 +752,19 @@ class InlineQueryLimit(IntEnum):
     MIN_SWITCH_PM_TEXT_LENGTH = 1
     """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
-    :meth:`telegram.Bot.answer_inline_query`."""
+    :meth:`telegram.Bot.answer_inline_query`.
+
+    .. deprecated:: NEXT.VERSION
+        Deprecated in favor of :attr:`InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH`.
+    """
     MAX_SWITCH_PM_TEXT_LENGTH = 64
     """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
-    :meth:`telegram.Bot.answer_inline_query`."""
+    :meth:`telegram.Bot.answer_inline_query`.
+
+    .. deprecated:: NEXT.VERSION
+        Deprecated in favor of :attr:`InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`.
+    """
 
 
 class InlineQueryResultLimit(IntEnum):
@@ -761,6 +786,26 @@ class InlineQueryResultLimit(IntEnum):
     :paramref:`~telegram.InlineQueryResult.id` parameter of
     :class:`telegram.InlineQueryResult` and its subclasses
     """
+
+
+class InlineQueryResultsButtonLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.InlineQueryResultsButton`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_START_PARAMETER_LENGTH = InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.InlineQueryResultsButton.start_parameter` parameter of
+    :meth:`telegram.InlineQueryResultsButton`."""
+
+    MAX_START_PARAMETER_LENGTH = InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.InlineQueryResultsButton.start_parameter` parameter of
+    :meth:`telegram.InlineQueryResultsButton`."""
 
 
 class InlineQueryResultType(StringEnum):
