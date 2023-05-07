@@ -43,6 +43,8 @@ Bot API Functionality
 ~~~~~~~~~~~~~~~~~~~~~
 
 Comparison of equality of instances of the classes in the :mod:`telegram` package is subject to change and the PTB team will update the behavior to best reflect updates in the Bot API.
+Changes in this regard will be documented in the affected classes.
+Note that equality comparison with objects that where serialized by an older version of PTB may hence give unexpected results.
 
 When the order of arguments of the Bot API methods changes or they become optional/mandatory due to changes in the Bot API, PTB will always try to reflect these changes.
 While we try to make such changes backward compatible, this is not always possible or only with significant effort.
@@ -60,8 +62,8 @@ Since attributes of the classes in the :mod:`telegram` package are not writable,
 Development Versions
 ~~~~~~~~~~~~~~~~~~~~
 
-Before a feature is in a release, i.e. the feature was merged into the ``master`` branch but not released yet, it is not covered by this policy and may change.
-Pre-releases marked as alpha, beta or release candidate are not covered by this policy either.
+Pre-releases marked as alpha, beta or release candidate are not covered by this policy.
+Before a feature is in a stable release, i.e. the feature was merged into the ``master`` branch but not released yet (or only in a pre-release), it is not covered by this policy either and may change.
 
 Security
 ~~~~~~~~
