@@ -159,7 +159,7 @@ class JobQueue(Generic[CCT]):
         raise RuntimeError("The application instance is no longer alive.")
 
     @staticmethod
-    async def job_callback(job_queue: "JobQueue", job: "Job") -> None:
+    async def job_callback(job_queue: "JobQueue[CCT]", job: "Job[CCT]") -> None:
         """This method is used as a callback for the APScheduler jobs.
 
         More precisely, the ``func`` argument of :class:`apscheduler.job.Job` is set to this method
