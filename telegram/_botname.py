@@ -16,36 +16,39 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains objects related to the write access allowed service message."""
-from typing import Optional
+"""This module contains an object that represent a Telegram bots name."""
+from typing import ClassVar
 
+from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 
-class WriteAccessAllowed(TelegramObject):
-    """
-    This object represents a service message about a user allowing a bot to write messages after
-    adding the bot to the attachment menu or launching a Web App from a link.
+class BotName(TelegramObject):
+    """This object represents the bot's name.
 
-    .. versionadded:: 20.0
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`name` is equal.
+
+    .. versionadded:: NEXT.VERSION
 
     Args:
-        web_app_name (:obj:`str`, optional): Name of the Web App which was launched from a link.
-
-            .. versionadded:: NEXT.VERSION
+        name (:obj:`str`): The bot's name.
 
     Attributes:
-        web_app_name (:obj:`str`): Optional. Name of the Web App which was launched from a link.
-
-            .. versionadded:: NEXT.VERSION
+        name (:obj:`str`): The bot's name.
 
     """
 
-    __slots__ = ("web_app_name",)
+    __slots__ = ("name",)
 
-    def __init__(self, web_app_name: str = None, *, api_kwargs: JSONDict = None):
+    def __init__(self, name: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.web_app_name: Optional[str] = web_app_name
+        self.name = name
+
+        self._id_attrs = (self.name,)
 
         self._freeze()
+
+    MAX_LENGTH: ClassVar[int] = constants.BotNameLimit.MAX_NAME_LENGTH
+    """:const:`telegram.constants.BotNameLimit.MAX_NAME_LENGTH`"""

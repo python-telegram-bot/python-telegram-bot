@@ -56,6 +56,7 @@ except ImportError:
 from telegram._botcommand import BotCommand
 from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
+from telegram._botname import BotName
 from telegram._chat import Chat
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._chatinvitelink import ChatInviteLink
@@ -79,6 +80,7 @@ from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
@@ -2811,8 +2813,15 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         cache_time: int = None,
         is_personal: bool = None,
         next_offset: str = None,
+        # Deprecated params since bot api 6.7
+        # <----
         switch_pm_text: str = None,
         switch_pm_parameter: str = None,
+        # --->
+        # New params since bot api 6.7
+        # <----
+        button: InlineQueryResultsButton = None,
+        # --->
         *,
         current_offset: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2825,15 +2834,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Use this method to send answers to an inline query. No more than
         :tg-const:`telegram.InlineQuery.MAX_RESULTS` results per query are allowed.
 
-        Example:
-            An inline bot that sends YouTube videos can ask the user to connect the bot to their
-            YouTube account to adapt search results accordingly. To do this, it displays a
-            'Connect your YouTube account' button above the results, or even before showing any.
-            The user presses the button, switches to a private chat with the bot and, in doing so,
-            passes a start parameter that instructs the bot to return an OAuth link. Once done, the
-            bot can offer a switch_inline button so that the user can easily return to the chat
-            where they wanted to use the bot's inline capabilities.
-
         Warning:
             In most use cases :paramref:`current_offset` should not be passed manually. Instead of
             calling this method directly, use the shortcut :meth:`telegram.InlineQuery.answer` with
@@ -2841,6 +2841,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             take care of passing the correct value.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. |api6_7_depr| replace:: Since Bot API 6.7, this argument is deprecated in favour of
+            :paramref:`button`.
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
@@ -2862,11 +2865,21 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             switch_pm_text (:obj:`str`, optional): If passed, clients will display a button with
                 specified text that switches the user to a private chat with the bot and sends the
                 bot a start message with the parameter :paramref:`switch_pm_parameter`.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_7_depr|
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the
                 :guilabel:`/start` message sent to the bot when user presses the switch button.
                 :tg-const:`telegram.InlineQuery.MIN_SWITCH_PM_TEXT_LENGTH`-
                 :tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
                 only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
+
+                .. deprecated:: NEXT.VERSION
+                    |api6_7_depr|
+            button (:class:`telegram.InlineQueryResultsButton`, optional): A button to be shown
+                above the inline query results.
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
@@ -2881,6 +2894,26 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
+        if (switch_pm_text or switch_pm_parameter) and button:
+            raise TypeError(
+                "Since Bot API 6.7, the parameter `button is mutually exclusive to the deprecated "
+                "parameters `switch_pm_text` and `switch_pm_parameter`. Please use the new "
+                "parameter `button`."
+            )
+
+        if switch_pm_text and switch_pm_parameter:
+            self._warn(
+                "Since Bot API 6.7, the parameters `switch_pm_text` and `switch_pm_parameter` are "
+                "deprecated in favour of the new parameter `button`. Please use the new parameter "
+                "`button` instead.",
+                category=PTBDeprecationWarning,
+                stacklevel=3,
+            )
+            button = InlineQueryResultsButton(
+                text=switch_pm_text,
+                start_parameter=switch_pm_parameter,
+            )
+
         effective_results, next_offset = self._effective_inline_results(
             results=results, next_offset=next_offset, current_offset=current_offset
         )
@@ -2896,8 +2929,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "next_offset": next_offset,
             "cache_time": cache_time,
             "is_personal": is_personal,
-            "switch_pm_text": switch_pm_text,
-            "switch_pm_parameter": switch_pm_parameter,
+            "button": button,
         }
 
         return await self._post(
@@ -8138,6 +8170,94 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    @_log
+    async def set_my_name(
+        self,
+        name: str = None,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to change the bot's name.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            name (:obj:`str`, optional): New bot name;
+                0-:tg-const:`telegram.constants.BotNameLimit.MAX_NAME_LENGTH`
+                characters. Pass an empty string to remove the dedicated name for the given
+                language.
+
+                Caution:
+                    If :paramref:`language_code` is not specified, a :paramref:`name` *must*
+                    be specified.
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
+                the name will be applied to all users for whose language there is no
+                dedicated name.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"name": name, "language_code": language_code}
+
+        return await self._post(
+            "setMyName",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def get_my_name(
+        self,
+        language_code: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> BotName:
+        """
+        Use this method to get the current bot name for the given user language.
+
+        Args:
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code or an empty
+                string.
+
+        Returns:
+            :class:`telegram.BotName`: On success, the bot name is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data = {"language_code": language_code}
+        return BotName.de_json(  # type: ignore[return-value]
+            await self._post(
+                "getMyName",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            bot=self,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # skipcq: PYL-W0613
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -8382,3 +8502,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`set_sticker_keywords`"""
     setStickerMaskPosition = set_sticker_mask_position
     """Alias for :meth:`set_sticker_mask_position`"""
+    setMyName = set_my_name
+    """Alias for :meth:`set_my_name`"""
+    getMyName = get_my_name
+    """Alias for :meth:`get_my_name`"""

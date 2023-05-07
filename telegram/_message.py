@@ -59,6 +59,7 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.warnings import warn
 from telegram._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -69,6 +70,7 @@ from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
 from telegram.constants import MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -578,8 +580,13 @@ class Message(TelegramObject):
 
             .. versionadded:: 20.1
 
-    .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
-        by this function. Instead, the supplied replacement for the emoji will be used.
+    .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
+        function. Instead, the supplied replacement for the emoji will be used.
+
+    .. |custom_emoji_md1_deprecation| replace:: Since custom emoji entities are not supported by
+       :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method will raise a
+       :exc:`ValueError` in future versions instead of falling back to the supplied replacement
+       for the emoji.
     """
 
     # fmt: on
@@ -3317,6 +3324,10 @@ class Message(TelegramObject):
                     insert = f"<s>{escaped_text}</s>"
                 elif entity.type == MessageEntity.SPOILER:
                     insert = f'<span class="tg-spoiler">{escaped_text}</span>'
+                elif entity.type == MessageEntity.CUSTOM_EMOJI:
+                    insert = (
+                        f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
+                    )
                 else:
                     insert = escaped_text
 
@@ -3355,11 +3366,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as HTML in
         the same way the original message was formatted.
 
-        Note:
-            |custom_emoji_formatting_note|
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
+
+        .. versionchanged:: NEXT.VERSION
+           Custom emoji entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
@@ -3374,11 +3385,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as HTML.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Note:
-            |custom_emoji_formatting_note|
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
+
+        .. versionchanged:: NEXT.VERSION
+           Custom emoji entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
@@ -3394,11 +3405,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML in the same way the original message was formatted.
 
-        Note:
-            |custom_emoji_formatting_note|
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
+
+        .. versionchanged:: NEXT.VERSION
+           Custom emoji entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
@@ -3413,11 +3424,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Note:
-            |custom_emoji_formatting_note|
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
+
+        .. versionchanged:: NEXT.VERSION
+           Custom emoji entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
@@ -3522,6 +3533,26 @@ class Message(TelegramObject):
                             "Spoiler entities are not supported for Markdown version 1"
                         )
                     insert = f"||{escaped_text}||"
+                elif entity.type == MessageEntity.CUSTOM_EMOJI:
+                    if version == 1:
+                        # this ensures compatibility to previous PTB versions
+                        insert = escaped_text
+                        warn(
+                            "Custom emoji entities are not supported for Markdown version 1. "
+                            "Future version of PTB will raise a ValueError instead of falling "
+                            "back to the alternative standard emoji.",
+                            stacklevel=3,
+                            category=PTBDeprecationWarning,
+                        )
+                    else:
+                        # This should never be needed because ids are numeric but the documentation
+                        # specifically mentions it so here we are
+                        custom_emoji_id = escape_markdown(
+                            entity.custom_emoji_id,
+                            version=version,
+                            entity_type=MessageEntity.CUSTOM_EMOJI,
+                        )
+                        insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
                 else:
                     insert = escaped_text
 
@@ -3570,6 +3601,9 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
+        .. deprecated:: NEXT.VERSION
+            |custom_emoji_md1_deprecation|
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
@@ -3588,11 +3622,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
-        Note:
-            |custom_emoji_formatting_note|
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
+
+        .. versionchanged:: NEXT.VERSION
+           Custom emoji entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3614,6 +3648,9 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
+        .. deprecated:: NEXT.VERSION
+            |custom_emoji_md1_deprecation|
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
@@ -3632,11 +3669,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Note:
-            |custom_emoji_formatting_note|
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
+
+        .. versionchanged:: NEXT.VERSION
+           Custom emoji entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3658,6 +3695,9 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
+        .. deprecated:: NEXT.VERSION
+            |custom_emoji_md1_deprecation|
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
@@ -3676,11 +3716,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
 
-        Note:
-            |custom_emoji_formatting_note|
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
+
+        .. versionchanged:: NEXT.VERSION
+           Custom emoji entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -3704,6 +3744,9 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
+        .. deprecated:: NEXT.VERSION
+            |custom_emoji_md1_deprecation|
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
@@ -3722,11 +3765,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Note:
-            |custom_emoji_formatting_note|
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
+
+        .. versionchanged:: NEXT.VERSION
+           Custom emoji entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
