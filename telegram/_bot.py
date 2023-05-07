@@ -3616,7 +3616,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 returned. An update is considered confirmed as soon as this method is called with
                 an offset higher than its :attr:`telegram.Update.update_id`. The negative offset
                 can be specified to retrieve updates starting from -offset update from the end of
-                the updates queue. All previous updates will forgotten.
+                the updates queue. All previous updates will be forgotten.
             limit (:obj:`int`, optional): Limits the number of updates to be retrieved. Values
                 between :tg-const:`telegram.constants.PollingLimit.MIN_LIMIT`-
                 :tg-const:`telegram.constants.PollingLimit.MAX_LIMIT` are accepted.
