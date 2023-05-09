@@ -44,7 +44,11 @@ extensions = [
 ]
 
 # For shorter links to Wiki in docstrings
-extlinks = {"wiki": ("https://github.com/python-telegram-bot/python-telegram-bot/wiki/%s", "%s")}
+extlinks = {
+    "wiki": ("https://github.com/python-telegram-bot/python-telegram-bot/wiki/%s", "%s"),
+    "pr": ("https://github.com/python-telegram-bot/python-telegram-bot/pull/%s", "#%s"),
+    "issue": ("https://github.com/python-telegram-bot/python-telegram-bot/issues/%s", "#%s"),
+}
 
 # Use intersphinx to reference the python builtin library docs
 intersphinx_mapping = {
