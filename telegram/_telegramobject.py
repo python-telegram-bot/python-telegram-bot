@@ -58,6 +58,12 @@ class TelegramObject:
     The :mod:`pickle` and :func:`~copy.deepcopy` behavior of objects of this type are defined by
     :meth:`__getstate__`, :meth:`__setstate__` and :meth:`__deepcopy__`.
 
+    Tip:
+        Objects of this type can be serialized via Python's :mod:`pickle` module and pickled
+        objects from one version of PTB are usually loadable in future versions. However, we can
+        not guarantee that this compatibility will always be provided. At least a manual one-time
+        conversion of the data may be needed on major updates of the library.
+
     .. versionchanged:: 20.0
 
         * Removed argument and attribute ``bot`` for several subclasses. Use

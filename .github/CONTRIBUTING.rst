@@ -67,6 +67,7 @@ Here's how to make a one-off code change.
       $ git checkout -b your-branch-name
 
 3. **Make a commit to your feature branch**. Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made.
+   We also have a check-list for PRs `below`_.
 
    - You can refer to relevant issues in the commit message by writing, e.g., "#105".
 
@@ -80,7 +81,7 @@ Here's how to make a one-off code change.
 
    - The following exceptions to the above (Google's) style guides applies:
 
-        - Documenting types of global variables and complex types of class members can be done using the Sphinx docstring convention.
+     - Documenting types of global variables and complex types of class members can be done using the Sphinx docstring convention.
 
    -  In addition, PTB uses some formatting/styling and linting tools in the pre-commit setup. Some of those tools also have command line tools that can help to run these tools outside of the pre-commit step. If you'd like to leverage that, please have a look at the `pre-commit config file`_ for an overview of which tools (and which versions of them) are used. For example, we use `Black`_ for code formatting. Plugins for Black exist for some `popular editors`_. You can use those instead of manually formatting everything.
 
@@ -121,11 +122,11 @@ Here's how to make a one-off code change.
 
    - When your reviewer has reviewed the code, you'll get a notification. You'll need to respond in two ways:
 
-       - Make a new commit addressing the comments you agree with, and push it to the same branch. Ideally, the commit message would explain what the commit does (e.g. "Fix lint error"), but if there are lots of disparate review comments, it's fine to refer to the original commit message and add something like "(address review comments)".
+     - Make a new commit addressing the comments you agree with, and push it to the same branch. Ideally, the commit message would explain what the commit does (e.g. "Fix lint error"), but if there are lots of disparate review comments, it's fine to refer to the original commit message and add something like "(address review comments)".
 
-       - In order to keep the commit history intact, please avoid squashing or amending history and then force-pushing to the PR. Reviewers often want to look at individual commits.
+     - In order to keep the commit history intact, please avoid squashing or amending history and then force-pushing to the PR. Reviewers often want to look at individual commits.
 
-       - In addition, please reply to each comment. Each reply should be either "Done" or a response explaining why the corresponding suggestion wasn't implemented. All comments must be resolved before LGTM can be given.
+     - In addition, please reply to each comment. Each reply should be either "Done" or a response explaining why the corresponding suggestion wasn't implemented. All comments must be resolved before LGTM can be given.
 
    - Resolve any merge conflicts that arise. To resolve conflicts between 'your-branch-name' (in your fork) and 'master' (in the ``python-telegram-bot`` repository), run:
 
@@ -149,6 +150,51 @@ Here's how to make a one-off code change.
       $ git push origin --delete your-branch-name
 
 7. **Celebrate.** Congratulations, you have contributed to ``python-telegram-bot``!
+
+Check-list for PRs
+------------------
+
+This checklist is a non-exhaustive reminder of things that should be done before a PR is merged, both for you as contributor and for the maintainers.
+Feel free to copy (parts of) the checklist to the PR description to remind you or the maintainers of open points or if you have questions on anything.
+
+- Added ``.. versionadded:: NEXT.VERSION``, ``.. versionchanged:: NEXT.VERSION`` or ``.. deprecated:: NEXT.VERSION`` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
+- Created new or adapted existing unit tests
+- Documented code changes according to the `CSI standard <https://standards.mousepawmedia.com/en/stable/csi.html>`__
+- Added myself alphabetically to ``AUTHORS.rst`` (optional)
+- Added new classes & modules to the docs and all suitable ``__all__`` s
+- Checked the `Stability Policy <https://docs.python-telegram-bot.org/stability_policy.html>`_ in case of deprecations or changes to documented behavior
+
+**If the PR contains API changes (otherwise, you can ignore this passage)**
+
+- Checked the Bot API specific sections of the `Stability Policy <https://docs.python-telegram-bot.org/stability_policy.html>`_
+
+-  New classes:
+
+   - Added ``self._id_attrs`` and corresponding documentation
+   - ``__init__`` accepts ``api_kwargs`` as kw-only
+
+-  Added new shortcuts:
+
+   - In :class:`~telegram.Chat` & :class:`~telegram.User` for all methods that accept ``chat/user_id``
+   - In :class:`~telegram.Message` for all methods that accept ``chat_id`` and ``message_id``
+   - For new :class:`~telegram.Message` shortcuts: Added ``quote`` argument if methods accepts ``reply_to_message_id``
+   - In :class:`~telegram.CallbackQuery` for all methods that accept either ``chat_id`` and ``message_id`` or ``inline_message_id``
+
+-  If relevant:
+
+   - Added new constants at :mod:`telegram.constants` and shortcuts to them as class variables
+   - Link new and existing constants in docstrings instead of hard-coded numbers and strings
+   - Add new message types to :attr:`telegram.Message.effective_attachment`
+   - Added new handlers for new update types
+
+     - Add the handlers to the warning loop in the :class:`~telegram.ext.ConversationHandler`
+
+   - Added new filters for new message (sub)types
+   - Added or updated documentation for the changed class(es) and/or method(s)
+   - Added the new method(s) to ``_extbot.py``
+   - Added or updated ``bot_methods.rst``
+   - Updated the Bot API version number in all places: ``README.rst`` and ``README_RAW.rst`` (including the badge), as well as ``telegram.constants.BOT_API_VERSION_INFO``
+   - Added logic for arbitrary callback data in :class:`telegram.ext.ExtBot` for new methods that either accept a ``reply_markup`` in some form or have a return type that is/contains :class:`~telegram.Message`
 
 Documenting
 ===========
@@ -266,3 +312,4 @@ break the API classes. For example:
 .. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html
 .. _`section`: #documenting
 .. _`testing page`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/tests/README.rst
+.. _`below`: #check-list-for-prs

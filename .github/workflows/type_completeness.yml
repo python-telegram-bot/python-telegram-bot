@@ -49,21 +49,21 @@ jobs:
             pr = float(
               json.load(open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
             )
-            base_text = f"After this PR, type completeness will be {round(pr, 3)}."
-            if pr < (base - 0.1):
-                text = f"This PR decreases type completeness by {round(base - pr, 3)}. ❌"
+            base_text = f"This PR changes type completeness from {round(base, 3)} to {round(pr, 3)}."
+            if pr < (base - 0.001):
+                text = f"{base_text} ❌"
                 set_summary(text)
                 print(Path("pr.readable").read_text(encoding="utf-8"))
-                error(f"{text}\n{base_text}")
+                error(text)
                 exit(1)
-            elif pr > (base + 0.1):
-                text = f"This PR increases type completeness by {round(pr - base, 3)}. ✨"
+            elif pr > (base + 0.001):
+                text = f"{base_text} ✨"
                 set_summary(text)
                 if pr < 1:
                     print(Path("pr.readable").read_text(encoding="utf-8"))
-                print(f"{text}\n{base_text}")
+                print(text)
             else:
-                text = f"This PR does not change type completeness by more than 0.1. ✅"
+                text = f"{base_text} This is less than 0.1 percentage points. ✅"
                 set_summary(text)
                 print(Path("pr.readable").read_text(encoding="utf-8"))
-                print(f"{text}\n{base_text}")
+                print(text)

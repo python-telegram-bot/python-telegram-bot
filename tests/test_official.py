@@ -154,6 +154,7 @@ BACKWARDS_COMPAT_KWARGS = {
         "thumb_url",
     },
     "InlineQueryResult(Game|Gif|Mpeg4Gif)": {"thumb_mime_type"},
+    "answer_inline_query": {"switch_pm_text", "switch_pm_parameter"},
 }
 
 

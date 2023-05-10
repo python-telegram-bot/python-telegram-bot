@@ -19,7 +19,13 @@
 
 import pytest
 
-from telegram import CallbackGame, InlineKeyboardButton, LoginUrl, WebAppInfo
+from telegram import (
+    CallbackGame,
+    InlineKeyboardButton,
+    LoginUrl,
+    SwitchInlineQueryChosenChat,
+    WebAppInfo,
+)
 from tests.auxil.slots import mro_slots
 
 
@@ -35,6 +41,7 @@ def inline_keyboard_button():
         pay=TestInlineKeyboardButtonBase.pay,
         login_url=TestInlineKeyboardButtonBase.login_url,
         web_app=TestInlineKeyboardButtonBase.web_app,
+        switch_inline_query_chosen_chat=TestInlineKeyboardButtonBase.switch_inline_query_chosen_chat,  # noqa: E501
     )
 
 
@@ -48,6 +55,7 @@ class TestInlineKeyboardButtonBase:
     pay = True
     login_url = LoginUrl("http://google.com")
     web_app = WebAppInfo(url="https://example.com")
+    switch_inline_query_chosen_chat = SwitchInlineQueryChosenChat("a_bot", True, False, True, True)
 
 
 class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
@@ -70,6 +78,10 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
         assert inline_keyboard_button.pay == self.pay
         assert inline_keyboard_button.login_url == self.login_url
         assert inline_keyboard_button.web_app == self.web_app
+        assert (
+            inline_keyboard_button.switch_inline_query_chosen_chat
+            == self.switch_inline_query_chosen_chat
+        )
 
     def test_to_dict(self, inline_keyboard_button):
         inline_keyboard_button_dict = inline_keyboard_button.to_dict()
@@ -95,6 +107,10 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
             inline_keyboard_button_dict["login_url"] == inline_keyboard_button.login_url.to_dict()
         )
         assert inline_keyboard_button_dict["web_app"] == inline_keyboard_button.web_app.to_dict()
+        assert (
+            inline_keyboard_button_dict["switch_inline_query_chosen_chat"]
+            == inline_keyboard_button.switch_inline_query_chosen_chat.to_dict()
+        )
 
     def test_de_json(self, bot):
         json_dict = {
@@ -107,6 +123,7 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
             "web_app": self.web_app.to_dict(),
             "login_url": self.login_url.to_dict(),
             "pay": self.pay,
+            "switch_inline_query_chosen_chat": self.switch_inline_query_chosen_chat.to_dict(),
         }
 
         inline_keyboard_button = InlineKeyboardButton.de_json(json_dict, None)
@@ -124,6 +141,10 @@ class TestInlineKeyboardButtonWithoutRequest(TestInlineKeyboardButtonBase):
         assert inline_keyboard_button.pay == self.pay
         assert inline_keyboard_button.login_url == self.login_url
         assert inline_keyboard_button.web_app == self.web_app
+        assert (
+            inline_keyboard_button.switch_inline_query_chosen_chat
+            == self.switch_inline_query_chosen_chat
+        )
 
         none = InlineKeyboardButton.de_json({}, bot)
         assert none is None
