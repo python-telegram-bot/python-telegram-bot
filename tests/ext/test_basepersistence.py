@@ -219,10 +219,10 @@ class TrackingConversationHandler(ConversationHandler):
 
 
 class PappInput(NamedTuple):
-    bot_data: bool = None
-    chat_data: bool = None
-    user_data: bool = None
-    callback_data: bool = None
+    bot_data: Optional[bool] = None
+    chat_data: Optional[bool] = None
+    user_data: Optional[bool] = None
+    callback_data: Optional[bool] = None
     conversations: bool = True
     update_interval: float = None
     fill_data: bool = False

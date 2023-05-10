@@ -3593,8 +3593,8 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_my_name(
         self,
-        name: str = None,
-        language_code: str = None,
+        name: Optional[str] = None,
+        language_code: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3615,7 +3615,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_my_name(
         self,
-        language_code: str = None,
+        language_code: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
