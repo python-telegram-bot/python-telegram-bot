@@ -121,15 +121,7 @@ def check_shortcut_signature(
             raise Exception(f"Argument {kwarg} must be of kind {expected_kind}.")
 
         if bot_sig.parameters[kwarg].annotation != shortcut_sig.parameters[kwarg].annotation:
-            if isinstance(bot_sig.parameters[kwarg].annotation, type):
-                if bot_sig.parameters[kwarg].annotation.__name__ != str(
-                    shortcut_sig.parameters[kwarg].annotation
-                ):
-                    raise Exception(
-                        f"For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, "
-                        f"but got {shortcut_sig.parameters[kwarg].annotation}"
-                    )
-            elif FORWARD_REF_PATTERN.search(str(shortcut_sig.parameters[kwarg])):
+            if FORWARD_REF_PATTERN.search(str(shortcut_sig.parameters[kwarg])):
                 # If a shortcut signature contains a ForwardRef, the simple comparison of
                 # annotations can fail. Try and resolve the .__args__, then compare them.
 
@@ -149,7 +141,14 @@ def check_shortcut_signature(
                             f"got {shortcut_sig.parameters[kwarg].annotation}."
                             f"Comparison of {shortcut_arg} and {bot_arg} failed."
                         )
-
+            elif isinstance(bot_sig.parameters[kwarg].annotation, type):
+                if bot_sig.parameters[kwarg].annotation.__name__ != str(
+                    shortcut_sig.parameters[kwarg].annotation
+                ):
+                    raise Exception(
+                        f"For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, "
+                        f"but got {shortcut_sig.parameters[kwarg].annotation}"
+                    )
             else:
                 raise Exception(
                     f"For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation},"

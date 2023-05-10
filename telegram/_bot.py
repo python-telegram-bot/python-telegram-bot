@@ -2820,7 +2820,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         # --->
         # New params since bot api 6.7
         # <----
-        button: InlineQueryResultsButton = None,
+        button: Optional[InlineQueryResultsButton] = None,
         # --->
         *,
         current_offset: Optional[str] = None,
