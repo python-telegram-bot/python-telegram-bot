@@ -16,6 +16,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""Provides functions to test both methods."""
 import datetime
 import functools
 import inspect
@@ -24,7 +25,7 @@ from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import pytest
 
-import telegram  # for ForwardRef resolution to work  # noqa
+import telegram  # for ForwardRef resolution
 from telegram import (
     Bot,
     ChatPermissions,
@@ -71,30 +72,17 @@ def check_shortcut_signature(
         :obj:`bool`: Whether or not the signature matches.
     """
 
-    def resolve_class(name: str) -> Optional[type]:
-        """Attempts to resolve a PTB class from a ForwardRef.
+    def resolve_class(class_name: str) -> Optional[type]:
+        """Attempts to resolve a PTB class (telegram module only) from a ForwardRef.
 
         E.g. resolves <class 'telegram._files.sticker.StickerSet'> from "StickerSet".
 
         Returns a class on success, :obj:`None` if nothing could be resolved.
         """
-
-        for option in (
-            name,
-            f"telegram.{name}",
-            f"telegram.ext.{name}",
-            f"telegram.ext.filters.{name}",
-        ):
-            try:
-                return eval(option)
-            # NameError will be raised if trying to eval just name and it doesn't work, e.g.
-            # "Name 'ApplicationBuilder' is not defined".
-            # AttributeError will be raised if trying to e.g. eval f"telegram.{name}" when the
-            # class denoted by `name` actually belongs to `telegram.ext`:
-            # "module 'telegram' has no attribute 'ApplicationBuilder'".
-            # If neither option works, this is not a PTB class.
-            except (NameError, AttributeError):
-                continue
+        for module in telegram, telegram.request:
+            cls = getattr(module, class_name, None)
+            if cls is not None:
+                return cls
         return None  # for ruff
 
     shortcut_sig = inspect.signature(shortcut)
