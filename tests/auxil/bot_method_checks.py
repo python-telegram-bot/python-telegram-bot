@@ -19,10 +19,12 @@
 import datetime
 import functools
 import inspect
+import re
 from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import pytest
 
+import telegram  # for ForwardRef resolution to work  # noqa
 from telegram import (
     Bot,
     ChatPermissions,
@@ -41,6 +43,14 @@ from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 
 if TEST_WITH_OPT_DEPS:
     import pytz
+
+
+FORWARD_REF_PATTERN = re.compile(r"ForwardRef\('(?P<class_name>\w+)'\)")
+""" A pattern to find a class name in a ForwardRef typing annotation.
+Class name (in a named group) is surrounded by parentheses and single quotes.
+Note that since we're analyzing argument by argument, the pattern can be strict, with
+start and end markers.
+"""
 
 
 def check_shortcut_signature(
@@ -62,6 +72,33 @@ def check_shortcut_signature(
     Returns:
         :obj:`bool`: Whether or not the signature matches.
     """
+
+    def resolve_class(name: str) -> Optional[type]:
+        """Attempts to resolve a PTB class from a ForwardRef.
+
+        E.g. resolves <class 'telegram._files.sticker.StickerSet'> from "StickerSet".
+
+        Returns a class on success, :obj:`None` if nothing could be resolved.
+        """
+
+        for option in (
+            name,
+            f"telegram.{name}",
+            f"telegram.ext.{name}",
+            f"telegram.ext.filters.{name}",
+        ):
+            try:
+                return eval(option)
+            # NameError will be raised if trying to eval just name and it doesn't work, e.g.
+            # "Name 'ApplicationBuilder' is not defined".
+            # AttributeError will be raised if trying to e.g. eval f"telegram.{name}" when the
+            # class denoted by `name` actually belongs to `telegram.ext`:
+            # "module 'telegram' has no attribute 'ApplicationBuilder'".
+            # If neither option works, this is not a PTB class.
+            except (NameError, AttributeError):
+                continue
+        return None  # for ruff
+
     shortcut_sig = inspect.signature(shortcut)
     effective_shortcut_args = set(shortcut_sig.parameters.keys()).difference(additional_kwargs)
     effective_shortcut_args.discard("self")
@@ -92,10 +129,31 @@ def check_shortcut_signature(
                         f"For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, "
                         f"but got {shortcut_sig.parameters[kwarg].annotation}"
                     )
+            elif FORWARD_REF_PATTERN.search(str(shortcut_sig.parameters[kwarg])):
+                # If a shortcut signature contains a ForwardRef, the simple comparison of
+                # annotations can fail. Try and resolve the .__args__, then compare them.
+
+                for shortcut_arg, bot_arg in zip(
+                    shortcut_sig.parameters[kwarg].annotation.__args__,
+                    bot_sig.parameters[kwarg].annotation.__args__,
+                ):
+                    shortcut_arg_to_check = shortcut_arg  # for ruff
+                    m = FORWARD_REF_PATTERN.search(str(shortcut_arg))
+                    if m:
+                        shortcut_arg_to_check = resolve_class(m.group("class_name"))
+
+                    if shortcut_arg_to_check != bot_arg:
+                        raise Exception(
+                            f"For argument {kwarg} I expected "
+                            f"{bot_sig.parameters[kwarg].annotation}, but "
+                            f"got {shortcut_sig.parameters[kwarg].annotation}."
+                            f"Comparison of {shortcut_arg} and {bot_arg} failed."
+                        )
+
             else:
                 raise Exception(
-                    f"For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, but "
-                    f"got {shortcut_sig.parameters[kwarg].annotation}"
+                    f"For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation},"
+                    f"but got {shortcut_sig.parameters[kwarg].annotation}"
                 )
 
     bot_method_sig = inspect.signature(bot_method)
