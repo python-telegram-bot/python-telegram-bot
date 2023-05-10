@@ -128,9 +128,9 @@ def check_shortcut_signature(
                     bot_sig.parameters[kwarg].annotation.__args__,
                 ):
                     shortcut_arg_to_check = shortcut_arg  # for ruff
-                    m = FORWARD_REF_PATTERN.search(str(shortcut_arg))
-                    if m:
-                        shortcut_arg_to_check = resolve_class(m.group("class_name"))
+                    match = FORWARD_REF_PATTERN.search(str(shortcut_arg))
+                    if match:
+                        shortcut_arg_to_check = resolve_class(match.group("class_name"))
 
                     if shortcut_arg_to_check != bot_arg:
                         raise Exception(
