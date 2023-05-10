@@ -48,8 +48,6 @@ if TEST_WITH_OPT_DEPS:
 FORWARD_REF_PATTERN = re.compile(r"ForwardRef\('(?P<class_name>\w+)'\)")
 """ A pattern to find a class name in a ForwardRef typing annotation.
 Class name (in a named group) is surrounded by parentheses and single quotes.
-Note that since we're analyzing argument by argument, the pattern can be strict, with
-start and end markers.
 """
 
 
