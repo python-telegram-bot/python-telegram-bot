@@ -19,7 +19,7 @@
 import pytest
 
 from telegram import Update
-from telegram.ext import ApplicationBuilder, BaseUpdateProcessor, SimpleUpdateProcessor
+from telegram.ext import BaseUpdateProcessor, SimpleUpdateProcessor
 from tests.auxil.asyncio_helpers import call_after
 
 
@@ -41,15 +41,12 @@ class TestBaseUpdateProcessor:
 
     async def test_process_update(self, one_time_bot):
         processor = mock_processor()
-        application = ApplicationBuilder().concurrent_updates(processor).bot(one_time_bot).build()
         update = Update(1)
 
         async def coroutine():
             pass
 
-        await application.update_queue.put(1)
-        await processor.process_update(update, coroutine, application)
-        assert not application.update_queue.empty()
+        await processor.process_update(update, coroutine)
 
     async def test_context_manager(self, monkeypatch):
         processor = mock_processor()
