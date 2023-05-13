@@ -97,7 +97,8 @@ class TestApplicationBuilder:
         app = builder.token(bot.token).build()
 
         assert isinstance(app, Application)
-        assert app.update_processor == SimpleUpdateProcessor(1)
+        assert isinstance(app.update_processor, SimpleUpdateProcessor)
+        assert app.update_processor.max_concurrent_updates == 1
 
         assert isinstance(app.bot, ExtBot)
         assert isinstance(app.bot.request, HTTPXRequest)
@@ -415,8 +416,9 @@ class TestApplicationBuilder:
         assert app.updater.update_queue is update_queue
         assert app.updater.bot is app.bot
         assert app.context_types is context_types
-        assert app.update_processor == expected
-        assert app.concurrent_updates == (app.update_processor.max_concurrent_updates)
+        assert isinstance(app.update_processor, SimpleUpdateProcessor)
+        assert app.update_processor.max_concurrent_updates == expected.max_concurrent_updates
+        assert app.concurrent_updates == app.update_processor.max_concurrent_updates
         assert app.post_init is post_init
         assert app.post_shutdown is post_shutdown
         assert app.post_stop is post_stop

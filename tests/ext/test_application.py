@@ -34,7 +34,7 @@ from threading import Thread
 
 import pytest
 
-from telegram import Bot, Chat, Message, MessageEntity, Update, User
+from telegram import Bot, Chat, Message, MessageEntity, User
 from telegram.error import TelegramError
 from telegram.ext import (
     Application,
@@ -213,22 +213,6 @@ class TestApplication:
         assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
-    async def test_active_updates(self, one_time_bot):
-        class MockProcessor(BaseUpdateProcessor):
-            async def do_process_update(self, update, coroutine) -> None:
-                pass
-
-        processor = MockProcessor(2)
-
-        async def coroutine():
-            pass
-
-        application = ApplicationBuilder().bot(one_time_bot).concurrent_updates(processor).build()
-        assert application.active_updates == processor._semaphore._value
-        await application.update_queue.put(1)
-        await processor.process_update(Update(1), coroutine, application)
-        assert application.active_updates == processor._semaphore._value
-
     def test_custom_context_init(self, one_time_bot):
         cc = ContextTypes(
             context=CustomContext,
@@ -243,26 +227,59 @@ class TestApplication:
         assert isinstance(application.chat_data[1], float)
         assert isinstance(application.bot_data, complex)
 
+    @pytest.mark.parametrize(
+        "update_processor", [BaseUpdateProcessor(1), SimpleUpdateProcessor(1)]
+    )
     @pytest.mark.parametrize("updater", [True, False])
-    async def test_initialize(self, one_time_bot, monkeypatch, updater):
+    async def test_initialize(self, one_time_bot, monkeypatch, updater, update_processor):
         """Initialization of persistence is tested test_basepersistence"""
+        is_update_processor = False
         self.test_flag = set()
 
         async def after_initialize_bot(*args, **kwargs):
             self.test_flag.add("bot")
 
+        async def after_initialize_update_processor(*args, **kwargs):
+            self.test_flag.add("update_processor")
+
         async def after_initialize_updater(*args, **kwargs):
             self.test_flag.add("updater")
 
         monkeypatch.setattr(Bot, "initialize", call_after(Bot.initialize, after_initialize_bot))
+        if isinstance(update_processor, BaseUpdateProcessor) and not isinstance(
+            update_processor, SimpleUpdateProcessor
+        ):
+            is_update_processor = True
+            monkeypatch.setattr(
+                BaseUpdateProcessor,
+                "initialize",
+                call_after(BaseUpdateProcessor.initialize, after_initialize_update_processor),
+            )
         monkeypatch.setattr(
             Updater, "initialize", call_after(Updater.initialize, after_initialize_updater)
         )
-
-        if updater:
+        if updater and is_update_processor:
+            app = (
+                ApplicationBuilder().bot(one_time_bot).concurrent_updates(update_processor).build()
+            )
+            await app.initialize()
+            assert self.test_flag == {"bot", "update_processor", "updater"}
+            await app.shutdown()
+        elif updater and not is_update_processor:
             app = ApplicationBuilder().bot(one_time_bot).build()
             await app.initialize()
             assert self.test_flag == {"bot", "updater"}
+            await app.shutdown()
+        elif is_update_processor and not updater:
+            app = (
+                ApplicationBuilder()
+                .bot(one_time_bot)
+                .updater(None)
+                .concurrent_updates(update_processor)
+                .build()
+            )
+            await app.initialize()
+            assert self.test_flag == {"bot", "update_processor"}
             await app.shutdown()
         else:
             app = ApplicationBuilder().bot(one_time_bot).updater(None).build()
@@ -270,26 +287,54 @@ class TestApplication:
             assert self.test_flag == {"bot"}
             await app.shutdown()
 
+    @pytest.mark.parametrize(
+        "update_processor", [BaseUpdateProcessor(1), SimpleUpdateProcessor(1)]
+    )
     @pytest.mark.parametrize("updater", [True, False])
-    async def test_shutdown(self, one_time_bot, monkeypatch, updater):
+    async def test_shutdown(self, one_time_bot, monkeypatch, updater, update_processor):
         """Shutdown of persistence is tested in test_basepersistence"""
+        is_update_processor = False
         self.test_flag = set()
 
         def after_bot_shutdown(*args, **kwargs):
             self.test_flag.add("bot")
 
+        def after_shutdown_update_processor(*args, **kwargs):
+            self.test_flag.add("update_processor")
+
         def after_updater_shutdown(*args, **kwargs):
             self.test_flag.add("updater")
 
         monkeypatch.setattr(Bot, "shutdown", call_after(Bot.shutdown, after_bot_shutdown))
+        if isinstance(update_processor, BaseUpdateProcessor) and not isinstance(
+            update_processor, SimpleUpdateProcessor
+        ):
+            is_update_processor = True
+            monkeypatch.setattr(
+                BaseUpdateProcessor,
+                "initialize",
+                call_after(BaseUpdateProcessor.shutdown, after_shutdown_update_processor),
+            )
         monkeypatch.setattr(
             Updater, "shutdown", call_after(Updater.shutdown, after_updater_shutdown)
         )
 
-        if updater:
+        if updater and is_update_processor:
+            async with ApplicationBuilder().bot(one_time_bot).concurrent_updates(
+                update_processor
+            ).build():
+                pass
+            assert self.test_flag == {"bot", "update_processor", "updater"}
+        elif updater and not is_update_processor:
             async with ApplicationBuilder().bot(one_time_bot).build():
                 pass
             assert self.test_flag == {"bot", "updater"}
+        elif is_update_processor and not updater:
+            async with ApplicationBuilder().bot(one_time_bot).updater(None).concurrent_updates(
+                update_processor
+            ).build():
+                pass
+            assert self.test_flag == {"bot", "update_processor"}
         else:
             async with ApplicationBuilder().bot(one_time_bot).updater(None).build():
                 pass
