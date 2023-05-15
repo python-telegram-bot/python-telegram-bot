@@ -163,8 +163,8 @@ class JobQueue(Generic[CCT]):
         """This method is used as a callback for the APScheduler jobs.
 
         More precisely, the ``func`` argument of :class:`apscheduler.job.Job` is set to this method
-        and the ``arg`` argument is set to a tuple containing the :class:`JobQueue`
-        itself and the :class:`~telegram.ext.Job` instance.
+        and the ``arg`` argument (representing positional arguments to ``func``) is set to a tuple
+        containing the :class:`JobQueue` itself and the :class:`~telegram.ext.Job` instance.
 
         Tip:
             This method is a static method rather than a bound method. This makes the arguments
@@ -172,7 +172,7 @@ class JobQueue(Generic[CCT]):
             when utilizing advanced features of APScheduler.
 
         Hint:
-            This method is effectively a shortcut for :meth:`telegram.ext.Job.run`.
+            This method is effectively a wrapper for :meth:`telegram.ext.Job.run`.
 
         .. versionadded:: NEXT.VERSION
 
@@ -649,10 +649,7 @@ class JobQueue(Generic[CCT]):
         Returns:
             Tuple[:class:`Job`]: Tuple of all *scheduled* jobs.
         """
-        return tuple(
-            Job.from_aps_job(job)  # pylint: disable=protected-access
-            for job in self.scheduler.get_jobs()
-        )
+        return tuple(Job.from_aps_job(job) for job in self.scheduler.get_jobs())
 
     def get_jobs_by_name(self, name: str) -> Tuple["Job[CCT]", ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
