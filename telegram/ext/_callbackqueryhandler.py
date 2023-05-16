@@ -148,8 +148,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
                     return self.pattern(callback_data)
                 if not isinstance(callback_data, str):
                     return False
-                match = re.match(self.pattern, callback_data)
-                if match:
+                match = self.pattern.match(callback_data)
+                if match and match.group():
                     return match
             else:
                 return True
