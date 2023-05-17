@@ -102,8 +102,7 @@ class TestBaseUpdateProcessor:
         # Sanity check: we expect that all tasks are completed.
         await asyncio.gather(*tasks)
 
-    async def test_context_manager(self, monkeypatch):
-        processor = mock_processor()
+    async def test_context_manager(self, monkeypatch, mock_processor):
         self.test_flag = set()
 
         async def after_initialize(*args, **kwargs):
@@ -123,12 +122,12 @@ class TestBaseUpdateProcessor:
             call_after(BaseUpdateProcessor.shutdown, after_shutdown),
         )
 
-        async with processor:
+        async with mock_processor:
             pass
 
         assert self.test_flag == {"initialize", "stop"}
 
-    async def test_context_manager_exception_on_init(self, monkeypatch):
+    async def test_context_manager_exception_on_init(self, monkeypatch, mock_processor):
         async def initialize(*args, **kwargs):
             raise RuntimeError("initialize")
 
@@ -139,7 +138,7 @@ class TestBaseUpdateProcessor:
         monkeypatch.setattr(BaseUpdateProcessor, "shutdown", shutdown)
 
         with pytest.raises(RuntimeError, match="initialize"):
-            async with mock_processor():
+            async with mock_processor:
                 pass
 
         assert self.test_flag == "shutdown"
