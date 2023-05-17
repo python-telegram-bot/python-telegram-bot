@@ -1,6 +1,8 @@
 telegram.ext package
 ====================
 
+.. automodule:: telegram.ext
+
 .. toctree::
     :titlesonly:
 

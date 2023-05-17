@@ -244,7 +244,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self._local_mode: bool = local_mode
         self._bot_user: Optional[User] = None
         self._private_key: Optional[bytes] = None
-        self._initialized = False
+        self._initialized: bool = False
 
         self._request: Tuple[BaseRequest, BaseRequest] = (
             HTTPXRequest() if get_updates_request is None else get_updates_request,
@@ -375,7 +375,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
     def _log(func: Any):  # type: ignore[no-untyped-def] # skipcq: PY-D0003
         @functools.wraps(func)
-        async def decorator(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        async def decorator(self: "Bot", *args: Any, **kwargs: Any) -> Any:
             # pylint: disable=protected-access
             self._LOGGER.debug("Entering: %s", func.__name__)
             result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
@@ -2866,7 +2866,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 specified text that switches the user to a private chat with the bot and sends the
                 bot a start message with the parameter :paramref:`switch_pm_parameter`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.3
                     |api6_7_depr|
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the
                 :guilabel:`/start` message sent to the bot when user presses the switch button.
@@ -2874,12 +2874,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
                 only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.3
                     |api6_7_depr|
             button (:class:`telegram.InlineQueryResultsButton`, optional): A button to be shown
                 above the inline query results.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.3
 
         Keyword Args:
             current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
@@ -3616,7 +3616,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 returned. An update is considered confirmed as soon as this method is called with
                 an offset higher than its :attr:`telegram.Update.update_id`. The negative offset
                 can be specified to retrieve updates starting from -offset update from the end of
-                the updates queue. All previous updates will forgotten.
+                the updates queue. All previous updates will be forgotten.
             limit (:obj:`int`, optional): Limits the number of updates to be retrieved. Values
                 between :tg-const:`telegram.constants.PollingLimit.MIN_LIMIT`-
                 :tg-const:`telegram.constants.PollingLimit.MAX_LIMIT` are accepted.
@@ -8185,7 +8185,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to change the bot's name.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.3
 
         Args:
             name (:obj:`str`, optional): New bot name;

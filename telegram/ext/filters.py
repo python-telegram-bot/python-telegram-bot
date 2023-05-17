@@ -141,7 +141,7 @@ class BaseFilter:
 
     Also works with more than two filters::
 
-        filters.TEXT & (filters.Entity(URL) | filters.Entity(TEXT_LINK))
+        filters.TEXT & (filters.Entity("url") | filters.Entity("text_link"))
         filters.TEXT & (~ filters.FORWARDED)
 
     Note:
@@ -514,7 +514,7 @@ class Caption(MessageFilter):
     allow those whose caption is appearing in the given list.
 
     Examples:
-        ``MessageHandler(filters.Caption(['PTB rocks!', 'PTB'], callback_method_2)``
+        ``MessageHandler(filters.Caption(['PTB rocks!', 'PTB']), callback_method_2)``
 
     .. seealso::
         :attr:`telegram.ext.filters.CAPTION`

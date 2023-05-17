@@ -41,7 +41,7 @@ class BotDescription(TelegramObject):
 
     def __init__(self, description: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.description = description
+        self.description: str = description
 
         self._id_attrs = (self.description,)
 
@@ -68,7 +68,7 @@ class BotShortDescription(TelegramObject):
 
     def __init__(self, short_description: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.short_description = short_description
+        self.short_description: str = short_description
 
         self._id_attrs = (self.short_description,)
 

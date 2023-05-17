@@ -30,7 +30,7 @@ class BotName(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`name` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.3
 
     Args:
         name (:obj:`str`): The bot's name.
@@ -44,7 +44,7 @@ class BotName(TelegramObject):
 
     def __init__(self, name: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.name = name
+        self.name: str = name
 
         self._id_attrs = (self.name,)
 

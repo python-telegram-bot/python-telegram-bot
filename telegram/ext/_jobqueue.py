@@ -291,6 +291,18 @@ class JobQueue(Generic[CCT]):
                   :attr:`telegram.ext.Defaults.tzinfo` is used.
 
                 Defaults to :paramref:`interval`
+
+                Note:
+                    Setting :paramref:`first` to ``0``, ``datetime.datetime.now()`` or another
+                    value that indicates that the job should run immediately will not work due
+                    to how the APScheduler library works. If you want to run a job immediately,
+                    we recommend to use an approach along the lines of::
+
+                        job = context.job_queue.run_repeating(callback, interval=5)
+                        await job.run(context.application)
+
+                    .. seealso:: :meth:`telegram.ext.Job.run`
+
             last (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                        \
                    :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
                 Latest possible time for the job to run. This parameter will be interpreted

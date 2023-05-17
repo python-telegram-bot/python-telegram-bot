@@ -132,7 +132,7 @@ class InlineKeyboardButton(TelegramObject):
             specified type, open that chat and insert the bot's username and the specified inline
             query in the input field.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.3
 
             Tip:
                 This is similar to :paramref:`switch_inline_query`, but gives more control on
@@ -193,7 +193,7 @@ class InlineKeyboardButton(TelegramObject):
             specified type, open that chat and insert the bot's username and the specified inline
             query in the input field.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.3
 
             Tip:
                 This is similar to :attr:`switch_inline_query`, but gives more control on

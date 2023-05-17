@@ -53,7 +53,7 @@ class ChatMemberUpdated(TelegramObject):
         date (:class:`datetime.datetime`): Date the change was done in Unix time. Converted to
             :class:`datetime.datetime`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         old_chat_member (:class:`telegram.ChatMember`): Previous information about the chat member.
         new_chat_member (:class:`telegram.ChatMember`): New information about the chat member.
@@ -62,7 +62,7 @@ class ChatMemberUpdated(TelegramObject):
         via_chat_folder_invite_link (:obj:`bool`, optional): :obj:`True`, if the user joined the
             chat via a chat folder invite link
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.3
 
     Attributes:
         chat (:class:`telegram.Chat`): Chat the user belongs to.
@@ -70,7 +70,7 @@ class ChatMemberUpdated(TelegramObject):
         date (:class:`datetime.datetime`): Date the change was done in Unix time. Converted to
             :class:`datetime.datetime`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         old_chat_member (:class:`telegram.ChatMember`): Previous information about the chat member.
         new_chat_member (:class:`telegram.ChatMember`): New information about the chat member.
@@ -79,7 +79,7 @@ class ChatMemberUpdated(TelegramObject):
         via_chat_folder_invite_link (:obj:`bool`): Optional. :obj:`True`, if the user joined the
             chat via a chat folder invite link
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.3
 
     """
 

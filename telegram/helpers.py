@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str:
     """Helper function to escape telegram markup symbols.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.3
         Custom emoji entity escaping is now supported.
 
     Args:

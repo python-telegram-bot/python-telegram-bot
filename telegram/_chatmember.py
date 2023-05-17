@@ -390,7 +390,7 @@ class ChatMemberRestricted(ChatMember):
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
 
@@ -445,7 +445,7 @@ class ChatMemberRestricted(ChatMember):
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
 
@@ -574,7 +574,7 @@ class ChatMemberBanned(ChatMember):
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
 
     Attributes:
@@ -584,7 +584,7 @@ class ChatMemberBanned(ChatMember):
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
 
     """

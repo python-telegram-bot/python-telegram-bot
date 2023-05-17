@@ -50,7 +50,7 @@ class Version(NamedTuple):
         return version
 
 
-__version_info__ = Version(major=20, minor=2, micro=0, releaselevel="final", serial=0)
+__version_info__ = Version(major=20, minor=3, micro=0, releaselevel="final", serial=0)
 __version__ = str(__version_info__)
 
 # # SETUP.PY MARKER
