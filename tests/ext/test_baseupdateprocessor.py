@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
+
 import pytest
 
 from telegram import Update
@@ -23,10 +25,14 @@ from telegram.ext import BaseUpdateProcessor, SimpleUpdateProcessor
 from tests.auxil.asyncio_helpers import call_after
 
 
+@pytest.fixture()
 def mock_processor():
     class MockProcessor(BaseUpdateProcessor):
+        test_flag = False
+
         async def do_process_update(self, update, coroutine):
-            pass
+            await coroutine
+            self.test_flag = True
 
     return MockProcessor(5)
 
@@ -39,14 +45,62 @@ class TestBaseUpdateProcessor:
         with pytest.raises(ValueError, match="must be a positive integer"):
             BaseUpdateProcessor(concurrent_updates)
 
-    async def test_process_update(self, one_time_bot):
-        processor = mock_processor()
+    async def test_process_update(self, mock_processor):
+        """Test that process_update calls do_process_update."""
         update = Update(1)
 
         async def coroutine():
             pass
 
-        await processor.process_update(update, coroutine)
+        await mock_processor.process_update(update, coroutine())
+        # This flag is set in the mock processor in do_process_update, telling us that
+        # do_process_update was called.
+        assert mock_processor.test_flag
+
+    async def test_max_concurrent_updates_enforcement(self, mock_processor):
+        """Test that max_concurrent_updates is enforced, i.e. that the processor will run
+        at most max_concurrent_updates coroutines at the same time."""
+        count = 2 * mock_processor.max_concurrent_updates
+        events = {i: asyncio.Event() for i in range(count)}
+        queue = asyncio.Queue()
+        for event in events.values():
+            await queue.put(event)
+
+        async def callback():
+            await asyncio.sleep(0.5)
+            (await queue.get()).set()
+
+        # We start several calls to `process_update` at the same time, each of them taking
+        # 0.5 seconds to complete. We know that they are completed when the corresponding
+        # event is set.
+        tasks = [
+            asyncio.create_task(mock_processor.process_update(update=_, coroutine=callback()))
+            for _ in range(count)
+        ]
+
+        # Right now we expect no event to be set
+        for i in range(count):
+            assert not events[i].is_set()
+
+        # After 0.5 seconds (+ some buffer), we expect that exactly max_concurrent_updates
+        # events are set.
+        await asyncio.sleep(0.75)
+        for i in range(mock_processor.max_concurrent_updates):
+            assert events[i].is_set()
+        for i in range(
+            mock_processor.max_concurrent_updates,
+            count,
+        ):
+            assert not events[i].is_set()
+
+        # After wating another 0.5 seconds, we expect that the next max_concurrent_updates
+        # events are set.
+        await asyncio.sleep(0.5)
+        for i in range(count):
+            assert events[i].is_set()
+
+        # Sanity check: we expect that all tasks are completed.
+        await asyncio.gather(*tasks)
 
     async def test_context_manager(self, monkeypatch):
         processor = mock_processor()
@@ -93,10 +147,14 @@ class TestBaseUpdateProcessor:
 
 class TestSimpleUpdateProcessor:
     async def test_do_process_update(self):
+        """Test that do_process_update calls the coroutine."""
         processor = SimpleUpdateProcessor(1)
         update = Update(1)
+        test_flag = False
 
         async def coroutine():
-            pass
+            nonlocal test_flag
+            test_flag = True
 
         await processor.do_process_update(update, coroutine())
+        assert test_flag
