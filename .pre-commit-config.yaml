@@ -32,7 +32,7 @@ repos:
           - tornado~=6.2
           - APScheduler~=3.10.1
           - cachetools~=5.3.0
-          - aiolimiter~=1.0.0
+          - aiolimiter~=1.1.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.2.0
@@ -48,7 +48,7 @@ repos:
           - tornado~=6.2
           - APScheduler~=3.10.1
           - cachetools~=5.3.0
-          - aiolimiter~=1.0.0
+          - aiolimiter~=1.1.0
           - . # this basically does `pip install -e .`
     - id: mypy
       name: mypy-examples
@@ -87,4 +87,4 @@ repos:
           - tornado~=6.2
           - APScheduler~=3.10.1
           - cachetools~=5.3.0
-          - aiolimiter~=1.0.0
+          - aiolimiter~=1.1.0
