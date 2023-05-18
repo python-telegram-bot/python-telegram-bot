@@ -391,8 +391,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         * The :attr:`bot`, by calling :meth:`telegram.Bot.initialize`.
         * The :attr:`updater`, by calling :meth:`telegram.ext.Updater.initialize`.
         * The :attr:`persistence`, by loading persistent conversations and data.
-        * The :attr:`update_processor` by calling :meth:`telegram.ext.BaseUpdateProcessor.\
-            initialize`.
+        * The :attr:`update_processor` by calling
+            :meth:`telegram.ext.BaseUpdateProcessor.initialize`.
 
         Does *not* call :attr:`post_init` - that is only done by :meth:`run_polling` and
         :meth:`run_webhook`.
