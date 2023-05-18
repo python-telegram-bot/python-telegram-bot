@@ -57,7 +57,7 @@ class ChatLocation(TelegramObject):
         location: Location,
         address: str,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.location: Location = location

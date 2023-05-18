@@ -94,13 +94,13 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
         self,
         id: str,  # pylint: disable=redefined-builtin
         audio_file_id: str,
-        caption: str = None,
-        reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: "InputMessageContent" = None,
+        caption: Optional[str] = None,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        input_message_content: Optional["InputMessageContent"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.AUDIO, id, api_kwargs=api_kwargs)

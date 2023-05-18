@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram PhotoSize."""
 
+from typing import Optional
+
 from telegram._files._basemedium import _BaseMedium
 from telegram._utils.types import JSONDict
 
@@ -59,9 +61,9 @@ class PhotoSize(_BaseMedium):
         file_unique_id: str,
         width: int,
         height: int,
-        file_size: int = None,
+        file_size: Optional[int] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(
             file_id=file_id,

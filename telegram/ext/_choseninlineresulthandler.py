@@ -79,7 +79,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
         self,
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
-        pattern: Union[str, Pattern[str]] = None,
+        pattern: Optional[Union[str, Pattern[str]]] = None,
     ):
         super().__init__(callback, block=block)
 

@@ -58,7 +58,7 @@ class UserProfilePhotos(TelegramObject):
         total_count: int,
         photos: Sequence[Sequence[PhotoSize]],
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required

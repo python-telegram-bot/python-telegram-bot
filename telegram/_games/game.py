@@ -101,11 +101,11 @@ class Game(TelegramObject):
         title: str,
         description: str,
         photo: Sequence[PhotoSize],
-        text: str = None,
-        text_entities: Sequence[MessageEntity] = None,
-        animation: Animation = None,
+        text: Optional[str] = None,
+        text_entities: Optional[Sequence[MessageEntity]] = None,
+        animation: Optional[Animation] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -162,7 +162,7 @@ class Game(TelegramObject):
 
         return entity_text.decode("utf-16-le")
 
-    def parse_text_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
+    def parse_text_entities(self, types: Optional[List[str]] = None) -> Dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message filtered by their

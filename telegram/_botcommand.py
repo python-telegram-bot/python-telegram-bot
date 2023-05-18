@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Command."""
 
-from typing import ClassVar
+from typing import ClassVar, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -52,7 +52,7 @@ class BotCommand(TelegramObject):
 
     __slots__ = ("description", "command")
 
-    def __init__(self, command: str, description: str, *, api_kwargs: JSONDict = None):
+    def __init__(self, command: str, description: str, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)
         self.command: str = command
         self.description: str = description

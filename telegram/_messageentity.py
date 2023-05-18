@@ -96,12 +96,12 @@ class MessageEntity(TelegramObject):
         type: str,  # pylint: disable=redefined-builtin
         offset: int,
         length: int,
-        url: str = None,
-        user: User = None,
-        language: str = None,
-        custom_emoji_id: str = None,
+        url: Optional[str] = None,
+        user: Optional[User] = None,
+        language: Optional[str] = None,
+        custom_emoji_id: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required

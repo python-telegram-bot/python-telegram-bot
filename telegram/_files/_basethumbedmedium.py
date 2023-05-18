@@ -74,11 +74,11 @@ class _BaseThumbedMedium(_BaseMedium):
         self,
         file_id: str,
         file_unique_id: str,
-        file_size: int = None,
-        thumb: PhotoSize = None,
-        thumbnail: PhotoSize = None,
+        file_size: Optional[int] = None,
+        thumb: Optional[PhotoSize] = None,
+        thumbnail: Optional[PhotoSize] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(
             file_id=file_id,

@@ -24,7 +24,7 @@ import functools
 import logging
 import time
 from pathlib import Path
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 import pytest
 
@@ -70,7 +70,7 @@ class TrackingPersistence(BasePersistence):
 
     def __init__(
         self,
-        store_data: PersistenceInput = None,
+        store_data: Optional[PersistenceInput] = None,
         update_interval: float = 60,
         fill_data: bool = False,
     ):
@@ -219,20 +219,20 @@ class TrackingConversationHandler(ConversationHandler):
 
 
 class PappInput(NamedTuple):
-    bot_data: bool = None
-    chat_data: bool = None
-    user_data: bool = None
-    callback_data: bool = None
+    bot_data: Optional[bool] = None
+    chat_data: Optional[bool] = None
+    user_data: Optional[bool] = None
+    callback_data: Optional[bool] = None
     conversations: bool = True
     update_interval: float = None
     fill_data: bool = False
 
 
 def build_papp(
-    bot_info: dict = None,
-    token: str = None,
-    store_data: dict = None,
-    update_interval: float = None,
+    bot_info: Optional[dict] = None,
+    token: Optional[str] = None,
+    store_data: Optional[dict] = None,
+    update_interval: Optional[float] = None,
     fill_data: bool = False,
 ) -> Application:
     store_data = PersistenceInput(**(store_data or {}))
@@ -311,7 +311,7 @@ class TestBasePersistence:
     """Tests basic behavior of BasePersistence and (most importantly) the integration of
     persistence into the Application."""
 
-    def job_callback(self, chat_id: int = None):
+    def job_callback(self, chat_id: Optional[int] = None):
         async def callback(context):
             if context.user_data:
                 context.user_data["key"] = "value"
@@ -330,7 +330,7 @@ class TestBasePersistence:
 
         return callback
 
-    def handler_callback(self, chat_id: int = None, sleep: float = None):
+    def handler_callback(self, chat_id: Optional[int] = None, sleep: Optional[float] = None):
         async def callback(update, context):
             if sleep:
                 await asyncio.sleep(sleep)

@@ -91,11 +91,11 @@ class InputMedia(TelegramObject):
         self,
         media_type: str,
         media: Union[str, InputFile, MediaType],
-        caption: str = None,
-        caption_entities: Sequence[MessageEntity] = None,
+        caption: Optional[str] = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = media_type
@@ -196,18 +196,18 @@ class InputMediaAnimation(InputMedia):
     def __init__(
         self,
         media: Union[FileInput, Animation],
-        thumb: FileInput = None,
-        caption: str = None,
+        thumb: Optional[FileInput] = None,
+        caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        width: int = None,
-        height: int = None,
-        duration: int = None,
-        caption_entities: Sequence[MessageEntity] = None,
-        filename: str = None,
-        has_spoiler: bool = None,
-        thumbnail: FileInput = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        duration: Optional[int] = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
+        filename: Optional[str] = None,
+        has_spoiler: Optional[bool] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         if isinstance(media, Animation):
             width = media.width if width is None else width
@@ -304,13 +304,13 @@ class InputMediaPhoto(InputMedia):
     def __init__(
         self,
         media: Union[FileInput, PhotoSize],
-        caption: str = None,
+        caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] = None,
-        filename: str = None,
-        has_spoiler: bool = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
+        filename: Optional[str] = None,
+        has_spoiler: Optional[bool] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
@@ -423,19 +423,19 @@ class InputMediaVideo(InputMedia):
     def __init__(
         self,
         media: Union[FileInput, Video],
-        caption: str = None,
-        width: int = None,
-        height: int = None,
-        duration: int = None,
-        supports_streaming: bool = None,
+        caption: Optional[str] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        duration: Optional[int] = None,
+        supports_streaming: Optional[bool] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: FileInput = None,
-        caption_entities: Sequence[MessageEntity] = None,
-        filename: str = None,
-        has_spoiler: bool = None,
-        thumbnail: FileInput = None,
+        thumb: Optional[FileInput] = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
+        filename: Optional[str] = None,
+        has_spoiler: Optional[bool] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         if isinstance(media, Video):
             width = width if width is not None else media.width
@@ -555,17 +555,17 @@ class InputMediaAudio(InputMedia):
     def __init__(
         self,
         media: Union[FileInput, Audio],
-        thumb: FileInput = None,
-        caption: str = None,
+        thumb: Optional[FileInput] = None,
+        caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        duration: int = None,
-        performer: str = None,
-        title: str = None,
-        caption_entities: Sequence[MessageEntity] = None,
-        filename: str = None,
-        thumbnail: FileInput = None,
+        duration: Optional[int] = None,
+        performer: Optional[str] = None,
+        title: Optional[str] = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
+        filename: Optional[str] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         if isinstance(media, Audio):
             duration = media.duration if duration is None else duration
@@ -675,15 +675,15 @@ class InputMediaDocument(InputMedia):
     def __init__(
         self,
         media: Union[FileInput, Document],
-        thumb: FileInput = None,
-        caption: str = None,
+        thumb: Optional[FileInput] = None,
+        caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        disable_content_type_detection: bool = None,
-        caption_entities: Sequence[MessageEntity] = None,
-        filename: str = None,
-        thumbnail: FileInput = None,
+        disable_content_type_detection: Optional[bool] = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
+        filename: Optional[str] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.

@@ -131,14 +131,14 @@ class KeyboardButton(TelegramObject):
     def __init__(
         self,
         text: str,
-        request_contact: bool = None,
-        request_location: bool = None,
-        request_poll: KeyboardButtonPollType = None,
-        web_app: WebAppInfo = None,
-        request_user: KeyboardButtonRequestUser = None,
-        request_chat: KeyboardButtonRequestChat = None,
+        request_contact: Optional[bool] = None,
+        request_location: Optional[bool] = None,
+        request_poll: Optional[KeyboardButtonPollType] = None,
+        web_app: Optional[WebAppInfo] = None,
+        request_user: Optional[KeyboardButtonRequestUser] = None,
+        request_chat: Optional[KeyboardButtonRequestChat] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required

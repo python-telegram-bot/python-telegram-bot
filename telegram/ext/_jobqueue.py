@@ -162,11 +162,11 @@ class JobQueue(Generic[CCT]):
         self,
         callback: JobCallback[CCT],
         when: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
-        job_kwargs: JSONDict = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+        job_kwargs: Optional[JSONDict] = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` instance that runs once and adds it to the queue.
 
@@ -246,13 +246,13 @@ class JobQueue(Generic[CCT]):
         self,
         callback: JobCallback[CCT],
         interval: Union[float, datetime.timedelta],
-        first: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
-        last: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
-        job_kwargs: JSONDict = None,
+        first: Optional[Union[float, datetime.timedelta, datetime.datetime, datetime.time]] = None,
+        last: Optional[Union[float, datetime.timedelta, datetime.datetime, datetime.time]] = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+        job_kwargs: Optional[JSONDict] = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` instance that runs at specified intervals and adds it to the
         queue.
@@ -374,11 +374,11 @@ class JobQueue(Generic[CCT]):
         callback: JobCallback[CCT],
         when: datetime.time,
         day: int,
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
-        job_kwargs: JSONDict = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+        job_kwargs: Optional[JSONDict] = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
 
@@ -452,11 +452,11 @@ class JobQueue(Generic[CCT]):
         callback: JobCallback[CCT],
         time: datetime.time,
         days: Tuple[int, ...] = _ALL_DAYS,
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
-        job_kwargs: JSONDict = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+        job_kwargs: Optional[JSONDict] = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` that runs on a daily basis and adds it to the queue.
 
@@ -542,10 +542,10 @@ class JobQueue(Generic[CCT]):
         self,
         callback: JobCallback[CCT],
         job_kwargs: JSONDict,
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
     ) -> "Job[CCT]":
         """Creates a new custom defined :class:`Job`.
 
@@ -721,10 +721,10 @@ class Job(Generic[CCT]):
     def __init__(
         self,
         callback: JobCallback[CCT],
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
     ):
         if not APS_AVAILABLE:
             raise RuntimeError(

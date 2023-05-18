@@ -53,9 +53,9 @@ class InlineQueryResultGame(InlineQueryResult):
         self,
         id: str,  # pylint: disable=redefined-builtin
         game_short_name: str,
-        reply_markup: InlineKeyboardMarkup = None,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.GAME, id, api_kwargs=api_kwargs)

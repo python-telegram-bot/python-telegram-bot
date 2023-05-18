@@ -71,9 +71,9 @@ class PassportFile(TelegramObject):
         file_unique_id: str,
         file_date: int,
         file_size: int,
-        credentials: "FileCredentials" = None,
+        credentials: Optional["FileCredentials"] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -155,7 +155,7 @@ class PassportFile(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "File":
         """
         Wrapper over :meth:`telegram.Bot.get_file`. Will automatically assign the correct

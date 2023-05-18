@@ -92,7 +92,7 @@ class ChatMember(TelegramObject):
         user: User,
         status: str,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
@@ -162,9 +162,9 @@ class ChatMemberOwner(ChatMember):
         self,
         user: User,
         is_anonymous: bool,
-        custom_title: str = None,
+        custom_title: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.OWNER, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -295,13 +295,13 @@ class ChatMemberAdministrator(ChatMember):
         can_promote_members: bool,
         can_change_info: bool,
         can_invite_users: bool,
-        can_post_messages: bool = None,
-        can_edit_messages: bool = None,
-        can_pin_messages: bool = None,
-        can_manage_topics: bool = None,
-        custom_title: str = None,
+        can_post_messages: Optional[bool] = None,
+        can_edit_messages: Optional[bool] = None,
+        can_pin_messages: Optional[bool] = None,
+        can_manage_topics: Optional[bool] = None,
+        custom_title: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.ADMINISTRATOR, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -344,7 +344,7 @@ class ChatMemberMember(ChatMember):
         self,
         user: User,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
         self._freeze()
@@ -511,7 +511,7 @@ class ChatMemberRestricted(ChatMember):
         can_send_video_notes: bool,
         can_send_voice_notes: bool,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -556,7 +556,7 @@ class ChatMemberLeft(ChatMember):
         self,
         user: User,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
         self._freeze()
@@ -596,7 +596,7 @@ class ChatMemberBanned(ChatMember):
         user: User,
         until_date: datetime.datetime,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():

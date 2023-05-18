@@ -159,23 +159,23 @@ class InlineQueryResultVideo(InlineQueryResult):
         # thumbnail_url and title are not optional in Telegram API, but we want to support
         # thumb_url as well, so thumbnail_url may not be passed if thumb_url is passed.
         # We will raise ValueError manually if neither thumbnail_url nor thumb_url are passed.
-        thumbnail_url: str = None,
+        thumbnail_url: Optional[str] = None,
         # title had to be made optional because of thumbnail_url. This is compensated by raising
         # TypeError manually if title is not passed.
-        title: str = None,
-        caption: str = None,
-        video_width: int = None,
-        video_height: int = None,
-        video_duration: int = None,
-        description: str = None,
-        reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: "InputMessageContent" = None,
+        title: Optional[str] = None,
+        caption: Optional[str] = None,
+        video_width: Optional[int] = None,
+        video_height: Optional[int] = None,
+        video_duration: Optional[int] = None,
+        description: Optional[str] = None,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        input_message_content: Optional["InputMessageContent"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
         # thumb_url is not optional in Telegram API, but it is here, along with thumbnail_url.
-        thumb_url: str = None,
+        thumb_url: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         if not (thumbnail_url or thumb_url):
             raise ValueError(

@@ -79,10 +79,10 @@ class ForceReply(TelegramObject):
 
     def __init__(
         self,
-        selective: bool = None,
-        input_field_placeholder: str = None,
+        selective: Optional[bool] = None,
+        input_field_placeholder: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.force_reply: bool = True

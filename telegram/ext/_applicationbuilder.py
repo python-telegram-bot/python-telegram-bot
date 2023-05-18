@@ -329,7 +329,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def application_class(
         self: BuilderType,
         application_class: Type[Application[Any, Any, Any, Any, Any, Any]],
-        kwargs: Dict[str, object] = None,
+        kwargs: Optional[Dict[str, object]] = None,
     ) -> BuilderType:
         """Sets a custom subclass instead of :class:`telegram.ext.Application`. The
         subclass's ``__init__`` should look like this
@@ -759,7 +759,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def private_key(
         self: BuilderType,
         private_key: Union[bytes, FilePathInput],
-        password: Union[bytes, FilePathInput] = None,
+        password: Optional[Union[bytes, FilePathInput]] = None,
     ) -> BuilderType:
         """Sets the private key and corresponding password for decryption of telegram passport data
         for :attr:`telegram.ext.Application.bot`.

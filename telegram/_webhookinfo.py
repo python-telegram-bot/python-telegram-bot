@@ -123,14 +123,14 @@ class WebhookInfo(TelegramObject):
         url: str,
         has_custom_certificate: bool,
         pending_update_count: int,
-        last_error_date: int = None,
-        last_error_message: str = None,
-        max_connections: int = None,
-        allowed_updates: Sequence[str] = None,
-        ip_address: str = None,
-        last_synchronization_error_date: int = None,
+        last_error_date: Optional[int] = None,
+        last_error_message: Optional[str] = None,
+        max_connections: Optional[int] = None,
+        allowed_updates: Optional[Sequence[str]] = None,
+        ip_address: Optional[str] = None,
+        last_synchronization_error_date: Optional[int] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
