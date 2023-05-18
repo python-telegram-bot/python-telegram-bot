@@ -394,7 +394,8 @@ Major Changes:
 - Align Behavior Of ``JobQueue.run_daily`` With ``cron`` (:pr:`3046`)
 - Make PTB Specific  Keyword-Only Arguments for PTB Specific in Bot methods (:pr:`3035`)
 - Adjust Equality Comparisons to Fit Bot API 6.0 (:pr:`3033`)
-- Add Tuple Based Version Info (:pr:`3030`)- Improve Type Annotations for ``CallbackContext`` and Move Default Type Alias to ``ContextTypes.DEFAULT_TYPE`` (:pr:`3017`, :pr:`3023`)
+- Add Tuple Based Version Info (:pr:`3030`)
+- Improve Type Annotations for ``CallbackContext`` and Move Default Type Alias to ``ContextTypes.DEFAULT_TYPE`` (:pr:`3017`, :pr:`3023`)
 - Rename ``Job.context`` to ``Job.data`` (:pr:`3028`)
 - Rename ``Handler`` to ``BaseHandler`` (:pr:`3019`)
 
