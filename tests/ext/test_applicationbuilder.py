@@ -429,6 +429,19 @@ class TestApplicationBuilder:
         assert app.updater is updater
         assert app.bot is updater.bot
         assert app.update_queue is updater.update_queue
+        app = (
+            builder.token(bot.token)
+            .job_queue(job_queue)
+            .persistence(persistence)
+            .update_queue(update_queue)
+            .context_types(context_types)
+            .concurrent_updates(expected)
+            .post_init(post_init)
+            .post_shutdown(post_shutdown)
+            .post_stop(post_stop)
+            .arbitrary_callback_data(True)
+        ).build()
+        assert app.update_processor is expected
 
         with pytest.raises(ValueError, match="must be a positive"):
             (
