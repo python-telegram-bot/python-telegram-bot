@@ -57,7 +57,7 @@ from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
-from telegram.ext._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
+from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._handler import BaseHandler
@@ -405,10 +405,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             return
 
         await self.bot.initialize()
-        if isinstance(self._update_processor, BaseUpdateProcessor) and not isinstance(
-            self._update_processor, SimpleUpdateProcessor
-        ):
-            await self._update_processor.initialize()
+        await self._update_processor.initialize()
 
         if self.updater:
             await self.updater.initialize()
@@ -461,10 +458,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             return
 
         await self.bot.shutdown()
-        if isinstance(self._update_processor, BaseUpdateProcessor) and not isinstance(
-            self._update_processor, SimpleUpdateProcessor
-        ):
-            await self._update_processor.shutdown()
+        await self._update_processor.shutdown()
 
         if self.updater:
             await self.updater.shutdown()

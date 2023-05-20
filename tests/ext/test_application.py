@@ -233,7 +233,6 @@ class TestApplication:
     @pytest.mark.parametrize("updater", [True, False])
     async def test_initialize(self, one_time_bot, monkeypatch, updater, update_processor):
         """Initialization of persistence is tested test_basepersistence"""
-        is_update_processor = False
         self.test_flag = set()
 
         async def after_initialize_bot(*args, **kwargs):
@@ -249,28 +248,28 @@ class TestApplication:
         if isinstance(update_processor, BaseUpdateProcessor) and not isinstance(
             update_processor, SimpleUpdateProcessor
         ):
-            is_update_processor = True
             monkeypatch.setattr(
                 BaseUpdateProcessor,
                 "initialize",
                 call_after(BaseUpdateProcessor.initialize, after_initialize_update_processor),
             )
+        else:
+            monkeypatch.setattr(
+                SimpleUpdateProcessor,
+                "initialize",
+                call_after(SimpleUpdateProcessor.initialize, after_initialize_update_processor),
+            )
         monkeypatch.setattr(
             Updater, "initialize", call_after(Updater.initialize, after_initialize_updater)
         )
-        if updater and is_update_processor:
+        if updater:
             app = (
                 ApplicationBuilder().bot(one_time_bot).concurrent_updates(update_processor).build()
             )
             await app.initialize()
             assert self.test_flag == {"bot", "update_processor", "updater"}
             await app.shutdown()
-        elif updater and not is_update_processor:
-            app = ApplicationBuilder().bot(one_time_bot).build()
-            await app.initialize()
-            assert self.test_flag == {"bot", "updater"}
-            await app.shutdown()
-        elif is_update_processor and not updater:
+        else:
             app = (
                 ApplicationBuilder()
                 .bot(one_time_bot)
@@ -281,11 +280,6 @@ class TestApplication:
             await app.initialize()
             assert self.test_flag == {"bot", "update_processor"}
             await app.shutdown()
-        else:
-            app = ApplicationBuilder().bot(one_time_bot).updater(None).build()
-            await app.initialize()
-            assert self.test_flag == {"bot"}
-            await app.shutdown()
 
     @pytest.mark.parametrize(
         "update_processor", [BaseUpdateProcessor(1), SimpleUpdateProcessor(1)]
@@ -293,7 +287,6 @@ class TestApplication:
     @pytest.mark.parametrize("updater", [True, False])
     async def test_shutdown(self, one_time_bot, monkeypatch, updater, update_processor):
         """Shutdown of persistence is tested in test_basepersistence"""
-        is_update_processor = False
         self.test_flag = set()
 
         def after_bot_shutdown(*args, **kwargs):
@@ -309,36 +302,33 @@ class TestApplication:
         if isinstance(update_processor, BaseUpdateProcessor) and not isinstance(
             update_processor, SimpleUpdateProcessor
         ):
-            is_update_processor = True
             monkeypatch.setattr(
                 BaseUpdateProcessor,
                 "initialize",
-                call_after(BaseUpdateProcessor.shutdown, after_shutdown_update_processor),
+                call_after(BaseUpdateProcessor.initialize, after_shutdown_update_processor),
+            )
+        else:
+            monkeypatch.setattr(
+                SimpleUpdateProcessor,
+                "initialize",
+                call_after(SimpleUpdateProcessor.initialize, after_shutdown_update_processor),
             )
         monkeypatch.setattr(
             Updater, "shutdown", call_after(Updater.shutdown, after_updater_shutdown)
         )
 
-        if updater and is_update_processor:
+        if updater:
             async with ApplicationBuilder().bot(one_time_bot).concurrent_updates(
                 update_processor
             ).build():
                 pass
             assert self.test_flag == {"bot", "update_processor", "updater"}
-        elif updater and not is_update_processor:
-            async with ApplicationBuilder().bot(one_time_bot).build():
-                pass
-            assert self.test_flag == {"bot", "updater"}
-        elif is_update_processor and not updater:
+        else:
             async with ApplicationBuilder().bot(one_time_bot).updater(None).concurrent_updates(
                 update_processor
             ).build():
                 pass
             assert self.test_flag == {"bot", "update_processor"}
-        else:
-            async with ApplicationBuilder().bot(one_time_bot).updater(None).build():
-                pass
-            assert self.test_flag == {"bot"}
 
     async def test_multiple_inits_and_shutdowns(self, app, monkeypatch):
         self.received = defaultdict(int)

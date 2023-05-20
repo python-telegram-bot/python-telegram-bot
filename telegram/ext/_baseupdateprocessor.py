@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BaseProcessor class."""
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from asyncio import BoundedSemaphore
 from types import TracebackType
 from typing import Any, Awaitable, Optional, Type
 
 
-class BaseUpdateProcessor:
+class BaseUpdateProcessor(ABC):
     """An abstract base class for update processors. You can use this class to implement
     your own update processor.
 
