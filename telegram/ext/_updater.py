@@ -202,7 +202,7 @@ class Updater(AsyncContextManager["Updater"]):
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is ``0.0``.
-            timeout (:obj:`float`, optional): Passed to
+            timeout (:obj:`int`, optional): Passed to
                 :paramref:`telegram.Bot.get_updates.timeout`. Defaults to ``10`` seconds.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
