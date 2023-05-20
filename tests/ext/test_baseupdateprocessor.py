@@ -16,18 +16,21 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""Here we run tests directly with SimpleUpdateProcessor because that's easier than providing dummy
+implementations for SimpleUpdateProcessor and we want to test SimpleUpdateProcessor anyway."""
 import asyncio
 
 import pytest
 
 from telegram import Update
-from telegram.ext import BaseUpdateProcessor, SimpleUpdateProcessor
+from telegram.ext import SimpleUpdateProcessor
 from tests.auxil.asyncio_helpers import call_after
+from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture()
 def mock_processor():
-    class MockProcessor(BaseUpdateProcessor):
+    class MockProcessor(SimpleUpdateProcessor):
         test_flag = False
 
         async def do_process_update(self, update, coroutine):
@@ -37,13 +40,19 @@ def mock_processor():
     return MockProcessor(5)
 
 
-class TestBaseUpdateProcessor:
+class TestSimpleUpdateProcessor:
+    def test_slot_behaviour(self):
+        inst = SimpleUpdateProcessor(1)
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
     @pytest.mark.parametrize("concurrent_updates", [0, -1])
     def test_init(self, concurrent_updates):
-        processor = BaseUpdateProcessor(3)
+        processor = SimpleUpdateProcessor(3)
         assert processor.max_concurrent_updates == 3
         with pytest.raises(ValueError, match="must be a positive integer"):
-            BaseUpdateProcessor(concurrent_updates)
+            SimpleUpdateProcessor(concurrent_updates)
 
     async def test_process_update(self, mock_processor):
         """Test that process_update calls do_process_update."""
@@ -56,6 +65,19 @@ class TestBaseUpdateProcessor:
         # This flag is set in the mock processor in do_process_update, telling us that
         # do_process_update was called.
         assert mock_processor.test_flag
+
+    async def test_do_process_update(self):
+        """Test that do_process_update calls the coroutine."""
+        processor = SimpleUpdateProcessor(1)
+        update = Update(1)
+        test_flag = False
+
+        async def coroutine():
+            nonlocal test_flag
+            test_flag = True
+
+        await processor.do_process_update(update, coroutine())
+        assert test_flag
 
     async def test_max_concurrent_updates_enforcement(self, mock_processor):
         """Test that max_concurrent_updates is enforced, i.e. that the processor will run
@@ -112,14 +134,14 @@ class TestBaseUpdateProcessor:
             self.test_flag.add("stop")
 
         monkeypatch.setattr(
-            BaseUpdateProcessor,
+            SimpleUpdateProcessor,
             "initialize",
-            call_after(BaseUpdateProcessor.initialize, after_initialize),
+            call_after(SimpleUpdateProcessor.initialize, after_initialize),
         )
         monkeypatch.setattr(
-            BaseUpdateProcessor,
+            SimpleUpdateProcessor,
             "shutdown",
-            call_after(BaseUpdateProcessor.shutdown, after_shutdown),
+            call_after(SimpleUpdateProcessor.shutdown, after_shutdown),
         )
 
         async with mock_processor:
@@ -134,26 +156,11 @@ class TestBaseUpdateProcessor:
         async def shutdown(*args, **kwargs):
             self.test_flag = "shutdown"
 
-        monkeypatch.setattr(BaseUpdateProcessor, "initialize", initialize)
-        monkeypatch.setattr(BaseUpdateProcessor, "shutdown", shutdown)
+        monkeypatch.setattr(SimpleUpdateProcessor, "initialize", initialize)
+        monkeypatch.setattr(SimpleUpdateProcessor, "shutdown", shutdown)
 
         with pytest.raises(RuntimeError, match="initialize"):
             async with mock_processor:
                 pass
 
         assert self.test_flag == "shutdown"
-
-
-class TestSimpleUpdateProcessor:
-    async def test_do_process_update(self):
-        """Test that do_process_update calls the coroutine."""
-        processor = SimpleUpdateProcessor(1)
-        update = Update(1)
-        test_flag = False
-
-        async def coroutine():
-            nonlocal test_flag
-            test_flag = True
-
-        await processor.do_process_update(update, coroutine())
-        assert test_flag

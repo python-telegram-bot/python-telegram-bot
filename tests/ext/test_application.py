@@ -41,7 +41,6 @@ from telegram.ext import (
     ApplicationBuilder,
     ApplicationHandlerStop,
     BaseHandler,
-    BaseUpdateProcessor,
     CallbackContext,
     CommandHandler,
     ContextTypes,
@@ -227,11 +226,8 @@ class TestApplication:
         assert isinstance(application.chat_data[1], float)
         assert isinstance(application.bot_data, complex)
 
-    @pytest.mark.parametrize(
-        "update_processor", [BaseUpdateProcessor(1), SimpleUpdateProcessor(1)]
-    )
     @pytest.mark.parametrize("updater", [True, False])
-    async def test_initialize(self, one_time_bot, monkeypatch, updater, update_processor):
+    async def test_initialize(self, one_time_bot, monkeypatch, updater):
         """Initialization of persistence is tested test_basepersistence"""
         self.test_flag = set()
 
@@ -244,21 +240,13 @@ class TestApplication:
         async def after_initialize_updater(*args, **kwargs):
             self.test_flag.add("updater")
 
+        update_processor = SimpleUpdateProcessor(1)
         monkeypatch.setattr(Bot, "initialize", call_after(Bot.initialize, after_initialize_bot))
-        if isinstance(update_processor, BaseUpdateProcessor) and not isinstance(
-            update_processor, SimpleUpdateProcessor
-        ):
-            monkeypatch.setattr(
-                BaseUpdateProcessor,
-                "initialize",
-                call_after(BaseUpdateProcessor.initialize, after_initialize_update_processor),
-            )
-        else:
-            monkeypatch.setattr(
-                SimpleUpdateProcessor,
-                "initialize",
-                call_after(SimpleUpdateProcessor.initialize, after_initialize_update_processor),
-            )
+        monkeypatch.setattr(
+            SimpleUpdateProcessor,
+            "initialize",
+            call_after(SimpleUpdateProcessor.initialize, after_initialize_update_processor),
+        )
         monkeypatch.setattr(
             Updater, "initialize", call_after(Updater.initialize, after_initialize_updater)
         )
@@ -281,11 +269,8 @@ class TestApplication:
             assert self.test_flag == {"bot", "update_processor"}
             await app.shutdown()
 
-    @pytest.mark.parametrize(
-        "update_processor", [BaseUpdateProcessor(1), SimpleUpdateProcessor(1)]
-    )
     @pytest.mark.parametrize("updater", [True, False])
-    async def test_shutdown(self, one_time_bot, monkeypatch, updater, update_processor):
+    async def test_shutdown(self, one_time_bot, monkeypatch, updater):
         """Shutdown of persistence is tested in test_basepersistence"""
         self.test_flag = set()
 
@@ -298,21 +283,13 @@ class TestApplication:
         def after_updater_shutdown(*args, **kwargs):
             self.test_flag.add("updater")
 
+        update_processor = SimpleUpdateProcessor(1)
         monkeypatch.setattr(Bot, "shutdown", call_after(Bot.shutdown, after_bot_shutdown))
-        if isinstance(update_processor, BaseUpdateProcessor) and not isinstance(
-            update_processor, SimpleUpdateProcessor
-        ):
-            monkeypatch.setattr(
-                BaseUpdateProcessor,
-                "initialize",
-                call_after(BaseUpdateProcessor.initialize, after_shutdown_update_processor),
-            )
-        else:
-            monkeypatch.setattr(
-                SimpleUpdateProcessor,
-                "initialize",
-                call_after(SimpleUpdateProcessor.initialize, after_shutdown_update_processor),
-            )
+        monkeypatch.setattr(
+            SimpleUpdateProcessor,
+            "initialize",
+            call_after(SimpleUpdateProcessor.initialize, after_shutdown_update_processor),
+        )
         monkeypatch.setattr(
             Updater, "shutdown", call_after(Updater.shutdown, after_updater_shutdown)
         )
