@@ -929,7 +929,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                 :class:`telegram.ext.BaseUpdateProcessor` to use that instance for handling updates
                 concurrently.
 
-                .. verionchanged:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     Now accepts :class:`BaseUpdateProcessor` instances.
 
         Returns:
