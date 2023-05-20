@@ -125,6 +125,8 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
     """Instance of :class:`telegram.ext.BaseUpdateProcessor` that immediately awaits the
     coroutine, i.e. does not apply any additional processing. This is used by default when
     :attr:`telegram.ext.ApplicationBuilder.concurrent_updates` is :obj:`int`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = ()

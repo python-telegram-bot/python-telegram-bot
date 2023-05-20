@@ -382,6 +382,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         application.
 
         .. seealso:: :wiki:`Concurrency`
+
+        .. versionadded:: NEXT.VERSION
         """
         return self._update_processor
 
