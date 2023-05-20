@@ -96,7 +96,7 @@ class HTTPXRequest(BaseRequest):
     def __init__(
         self,
         connection_pool_size: int = 1,
-        proxy_url: str = None,
+        proxy_url: Optional[str] = None,
         read_timeout: Optional[float] = 5.0,
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
@@ -175,7 +175,7 @@ class HTTPXRequest(BaseRequest):
         self,
         url: str,
         method: str,
-        request_data: RequestData = None,
+        request_data: Optional[RequestData] = None,
         read_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,

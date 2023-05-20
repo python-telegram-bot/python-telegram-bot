@@ -109,7 +109,9 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        pattern: Union[str, Pattern[str], type, Callable[[object], Optional[bool]]] = None,
+        pattern: Optional[
+            Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
+        ] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)

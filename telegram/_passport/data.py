@@ -81,12 +81,12 @@ class PersonalDetails(TelegramObject):
         gender: str,
         country_code: str,
         residence_country_code: str,
-        first_name_native: str = None,
-        last_name_native: str = None,
-        middle_name: str = None,
-        middle_name_native: str = None,
+        first_name_native: Optional[str] = None,
+        last_name_native: Optional[str] = None,
+        middle_name: Optional[str] = None,
+        middle_name_native: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -143,7 +143,7 @@ class ResidentialAddress(TelegramObject):
         country_code: str,
         post_code: str,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -177,7 +177,7 @@ class IdDocumentData(TelegramObject):
         document_no: str,
         expiry_date: str,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.document_no: str = document_no

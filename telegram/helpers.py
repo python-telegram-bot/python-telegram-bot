@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from telegram import Message, Update
 
 
-def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str:
+def escape_markdown(text: str, version: int = 1, entity_type: Optional[str] = None) -> str:
     """Helper function to escape telegram markup symbols.
 
     .. versionchanged:: 20.3
@@ -140,7 +140,9 @@ def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:
     return None
 
 
-def create_deep_linked_url(bot_username: str, payload: str = None, group: bool = False) -> str:
+def create_deep_linked_url(
+    bot_username: str, payload: Optional[str] = None, group: bool = False
+) -> str:
     """
     Creates a deep-linked URL for this :paramref:`~create_deep_linked_url.bot_username` with the
     specified :paramref:`~create_deep_linked_url.payload`. See

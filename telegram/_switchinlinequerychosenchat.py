@@ -73,13 +73,13 @@ class SwitchInlineQueryChosenChat(TelegramObject):
 
     def __init__(
         self,
-        query: str = None,
-        allow_user_chats: bool = None,
-        allow_bot_chats: bool = None,
-        allow_group_chats: bool = None,
-        allow_channel_chats: bool = None,
+        query: Optional[str] = None,
+        allow_user_chats: Optional[bool] = None,
+        allow_bot_chats: Optional[bool] = None,
+        allow_group_chats: Optional[bool] = None,
+        allow_channel_chats: Optional[bool] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Optional

@@ -89,9 +89,9 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        pattern: Union[str, Pattern[str]] = None,
+        pattern: Optional[Union[str, Pattern[str]]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
-        chat_types: List[str] = None,
+        chat_types: Optional[List[str]] = None,
     ):
         super().__init__(callback, block=block)
 

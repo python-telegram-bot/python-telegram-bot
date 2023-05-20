@@ -55,9 +55,9 @@ class ForumTopic(TelegramObject):
         message_thread_id: int,
         name: str,
         icon_color: int,
-        icon_custom_emoji_id: str = None,
+        icon_custom_emoji_id: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.message_thread_id: int = message_thread_id
@@ -99,9 +99,9 @@ class ForumTopicCreated(TelegramObject):
         self,
         name: str,
         icon_color: int,
-        icon_custom_emoji_id: str = None,
+        icon_custom_emoji_id: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.name: str = name
@@ -123,7 +123,7 @@ class ForumTopicClosed(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None) -> None:
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()
@@ -139,7 +139,7 @@ class ForumTopicReopened(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None) -> None:
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()
@@ -169,10 +169,10 @@ class ForumTopicEdited(TelegramObject):
 
     def __init__(
         self,
-        name: str = None,
-        icon_custom_emoji_id: str = None,
+        name: Optional[str] = None,
+        icon_custom_emoji_id: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.name: Optional[str] = name
@@ -193,7 +193,7 @@ class GeneralForumTopicHidden(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None):
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()
@@ -209,7 +209,7 @@ class GeneralForumTopicUnhidden(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None):
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()

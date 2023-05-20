@@ -144,22 +144,22 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         # thumbnail_url is not optional in Telegram API, but we want to support thumb_url as well,
         # so thumbnail_url may not be passed.  We will raise ValueError manually if neither
         # thumbnail_url nor thumb_url are passed
-        thumbnail_url: str = None,
-        mpeg4_width: int = None,
-        mpeg4_height: int = None,
-        title: str = None,
-        caption: str = None,
-        reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: "InputMessageContent" = None,
-        mpeg4_duration: int = None,
+        thumbnail_url: Optional[str] = None,
+        mpeg4_width: Optional[int] = None,
+        mpeg4_height: Optional[int] = None,
+        title: Optional[str] = None,
+        caption: Optional[str] = None,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        input_message_content: Optional["InputMessageContent"] = None,
+        mpeg4_duration: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb_mime_type: str = None,
-        caption_entities: Sequence[MessageEntity] = None,
-        thumbnail_mime_type: str = None,
+        thumb_mime_type: Optional[str] = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
+        thumbnail_mime_type: Optional[str] = None,
         # thumb_url is not optional in Telegram API, but it is here, along with thumbnail_url.
-        thumb_url: str = None,
+        thumb_url: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         if not (thumbnail_url or thumb_url):
             raise ValueError(

@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputMessageContent."""
 
+from typing import Optional
+
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -34,7 +36,7 @@ class InputMessageContent(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None) -> None:
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()

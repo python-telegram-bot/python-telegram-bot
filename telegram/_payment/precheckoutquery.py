@@ -89,10 +89,10 @@ class PreCheckoutQuery(TelegramObject):
         currency: str,
         total_amount: int,
         invoice_payload: str,
-        shipping_option_id: str = None,
-        order_info: OrderInfo = None,
+        shipping_option_id: Optional[str] = None,
+        order_info: Optional[OrderInfo] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id  # pylint: disable=invalid-name
@@ -123,13 +123,13 @@ class PreCheckoutQuery(TelegramObject):
     async def answer(  # pylint: disable=invalid-name
         self,
         ok: bool,
-        error_message: str = None,
+        error_message: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 

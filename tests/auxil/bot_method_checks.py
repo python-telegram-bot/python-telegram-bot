@@ -16,13 +16,16 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""Provides functions to test both methods."""
 import datetime
 import functools
 import inspect
-from typing import Any, Callable, Dict, Iterable, List
+import re
+from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import pytest
 
+import telegram  # for ForwardRef resolution
 from telegram import (
     Bot,
     ChatPermissions,
@@ -41,6 +44,12 @@ from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 
 if TEST_WITH_OPT_DEPS:
     import pytz
+
+
+FORWARD_REF_PATTERN = re.compile(r"ForwardRef\('(?P<class_name>\w+)'\)")
+""" A pattern to find a class name in a ForwardRef typing annotation.
+Class name (in a named group) is surrounded by parentheses and single quotes.
+"""
 
 
 def check_shortcut_signature(
@@ -62,6 +71,20 @@ def check_shortcut_signature(
     Returns:
         :obj:`bool`: Whether or not the signature matches.
     """
+
+    def resolve_class(class_name: str) -> Optional[type]:
+        """Attempts to resolve a PTB class (telegram module only) from a ForwardRef.
+
+        E.g. resolves <class 'telegram._files.sticker.StickerSet'> from "StickerSet".
+
+        Returns a class on success, :obj:`None` if nothing could be resolved.
+        """
+        for module in telegram, telegram.request:
+            cls = getattr(module, class_name, None)
+            if cls is not None:
+                return cls
+        return None  # for ruff
+
     shortcut_sig = inspect.signature(shortcut)
     effective_shortcut_args = set(shortcut_sig.parameters.keys()).difference(additional_kwargs)
     effective_shortcut_args.discard("self")
@@ -84,7 +107,27 @@ def check_shortcut_signature(
             raise Exception(f"Argument {kwarg} must be of kind {expected_kind}.")
 
         if bot_sig.parameters[kwarg].annotation != shortcut_sig.parameters[kwarg].annotation:
-            if isinstance(bot_sig.parameters[kwarg].annotation, type):
+            if FORWARD_REF_PATTERN.search(str(shortcut_sig.parameters[kwarg])):
+                # If a shortcut signature contains a ForwardRef, the simple comparison of
+                # annotations can fail. Try and resolve the .__args__, then compare them.
+
+                for shortcut_arg, bot_arg in zip(
+                    shortcut_sig.parameters[kwarg].annotation.__args__,
+                    bot_sig.parameters[kwarg].annotation.__args__,
+                ):
+                    shortcut_arg_to_check = shortcut_arg  # for ruff
+                    match = FORWARD_REF_PATTERN.search(str(shortcut_arg))
+                    if match:
+                        shortcut_arg_to_check = resolve_class(match.group("class_name"))
+
+                    if shortcut_arg_to_check != bot_arg:
+                        raise Exception(
+                            f"For argument {kwarg} I expected "
+                            f"{bot_sig.parameters[kwarg].annotation}, but "
+                            f"got {shortcut_sig.parameters[kwarg].annotation}."
+                            f"Comparison of {shortcut_arg} and {bot_arg} failed."
+                        )
+            elif isinstance(bot_sig.parameters[kwarg].annotation, type):
                 if bot_sig.parameters[kwarg].annotation.__name__ != str(
                     shortcut_sig.parameters[kwarg].annotation
                 ):
@@ -94,8 +137,8 @@ def check_shortcut_signature(
                     )
             else:
                 raise Exception(
-                    f"For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, but "
-                    f"got {shortcut_sig.parameters[kwarg].annotation}"
+                    f"For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation},"
+                    f"but got {shortcut_sig.parameters[kwarg].annotation}"
                 )
 
     bot_method_sig = inspect.signature(bot_method)
@@ -117,8 +160,8 @@ async def check_shortcut_call(
     shortcut_method: Callable,
     bot: ExtBot,
     bot_method_name: str,
-    skip_params: Iterable[str] = None,
-    shortcut_kwargs: Iterable[str] = None,
+    skip_params: Optional[Iterable[str]] = None,
+    shortcut_kwargs: Optional[Iterable[str]] = None,
 ) -> bool:
     """
     Checks that a shortcut passes all the existing arguments to the underlying bot method. Use as::

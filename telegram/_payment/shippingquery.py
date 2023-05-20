@@ -64,7 +64,7 @@ class ShippingQuery(TelegramObject):
         invoice_payload: str,
         shipping_address: ShippingAddress,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.id: str = id  # pylint: disable=invalid-name
@@ -92,14 +92,14 @@ class ShippingQuery(TelegramObject):
     async def answer(  # pylint: disable=invalid-name
         self,
         ok: bool,
-        shipping_options: Sequence[ShippingOption] = None,
-        error_message: str = None,
+        shipping_options: Optional[Sequence[ShippingOption]] = None,
+        error_message: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 

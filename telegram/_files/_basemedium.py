@@ -56,9 +56,9 @@ class _BaseMedium(TelegramObject):
         self,
         file_id: str,
         file_unique_id: str,
-        file_size: int = None,
+        file_size: Optional[int] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -77,7 +77,7 @@ class _BaseMedium(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> "File":
         """Convenience wrapper over :meth:`telegram.Bot.get_file`
 

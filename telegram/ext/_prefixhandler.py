@@ -127,7 +127,7 @@ class PrefixHandler(BaseHandler[Update, CCT]):
         prefix: SCT[str],
         command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],
-        filters: filters_module.BaseFilter = None,
+        filters: Optional[filters_module.BaseFilter] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback=callback, block=block)

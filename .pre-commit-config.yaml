@@ -28,11 +28,11 @@ repos:
           - --jobs=0
 
         additional_dependencies:
-          - httpx~=0.23.3
+          - httpx~=0.24.1
           - tornado~=6.2
           - APScheduler~=3.10.1
           - cachetools~=5.3.0
-          - aiolimiter~=1.0.0
+          - aiolimiter~=1.1.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.2.0
@@ -44,11 +44,11 @@ repos:
           - types-pytz
           - types-cryptography
           - types-cachetools
-          - httpx~=0.23.3
+          - httpx~=0.24.1
           - tornado~=6.2
           - APScheduler~=3.10.1
           - cachetools~=5.3.0
-          - aiolimiter~=1.0.0
+          - aiolimiter~=1.1.0
           - . # this basically does `pip install -e .`
     - id: mypy
       name: mypy-examples
@@ -83,8 +83,8 @@ repos:
         name: ruff
         files: ^(telegram|examples|tests)/.*\.py$
         additional_dependencies:
-          - httpx~=0.23.3
+          - httpx~=0.24.1
           - tornado~=6.2
           - APScheduler~=3.10.1
           - cachetools~=5.3.0
-          - aiolimiter~=1.0.0
+          - aiolimiter~=1.1.0

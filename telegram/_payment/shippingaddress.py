@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingAddress."""
 
+from typing import Optional
+
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -65,7 +67,7 @@ class ShippingAddress(TelegramObject):
         street_line2: str,
         post_code: str,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.country_code: str = country_code

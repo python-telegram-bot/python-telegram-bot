@@ -98,7 +98,7 @@ class TelegramObject:
     # unless it's overridden
     __INIT_PARAMS_CHECK: Optional[Type["TelegramObject"]] = None
 
-    def __init__(self, *, api_kwargs: JSONDict = None) -> None:
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         # Setting _frozen to `False` here means that classes without arguments still need to
         # implement __init__. However, with `True` would mean increased usage of
         # `with self._unfrozen()` in the `__init__` of subclasses and we have fewer empty
@@ -446,7 +446,10 @@ class TelegramObject:
 
     @classmethod
     def _de_json(
-        cls: Type[Tele_co], data: Optional[JSONDict], bot: "Bot", api_kwargs: JSONDict = None
+        cls: Type[Tele_co],
+        data: Optional[JSONDict],
+        bot: "Bot",
+        api_kwargs: Optional[JSONDict] = None,
     ) -> Optional[Tele_co]:
         if data is None:
             return None

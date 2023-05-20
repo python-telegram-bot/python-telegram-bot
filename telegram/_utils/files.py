@@ -90,8 +90,8 @@ def is_local_file(obj: Optional[FilePathInput]) -> bool:
 
 def parse_file_input(  # pylint: disable=too-many-return-statements
     file_input: Union[FileInput, "TelegramObject"],
-    tg_type: Type["TelegramObject"] = None,
-    filename: str = None,
+    tg_type: Optional[Type["TelegramObject"]] = None,
+    filename: Optional[str] = None,
     attach: bool = False,
     local_mode: bool = False,
 ) -> Union[str, "InputFile", Any]:
