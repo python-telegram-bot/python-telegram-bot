@@ -1,0 +1,49 @@
+name: Process Dependabot PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  process-dependabot-prs:
+    permissions:
+      pull-requests: read
+      contents: write
+
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
+    steps:
+
+    - name: Fetch Dependabot metadata
+      id: dependabot-metadata
+      uses: dependabot/fetch-metadata@v1.4.0
+
+    - uses: actions/checkout@v3.5.2
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    # There surely is a way to do this directly in bash, but @Bibo-Joshi could not figure it out
+    # and this Python workaround does thi trick, so ¯\_(ツ)_/¯
+    - name: Strip Whitespaces from Versions
+      uses: jannekem/run-python-script-action@v1
+      id: version-numbers
+      with:
+        script: |
+          outputs = ${{ toJSON(steps.dependabot-metadata.outputs) }}
+          for name, value in outputs.items():
+            if name.endswith("-version"):
+              set_output(name, value.strip())
+
+    - name: Update Version Number in Other Files
+      uses: jacobtomlinson/gha-find-replace@v3
+      with:
+        find: ${{ steps.version-numbers.outputs.previous-version }}
+        replace: ${{ steps.version-numbers.outputs.new-version }}
+        regex: false
+
+    - name: Commit & Push Changes to PR
+      uses: EndBug/add-and-commit@v9.1.3
+      with:
+        message: 'Update version number in other files'
+        committer_name: GitHub Actions
+        committer_email: 41898282+github-actions[bot]@users.noreply.github.com
