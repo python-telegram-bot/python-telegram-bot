@@ -36,7 +36,7 @@ class NonchalantHttpxRequest(HTTPXRequest):
         self,
         method: str,
         url: str,
-        request_data: RequestData = None,
+        request_data: Optional[RequestData] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -88,8 +88,8 @@ async def send_webhook_message(
     url_path: str = "",
     content_len: int = -1,
     content_type: str = "application/json",
-    get_method: str = None,
-    secret_token: str = None,
+    get_method: Optional[str] = None,
+    secret_token: Optional[str] = None,
 ) -> Response:
     headers = {
         "content-type": content_type,

@@ -100,10 +100,10 @@ class ChatMemberUpdated(TelegramObject):
         date: datetime.datetime,
         old_chat_member: ChatMember,
         new_chat_member: ChatMember,
-        invite_link: ChatInviteLink = None,
-        via_chat_folder_invite_link: bool = None,
+        invite_link: Optional[ChatInviteLink] = None,
+        via_chat_folder_invite_link: Optional[bool] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required

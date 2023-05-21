@@ -127,12 +127,12 @@ class ChatAdministratorRights(TelegramObject):
         can_promote_members: bool,
         can_change_info: bool,
         can_invite_users: bool,
-        can_post_messages: bool = None,
-        can_edit_messages: bool = None,
-        can_pin_messages: bool = None,
-        can_manage_topics: bool = None,
+        can_post_messages: Optional[bool] = None,
+        can_edit_messages: Optional[bool] = None,
+        can_pin_messages: Optional[bool] = None,
+        can_manage_topics: Optional[bool] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
         # Required

@@ -71,14 +71,14 @@ class Defaults:
 
     def __init__(
         self,
-        parse_mode: str = None,
-        disable_notification: bool = None,
-        disable_web_page_preview: bool = None,
-        quote: bool = None,
+        parse_mode: Optional[str] = None,
+        disable_notification: Optional[bool] = None,
+        disable_web_page_preview: Optional[bool] = None,
+        quote: Optional[bool] = None,
         tzinfo: datetime.tzinfo = UTC,
         block: bool = True,
-        allow_sending_without_reply: bool = None,
-        protect_content: bool = None,
+        allow_sending_without_reply: Optional[bool] = None,
+        protect_content: Optional[bool] = None,
     ):
         self._parse_mode: Optional[str] = parse_mode
         self._disable_notification: Optional[bool] = disable_notification

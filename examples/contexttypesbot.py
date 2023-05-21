@@ -57,7 +57,12 @@ class ChatData:
 class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
     """Custom class for context."""
 
-    def __init__(self, application: Application, chat_id: int = None, user_id: int = None):
+    def __init__(
+        self,
+        application: Application,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+    ):
         super().__init__(application=application, chat_id=chat_id, user_id=user_id)
         self._message_id: Optional[int] = None
 

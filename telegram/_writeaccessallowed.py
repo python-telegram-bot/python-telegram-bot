@@ -44,7 +44,9 @@ class WriteAccessAllowed(TelegramObject):
 
     __slots__ = ("web_app_name",)
 
-    def __init__(self, web_app_name: str = None, *, api_kwargs: JSONDict = None):
+    def __init__(
+        self, web_app_name: Optional[str] = None, *, api_kwargs: Optional[JSONDict] = None
+    ):
         super().__init__(api_kwargs=api_kwargs)
         self.web_app_name: Optional[str] = web_app_name
 

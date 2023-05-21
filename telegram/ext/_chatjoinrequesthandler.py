@@ -82,8 +82,8 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        chat_id: SCT[int] = None,
-        username: SCT[str] = None,
+        chat_id: Optional[SCT[int]] = None,
+        username: Optional[SCT[str]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)

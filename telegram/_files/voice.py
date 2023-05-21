@@ -58,10 +58,10 @@ class Voice(_BaseMedium):
         file_id: str,
         file_unique_id: str,
         duration: int,
-        mime_type: str = None,
-        file_size: int = None,
+        mime_type: Optional[str] = None,
+        file_size: Optional[int] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(
             file_id=file_id,

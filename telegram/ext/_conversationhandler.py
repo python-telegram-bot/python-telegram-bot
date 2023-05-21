@@ -303,10 +303,10 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         per_chat: bool = True,
         per_user: bool = True,
         per_message: bool = False,
-        conversation_timeout: Union[float, datetime.timedelta] = None,
-        name: str = None,
+        conversation_timeout: Optional[Union[float, datetime.timedelta]] = None,
+        name: Optional[str] = None,
         persistent: bool = False,
-        map_to_parent: Dict[object, object] = None,
+        map_to_parent: Optional[Dict[object, object]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         # these imports need to be here because of circular import error otherwise
@@ -877,7 +877,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return None
 
     def _update_state(
-        self, new_state: object, key: ConversationKey, handler: BaseHandler = None
+        self, new_state: object, key: ConversationKey, handler: Optional[BaseHandler] = None
     ) -> None:
         if new_state == self.END:
             if key in self._conversations:
