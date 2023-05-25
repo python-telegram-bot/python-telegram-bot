@@ -37,6 +37,9 @@ The versions that PTB uses of these third-party packages may change if that does
 PTB does not give guarantees about which Python versions are supported.
 In general, we will try to support all Python versions that have not yet reached their end of life, but we reserve ourselves the option to drop support for Python versions earlier if that benefits the advancement of the library.
 
+PTB provides static type hints for all public attributes, parameters, return values and generic classes.
+These type hints are not covered by this policy and may change at any time under the condition that these changes have no impact on the runtime behavior of PTB.
+
 .. _bot-api-functionality-1:
 
 Bot API Functionality
