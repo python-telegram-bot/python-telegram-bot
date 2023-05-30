@@ -67,7 +67,8 @@ class BaseUpdateProcessor(ABC):
 
         Args:
             update (:obj:`object`): The update to be processed.
-            coroutine (:term:`Awaitable`): The coroutine that will be awaited to process the update.
+            coroutine (:term:`Awaitable`): The coroutine that will be awaited to process the
+                update.
         """
 
     @abstractmethod
@@ -97,7 +98,8 @@ class BaseUpdateProcessor(ABC):
 
         Args:
             update (:obj:`object`): The update to be processed.
-            coroutine (:term:`Awaitable`): The coroutine that will be awaited to process the update.
+            coroutine (:term:`Awaitable`): The coroutine that will be awaited to process the
+                update.
         """
         async with self._semaphore:
             await self.do_process_update(update, coroutine)
@@ -140,7 +142,8 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
 
         Args:
             update (:obj:`object`): The update to be processed.
-            coroutine (:term:`Awaitable`): The coroutine that will be awaited to process the update.
+            coroutine (:term:`Awaitable`): The coroutine that will be awaited to process the
+                update.
         """
         await coroutine
 
