@@ -288,8 +288,8 @@ class TestApplication:
         monkeypatch.setattr(Bot, "shutdown", call_after(Bot.shutdown, after_bot_shutdown))
         monkeypatch.setattr(
             SimpleUpdateProcessor,
-            "initialize",
-            call_after(SimpleUpdateProcessor.initialize, after_shutdown_update_processor),
+            "shutdown",
+            call_after(SimpleUpdateProcessor.shutdown, after_shutdown_update_processor),
         )
         monkeypatch.setattr(
             Updater, "shutdown", call_after(Updater.shutdown, after_updater_shutdown)

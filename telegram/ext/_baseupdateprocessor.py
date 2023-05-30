@@ -37,7 +37,7 @@ class BaseUpdateProcessor(ABC):
             of currently processed updates decreases.
 
     Raises:
-        :exc:`ValueError`: If :paramref:`max_concurrent_updates` is a negative integer.
+        :exc:`ValueError`: If :paramref:`max_concurrent_updates` is a non-positive integer.
     """
 
     __slots__ = ("_max_concurrent_updates", "_semaphore")
@@ -67,7 +67,7 @@ class BaseUpdateProcessor(ABC):
 
         Args:
             update (:obj:`object`): The update to be processed.
-            coroutine (:obj:`Awaitable`): The coroutine that will be awaited to process the update.
+            coroutine (:term:`Awaitable`): The coroutine that will be awaited to process the update.
         """
 
     @abstractmethod
@@ -97,7 +97,7 @@ class BaseUpdateProcessor(ABC):
 
         Args:
             update (:obj:`object`): The update to be processed.
-            coroutine (:obj:`Awaitable`): The coroutine that will be awaited to process the update.
+            coroutine (:term:`Awaitable`): The coroutine that will be awaited to process the update.
         """
         async with self._semaphore:
             await self.do_process_update(update, coroutine)
@@ -140,7 +140,7 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
 
         Args:
             update (:obj:`object`): The update to be processed.
-            coroutine (:obj:`Awaitable`): The coroutine that will be awaited to process the update.
+            coroutine (:term:`Awaitable`): The coroutine that will be awaited to process the update.
         """
         await coroutine
 

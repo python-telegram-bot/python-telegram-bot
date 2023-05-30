@@ -377,9 +377,8 @@ class TestApplicationBuilder:
             (True, SimpleUpdateProcessor(256)),
         ],
     )
-    @pytest.mark.parametrize("conc_updates", [0, -1])
     def test_all_application_args_custom(
-        self, builder, bot, monkeypatch, concurrent_updates, expected, conc_updates
+        self, builder, bot, monkeypatch, concurrent_updates, expected
     ):
         job_queue = JobQueue()
         persistence = PicklePersistence("file_path")
@@ -442,20 +441,6 @@ class TestApplicationBuilder:
             .arbitrary_callback_data(True)
         ).build()
         assert app.update_processor is expected
-
-        with pytest.raises(ValueError, match="must be a positive"):
-            (
-                builder.token(bot.token)
-                .job_queue(job_queue)
-                .persistence(persistence)
-                .update_queue(update_queue)
-                .context_types(context_types)
-                .concurrent_updates(conc_updates)
-                .post_init(post_init)
-                .post_shutdown(post_shutdown)
-                .post_stop(post_stop)
-                .arbitrary_callback_data(True)
-            ).build()
 
     @pytest.mark.parametrize("input_type", ["bytes", "str", "Path"])
     def test_all_private_key_input_types(self, builder, bot, input_type):

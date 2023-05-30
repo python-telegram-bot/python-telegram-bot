@@ -945,8 +945,6 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         # instance with that integer value; otherwise, raise an error if the value
         # is negative
         if isinstance(concurrent_updates, int):
-            if concurrent_updates < 1:
-                raise ValueError("`concurrent_updates` must be a positive integer!")
             concurrent_updates = SimpleUpdateProcessor(concurrent_updates)
 
         # Assign default value of concurrent_updates if it is instance of
