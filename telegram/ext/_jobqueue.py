@@ -842,7 +842,7 @@ class Job(Generic[CCT]):
         return self.job.next_run_time
 
     @classmethod
-    def from_aps_job(cls, job: "APSJob") -> "Job[CCT]":
+    def from_aps_job(cls, aps_job: "APSJob") -> "Job[CCT]":
         """Provides the :class:`telegram.ext.Job` that is associated with the given APScheduler
         job.
 
@@ -853,13 +853,13 @@ class Job(Generic[CCT]):
         .. versionadded:: NEXT.VERSION
 
         Args:
-            job (:class:`apscheduler.job.Job`): The APScheduler job
+            aps_job (:class:`apscheduler.job.Job`): The APScheduler job
 
         Returns:
             :class:`telegram.ext.Job`
         """
-        job_ = job.args[1]
-        job_._job = job  # pylint: disable=protected-access
+        job_ = aps_job.args[1]
+        job_._job = aps_job  # pylint: disable=protected-access
         return job_
 
     def __getattr__(self, item: str) -> object:
