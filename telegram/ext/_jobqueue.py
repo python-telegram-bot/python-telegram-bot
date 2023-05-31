@@ -858,9 +858,9 @@ class Job(Generic[CCT]):
         Returns:
             :class:`telegram.ext.Job`
         """
-        job_ = aps_job.args[1]
-        job_._job = aps_job  # pylint: disable=protected-access
-        return job_
+        ext_job = aps_job.args[1]
+        ext_job._job = aps_job  # pylint: disable=protected-access
+        return ext_job
 
     def __getattr__(self, item: str) -> object:
         try:
