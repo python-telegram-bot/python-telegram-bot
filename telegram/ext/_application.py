@@ -57,6 +57,7 @@ from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
+from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._handler import BaseHandler
@@ -228,12 +229,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         "_chat_data",
         "_chat_ids_to_be_deleted_in_persistence",
         "_chat_ids_to_be_updated_in_persistence",
-        "_concurrent_updates",
-        "_concurrent_updates_sem",
         "_conversation_handler_conversations",
         "_initialized",
         "_job_queue",
         "_running",
+        "_update_processor",
         "_user_data",
         "_user_ids_to_be_deleted_in_persistence",
         "_user_ids_to_be_updated_in_persistence",
@@ -259,7 +259,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update_queue: "asyncio.Queue[object]",
         updater: Optional[Updater],
         job_queue: JQ,
-        concurrent_updates: Union[bool, int],
+        update_processor: "BaseUpdateProcessor",
         persistence: Optional[BasePersistence[UD, CD, BD]],
         context_types: ContextTypes[CCT, UD, CD, BD],
         post_init: Optional[
@@ -297,14 +297,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.post_stop: Optional[
             Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
         ] = post_stop
-
-        if isinstance(concurrent_updates, int) and concurrent_updates < 0:
-            raise ValueError("`concurrent_updates` must be a non-negative integer!")
-        if concurrent_updates is True:
-            concurrent_updates = 256
-        self._concurrent_updates_sem = asyncio.BoundedSemaphore(concurrent_updates or 1)
-        self._concurrent_updates: int = concurrent_updates or 0
-
+        self._update_processor = update_processor
         self.bot_data: BD = self.context_types.bot_data()
         self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
         self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
@@ -359,9 +352,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         """:obj:`int`: The number of concurrent updates that will be processed in parallel. A
         value of ``0`` indicates updates are *not* being processed concurrently.
 
+        .. versionchanged:: NEXT.VERSION
+            This is now just a shortcut to :attr:`update_processor.max_concurrent_updates
+            <telegram.ext.BaseUpdateProcessor.max_concurrent_updates>`.
+
         .. seealso:: :wiki:`Concurrency`
         """
-        return self._concurrent_updates
+        return self._update_processor.max_concurrent_updates
 
     @property
     def job_queue(self) -> Optional["JobQueue[CCT]"]:
@@ -379,12 +376,25 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             )
         return self._job_queue
 
+    @property
+    def update_processor(self) -> "BaseUpdateProcessor":
+        """:class:`telegram.ext.BaseUpdateProcessor`: The update processor used by this
+        application.
+
+        .. seealso:: :wiki:`Concurrency`
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self._update_processor
+
     async def initialize(self) -> None:
         """Initializes the Application by initializing:
 
         * The :attr:`bot`, by calling :meth:`telegram.Bot.initialize`.
         * The :attr:`updater`, by calling :meth:`telegram.ext.Updater.initialize`.
         * The :attr:`persistence`, by loading persistent conversations and data.
+        * The :attr:`update_processor` by calling
+          :meth:`telegram.ext.BaseUpdateProcessor.initialize`.
 
         Does *not* call :attr:`post_init` - that is only done by :meth:`run_polling` and
         :meth:`run_webhook`.
@@ -397,6 +407,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             return
 
         await self.bot.initialize()
+        await self._update_processor.initialize()
+
         if self.updater:
             await self.updater.initialize()
 
@@ -429,6 +441,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         * :attr:`updater` by calling :meth:`telegram.ext.Updater.shutdown`
         * :attr:`persistence` by calling :meth:`update_persistence` and
           :meth:`BasePersistence.flush`
+        * :attr:`update_processor` by calling :meth:`telegram.ext.BaseUpdateProcessor.shutdown`
 
         Does *not* call :attr:`post_shutdown` - that is only done by :meth:`run_polling` and
         :meth:`run_webhook`.
@@ -447,6 +460,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             return
 
         await self.bot.shutdown()
+        await self._update_processor.shutdown()
+
         if self.updater:
             await self.updater.shutdown()
 
@@ -1060,11 +1075,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
                 _LOGGER.debug("Processing update %s", update)
 
-                if self._concurrent_updates:
+                if self._update_processor.max_concurrent_updates > 1:
                     # We don't await the below because it has to be run concurrently
-                    self.create_task(self.__process_update_wrapper(update), update=update)
+                    self.create_task(
+                        self.__process_update_wrapper(update),
+                        update=update,
+                    )
                 else:
                     await self.__process_update_wrapper(update)
+
             except asyncio.CancelledError:
                 # This may happen if the application is manually run via application.start() and
                 # then a KeyboardInterrupt is sent. We must prevent this loop to die since
@@ -1075,9 +1094,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 )
 
     async def __process_update_wrapper(self, update: object) -> None:
-        async with self._concurrent_updates_sem:
-            await self.process_update(update)
-            self.update_queue.task_done()
+        await self._update_processor.process_update(update, self.process_update(update))
+        self.update_queue.task_done()
 
     async def process_update(self, update: object) -> None:
         """Processes a single update and marks the update to be updated by the persistence later.
