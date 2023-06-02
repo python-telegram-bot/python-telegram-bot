@@ -90,10 +90,6 @@ bot of the two gets chosen for the test session is random. Whereas when the test
 Github Actions CI are run, the test setup allocates a different, but same bot for every combination of Python version and
 OS.
 
-Thus, number of bots used for testing locally is 2 (called as fallback bots), and on the CI,
-its [3.7, 3.8, 3.9, 3.10, 3.11] x [ubuntu-latest, macos-latest, windows-latest] = 15. Bringing the
-total number of bots used for testing to 17.
-
 
 That's it! If you have any questions, feel free to ask them in the `PTB dev
 group`_.
