@@ -147,7 +147,7 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(count_click))
     application.add_handler(CommandHandler("print_users", print_users))
 
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":

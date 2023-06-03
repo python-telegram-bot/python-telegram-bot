@@ -72,7 +72,7 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
 
     # Run the bot until the user presses Ctrl-C
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
