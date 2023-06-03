@@ -87,8 +87,8 @@ Bots used in tests
 
 If you run the tests locally, the test setup will use one of the two public bots available. Which
 bot of the two gets chosen for the test session is random. Whereas when the tests on the
-Github Actions CI are run, the test setup allocates a different, but same bot for every combination of Python version and
-OS.
+Github Actions CI are run, the test setup allocates a different, but same bot is for every combination of Python version and
+OS. The operating systems and Python versions the CI runs the tests on can be viewed in the `corresponding workflow`_.
 
 
 That's it! If you have any questions, feel free to ask them in the `PTB dev
@@ -97,3 +97,4 @@ group`_.
 .. _pytest: https://docs.pytest.org/en/stable/
 .. _pytest-xdist: https://pypi.org/project/pytest-xdist/
 .. _PTB dev group: https://t.me/pythontelegrambotgroup
+.. _corresponding workflow: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.github/workflows/test.yml
