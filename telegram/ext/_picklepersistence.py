@@ -17,11 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PicklePersistence class."""
-import copyreg
 import pickle
 from copy import deepcopy
 from pathlib import Path
-from sys import version_info as py_ver
 from typing import Any, Callable, Dict, Optional, Set, Tuple, Type, TypeVar, Union, cast, overload
 
 from telegram import Bot, TelegramObject
@@ -49,24 +47,10 @@ def _reconstruct_to(cls: Type[TelegramObj], kwargs: dict) -> TelegramObj:
     """
     This method is used for unpickling. The data, which is in the form a dictionary, is
     converted back into a class. Works mostly the same as :meth:`TelegramObject.__setstate__`.
-    This function should be kept in place for backwards compatibility even if the pickling logic
-    is changed, since `_custom_reduction` places references to this function into the pickled data.
     """
     obj = cls.__new__(cls)
     obj.__setstate__(kwargs)
     return obj
-
-
-def _custom_reduction(cls: TelegramObj) -> Tuple[Callable, Tuple[Type[TelegramObj], dict]]:
-    """
-    This method is used for pickling. The bot attribute is preserved so _BotPickler().persistent_id
-    works as intended.
-    """
-    data = cls._get_attrs(include_private=True)  # pylint: disable=protected-access
-    # MappingProxyType is not pickable, so we convert it to a dict
-    # no need to convert back to MPT in _reconstruct_to, since it's done in __setstate__
-    data["api_kwargs"] = dict(data["api_kwargs"])  # type: ignore[arg-type]
-    return _reconstruct_to, (cls.__class__, data)
 
 
 class _BotPickler(pickle.Pickler):
@@ -74,22 +58,23 @@ class _BotPickler(pickle.Pickler):
 
     def __init__(self, bot: Bot, *args: Any, **kwargs: Any):
         self._bot = bot
-        if py_ver < (3, 8):  # self.reducer_override is used above this version
-            # Here we define a private dispatch_table, because we want to preserve the bot
-            # attribute of objects so persistent_id works as intended. Otherwise, the bot attribute
-            # is deleted in __getstate__, which is used during regular pickling (via pickle.dumps)
-            self.dispatch_table = copyreg.dispatch_table.copy()
-            for obj in _all_subclasses(TelegramObject):
-                self.dispatch_table[obj] = _custom_reduction
         super().__init__(*args, **kwargs)
 
     def reducer_override(  # skipcq: PYL-R0201
         self, obj: TelegramObj
     ) -> Tuple[Callable, Tuple[Type[TelegramObj], dict]]:
+        """
+        This method is used for pickling. The bot attribute is preserved so
+        _BotPickler().persistent_id works as intended.
+        """
         if not isinstance(obj, TelegramObject):
             return NotImplemented
 
-        return _custom_reduction(obj)
+        data = obj._get_attrs(include_private=True)  # pylint: disable=protected-access
+        # MappingProxyType is not pickable, so we convert it to a dict
+        # no need to convert back to MPT in _reconstruct_to, since it's done in __setstate__
+        data["api_kwargs"] = dict(data["api_kwargs"])  # type: ignore[arg-type]
+        return _reconstruct_to, (obj.__class__, data)
 
     def persistent_id(self, obj: object) -> Optional[str]:
         """Used to 'mark' the Bot, so it can be replaced later. See
