@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - master
+      - drop-py-37
   push:
     branches:
       - master
