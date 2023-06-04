@@ -24,7 +24,7 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
         f"{TG_VER} version of this example, "
         f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
-from telegram import Bot
+from telegram import Bot, Update
 from telegram.error import Forbidden, NetworkError
 
 logging.basicConfig(
@@ -58,7 +58,7 @@ async def main() -> NoReturn:
 async def echo(bot: Bot, update_id: int) -> int:
     """Echo the message the user sent."""
     # Request updates after the last update_id
-    updates = await bot.get_updates(offset=update_id, timeout=10)
+    updates = await bot.get_updates(offset=update_id, timeout=10, allowed_updates=Update.ALL_TYPES)
     for update in updates:
         next_update_id = update.update_id + 1
 

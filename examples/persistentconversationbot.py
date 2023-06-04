@@ -180,7 +180,7 @@ def main() -> None:
     application.add_handler(show_data_handler)
 
     # Run the bot until the user presses Ctrl-C
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
