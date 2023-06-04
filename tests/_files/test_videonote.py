@@ -250,8 +250,7 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
 
     async def test_get_and_download(self, bot, video_note, chat_id):
         path = Path("telegram2.mp4")
-        if path.is_file():
-            path.unlink()
+        path.unlink(missing_ok=True)
 
         new_file = await bot.get_file(video_note.file_id)
 

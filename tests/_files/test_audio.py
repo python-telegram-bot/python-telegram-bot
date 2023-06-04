@@ -261,8 +261,7 @@ class TestAudioWithRequest(TestAudioBase):
 
     async def test_get_and_download(self, bot, chat_id, audio):
         path = Path("telegram.mp3")
-        if path.is_file():
-            path.unlink()
+        path.unlink(missing_ok=True)
 
         new_file = await bot.get_file(audio.file_id)
 

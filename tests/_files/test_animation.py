@@ -262,8 +262,7 @@ class TestAnimationWithRequest(TestAnimationBase):
 
     async def test_get_and_download(self, bot, animation):
         path = Path("game.gif")
-        if path.is_file():
-            path.unlink()
+        path.unlink(missing_ok=True)
 
         new_file = await bot.get_file(animation.file_id)
 

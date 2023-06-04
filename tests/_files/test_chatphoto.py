@@ -157,8 +157,7 @@ class TestChatPhotoWithoutRequest(TestChatPhotoBase):
 class TestChatPhotoWithRequest:
     async def test_get_and_download(self, bot, chat_photo):
         jpg_file = Path("telegram.jpg")
-        if jpg_file.is_file():
-            jpg_file.unlink()
+        jpg_file.unlink(missing_ok=True)
 
         tasks = {bot.get_file(chat_photo.small_file_id), bot.get_file(chat_photo.big_file_id)}
         asserts = []
