@@ -174,8 +174,7 @@ class AdmonitionInserter:
                     break
 
             for line in lines_with_attrs:
-                line_match = attr_docstr_pattern.match(line)
-                if not line_match:
+                if not (line_match := attr_docstr_pattern.match(line)):
                     continue
 
                 target_attr = line_match.group("attr_name")
