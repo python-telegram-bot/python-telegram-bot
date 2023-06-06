@@ -117,13 +117,13 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
                 update.inline_query.chat_type not in self.chat_types
             ):
                 return False
-            if self.pattern:
-                if update.inline_query.query:
-                    match = re.match(self.pattern, update.inline_query.query)
-                    if match:
-                        return match
-            else:
-                return True
+            if (
+                self.pattern
+                and update.inline_query.query
+                and (match := re.match(self.pattern, update.inline_query.query))
+            ):
+                return match
+            return True
         return None
 
     def collect_additional_context(
