@@ -47,10 +47,24 @@ def _reconstruct_to(cls: Type[TelegramObj], kwargs: dict) -> TelegramObj:
     """
     This method is used for unpickling. The data, which is in the form a dictionary, is
     converted back into a class. Works mostly the same as :meth:`TelegramObject.__setstate__`.
+    This function should be kept in place for backwards compatibility even if the pickling logic
+    is changed, since `_custom_reduction` places references to this function into the pickled data.
     """
     obj = cls.__new__(cls)
     obj.__setstate__(kwargs)
     return obj
+
+
+def _custom_reduction(cls: TelegramObj) -> Tuple[Callable, Tuple[Type[TelegramObj], dict]]:
+    """
+    This method is used for pickling. The bot attribute is preserved so _BotPickler().persistent_id
+    works as intended.
+    """
+    data = cls._get_attrs(include_private=True)  # pylint: disable=protected-access
+    # MappingProxyType is not pickable, so we convert it to a dict
+    # no need to convert back to MPT in _reconstruct_to, since it's done in __setstate__
+    data["api_kwargs"] = dict(data["api_kwargs"])  # type: ignore[arg-type]
+    return _reconstruct_to, (cls.__class__, data)
 
 
 class _BotPickler(pickle.Pickler):
@@ -70,11 +84,7 @@ class _BotPickler(pickle.Pickler):
         if not isinstance(obj, TelegramObject):
             return NotImplemented
 
-        data = obj._get_attrs(include_private=True)  # pylint: disable=protected-access
-        # MappingProxyType is not pickable, so we convert it to a dict
-        # no need to convert back to MPT in _reconstruct_to, since it's done in __setstate__
-        data["api_kwargs"] = dict(data["api_kwargs"])  # type: ignore[arg-type]
-        return _reconstruct_to, (obj.__class__, data)
+        return _custom_reduction(obj)
 
     def persistent_id(self, obj: object) -> Optional[str]:
         """Used to 'mark' the Bot, so it can be replaced later. See
