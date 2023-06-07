@@ -290,7 +290,7 @@ class BaseRequest(
         except TelegramError as exc:
             raise exc
         except Exception as exc:
-            raise NetworkError(f"Unknown error in HTTP implementation: {repr(exc)}") from exc
+            raise NetworkError(f"Unknown error in HTTP implementation: {exc!r}") from exc
 
         if HTTPStatus.OK <= code <= 299:
             # 200-299 range are HTTP success statuses
