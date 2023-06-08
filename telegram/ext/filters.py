@@ -599,10 +599,8 @@ class CaptionRegex(MessageFilter):
         super().__init__(name=f"filters.CaptionRegex({self.pattern})", data_filter=True)
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match[str]]]]:
-        if message.caption:
-            match = self.pattern.search(message.caption)
-            if match:
-                return {"matches": [match]}
+        if message.caption and (match := self.pattern.search(message.caption)):
+            return {"matches": [match]}
         return {}
 
 
@@ -974,15 +972,15 @@ class _Dice(MessageFilter):
             self.name = "filters.Dice.ALL"
 
     def filter(self, message: Message) -> bool:
-        if not message.dice:  # no dice
+        if not (dice := message.dice):  # no dice
             return False
 
         if self.emoji:
-            emoji_match = message.dice.emoji == self.emoji
+            emoji_match = dice.emoji == self.emoji
             if self.values:
-                return message.dice.value in self.values and emoji_match  # emoji and value
+                return dice.value in self.values and emoji_match  # emoji and value
             return emoji_match  # emoji, no value
-        return message.dice.value in self.values if self.values else True  # no emoji, only value
+        return dice.value in self.values if self.values else True  # no emoji, only value
 
 
 class Dice(_Dice):
@@ -1597,10 +1595,8 @@ class Regex(MessageFilter):
         super().__init__(name=f"filters.Regex({self.pattern})", data_filter=True)
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match[str]]]]:
-        if message.text:
-            match = self.pattern.search(message.text)
-            if match:
-                return {"matches": [match]}
+        if message.text and (match := self.pattern.search(message.text)):
+            return {"matches": [match]}
         return {}
 
 
