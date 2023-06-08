@@ -123,7 +123,8 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
                 and (match := re.match(self.pattern, update.inline_query.query))
             ):
                 return match
-            return True
+            if not self.pattern:
+                return True
         return None
 
     def collect_additional_context(
