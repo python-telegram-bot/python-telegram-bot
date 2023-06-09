@@ -20,6 +20,7 @@ import datetime
 import gzip
 import os
 import pickle
+import sys
 from pathlib import Path
 
 import pytest
@@ -872,7 +873,8 @@ class TestPicklePersistence:
             "function was specified."
         )
         with Path("pickletest_chat_data").open("rb") as f, pytest.raises(
-            pickle.UnpicklingError, match=err_msg
+            pickle.UnpicklingError,
+            match=err_msg if sys.version_info < (3, 12) else err_msg.replace("\n", " "),
         ):
             pickle.load(f)
 

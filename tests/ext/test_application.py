@@ -1299,16 +1299,6 @@ class TestApplication:
         out = await app.create_task(asyncio.gather(callback()))
         assert out == [42]
 
-    async def test_create_task_awaiting_generator(self, app):
-        event = asyncio.Event()
-
-        def gen():
-            yield
-            event.set()
-
-        await app.create_task(gen())
-        assert event.is_set()
-
     async def test_no_concurrent_updates(self, app):
         queue = asyncio.Queue()
         event_1 = asyncio.Event()
