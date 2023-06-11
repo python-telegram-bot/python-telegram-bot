@@ -39,7 +39,7 @@ command with a specific time, for example ``/set 30``. The bot then sets
 up a job to send a message to that user after 30 seconds. The user can
 also cancel the timer by sending ``/unset``. To learn more about the
 ``JobQueue``, read `this wiki
-article <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`__.
+article <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Extensions---JobQueue>`__.
 Note: To use ``JobQueue``, you must install PTB via ``pip install python-telegram-bot[job-queue]``
 
 :any:`examples.conversationbot`
