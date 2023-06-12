@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
-from typing import ClassVar, Optional
+from typing import Final, Optional
 
 from telegram import constants
 from telegram._inline.inputmessagecontent import InputMessageContent
@@ -106,37 +106,37 @@ class InputLocationMessageContent(InputMessageContent):
 
             self._id_attrs = (self.latitude, self.longitude)
 
-    HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
+    HORIZONTAL_ACCURACY: Final[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
 
     .. versionadded:: 20.0
     """
-    MIN_HEADING: ClassVar[int] = constants.LocationLimit.MIN_HEADING
+    MIN_HEADING: Final[int] = constants.LocationLimit.MIN_HEADING
     """:const:`telegram.constants.LocationLimit.MIN_HEADING`
 
     .. versionadded:: 20.0
     """
-    MAX_HEADING: ClassVar[int] = constants.LocationLimit.MAX_HEADING
+    MAX_HEADING: Final[int] = constants.LocationLimit.MAX_HEADING
     """:const:`telegram.constants.LocationLimit.MAX_HEADING`
 
     .. versionadded:: 20.0
     """
-    MIN_LIVE_PERIOD: ClassVar[int] = constants.LocationLimit.MIN_LIVE_PERIOD
+    MIN_LIVE_PERIOD: Final[int] = constants.LocationLimit.MIN_LIVE_PERIOD
     """:const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD`
 
     .. versionadded:: 20.0
     """
-    MAX_LIVE_PERIOD: ClassVar[int] = constants.LocationLimit.MAX_LIVE_PERIOD
+    MAX_LIVE_PERIOD: Final[int] = constants.LocationLimit.MAX_LIVE_PERIOD
     """:const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`
 
     .. versionadded:: 20.0
     """
-    MIN_PROXIMITY_ALERT_RADIUS: ClassVar[int] = constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS
+    MIN_PROXIMITY_ALERT_RADIUS: Final[int] = constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS
     """:const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`
 
     .. versionadded:: 20.0
     """
-    MAX_PROXIMITY_ALERT_RADIUS: ClassVar[int] = constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS
+    MAX_PROXIMITY_ALERT_RADIUS: Final[int] = constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS
     """:const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`
 
     .. versionadded:: 20.0

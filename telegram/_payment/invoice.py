@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Invoice."""
 
-from typing import ClassVar, Optional
+from typing import Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -95,37 +95,37 @@ class Invoice(TelegramObject):
 
         self._freeze()
 
-    MIN_TITLE_LENGTH: ClassVar[int] = constants.InvoiceLimit.MIN_TITLE_LENGTH
+    MIN_TITLE_LENGTH: Final[int] = constants.InvoiceLimit.MIN_TITLE_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MIN_TITLE_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_TITLE_LENGTH: ClassVar[int] = constants.InvoiceLimit.MAX_TITLE_LENGTH
+    MAX_TITLE_LENGTH: Final[int] = constants.InvoiceLimit.MAX_TITLE_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MAX_TITLE_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MIN_DESCRIPTION_LENGTH: ClassVar[int] = constants.InvoiceLimit.MIN_DESCRIPTION_LENGTH
+    MIN_DESCRIPTION_LENGTH: Final[int] = constants.InvoiceLimit.MIN_DESCRIPTION_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MIN_DESCRIPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_DESCRIPTION_LENGTH: ClassVar[int] = constants.InvoiceLimit.MAX_DESCRIPTION_LENGTH
+    MAX_DESCRIPTION_LENGTH: Final[int] = constants.InvoiceLimit.MAX_DESCRIPTION_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MAX_DESCRIPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MIN_PAYLOAD_LENGTH: ClassVar[int] = constants.InvoiceLimit.MIN_PAYLOAD_LENGTH
+    MIN_PAYLOAD_LENGTH: Final[int] = constants.InvoiceLimit.MIN_PAYLOAD_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MIN_PAYLOAD_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_PAYLOAD_LENGTH: ClassVar[int] = constants.InvoiceLimit.MAX_PAYLOAD_LENGTH
+    MAX_PAYLOAD_LENGTH: Final[int] = constants.InvoiceLimit.MAX_PAYLOAD_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MAX_PAYLOAD_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_TIP_AMOUNTS: ClassVar[int] = constants.InvoiceLimit.MAX_TIP_AMOUNTS
+    MAX_TIP_AMOUNTS: Final[int] = constants.InvoiceLimit.MAX_TIP_AMOUNTS
     """:const:`telegram.constants.InvoiceLimit.MAX_TIP_AMOUNTS`
 
     .. versionadded:: 20.0

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageEntity."""
 
-from typing import TYPE_CHECKING, ClassVar, List, Optional
+from typing import TYPE_CHECKING, Final, List, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -130,45 +130,45 @@ class MessageEntity(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    MENTION: ClassVar[str] = constants.MessageEntityType.MENTION
+    MENTION: Final[str] = constants.MessageEntityType.MENTION
     """:const:`telegram.constants.MessageEntityType.MENTION`"""
-    HASHTAG: ClassVar[str] = constants.MessageEntityType.HASHTAG
+    HASHTAG: Final[str] = constants.MessageEntityType.HASHTAG
     """:const:`telegram.constants.MessageEntityType.HASHTAG`"""
-    CASHTAG: ClassVar[str] = constants.MessageEntityType.CASHTAG
+    CASHTAG: Final[str] = constants.MessageEntityType.CASHTAG
     """:const:`telegram.constants.MessageEntityType.CASHTAG`"""
-    PHONE_NUMBER: ClassVar[str] = constants.MessageEntityType.PHONE_NUMBER
+    PHONE_NUMBER: Final[str] = constants.MessageEntityType.PHONE_NUMBER
     """:const:`telegram.constants.MessageEntityType.PHONE_NUMBER`"""
-    BOT_COMMAND: ClassVar[str] = constants.MessageEntityType.BOT_COMMAND
+    BOT_COMMAND: Final[str] = constants.MessageEntityType.BOT_COMMAND
     """:const:`telegram.constants.MessageEntityType.BOT_COMMAND`"""
-    URL: ClassVar[str] = constants.MessageEntityType.URL
+    URL: Final[str] = constants.MessageEntityType.URL
     """:const:`telegram.constants.MessageEntityType.URL`"""
-    EMAIL: ClassVar[str] = constants.MessageEntityType.EMAIL
+    EMAIL: Final[str] = constants.MessageEntityType.EMAIL
     """:const:`telegram.constants.MessageEntityType.EMAIL`"""
-    BOLD: ClassVar[str] = constants.MessageEntityType.BOLD
+    BOLD: Final[str] = constants.MessageEntityType.BOLD
     """:const:`telegram.constants.MessageEntityType.BOLD`"""
-    ITALIC: ClassVar[str] = constants.MessageEntityType.ITALIC
+    ITALIC: Final[str] = constants.MessageEntityType.ITALIC
     """:const:`telegram.constants.MessageEntityType.ITALIC`"""
-    CODE: ClassVar[str] = constants.MessageEntityType.CODE
+    CODE: Final[str] = constants.MessageEntityType.CODE
     """:const:`telegram.constants.MessageEntityType.CODE`"""
-    PRE: ClassVar[str] = constants.MessageEntityType.PRE
+    PRE: Final[str] = constants.MessageEntityType.PRE
     """:const:`telegram.constants.MessageEntityType.PRE`"""
-    TEXT_LINK: ClassVar[str] = constants.MessageEntityType.TEXT_LINK
+    TEXT_LINK: Final[str] = constants.MessageEntityType.TEXT_LINK
     """:const:`telegram.constants.MessageEntityType.TEXT_LINK`"""
-    TEXT_MENTION: ClassVar[str] = constants.MessageEntityType.TEXT_MENTION
+    TEXT_MENTION: Final[str] = constants.MessageEntityType.TEXT_MENTION
     """:const:`telegram.constants.MessageEntityType.TEXT_MENTION`"""
-    UNDERLINE: ClassVar[str] = constants.MessageEntityType.UNDERLINE
+    UNDERLINE: Final[str] = constants.MessageEntityType.UNDERLINE
     """:const:`telegram.constants.MessageEntityType.UNDERLINE`"""
-    STRIKETHROUGH: ClassVar[str] = constants.MessageEntityType.STRIKETHROUGH
+    STRIKETHROUGH: Final[str] = constants.MessageEntityType.STRIKETHROUGH
     """:const:`telegram.constants.MessageEntityType.STRIKETHROUGH`"""
-    SPOILER: ClassVar[str] = constants.MessageEntityType.SPOILER
+    SPOILER: Final[str] = constants.MessageEntityType.SPOILER
     """:const:`telegram.constants.MessageEntityType.SPOILER`
 
     .. versionadded:: 13.10
     """
-    CUSTOM_EMOJI: ClassVar[str] = constants.MessageEntityType.CUSTOM_EMOJI
+    CUSTOM_EMOJI: Final[str] = constants.MessageEntityType.CUSTOM_EMOJI
     """:const:`telegram.constants.MessageEntityType.CUSTOM_EMOJI`
 
     .. versionadded:: 20.0
     """
-    ALL_TYPES: ClassVar[List[str]] = list(constants.MessageEntityType)
+    ALL_TYPES: Final[List[str]] = list(constants.MessageEntityType)
     """List[:obj:`str`]: A list of all available message entity types."""

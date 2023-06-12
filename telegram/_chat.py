@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Chat."""
 from datetime import datetime
 from html import escape
-from typing import TYPE_CHECKING, ClassVar, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple, Union
 
 from telegram import constants
 from telegram._chatlocation import ChatLocation
@@ -303,18 +303,18 @@ class Chat(TelegramObject):
         "has_aggressive_anti_spam_enabled",
     )
 
-    SENDER: ClassVar[str] = constants.ChatType.SENDER
+    SENDER: Final[str] = constants.ChatType.SENDER
     """:const:`telegram.constants.ChatType.SENDER`
 
     .. versionadded:: 13.5
     """
-    PRIVATE: ClassVar[str] = constants.ChatType.PRIVATE
+    PRIVATE: Final[str] = constants.ChatType.PRIVATE
     """:const:`telegram.constants.ChatType.PRIVATE`"""
-    GROUP: ClassVar[str] = constants.ChatType.GROUP
+    GROUP: Final[str] = constants.ChatType.GROUP
     """:const:`telegram.constants.ChatType.GROUP`"""
-    SUPERGROUP: ClassVar[str] = constants.ChatType.SUPERGROUP
+    SUPERGROUP: Final[str] = constants.ChatType.SUPERGROUP
     """:const:`telegram.constants.ChatType.SUPERGROUP`"""
-    CHANNEL: ClassVar[str] = constants.ChatType.CHANNEL
+    CHANNEL: Final[str] = constants.ChatType.CHANNEL
     """:const:`telegram.constants.ChatType.CHANNEL`"""
 
     def __init__(
