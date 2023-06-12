@@ -49,6 +49,7 @@ from telegram.ext import (
     JobQueue,
     MessageHandler,
     PicklePersistence,
+    SimpleUpdateProcessor,
     TypeHandler,
     Updater,
     filters,
@@ -134,7 +135,7 @@ class TestApplication:
             persistence=None,
             context_types=ContextTypes(),
             updater=updater,
-            concurrent_updates=False,
+            update_processor=False,
             post_init=None,
             post_shutdown=None,
             post_stop=None,
@@ -147,15 +148,13 @@ class TestApplication:
         assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
-    @pytest.mark.parametrize(
-        ("concurrent_updates", "expected"), [(0, 0), (4, 4), (False, 0), (True, 256)]
-    )
     @pytest.mark.filterwarnings("ignore: `Application` instances should")
-    def test_init(self, one_time_bot, concurrent_updates, expected):
+    def test_init(self, one_time_bot):
         update_queue = asyncio.Queue()
         job_queue = JobQueue()
         persistence = PicklePersistence("file_path")
         context_types = ContextTypes()
+        update_processor = SimpleUpdateProcessor(1)
         updater = Updater(bot=one_time_bot, update_queue=update_queue)
 
         async def post_init(application: Application) -> None:
@@ -174,7 +173,7 @@ class TestApplication:
             persistence=persistence,
             context_types=context_types,
             updater=updater,
-            concurrent_updates=concurrent_updates,
+            update_processor=update_processor,
             post_init=post_init,
             post_shutdown=post_shutdown,
             post_stop=post_stop,
@@ -187,7 +186,7 @@ class TestApplication:
         assert app.updater is updater
         assert app.update_queue is updater.update_queue
         assert app.bot is updater.bot
-        assert app.concurrent_updates == expected
+        assert app.update_processor is update_processor
         assert app.post_init is post_init
         assert app.post_shutdown is post_shutdown
         assert app.post_stop is post_stop
@@ -200,20 +199,6 @@ class TestApplication:
         assert isinstance(app.bot_data, dict)
         assert isinstance(app.chat_data[1], dict)
         assert isinstance(app.user_data[1], dict)
-
-        with pytest.raises(ValueError, match="must be a non-negative"):
-            Application(
-                bot=one_time_bot,
-                update_queue=update_queue,
-                job_queue=job_queue,
-                persistence=persistence,
-                context_types=context_types,
-                updater=updater,
-                concurrent_updates=-1,
-                post_init=None,
-                post_shutdown=None,
-                post_stop=None,
-            )
 
     def test_job_queue(self, one_time_bot, app, recwarn):
         expected_warning = (
@@ -250,23 +235,39 @@ class TestApplication:
         async def after_initialize_bot(*args, **kwargs):
             self.test_flag.add("bot")
 
+        async def after_initialize_update_processor(*args, **kwargs):
+            self.test_flag.add("update_processor")
+
         async def after_initialize_updater(*args, **kwargs):
             self.test_flag.add("updater")
 
+        update_processor = SimpleUpdateProcessor(1)
         monkeypatch.setattr(Bot, "initialize", call_after(Bot.initialize, after_initialize_bot))
+        monkeypatch.setattr(
+            SimpleUpdateProcessor,
+            "initialize",
+            call_after(SimpleUpdateProcessor.initialize, after_initialize_update_processor),
+        )
         monkeypatch.setattr(
             Updater, "initialize", call_after(Updater.initialize, after_initialize_updater)
         )
-
         if updater:
-            app = ApplicationBuilder().bot(one_time_bot).build()
+            app = (
+                ApplicationBuilder().bot(one_time_bot).concurrent_updates(update_processor).build()
+            )
             await app.initialize()
-            assert self.test_flag == {"bot", "updater"}
+            assert self.test_flag == {"bot", "update_processor", "updater"}
             await app.shutdown()
         else:
-            app = ApplicationBuilder().bot(one_time_bot).updater(None).build()
+            app = (
+                ApplicationBuilder()
+                .bot(one_time_bot)
+                .updater(None)
+                .concurrent_updates(update_processor)
+                .build()
+            )
             await app.initialize()
-            assert self.test_flag == {"bot"}
+            assert self.test_flag == {"bot", "update_processor"}
             await app.shutdown()
 
     @pytest.mark.parametrize("updater", [True, False])
@@ -277,22 +278,35 @@ class TestApplication:
         def after_bot_shutdown(*args, **kwargs):
             self.test_flag.add("bot")
 
+        def after_shutdown_update_processor(*args, **kwargs):
+            self.test_flag.add("update_processor")
+
         def after_updater_shutdown(*args, **kwargs):
             self.test_flag.add("updater")
 
+        update_processor = SimpleUpdateProcessor(1)
         monkeypatch.setattr(Bot, "shutdown", call_after(Bot.shutdown, after_bot_shutdown))
+        monkeypatch.setattr(
+            SimpleUpdateProcessor,
+            "shutdown",
+            call_after(SimpleUpdateProcessor.shutdown, after_shutdown_update_processor),
+        )
         monkeypatch.setattr(
             Updater, "shutdown", call_after(Updater.shutdown, after_updater_shutdown)
         )
 
         if updater:
-            async with ApplicationBuilder().bot(one_time_bot).build():
+            async with ApplicationBuilder().bot(one_time_bot).concurrent_updates(
+                update_processor
+            ).build():
                 pass
-            assert self.test_flag == {"bot", "updater"}
+            assert self.test_flag == {"bot", "update_processor", "updater"}
         else:
-            async with ApplicationBuilder().bot(one_time_bot).updater(None).build():
+            async with ApplicationBuilder().bot(one_time_bot).updater(None).concurrent_updates(
+                update_processor
+            ).build():
                 pass
-            assert self.test_flag == {"bot"}
+            assert self.test_flag == {"bot", "update_processor"}
 
     async def test_multiple_inits_and_shutdowns(self, app, monkeypatch):
         self.received = defaultdict(int)
@@ -1309,7 +1323,7 @@ class TestApplication:
         await app.create_task(gen())
         assert event.is_set()
 
-    async def test_no_concurrent_updates(self, app):
+    async def test_no_update_processor(self, app):
         queue = asyncio.Queue()
         event_1 = asyncio.Event()
         event_2 = asyncio.Event()
@@ -1337,14 +1351,14 @@ class TestApplication:
 
             await app.stop()
 
-    @pytest.mark.parametrize("concurrent_updates", [15, 50, 100])
-    async def test_concurrent_updates(self, one_time_bot, concurrent_updates):
+    @pytest.mark.parametrize("update_processor", [15, 50, 100])
+    async def test_update_processor(self, one_time_bot, update_processor):
         # We don't test with `True` since the large number of parallel coroutines quickly leads
         # to test instabilities
-        app = (
-            Application.builder().bot(one_time_bot).concurrent_updates(concurrent_updates).build()
-        )
-        events = {i: asyncio.Event() for i in range(app.concurrent_updates + 10)}
+        app = Application.builder().bot(one_time_bot).concurrent_updates(update_processor).build()
+        events = {
+            i: asyncio.Event() for i in range(app.update_processor.max_concurrent_updates + 10)
+        }
         queue = asyncio.Queue()
         for event in events.values():
             await queue.put(event)
@@ -1356,25 +1370,28 @@ class TestApplication:
         app.add_handler(TypeHandler(object, callback))
         async with app:
             await app.start()
-            for i in range(app.concurrent_updates + 10):
+            for i in range(app.update_processor.max_concurrent_updates + 10):
                 await app.update_queue.put(i)
 
-            for i in range(app.concurrent_updates + 10):
+            for i in range(app.update_processor.max_concurrent_updates + 10):
                 assert not events[i].is_set()
 
             await asyncio.sleep(0.9)
-            for i in range(app.concurrent_updates):
+            for i in range(app.update_processor.max_concurrent_updates):
                 assert events[i].is_set()
-            for i in range(app.concurrent_updates, app.concurrent_updates + 10):
+            for i in range(
+                app.update_processor.max_concurrent_updates,
+                app.update_processor.max_concurrent_updates + 10,
+            ):
                 assert not events[i].is_set()
 
             await asyncio.sleep(0.5)
-            for i in range(app.concurrent_updates + 10):
+            for i in range(app.update_processor.max_concurrent_updates + 10):
                 assert events[i].is_set()
 
             await app.stop()
 
-    async def test_concurrent_updates_done_on_shutdown(self, one_time_bot):
+    async def test_update_processor_done_on_shutdown(self, one_time_bot):
         app = Application.builder().bot(one_time_bot).concurrent_updates(True).build()
         event = asyncio.Event()
 
