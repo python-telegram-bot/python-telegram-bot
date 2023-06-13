@@ -201,8 +201,7 @@ class TestVoiceWithRequest(TestVoiceBase):
 
     async def test_get_and_download(self, bot, voice, chat_id):
         path = Path("telegram.ogg")
-        if path.is_file():
-            path.unlink()
+        path.unlink(missing_ok=True)
 
         new_file = await bot.get_file(voice.file_id)
 

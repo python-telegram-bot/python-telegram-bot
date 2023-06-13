@@ -336,8 +336,7 @@ class TestStickerWithRequest(TestStickerBase):
 
     async def test_get_and_download(self, bot, sticker):
         path = Path("telegram.webp")
-        if path.is_file():
-            path.unlink()
+        path.unlink(missing_ok=True)
 
         new_file = await bot.get_file(sticker.file_id)
 

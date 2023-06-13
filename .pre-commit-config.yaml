@@ -67,7 +67,7 @@ repos:
     -   id: pyupgrade
         files: ^(telegram|examples|tests|docs)/.*\.py$
         args:
-          - --py37-plus
+          - --py38-plus
 -   repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:

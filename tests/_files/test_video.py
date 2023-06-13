@@ -279,8 +279,7 @@ class TestVideoWithRequest(TestVideoBase):
 
     async def test_get_and_download(self, bot, video, chat_id):
         path = Path("telegram.mp4")
-        if path.is_file():
-            path.unlink()
+        path.unlink(missing_ok=True)
 
         new_file = await bot.get_file(video.file_id)
 

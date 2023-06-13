@@ -362,8 +362,7 @@ class TestPhotoWithRequest(TestPhotoBase):
 
     async def test_get_and_download(self, bot, photo):
         path = Path("telegram.jpg")
-        if path.is_file():
-            path.unlink()
+        path.unlink(missing_ok=True)
 
         new_file = await bot.getFile(photo.file_id)
 
