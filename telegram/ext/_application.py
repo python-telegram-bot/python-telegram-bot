@@ -1027,10 +1027,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             if isinstance(coroutine, Generator):
                 return await asyncio.create_task(coroutine)
             return await coroutine
-        except asyncio.CancelledError as cancel:
-            # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop this
-            #  clause when we drop py3.7
-            raise cancel
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(
