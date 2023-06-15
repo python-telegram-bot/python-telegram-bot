@@ -26,7 +26,6 @@ from typing import (
     Coroutine,
     Dict,
     Generic,
-    Literal,
     Optional,
     Type,
     TypeVar,
@@ -42,7 +41,7 @@ from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._jobqueue import JobQueue
 from telegram.ext._updater import Updater
-from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD
+from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD, HTTPVersion
 from telegram.request import BaseRequest
 from telegram.request._httpxrequest import HTTPXRequest
 
@@ -565,7 +564,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._pool_timeout = pool_timeout
         return self
 
-    def http_version(self: BuilderType, http_version: Literal["1.1", "2"]) -> BuilderType:
+    def http_version(self: BuilderType, http_version: HTTPVersion) -> BuilderType:
         """Sets the HTTP protocol version which is used for the
         :paramref:`~telegram.request.HTTPXRequest.http_version` parameter of
         :attr:`telegram.Bot.request`. By default, HTTP/1.1 is used.
@@ -725,7 +724,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def get_updates_http_version(
-        self: BuilderType, get_updates_http_version: Literal["1.1", "2"]
+        self: BuilderType, get_updates_http_version: HTTPVersion
     ) -> BuilderType:
         """Sets the HTTP protocol version which is used for the
         :paramref:`~telegram.request.HTTPXRequest.http_version` parameter which is used in the

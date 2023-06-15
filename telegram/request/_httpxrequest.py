@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
-from typing import Literal, Optional, Tuple
+from typing import Optional, Tuple
 
 import httpx
 
@@ -25,6 +25,7 @@ from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
 from telegram._utils.types import ODVInput
 from telegram.error import NetworkError, TimedOut
+from telegram.ext._utils.types import HTTPVersion
 from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
 
@@ -101,7 +102,7 @@ class HTTPXRequest(BaseRequest):
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
-        http_version: Literal["1.1", "2"] = "1.1",
+        http_version: HTTPVersion = "1.1",
     ):
         self._http_version = http_version
         timeout = httpx.Timeout(

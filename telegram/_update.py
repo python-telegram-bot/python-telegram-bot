@@ -223,7 +223,7 @@ class Update(TelegramObject):
     """:const:`telegram.constants.UpdateType.CHAT_MEMBER`
 
     .. versionadded:: 13.5"""
-    CHAT_JOIN_REQUEST = constants.UpdateType.CHAT_JOIN_REQUEST
+    CHAT_JOIN_REQUEST: Final[str] = constants.UpdateType.CHAT_JOIN_REQUEST
     """:const:`telegram.constants.UpdateType.CHAT_JOIN_REQUEST`
 
     .. versionadded:: 13.8"""
