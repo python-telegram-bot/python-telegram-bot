@@ -32,7 +32,6 @@ from typing import (
     Coroutine,
     Dict,
     List,
-    Literal,
     MutableMapping,
     Tuple,
     TypeVar,
@@ -115,8 +114,3 @@ RLARGS = TypeVar("RLARGS")
 
 .. versionadded:: 20.0"""
 FilterDataDict = Dict[str, List[Any]]
-
-HTTPVersion = Literal["1.1", "2.0"]
-"""Allowed HTTP versions.
-
-.. versionadded:: NEXT.VERSION"""

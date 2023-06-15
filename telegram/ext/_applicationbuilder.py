@@ -34,14 +34,14 @@ from typing import (
 
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
-from telegram._utils.types import DVInput, DVType, FilePathInput, ODVInput
+from telegram._utils.types import DVInput, DVType, FilePathInput, HTTPVersion, ODVInput
 from telegram.ext._application import Application
 from telegram.ext._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._jobqueue import JobQueue
 from telegram.ext._updater import Updater
-from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD, HTTPVersion
+from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD
 from telegram.request import BaseRequest
 from telegram.request._httpxrequest import HTTPXRequest
 

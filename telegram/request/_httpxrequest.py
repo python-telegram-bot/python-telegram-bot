@@ -23,9 +23,8 @@ import httpx
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
-from telegram._utils.types import ODVInput
+from telegram._utils.types import HTTPVersion, ODVInput
 from telegram.error import NetworkError, TimedOut
-from telegram.ext._utils.types import HTTPVersion
 from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
 
