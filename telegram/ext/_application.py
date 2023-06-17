@@ -979,6 +979,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         Keyword Args:
             name (:obj:`str`, optional): The name of the task.
 
+                .. versionadded:: NEXT.VERSION
+
         Returns:
             :class:`asyncio.Task`: The created task.
         """
