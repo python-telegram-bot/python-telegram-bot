@@ -1,0 +1,39 @@
+import logging
+from telegram.ext import Updater, MessageHandler, Filters
+from PIL import Image
+import requests
+import cv2
+import numpy as np
+
+# Инициализация бота с токеном API
+updater = Updater(token='6216373224:AAHIIGO_TNGbqmUwhqioWxvnz5zdIILniKE', use_context=True)
+dispatcher = updater.dispatcher
+
+# Настройка логирования
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                     level=logging.INFO)
+
+# Обработчик фотографий
+def process_photo(update, context):
+    # Получение файла фотографии
+    photo_file = context.bot.getFile(update.message.photo[-1].file_id)
+    photo_url = photo_file.file_path
+
+    # Загрузка и обработка изображения
+    response = requests.get(photo_url)
+    img = Image.open(BytesIO(response.content))
+    img_cv = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+
+    # Анализ изображения и поиск объявлений
+
+    # ...
+
+    # Отправка ссылки на объявление
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Найдено объявление: ссылка_на_объявление")
+
+# Регистрация обработчика фотографий
+photo_handler = MessageHandler(Filters.photo, process_photo)
+dispatcher.add_handler(photo_handler)
+
+# Запуск бота
+updater.start_polling()
