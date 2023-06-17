@@ -326,10 +326,6 @@ class Updater(AsyncContextManager["Updater"]):
                     pool_timeout=pool_timeout,
                     allowed_updates=allowed_updates,
                 )
-            except asyncio.CancelledError as exc:
-                # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop
-                #  this clause when we drop py3.7
-                raise exc
             except TelegramError as exc:
                 # TelegramErrors should be processed by the network retry loop
                 raise exc
