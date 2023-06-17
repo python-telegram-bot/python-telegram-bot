@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
-from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
+from typing import TYPE_CHECKING, Dict, Final, Optional, Type
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -95,11 +95,11 @@ class MenuButton(TelegramObject):
             return _class_mapping[data.pop("type")].de_json(data, bot=bot)
         return super().de_json(data=data, bot=bot)
 
-    COMMANDS: ClassVar[str] = constants.MenuButtonType.COMMANDS
+    COMMANDS: Final[str] = constants.MenuButtonType.COMMANDS
     """:const:`telegram.constants.MenuButtonType.COMMANDS`"""
-    WEB_APP: ClassVar[str] = constants.MenuButtonType.WEB_APP
+    WEB_APP: Final[str] = constants.MenuButtonType.WEB_APP
     """:const:`telegram.constants.MenuButtonType.WEB_APP`"""
-    DEFAULT: ClassVar[str] = constants.MenuButtonType.DEFAULT
+    DEFAULT: Final[str] = constants.MenuButtonType.DEFAULT
     """:const:`telegram.constants.MenuButtonType.DEFAULT`"""
 
 

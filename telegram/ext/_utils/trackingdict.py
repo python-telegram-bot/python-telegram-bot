@@ -26,7 +26,7 @@ Warning:
     the changelog.
 """
 from collections import UserDict
-from typing import ClassVar, Generic, List, Mapping, Optional, Set, Tuple, TypeVar, Union
+from typing import Final, Generic, List, Mapping, Optional, Set, Tuple, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 
@@ -45,7 +45,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
         * deleting values is considered writing
     """
 
-    DELETED: ClassVar = object()
+    DELETED: Final = object()
     """Special marker indicating that an entry was deleted."""
 
     __slots__ = ("_write_access_keys",)

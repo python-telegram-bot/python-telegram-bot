@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
-from typing import NamedTuple
+from typing import Final, NamedTuple
 
 __all__ = ("__version__", "__version_info__", "__bot_api_version__", "__bot_api_version_info__")
 
@@ -50,8 +50,10 @@ class Version(NamedTuple):
         return version
 
 
-__version_info__ = Version(major=20, minor=3, micro=0, releaselevel="final", serial=0)
-__version__ = str(__version_info__)
+__version_info__: Final[Version] = Version(
+    major=20, minor=3, micro=0, releaselevel="final", serial=0
+)
+__version__: Final[str] = str(__version_info__)
 
 # # SETUP.PY MARKER
 # Lines above this line will be `exec`-cuted in setup.py. Make sure that this only contains
@@ -59,5 +61,7 @@ __version__ = str(__version_info__)
 
 from telegram import constants  # noqa: E402  # pylint: disable=wrong-import-position
 
-__bot_api_version__ = constants.BOT_API_VERSION
-__bot_api_version_info__ = constants.BOT_API_VERSION_INFO
+__bot_api_version__: Final[str] = constants.BOT_API_VERSION
+__bot_api_version_info__: Final[
+    constants._BotAPIVersion
+] = constants.BOT_API_VERSION_INFO  # pylint: disable=protected-access

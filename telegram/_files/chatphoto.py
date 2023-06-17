@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPhoto."""
-from typing import TYPE_CHECKING, ClassVar, Optional
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -164,12 +164,12 @@ class ChatPhoto(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    SIZE_SMALL: ClassVar[int] = constants.ChatPhotoSize.SMALL
+    SIZE_SMALL: Final[int] = constants.ChatPhotoSize.SMALL
     """:const:`telegram.constants.ChatPhotoSize.SMALL`
 
     .. versionadded:: 20.0
     """
-    SIZE_BIG: ClassVar[int] = constants.ChatPhotoSize.BIG
+    SIZE_BIG: Final[int] = constants.ChatPhotoSize.BIG
     """:const:`telegram.constants.ChatPhotoSize.BIG`
 
     .. versionadded:: 20.0
