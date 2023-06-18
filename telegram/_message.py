@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Message."""
 import datetime
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -3442,10 +3442,10 @@ class Message(TelegramObject):
         message_text: Optional[str],
         entities: Dict[MessageEntity, str],
         urled: bool = False,
-        version: int = 1,
+        version: Literal[1, 2] = 1,
         offset: int = 0,
     ) -> Optional[str]:
-        version = int(version)
+        version = int(version)  # type: ignore
 
         if message_text is None:
             return None

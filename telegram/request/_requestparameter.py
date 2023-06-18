@@ -20,7 +20,7 @@
 import json
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple, final
 
 from telegram._files.inputfile import InputFile
 from telegram._files.inputmedia import InputMedia
@@ -31,6 +31,7 @@ from telegram._utils.enum import StringEnum
 from telegram._utils.types import UploadFileDict
 
 
+@final
 @dataclass(repr=True, eq=False, order=False, frozen=True)
 class RequestParameter:
     """Instances of this class represent a single parameter to be sent along with a request to
