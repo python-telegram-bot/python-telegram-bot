@@ -63,7 +63,7 @@ from telegram._utils.types import (
     DVInput,
     FileInput,
     JSONDict,
-    MarkdownVersions,
+    MarkdownVersion,
     ODVInput,
     ReplyMarkup,
 )
@@ -3450,7 +3450,7 @@ class Message(TelegramObject):
         message_text: Optional[str],
         entities: Dict[MessageEntity, str],
         urled: bool = False,
-        version: MarkdownVersions = 1,
+        version: MarkdownVersion = 1,
         offset: int = 0,
     ) -> Optional[str]:
         version = int(version)  # type: ignore
