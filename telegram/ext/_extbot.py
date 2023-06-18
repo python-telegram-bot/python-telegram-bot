@@ -27,7 +27,6 @@ from typing import (
     Dict,
     Generic,
     List,
-    Literal,
     Optional,
     Sequence,
     Tuple,
@@ -89,7 +88,14 @@ from telegram import (
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.logging import get_logger
-from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.types import (
+    CorrectOptionID,
+    DVInput,
+    FileInput,
+    JSONDict,
+    ODVInput,
+    ReplyMarkup,
+)
 from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.ext._utils.types import RLARGS
 from telegram.request import BaseRequest
@@ -2706,7 +2712,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
-        correct_option_id: Optional[Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]] = None,
+        correct_option_id: Optional[CorrectOptionID] = None,
         is_closed: Optional[bool] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,

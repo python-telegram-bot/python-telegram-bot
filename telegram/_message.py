@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Message."""
 import datetime
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -58,7 +58,15 @@ from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
-from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.types import (
+    CorrectOptionID,
+    DVInput,
+    FileInput,
+    JSONDict,
+    MarkdownVersions,
+    ODVInput,
+    ReplyMarkup,
+)
 from telegram._utils.warnings import warn
 from telegram._videochat import (
     VideoChatEnded,
@@ -2023,7 +2031,7 @@ class Message(TelegramObject):
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
-        correct_option_id: Optional[Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]] = None,
+        correct_option_id: Optional[CorrectOptionID] = None,
         is_closed: Optional[bool] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -3442,7 +3450,7 @@ class Message(TelegramObject):
         message_text: Optional[str],
         entities: Dict[MessageEntity, str],
         urled: bool = False,
-        version: Literal[1, 2] = 1,
+        version: MarkdownVersions = 1,
         offset: int = 0,
     ) -> Optional[str]:
         version = int(version)  # type: ignore

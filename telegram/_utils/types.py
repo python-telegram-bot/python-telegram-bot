@@ -91,3 +91,7 @@ HTTPVersion = Literal["1.1", "2.0"]
 """Allowed HTTP versions.
 
 .. versionadded:: NEXT.VERSION"""
+
+CorrectOptionID = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+MarkdownVersions = Literal[1, 2]
