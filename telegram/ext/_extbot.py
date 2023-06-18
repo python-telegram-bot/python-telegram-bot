@@ -27,6 +27,7 @@ from typing import (
     Dict,
     Generic,
     List,
+    Literal,
     Optional,
     Sequence,
     Tuple,
@@ -2705,7 +2706,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
-        correct_option_id: Optional[int] = None,
+        correct_option_id: Optional[Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]] = None,
         is_closed: Optional[bool] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,

@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Chat."""
 from datetime import datetime
 from html import escape
-from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Final, Literal, Optional, Sequence, Tuple, Union
 
 from telegram import constants
 from telegram._chatlocation import ChatLocation
@@ -2201,7 +2201,7 @@ class Chat(TelegramObject):
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,
         allows_multiple_answers: Optional[bool] = None,
-        correct_option_id: Optional[int] = None,
+        correct_option_id: Optional[Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]] = None,
         is_closed: Optional[bool] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
