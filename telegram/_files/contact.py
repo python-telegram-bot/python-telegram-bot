@@ -51,11 +51,11 @@ class Contact(TelegramObject):
         self,
         phone_number: str,
         first_name: str,
-        last_name: str = None,
-        user_id: int = None,
-        vcard: str = None,
+        last_name: Optional[str] = None,
+        user_id: Optional[int] = None,
+        vcard: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required

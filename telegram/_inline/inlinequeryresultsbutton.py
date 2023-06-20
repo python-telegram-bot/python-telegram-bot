@@ -79,10 +79,10 @@ class InlineQueryResultsButton(TelegramObject):
     def __init__(
         self,
         text: str,
-        web_app: WebAppInfo = None,
-        start_parameter: str = None,
+        web_app: Optional[WebAppInfo] = None,
+        start_parameter: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 

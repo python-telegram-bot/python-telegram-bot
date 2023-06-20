@@ -3,9 +3,6 @@
 ci:
     autofix_prs: false
     autoupdate_schedule: monthly
-    # We currently only need this behavior on the v13.x branch were we have the vendored urllib
-    # TODO: Remove once we discontinue v13
-    submodules: true
 
 repos:
 -   repo: https://github.com/psf/black
@@ -31,14 +28,14 @@ repos:
           - --jobs=0
 
         additional_dependencies:
-          - httpx~=0.23.3
+          - httpx~=0.24.1
           - tornado~=6.2
           - APScheduler~=3.10.1
-          - cachetools~=5.3.0
-          - aiolimiter~=1.0.0
+          - cachetools~=5.3.1
+          - aiolimiter~=1.1.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.2.0
+    rev: v1.3.0
     hooks:
     -   id: mypy
         name: mypy-ptb
@@ -47,11 +44,11 @@ repos:
           - types-pytz
           - types-cryptography
           - types-cachetools
-          - httpx~=0.23.3
+          - httpx~=0.24.1
           - tornado~=6.2
           - APScheduler~=3.10.1
-          - cachetools~=5.3.0
-          - aiolimiter~=1.0.0
+          - cachetools~=5.3.1
+          - aiolimiter~=1.1.0
           - . # this basically does `pip install -e .`
     - id: mypy
       name: mypy-examples
@@ -62,10 +59,10 @@ repos:
       additional_dependencies:
         - tornado~=6.2
         - APScheduler~=3.10.1
-        - cachetools~=5.3.0
+        - cachetools~=5.3.1
         - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.2
+    rev: v3.4.0
     hooks:
     -   id: pyupgrade
         files: ^(telegram|examples|tests|docs)/.*\.py$
@@ -80,14 +77,14 @@ repos:
         - --diff
         - --check
 -   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.263'
+    rev: 'v0.0.270'
     hooks:
     -   id: ruff
         name: ruff
         files: ^(telegram|examples|tests)/.*\.py$
         additional_dependencies:
-          - httpx~=0.23.3
+          - httpx~=0.24.1
           - tornado~=6.2
           - APScheduler~=3.10.1
-          - cachetools~=5.3.0
-          - aiolimiter~=1.0.0
+          - cachetools~=5.3.1
+          - aiolimiter~=1.1.0

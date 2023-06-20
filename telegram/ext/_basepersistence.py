@@ -145,7 +145,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     def __init__(
         self,
-        store_data: PersistenceInput = None,
+        store_data: Optional[PersistenceInput] = None,
         update_interval: float = 60,
     ):
         self.store_data: PersistenceInput = store_data or PersistenceInput()

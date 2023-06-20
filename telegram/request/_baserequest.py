@@ -128,7 +128,7 @@ class BaseRequest(
     async def post(
         self,
         url: str,
-        request_data: RequestData = None,
+        request_data: Optional[RequestData] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -229,7 +229,7 @@ class BaseRequest(
         self,
         url: str,
         method: str,
-        request_data: RequestData = None,
+        request_data: Optional[RequestData] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -290,7 +290,7 @@ class BaseRequest(
         except TelegramError as exc:
             raise exc
         except Exception as exc:
-            raise NetworkError(f"Unknown error in HTTP implementation: {repr(exc)}") from exc
+            raise NetworkError(f"Unknown error in HTTP implementation: {exc!r}") from exc
 
         if HTTPStatus.OK <= code <= 299:
             # 200-299 range are HTTP success statuses
@@ -362,7 +362,7 @@ class BaseRequest(
         self,
         url: str,
         method: str,
-        request_data: RequestData = None,
+        request_data: Optional[RequestData] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,

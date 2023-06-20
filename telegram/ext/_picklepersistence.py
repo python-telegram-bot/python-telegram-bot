@@ -206,7 +206,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def __init__(
         self: "PicklePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, Any]]",
         filepath: FilePathInput,
-        store_data: PersistenceInput = None,
+        store_data: Optional[PersistenceInput] = None,
         single_file: bool = True,
         on_flush: bool = False,
         update_interval: float = 60,
@@ -217,22 +217,22 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def __init__(
         self: "PicklePersistence[UD, CD, BD]",
         filepath: FilePathInput,
-        store_data: PersistenceInput = None,
+        store_data: Optional[PersistenceInput] = None,
         single_file: bool = True,
         on_flush: bool = False,
         update_interval: float = 60,
-        context_types: ContextTypes[Any, UD, CD, BD] = None,
+        context_types: Optional[ContextTypes[Any, UD, CD, BD]] = None,
     ):
         ...
 
     def __init__(
         self,
         filepath: FilePathInput,
-        store_data: PersistenceInput = None,
+        store_data: Optional[PersistenceInput] = None,
         single_file: bool = True,
         on_flush: bool = False,
         update_interval: float = 60,
-        context_types: ContextTypes[Any, UD, CD, BD] = None,
+        context_types: Optional[ContextTypes[Any, UD, CD, BD]] = None,
     ):
         super().__init__(store_data=store_data, update_interval=update_interval)
         self.filepath: Path = Path(filepath)

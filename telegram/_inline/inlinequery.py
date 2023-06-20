@@ -104,10 +104,10 @@ class InlineQuery(TelegramObject):
         from_user: User,
         query: str,
         offset: str,
-        location: Location = None,
-        chat_type: str = None,
+        location: Optional[Location] = None,
+        chat_type: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -142,20 +142,20 @@ class InlineQuery(TelegramObject):
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
-        cache_time: int = None,
-        is_personal: bool = None,
-        next_offset: str = None,
-        switch_pm_text: str = None,
-        switch_pm_parameter: str = None,
-        button: InlineQueryResultsButton = None,
+        cache_time: Optional[int] = None,
+        is_personal: Optional[bool] = None,
+        next_offset: Optional[str] = None,
+        switch_pm_text: Optional[str] = None,
+        switch_pm_parameter: Optional[str] = None,
+        button: Optional[InlineQueryResultsButton] = None,
         *,
-        current_offset: str = None,
+        current_offset: Optional[str] = None,
         auto_pagination: bool = False,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 

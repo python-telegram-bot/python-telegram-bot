@@ -66,10 +66,10 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         self,
         id: str,  # pylint: disable=redefined-builtin
         sticker_file_id: str,
-        reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: "InputMessageContent" = None,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        input_message_content: Optional["InputMessageContent"] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.STICKER, id, api_kwargs=api_kwargs)

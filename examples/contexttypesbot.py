@@ -43,6 +43,9 @@ from telegram.ext import (
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 
@@ -57,7 +60,12 @@ class ChatData:
 class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
     """Custom class for context."""
 
-    def __init__(self, application: Application, chat_id: int = None, user_id: int = None):
+    def __init__(
+        self,
+        application: Application,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+    ):
         super().__init__(application=application, chat_id=chat_id, user_id=user_id)
         self._message_id: Optional[int] = None
 
@@ -142,7 +150,7 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(count_click))
     application.add_handler(CommandHandler("print_users", print_users))
 
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":

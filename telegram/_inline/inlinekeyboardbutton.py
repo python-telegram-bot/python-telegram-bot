@@ -220,17 +220,17 @@ class InlineKeyboardButton(TelegramObject):
     def __init__(
         self,
         text: str,
-        url: str = None,
-        callback_data: Union[str, object] = None,
-        switch_inline_query: str = None,
-        switch_inline_query_current_chat: str = None,
-        callback_game: CallbackGame = None,
-        pay: bool = None,
-        login_url: LoginUrl = None,
-        web_app: WebAppInfo = None,
-        switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat = None,
+        url: Optional[str] = None,
+        callback_data: Optional[Union[str, object]] = None,
+        switch_inline_query: Optional[str] = None,
+        switch_inline_query_current_chat: Optional[str] = None,
+        callback_game: Optional[CallbackGame] = None,
+        pay: Optional[bool] = None,
+        login_url: Optional[LoginUrl] = None,
+        web_app: Optional[WebAppInfo] = None,
+        switch_inline_query_chosen_chat: Optional[SwitchInlineQueryChosenChat] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required

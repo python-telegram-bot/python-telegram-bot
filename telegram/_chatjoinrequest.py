@@ -102,10 +102,10 @@ class ChatJoinRequest(TelegramObject):
         from_user: User,
         date: datetime.datetime,
         user_chat_id: int,
-        bio: str = None,
-        invite_link: ChatInviteLink = None,
+        bio: Optional[str] = None,
+        invite_link: Optional[ChatInviteLink] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -147,7 +147,7 @@ class ChatJoinRequest(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 
@@ -179,7 +179,7 @@ class ChatJoinRequest(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 

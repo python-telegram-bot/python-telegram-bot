@@ -102,14 +102,14 @@ class InlineQueryResultVoice(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         voice_url: str,
         title: str,
-        voice_duration: int = None,
-        caption: str = None,
-        reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: "InputMessageContent" = None,
+        voice_duration: Optional[int] = None,
+        caption: Optional[str] = None,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        input_message_content: Optional["InputMessageContent"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] = None,
+        caption_entities: Optional[Sequence[MessageEntity]] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.VOICE, id, api_kwargs=api_kwargs)

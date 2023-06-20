@@ -26,7 +26,7 @@ Warning:
     the changelog.
 """
 from collections import UserDict
-from typing import ClassVar, Generic, List, Mapping, Set, Tuple, TypeVar, Union
+from typing import ClassVar, Generic, List, Mapping, Optional, Set, Tuple, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 
@@ -113,7 +113,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
 
     # Mypy seems a bit inconsistent about what it wants as types for `default` and return value
     # so we just ignore a bit
-    def setdefault(self: "TrackingDict[_KT, _T]", key: _KT, default: _T = None) -> _T:
+    def setdefault(self: "TrackingDict[_KT, _T]", key: _KT, default: Optional[_T] = None) -> _T:
         if key in self:
             return self[key]
 

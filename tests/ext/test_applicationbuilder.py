@@ -35,6 +35,7 @@ from telegram.ext import (
     Updater,
 )
 from telegram.ext._applicationbuilder import _BOT_CHECKS
+from telegram.ext._baseupdateprocessor import SimpleUpdateProcessor
 from telegram.request import HTTPXRequest
 from tests.auxil.constants import PRIVATE_KEY
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
@@ -96,7 +97,8 @@ class TestApplicationBuilder:
         app = builder.token(bot.token).build()
 
         assert isinstance(app, Application)
-        assert app.concurrent_updates == 0
+        assert isinstance(app.update_processor, SimpleUpdateProcessor)
+        assert app.update_processor.max_concurrent_updates == 1
 
         assert isinstance(app.bot, ExtBot)
         assert isinstance(app.bot.request, HTTPXRequest)
@@ -367,12 +369,21 @@ class TestApplicationBuilder:
         assert isinstance(app, CustomApplication)
         assert app.arg == 2
 
-    def test_all_application_args_custom(self, builder, bot, monkeypatch):
+    @pytest.mark.parametrize(
+        ("concurrent_updates", "expected"),
+        [
+            (4, SimpleUpdateProcessor(4)),
+            (False, SimpleUpdateProcessor(1)),
+            (True, SimpleUpdateProcessor(256)),
+        ],
+    )
+    def test_all_application_args_custom(
+        self, builder, bot, monkeypatch, concurrent_updates, expected
+    ):
         job_queue = JobQueue()
         persistence = PicklePersistence("file_path")
         update_queue = asyncio.Queue()
         context_types = ContextTypes()
-        concurrent_updates = 123
 
         async def post_init(app: Application) -> None:
             pass
@@ -395,6 +406,7 @@ class TestApplicationBuilder:
             .post_stop(post_stop)
             .arbitrary_callback_data(True)
         ).build()
+
         assert app.job_queue is job_queue
         assert app.job_queue.application is app
         assert app.persistence is persistence
@@ -403,7 +415,9 @@ class TestApplicationBuilder:
         assert app.updater.update_queue is update_queue
         assert app.updater.bot is app.bot
         assert app.context_types is context_types
-        assert app.concurrent_updates == concurrent_updates
+        assert isinstance(app.update_processor, SimpleUpdateProcessor)
+        assert app.update_processor.max_concurrent_updates == expected.max_concurrent_updates
+        assert app.concurrent_updates == app.update_processor.max_concurrent_updates
         assert app.post_init is post_init
         assert app.post_shutdown is post_shutdown
         assert app.post_stop is post_stop
@@ -414,6 +428,19 @@ class TestApplicationBuilder:
         assert app.updater is updater
         assert app.bot is updater.bot
         assert app.update_queue is updater.update_queue
+        app = (
+            builder.token(bot.token)
+            .job_queue(job_queue)
+            .persistence(persistence)
+            .update_queue(update_queue)
+            .context_types(context_types)
+            .concurrent_updates(expected)
+            .post_init(post_init)
+            .post_shutdown(post_shutdown)
+            .post_stop(post_stop)
+            .arbitrary_callback_data(True)
+        ).build()
+        assert app.update_processor is expected
 
     @pytest.mark.parametrize("input_type", ["bytes", "str", "Path"])
     def test_all_private_key_input_types(self, builder, bot, input_type):

@@ -151,17 +151,17 @@ class EncryptedPassportElement(TelegramObject):
         self,
         type: str,  # pylint: disable=redefined-builtin
         hash: str,  # pylint: disable=redefined-builtin
-        data: PersonalDetails = None,
-        phone_number: str = None,
-        email: str = None,
-        files: Sequence[PassportFile] = None,
-        front_side: PassportFile = None,
-        reverse_side: PassportFile = None,
-        selfie: PassportFile = None,
-        translation: Sequence[PassportFile] = None,
-        credentials: "Credentials" = None,  # pylint: disable=unused-argument
+        data: Optional[PersonalDetails] = None,
+        phone_number: Optional[str] = None,
+        email: Optional[str] = None,
+        files: Optional[Sequence[PassportFile]] = None,
+        front_side: Optional[PassportFile] = None,
+        reverse_side: Optional[PassportFile] = None,
+        selfie: Optional[PassportFile] = None,
+        translation: Optional[Sequence[PassportFile]] = None,
+        credentials: Optional["Credentials"] = None,  # pylint: disable=unused-argument
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
