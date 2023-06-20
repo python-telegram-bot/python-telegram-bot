@@ -2069,12 +2069,8 @@ class TestConversationHandler:
             await app.process_update(Update(0, message=message))
             await asyncio.sleep(0.7)
             tasks = asyncio.all_tasks()
-            assert any(
-                "ConversationHandler:handle_update:non_blocking_cb" in t.get_name() for t in tasks
-            )
-            assert any(
-                "ConversationHandler:handle_update:timeout_job" in t.get_name() for t in tasks
-            )
+            assert any(":handle_update:non_blocking_cb" in t.get_name() for t in tasks)
+            assert any(":handle_update:timeout_job" in t.get_name() for t in tasks)
             assert not self.is_timeout
             event.set()
             await asyncio.sleep(0.7)

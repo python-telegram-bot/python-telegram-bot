@@ -798,7 +798,8 @@ class Job(Generic[CCT]):
             await self.callback(context)
         except Exception as exc:
             await application.create_task(
-                application.process_error(None, exc, job=self), name="Job:_run:process_error"
+                application.process_error(None, exc, job=self),
+                name=f"Job:{self.id}:run:process_error",
             )
         finally:
             # This is internal logic of application - let's keep it private for now

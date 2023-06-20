@@ -1082,7 +1082,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     self.create_task(
                         self.__process_update_wrapper(update),
                         update=update,
-                        name=f"Application:process_concurrent_update_{self.update_queue.qsize()}",
+                        name=f"Application:{self.bot.id}:process_concurrent_update_"
+                        f"{self.update_queue.qsize()}",
                     )
                 else:
                     await self.__process_update_wrapper(update)
@@ -1142,7 +1143,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                             self.create_task(
                                 coroutine,
                                 update=update,
-                                name=f"Application:process_update_non_blocking:{handler}",
+                                name=f"Application:{self.bot.id}:process_update_non_blocking"
+                                f":{handler}",
                             )
                         else:
                             any_blocking = True
@@ -1216,7 +1218,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             if self._initialized:
                 self.create_task(
                     self._add_ch_to_persistence(handler),
-                    name="Application:add_handler:conversation_handler_after_init",
+                    name=f"Application:{self.bot.id}:add_handler:conversation_handler_after_init",
                 )
                 warn(
                     "A persistent `ConversationHandler` was passed to `add_handler`, "
@@ -1700,7 +1702,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                         callback(update, context),
                         update=update,
                         is_error_handler=True,
-                        name="Application:process_error:non_blocking",
+                        name=f"Application:{self.bot.id}:process_error:non_blocking",
                     )
                 else:
                     try:

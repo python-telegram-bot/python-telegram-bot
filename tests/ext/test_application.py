@@ -966,7 +966,7 @@ class TestApplication:
             task = asyncio.create_task(app.stop())
             await asyncio.sleep(0.05)
             tasks = asyncio.all_tasks()
-            assert any("Application:process_update_non_blocking" in t.get_name() for t in tasks)
+            assert any(":process_update_non_blocking" in t.get_name() for t in tasks)
             assert self.count == 1
             # Make sure that app stops only once all non blocking callbacks are done
             assert not task.done()
@@ -1033,7 +1033,7 @@ class TestApplication:
             task = asyncio.create_task(app.stop())
             await asyncio.sleep(0.05)
             tasks = asyncio.all_tasks()
-            assert any("Application:process_error:non_blocking" in t.get_name() for t in tasks)
+            assert any(":process_error:non_blocking" in t.get_name() for t in tasks)
             assert self.count == 42
             assert self.received is None
             event.set()
