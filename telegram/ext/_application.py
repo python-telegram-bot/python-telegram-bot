@@ -84,12 +84,10 @@ _DEFAULT_0 = DefaultValue(0)
 # this check when we drop support for python 3.11.
 if sys.version_info >= (3, 12):
     _CoroType = Union["asyncio.Future[object]", Awaitable[RT]]
-    _ErrorCoroType = Optional[Union[Optional["asyncio.Future[object]"], Awaitable[RT]]]
 else:
     _CoroType = Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]]
-    _ErrorCoroType = Optional[
-        Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]]
-    ]
+
+_ErrorCoroType = Optional[_CoroType]
 
 
 _LOGGER = get_logger(__name__)
@@ -1041,9 +1039,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     ) -> RT:
         try:
             # Generator-based coroutines are not supported in Python 3.12+
-            if isinstance(coroutine, Generator) and sys.version_info < (3, 12):
+            if sys.version_info < (3, 12) and isinstance(coroutine, Generator):
                 return await asyncio.create_task(coroutine)
-            return await coroutine  # type: ignore[misc]
+            return await coroutine  # type: ignore
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(
