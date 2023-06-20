@@ -528,11 +528,7 @@ class AdmonitionInserter:
         # For custom generics like telegram.ext._application.Application[~BT, ~CCT, ~UD...].
         # This must come before the check for isinstance(type) because GenericAlias can also be
         # recognized as type if it belongs to <class 'types.GenericAlias'>.
-        elif str(type(arg)) in (
-            "<class 'typing._GenericAlias'>",
-            "<class 'types.GenericAlias'>",
-            "<class 'typing._LiteralGenericAlias'>",
-        ):
+        elif str(type(arg)) in ("<class 'typing._GenericAlias'>", "<class 'types.GenericAlias'>"):
             if "telegram" in str(arg):
                 # get_origin() of telegram.ext._application.Application[~BT, ~CCT, ~UD...]
                 # will produce <class 'telegram.ext._application.Application'>
