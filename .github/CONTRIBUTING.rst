@@ -274,25 +274,6 @@ callable we prefer that the call also uses keyword arg syntax. For example:
 This gives us the flexibility to re-order arguments and more importantly
 to add new required arguments. It's also more explicit and easier to read.
 
-Properly defining optional arguments
-------------------------------------
-
-It's always good to not initialize optional arguments at class creation,
-instead use ``**kwargs`` to get them. It's well known Telegram API can
-change without notice, in that case if a new argument is added it won't
-break the API classes. For example:
-
-.. code-block:: python
-
-    # GOOD
-    def __init__(self, id, name, last_name=None, **kwargs):
-        self.last_name = last_name
-
-
-    # BAD
-    def __init__(self, id, name, last_name=None):
-        self.last_name = last_name
-
 
 .. _`Code of Conduct`: https://www.python.org/psf/conduct/
 .. _`issue tracker`: https://github.com/python-telegram-bot/python-telegram-bot/issues
