@@ -28,6 +28,7 @@ jobs:
         find: ${{ steps.dependabot-metadata.outputs.previous-version }}
         replace: ${{ steps.dependabot-metadata.outputs.new-version }}
         regex: false
+        exclude: CHANGES.rst
 
     - name: Commit & Push Changes to PR
       uses: EndBug/add-and-commit@v9.1.3

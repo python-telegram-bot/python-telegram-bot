@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._games.callbackgame import CallbackGame
@@ -297,12 +297,12 @@ class InlineKeyboardButton(TelegramObject):
             self.callback_data = callback_data
             self._set_id_attrs()
 
-    MIN_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA
+    MIN_CALLBACK_DATA: Final[int] = constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA
     """:const:`telegram.constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA`
 
     .. versionadded:: 20.0
     """
-    MAX_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA
+    MAX_CALLBACK_DATA: Final[int] = constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA
     """:const:`telegram.constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA`
 
     .. versionadded:: 20.0

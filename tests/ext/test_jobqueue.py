@@ -615,3 +615,29 @@ class TestJobQueue:
         else:
             await asyncio.sleep(0.1)  # unfortunately we will get a CancelledError here
             assert task.done()
+
+    async def test_from_aps_job(self, job_queue):
+        job = job_queue.run_once(self.job_run_once, 0.1, name="test_job")
+        aps_job = job_queue.scheduler.get_job(job.id)
+
+        tg_job = Job.from_aps_job(aps_job)
+        assert tg_job is job
+        assert tg_job.job is aps_job
+
+    async def test_from_aps_job_missing_reference(self, job_queue):
+        """We manually create a ext.Job and an aps job such that the former has no reference to the
+        latter. Then we test that Job.from_aps_job() still sets the reference correctly.
+        """
+        job = Job(self.job_run_once)
+        aps_job = job_queue.scheduler.add_job(
+            func=job_queue.job_callback,
+            args=(job_queue, job),
+            trigger="interval",
+            seconds=2,
+            id="test_id",
+        )
+
+        assert job.job is None
+        tg_job = Job.from_aps_job(aps_job)
+        assert tg_job is job
+        assert tg_job.job is aps_job

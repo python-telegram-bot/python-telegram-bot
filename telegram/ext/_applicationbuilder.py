@@ -34,8 +34,9 @@ from typing import (
 
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
-from telegram._utils.types import DVInput, DVType, FilePathInput, ODVInput
+from telegram._utils.types import DVInput, DVType, FilePathInput, HTTPVersion, ODVInput
 from telegram.ext._application import Application
+from telegram.ext._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._jobqueue import JobQueue
@@ -127,7 +128,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_base_file_url",
         "_base_url",
         "_bot",
-        "_concurrent_updates",
+        "_update_processor",
         "_connect_timeout",
         "_connection_pool_size",
         "_context_types",
@@ -198,7 +199,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._context_types: DVType[ContextTypes] = DefaultValue(ContextTypes())
         self._application_class: DVType[Type[Application]] = DefaultValue(Application)
         self._application_kwargs: Dict[str, object] = {}
-        self._concurrent_updates: Union[int, DefaultValue[bool]] = DEFAULT_FALSE
+        self._update_processor: "BaseUpdateProcessor" = SimpleUpdateProcessor(
+            max_concurrent_updates=1
+        )
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
@@ -237,7 +240,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return HTTPXRequest(
             connection_pool_size=connection_pool_size,
             proxy_url=proxy_url,
-            http_version=http_version,
+            http_version=http_version,  # type: ignore[arg-type]
             **effective_timeouts,
         )
 
@@ -306,7 +309,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             bot=bot,
             update_queue=update_queue,
             updater=updater,
-            concurrent_updates=DefaultValue.get_value(self._concurrent_updates),
+            update_processor=self._update_processor,
             job_queue=job_queue,
             persistence=persistence,
             context_types=DefaultValue.get_value(self._context_types),
@@ -561,7 +564,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._pool_timeout = pool_timeout
         return self
 
-    def http_version(self: BuilderType, http_version: str) -> BuilderType:
+    def http_version(self: BuilderType, http_version: HTTPVersion) -> BuilderType:
         """Sets the HTTP protocol version which is used for the
         :paramref:`~telegram.request.HTTPXRequest.http_version` parameter of
         :attr:`telegram.Bot.request`. By default, HTTP/1.1 is used.
@@ -720,7 +723,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._get_updates_pool_timeout = get_updates_pool_timeout
         return self
 
-    def get_updates_http_version(self: BuilderType, get_updates_http_version: str) -> BuilderType:
+    def get_updates_http_version(
+        self: BuilderType, get_updates_http_version: HTTPVersion
+    ) -> BuilderType:
         """Sets the HTTP protocol version which is used for the
         :paramref:`~telegram.request.HTTPXRequest.http_version` parameter which is used in the
         :meth:`telegram.Bot.get_updates` request. By default, HTTP/1.1 is used.
@@ -902,7 +907,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._update_queue = update_queue
         return self
 
-    def concurrent_updates(self: BuilderType, concurrent_updates: Union[bool, int]) -> BuilderType:
+    def concurrent_updates(
+        self: BuilderType, concurrent_updates: Union[bool, int, "BaseUpdateProcessor"]
+    ) -> BuilderType:
         """Specifies if and how many updates may be processed concurrently instead of one by one.
         If not called, updates will be processed one by one.
 
@@ -917,14 +924,34 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         .. seealso:: :attr:`telegram.ext.Application.concurrent_updates`
 
         Args:
-            concurrent_updates (:obj:`bool` | :obj:`int`): Passing :obj:`True` will allow for
-                ``256`` updates to be processed concurrently. Pass an integer to specify a
-                different number of updates that may be processed concurrently.
+            concurrent_updates (:obj:`bool` | :obj:`int` | :class:`BaseUpdateProcessor`): Passing
+                :obj:`True` will allow for ``256`` updates to be processed concurrently using
+                :class:`telegram.ext.SimpleUpdateProcessor`. Pass an integer to specify a different
+                number of updates that may be processed concurrently. Pass an instance of
+                :class:`telegram.ext.BaseUpdateProcessor` to use that instance for handling updates
+                concurrently.
+
+                .. versionchanged:: NEXT.VERSION
+                    Now accepts :class:`BaseUpdateProcessor` instances.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        self._concurrent_updates = concurrent_updates
+        # Check if concurrent updates is bool and convert to integer
+        if concurrent_updates is True:
+            concurrent_updates = 256
+        elif concurrent_updates is False:
+            concurrent_updates = 1
+
+        # If `concurrent_updates` is an integer, create a `SimpleUpdateProcessor`
+        # instance with that integer value; otherwise, raise an error if the value
+        # is negative
+        if isinstance(concurrent_updates, int):
+            concurrent_updates = SimpleUpdateProcessor(concurrent_updates)
+
+        # Assign default value of concurrent_updates if it is instance of
+        # `BaseUpdateProcessor`
+        self._update_processor: BaseUpdateProcessor = concurrent_updates  # type: ignore[no-redef]
         return self
 
     def job_queue(

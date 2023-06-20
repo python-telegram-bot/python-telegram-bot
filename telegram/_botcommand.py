@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Command."""
 
-from typing import ClassVar, Optional
+from typing import Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -61,22 +61,22 @@ class BotCommand(TelegramObject):
 
         self._freeze()
 
-    MIN_COMMAND: ClassVar[int] = constants.BotCommandLimit.MIN_COMMAND
+    MIN_COMMAND: Final[int] = constants.BotCommandLimit.MIN_COMMAND
     """:const:`telegram.constants.BotCommandLimit.MIN_COMMAND`
 
     .. versionadded:: 20.0
     """
-    MAX_COMMAND: ClassVar[int] = constants.BotCommandLimit.MAX_COMMAND
+    MAX_COMMAND: Final[int] = constants.BotCommandLimit.MAX_COMMAND
     """:const:`telegram.constants.BotCommandLimit.MAX_COMMAND`
 
     .. versionadded:: 20.0
     """
-    MIN_DESCRIPTION: ClassVar[int] = constants.BotCommandLimit.MIN_DESCRIPTION
+    MIN_DESCRIPTION: Final[int] = constants.BotCommandLimit.MIN_DESCRIPTION
     """:const:`telegram.constants.BotCommandLimit.MIN_DESCRIPTION`
 
     .. versionadded:: 20.0
     """
-    MAX_DESCRIPTION: ClassVar[int] = constants.BotCommandLimit.MAX_DESCRIPTION
+    MAX_DESCRIPTION: Final[int] = constants.BotCommandLimit.MAX_DESCRIPTION
     """:const:`telegram.constants.BotCommandLimit.MAX_DESCRIPTION`
 
     .. versionadded:: 20.0
