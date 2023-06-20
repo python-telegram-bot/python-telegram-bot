@@ -492,12 +492,10 @@ class TestJobQueue:
         job_2 = job_queue.run_repeating(self.job_run_once, 0.2)
         job_3 = Job(self.job_run_once, 0.2)
         job_3._job = job.job
-        assert job == job
         assert job != job_queue
         assert job != job_2
         assert job == job_3
 
-        assert hash(job) == hash(job)
         assert hash(job) != hash(job_queue)
         assert hash(job) != hash(job_2)
         assert hash(job) == hash(job_3)
