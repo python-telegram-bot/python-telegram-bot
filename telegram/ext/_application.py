@@ -23,6 +23,7 @@ import inspect
 import itertools
 import platform
 import signal
+import sys
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -36,6 +37,7 @@ from typing import (
     Coroutine,
     DefaultDict,
     Dict,
+    Generator,
     Generic,
     List,
     Mapping,
@@ -75,6 +77,19 @@ DEFAULT_GROUP: int = 0
 _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-name
 _STOP_SIGNAL = object()
 _DEFAULT_0 = DefaultValue(0)
+
+
+# Since python 3.12, the coroutine passed to create_task should not be an async generator. Remove
+# this check when we drop support for python 3.11.
+if sys.version_info >= (3, 12):
+    _CoroType = Union[Optional["asyncio.Future[object]"], Awaitable[RT]]
+    _ErrorCoroType = Optional[Union[Optional["asyncio.Future[object]"], Awaitable[RT]]]
+else:
+    _CoroType = Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]]
+    _ErrorCoroType = Optional[
+        Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]]
+    ]
+
 
 _LOGGER = get_logger(__name__)
 
@@ -937,7 +952,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     def create_task(
         self,
-        coroutine: Union[Optional["asyncio.Future[object]"], Awaitable[RT]],
+        coroutine: _CoroType,
         update: Optional[object] = None,
     ) -> "asyncio.Task[RT]":
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
@@ -956,7 +971,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
                 .. versionchanged:: 20.2
                     Accepts :class:`asyncio.Future` and generator-based coroutine functions.
-                .. versionchanged:: NEXT.VERSION
+                .. deprecated:: NEXT.VERSION
                     Since Python 3.12, generator-based coroutine functions are no longer accepted.
             update (:obj:`object`, optional): If set, will be passed to :meth:`process_error`
                 as additional information for the error handlers. Moreover, the corresponding
@@ -970,7 +985,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     def __create_task(
         self,
-        coroutine: Union[Optional["asyncio.Future[object]"], Awaitable[RT]],
+        coroutine: _CoroType,
         update: Optional[object] = None,
         is_error_handler: bool = False,
     ) -> "asyncio.Task[RT]":
@@ -1005,11 +1020,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     async def __create_task_callback(
         self,
-        coroutine: Union[Optional["asyncio.Future[object]"], Awaitable[RT]],
+        coroutine: _CoroType,
         update: Optional[object] = None,
         is_error_handler: bool = False,
     ) -> RT:
         try:
+            # Generator-based coroutines are not supported in Python 3.12+
+            if isinstance(coroutine, Generator) and sys.version_info < (3, 12):
+                return await asyncio.create_task(coroutine)
             return await coroutine  # type: ignore[misc]
         except asyncio.CancelledError as cancel:
             # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop this
@@ -1618,7 +1636,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update: Optional[object],
         error: Exception,
         job: Optional["Job[CCT]"] = None,
-        coroutine: Optional[Union[Optional["asyncio.Future[object]"], Awaitable[RT]]] = None,
+        coroutine: _ErrorCoroType = None,
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises

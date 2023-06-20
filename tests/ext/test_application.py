@@ -24,6 +24,7 @@ import logging
 import os
 import platform
 import signal
+import sys
 import threading
 import time
 from collections import defaultdict
@@ -1298,6 +1299,17 @@ class TestApplication:
         # `asyncio.Task`
         out = await app.create_task(asyncio.gather(callback()))
         assert out == [42]
+
+    @pytest.mark.skipif(sys.version_info >= (3, 12), reason="generator coroutines are deprecated")
+    async def test_create_task_awaiting_generator(self, app):
+        event = asyncio.Event()
+
+        def gen():
+            yield
+            event.set()
+
+        await app.create_task(gen())
+        assert event.is_set()
 
     async def test_no_concurrent_updates(self, app):
         queue = asyncio.Queue()
