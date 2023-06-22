@@ -19,7 +19,7 @@
 import _pytest.config
 import pytest
 
-fold_plugins = set()
+fold_plugins = {"_cov": "Coverage report", "flaky": "Flaky report"}
 
 
 def terminal_summary_wrapper(original, plugin_name):
@@ -35,10 +35,12 @@ def terminal_summary_wrapper(original, plugin_name):
 
 @pytest.mark.trylast()
 def pytest_configure(config):
-    for hookimpl in config.pluginmanager.hook.pytest_terminal_summary._nonwrappers:
-        if hookimpl.plugin_name in fold_plugins:
-            hookimpl.function = terminal_summary_wrapper(hookimpl.function, hookimpl.plugin_name)
-
+    try:
+        for hookimpl in config.pluginmanager.hook.pytest_terminal_summary._nonwrappers:
+            if hookimpl.plugin_name in fold_plugins:
+                hookimpl.function = terminal_summary_wrapper(hookimpl.function, hookimpl.plugin_name)
+    except AttributeError:
+        print(vars(config.pluginmanager.hook.pytest_terminal_summary))
 
 class PytestPluginHelpers:
     terminal = None
