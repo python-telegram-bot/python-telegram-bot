@@ -35,10 +35,10 @@ def terminal_summary_wrapper(original, plugin_name):
 
 @pytest.mark.trylast()
 def pytest_configure(config):
-    print(config.pluginmanager.hook.pytest_terminal_summary._hookimpls)
     for hookimpl in config.pluginmanager.hook.pytest_terminal_summary._hookimpls:
         if hookimpl.plugin_name in fold_plugins:
             hookimpl.function = terminal_summary_wrapper(hookimpl.function, hookimpl.plugin_name)
+
 
 class PytestPluginHelpers:
     terminal = None
