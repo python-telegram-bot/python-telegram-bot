@@ -40,7 +40,7 @@ def pytest_configure(config):
             if hookimpl.plugin_name in fold_plugins:
                 hookimpl.function = terminal_summary_wrapper(hookimpl.function, hookimpl.plugin_name)
     except AttributeError:
-        print(vars(config.pluginmanager.hook.pytest_terminal_summary))
+        print(dir(config.pluginmanager.hook.pytest_terminal_summary))
 
 class PytestPluginHelpers:
     terminal = None
