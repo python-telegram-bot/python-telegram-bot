@@ -19,7 +19,7 @@
 import _pytest.config
 import pytest
 
-fold_plugins = {"_cov": "Coverage report", "flaky": "Flaky report"}
+fold_plugins = set()
 
 
 def terminal_summary_wrapper(original, plugin_name):
