@@ -36,7 +36,7 @@ def terminal_summary_wrapper(original, plugin_name):
 @pytest.mark.trylast()
 def pytest_configure(config):
     try:
-        for hookimpl in config.pluginmanager.hook.pytest_terminal_summary._nonwrappers:
+        for hookimpl in config.pluginmanager.hook.pytest_terminal_summary._hookimpls:
             if hookimpl.plugin_name in fold_plugins:
                 hookimpl.function = terminal_summary_wrapper(hookimpl.function, hookimpl.plugin_name)
     except AttributeError:
