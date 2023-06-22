@@ -139,8 +139,8 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert keyboard_button == keyboard_button
 
         assert str(recwarn[0].message) == (
-            "In v21, granular media settings will be considered as well when comparing"
-            " ChatPermissions instances."
+            "In v21, `request_user` and `request_chat` will be considered as well when comparing"
+            " KeyboardButton instances."
         )
         assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
