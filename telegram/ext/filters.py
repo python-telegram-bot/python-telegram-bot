@@ -73,6 +73,7 @@ __all__ = (
     "Regex",
     "Sticker",
     "SUCCESSFUL_PAYMENT",
+    "SuccessfulPayment",
     "SenderChat",
     "StatusUpdate",
     "TEXT",
@@ -2147,14 +2148,24 @@ class Sticker:
     # neither mask nor emoji can be a message.sticker, so no filters for them
 
 
-class _SuccessfulPayment(MessageFilter):
-    __slots__ = ()
+class SuccessfulPayment(MessageFilter):
+    __slots__ = ("strings",)
+
+    def __init__(self, strings: Optional[Union[List[str], Tuple[str, ...]]] = None):
+        self.strings: Optional[Sequence[str]] = strings
+        super().__init__(
+            name=f"filters.SuccessfulPayment({strings})"
+            if strings
+            else "filters.SUCCESSFUL_PAYMENT"
+        )
 
     def filter(self, message: Message) -> bool:
-        return bool(message.successful_payment)
+        if self.strings is None:
+            return bool(message.successful_payment)
+        return message.successful_payment in self.strings if message.successful_payment else False
 
 
-SUCCESSFUL_PAYMENT = _SuccessfulPayment(name="filters.SUCCESSFUL_PAYMENT")
+SUCCESSFUL_PAYMENT = SuccessfulPayment()
 """Messages that contain :attr:`telegram.Message.successful_payment`."""
 
 
