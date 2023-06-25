@@ -80,6 +80,7 @@ jobs:
       - name: Test Summary
         id: test_summary
         uses: test-summary/action@v2.1
+        if: always()  # always run, even if tests fail
         with:
           paths: |
             .test_report_no_optionals.xml
@@ -91,6 +92,7 @@ jobs:
           env_vars: OS,PYTHON
           name: ${{ matrix.os }}-${{ matrix.python-version }}
           fail_ci_if_error: true
+
   test_official:
     name: test-official
     runs-on: ${{matrix.os}}
