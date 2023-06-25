@@ -115,8 +115,15 @@ jobs:
           python -W ignore -m pip install -r requirements-dev.txt
       - name: Compare to official api
         run: |
-          pytest -v tests/test_official.py
+          pytest -v tests/test_official.py --junit-xml=.test_report_official.xml
           exit $?
         env:
           TEST_OFFICIAL: "true"
         shell: bash --noprofile --norc {0}
+
+      - name: Test Summary
+        id: test_summary
+        uses: test-summary/action@v2.1
+        if: always()  # always run, even if tests fail
+        with:
+          paths: .test_report_official.xml
