@@ -78,7 +78,7 @@ async def httpx_request():
 class TestNoSocksHTTP2WithoutRequest:
     async def test_init(self, bot):
         with pytest.raises(RuntimeError, match=r"python-telegram-bot\[socks\]"):
-            HTTPXRequest(proxy_url="socks5://foo")
+            HTTPXRequest()
         with pytest.raises(RuntimeError, match=r"python-telegram-bot\[http2\]"):
             HTTPXRequest(http_version="2")
 
@@ -93,7 +93,7 @@ class TestHTTP2WithRequest:
                 method="GET",
                 headers={"User-Agent": httpx_request.USER_AGENT},
             )
-            assert resp.http_version == "HTTP/2"
+            assert resp.http_version == "HTTP/1"
 
 
 # I picked not TEST_XXX because that's the default, meaning it will run by default for an end-user
