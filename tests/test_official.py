@@ -42,7 +42,6 @@ GLOBALLY_IGNORED_PARAMETERS = {
 
 # Arguments *added* to the official API
 PTB_EXTRA_PARAMS = {
-    "send_contact": {"contact"},
     "send_location": {"location"},
     "edit_message_live_location": {"location"},
     "send_venue": {"venue"},
