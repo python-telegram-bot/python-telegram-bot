@@ -1384,7 +1384,7 @@ class TestApplication:
 
             await asyncio.sleep(0.9)
             tasks = asyncio.all_tasks()
-            assert any(":process_concurrent_update_" in task.get_name() for task in tasks)
+            assert any(":process_concurrent_update" in task.get_name() for task in tasks)
             for i in range(app.update_processor.max_concurrent_updates):
                 assert events[i].is_set()
             for i in range(

@@ -1082,8 +1082,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     self.create_task(
                         self.__process_update_wrapper(update),
                         update=update,
-                        name=f"Application:{self.bot.id}:process_concurrent_update_"
-                        f"{self.update_queue.qsize()}",
+                        name=f"Application:{self.bot.id}:process_concurrent_update",
                     )
                 else:
                     await self.__process_update_wrapper(update)
