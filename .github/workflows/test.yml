@@ -86,6 +86,14 @@ jobs:
             .test_report_no_optionals.xml
             .test_report_optionals.xml
 
+      - name: Archive Test Summary Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-summary-xmls
+          path: |
+            .test_report_no_optionals.xml
+            .test_report_optionals.xml
+
       - name: Submit coverage
         uses: codecov/codecov-action@v3
         with:
