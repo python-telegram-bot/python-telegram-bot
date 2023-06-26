@@ -240,9 +240,11 @@ class TestDocumentWithRequest(TestDocumentBase):
         assert new_file.file_unique_id == document.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram.png")
-
-        assert path.is_file()
+        try:
+            await new_file.download_to_drive("telegram.png")
+            assert path.is_file()
+        finally:
+            path.unlink(missing_ok=True)
 
     async def test_send_resend(self, bot, chat_id, document):
         message = await bot.send_document(chat_id=chat_id, document=document.file_id)

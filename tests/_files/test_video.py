@@ -288,9 +288,11 @@ class TestVideoWithRequest(TestVideoBase):
         assert new_file.file_unique_id == video.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram.mp4")
-
-        assert path.is_file()
+        try:
+            await new_file.download_to_drive("telegram.mp4")
+            assert path.is_file()
+        finally:
+            path.unlink(missing_ok=True)
 
     async def test_send_mp4_file_url(self, bot, chat_id, video):
         message = await bot.send_video(chat_id, self.video_file_url, caption=self.caption)

@@ -270,8 +270,11 @@ class TestAudioWithRequest(TestAudioBase):
         assert new_file.file_unique_id == audio.file_unique_id
         assert str(new_file.file_path).startswith("https://")
 
-        await new_file.download_to_drive("telegram.mp3")
-        assert path.is_file()
+        try:
+            await new_file.download_to_drive("telegram.mp3")
+            assert path.is_file()
+        finally:
+            path.unlink(missing_ok=True)
 
     async def test_send_mp3_url_file(self, bot, chat_id, audio):
         message = await bot.send_audio(

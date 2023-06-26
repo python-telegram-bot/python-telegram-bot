@@ -269,8 +269,11 @@ class TestAnimationWithRequest(TestAnimationBase):
 
         assert new_file.file_path.startswith("https://")
 
-        new_filepath = await new_file.download_to_drive("game.gif")
-        assert new_filepath.is_file()
+        try:
+            new_filepath = await new_file.download_to_drive("game.gif")
+            assert new_filepath.is_file()
+        finally:
+            new_filepath.unlink(missing_ok=True)
 
     async def test_send_animation_url_file(self, bot, chat_id, animation):
         message = await bot.send_animation(

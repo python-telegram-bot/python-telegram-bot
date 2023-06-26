@@ -171,8 +171,11 @@ class TestChatPhotoWithRequest:
                 asserts.append("big")
             assert file.file_path.startswith("https://")
 
-            await file.download_to_drive(jpg_file)
-            assert jpg_file.is_file()
+            try:
+                await file.download_to_drive(jpg_file)
+                assert jpg_file.is_file()
+            finally:
+                jpg_file.unlink(missing_ok=True)
 
         assert "small" in asserts
         assert "big" in asserts

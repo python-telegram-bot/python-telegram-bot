@@ -371,9 +371,11 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert new_file.file_unique_id == photo.file_unique_id
         assert new_file.file_path.startswith("https://") is True
 
-        await new_file.download_to_drive("telegram.jpg")
-
-        assert path.is_file()
+        try:
+            await new_file.download_to_drive("telegram.jpg")
+            assert path.is_file()
+        finally:
+            path.unlink(missing_ok=True)
 
     async def test_send_url_jpg_file(self, bot, chat_id):
         message = await bot.send_photo(chat_id, photo=self.photo_file_url)
