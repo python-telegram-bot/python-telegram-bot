@@ -139,11 +139,11 @@ class HTTPXRequest(BaseRequest):
             if "httpx[socks]" in str(exc):
                 raise RuntimeError(
                     "To use Socks5 proxies, PTB must be installed via `pip install "
-                    "python-telegram-bot[socks]`."
+                    '"python-telegram-bot[socks]"`.'
                 ) from exc
             raise RuntimeError(
                 "To use HTTP/2, PTB must be installed via `pip install "
-                "python-telegram-bot[http2]`."
+                '"python-telegram-bot[http2]"`.'
             ) from exc
 
     @property

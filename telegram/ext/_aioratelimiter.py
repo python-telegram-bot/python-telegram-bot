@@ -136,7 +136,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
         if not AIO_LIMITER_AVAILABLE:
             raise RuntimeError(
                 "To use `AIORateLimiter`, PTB must be installed via `pip install "
-                "python-telegram-bot[rate-limiter]`."
+                '"python-telegram-bot[rate-limiter]"`.'
             )
         if overall_max_rate and overall_time_period:
             self._base_limiter: Optional[AsyncLimiter] = AsyncLimiter(

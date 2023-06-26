@@ -153,7 +153,7 @@ class CallbackDataCache:
         if not CACHE_TOOLS_AVAILABLE:
             raise RuntimeError(
                 "To use `CallbackDataCache`, PTB must be installed via `pip install "
-                "python-telegram-bot[callback-data]`."
+                '"python-telegram-bot[callback-data]"`.'
             )
 
         self.bot: ExtBot[Any] = bot

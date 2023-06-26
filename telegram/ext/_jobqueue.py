@@ -86,7 +86,7 @@ class JobQueue(Generic[CCT]):
         if not APS_AVAILABLE:
             raise RuntimeError(
                 "To use `JobQueue`, PTB must be installed via `pip install "
-                "python-telegram-bot[job-queue]`."
+                '"python-telegram-bot[job-queue]"`.'
             )
 
         self._application: "Optional[weakref.ReferenceType[Application]]" = None
@@ -750,7 +750,7 @@ class Job(Generic[CCT]):
         if not APS_AVAILABLE:
             raise RuntimeError(
                 "To use `Job`, PTB must be installed via `pip install "
-                "python-telegram-bot[job-queue]`."
+                '"python-telegram-bot[job-queue]"`.'
             )
 
         self.callback: JobCallback[CCT] = callback
