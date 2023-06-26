@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any, List, Match, Optional, Pattern, TypeVar, 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
-from telegram.ext._handler import BaseHandler
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:

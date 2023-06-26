@@ -56,11 +56,11 @@ from telegram._utils.logging import get_logger
 from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._basepersistence import BasePersistence
 from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
-from telegram.ext._handler import BaseHandler
 from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
