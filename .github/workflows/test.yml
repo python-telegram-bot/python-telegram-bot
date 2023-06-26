@@ -1,4 +1,4 @@
-name: GitHub Actions
+name: Unit Tests
 on:
   pull_request:
     branches:
@@ -55,7 +55,7 @@ jobs:
           TO_TEST="test_no_passport.py or test_datetime.py or test_defaults.py or test_jobqueue.py or test_applicationbuilder.py or test_ratelimiter.py or test_updater.py or test_callbackdatacache.py or test_request.py"
           pytest -v --cov -k "${TO_TEST}"
           # Rerun only failed tests (--lf), and don't run any tests if none failed (--lfnf=none)
-          pytest -v --cov --cov-append -k "${TO_TEST}" --lf --lfnf=none
+          pytest -v --cov --cov-append -k "${TO_TEST}" --lf --lfnf=none --junit-xml=.test_report_no_optionals.xml
           # No tests were selected, convert returned status code to 0
           opt_dep_status=$(( $? == 5 ? 0 : $? ))
 
@@ -66,7 +66,7 @@ jobs:
           # worker. Increasing number of workers has little effect on test duration, but it seems
           # to increase flakyness, specially on python 3.7 with --dist=loadgroup.
           pytest -v --cov --cov-append -n auto --dist loadfile
-          pytest -v --cov --cov-append -n auto --dist loadfile --lf --lfnf=none
+          pytest -v --cov --cov-append -n auto --dist loadfile --lf --lfnf=none --junit-xml=.test_report_optionals.xml
           main_status=$(( $? == 5 ? 0 : $? ))
           # exit with non-zero status if any of the two pytest runs failed
           exit $(( ${opt_dep_status} || ${main_status} ))
@@ -77,12 +77,22 @@ jobs:
           TEST_BUILD: "true"
         shell: bash --noprofile --norc {0}
 
+      - name: Test Summary
+        id: test_summary
+        uses: test-summary/action@v2.1
+        if: always()  # always run, even if tests fail
+        with:
+          paths: |
+            .test_report_no_optionals.xml
+            .test_report_optionals.xml
+
       - name: Submit coverage
         uses: codecov/codecov-action@v3
         with:
           env_vars: OS,PYTHON
           name: ${{ matrix.os }}-${{ matrix.python-version }}
           fail_ci_if_error: true
+
   test_official:
     name: test-official
     runs-on: ${{matrix.os}}
@@ -105,8 +115,15 @@ jobs:
           python -W ignore -m pip install -r requirements-dev.txt
       - name: Compare to official api
         run: |
-          pytest -v tests/test_official.py
+          pytest -v tests/test_official.py --junit-xml=.test_report_official.xml
           exit $?
         env:
           TEST_OFFICIAL: "true"
         shell: bash --noprofile --norc {0}
+
+      - name: Test Summary
+        id: test_summary
+        uses: test-summary/action@v2.1
+        if: always()  # always run, even if tests fail
+        with:
+          paths: .test_report_official.xml
