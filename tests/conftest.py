@@ -39,7 +39,7 @@ from telegram.ext.filters import MessageFilter, UpdateFilter
 from tests.auxil.build_messages import DATE
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.constants import PRIVATE_KEY
-from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
+from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.pytest_classes import PytestApplication, PytestBot, make_bot
@@ -85,10 +85,6 @@ def pytest_collection_modifyitems(items: List[pytest.Item]):
             name="no_req"
         ):
             parent.add_marker(pytest.mark.no_req)
-
-
-if GITHUB_ACTION:
-    pytest_plugins = ["tests.auxil.plugin_github_group"]
 
 
 # Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be
