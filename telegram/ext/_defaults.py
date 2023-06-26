@@ -18,11 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
 import datetime
-from typing import Any, Dict, NoReturn, Optional
+from typing import Any, Dict, NoReturn, Optional, final
 
 from telegram._utils.datetime import UTC
 
 
+@final
 class Defaults:
     """Convenience Class to gather all parameters with a (user defined) default value
 
