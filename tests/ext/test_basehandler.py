@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-from telegram.ext._handler import BaseHandler
+from telegram.ext._basehandler import BaseHandler
 from tests.auxil.slots import mro_slots
 
 
