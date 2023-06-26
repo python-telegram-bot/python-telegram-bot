@@ -62,7 +62,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
 
         .. code-block:: bash
 
-           pip install python-telegram-bot[rate-limiter]
+           pip install "python-telegram-bot[rate-limiter]"
 
     The rate limiting is applied by combining two levels of throttling and :meth:`process_request`
     roughly boils down to::

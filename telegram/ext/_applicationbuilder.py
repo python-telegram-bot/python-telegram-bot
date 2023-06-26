@@ -582,7 +582,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             .. code-block:: bash
 
-               pip install python-telegram-bot[http2]
+               pip install "python-telegram-bot[http2]"
 
             Keep in mind that the HTTP/1.1 implementation may be considered the `"more
             robust option at this time" <https://www.python-httpx.org/http2#enabling-http2>`_.
@@ -827,7 +827,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             .. code-block:: bash
 
-               pip install python-telegram-bot[callback-data]
+               pip install "python-telegram-bot[callback-data]"
 
         Examples:
             :any:`Arbitrary callback_data Bot <examples.arbitrarycallbackdatabot>`

@@ -401,7 +401,7 @@ class Updater(AsyncContextManager["Updater"]):
 
             .. code-block:: bash
 
-               pip install python-telegram-bot[webhooks]
+               pip install "python-telegram-bot[webhooks]"
 
         .. seealso:: :wiki:`Webhooks`
 

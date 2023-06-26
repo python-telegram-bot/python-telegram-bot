@@ -113,7 +113,7 @@ class CallbackDataCache:
 
         .. code-block:: bash
 
-           pip install python-telegram-bot[callback-data]
+           pip install "python-telegram-bot[callback-data]"
 
     Examples:
         :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
@@ -125,7 +125,7 @@ class CallbackDataCache:
 
     .. versionchanged:: 20.0
         To use this class, PTB must be installed via
-        ``pip install python-telegram-bot[callback-data]``.
+        ``pip install "python-telegram-bot[callback-data]"``.
 
     Args:
         bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.

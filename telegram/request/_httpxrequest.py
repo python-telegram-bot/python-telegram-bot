@@ -56,7 +56,7 @@ class HTTPXRequest(BaseRequest):
                 * The proxy URL can also be set via the environment variables ``HTTPS_PROXY`` or
                   ``ALL_PROXY``. See `the docs of httpx`_ for more info.
                 * For Socks5 support, additional dependencies are required. Make sure to install
-                  PTB via :command:`pip install python-telegram-bot[socks]` in this case.
+                  PTB via :command:`pip install "python-telegram-bot[socks]"` in this case.
                 * Socks5 proxies can not be set via environment variables.
 
             .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
