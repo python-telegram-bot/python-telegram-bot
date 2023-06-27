@@ -1,0 +1,68 @@
+import logging
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
+
+# Установка уровня логирования
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                     level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+
+# Обработчик команды /start
+def start(update: Update, context: CallbackContext) -> None:
+    user = update.effective_user
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text=f"Привет, {user.first_name}! Я бот для продажи. Чем я могу помочь?")
+
+# Обработчик команды /products
+def products(update: Update, context: CallbackContext) -> None:
+    # Создание клавиатуры с товарами
+    keyboard = [
+        [InlineKeyboardButton("Товар 1", callback_data='product1')],
+        [InlineKeyboardButton("Товар 2", callback_data='product2')],
+        [InlineKeyboardButton("Товар 3", callback_data='product3')],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="Выберите товар:",
+                             reply_markup=reply_markup)
+
+# Обработчик выбора товара
+def product_selected(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    product = query.data
+
+    # Обработка выбранного товара
+    if product == 'product1':
+        context.bot.send_message(chat_id=query.message.chat_id, text="Вы выбрали товар 1.")
+    elif product == 'product2':
+        context.bot.send_message(chat_id=query.message.chat_id, text="Вы выбрали товар 2.")
+    elif product == 'product3':
+        context.bot.send_message(chat_id=query.message.chat_id, text="Вы выбрали товар 3.")
+
+# Основная функция
+def main() -> None:
+    # Инициализация бота
+    updater = Updater("YOUR_TOKEN_HERE", use_context=True)
+
+    # Получение диспетчера для регистрации обработчиков
+    dispatcher = updater.dispatcher
+
+    # Регистрация обработчика команды /start
+    dispatcher.add_handler(CommandHandler("start", start))
+
+    # Регистрация обработчика команды /products
+    dispatcher.add_handler(CommandHandler("products", products))
+
+    # Регистрация обработчика выбора товара
+    dispatcher.add_handler(CallbackQueryHandler(product_selected))
+
+    # Запуск бота
+    updater.start_polling()
+
+    # Остановка бота при нажатии Ctrl+C
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
