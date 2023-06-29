@@ -12,7 +12,10 @@ target-version = "py37"
 show-fixes = true
 ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915"]
 select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
-          "G", "ISC", "PT"]
+          "G", "ISC", "PT", "ASYNC", "TCH", "CPY", "SLOT", "PERF",]
 
 [tool.ruff.per-file-ignores]
 "tests/*.py" = ["B018"]
+"**/__init__.py" = ["CPY001"]
+"examples/**.py" = ["CPY001"]
+"tests/**.py" = ["RUF012"]
