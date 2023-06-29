@@ -136,7 +136,7 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
 
     def test_equality_warning(self, recwarn, keyboard_button):
         recwarn.clear()
-        assert keyboard_button == keyboard_button
+        assert keyboard_button == keyboard_button  # noqa: PLR0124
 
         assert str(recwarn[0].message) == (
             "In v21, `request_user` and `request_chat` will be considered as well when comparing"

@@ -58,7 +58,6 @@ from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basehandler import BaseHandler
 from telegram.ext._basepersistence import BasePersistence
-from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._updater import Updater
@@ -70,6 +69,7 @@ if TYPE_CHECKING:
     from telegram import Message
     from telegram.ext import ConversationHandler, JobQueue
     from telegram.ext._applicationbuilder import InitApplicationBuilder
+    from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
     from telegram.ext._jobqueue import Job
 
 DEFAULT_GROUP: int = 0

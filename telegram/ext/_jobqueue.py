@@ -25,7 +25,6 @@ from typing import TYPE_CHECKING, Any, Generic, Optional, Tuple, Union, cast, ov
 try:
     import pytz
     from apscheduler.executors.asyncio import AsyncIOExecutor
-    from apscheduler.job import Job as APSJob
     from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
     APS_AVAILABLE = True
@@ -38,6 +37,9 @@ from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import CCT, JobCallback
 
 if TYPE_CHECKING:
+    if APS_AVAILABLE:
+        from apscheduler.job import Job as APSJob
+
     from telegram.ext import Application
 
 
