@@ -62,7 +62,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
 
         .. code-block:: bash
 
-           pip install python-telegram-bot[rate-limiter]
+           pip install "python-telegram-bot[rate-limiter]"
 
     The rate limiting is applied by combining two levels of throttling and :meth:`process_request`
     roughly boils down to::
@@ -136,7 +136,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
         if not AIO_LIMITER_AVAILABLE:
             raise RuntimeError(
                 "To use `AIORateLimiter`, PTB must be installed via `pip install "
-                "python-telegram-bot[rate-limiter]`."
+                '"python-telegram-bot[rate-limiter]"`.'
             )
         if overall_max_rate and overall_time_period:
             self._base_limiter: Optional[AsyncLimiter] = AsyncLimiter(
@@ -196,12 +196,11 @@ class AIORateLimiter(BaseRateLimiter[int]):
             self._get_group_limiter(group) if group and self._group_max_rate else null_context()
         )
 
-        async with group_context:  # skipcq: PTC-W0062
-            async with base_context:
-                # In case a retry_after was hit, we wait with processing the request
-                await self._retry_after_event.wait()
+        async with group_context, base_context:
+            # In case a retry_after was hit, we wait with processing the request
+            await self._retry_after_event.wait()
 
-                return await callback(*args, **kwargs)
+            return await callback(*args, **kwargs)
 
     # mypy doesn't understand that the last run of the for loop raises an exception
     async def process_request(

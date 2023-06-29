@@ -19,7 +19,7 @@ bot.
 
 Note:
 To use the JobQueue, you must install PTB via
-`pip install python-telegram-bot[job-queue]`
+`pip install "python-telegram-bot[job-queue]"`
 """
 
 import logging

@@ -28,6 +28,7 @@ from types import MappingProxyType
 from typing import (
     TYPE_CHECKING,
     Any,
+    ClassVar,
     Dict,
     Iterator,
     List,
@@ -92,7 +93,7 @@ class TelegramObject:
 
     # Used to cache the names of the parameters of the __init__ method of the class
     # Must be a private attribute to avoid name clashes between subclasses
-    __INIT_PARAMS: Set[str] = set()
+    __INIT_PARAMS: ClassVar[Set[str]] = set()
     # Used to check if __INIT_PARAMS has been set for the current class. Unfortunately, we can't
     # just check if `__INIT_PARAMS is None`, since subclasses use the parent class' __INIT_PARAMS
     # unless it's overridden

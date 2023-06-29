@@ -206,7 +206,7 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
 
     def test_equality_warning(self, recwarn, chat_permissions):
         recwarn.clear()
-        assert chat_permissions == chat_permissions
+        assert chat_permissions == ChatPermissions.all_permissions()
 
         assert str(recwarn[0].message) == (
             "In v21, granular media settings will be considered as well when comparing"
