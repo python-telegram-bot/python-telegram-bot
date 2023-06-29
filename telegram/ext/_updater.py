@@ -363,7 +363,8 @@ class Updater(AsyncContextManager["Updater"]):
                 on_err_cb=error_callback or default_error_callback,
                 description="getting Updates",
                 interval=poll_interval,
-            )
+            ),
+            name="Updater:start_polling:polling_task",
         )
 
         if ready is not None:

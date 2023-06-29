@@ -552,6 +552,8 @@ class TestBasePersistence:
             papp.add_handler(conversation)
 
             assert len(recwarn) >= 1
+            tasks = asyncio.all_tasks()
+            assert any("conversation_handler_after_init" in t.get_name() for t in tasks)
             found = False
             for warning in recwarn:
                 if "after `Application.initialize` was called" in str(warning.message):
@@ -583,6 +585,28 @@ class TestBasePersistence:
     async def test_add_conversation_handler_without_name(self, papp: Application):
         with pytest.raises(ValueError, match="when handler is unnamed"):
             papp.add_handler(build_conversation_handler(name=None, persistent=True))
+
+    @pytest.mark.parametrize(
+        "papp",
+        [
+            PappInput(update_interval=0.0),
+        ],
+        indirect=True,
+    )
+    async def test_update_persistence_called(self, papp: Application, monkeypatch):
+        """Tests if Application.update_persistence is called from app.start()"""
+        called = asyncio.Event()
+
+        async def update_persistence(*args, **kwargs):
+            called.set()
+
+        monkeypatch.setattr(papp, "update_persistence", update_persistence)
+        async with papp:
+            await papp.start()
+            tasks = asyncio.all_tasks()
+            assert any(":persistence_updater" in task.get_name() for task in tasks)
+            assert await called.wait()
+            await papp.stop()
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
