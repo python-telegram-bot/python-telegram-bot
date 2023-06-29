@@ -58,7 +58,15 @@ from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
-from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.types import (
+    CorrectOptionID,
+    DVInput,
+    FileInput,
+    JSONDict,
+    MarkdownVersion,
+    ODVInput,
+    ReplyMarkup,
+)
 from telegram._utils.warnings import warn
 from telegram._videochat import (
     VideoChatEnded,
@@ -2023,7 +2031,7 @@ class Message(TelegramObject):
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
-        correct_option_id: Optional[int] = None,
+        correct_option_id: Optional[CorrectOptionID] = None,
         is_closed: Optional[bool] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -3442,10 +3450,10 @@ class Message(TelegramObject):
         message_text: Optional[str],
         entities: Dict[MessageEntity, str],
         urled: bool = False,
-        version: int = 1,
+        version: MarkdownVersion = 1,
         offset: int = 0,
     ) -> Optional[str]:
-        version = int(version)
+        version = int(version)  # type: ignore
 
         if message_text is None:
             return None

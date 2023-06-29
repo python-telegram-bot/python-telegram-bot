@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram CallbackQuery"""
-from typing import TYPE_CHECKING, ClassVar, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple, Union
 
 from telegram import constants
 from telegram._files.location import Location
@@ -771,7 +771,7 @@ class CallbackQuery(TelegramObject):
             message_thread_id=message_thread_id,
         )
 
-    MAX_ANSWER_TEXT_LENGTH: ClassVar[
+    MAX_ANSWER_TEXT_LENGTH: Final[
         int
     ] = constants.CallbackQueryLimit.ANSWER_CALLBACK_QUERY_TEXT_LENGTH
     """

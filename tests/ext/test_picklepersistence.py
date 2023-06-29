@@ -991,7 +991,7 @@ class TestPicklePersistence:
         await pickle_persistence.update_callback_data(callback_data)
 
         assert pickle_persistence.filepath.is_file()
-        pickle_persistence.filepath.unlink()
+        pickle_persistence.filepath.unlink(missing_ok=True)
         assert not pickle_persistence.filepath.is_file()
 
         await pickle_persistence.update_bot_data(bot_data)

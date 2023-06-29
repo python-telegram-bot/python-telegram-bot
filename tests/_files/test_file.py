@@ -161,7 +161,7 @@ class TestFileWithoutRequest(TestFileBase):
         try:
             assert out_file.read_bytes() == self.file_content
         finally:
-            out_file.unlink()
+            out_file.unlink(missing_ok=True)
 
     @pytest.mark.parametrize(
         "custom_path_type", [str, Path], ids=["str custom_path", "pathlib.Path custom_path"]
@@ -179,7 +179,7 @@ class TestFileWithoutRequest(TestFileBase):
             assert out_file.read_bytes() == self.file_content
         finally:
             os.close(file_handle)
-            custom_path.unlink()
+            custom_path.unlink(missing_ok=True)
 
     async def test_download_no_filename(self, monkeypatch, file):
         async def test(*args, **kwargs):
@@ -194,7 +194,7 @@ class TestFileWithoutRequest(TestFileBase):
         try:
             assert out_file.read_bytes() == self.file_content
         finally:
-            out_file.unlink()
+            out_file.unlink(missing_ok=True)
 
     async def test_download_file_obj(self, monkeypatch, file):
         async def test(*args, **kwargs):
@@ -233,7 +233,7 @@ class TestFileWithoutRequest(TestFileBase):
         try:
             assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
         finally:
-            out_file.unlink()
+            out_file.unlink(missing_ok=True)
 
     async def test_download_file_obj_encrypted(self, monkeypatch, encrypted_file):
         async def test(*args, **kwargs):
@@ -293,7 +293,7 @@ class TestFileWithRequest(TestFileBase):
             assert out_file.read_bytes() == self.file_content
         finally:
             os.close(file_handle)
-            custom_path.unlink()
+            custom_path.unlink(missing_ok=True)
 
     async def test_download_file_obj_local_file(self, local_file):
         with TemporaryFile() as custom_fobj:
@@ -315,14 +315,14 @@ class TestFileWithRequest(TestFileBase):
             assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
         finally:
             os.close(file_handle)
-            custom_path.unlink()
+            custom_path.unlink(missing_ok=True)
 
     async def test_download_local_file_encrypted(self, encrypted_local_file):
         out_file = await encrypted_local_file.download_to_drive()
         try:
             assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
         finally:
-            out_file.unlink()
+            out_file.unlink(missing_ok=True)
 
     async def test_download_bytearray_local_file(self, local_file):
         # Check that a download to a newly allocated bytearray works.

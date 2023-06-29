@@ -24,7 +24,18 @@ Warning:
     the changelog.
 """
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Collection, Dict, Optional, Tuple, TypeVar, Union
+from typing import (
+    IO,
+    TYPE_CHECKING,
+    Any,
+    Collection,
+    Dict,
+    Literal,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 if TYPE_CHECKING:
     from telegram import (
@@ -75,3 +86,12 @@ FieldTuple = Tuple[str, bytes, str]
 """Alias for return type of `InputFile.field_tuple`."""
 UploadFileDict = Dict[str, FieldTuple]
 """Dictionary containing file data to be uploaded to the API."""
+
+HTTPVersion = Literal["1.1", "2.0"]
+"""Allowed HTTP versions.
+
+.. versionadded:: NEXT.VERSION"""
+
+CorrectOptionID = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+MarkdownVersion = Literal[1, 2]

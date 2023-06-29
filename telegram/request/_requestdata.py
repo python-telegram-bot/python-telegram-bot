@@ -18,13 +18,14 @@
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that holds the parameters of a request to the Bot API."""
 import json
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, final
 from urllib.parse import urlencode
 
 from telegram._utils.types import UploadFileDict
 from telegram.request._requestparameter import RequestParameter
 
 
+@final
 class RequestData:
     """Instances of this class collect the data needed for one request to the Bot API, including
     all parameters and files to be sent along with the request.

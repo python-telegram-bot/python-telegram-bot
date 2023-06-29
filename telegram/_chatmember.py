@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
-from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
+from typing import TYPE_CHECKING, Dict, Final, Optional, Type
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -74,17 +74,17 @@ class ChatMember(TelegramObject):
 
     __slots__ = ("user", "status")
 
-    ADMINISTRATOR: ClassVar[str] = constants.ChatMemberStatus.ADMINISTRATOR
+    ADMINISTRATOR: Final[str] = constants.ChatMemberStatus.ADMINISTRATOR
     """:const:`telegram.constants.ChatMemberStatus.ADMINISTRATOR`"""
-    OWNER: ClassVar[str] = constants.ChatMemberStatus.OWNER
+    OWNER: Final[str] = constants.ChatMemberStatus.OWNER
     """:const:`telegram.constants.ChatMemberStatus.OWNER`"""
-    BANNED: ClassVar[str] = constants.ChatMemberStatus.BANNED
+    BANNED: Final[str] = constants.ChatMemberStatus.BANNED
     """:const:`telegram.constants.ChatMemberStatus.BANNED`"""
-    LEFT: ClassVar[str] = constants.ChatMemberStatus.LEFT
+    LEFT: Final[str] = constants.ChatMemberStatus.LEFT
     """:const:`telegram.constants.ChatMemberStatus.LEFT`"""
-    MEMBER: ClassVar[str] = constants.ChatMemberStatus.MEMBER
+    MEMBER: Final[str] = constants.ChatMemberStatus.MEMBER
     """:const:`telegram.constants.ChatMemberStatus.MEMBER`"""
-    RESTRICTED: ClassVar[str] = constants.ChatMemberStatus.RESTRICTED
+    RESTRICTED: Final[str] = constants.ChatMemberStatus.RESTRICTED
     """:const:`telegram.constants.ChatMemberStatus.RESTRICTED`"""
 
     def __init__(

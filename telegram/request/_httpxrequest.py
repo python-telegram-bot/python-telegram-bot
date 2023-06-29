@@ -23,7 +23,7 @@ import httpx
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
-from telegram._utils.types import ODVInput
+from telegram._utils.types import HTTPVersion, ODVInput
 from telegram.error import NetworkError, TimedOut
 from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
@@ -101,7 +101,7 @@ class HTTPXRequest(BaseRequest):
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
-        http_version: str = "1.1",
+        http_version: HTTPVersion = "1.1",
     ):
         self._http_version = http_version
         timeout = httpx.Timeout(
