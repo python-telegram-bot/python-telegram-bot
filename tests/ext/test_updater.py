@@ -248,6 +248,8 @@ class TestUpdater:
             # We call the same logic twice to make sure that restarting the updater works as well
             await updater.start_polling(drop_pending_updates=drop_pending_updates)
             assert updater.running
+            tasks = asyncio.all_tasks()
+            assert any("Updater:start_polling:polling_task" in t.get_name() for t in tasks)
             await updates.join()
             await updater.stop()
             assert not updater.running

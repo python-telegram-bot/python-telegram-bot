@@ -20,7 +20,7 @@
 from abc import ABC, abstractmethod
 from asyncio import BoundedSemaphore
 from types import TracebackType
-from typing import Any, Awaitable, Optional, Type
+from typing import Any, Awaitable, Optional, Type, final
 
 
 class BaseUpdateProcessor(ABC):
@@ -88,6 +88,7 @@ class BaseUpdateProcessor(ABC):
             :meth:`initialize`
         """
 
+    @final
     async def process_update(
         self,
         update: object,

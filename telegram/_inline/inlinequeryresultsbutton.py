@@ -19,7 +19,7 @@
 # pylint: disable=redefined-builtin
 """This module contains the class that represent a Telegram InlineQueryResultsButton."""
 
-from typing import TYPE_CHECKING, ClassVar, Optional
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -107,11 +107,11 @@ class InlineQueryResultsButton(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    MIN_START_PARAMETER_LENGTH: ClassVar[
+    MIN_START_PARAMETER_LENGTH: Final[
         int
     ] = constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH
     """:const:`telegram.constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH`"""
-    MAX_START_PARAMETER_LENGTH: ClassVar[
+    MAX_START_PARAMETER_LENGTH: Final[
         int
     ] = constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH
     """:const:`telegram.constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`"""
