@@ -401,7 +401,7 @@ class Updater(AsyncContextManager["Updater"]):
 
             .. code-block:: bash
 
-               pip install python-telegram-bot[webhooks]
+               pip install "python-telegram-bot[webhooks]"
 
         .. seealso:: :wiki:`Webhooks`
 
@@ -464,7 +464,7 @@ class Updater(AsyncContextManager["Updater"]):
         if not WEBHOOKS_AVAILABLE:
             raise RuntimeError(
                 "To use `start_webhook`, PTB must be installed via `pip install "
-                "python-telegram-bot[webhooks]`."
+                '"python-telegram-bot[webhooks]"`.'
             )
 
         async with self.__lock:
