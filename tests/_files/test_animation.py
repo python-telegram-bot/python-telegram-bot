@@ -260,20 +260,13 @@ class TestAnimationWithRequest(TestAnimationBase):
         except AssertionError:
             pytest.xfail("This is a bug on Telegram's end")
 
-    async def test_get_and_download(self, bot, animation):
-        path = Path("game.gif")
-        if path.is_file():
-            path.unlink()
-
+    async def test_get_and_download(self, bot, animation, tmp_file):
         new_file = await bot.get_file(animation.file_id)
 
         assert new_file.file_path.startswith("https://")
 
-        try:
-            new_filepath = await new_file.download_to_drive("game.gif")
-            assert new_filepath.is_file()
-        finally:
-            new_filepath.unlink(missing_ok=True)
+        new_filepath = await new_file.download_to_drive(str(tmp_file))
+        assert new_filepath.is_file()
 
     async def test_send_animation_url_file(self, bot, chat_id, animation):
         message = await bot.send_animation(

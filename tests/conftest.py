@@ -277,3 +277,9 @@ def tzinfo(request):
 @pytest.fixture(scope="session")
 def timezone(tzinfo):
     return tzinfo
+
+
+@pytest.fixture()
+def tmp_file(tmp_path):
+    with tmp_path / "tpm_file" as file:
+        yield file
