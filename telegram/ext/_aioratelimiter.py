@@ -62,7 +62,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
 
         .. code-block:: bash
 
-           pip install python-telegram-bot[rate-limiter]
+           pip install "python-telegram-bot[rate-limiter]"
 
     The rate limiting is applied by combining two levels of throttling and :meth:`process_request`
     roughly boils down to::
@@ -136,7 +136,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
         if not AIO_LIMITER_AVAILABLE:
             raise RuntimeError(
                 "To use `AIORateLimiter`, PTB must be installed via `pip install "
-                "python-telegram-bot[rate-limiter]`."
+                '"python-telegram-bot[rate-limiter]"`.'
             )
         if overall_max_rate and overall_time_period:
             self._base_limiter: Optional[AsyncLimiter] = AsyncLimiter(

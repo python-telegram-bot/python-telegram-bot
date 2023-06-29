@@ -71,7 +71,7 @@ def decrypt(secret, hash, data):  # skipcq: PYL-W0622
     if not CRYPTO_INSTALLED:
         raise RuntimeError(
             "To use Telegram Passports, PTB must be installed via `pip install "
-            "python-telegram-bot[passport]`."
+            '"python-telegram-bot[passport]"`.'
         )
     # Make a SHA512 hash of secret + update
     digest = Hash(SHA512(), backend=default_backend())
@@ -171,7 +171,7 @@ class EncryptedCredentials(TelegramObject):
             if not CRYPTO_INSTALLED:
                 raise RuntimeError(
                     "To use Telegram Passports, PTB must be installed via `pip install "
-                    "python-telegram-bot[passport]`."
+                    '"python-telegram-bot[passport]"`.'
                 )
             # Try decrypting according to step 1 at
             # https://core.telegram.org/passport#decrypting-data

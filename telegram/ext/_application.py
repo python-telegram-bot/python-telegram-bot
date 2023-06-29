@@ -371,7 +371,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         if self._job_queue is None:
             warn(
                 "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-                "`pip install python-telegram-bot[job-queue]`.",
+                '`pip install "python-telegram-bot[job-queue]"`.',
                 stacklevel=2,
             )
         return self._job_queue
@@ -807,7 +807,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
             .. code-block:: bash
 
-               pip install python-telegram-bot[webhooks]
+               pip install "python-telegram-bot[webhooks]"
 
         .. include:: inclusions/application_run_tip.rst
 
