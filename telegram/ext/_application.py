@@ -86,7 +86,7 @@ _DEFAULT_0 = DefaultValue(0)
 if sys.version_info >= (3, 12):
     _CoroType = Awaitable[RT]
 else:
-    _CoroType = Union[Generator[Any, None, RT], Awaitable[RT]]
+    _CoroType = Union[Generator["asyncio.Future[object]", None, RT], Awaitable[RT]]
 
 _ErrorCoroType = Optional[_CoroType]
 
