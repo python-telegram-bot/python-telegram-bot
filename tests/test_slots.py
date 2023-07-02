@@ -37,7 +37,7 @@ def test_class_has_slots_and_no_dict():
 
         for name, cls in inspect.getmembers(module, inspect.isclass):
             if cls.__module__ != module.__name__ or any(  # exclude 'imported' modules
-                x in name for x in {"__class__", "__init__", "Queue", "Webhook"}
+                x in name for x in ("__class__", "__init__", "Queue", "Webhook")
             ):
                 continue
 
@@ -46,7 +46,7 @@ def test_class_has_slots_and_no_dict():
             assert not isinstance(cls.__slots__, str), f"{name!r}s slots shouldn't be strings"
 
             # specify if a certain module/class/base class should have dict-
-            if any(i in included for i in {cls.__module__, name, cls.__base__.__name__}):
+            if any(i in included for i in (cls.__module__, name, cls.__base__.__name__)):
                 assert "__dict__" in get_slots(cls), f"class {name!r} ({path}) has no __dict__"
                 continue
 

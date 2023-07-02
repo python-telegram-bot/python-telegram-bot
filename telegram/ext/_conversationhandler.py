@@ -41,10 +41,10 @@ from telegram._utils.logging import get_logger
 from telegram._utils.types import DVType
 from telegram._utils.warnings import warn
 from telegram.ext._application import ApplicationHandlerStop
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._callbackqueryhandler import CallbackQueryHandler
 from telegram.ext._choseninlineresulthandler import ChosenInlineResultHandler
 from telegram.ext._extbot import ExtBot
-from telegram.ext._handler import BaseHandler
 from telegram.ext._inlinequeryhandler import InlineQueryHandler
 from telegram.ext._stringcommandhandler import StringCommandHandler
 from telegram.ext._stringregexhandler import StringRegexHandler
@@ -831,6 +831,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                         update, application, handler_check_result, context
                     ),
                     update=update,
+                    name=f"ConversationHandler:{update.update_id}:handle_update:non_blocking_cb",
                 )
         except ApplicationHandlerStop as exception:
             new_state = exception.state
@@ -856,6 +857,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                             new_state, application, update, context, conversation_key
                         ),
                         update=update,
+                        name=f"ConversationHandler:{update.update_id}:handle_update:timeout_job",
                     )
                 else:
                     self._schedule_job(new_state, application, update, context, conversation_key)

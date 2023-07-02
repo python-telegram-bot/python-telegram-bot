@@ -9,7 +9,7 @@ https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callba
 
 Note:
 To use arbitrary callback data, you must install PTB via
-`pip install python-telegram-bot[callback-data]`
+`pip install "python-telegram-bot[callback-data]"`
 """
 import logging
 from typing import List, Tuple, cast

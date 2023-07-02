@@ -25,7 +25,6 @@ from typing import TYPE_CHECKING, Any, Generic, Optional, Tuple, Union, cast, ov
 try:
     import pytz
     from apscheduler.executors.asyncio import AsyncIOExecutor
-    from apscheduler.job import Job as APSJob
     from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
     APS_AVAILABLE = True
@@ -38,6 +37,9 @@ from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import CCT, JobCallback
 
 if TYPE_CHECKING:
+    if APS_AVAILABLE:
+        from apscheduler.job import Job as APSJob
+
     from telegram.ext import Application
 
 
@@ -58,7 +60,7 @@ class JobQueue(Generic[CCT]):
 
         .. code-block:: bash
 
-           pip install python-telegram-bot[job-queue]
+           pip install "python-telegram-bot[job-queue]"
 
     Examples:
         :any:`Timer Bot <examples.timerbot>`
@@ -68,7 +70,7 @@ class JobQueue(Generic[CCT]):
 
     .. versionchanged:: 20.0
         To use this class, PTB must be installed via
-        ``pip install python-telegram-bot[job-queue]``.
+        ``pip install "python-telegram-bot[job-queue]"``.
 
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
@@ -86,7 +88,7 @@ class JobQueue(Generic[CCT]):
         if not APS_AVAILABLE:
             raise RuntimeError(
                 "To use `JobQueue`, PTB must be installed via `pip install "
-                "python-telegram-bot[job-queue]`."
+                '"python-telegram-bot[job-queue]"`.'
             )
 
         self._application: "Optional[weakref.ReferenceType[Application]]" = None
@@ -678,7 +680,7 @@ class Job(Generic[CCT]):
 
         .. code-block:: bash
 
-           pip install python-telegram-bot[job-queue]
+           pip install "python-telegram-bot[job-queue]"
 
     Note:
         All attributes and instance methods of :attr:`job` are also directly available as
@@ -696,7 +698,7 @@ class Job(Generic[CCT]):
        * Renamed ``Job.context`` to :attr:`Job.data`.
        * Removed argument ``job``
        * To use this class, PTB must be installed via
-         ``pip install python-telegram-bot[job-queue]``.
+         ``pip install "python-telegram-bot[job-queue]"``.
 
     Args:
         callback (:term:`coroutine function`): The callback function that should be executed by the
@@ -750,7 +752,7 @@ class Job(Generic[CCT]):
         if not APS_AVAILABLE:
             raise RuntimeError(
                 "To use `Job`, PTB must be installed via `pip install "
-                "python-telegram-bot[job-queue]`."
+                '"python-telegram-bot[job-queue]"`.'
             )
 
         self.callback: JobCallback[CCT] = callback
@@ -797,7 +799,10 @@ class Job(Generic[CCT]):
             await context.refresh_data()
             await self.callback(context)
         except Exception as exc:
-            await application.create_task(application.process_error(None, exc, job=self))
+            await application.create_task(
+                application.process_error(None, exc, job=self),
+                name=f"Job:{self.id}:run:process_error",
+            )
         finally:
             # This is internal logic of application - let's keep it private for now
             application._mark_for_persistence_update(job=self)  # pylint: disable=protected-access

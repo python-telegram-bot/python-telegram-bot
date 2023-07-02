@@ -18,14 +18,16 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InputSticker."""
 
-from typing import Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
 
-from telegram._files.inputfile import InputFile
 from telegram._files.sticker import MaskPosition
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict
+
+if TYPE_CHECKING:
+    from telegram._files.inputfile import InputFile
 
 
 class InputSticker(TelegramObject):

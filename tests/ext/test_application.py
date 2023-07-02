@@ -204,7 +204,7 @@ class TestApplication:
     def test_job_queue(self, one_time_bot, app, recwarn):
         expected_warning = (
             "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-            "`pip install python-telegram-bot[job-queue]`."
+            '`pip install "python-telegram-bot[job-queue]"`.'
         )
         assert app.job_queue is app._job_queue
         application = ApplicationBuilder().bot(one_time_bot).job_queue(None).build()
@@ -454,6 +454,8 @@ class TestApplication:
         async with app:
             await app.start()
             assert app.running
+            tasks = asyncio.all_tasks()
+            assert any(":update_fetcher" in task.get_name() for task in tasks)
             if job_queue:
                 assert app.job_queue.scheduler.running
             else:
@@ -552,7 +554,6 @@ class TestApplication:
             app.remove_handler(handler)
         app.remove_handler(handler, group=2)
 
-    #
     async def test_handler_order_in_group(self, app):
         app.add_handler(MessageHandler(filters.PHOTO, self.callback_set_count(1)))
         app.add_handler(MessageHandler(filters.ALL, self.callback_set_count(2)))
@@ -965,6 +966,8 @@ class TestApplication:
             await app.update_queue.put(1)
             task = asyncio.create_task(app.stop())
             await asyncio.sleep(0.05)
+            tasks = asyncio.all_tasks()
+            assert any(":process_update_non_blocking" in t.get_name() for t in tasks)
             assert self.count == 1
             # Make sure that app stops only once all non blocking callbacks are done
             assert not task.done()
@@ -1030,6 +1033,8 @@ class TestApplication:
             await app.update_queue.put(self.message_update)
             task = asyncio.create_task(app.stop())
             await asyncio.sleep(0.05)
+            tasks = asyncio.all_tasks()
+            assert any(":process_error:non_blocking" in t.get_name() for t in tasks)
             assert self.count == 42
             assert self.received is None
             event.set()
@@ -1197,7 +1202,8 @@ class TestApplication:
             self.count = 42
             return 43
 
-        task = app.create_task(callback())
+        task = app.create_task(callback(), name="test_task")
+        assert task.get_name() == "test_task"
         await asyncio.sleep(0.01)
         assert not task.done()
         out = await task
@@ -1382,6 +1388,8 @@ class TestApplication:
                 assert not events[i].is_set()
 
             await asyncio.sleep(0.9)
+            tasks = asyncio.all_tasks()
+            assert any(":process_concurrent_update" in task.get_name() for task in tasks)
             for i in range(app.update_processor.max_concurrent_updates):
                 assert events[i].is_set()
             for i in range(

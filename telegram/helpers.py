@@ -35,13 +35,16 @@ import re
 from html import escape
 from typing import TYPE_CHECKING, Optional, Union
 
+from telegram._utils.types import MarkdownVersion
 from telegram.constants import MessageType
 
 if TYPE_CHECKING:
     from telegram import Message, Update
 
 
-def escape_markdown(text: str, version: int = 1, entity_type: Optional[str] = None) -> str:
+def escape_markdown(
+    text: str, version: MarkdownVersion = 1, entity_type: Optional[str] = None
+) -> str:
     """Helper function to escape telegram markup symbols.
 
     .. versionchanged:: 20.3
@@ -88,7 +91,7 @@ def mention_html(user_id: Union[int, str], name: str) -> str:
     return f'<a href="tg://user?id={user_id}">{escape(name)}</a>'
 
 
-def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> str:
+def mention_markdown(user_id: Union[int, str], name: str, version: MarkdownVersion = 1) -> str:
     """
     Helper function to create a user mention in Markdown syntax.
 

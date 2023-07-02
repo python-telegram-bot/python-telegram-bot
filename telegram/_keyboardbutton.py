@@ -163,8 +163,8 @@ class KeyboardButton(TelegramObject):
 
     def __eq__(self, other: object) -> bool:
         warn(
-            "In v21, granular media settings will be considered as well when comparing"
-            " ChatPermissions instances.",
+            "In v21, `request_user` and `request_chat` will be considered as well when comparing"
+            " KeyboardButton instances.",
             PTBDeprecationWarning,
             stacklevel=2,
         )

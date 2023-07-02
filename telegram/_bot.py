@@ -96,7 +96,14 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.logging import get_logger
-from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.types import (
+    CorrectOptionID,
+    DVInput,
+    FileInput,
+    JSONDict,
+    ODVInput,
+    ReplyMarkup,
+)
 from telegram._utils.warnings import warn
 from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
 from telegram._webhookinfo import WebhookInfo
@@ -287,7 +294,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             if not CRYPTO_INSTALLED:
                 raise RuntimeError(
                     "To use Telegram Passports, PTB must be installed via `pip install "
-                    "python-telegram-bot[passport]`."
+                    '"python-telegram-bot[passport]"`.'
                 )
             self._private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
@@ -6602,7 +6609,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
-        correct_option_id: Optional[int] = None,
+        correct_option_id: Optional[CorrectOptionID] = None,
         is_closed: Optional[bool] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
