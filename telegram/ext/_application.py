@@ -66,6 +66,7 @@ from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
 from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, RT, UD, ConversationKey, HandlerCallback
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Message
@@ -80,12 +81,12 @@ _STOP_SIGNAL = object()
 _DEFAULT_0 = DefaultValue(0)
 
 
-# Since python 3.12, the coroutine passed to create_task should not be an async generator. Remove
+# Since python 3.12, the coroutine passed to create_task should not be an (async) generator. Remove
 # this check when we drop support for python 3.11.
 if sys.version_info >= (3, 12):
-    _CoroType = Union["asyncio.Future[object]", Awaitable[RT]]
+    _CoroType = Awaitable[RT]
 else:
-    _CoroType = Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]]
+    _CoroType = Union[Generator[Any, None, RT], Awaitable[RT]]
 
 _ErrorCoroType = Optional[_CoroType]
 
@@ -1040,7 +1041,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         try:
             # Generator-based coroutines are not supported in Python 3.12+
             if sys.version_info < (3, 12) and isinstance(coroutine, Generator):
+                warn(
+                    "Generator-based coroutines are deprecated in create_task and will not work"
+                    " in Python 3.12+",
+                    category=PTBDeprecationWarning,
+                )
                 return await asyncio.create_task(coroutine)
+            # If user uses generator in python 3.12+, Exception will happen and we cannot do
+            # anything about it. (hence the type ignore if mypy is run on python 3.12-)
             return await coroutine  # type: ignore
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):

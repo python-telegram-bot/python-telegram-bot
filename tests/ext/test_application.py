@@ -55,7 +55,7 @@ from telegram.ext import (
     Updater,
     filters,
 )
-from telegram.warnings import PTBUserWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.asyncio_helpers import call_after
 from tests.auxil.build_messages import make_message_update
 from tests.auxil.files import PROJECT_ROOT_PATH
@@ -1315,7 +1315,7 @@ class TestApplication:
         assert out == [42]
 
     @pytest.mark.skipif(sys.version_info >= (3, 12), reason="generator coroutines are deprecated")
-    async def test_create_task_awaiting_generator(self, app):
+    async def test_create_task_awaiting_generator(self, app, recwarn):
         event = asyncio.Event()
 
         def gen():
@@ -1324,6 +1324,9 @@ class TestApplication:
 
         await app.create_task(gen())
         assert event.is_set()
+        assert len(recwarn) == 2  # 1st warning is: tasks not being awaited when app isn't running
+        assert recwarn[1].category is PTBDeprecationWarning
+        assert "Generator-based coroutines are deprecated" in str(recwarn[1].message)
 
     async def test_no_update_processor(self, app):
         queue = asyncio.Queue()
