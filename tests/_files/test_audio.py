@@ -266,7 +266,7 @@ class TestAudioWithRequest(TestAudioBase):
         assert new_file.file_unique_id == audio.file_unique_id
         assert str(new_file.file_path).startswith("https://")
 
-        await new_file.download_to_drive(str(tmp_file))
+        await new_file.download_to_drive(tmp_file)
         assert tmp_file.is_file()
 
     async def test_send_mp3_url_file(self, bot, chat_id, audio):

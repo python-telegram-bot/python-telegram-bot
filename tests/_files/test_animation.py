@@ -265,7 +265,7 @@ class TestAnimationWithRequest(TestAnimationBase):
 
         assert new_file.file_path.startswith("https://")
 
-        new_filepath = await new_file.download_to_drive(str(tmp_file))
+        new_filepath = await new_file.download_to_drive(tmp_file)
         assert new_filepath.is_file()
 
     async def test_send_animation_url_file(self, bot, chat_id, animation):

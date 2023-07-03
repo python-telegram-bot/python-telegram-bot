@@ -341,7 +341,7 @@ class TestStickerWithRequest(TestStickerBase):
         assert new_file.file_unique_id == sticker.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive(str(tmp_file))
+        await new_file.download_to_drive(tmp_file)
 
         assert tmp_file.is_file()
 
