@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ForceReply."""
 
-from typing import ClassVar, Optional
+from typing import Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -93,12 +93,12 @@ class ForceReply(TelegramObject):
 
         self._freeze()
 
-    MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
+    MIN_INPUT_FIELD_PLACEHOLDER: Final[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
     """:const:`telegram.constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER`
 
     .. versionadded:: 20.0
     """
-    MAX_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
+    MAX_INPUT_FIELD_PLACEHOLDER: Final[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
     """:const:`telegram.constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER`
 
     .. versionadded:: 20.0

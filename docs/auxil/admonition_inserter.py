@@ -174,8 +174,7 @@ class AdmonitionInserter:
                     break
 
             for line in lines_with_attrs:
-                line_match = attr_docstr_pattern.match(line)
-                if not line_match:
+                if not (line_match := attr_docstr_pattern.match(line)):
                     continue
 
                 target_attr = line_match.group("attr_name")
@@ -529,7 +528,11 @@ class AdmonitionInserter:
         # For custom generics like telegram.ext._application.Application[~BT, ~CCT, ~UD...].
         # This must come before the check for isinstance(type) because GenericAlias can also be
         # recognized as type if it belongs to <class 'types.GenericAlias'>.
-        elif str(type(arg)) in ("<class 'typing._GenericAlias'>", "<class 'types.GenericAlias'>"):
+        elif str(type(arg)) in (
+            "<class 'typing._GenericAlias'>",
+            "<class 'types.GenericAlias'>",
+            "<class 'typing._LiteralGenericAlias'>",
+        ):
             if "telegram" in str(arg):
                 # get_origin() of telegram.ext._application.Application[~BT, ~CCT, ~UD...]
                 # will produce <class 'telegram.ext._application.Application'>

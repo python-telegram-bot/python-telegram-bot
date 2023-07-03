@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
-from typing import TYPE_CHECKING, ClassVar, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
@@ -192,11 +192,11 @@ class Sticker(_BaseThumbedMedium):
             self.custom_emoji_id: Optional[str] = custom_emoji_id
             self.needs_repainting: Optional[bool] = needs_repainting
 
-    REGULAR: ClassVar[str] = constants.StickerType.REGULAR
+    REGULAR: Final[str] = constants.StickerType.REGULAR
     """:const:`telegram.constants.StickerType.REGULAR`"""
-    MASK: ClassVar[str] = constants.StickerType.MASK
+    MASK: Final[str] = constants.StickerType.MASK
     """:const:`telegram.constants.StickerType.MASK`"""
-    CUSTOM_EMOJI: ClassVar[str] = constants.StickerType.CUSTOM_EMOJI
+    CUSTOM_EMOJI: Final[str] = constants.StickerType.CUSTOM_EMOJI
     """:const:`telegram.constants.StickerType.CUSTOM_EMOJI`"""
 
     @classmethod
@@ -390,13 +390,13 @@ class MaskPosition(TelegramObject):
 
     __slots__ = ("point", "scale", "x_shift", "y_shift")
 
-    FOREHEAD: ClassVar[str] = constants.MaskPosition.FOREHEAD
+    FOREHEAD: Final[str] = constants.MaskPosition.FOREHEAD
     """:const:`telegram.constants.MaskPosition.FOREHEAD`"""
-    EYES: ClassVar[str] = constants.MaskPosition.EYES
+    EYES: Final[str] = constants.MaskPosition.EYES
     """:const:`telegram.constants.MaskPosition.EYES`"""
-    MOUTH: ClassVar[str] = constants.MaskPosition.MOUTH
+    MOUTH: Final[str] = constants.MaskPosition.MOUTH
     """:const:`telegram.constants.MaskPosition.MOUTH`"""
-    CHIN: ClassVar[str] = constants.MaskPosition.CHIN
+    CHIN: Final[str] = constants.MaskPosition.CHIN
     """:const:`telegram.constants.MaskPosition.CHIN`"""
 
     def __init__(

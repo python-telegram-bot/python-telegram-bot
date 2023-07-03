@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from typing import TYPE_CHECKING, ClassVar, List, Optional
+from typing import TYPE_CHECKING, Final, List, Optional
 
 from telegram import constants
 from telegram._callbackquery import CallbackQuery
@@ -171,63 +171,63 @@ class Update(TelegramObject):
         "chat_join_request",
     )
 
-    MESSAGE: ClassVar[str] = constants.UpdateType.MESSAGE
+    MESSAGE: Final[str] = constants.UpdateType.MESSAGE
     """:const:`telegram.constants.UpdateType.MESSAGE`
 
     .. versionadded:: 13.5"""
-    EDITED_MESSAGE: ClassVar[str] = constants.UpdateType.EDITED_MESSAGE
+    EDITED_MESSAGE: Final[str] = constants.UpdateType.EDITED_MESSAGE
     """:const:`telegram.constants.UpdateType.EDITED_MESSAGE`
 
     .. versionadded:: 13.5"""
-    CHANNEL_POST: ClassVar[str] = constants.UpdateType.CHANNEL_POST
+    CHANNEL_POST: Final[str] = constants.UpdateType.CHANNEL_POST
     """:const:`telegram.constants.UpdateType.CHANNEL_POST`
 
     .. versionadded:: 13.5"""
-    EDITED_CHANNEL_POST: ClassVar[str] = constants.UpdateType.EDITED_CHANNEL_POST
+    EDITED_CHANNEL_POST: Final[str] = constants.UpdateType.EDITED_CHANNEL_POST
     """:const:`telegram.constants.UpdateType.EDITED_CHANNEL_POST`
 
     .. versionadded:: 13.5"""
-    INLINE_QUERY: ClassVar[str] = constants.UpdateType.INLINE_QUERY
+    INLINE_QUERY: Final[str] = constants.UpdateType.INLINE_QUERY
     """:const:`telegram.constants.UpdateType.INLINE_QUERY`
 
     .. versionadded:: 13.5"""
-    CHOSEN_INLINE_RESULT: ClassVar[str] = constants.UpdateType.CHOSEN_INLINE_RESULT
+    CHOSEN_INLINE_RESULT: Final[str] = constants.UpdateType.CHOSEN_INLINE_RESULT
     """:const:`telegram.constants.UpdateType.CHOSEN_INLINE_RESULT`
 
     .. versionadded:: 13.5"""
-    CALLBACK_QUERY: ClassVar[str] = constants.UpdateType.CALLBACK_QUERY
+    CALLBACK_QUERY: Final[str] = constants.UpdateType.CALLBACK_QUERY
     """:const:`telegram.constants.UpdateType.CALLBACK_QUERY`
 
     .. versionadded:: 13.5"""
-    SHIPPING_QUERY: ClassVar[str] = constants.UpdateType.SHIPPING_QUERY
+    SHIPPING_QUERY: Final[str] = constants.UpdateType.SHIPPING_QUERY
     """:const:`telegram.constants.UpdateType.SHIPPING_QUERY`
 
     .. versionadded:: 13.5"""
-    PRE_CHECKOUT_QUERY: ClassVar[str] = constants.UpdateType.PRE_CHECKOUT_QUERY
+    PRE_CHECKOUT_QUERY: Final[str] = constants.UpdateType.PRE_CHECKOUT_QUERY
     """:const:`telegram.constants.UpdateType.PRE_CHECKOUT_QUERY`
 
     .. versionadded:: 13.5"""
-    POLL: ClassVar[str] = constants.UpdateType.POLL
+    POLL: Final[str] = constants.UpdateType.POLL
     """:const:`telegram.constants.UpdateType.POLL`
 
     .. versionadded:: 13.5"""
-    POLL_ANSWER: ClassVar[str] = constants.UpdateType.POLL_ANSWER
+    POLL_ANSWER: Final[str] = constants.UpdateType.POLL_ANSWER
     """:const:`telegram.constants.UpdateType.POLL_ANSWER`
 
     .. versionadded:: 13.5"""
-    MY_CHAT_MEMBER: ClassVar[str] = constants.UpdateType.MY_CHAT_MEMBER
+    MY_CHAT_MEMBER: Final[str] = constants.UpdateType.MY_CHAT_MEMBER
     """:const:`telegram.constants.UpdateType.MY_CHAT_MEMBER`
 
     .. versionadded:: 13.5"""
-    CHAT_MEMBER: ClassVar[str] = constants.UpdateType.CHAT_MEMBER
+    CHAT_MEMBER: Final[str] = constants.UpdateType.CHAT_MEMBER
     """:const:`telegram.constants.UpdateType.CHAT_MEMBER`
 
     .. versionadded:: 13.5"""
-    CHAT_JOIN_REQUEST = constants.UpdateType.CHAT_JOIN_REQUEST
+    CHAT_JOIN_REQUEST: Final[str] = constants.UpdateType.CHAT_JOIN_REQUEST
     """:const:`telegram.constants.UpdateType.CHAT_JOIN_REQUEST`
 
     .. versionadded:: 13.8"""
-    ALL_TYPES: ClassVar[List[str]] = list(constants.UpdateType)
+    ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
     """List[:obj:`str`]: A list of all available update types.
 
     .. versionadded:: 13.5"""

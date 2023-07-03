@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 99
-target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
+target-version = ['py38', 'py39', 'py310', 'py311']
 
 [tool.isort]  # black config
 profile = "black"
@@ -8,7 +8,7 @@ line_length = 99
 
 [tool.ruff]
 line-length = 99
-target-version = "py37"
+target-version = "py38"
 show-fixes = true
 ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915"]
 select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",

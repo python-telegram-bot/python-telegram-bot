@@ -96,10 +96,8 @@ class StringRegexHandler(BaseHandler[str, CCT]):
             :obj:`None` | :obj:`re.match`
 
         """
-        if isinstance(update, str):
-            match = re.match(self.pattern, update)
-            if match:
-                return match
+        if isinstance(update, str) and (match := re.match(self.pattern, update)):
+            return match
         return None
 
     def collect_additional_context(

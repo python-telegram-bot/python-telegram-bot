@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a location to which a chat is connected."""
 
-from typing import TYPE_CHECKING, ClassVar, Optional
+from typing import TYPE_CHECKING, Final, Optional
 
 from telegram import constants
 from telegram._files.location import Location
@@ -79,12 +79,12 @@ class ChatLocation(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    MIN_ADDRESS: ClassVar[int] = constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS
+    MIN_ADDRESS: Final[int] = constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS
     """:const:`telegram.constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS`
 
     .. versionadded:: 20.0
     """
-    MAX_ADDRESS: ClassVar[int] = constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS
+    MAX_ADDRESS: Final[int] = constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS
     """:const:`telegram.constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS`
 
     .. versionadded:: 20.0

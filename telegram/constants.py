@@ -86,7 +86,7 @@ __all__ = [
 ]
 
 import sys
-from typing import List, NamedTuple
+from typing import Final, List, NamedTuple
 
 from telegram._utils.enum import IntEnum, StringEnum
 
@@ -116,19 +116,19 @@ class _BotAPIVersion(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=7)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=6, minor=7)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
 #:
 #: .. versionadded:: 13.4
-BOT_API_VERSION = str(BOT_API_VERSION_INFO)
+BOT_API_VERSION: Final[str] = str(BOT_API_VERSION_INFO)
 
 # constants above this line are tested
 
 #: List[:obj:`int`]: Ports supported by
 #:  :paramref:`telegram.Bot.set_webhook.url`.
-SUPPORTED_WEBHOOK_PORTS: List[int] = [443, 80, 88, 8443]
+SUPPORTED_WEBHOOK_PORTS: Final[List[int]] = [443, 80, 88, 8443]
 
 
 class BotCommandLimit(IntEnum):
