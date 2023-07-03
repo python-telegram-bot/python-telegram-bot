@@ -360,19 +360,16 @@ class TestPhotoWithRequest(TestPhotoBase):
                     chat_id, photo_file, reply_to_message_id=reply_to_message.message_id
                 )
 
-    async def test_get_and_download(self, bot, photo):
-        path = Path("telegram.jpg")
-        path.unlink(missing_ok=True)
-
+    async def test_get_and_download(self, bot, photo, tmp_file):
         new_file = await bot.getFile(photo.file_id)
 
         assert new_file.file_size == photo.file_size
         assert new_file.file_unique_id == photo.file_unique_id
         assert new_file.file_path.startswith("https://") is True
 
-        await new_file.download_to_drive("telegram.jpg")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_send_url_jpg_file(self, bot, chat_id):
         message = await bot.send_photo(chat_id, photo=self.photo_file_url)

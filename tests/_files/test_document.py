@@ -229,19 +229,16 @@ class TestDocumentWithRequest(TestDocumentBase):
         with pytest.raises(TelegramError):
             await bot.send_document(chat_id=chat_id, document="")
 
-    async def test_get_and_download(self, bot, document, chat_id):
-        path = Path("telegram.png")
-        path.unlink(missing_ok=True)
-
+    async def test_get_and_download(self, bot, document, chat_id, tmp_file):
         new_file = await bot.get_file(document.file_id)
 
         assert new_file.file_size == document.file_size
         assert new_file.file_unique_id == document.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram.png")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_send_resend(self, bot, chat_id, document):
         message = await bot.send_document(chat_id=chat_id, document=document.file_id)
