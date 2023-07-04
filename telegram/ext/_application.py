@@ -88,7 +88,7 @@ if sys.version_info >= (3, 12):
 else:
     _CoroType = Union[Generator["asyncio.Future[object]", None, RT], Awaitable[RT]]
 
-_ErrorCoroType = Optional[_CoroType]
+_ErrorCoroType = Optional[_CoroType[RT]]
 
 
 _LOGGER = get_logger(__name__)
@@ -963,7 +963,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     def create_task(
         self,
-        coroutine: _CoroType,
+        coroutine: _CoroType[RT],
         update: Optional[object] = None,
         *,
         name: Optional[str] = None,
@@ -1003,7 +1003,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     def __create_task(
         self,
-        coroutine: _CoroType,
+        coroutine: _CoroType[RT],
         update: Optional[object] = None,
         is_error_handler: bool = False,
         name: Optional[str] = None,
@@ -1040,7 +1040,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     async def __create_task_callback(
         self,
-        coroutine: _CoroType,
+        coroutine: _CoroType[RT],
         update: Optional[object] = None,
         is_error_handler: bool = False,
     ) -> RT:
@@ -1671,7 +1671,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update: Optional[object],
         error: Exception,
         job: Optional["Job[CCT]"] = None,
-        coroutine: _ErrorCoroType = None,  # noqa: RUF013
+        coroutine: _ErrorCoroType[RT] = None,  # noqa: RUF013
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises
