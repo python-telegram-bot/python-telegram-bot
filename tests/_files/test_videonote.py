@@ -248,19 +248,16 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         assert message.video_note.thumbnail.height == self.thumb_height
         assert message.has_protected_content
 
-    async def test_get_and_download(self, bot, video_note, chat_id):
-        path = Path("telegram2.mp4")
-        path.unlink(missing_ok=True)
-
+    async def test_get_and_download(self, bot, video_note, chat_id, tmp_file):
         new_file = await bot.get_file(video_note.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_unique_id == video_note.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram2.mp4")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_resend(self, bot, chat_id, video_note):
         message = await bot.send_video_note(chat_id, video_note.file_id)

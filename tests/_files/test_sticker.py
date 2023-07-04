@@ -334,19 +334,16 @@ class TestStickerWithRequest(TestStickerBase):
         assert message.sticker.thumbnail.height == sticker.thumbnail.height
         assert message.sticker.thumbnail.file_size == sticker.thumbnail.file_size
 
-    async def test_get_and_download(self, bot, sticker):
-        path = Path("telegram.webp")
-        path.unlink(missing_ok=True)
-
+    async def test_get_and_download(self, bot, sticker, tmp_file):
         new_file = await bot.get_file(sticker.file_id)
 
         assert new_file.file_size == sticker.file_size
         assert new_file.file_unique_id == sticker.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram.webp")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_resend(self, bot, chat_id, sticker):
         message = await bot.send_sticker(chat_id=chat_id, sticker=sticker.file_id)

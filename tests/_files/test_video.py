@@ -277,19 +277,16 @@ class TestVideoWithRequest(TestVideoBase):
         assert message.has_protected_content
         assert message.has_media_spoiler
 
-    async def test_get_and_download(self, bot, video, chat_id):
-        path = Path("telegram.mp4")
-        path.unlink(missing_ok=True)
-
+    async def test_get_and_download(self, bot, video, chat_id, tmp_file):
         new_file = await bot.get_file(video.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_unique_id == video.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram.mp4")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_send_mp4_file_url(self, bot, chat_id, video):
         message = await bot.send_video(chat_id, self.video_file_url, caption=self.caption)

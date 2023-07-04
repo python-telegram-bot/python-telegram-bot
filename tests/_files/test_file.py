@@ -280,6 +280,8 @@ class TestFileWithRequest(TestFileBase):
 
     async def test_download_local_file(self, local_file):
         assert await local_file.download_to_drive() == Path(local_file.file_path)
+        # Ensure that the file contents didn't change
+        assert Path(local_file.file_path).read_bytes() == self.file_content
 
     @pytest.mark.parametrize(
         "custom_path_type", [str, Path], ids=["str custom_path", "pathlib.Path custom_path"]

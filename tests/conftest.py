@@ -20,6 +20,7 @@ import asyncio
 import datetime
 import sys
 from typing import Dict, List
+from uuid import uuid4
 
 import pytest
 
@@ -277,3 +278,9 @@ def tzinfo(request):
 @pytest.fixture(scope="session")
 def timezone(tzinfo):
     return tzinfo
+
+
+@pytest.fixture()
+def tmp_file(tmp_path):
+    with tmp_path / uuid4().hex as file:
+        yield file
