@@ -23,8 +23,8 @@ from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
-    ClassVar,
     Dict,
+    Final,
     Generic,
     List,
     NoReturn,
@@ -283,13 +283,13 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         "timeout_jobs",
     )
 
-    END: ClassVar[int] = -1
+    END: Final[int] = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
-    TIMEOUT: ClassVar[int] = -2
+    TIMEOUT: Final[int] = -2
     """:obj:`int`: Used as a constant to handle state when a conversation is timed out
     (exceeded :attr:`conversation_timeout`).
     """
-    WAITING: ClassVar[int] = -3
+    WAITING: Final[int] = -3
     """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
     previous :attr:`block=False <block>` handler to finish."""
 
@@ -831,6 +831,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                         update, application, handler_check_result, context
                     ),
                     update=update,
+                    name=f"ConversationHandler:{update.update_id}:handle_update:non_blocking_cb",
                 )
         except ApplicationHandlerStop as exception:
             new_state = exception.state
@@ -856,6 +857,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                             new_state, application, update, context, conversation_key
                         ),
                         update=update,
+                        name=f"ConversationHandler:{update.update_id}:handle_update:timeout_job",
                     )
                 else:
                     self._schedule_job(new_state, application, update, context, conversation_key)

@@ -12,7 +12,7 @@ See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Telegram-Pas
 
 Note:
 To use Telegram Passport, you must install PTB via
-`pip install python-telegram-bot[passport]`
+`pip install "python-telegram-bot[passport]"`
 """
 import logging
 from pathlib import Path

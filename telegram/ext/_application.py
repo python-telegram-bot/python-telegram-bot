@@ -58,7 +58,6 @@ from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basehandler import BaseHandler
 from telegram.ext._basepersistence import BasePersistence
-from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._updater import Updater
@@ -70,6 +69,7 @@ if TYPE_CHECKING:
     from telegram import Message
     from telegram.ext import ConversationHandler, JobQueue
     from telegram.ext._applicationbuilder import InitApplicationBuilder
+    from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
     from telegram.ext._jobqueue import Job
 
 DEFAULT_GROUP: int = 0
@@ -371,7 +371,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         if self._job_queue is None:
             warn(
                 "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-                "`pip install python-telegram-bot[job-queue]`.",
+                '`pip install "python-telegram-bot[job-queue]"`.',
                 stacklevel=2,
             )
         return self._job_queue
@@ -568,9 +568,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         try:
             if self.persistence:
                 self.__update_persistence_task = asyncio.create_task(
-                    self._persistence_updater()
-                    # TODO: Add this once we drop py3.7
-                    # name=f'Application:{self.bot.id}:persistence_updater'
+                    self._persistence_updater(),
+                    name=f"Application:{self.bot.id}:persistence_updater",
                 )
                 _LOGGER.debug("Loop for updating persistence started")
 
@@ -579,9 +578,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 _LOGGER.debug("JobQueue started")
 
             self.__update_fetcher_task = asyncio.create_task(
-                self._update_fetcher(),
-                # TODO: Add this once we drop py3.7
-                # name=f'Application:{self.bot.id}:update_fetcher'
+                self._update_fetcher(), name=f"Application:{self.bot.id}:update_fetcher"
             )
             _LOGGER.info("Application started")
 
@@ -807,7 +804,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
             .. code-block:: bash
 
-               pip install python-telegram-bot[webhooks]
+               pip install "python-telegram-bot[webhooks]"
 
         .. include:: inclusions/application_run_tip.rst
 
@@ -955,6 +952,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self,
         coroutine: Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]],
         update: Optional[object] = None,
+        *,
+        name: Optional[str] = None,
     ) -> "asyncio.Task[RT]":
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
         the :paramref:`coroutine` with :meth:`process_error`.
@@ -977,16 +976,22 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 :attr:`chat_data` and :attr:`user_data` entries will be updated in the next run of
                 :meth:`update_persistence` after the :paramref:`coroutine` is finished.
 
+        Keyword Args:
+            name (:obj:`str`, optional): The name of the task.
+
+                .. versionadded:: NEXT.VERSION
+
         Returns:
             :class:`asyncio.Task`: The created task.
         """
-        return self.__create_task(coroutine=coroutine, update=update)
+        return self.__create_task(coroutine=coroutine, update=update, name=name)
 
     def __create_task(
         self,
         coroutine: Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]],
         update: Optional[object] = None,
         is_error_handler: bool = False,
+        name: Optional[str] = None,
     ) -> "asyncio.Task[RT]":
         # Unfortunately, we can't know if `coroutine` runs one of the error handler functions
         # but by passing `is_error_handler=True` from `process_error`, we can make sure that we
@@ -995,7 +1000,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         task: "asyncio.Task[RT]" = asyncio.create_task(
             self.__create_task_callback(
                 coroutine=coroutine, update=update, is_error_handler=is_error_handler
-            )
+            ),
+            name=name,
         )
 
         if self.running:
@@ -1027,10 +1033,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             if isinstance(coroutine, Generator):
                 return await asyncio.create_task(coroutine)
             return await coroutine
-        except asyncio.CancelledError as cancel:
-            # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop this
-            #  clause when we drop py3.7
-            raise cancel
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(
@@ -1080,6 +1082,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     self.create_task(
                         self.__process_update_wrapper(update),
                         update=update,
+                        name=f"Application:{self.bot.id}:process_concurrent_update",
                     )
                 else:
                     await self.__process_update_wrapper(update)
@@ -1136,7 +1139,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                             and self.bot.defaults
                             and not self.bot.defaults.block
                         ):
-                            self.create_task(coroutine, update=update)
+                            self.create_task(
+                                coroutine,
+                                update=update,
+                                name=f"Application:{self.bot.id}:process_update_non_blocking"
+                                f":{handler}",
+                            )
                         else:
                             any_blocking = True
                             await coroutine
@@ -1207,7 +1215,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     f"can not be persistent if application has no persistence"
                 )
             if self._initialized:
-                self.create_task(self._add_ch_to_persistence(handler))
+                self.create_task(
+                    self._add_ch_to_persistence(handler),
+                    name=f"Application:{self.bot.id}:add_handler:conversation_handler_after_init",
+                )
                 warn(
                     "A persistent `ConversationHandler` was passed to `add_handler`, "
                     "after `Application.initialize` was called. This is discouraged."
@@ -1687,7 +1698,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     and not self.bot.defaults.block
                 ):
                     self.__create_task(
-                        callback(update, context), update=update, is_error_handler=True
+                        callback(update, context),
+                        update=update,
+                        is_error_handler=True,
+                        name=f"Application:{self.bot.id}:process_error:non_blocking",
                     )
                 else:
                     try:

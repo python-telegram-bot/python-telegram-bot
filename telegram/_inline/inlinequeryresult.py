@@ -19,7 +19,7 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram InlineQueryResult."""
 
-from typing import ClassVar, Optional
+from typing import Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -66,12 +66,12 @@ class InlineQueryResult(TelegramObject):
 
         self._freeze()
 
-    MIN_ID_LENGTH: ClassVar[int] = constants.InlineQueryResultLimit.MIN_ID_LENGTH
+    MIN_ID_LENGTH: Final[int] = constants.InlineQueryResultLimit.MIN_ID_LENGTH
     """:const:`telegram.constants.InlineQueryResultLimit.MIN_ID_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_ID_LENGTH: ClassVar[int] = constants.InlineQueryResultLimit.MAX_ID_LENGTH
+    MAX_ID_LENGTH: Final[int] = constants.InlineQueryResultLimit.MAX_ID_LENGTH
     """:const:`telegram.constants.InlineQueryResultLimit.MAX_ID_LENGTH`
 
     .. versionadded:: 20.0

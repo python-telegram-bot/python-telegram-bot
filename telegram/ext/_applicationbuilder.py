@@ -34,7 +34,7 @@ from typing import (
 
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
-from telegram._utils.types import DVInput, DVType, FilePathInput, ODVInput
+from telegram._utils.types import DVInput, DVType, FilePathInput, HTTPVersion, ODVInput
 from telegram.ext._application import Application
 from telegram.ext._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
 from telegram.ext._contexttypes import ContextTypes
@@ -240,7 +240,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return HTTPXRequest(
             connection_pool_size=connection_pool_size,
             proxy_url=proxy_url,
-            http_version=http_version,
+            http_version=http_version,  # type: ignore[arg-type]
             **effective_timeouts,
         )
 
@@ -564,7 +564,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._pool_timeout = pool_timeout
         return self
 
-    def http_version(self: BuilderType, http_version: str) -> BuilderType:
+    def http_version(self: BuilderType, http_version: HTTPVersion) -> BuilderType:
         """Sets the HTTP protocol version which is used for the
         :paramref:`~telegram.request.HTTPXRequest.http_version` parameter of
         :attr:`telegram.Bot.request`. By default, HTTP/1.1 is used.
@@ -582,7 +582,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             .. code-block:: bash
 
-               pip install python-telegram-bot[http2]
+               pip install "python-telegram-bot[http2]"
 
             Keep in mind that the HTTP/1.1 implementation may be considered the `"more
             robust option at this time" <https://www.python-httpx.org/http2#enabling-http2>`_.
@@ -723,7 +723,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._get_updates_pool_timeout = get_updates_pool_timeout
         return self
 
-    def get_updates_http_version(self: BuilderType, get_updates_http_version: str) -> BuilderType:
+    def get_updates_http_version(
+        self: BuilderType, get_updates_http_version: HTTPVersion
+    ) -> BuilderType:
         """Sets the HTTP protocol version which is used for the
         :paramref:`~telegram.request.HTTPXRequest.http_version` parameter which is used in the
         :meth:`telegram.Bot.get_updates` request. By default, HTTP/1.1 is used.
@@ -827,7 +829,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             .. code-block:: bash
 
-               pip install python-telegram-bot[callback-data]
+               pip install "python-telegram-bot[callback-data]"
 
         Examples:
             :any:`Arbitrary callback_data Bot <examples.arbitrarycallbackdatabot>`

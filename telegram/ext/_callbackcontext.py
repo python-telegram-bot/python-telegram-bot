@@ -404,7 +404,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         if self._application._job_queue is None:  # pylint: disable=protected-access
             warn(
                 "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-                "`pip install python-telegram-bot[job-queue]`.",
+                '`pip install "python-telegram-bot[job-queue]"`.',
                 stacklevel=2,
             )
         return self._application._job_queue  # pylint: disable=protected-access

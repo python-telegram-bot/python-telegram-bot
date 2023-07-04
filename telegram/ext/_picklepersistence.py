@@ -17,11 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PicklePersistence class."""
-import copyreg
 import pickle
 from copy import deepcopy
 from pathlib import Path
-from sys import version_info as py_ver
 from typing import Any, Callable, Dict, Optional, Set, Tuple, Type, TypeVar, Union, cast, overload
 
 from telegram import Bot, TelegramObject
@@ -74,18 +72,15 @@ class _BotPickler(pickle.Pickler):
 
     def __init__(self, bot: Bot, *args: Any, **kwargs: Any):
         self._bot = bot
-        if py_ver < (3, 8):  # self.reducer_override is used above this version
-            # Here we define a private dispatch_table, because we want to preserve the bot
-            # attribute of objects so persistent_id works as intended. Otherwise, the bot attribute
-            # is deleted in __getstate__, which is used during regular pickling (via pickle.dumps)
-            self.dispatch_table = copyreg.dispatch_table.copy()
-            for obj in _all_subclasses(TelegramObject):
-                self.dispatch_table[obj] = _custom_reduction
         super().__init__(*args, **kwargs)
 
     def reducer_override(  # skipcq: PYL-R0201
         self, obj: TelegramObj
     ) -> Tuple[Callable, Tuple[Type[TelegramObj], dict]]:
+        """
+        This method is used for pickling. The bot attribute is preserved so
+        _BotPickler().persistent_id works as intended.
+        """
         if not isinstance(obj, TelegramObject):
             return NotImplemented
 

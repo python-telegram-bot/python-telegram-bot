@@ -20,6 +20,7 @@ import asyncio
 import datetime
 import sys
 from typing import Dict, List
+from uuid import uuid4
 
 import pytest
 
@@ -94,7 +95,7 @@ def event_loop(request):
     # ever since ProactorEventLoop became the default in Win 3.8+, the app crashes after the loop
     # is closed. Hence, we use SelectorEventLoop on Windows to avoid this. See
     # https://github.com/python/cpython/issues/83413, https://github.com/encode/httpx/issues/914
-    if sys.version_info[0] == 3 and sys.version_info[1] >= 8 and sys.platform.startswith("win"):
+    if sys.platform.startswith("win"):
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     return asyncio.get_event_loop_policy().new_event_loop()
     # loop.close() # instead of closing here, do that at the every end of the test session
@@ -277,3 +278,9 @@ def tzinfo(request):
 @pytest.fixture(scope="session")
 def timezone(tzinfo):
     return tzinfo
+
+
+@pytest.fixture()
+def tmp_file(tmp_path):
+    with tmp_path / uuid4().hex as file:
+        yield file

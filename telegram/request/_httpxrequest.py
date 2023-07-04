@@ -23,7 +23,7 @@ import httpx
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
-from telegram._utils.types import ODVInput
+from telegram._utils.types import HTTPVersion, ODVInput
 from telegram.error import NetworkError, TimedOut
 from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
@@ -56,7 +56,7 @@ class HTTPXRequest(BaseRequest):
                 * The proxy URL can also be set via the environment variables ``HTTPS_PROXY`` or
                   ``ALL_PROXY``. See `the docs of httpx`_ for more info.
                 * For Socks5 support, additional dependencies are required. Make sure to install
-                  PTB via :command:`pip install python-telegram-bot[socks]` in this case.
+                  PTB via :command:`pip install "python-telegram-bot[socks]"` in this case.
                 * Socks5 proxies can not be set via environment variables.
 
             .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
@@ -101,7 +101,7 @@ class HTTPXRequest(BaseRequest):
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
-        http_version: str = "1.1",
+        http_version: HTTPVersion = "1.1",
     ):
         self._http_version = http_version
         timeout = httpx.Timeout(
@@ -139,11 +139,11 @@ class HTTPXRequest(BaseRequest):
             if "httpx[socks]" in str(exc):
                 raise RuntimeError(
                     "To use Socks5 proxies, PTB must be installed via `pip install "
-                    "python-telegram-bot[socks]`."
+                    '"python-telegram-bot[socks]"`.'
                 ) from exc
             raise RuntimeError(
                 "To use HTTP/2, PTB must be installed via `pip install "
-                "python-telegram-bot[http2]`."
+                '"python-telegram-bot[http2]"`.'
             ) from exc
 
     @property

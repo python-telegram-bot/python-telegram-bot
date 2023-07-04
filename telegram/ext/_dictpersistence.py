@@ -19,11 +19,13 @@
 """This module contains the DictPersistence class."""
 import json
 from copy import deepcopy
-from typing import Any, Dict, Optional, cast
+from typing import TYPE_CHECKING, Any, Dict, Optional, cast
 
-from telegram._utils.types import JSONDict
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext._utils.types import CDCData, ConversationDict, ConversationKey
+
+if TYPE_CHECKING:
+    from telegram._utils.types import JSONDict
 
 
 class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, Any]]):

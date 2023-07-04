@@ -137,9 +137,8 @@ class TestHelpers:
         assert helpers.effective_message_type(empty_update) is None
 
     def test_effective_message_type_wrong_type(self):
-        entity = {}
         with pytest.raises(
-            TypeError, match=re.escape(f"neither Message nor Update (got: {type(entity)})")
+            TypeError, match=re.escape(f"neither Message nor Update (got: {type(entity := {})})")
         ):
             helpers.effective_message_type(entity)
 

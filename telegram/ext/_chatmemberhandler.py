@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatMemberHandler class."""
-from typing import ClassVar, Optional, TypeVar
+from typing import Final, Optional, TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -71,11 +71,11 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
     """
 
     __slots__ = ("chat_member_types",)
-    MY_CHAT_MEMBER: ClassVar[int] = -1
+    MY_CHAT_MEMBER: Final[int] = -1
     """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.my_chat_member`."""
-    CHAT_MEMBER: ClassVar[int] = 0
+    CHAT_MEMBER: Final[int] = 0
     """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.chat_member`."""
-    ANY_CHAT_MEMBER: ClassVar[int] = 1
+    ANY_CHAT_MEMBER: Final[int] = 1
     """:obj:`int`: Used as a constant to handle both :attr:`telegram.Update.my_chat_member`
     and :attr:`telegram.Update.chat_member`."""
 

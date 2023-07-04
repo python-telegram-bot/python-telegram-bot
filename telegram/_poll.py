@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Poll."""
 import datetime
-from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Dict, Final, List, Optional, Sequence, Tuple
 
 from telegram import constants
 from telegram._messageentity import MessageEntity
@@ -65,12 +65,12 @@ class PollOption(TelegramObject):
 
         self._freeze()
 
-    MIN_LENGTH: ClassVar[int] = constants.PollLimit.MIN_OPTION_LENGTH
+    MIN_LENGTH: Final[int] = constants.PollLimit.MIN_OPTION_LENGTH
     """:const:`telegram.constants.PollLimit.MIN_OPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_LENGTH: ClassVar[int] = constants.PollLimit.MAX_OPTION_LENGTH
+    MAX_LENGTH: Final[int] = constants.PollLimit.MAX_OPTION_LENGTH
     """:const:`telegram.constants.PollLimit.MAX_OPTION_LENGTH`
 
     .. versionadded:: 20.0
@@ -350,56 +350,56 @@ class Poll(TelegramObject):
             if entity.type in types
         }
 
-    REGULAR: ClassVar[str] = constants.PollType.REGULAR
+    REGULAR: Final[str] = constants.PollType.REGULAR
     """:const:`telegram.constants.PollType.REGULAR`"""
-    QUIZ: ClassVar[str] = constants.PollType.QUIZ
+    QUIZ: Final[str] = constants.PollType.QUIZ
     """:const:`telegram.constants.PollType.QUIZ`"""
-    MAX_EXPLANATION_LENGTH: ClassVar[int] = constants.PollLimit.MAX_EXPLANATION_LENGTH
+    MAX_EXPLANATION_LENGTH: Final[int] = constants.PollLimit.MAX_EXPLANATION_LENGTH
     """:const:`telegram.constants.PollLimit.MAX_EXPLANATION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_EXPLANATION_LINE_FEEDS: ClassVar[int] = constants.PollLimit.MAX_EXPLANATION_LINE_FEEDS
+    MAX_EXPLANATION_LINE_FEEDS: Final[int] = constants.PollLimit.MAX_EXPLANATION_LINE_FEEDS
     """:const:`telegram.constants.PollLimit.MAX_EXPLANATION_LINE_FEEDS`
 
     .. versionadded:: 20.0
     """
-    MIN_OPEN_PERIOD: ClassVar[int] = constants.PollLimit.MIN_OPEN_PERIOD
+    MIN_OPEN_PERIOD: Final[int] = constants.PollLimit.MIN_OPEN_PERIOD
     """:const:`telegram.constants.PollLimit.MIN_OPEN_PERIOD`
 
     .. versionadded:: 20.0
     """
-    MAX_OPEN_PERIOD: ClassVar[int] = constants.PollLimit.MAX_OPEN_PERIOD
+    MAX_OPEN_PERIOD: Final[int] = constants.PollLimit.MAX_OPEN_PERIOD
     """:const:`telegram.constants.PollLimit.MAX_OPEN_PERIOD`
 
     .. versionadded:: 20.0
     """
-    MIN_QUESTION_LENGTH: ClassVar[int] = constants.PollLimit.MIN_QUESTION_LENGTH
+    MIN_QUESTION_LENGTH: Final[int] = constants.PollLimit.MIN_QUESTION_LENGTH
     """:const:`telegram.constants.PollLimit.MIN_QUESTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_QUESTION_LENGTH: ClassVar[int] = constants.PollLimit.MAX_QUESTION_LENGTH
+    MAX_QUESTION_LENGTH: Final[int] = constants.PollLimit.MAX_QUESTION_LENGTH
     """:const:`telegram.constants.PollLimit.MAX_QUESTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MIN_OPTION_LENGTH: ClassVar[int] = constants.PollLimit.MIN_OPTION_LENGTH
+    MIN_OPTION_LENGTH: Final[int] = constants.PollLimit.MIN_OPTION_LENGTH
     """:const:`telegram.constants.PollLimit.MIN_OPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_OPTION_LENGTH: ClassVar[int] = constants.PollLimit.MAX_OPTION_LENGTH
+    MAX_OPTION_LENGTH: Final[int] = constants.PollLimit.MAX_OPTION_LENGTH
     """:const:`telegram.constants.PollLimit.MAX_OPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MIN_OPTION_NUMBER: ClassVar[int] = constants.PollLimit.MIN_OPTION_NUMBER
+    MIN_OPTION_NUMBER: Final[int] = constants.PollLimit.MIN_OPTION_NUMBER
     """:const:`telegram.constants.PollLimit.MIN_OPTION_NUMBER`
 
     .. versionadded:: 20.0
     """
-    MAX_OPTION_NUMBER: ClassVar[int] = constants.PollLimit.MAX_OPTION_NUMBER
+    MAX_OPTION_NUMBER: Final[int] = constants.PollLimit.MAX_OPTION_NUMBER
     """:const:`telegram.constants.PollLimit.MAX_OPTION_NUMBER`
 
     .. versionadded:: 20.0
