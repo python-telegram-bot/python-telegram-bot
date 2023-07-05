@@ -63,6 +63,10 @@ class TestErrors:
             raise InvalidToken
 
     def test_network_error(self):
+        cause = Exception("test cause")
+        error = NetworkError("test message", cause)
+        assert error.cause is cause
+
         with pytest.raises(NetworkError, match="test message"):
             raise NetworkError("test message")
         with pytest.raises(NetworkError, match="^Test message$"):
@@ -105,9 +109,9 @@ class TestErrors:
             (TelegramError("test message"), ["message"]),
             (Forbidden("test message"), ["message"]),
             (InvalidToken(), ["message"]),
-            (NetworkError("test message"), ["message"]),
+            (NetworkError("test message"), ["message", "cause"]),
             (BadRequest("test message"), ["message"]),
-            (TimedOut(), ["message"]),
+            (TimedOut(), ["message", "cause"]),
             (ChatMigrated(1234), ["message", "new_chat_id"]),
             (RetryAfter(12), ["message", "retry_after"]),
             (Conflict("test message"), ["message"]),
@@ -130,7 +134,7 @@ class TestErrors:
             (TelegramError("test message")),
             (Forbidden("test message")),
             (InvalidToken()),
-            (NetworkError("test message")),
+            (NetworkError("test message", Exception("test cause"))),
             (BadRequest("test message")),
             (TimedOut()),
             (ChatMigrated(1234)),
