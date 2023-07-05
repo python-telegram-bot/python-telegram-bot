@@ -22,6 +22,7 @@ import copy
 import enum
 import functools
 import logging
+import sys
 import time
 from pathlib import Path
 from typing import NamedTuple, Optional
@@ -377,15 +378,13 @@ class TestBasePersistence:
         assert persistence.store_data.callback_data == callback_data
 
     def test_abstract_methods(self):
+        methods = list(BasePersistence.__abstractmethods__)
+        methods.sort()
         with pytest.raises(
             TypeError,
-            match=(
-                "drop_chat_data, drop_user_data, flush, get_bot_data, get_callback_data, "
-                "get_chat_data, get_conversations, "
-                "get_user_data, refresh_bot_data, refresh_chat_data, "
-                "refresh_user_data, update_bot_data, update_callback_data, "
-                "update_chat_data, update_conversation, update_user_data"
-            ),
+            match=", ".join(methods)
+            if sys.version_info < (3, 12)
+            else ", ".join(f"'{i}'" for i in methods),
         ):
             BasePersistence()
 
