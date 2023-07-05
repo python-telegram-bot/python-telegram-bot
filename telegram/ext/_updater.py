@@ -598,8 +598,8 @@ class Updater(AsyncContextManager["Updater"]):
         """
         _LOGGER.debug("Start network loop retry %s", description)
         cur_interval = interval
-        while self.running:
-            try:
+        try:
+            while self.running:
                 try:
                     if not await action_cb():
                         break
@@ -625,9 +625,8 @@ class Updater(AsyncContextManager["Updater"]):
                 if cur_interval:
                     await asyncio.sleep(cur_interval)
 
-            except asyncio.CancelledError:
-                _LOGGER.debug("Network loop retry %s was cancelled", description)
-                break
+        except asyncio.CancelledError:
+            _LOGGER.debug("Network loop retry %s was cancelled", description)
 
     async def _bootstrap(
         self,

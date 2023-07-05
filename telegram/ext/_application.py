@@ -1123,8 +1123,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         context = None
         any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
-        for handlers in self.handlers.values():
-            try:
+        try:
+            for handlers in self.handlers.values():
                 for handler in handlers:
                     check = handler.check_update(update)  # Should the handler handle this update?
                     if not (check is None or check is False):  # if yes,
@@ -1150,16 +1150,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                             await coroutine
                         break  # Only a max of 1 handler per group is handled
 
-            # Stop processing with any other handler.
-            except ApplicationHandlerStop:
-                _LOGGER.debug("Stopping further handlers due to ApplicationHandlerStop")
-                break
+        # Stop processing with any other handler.
+        except ApplicationHandlerStop:
+            _LOGGER.debug("Stopping further handlers due to ApplicationHandlerStop")
 
-            # Dispatch any error.
-            except Exception as exc:
-                if await self.process_error(update=update, error=exc):
-                    _LOGGER.debug("Error handler stopped further handlers.")
-                    break
+        # Dispatch any error.
+        except Exception as exc:
+            if await self.process_error(update=update, error=exc):
+                _LOGGER.debug("Error handler stopped further handlers.")
 
         if any_blocking:
             # Only need to mark the update for persistence if there was at least one
