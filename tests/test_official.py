@@ -179,10 +179,7 @@ def parse_table(h4) -> List[List[str]]:
     table = find_next_sibling_until(h4, "table", h4.find_next_sibling("h4"))
     if not table:
         return []
-    t = []
-    for tr in table.find_all("tr")[1:]:
-        t.append([td.text for td in tr.find_all("td")])
-    return t
+    return [[td.text for td in tr.find_all("td")] for tr in table.find_all("tr")[1:]]
 
 
 def check_method(h4):

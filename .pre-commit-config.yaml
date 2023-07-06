@@ -62,7 +62,7 @@ repos:
         - cachetools~=5.3.1
         - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.4.0
+    rev: v3.8.0
     hooks:
     -   id: pyupgrade
         files: ^(telegram|examples|tests|docs)/.*\.py$
@@ -76,8 +76,8 @@ repos:
         args:
         - --diff
         - --check
--   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.275'
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 'v0.0.277'
     hooks:
     -   id: ruff
         name: ruff
