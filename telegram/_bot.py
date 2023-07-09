@@ -4952,6 +4952,14 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         administrator in the chat for this to work and must have the appropriate admin rights.
         The link can be revoked using the method :meth:`revoke_chat_invite_link`.
 
+        Note:
+            When joining *public* groups via an invite link, Telegram clients may display the
+            usual "Join" button, effectively ignoring the invite link. In particular, the parameter
+            :paramref:`creates_join_request` has no effect in this case.
+            However, this behavior is undocument and may be subject to change.
+            See `this GitHub thread <https://github.com/tdlib/telegram-bot-api/issues/429>`_
+            for some discussion.
+
         .. versionadded:: 13.4
 
         Args:

@@ -379,7 +379,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.
 
-        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+        .. seealso:: :wiki:`Job Queue <Extensions---JobQueue>`
         """
         if self._job_queue is None:
             warn(

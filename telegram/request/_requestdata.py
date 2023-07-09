@@ -33,8 +33,8 @@ class RequestData:
     .. versionadded:: 20.0
 
     Warning:
-        How exactly instances of this will are created should be considered an implementation
-        detail and not part of PTBs public API. Users should exclusively rely on the documented
+        How exactly instances of this are created should be considered an implementation detail
+        and not part of PTBs public API. Users should exclusively rely on the documented
         attributes, properties and methods.
 
     Attributes:

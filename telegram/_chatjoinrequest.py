@@ -92,6 +92,12 @@ class ChatJoinRequest(TelegramObject):
         invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link that was used
             by the user to send the join request.
 
+            Note:
+                When a user joins a *public* group via an invite link, this attribute may not
+                be present. However, this behavior is undocument and may be subject to change.
+                See `this GitHub thread <https://github.com/tdlib/telegram-bot-api/issues/428>`_
+                for some discussion.
+
     """
 
     __slots__ = ("chat", "from_user", "date", "bio", "invite_link", "user_chat_id")

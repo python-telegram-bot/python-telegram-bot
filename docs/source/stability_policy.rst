@@ -29,7 +29,7 @@ Objects are in general not guaranteed to be pickleable (unless stated otherwise)
 We may provide a way to convert pickled objects from one version to another, but this is not guaranteed.
 
 Functionality that is part of PTBs API but is explicitly documented as not being intended to be used directly by users (e.g. :meth:`telegram.request.BaseRequest.do_request`) may change.
-This also applies to functions or attributes marked as final in the sense of `PEP 591 <https://www.python.org/dev/peps/pep-0591/>`__.
+This also applies to functions or attributes marked as final in the sense of `PEP 591 <https://peps.python.org/pep-0591/>`__.
 
 PTB has dependencies to third-party packages.
 The versions that PTB uses of these third-party packages may change if that does not affect PTBs public API.

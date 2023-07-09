@@ -965,7 +965,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Examples:
             :any:`Timer Bot <examples.timerbot>`
 
-        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+        .. seealso:: :wiki:`Job Queue <Extensions---JobQueue>`
 
         Note:
             * :meth:`telegram.ext.JobQueue.set_application` will be called automatically by
