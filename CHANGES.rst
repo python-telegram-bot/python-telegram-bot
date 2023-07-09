@@ -4,6 +4,76 @@
 Changelog
 =========
 
+Version 20.4
+============
+
+*Released 2023-07-09*
+
+This is the technical changelog for version 20.4. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
+
+Major Changes
+-------------
+
+-  Drop Support for Python 3.7 (:pr:`3728`, :pr:`3742` by `@Trifase <https://github.com/Trifase>`__, :pr:`3749` by `@thefunkycat <https://github.com/thefunkycat>`__, :pr:`3740` closes :issue:`3732`, :pr:`3754` closes :issue:`3731`, :pr:`3753`, :pr:`3764`, :pr:`3762`, :pr:`3759` closes :issue:`3733`)
+
+New Features
+------------
+
+-  Make Integration of ``APScheduler`` into ``JobQueue`` More Explicit (:pr:`3695`)
+-  Introduce ``BaseUpdateProcessor`` for Customized Concurrent Handling of Updates (:pr:`3654` closes :issue:`3509`)
+
+Minor Changes
+-------------
+
+-  Fix Inconsistent Type Hints for ``timeout`` Parameter of ``Bot.get_updates`` (:pr:`3709` by `@revolter <https://github.com/revolter>`__)
+-  Use Explicit Optionals (:pr:`3692` by `@MiguelX413 <https://github.com/MiguelX413>`__)
+
+Bug Fixes
+---------
+
+-  Fix Wrong Warning Text in ``KeyboardButton.__eq__`` (:pr:`3768`)
+
+Documentation Improvements
+--------------------------
+
+-  Explicitly set ``allowed_updates`` in Examples (:pr:`3741` by `@Trifase <https://github.com/Trifase>`__ closes :issue:`3726`)
+-  Bump ``furo`` and ``sphinx`` (:pr:`3719`)
+-  Documentation Improvements (:pr:`3698`, :pr:`3708` by `@revolter <https://github.com/revolter>`__, :pr:`3767`)
+-  Add Quotes for Installation Instructions With Optional Dependencies (:pr:`3780`)
+-  Exclude Type Hints from Stability Policy (:pr:`3712`)
+-  Set ``httpx`` Logging Level to Warning in Examples (:pr:`3746` closes :issue:`3743`)
+
+Internal Changes
+----------------
+
+-  Drop a Legacy ``pre-commit.ci`` Configuration (:pr:`3697`)
+-  Add Python 3.12 Beta to the Test Matrix (:pr:`3751`)
+-  Use Temporary Files for Testing File Downloads (:pr:`3777`)
+-  Auto-Update Changed Version in Other Files After Dependabot PRs (:pr:`3716`)
+-  Add More ``ruff`` Rules (:pr:`3763`)
+-  Rename ``_handler.py`` to ``_basehandler.py`` (:pr:`3761`)
+-  Automatically Label ``pre-commit-ci`` PRs (:pr:`3713`)
+-  Rework ``pytest`` Integration into GitHub Actions (:pr:`3776`)
+-  Fix Two Bugs in GitHub Actions Workflows (:pr:`3739`)
+
+Dependency Updates
+------------------
+
+-  Update ``cachetools`` requirement from ~=5.3.0 to ~=5.3.1 (:pr:`3738`)
+-  Update ``aiolimiter`` requirement from ~=1.0.0 to ~=1.1.0 (:pr:`3707`)
+-  ``pre-commit`` autoupdate (:pr:`3791`)
+-  Bump ``sphinxcontrib-mermaid`` from 0.8.1 to 0.9.2 (:pr:`3737`)
+-  Bump ``pytest-xdist`` from 3.2.1 to 3.3.0 (:pr:`3705`)
+-  Bump ``srvaroa/labeler`` from 1.5.0 to 1.6.0 (:pr:`3786`)
+-  Bump ``dependabot/fetch-metadata`` from 1.5.1 to 1.6.0 (:pr:`3787`)
+-  Bump ``dessant/lock-threads`` from 4.0.0 to 4.0.1 (:pr:`3785`)
+-  Bump ``pytest`` from 7.3.2 to 7.4.0 (:pr:`3774`)
+-  Update ``httpx`` requirement from ~=0.24.0 to ~=0.24.1 (:pr:`3715`)
+-  Bump ``pytest-xdist`` from 3.3.0 to 3.3.1 (:pr:`3714`)
+-  Bump ``pytest`` from 7.3.1 to 7.3.2 (:pr:`3758`)
+-  ``pre-commit`` autoupdate (:pr:`3747`)
+
+
 Version 20.3
 ============
 *Released 2023-05-07*

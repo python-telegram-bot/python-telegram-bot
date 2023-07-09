@@ -176,7 +176,7 @@ class JobQueue(Generic[CCT]):
         Hint:
             This method is effectively a wrapper for :meth:`telegram.ext.Job.run`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.4
 
         Args:
             job_queue (:class:`JobQueue`): The job queue that created the job.
@@ -855,7 +855,7 @@ class Job(Generic[CCT]):
             This method can be useful when using advanced APScheduler features along with
             :class:`telegram.ext.JobQueue`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.4
 
         Args:
             aps_job (:class:`apscheduler.job.Job`): The APScheduler job

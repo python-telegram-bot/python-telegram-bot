@@ -365,7 +365,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         """:obj:`int`: The number of concurrent updates that will be processed in parallel. A
         value of ``0`` indicates updates are *not* being processed concurrently.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.4
             This is now just a shortcut to :attr:`update_processor.max_concurrent_updates
             <telegram.ext.BaseUpdateProcessor.max_concurrent_updates>`.
 
@@ -396,7 +396,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         .. seealso:: :wiki:`Concurrency`
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.4
         """
         return self._update_processor
 
@@ -984,7 +984,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
                 .. versionchanged:: 20.2
                     Accepts :class:`asyncio.Future` and generator-based coroutine functions.
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.4
                     Since Python 3.12, generator-based coroutine functions are no longer accepted.
             update (:obj:`object`, optional): If set, will be passed to :meth:`process_error`
                 as additional information for the error handlers. Moreover, the corresponding
@@ -994,7 +994,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         Keyword Args:
             name (:obj:`str`, optional): The name of the task.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.4
 
         Returns:
             :class:`asyncio.Task`: The created task.
