@@ -1092,6 +1092,12 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
                 application = Application.builder().token("TOKEN").post_init(post_init).build()
 
+        Note:
+            If you implement custom logic that implies that you will **not** be using
+            :meth:`Application.run_polling` or :meth:`Application.run_webhook` to run
+            your application (e.g. in :any:`Custom Webhook Example <examples.customwebhookbot>`),
+            make sure that you explicitly call this method.
+
         .. seealso:: :meth:`post_stop`, :meth:`post_shutdown`
 
         Args:
@@ -1129,6 +1135,12 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                                         .token("TOKEN")
                                         .post_shutdown(post_shutdown)
                                         .build()
+
+        Note:
+            If you implement custom logic that implies that you will **not** be using
+            :meth:`Application.run_polling` or :meth:`Application.run_webhook` to run
+            your application (e.g. in :any:`Custom Webhook Example <examples.customwebhookbot>`),
+            make sure that you explicitly call this method.
 
         .. seealso:: :meth:`post_init`, :meth:`post_stop`
 
@@ -1169,6 +1181,12 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                                         .token("TOKEN")
                                         .post_stop(post_stop)
                                         .build()
+
+        Note:
+            If you implement custom logic that implies that you will **not** be using
+            :meth:`Application.run_polling` or :meth:`Application.run_webhook` to run
+            your application (e.g. in :any:`Custom Webhook Example <examples.customwebhookbot>`),
+            make sure that you explicitly call this method.
 
         .. seealso:: :meth:`post_init`, :meth:`post_shutdown`
 
