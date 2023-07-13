@@ -40,11 +40,13 @@ class MessageEntity(TelegramObject):
 
     Args:
         type (:obj:`str`): Type of the entity. Can be :attr:`MENTION` (@username),
-            :attr:`HASHTAG`, :attr:`BOT_COMMAND`,
-            :attr:`URL`, :attr:`EMAIL`, :attr:`PHONE_NUMBER`, :attr:`BOLD` (bold text),
-            :attr:`ITALIC` (italic text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
-            :attr:`CODE` (monowidth string), :attr:`PRE` (monowidth block), :attr:`TEXT_LINK` (for
-            clickable text URLs), :attr:`TEXT_MENTION` (for users without usernames),
+            :attr:`HASHTAG` (#hashtag), :attr:`CASHTAG` ($USD), :attr:`BOT_COMMAND`
+            (/start@jobs_bot), :attr:`URL` (https://telegram.org),
+            :attr:`EMAIL` (do-not-reply@telegram.org), :attr:`PHONE_NUMBER` (+1-212-555-0123),
+            :attr:`BOLD` (**bold text**), :attr:`ITALIC` (*italic text*), :attr:`UNDERLINE`
+            (underlined text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
+            :attr:`CODE` (monowidth string), :attr:`PRE` (monowidth block), :attr:`TEXT_LINK`
+            (for clickable text URLs), :attr:`TEXT_MENTION` (for users without usernames),
             :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
 
             .. versionadded:: 20.0
@@ -64,11 +66,13 @@ class MessageEntity(TelegramObject):
             .. versionadded:: 20.0
     Attributes:
         type (:obj:`str`): Type of the entity. Can be :attr:`MENTION` (@username),
-            :attr:`HASHTAG`, :attr:`BOT_COMMAND`,
-            :attr:`URL`, :attr:`EMAIL`, :attr:`PHONE_NUMBER`, :attr:`BOLD` (bold text),
-            :attr:`ITALIC` (italic text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
-            :attr:`CODE` (monowidth string), :attr:`PRE` (monowidth block), :attr:`TEXT_LINK` (for
-            clickable text URLs), :attr:`TEXT_MENTION` (for users without usernames),
+            :attr:`HASHTAG` (#hashtag), :attr:`CASHTAG` ($USD), :attr:`BOT_COMMAND`
+            (/start@jobs_bot), :attr:`URL` (https://telegram.org),
+            :attr:`EMAIL` (do-not-reply@telegram.org), :attr:`PHONE_NUMBER` (+1-212-555-0123),
+            :attr:`BOLD` (**bold text**), :attr:`ITALIC` (*italic text*), :attr:`UNDERLINE`
+            (underlined text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
+            :attr:`CODE` (monowidth string), :attr:`PRE` (monowidth block), :attr:`TEXT_LINK`
+            (for clickable text URLs), :attr:`TEXT_MENTION` (for users without usernames),
             :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
 
             .. versionadded:: 20.0
