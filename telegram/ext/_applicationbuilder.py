@@ -1097,7 +1097,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :meth:`Application.run_polling` or :meth:`Application.run_webhook` to run
             your application (like e.g. in
             :any:`Custom Webhook Bot Example <examples.customwebhookbot>`),
-            make sure that you explicitly call this method.
+            the callback you set in this method will not be called automatically.
+            So instead of setting a callback with this method, you have to explicitly ``await``
+            the function that you want to run at this stage of your application's life (in the
+            example mentioned above, that would be in ``async with application`` context manager.
 
         .. seealso:: :meth:`post_stop`, :meth:`post_shutdown`
 
@@ -1142,7 +1145,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :meth:`Application.run_polling` or :meth:`Application.run_webhook` to run
             your application (like e.g. in
             :any:`Custom Webhook Bot Example <examples.customwebhookbot>`),
-            make sure that you explicitly call this method.
+            the callback you set in this method will not be called automatically.
+            So instead of setting a callback with this method, you have to explicitly ``await``
+            the function that you want to run at this stage of your application's life (in the
+            example mentioned above, that would be in ``async with application`` context manager.
 
         .. seealso:: :meth:`post_init`, :meth:`post_stop`
 
@@ -1189,7 +1195,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :meth:`Application.run_polling` or :meth:`Application.run_webhook` to run
             your application (like e.g. in
             :any:`Custom Webhook Bot Example <examples.customwebhookbot>`),
-            make sure that you explicitly call this method.
+            the callback you set in this method will not be called automatically.
+            So instead of setting a callback with this method, you have to explicitly ``await``
+            the function that you want to run at this stage of your application's life (in the
+            example mentioned above, that would be in ``async with application`` context manager.
 
         .. seealso:: :meth:`post_init`, :meth:`post_shutdown`
 
