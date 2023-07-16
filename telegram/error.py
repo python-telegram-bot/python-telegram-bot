@@ -118,30 +118,11 @@ class InvalidToken(TelegramError):
 class NetworkError(TelegramError):
     """Base class for exceptions due to networking errors.
 
-    Args:
-        cause (:obj:`Exception`, optional): The original exception that caused this error as issued
-            by the library used for network communication.
-
-            .. versionadded:: NEXT.VERSION
-
-    Attributes:
-        cause (:obj:`Exception`): Optional. The original exception that caused this error as issued
-            by the library used for network communication.
-
-            .. versionadded:: NEXT.VERSION
-
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
     """
 
-    __slots__ = ("cause",)
-
-    def __init__(self, message: str, cause: Optional[Exception] = None) -> None:
-        super().__init__(message)
-        self.cause: Optional[Exception] = cause
-
-    def __reduce__(self) -> Tuple[type, Tuple[str, Optional[Exception]]]:  # type: ignore[override]
-        return self.__class__, (self.message, self.cause)
+    __slots__ = ()
 
 
 class BadRequest(NetworkError):
@@ -161,8 +142,8 @@ class TimedOut(NetworkError):
 
     __slots__ = ()
 
-    def __init__(self, message: Optional[str] = None, cause: Optional[Exception] = None) -> None:
-        super().__init__(message=message or "Timed out", cause=cause)
+    def __init__(self, message: Optional[str] = None) -> None:
+        super().__init__(message or "Timed out")
 
 
 class ChatMigrated(TelegramError):
