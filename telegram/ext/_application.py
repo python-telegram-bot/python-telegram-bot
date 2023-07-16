@@ -653,6 +653,20 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         _LOGGER.info("Application.stop() complete")
 
+    def stop_running(self) -> None:
+        """This method can be used to stop the execution of :meth:`run_polling` or
+        :meth:`run_webhook` from within a handler, job or error callback. This allows a graceful
+        shutdown of the application, i.e. the methods listed in :attr:`run_polling` and
+        :attr:`run_webhook` will still be executed.
+
+        Note:
+            If the application is not running, this method does nothing.
+        """
+        if self.running:
+            asyncio.get_running_loop().stop()
+        else:
+            _LOGGER.debug("Application is not running, stop_running() does nothing.")
+
     def run_polling(
         self,
         poll_interval: float = 0.0,
