@@ -316,7 +316,7 @@ class TestRequestWithoutRequest:
             await httpx_request.post(None, None, None)
 
         if catch_class is NetworkError:
-            assert exc_info.value.cause is exception
+            assert exc_info.value.__cause__ is exception
 
     async def test_retrieve(self, monkeypatch, httpx_request):
         """Here we just test that retrieve gives us the raw bytes instead of trying to parse them
@@ -594,7 +594,7 @@ class TestHTTPXRequestWithoutRequest:
                 "url",
             )
 
-        assert exc_info.value.cause is raised_exception
+        assert exc_info.value.__cause__ is raised_exception
 
     async def test_do_request_pool_timeout(self, monkeypatch):
         pool_timeout = httpx.PoolTimeout("pool timeout")
@@ -615,7 +615,7 @@ class TestHTTPXRequestWithoutRequest:
                     httpx_request.do_request(method="GET", url="URL"),
                 )
 
-            assert exc_info.value.cause is pool_timeout
+            assert exc_info.value.__cause__ is pool_timeout
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
