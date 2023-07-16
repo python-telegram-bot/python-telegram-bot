@@ -57,6 +57,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Harshil <https://github.com/harshil21>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_
+- `Iulian Onofrei <https://github.com/revolter>`_
 - `Jasmin Bom <https://github.com/jsmnbom>`_
 - `JASON0916 <https://github.com/JASON0916>`_
 - `jeffffc <https://github.com/jeffffc>`_

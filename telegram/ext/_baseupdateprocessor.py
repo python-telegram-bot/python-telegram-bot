@@ -29,7 +29,7 @@ class BaseUpdateProcessor(ABC):
 
     .. seealso:: :wiki:`Concurrency`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.4
 
     Args:
         max_concurrent_updates (:obj:`int`): The maximum number of updates to be processed
@@ -129,7 +129,7 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
     coroutine, i.e. does not apply any additional processing. This is used by default when
     :attr:`telegram.ext.ApplicationBuilder.concurrent_updates` is :obj:`int`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.4
     """
 
     __slots__ = ()

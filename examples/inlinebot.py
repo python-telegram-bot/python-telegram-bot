@@ -98,7 +98,7 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
 
-    # on non command i.e message - echo the message on Telegram
+    # on inline queries - show corresponding inline results
     application.add_handler(InlineQueryHandler(inline_query))
 
     # Run the bot until the user presses Ctrl-C

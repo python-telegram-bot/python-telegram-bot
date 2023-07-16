@@ -84,7 +84,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         * :any:`Custom Webhook Bot <examples.customwebhookbot>`
 
     .. seealso:: :attr:`telegram.ext.ContextTypes.DEFAULT_TYPE`,
-        :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+        :wiki:`Job Queue <Extensions---JobQueue>`
 
     Args:
         application (:class:`telegram.ext.Application`): The application associated with this
@@ -399,7 +399,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
         :class:`telegram.ext.Application`.
 
-        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+        .. seealso:: :wiki:`Job Queue <Extensions---JobQueue>`
         """
         if self._application._job_queue is None:  # pylint: disable=protected-access
             warn(

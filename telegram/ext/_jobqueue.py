@@ -66,7 +66,7 @@ class JobQueue(Generic[CCT]):
         :any:`Timer Bot <examples.timerbot>`
 
     .. seealso:: :wiki:`Architecture Overview <Architecture>`,
-        :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+        :wiki:`Job Queue <Extensions---JobQueue>`
 
     .. versionchanged:: 20.0
         To use this class, PTB must be installed via
@@ -176,7 +176,7 @@ class JobQueue(Generic[CCT]):
         Hint:
             This method is effectively a wrapper for :meth:`telegram.ext.Job.run`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.4
 
         Args:
             job_queue (:class:`JobQueue`): The job queue that created the job.
@@ -690,7 +690,7 @@ class Job(Generic[CCT]):
         This class should not be instantiated manually.
         Use the methods of :class:`telegram.ext.JobQueue` to schedule jobs.
 
-    .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+    .. seealso:: :wiki:`Job Queue <Extensions---JobQueue>`
 
     .. versionchanged:: 20.0
 
@@ -855,7 +855,7 @@ class Job(Generic[CCT]):
             This method can be useful when using advanced APScheduler features along with
             :class:`telegram.ext.JobQueue`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.4
 
         Args:
             aps_job (:class:`apscheduler.job.Job`): The APScheduler job

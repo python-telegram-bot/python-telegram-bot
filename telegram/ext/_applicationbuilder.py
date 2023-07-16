@@ -931,7 +931,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                 :class:`telegram.ext.BaseUpdateProcessor` to use that instance for handling updates
                 concurrently.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.4
                     Now accepts :class:`BaseUpdateProcessor` instances.
 
         Returns:
@@ -965,7 +965,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Examples:
             :any:`Timer Bot <examples.timerbot>`
 
-        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+        .. seealso:: :wiki:`Job Queue <Extensions---JobQueue>`
 
         Note:
             * :meth:`telegram.ext.JobQueue.set_application` will be called automatically by
