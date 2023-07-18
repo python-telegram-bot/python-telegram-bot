@@ -295,7 +295,7 @@ class TestRequestWithoutRequest:
             (TelegramError("TelegramError"), TelegramError, "TelegramError"),
             (
                 RuntimeError("CustomError"),
-                Exception,
+                NetworkError,
                 r"HTTP implementation: RuntimeError\('CustomError'\)",
             ),
         ],
@@ -312,8 +312,11 @@ class TestRequestWithoutRequest:
             do_request,
         )
 
-        with pytest.raises(catch_class, match=match):
+        with pytest.raises(catch_class, match=match) as exc_info:
             await httpx_request.post(None, None, None)
+
+        if catch_class is NetworkError:
+            assert exc_info.value.__cause__ is exception
 
     async def test_retrieve(self, monkeypatch, httpx_request):
         """Here we just test that retrieve gives us the raw bytes instead of trying to parse them
@@ -571,42 +574,48 @@ class TestHTTPXRequestWithoutRequest:
         assert content == b"content"
 
     @pytest.mark.parametrize(
-        ("raised_class", "expected_class", "expected_message"),
+        ("raised_exception", "expected_class", "expected_message"),
         [
-            (httpx.TimeoutException, TimedOut, "Timed out"),
-            (httpx.ReadError, NetworkError, "httpx.ReadError: message"),
+            (httpx.TimeoutException("timeout"), TimedOut, "Timed out"),
+            (httpx.ReadError("read_error"), NetworkError, "httpx.ReadError: read_error"),
         ],
     )
     async def test_do_request_exceptions(
-        self, monkeypatch, httpx_request, raised_class, expected_class, expected_message
+        self, monkeypatch, httpx_request, raised_exception, expected_class, expected_message
     ):
         async def make_assertion(self, method, url, headers, timeout, files, data):
-            raise raised_class("message")
+            raise raised_exception
 
         monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
 
-        with pytest.raises(expected_class, match=expected_message):
+        with pytest.raises(expected_class, match=expected_message) as exc_info:
             await httpx_request.do_request(
                 "method",
                 "url",
             )
 
+        assert exc_info.value.__cause__ is raised_exception
+
     async def test_do_request_pool_timeout(self, monkeypatch):
+        pool_timeout = httpx.PoolTimeout("pool timeout")
+
         async def request(_, **kwargs):
             if self.test_flag is None:
                 self.test_flag = True
             else:
-                raise httpx.PoolTimeout("pool timeout")
+                raise pool_timeout
             return httpx.Response(HTTPStatus.OK)
 
         monkeypatch.setattr(httpx.AsyncClient, "request", request)
 
         async with HTTPXRequest(pool_timeout=0.02) as httpx_request:
-            with pytest.raises(TimedOut, match="Pool timeout"):
+            with pytest.raises(TimedOut, match="Pool timeout") as exc_info:
                 await asyncio.gather(
                     httpx_request.do_request(method="GET", url="URL"),
                     httpx_request.do_request(method="GET", url="URL"),
                 )
+
+            assert exc_info.value.__cause__ is pool_timeout
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
