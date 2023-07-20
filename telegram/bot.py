@@ -2425,7 +2425,7 @@ class Bot(TelegramObject):
         limit: int = 100,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> Optional[UserProfilePhotos]:
+    ) -> UserProfilePhotos:
         """Use this method to get a list of profile pictures for a user.
 
         Args:
