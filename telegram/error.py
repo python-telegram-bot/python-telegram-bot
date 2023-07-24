@@ -118,6 +118,13 @@ class InvalidToken(TelegramError):
 class NetworkError(TelegramError):
     """Base class for exceptions due to networking errors.
 
+    Tip:
+        This exception (and its subclasses) usually originates from the networking backend
+        used by :class:`~telegram.request.HTTPXRequest`, or a custom implementation of
+        :class:`~telegram.request.BaseRequest`. In this case, the original exception can be
+        accessed via the ``__cause__``
+        `attribute <https://docs.python.org/3/library/exceptions.html#exception-context>`_.
+
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
     """
