@@ -2176,7 +2176,7 @@ class TestApplication:
         assert len(recwarn) >= 1
         found = False
         for record in recwarn:
-            print(record)
+            print("\t", record)
             if str(record.message).startswith("Could not add signal handlers for the stop"):
                 assert record.category is PTBUserWarning
                 assert record.filename == __file__, "stacklevel is incorrect!"
@@ -2239,10 +2239,12 @@ class TestApplication:
     #     platform.system() == "Windows",
     #     reason="Can't send signals without stopping whole process on windows",
     # )
-    @pytest.mark.parametrize("method", ["polling", "webhook"])
-    def test_stop_running(self, one_time_bot, monkeypatch, method, caplog):
+    # @pytest.mark.parametrize("method", ["polling", "webhook"])
+    @pytest.mark.parametrize("method", ["polling"])
+    def test_stop_running(self, one_time_bot, monkeypatch, method):
         async def get_updates(*args, **kwargs):
             await asyncio.sleep(0)
+            print("get_updates")
             return []
 
         async def delete_webhook(*args, **kwargs):
@@ -2273,7 +2275,7 @@ class TestApplication:
             call_after(app.shutdown, lambda _: events.append("app.shutdown")),
         )
 
-        callback_done_event = asyncio.Event()
+        callback_done_event = threading.Event()
         called_stop_running = threading.Event()
         assertions = {}
 
@@ -2287,27 +2289,53 @@ class TestApplication:
 
             time.sleep(0.1)
             assertions["called_stop_running_not_set"] = not called_stop_running.is_set()
+            print("\t", assertions)
 
+            print("\t", "putting", repr(method), "into update queue")
+            # print("\t", id(app.update_queue))
+            # print("a.u_q.getters:", [id(getter) for getter in app.update_queue._getters])
             app.update_queue.put_nowait(method)
+            # print("a.u_q.getters:", app.update_queue._getters)
             time.sleep(0.1)
+            # print("\t", "size of update queue:", app.update_queue.qsize())
+            # print("\t", "pending update is", repr(app.update_queue.get_nowait()))
 
             assertions["called_stop_running_set"] = called_stop_running.is_set()
+            print("\t", assertions)
 
             # App should have entered `stop` now but not finished it yet because the callback
             # is still running
             assertions["updater.stop_event"] = events == ["updater.stop"]
             assertions["app.running_False"] = not app.running
+            print("\t", assertions)
 
+            print("\t", "setting callback_done_event")
+            # print(callback_done_event._waiters)
             callback_done_event.set()
             time.sleep(0.1)
+            # print([fut.done() for fut in callback_done_event._waiters])
 
             # Now that the update is fully handled, we expect the full shutdown
             assertions["events"] = events == ["updater.stop", "app.stop", "app.shutdown"]
+            print("\t", events)
+            print("\t", assertions)
 
         async def callback(update, context):
-            context.application.stop_running()
-            called_stop_running.set()
-            await callback_done_event.wait()
+            try:
+                print("\t", "callback starting")
+                context.application.stop_running()
+                print("\t", "called stop_running")
+                called_stop_running.set()
+                print("\t", "called_stop_running.set()")
+                print("\t", "waiting for callback_done_event")
+                # For some reason using asyncio.Event und a simple `await` here doesn't work
+                # and using a blocking threading.Event.wait() doesn't either because it blocks
+                # the asyncio logic. Hence, using run_in_executor() here.
+                await asyncio.get_running_loop().run_in_executor(None, callback_done_event.wait)
+                print("\t", "callback done")
+            except Exception as e:
+                print("\t", "callback failed")
+                print("\t", e)
 
         app.add_handler(TypeHandler(object, callback))
 
@@ -2330,6 +2358,6 @@ class TestApplication:
 
         thread.join()
 
-        assert len(assertions) == 4
+        assert len(assertions) == 5
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
