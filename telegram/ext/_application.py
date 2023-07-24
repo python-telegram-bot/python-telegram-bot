@@ -661,8 +661,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         Note:
             If the application is not running, this method does nothing.
+
+        .. versionadded:: NEXT.VERSION
         """
         if self.running:
+            # This works because `__run` is using `loop.run_forever()`. If that changes, this
+            # method needs to be adapted.
             asyncio.get_running_loop().stop()
         else:
             _LOGGER.debug("Application is not running, stop_running() does nothing.")
