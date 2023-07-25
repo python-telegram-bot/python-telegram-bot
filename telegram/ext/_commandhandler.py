@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CommandHandler class."""
 import re
+from enum import Enum, auto
 from typing import TYPE_CHECKING, Any, FrozenSet, List, Optional, Tuple, TypeVar, Union
 
 from telegram import MessageEntity, Update
@@ -102,7 +103,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`.
     """
 
-    __slots__ = ("commands", "filters")
+    __slots__ = ("commands", "filters", "has_args")
 
     def __init__(
         self,
@@ -110,6 +111,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         callback: HandlerCallback[Update, CCT, RT],
         filters: Optional[filters_module.BaseFilter] = None,
         block: DVType[bool] = DEFAULT_TRUE,
+        has_args: Union[bool, None, int] = None,
     ):
         super().__init__(callback, block=block)
 
@@ -125,6 +127,38 @@ class CommandHandler(BaseHandler[Update, CCT]):
         self.filters: filters_module.BaseFilter = (
             filters if filters is not None else filters_module.UpdateType.MESSAGES
         )
+
+        self.has_args = has_args
+
+    def _check_correct_args(self, args: List[str]) -> Optional[bool]:
+        class ArgsCondition(Enum):
+            HAS_ARGS_TRUE_ARGS_PRESENT = auto()
+            HAS_ARGS_FALSE_ARGS_ABSENT = auto()
+            HAS_ARGS_NUM = auto()
+            HAS_ARGS_NONE = auto()
+            HAS_INVALID_ARGS = auto()
+
+        mapping = {
+            ArgsCondition.HAS_ARGS_TRUE_ARGS_PRESENT: True,
+            ArgsCondition.HAS_ARGS_FALSE_ARGS_ABSENT: True,
+            ArgsCondition.HAS_ARGS_NONE: True,
+            ArgsCondition.HAS_ARGS_NUM: True,
+            ArgsCondition.HAS_INVALID_ARGS: False,
+        }
+
+        condition = (
+            ArgsCondition.HAS_ARGS_NONE
+            if self.has_args is None
+            else ArgsCondition.HAS_ARGS_TRUE_ARGS_PRESENT
+            if self.has_args and args
+            else ArgsCondition.HAS_ARGS_FALSE_ARGS_ABSENT
+            if not self.has_args and not args
+            else ArgsCondition.HAS_ARGS_NUM
+            if isinstance(self.has_args, int) and len(args) == self.has_args
+            else ArgsCondition.HAS_INVALID_ARGS
+        )
+
+        return mapping.get(condition)
 
     def check_update(
         self, update: object
@@ -158,6 +192,13 @@ class CommandHandler(BaseHandler[Update, CCT]):
                     and command_parts[1].lower() == message.get_bot().username.lower()
                 ):
                     return None
+
+                _valid = self._check_correct_args(args)
+                if _valid is False:
+                    return None
+                # if _valid: TODO: Implement condition if has_args and args are True.
+                #     raise ValueError("CommandHandler: args are not valid")
+                #     return None  # args does not match what developer specified, returning None.
 
                 filter_result = self.filters.check_update(update)
                 if filter_result:
