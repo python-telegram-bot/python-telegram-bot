@@ -148,13 +148,14 @@ class CommandHandler(BaseHandler[Update, CCT]):
 
         condition = (
             ArgsCondition.HAS_ARGS_NONE
-            if self.has_args is None
+            if (self.has_args is None)
             else ArgsCondition.HAS_ARGS_TRUE_ARGS_PRESENT
-            if self.has_args and args
+            if (self.has_args is True and args)
+            # Must specify is True, otherwise if has_args is int, it will default to Truthy value.
             else ArgsCondition.HAS_ARGS_FALSE_ARGS_ABSENT
-            if not self.has_args and not args
+            if (self.has_args is False and not args)
             else ArgsCondition.HAS_ARGS_NUM
-            if isinstance(self.has_args, int) and len(args) == self.has_args
+            if (isinstance(self.has_args, int) and len(args) == self.has_args)
             else ArgsCondition.HAS_INVALID_ARGS
         )
 
@@ -196,9 +197,6 @@ class CommandHandler(BaseHandler[Update, CCT]):
                 _valid = self._check_correct_args(args)
                 if _valid is False:
                     return None
-                # if _valid: TODO: Implement condition if has_args and args are True.
-                #     raise ValueError("CommandHandler: args are not valid")
-                #     return None  # args does not match what developer specified, returning None.
 
                 filter_result = self.filters.check_update(update)
                 if filter_result:

@@ -181,7 +181,11 @@ class TestCommandHandler(BaseTest):
 
     @pytest.mark.parametrize(
         "cmd",
-        ["way_too_longcommand1234567yes_way_toooooooLong", "ïñválídletters", "invalid #&* chars"],
+        [
+            "way_too_longcommand1234567yes_way_toooooooLong",
+            "ïñválídletters",
+            "invalid #&* chars",
+        ],
         ids=["too long", "invalid letter", "invalid characters"],
     )
     def test_invalid_commands(self, cmd):
@@ -259,3 +263,22 @@ class TestCommandHandler(BaseTest):
             self.callback_regex2, filters=filters.Regex("one") & filters.Regex("two")
         )
         await self._test_context_args_or_regex(app, handler, command)
+
+    def test_command_has_args(self, bot):
+        """Test CHs with optional has_args specified."""
+        handler_true = CommandHandler(["test"], self.callback_basic, has_args=True)
+        handler_false = CommandHandler(["test"], self.callback_basic, has_args=False)
+        handler_int_one = CommandHandler(["test"], self.callback_basic, has_args=1)
+        handler_int_two = CommandHandler(["test"], self.callback_basic, has_args=2)
+
+        assert is_match(handler_true, make_command_update("/test helloworld", bot=bot))
+        assert not is_match(handler_true, make_command_update("/test", bot=bot))
+
+        assert is_match(handler_false, make_command_update("/test", bot=bot))
+        assert not is_match(handler_false, make_command_update("/test helloworld", bot=bot))
+
+        assert is_match(handler_int_one, make_command_update("/test helloworld", bot=bot))
+        assert not is_match(handler_int_one, make_command_update("/test hello world", bot=bot))
+
+        assert is_match(handler_int_two, make_command_update("/test hello world", bot=bot))
+        assert not is_match(handler_int_two, make_command_update("/test helloworld", bot=bot))
