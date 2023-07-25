@@ -89,6 +89,12 @@ class CommandHandler(BaseHandler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
+        has_args (:obj:`bool` | :obj:`int`, optional):
+            Determines whether the command handler should process the update or not.
+            If :obj:`True`, the handler will process any non-zero number of args.
+            If :obj:`False`, the handler will only process if there are no args.
+            if :obj:`int`, the handler will only process if there are exactly that many args.
+            Defaults to :obj:`None`, which means the handler will process any or no args.
 
     Raises:
         :exc:`ValueError`: When the command is too long or has illegal chars.
@@ -101,6 +107,9 @@ class CommandHandler(BaseHandler[Update, CCT]):
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
+        has_args (:obj:`bool` | :obj:`int` | None):
+            Optional argument, otherwise all implementations of :class:`CommandHandler` will break.
+            Defaults to :obj:`None`, which means the handler will process any args or no args.
     """
 
     __slots__ = ("commands", "filters", "has_args")
