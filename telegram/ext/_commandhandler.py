@@ -96,7 +96,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         commands (FrozenSet[:obj:`str`]): The set of commands this handler should listen for.
         callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
-            Filters.
+            filters.
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
