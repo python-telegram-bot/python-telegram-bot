@@ -487,6 +487,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the proxy for the :paramref:`~telegram.request.HTTPXRequest.proxy_url`
         parameter of :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
 
+        Note:
+            this is not the proxy used for all http requests.
+
+        .. seealso:: :meth:`get_updates_proxy_url`
+
         Args:
             proxy_url (:obj:`str`): The URL to the proxy server. See
                 :paramref:`telegram.request.HTTPXRequest.proxy_url` for more information.
@@ -639,6 +644,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_proxy_url(self: BuilderType, get_updates_proxy_url: str) -> BuilderType:
         """Sets the proxy for the :paramref:`telegram.request.HTTPXRequest.proxy_url`
         parameter which is used for :meth:`telegram.Bot.get_updates`. Defaults to :obj:`None`.
+
+        proxy used to get updates.
+
+        .. seealso:: :meth:`proxy_url`
 
         Args:
             get_updates_proxy_url (:obj:`str`): The URL to the proxy server. See
