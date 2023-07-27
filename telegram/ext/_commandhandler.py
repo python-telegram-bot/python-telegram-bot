@@ -34,7 +34,7 @@ RT = TypeVar("RT")
 
 
 class CommandHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram commands.
+    """Handler class to handle Telegram commands.
 
     Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
     bot's name and/or some additional text. The handler will add a :obj:`list` to the

@@ -34,7 +34,7 @@ RT = TypeVar("RT")
 
 
 class CallbackQueryHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram
+    """Handler class to handle Telegram
     :attr:`callback queries <telegram.Update.callback_query>`. Optionally based on a regex.
 
     Read the documentation of the :mod:`re` module for more information.

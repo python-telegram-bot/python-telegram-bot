@@ -29,7 +29,7 @@ RT = TypeVar("RT")
 
 
 class ChatMemberHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram updates that contain a chat member update.
+    """Handler class to handle Telegram updates that contain a chat member update.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
