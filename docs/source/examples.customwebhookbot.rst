@@ -21,4 +21,10 @@ Please select the framework you would like to use.
     .. literalinclude:: ../../examples/customwebhookbot_quart.py
        :language: python
        :linenos:
+
+.. tab:: ``Django``
+
+    .. literalinclude:: ../../examples/customwebhookbot_django.py
+       :language: python
+       :linenos:
     
