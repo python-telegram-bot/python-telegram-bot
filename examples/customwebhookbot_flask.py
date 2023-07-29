@@ -3,8 +3,8 @@
 # pylint: disable=import-error,wrong-import-position
 """
 Simple example of a bot that uses a custom webhook setup and handles custom updates.
-For the custom webhook setup, the libraries `starlette` and `uvicorn` are used. Please install
-them as `pip install starlette~=0.20.0 uvicorn~=0.17.0`.
+For the custom webhook setup, the libraries `flask`, `asgiref` and `uvicorn` are used. Please
+install them as `pip install flask[async]~=2.3.2 uvicorn~=0.23.1 asgiref~=3.7.2`.
 Note that any other `asyncio` based web server framework can be used for a custom webhook setup
 just as well.
 
@@ -20,10 +20,8 @@ from dataclasses import dataclass
 from http import HTTPStatus
 
 import uvicorn
-from starlette.applications import Starlette
-from starlette.requests import Request
-from starlette.responses import PlainTextResponse, Response
-from starlette.routing import Route
+from asgiref.wsgi import WsgiToAsgi
+from flask import Flask, Response, abort, make_response, request
 
 from telegram import __version__ as TG_VER
 
@@ -135,49 +133,44 @@ async def main() -> None:
     await application.bot.set_webhook(url=f"{url}/telegram", allowed_updates=Update.ALL_TYPES)
 
     # Set up webserver
-    async def telegram(request: Request) -> Response:
-        """Handle incoming Telegram updates by putting them into the `update_queue`"""
-        await application.update_queue.put(
-            Update.de_json(data=await request.json(), bot=application.bot)
-        )
-        return Response()
+    flask_app = Flask(__name__)
 
-    async def custom_updates(request: Request) -> PlainTextResponse:
+    @flask_app.post("/telegram")  # type: ignore[misc]
+    async def telegram() -> Response:
+        """Handle incoming Telegram updates by putting them into the `update_queue`"""
+        await application.update_queue.put(Update.de_json(data=request.json, bot=application.bot))
+        return Response(status=HTTPStatus.OK)
+
+    @flask_app.route("/submitpayload", methods=["GET", "POST"])  # type: ignore[misc]
+    async def custom_updates() -> Response:
         """
         Handle incoming webhook updates by also putting them into the `update_queue` if
         the required parameters were passed correctly.
         """
         try:
-            user_id = int(request.query_params["user_id"])
-            payload = request.query_params["payload"]
+            user_id = int(request.args["user_id"])
+            payload = request.args["payload"]
         except KeyError:
-            return PlainTextResponse(
-                status_code=HTTPStatus.BAD_REQUEST,
-                content="Please pass both `user_id` and `payload` as query parameters.",
+            abort(
+                HTTPStatus.BAD_REQUEST,
+                "Please pass both `user_id` and `payload` as query parameters.",
             )
         except ValueError:
-            return PlainTextResponse(
-                status_code=HTTPStatus.BAD_REQUEST,
-                content="The `user_id` must be a string!",
-            )
+            abort(HTTPStatus.BAD_REQUEST, "The `user_id` must be a string!")
 
         await application.update_queue.put(WebhookUpdate(user_id=user_id, payload=payload))
-        return PlainTextResponse("Thank you for the submission! It's being forwarded.")
+        return Response(status=HTTPStatus.OK)
 
-    async def health(_: Request) -> PlainTextResponse:
+    @flask_app.get("/healthcheck")  # type: ignore[misc]
+    async def health() -> Response:
         """For the health endpoint, reply with a simple plain text message."""
-        return PlainTextResponse(content="The bot is still running fine :)")
+        response = make_response("The bot is still running fine :)", HTTPStatus.OK)
+        response.mimetype = "text/plain"
+        return response
 
-    starlette_app = Starlette(
-        routes=[
-            Route("/telegram", telegram, methods=["POST"]),
-            Route("/healthcheck", health, methods=["GET"]),
-            Route("/submitpayload", custom_updates, methods=["POST", "GET"]),
-        ]
-    )
     webserver = uvicorn.Server(
         config=uvicorn.Config(
-            app=starlette_app,
+            app=WsgiToAsgi(flask_app),
             port=port,
             use_colors=False,
             host="127.0.0.1",
