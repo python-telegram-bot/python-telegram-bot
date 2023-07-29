@@ -15,4 +15,10 @@ Please select the framework you would like to use.
     .. literalinclude:: ../../examples/customwebhookbot_flask.py
        :language: python
        :linenos:
+
+.. tab:: ``quart``
+
+    .. literalinclude:: ../../examples/customwebhookbot_quart.py
+       :language: python
+       :linenos:
     
