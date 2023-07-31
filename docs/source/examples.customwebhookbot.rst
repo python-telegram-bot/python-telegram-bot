@@ -2,7 +2,7 @@
 =======================
 
 This example is available for different web frameworks.
-Please select the framework you would like to use.
+You can select your preferred framework by opening one of the tabs above the code example.
 
 .. tab:: ``starlette``
 

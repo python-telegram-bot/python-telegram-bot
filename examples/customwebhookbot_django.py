@@ -98,7 +98,7 @@ async def start(update: Update, context: CustomContext) -> None:
 
 
 async def webhook_update(update: WebhookUpdate, context: CustomContext) -> None:
-    """Callback that handles the custom updates."""
+    """Handle custom updates."""
     chat_member = await context.bot.get_chat_member(chat_id=update.user_id, user_id=update.user_id)
     payloads = context.user_data.setdefault("payloads", [])
     payloads.append(update.payload)
@@ -110,9 +110,6 @@ async def webhook_update(update: WebhookUpdate, context: CustomContext) -> None:
     await context.bot.send_message(
         chat_id=context.bot_data["admin_chat_id"], text=text, parse_mode=ParseMode.HTML
     )
-
-
-# Set up webserver
 
 
 async def telegram(request: HttpRequest) -> HttpResponse:
@@ -147,7 +144,7 @@ async def health(_: HttpRequest) -> HttpResponse:
     return HttpResponse("The bot is still running fine :)")
 
 
-# Set up the application and a custom webserver.
+# Set up PTB application and a web application for handling the incoming requests.
 
 context_types = ContextTypes(context=CustomContext)
 # Here we set updater to None because we want our custom webhook server to handle the updates
@@ -169,7 +166,7 @@ settings.configure(ROOT_URLCONF=__name__, SECRET_KEY=uuid4().hex)
 
 
 async def main() -> None:
-    """Set up the application and a custom webserver."""
+    """Finalize configuration and run the applications."""
     url = "https://domain.tld"
     admin_chat_id = 123456
     port = 8000

@@ -95,7 +95,7 @@ async def start(update: Update, context: CustomContext) -> None:
 
 
 async def webhook_update(update: WebhookUpdate, context: CustomContext) -> None:
-    """Callback that handles the custom updates."""
+    """Handle custom updates."""
     chat_member = await context.bot.get_chat_member(chat_id=update.user_id, user_id=update.user_id)
     payloads = context.user_data.setdefault("payloads", [])
     payloads.append(update.payload)
@@ -110,7 +110,7 @@ async def webhook_update(update: WebhookUpdate, context: CustomContext) -> None:
 
 
 async def main() -> None:
-    """Set up the application and a custom webserver."""
+    """Set up PTB application and a web application for handling the incoming requests."""
     url = "https://domain.tld"
     admin_chat_id = 123456
     port = 8000
