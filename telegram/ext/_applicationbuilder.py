@@ -595,6 +595,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             http_version (:obj:`str`): Pass ``"2"`` or ``"2.0"`` if you'd like to use HTTP/2 for
                 making requests to Telegram. Defaults to ``"1.1"``, in which case HTTP/1.1 is used.
 
+                .. versionchanged:: NEXT.VERSION
+                    Accept ``"2"`` as a valid value.
+
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
@@ -754,6 +757,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             get_updates_http_version (:obj:`str`): Pass ``"2"`` or ``"2.0"`` if you'd like to use
                 HTTP/2 for making requests to Telegram. Defaults to ``"1.1"``, in which case
                 HTTP/1.1 is used.
+
+                .. versionchanged:: NEXT.VERSION
+                    Accept ``"2"`` as a valid value.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.

@@ -89,6 +89,9 @@ class HTTPXRequest(BaseRequest):
             .. versionchanged:: 20.2
                 Reset the default version to 1.1.
 
+            .. versionchanged:: NEXT.VERSION
+                Accept ``"2"`` as a valid value.
+
     """
 
     __slots__ = ("_client", "_client_kwargs", "_http_version")
