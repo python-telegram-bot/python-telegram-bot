@@ -82,8 +82,8 @@ class HTTPXRequest(BaseRequest):
                 With a finite pool timeout, you must expect :exc:`telegram.error.TimedOut`
                 exceptions to be thrown when more requests are made simultaneously than there are
                 connections in the connection pool!
-        http_version (:obj:`str`, optional): If ``"2"``, HTTP/2 will be used instead of HTTP/1.1.
-            Defaults to ``"1.1"``.
+        http_version (:obj:`str`, optional): If ``"2"`` or ``"2.0"``, HTTP/2 will be used instead
+            of HTTP/1.1. Defaults to ``"1.1"``.
 
             .. versionadded:: 20.1
             .. versionchanged:: 20.2
@@ -115,8 +115,8 @@ class HTTPXRequest(BaseRequest):
             max_keepalive_connections=connection_pool_size,
         )
 
-        if http_version not in ("1.1", "2"):
-            raise ValueError("`http_version` must be either '1.1' or '2'.")
+        if http_version not in ("1.1", "2", "2.0"):
+            raise ValueError("`http_version` must be either '1.1', '2.0' or '2'.")
 
         http1 = http_version == "1.1"
 
