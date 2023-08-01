@@ -202,9 +202,8 @@ class TestCallbackDataCache:
                 assert callback_query.data == "some data 1"
                 # make sure that we stored the mapping CallbackQuery.id -> keyboard_uuid correctly
                 assert len(callback_data_cache._keyboard_data) == 1
-                assert (
-                    callback_data_cache._callback_queries[cq_id]
-                    == list(callback_data_cache._keyboard_data.keys())[0]
+                assert callback_data_cache._callback_queries[cq_id] == next(
+                    iter(callback_data_cache._keyboard_data.keys())
                 )
             else:
                 assert callback_query.data is None
@@ -399,6 +398,6 @@ class TestCallbackDataCache:
         assert len(callback_data_cache.persistence_data[0]) == 50
         assert len(callback_data_cache.persistence_data[1]) == 100
         callback_data = [
-            list(data[2].values())[0] for data in callback_data_cache.persistence_data[0]
+            next(iter(data[2].values())) for data in callback_data_cache.persistence_data[0]
         ]
         assert callback_data == [str(i) for i in range(50, 100)]

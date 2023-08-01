@@ -144,9 +144,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match[str]]] = None
         self.error: Optional[Exception] = None
-        self.job: Optional["Job[CCT]"] = None
+        self.job: Optional[Job[CCT]] = None
         self.coroutine: Optional[
-            Union[Generator[Optional["Future[object]"], None, Any], Awaitable[Any]]
+            Union[Generator[Optional[Future[object]], None, Any], Awaitable[Any]]
         ] = None
 
     @property

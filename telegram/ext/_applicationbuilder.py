@@ -171,42 +171,42 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._read_timeout: ODVInput[float] = DEFAULT_NONE
         self._write_timeout: ODVInput[float] = DEFAULT_NONE
         self._pool_timeout: ODVInput[float] = DEFAULT_NONE
-        self._request: DVInput["BaseRequest"] = DEFAULT_NONE
+        self._request: DVInput[BaseRequest] = DEFAULT_NONE
         self._get_updates_connection_pool_size: DVInput[int] = DEFAULT_NONE
         self._get_updates_proxy_url: DVInput[str] = DEFAULT_NONE
         self._get_updates_connect_timeout: ODVInput[float] = DEFAULT_NONE
         self._get_updates_read_timeout: ODVInput[float] = DEFAULT_NONE
         self._get_updates_write_timeout: ODVInput[float] = DEFAULT_NONE
         self._get_updates_pool_timeout: ODVInput[float] = DEFAULT_NONE
-        self._get_updates_request: DVInput["BaseRequest"] = DEFAULT_NONE
+        self._get_updates_request: DVInput[BaseRequest] = DEFAULT_NONE
         self._get_updates_http_version: DVInput[str] = DefaultValue("1.1")
         self._private_key: ODVInput[bytes] = DEFAULT_NONE
         self._private_key_password: ODVInput[bytes] = DEFAULT_NONE
-        self._defaults: ODVInput["Defaults"] = DEFAULT_NONE
+        self._defaults: ODVInput[Defaults] = DEFAULT_NONE
         self._arbitrary_callback_data: Union[DefaultValue[bool], int] = DEFAULT_FALSE
         self._local_mode: DVType[bool] = DEFAULT_FALSE
         self._bot: DVInput[Bot] = DEFAULT_NONE
         self._update_queue: DVType[Queue] = DefaultValue(Queue())
 
         try:
-            self._job_queue: ODVInput["JobQueue"] = DefaultValue(JobQueue())
+            self._job_queue: ODVInput[JobQueue] = DefaultValue(JobQueue())
         except RuntimeError as exc:
             if "PTB must be installed via" not in str(exc):
                 raise exc
             self._job_queue = DEFAULT_NONE
 
-        self._persistence: ODVInput["BasePersistence"] = DEFAULT_NONE
+        self._persistence: ODVInput[BasePersistence] = DEFAULT_NONE
         self._context_types: DVType[ContextTypes] = DefaultValue(ContextTypes())
         self._application_class: DVType[Type[Application]] = DefaultValue(Application)
         self._application_kwargs: Dict[str, object] = {}
-        self._update_processor: "BaseUpdateProcessor" = SimpleUpdateProcessor(
+        self._update_processor: BaseUpdateProcessor = SimpleUpdateProcessor(
             max_concurrent_updates=1
         )
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_stop: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
-        self._rate_limiter: ODVInput["BaseRateLimiter"] = DEFAULT_NONE
+        self._rate_limiter: ODVInput[BaseRateLimiter] = DEFAULT_NONE
         self._http_version: DVInput[str] = DefaultValue("1.1")
 
     def _build_request(self, get_updates: bool) -> BaseRequest:

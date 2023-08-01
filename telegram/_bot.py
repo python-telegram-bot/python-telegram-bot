@@ -2746,7 +2746,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             if callable(results):
                 callable_output = results(current_offset_int)
                 if not callable_output:
-                    effective_results: Sequence["InlineQueryResult"] = []
+                    effective_results: Sequence[InlineQueryResult] = []
                 else:
                     effective_results = callable_output
                     # the callback *might* return more results on the next call, so we increment

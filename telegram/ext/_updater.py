@@ -113,7 +113,7 @@ class Updater(AsyncContextManager["Updater"]):
         update_queue: "asyncio.Queue[object]",
     ):
         self.bot: Bot = bot
-        self.update_queue: "asyncio.Queue[object]" = update_queue
+        self.update_queue: asyncio.Queue[object] = update_queue
 
         self._last_update_id = 0
         self._running = False
