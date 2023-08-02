@@ -265,6 +265,52 @@ class TestUpdater:
         assert self.message_count == 4
         assert self.received == [1, 2, 3, 4]
 
+    async def test_polling_mark_updates_as_read(self, monkeypatch, updater, caplog):
+        updates = asyncio.Queue()
+        max_update_id = 3
+        for i in range(1, max_update_id + 1):
+            await updates.put(Update(update_id=i))
+        tracking_flag = False
+        offsets = set()
+
+        async def get_updates(*args, **kwargs):
+            if tracking_flag:
+                offsets.add(kwargs.get("offset"))
+            if not updates.empty():
+                next_update = await updates.get()
+                updates.task_done()
+                return [next_update]
+            await asyncio.sleep(0)
+            return []
+
+        monkeypatch.setattr(updater.bot, "get_updates", get_updates)
+
+        async with updater:
+            await updater.start_polling()
+            await updates.join()
+            assert offsets == set()
+            # Set the flag only now since we want to make sure that the get_updates
+            # is called one last time by updater.stop()
+            tracking_flag = True
+            with caplog.at_level(logging.DEBUG):
+                await updater.stop()
+
+        # ensure that the last fetched update was still marked as read
+        assert max_update_id + 1 in offsets
+
+        assert len(caplog.records) >= 1
+        log_found = False
+        for record in caplog.records:
+            if not record.getMessage().startswith("Calling `get_updates` one more time"):
+                continue
+
+            assert record.name == "telegram.ext.Updater"
+            assert record.levelno == logging.DEBUG
+            log_found = True
+            break
+
+        assert log_found
+
     async def test_start_polling_already_running(self, updater):
         async with updater:
             await updater.start_polling()
