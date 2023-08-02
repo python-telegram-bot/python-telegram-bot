@@ -271,11 +271,19 @@ class TestUpdater:
         for i in range(1, max_update_id + 1):
             await updates.put(Update(update_id=i))
         tracking_flag = False
-        offsets = set()
+        received_kwargs = {}
+        expected_kwargs = {
+            "timeout": "timeout",
+            "read_timeout": "read_timeout",
+            "connect_timeout": "connect_timeout",
+            "write_timeout": "write_timeout",
+            "pool_timeout": "pool_timeout",
+            "allowed_updates": "allowed_updates",
+        }
 
         async def get_updates(*args, **kwargs):
             if tracking_flag:
-                offsets.add(kwargs.get("offset"))
+                received_kwargs.update(kwargs)
             if not updates.empty():
                 next_update = await updates.get()
                 updates.task_done()
@@ -286,9 +294,9 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, "get_updates", get_updates)
 
         async with updater:
-            await updater.start_polling()
+            await updater.start_polling(**expected_kwargs)
             await updates.join()
-            assert offsets == set()
+            assert not received_kwargs
             # Set the flag only now since we want to make sure that the get_updates
             # is called one last time by updater.stop()
             tracking_flag = True
@@ -296,7 +304,10 @@ class TestUpdater:
                 await updater.stop()
 
         # ensure that the last fetched update was still marked as read
-        assert max_update_id + 1 in offsets
+        assert received_kwargs["offset"] == max_update_id + 1
+        # ensure that the correct arguments where passed to the last `get_updates` call
+        for name, value in expected_kwargs.items():
+            assert received_kwargs[name] == value
 
         assert len(caplog.records) >= 1
         log_found = False
