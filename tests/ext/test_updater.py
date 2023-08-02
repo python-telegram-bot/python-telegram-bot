@@ -214,9 +214,13 @@ class TestUpdater:
         await updates.put(Update(update_id=2))
 
         async def get_updates(*args, **kwargs):
-            next_update = await updates.get()
-            updates.task_done()
-            return [next_update]
+            if not updates.empty():
+                next_update = await updates.get()
+                updates.task_done()
+                return [next_update]
+
+            await asyncio.sleep(0)
+            return []
 
         orig_del_webhook = updater.bot.delete_webhook
 
@@ -385,10 +389,14 @@ class TestUpdater:
             if offset is not None and self.message_count != 0:
                 assert offset == self.message_count + 1, "get_updates got wrong `offset` parameter"
 
-            update = await update_queue.get()
-            self.message_count = update.update_id
-            update_queue.task_done()
-            return [update]
+            if not update_queue.empty():
+                update = await update_queue.get()
+                self.message_count = update.update_id
+                update_queue.task_done()
+                return [update]
+
+            await asyncio.sleep(0)
+            return []
 
         monkeypatch.setattr(updater.bot, "get_updates", get_updates)
 
@@ -453,11 +461,15 @@ class TestUpdater:
     async def test_start_polling_exceptions_and_error_callback(
         self, monkeypatch, updater, error, callback_should_be_called, custom_error_callback, caplog
     ):
+        raise_exception = True
         get_updates_event = asyncio.Event()
 
         async def get_updates(*args, **kwargs):
             # So that the main task has a chance to be called
             await asyncio.sleep(0)
+
+            if not raise_exception:
+                return []
 
             get_updates_event.set()
             raise error
@@ -513,6 +525,7 @@ class TestUpdater:
                         and record.name == "telegram.ext.Updater"
                         for record in caplog.records
                     )
+            raise_exception = False
             await updater.stop()
 
     async def test_start_polling_unexpected_shutdown(self, updater, monkeypatch, caplog):
@@ -575,9 +588,13 @@ class TestUpdater:
                 await asyncio.sleep(0.01)
                 raise TypeError("Invalid Data")
 
-            next_update = await updates.get()
-            updates.task_done()
-            return [next_update]
+            if not updates.empty():
+                next_update = await updates.get()
+                updates.task_done()
+                return [next_update]
+
+            await asyncio.sleep(0)
+            return []
 
         orig_del_webhook = updater.bot.delete_webhook
 
