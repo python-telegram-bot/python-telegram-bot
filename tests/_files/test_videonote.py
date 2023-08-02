@@ -169,7 +169,7 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         self, bot, chat_id, video_note_file, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+            return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
 

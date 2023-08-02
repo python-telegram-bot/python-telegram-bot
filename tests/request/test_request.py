@@ -543,7 +543,7 @@ class TestHTTPXRequestWithoutRequest:
         assert code == HTTPStatus.OK
 
     async def test_do_request_params_with_data(
-        self, monkeypatch, httpx_request, mixed_rqs  # noqa: 9811
+        self, monkeypatch, httpx_request, mixed_rqs  # noqa: F811
     ):
         async def make_assertion(self, **kwargs):
             method_assertion = kwargs.get("method") == "method"
