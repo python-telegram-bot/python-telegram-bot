@@ -87,7 +87,7 @@ FieldTuple = Tuple[str, bytes, str]
 UploadFileDict = Dict[str, FieldTuple]
 """Dictionary containing file data to be uploaded to the API."""
 
-HTTPVersion = Literal["1.1", "2.0"]
+HTTPVersion = Literal["1.1", "2.0", "2"]
 """Allowed HTTP versions.
 
 .. versionadded:: 20.4"""

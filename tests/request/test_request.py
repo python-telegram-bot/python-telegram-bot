@@ -85,8 +85,9 @@ class TestNoSocksHTTP2WithoutRequest:
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")
 class TestHTTP2WithRequest:
-    async def test_http_2_response(self):
-        httpx_request = HTTPXRequest(http_version="2")
+    @pytest.mark.parametrize("http_version", ["2", "2.0"])
+    async def test_http_2_response(self, http_version):
+        httpx_request = HTTPXRequest(http_version=http_version)
         async with httpx_request:
             resp = await httpx_request._client.request(
                 url="https://python-telegram-bot.org",
