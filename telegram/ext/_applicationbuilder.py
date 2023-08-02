@@ -487,8 +487,6 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the proxy for the :paramref:`~telegram.request.HTTPXRequest.proxy_url`
         parameter of :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
 
-        Note:
-            this is not the proxy used for all http requests.
 
         .. seealso:: :meth:`get_updates_proxy_url`
 
