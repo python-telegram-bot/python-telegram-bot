@@ -774,6 +774,7 @@ class Updater(AsyncContextManager["Updater"]):
 
             if self.__polling_cleanup_cb:
                 await self.__polling_cleanup_cb()
+                self.__polling_cleanup_cb = None
             else:
                 _LOGGER.warning(
                     "No polling cleanup callback defined. The last fetched updates may be "

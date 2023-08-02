@@ -311,6 +311,34 @@ class TestUpdater:
 
         assert log_found
 
+    async def test_polling_mark_updates_as_read_failure(self, monkeypatch, updater, caplog):
+        async def get_updates(*args, **kwargs):
+            await asyncio.sleep(0)
+            return []
+
+        monkeypatch.setattr(updater.bot, "get_updates", get_updates)
+
+        async with updater:
+            await updater.start_polling()
+            # Unfortunately, there is no clean way to test this scenario as it should in fact
+            # never happen
+            updater._Updater__polling_cleanup_cb = None
+            with caplog.at_level(logging.DEBUG):
+                await updater.stop()
+
+        assert len(caplog.records) >= 1
+        log_found = False
+        for record in caplog.records:
+            if not record.getMessage().startswith("No polling cleanup callback defined"):
+                continue
+
+            assert record.name == "telegram.ext.Updater"
+            assert record.levelno == logging.WARNING
+            log_found = True
+            break
+
+        assert log_found
+
     async def test_start_polling_already_running(self, updater):
         async with updater:
             await updater.start_polling()
