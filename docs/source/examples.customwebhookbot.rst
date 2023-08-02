@@ -13,7 +13,7 @@ You can select your preferred framework by opening one of the tabs above the cod
     2. For extending the functionality of your exisiting web application to also include chat bot functionality
 
     How the PTB and web framework components of the examples below are viewed surely depends on which use case one has in mind.
-    We are fully aware that a combinations of PTB with web frameworks will always mean finding a trade off between usability and best practices for both PTB and the web framework and these examples are certainly far from optimal solutions.
+    We are fully aware that a combination of PTB with web frameworks will always mean finding a tradeoff between usability and best practices for both PTB and the web framework and these examples are certainly far from optimal solutions.
     Please understand them as starting points and use your expertise of the web framework of your choosing to build up on them.
     You are of course also very welcome to help improve these examples!
 
