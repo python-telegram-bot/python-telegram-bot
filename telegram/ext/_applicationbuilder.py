@@ -1092,6 +1092,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
                 application = Application.builder().token("TOKEN").post_init(post_init).build()
 
+        Note:
+            |post_methods_note|
+
         .. seealso:: :meth:`post_stop`, :meth:`post_shutdown`
 
         Args:
@@ -1129,6 +1132,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                                         .token("TOKEN")
                                         .post_shutdown(post_shutdown)
                                         .build()
+
+        Note:
+            |post_methods_note|
 
         .. seealso:: :meth:`post_init`, :meth:`post_stop`
 
@@ -1169,6 +1175,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                                         .token("TOKEN")
                                         .post_stop(post_stop)
                                         .build()
+
+        Note:
+            |post_methods_note|
 
         .. seealso:: :meth:`post_init`, :meth:`post_shutdown`
 
