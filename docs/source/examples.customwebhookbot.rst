@@ -6,7 +6,7 @@ You can select your preferred framework by opening one of the tabs above the cod
 
 .. hint::
 
-    The following examples show how different Python web frameworks can be used alongside with PTB.
+    The following examples show how different Python web frameworks can be used alongside PTB.
     This can be useful for two use cases:
 
     1. For extending the functionality of your existing bot to handling updates of external services
