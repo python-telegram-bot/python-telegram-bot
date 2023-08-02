@@ -2176,7 +2176,7 @@ class TestApplication:
         assert len(recwarn) >= 1
         found = False
         for record in recwarn:
-            print("\t", record)
+            print(record)
             if str(record.message).startswith("Could not add signal handlers for the stop"):
                 assert record.category is PTBUserWarning
                 assert record.filename == __file__, "stacklevel is incorrect!"
