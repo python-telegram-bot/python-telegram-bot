@@ -1464,6 +1464,9 @@ class TestApplication:
             time.sleep(0.05)
             assertions["exception_handling"] = self.received == exception.message
 
+            # So that the get_updates call on shutdown doesn't fail
+            exception_event.clear()
+
             os.kill(os.getpid(), signal.SIGINT)
             time.sleep(0.1)
 
