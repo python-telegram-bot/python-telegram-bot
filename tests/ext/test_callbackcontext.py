@@ -228,7 +228,7 @@ class TestCallbackContext:
                 ),
             )
         keyboard_uuid = app.bot.callback_data_cache.persistence_data[0][0][0]
-        button_uuid = list(app.bot.callback_data_cache.persistence_data[0][0][2])[0]
+        button_uuid = next(iter(app.bot.callback_data_cache.persistence_data[0][0][2]))
         callback_data = keyboard_uuid + button_uuid
         callback_query = CallbackQuery(
             id="1",

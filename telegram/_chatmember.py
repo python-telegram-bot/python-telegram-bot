@@ -111,7 +111,7 @@ class ChatMember(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type["ChatMember"]] = {
+        _class_mapping: Dict[str, Type[ChatMember]] = {
             cls.OWNER: ChatMemberOwner,
             cls.ADMINISTRATOR: ChatMemberAdministrator,
             cls.MEMBER: ChatMemberMember,

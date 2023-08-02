@@ -106,7 +106,7 @@ class TelegramObject:
         # classes than classes with arguments.
         self._frozen: bool = False
         self._id_attrs: Tuple[object, ...] = ()
-        self._bot: Optional["Bot"] = None
+        self._bot: Optional[Bot] = None
         # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
         self.api_kwargs: Mapping[str, Any] = MappingProxyType(api_kwargs or {})
 

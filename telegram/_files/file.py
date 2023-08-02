@@ -99,7 +99,7 @@ class File(TelegramObject):
         self.file_size: Optional[int] = file_size
         self.file_path: Optional[str] = file_path
 
-        self._credentials: Optional["FileCredentials"] = None
+        self._credentials: Optional[FileCredentials] = None
 
         self._id_attrs = (self.file_unique_id,)
 

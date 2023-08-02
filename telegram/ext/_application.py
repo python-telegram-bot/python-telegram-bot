@@ -294,7 +294,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             )
 
         self.bot: BT = bot
-        self.update_queue: "asyncio.Queue[object]" = update_queue
+        self.update_queue: asyncio.Queue[object] = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
         self.updater: Optional[Updater] = updater
         self.handlers: Dict[int, List[BaseHandler[Any, CCT]]] = {}
@@ -302,13 +302,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             HandlerCallback[object, CCT, None], Union[bool, DefaultValue[bool]]
         ] = {}
         self.post_init: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
         ] = post_init
         self.post_shutdown: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
         ] = post_shutdown
         self.post_stop: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
         ] = post_stop
         self._update_processor = update_processor
         self.bot_data: BD = self.context_types.bot_data()
@@ -1012,7 +1012,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         # but by passing `is_error_handler=True` from `process_error`, we can make sure that we
         # get at most one recursion of the user calls `create_task` manually with an error handler
         # function
-        task: "asyncio.Task[RT]" = asyncio.create_task(
+        task: asyncio.Task[RT] = asyncio.create_task(
             self.__create_task_callback(
                 coroutine=coroutine, update=update, is_error_handler=is_error_handler
             ),
@@ -1671,7 +1671,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update: Optional[object],
         error: Exception,
         job: Optional["Job[CCT]"] = None,
-        coroutine: _ErrorCoroType[RT] = None,  # noqa: RUF013
+        coroutine: _ErrorCoroType[RT] = None,
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises

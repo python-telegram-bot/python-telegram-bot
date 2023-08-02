@@ -176,7 +176,7 @@ class TestAudioWithoutRequest(TestAudioBase):
 
     async def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+            return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_audio(chat_id, audio_file, filename="custom_filename")

@@ -271,8 +271,8 @@ class Update(TelegramObject):
         self.chat_member: Optional[ChatMemberUpdated] = chat_member
         self.chat_join_request: Optional[ChatJoinRequest] = chat_join_request
 
-        self._effective_user: Optional["User"] = None
-        self._effective_chat: Optional["Chat"] = None
+        self._effective_user: Optional[User] = None
+        self._effective_chat: Optional[Chat] = None
         self._effective_message: Optional[Message] = None
 
         self._id_attrs = (self.update_id,)

@@ -766,8 +766,8 @@ class Message(TelegramObject):
         self.edit_date: Optional[datetime.datetime] = edit_date
         self.has_protected_content: Optional[bool] = has_protected_content
         self.text: Optional[str] = text
-        self.entities: Tuple["MessageEntity", ...] = parse_sequence_arg(entities)
-        self.caption_entities: Tuple["MessageEntity", ...] = parse_sequence_arg(caption_entities)
+        self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
+        self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
         self.audio: Optional[Audio] = audio
         self.game: Optional[Game] = game
         self.document: Optional[Document] = document

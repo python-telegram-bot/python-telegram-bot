@@ -100,7 +100,7 @@ class BotCommandScope(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type["BotCommandScope"]] = {
+        _class_mapping: Dict[str, Type[BotCommandScope]] = {
             cls.DEFAULT: BotCommandScopeDefault,
             cls.ALL_PRIVATE_CHATS: BotCommandScopeAllPrivateChats,
             cls.ALL_GROUP_CHATS: BotCommandScopeAllGroupChats,
