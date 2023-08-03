@@ -339,10 +339,10 @@ class ConversationHandler(BaseHandler[Update, CCT]):
 
         # if conversation_timeout is used, this dict is used to schedule a job which runs when the
         # conv has timed out.
-        self.timeout_jobs: Dict[ConversationKey, "Job[Any]"] = {}
+        self.timeout_jobs: Dict[ConversationKey, Job[Any]] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
-        self._child_conversations: Set["ConversationHandler"] = set()
+        self._child_conversations: Set[ConversationHandler] = set()
 
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
