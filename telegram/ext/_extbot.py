@@ -243,6 +243,9 @@ class ExtBot(Bot, Generic[RLARGS]):
 
             self._callback_data_cache = CallbackDataCache(bot=self, maxsize=maxsize)
 
+    def __repr__(self) -> str:
+        return f"Object of class ExtBot with token {self.token}"
+
     @classmethod
     def _warn(
         cls, message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0

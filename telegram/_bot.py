@@ -302,6 +302,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         self._freeze()
 
+    def __repr__(self) -> str:
+        return f"Object of class Bot with token {self.token}"
+
     @property
     def token(self) -> str:
         """:obj:`str`: Bot's unique authentication token.
