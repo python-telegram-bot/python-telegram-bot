@@ -882,3 +882,10 @@ class Job(Generic[CCT]):
 
     def __hash__(self) -> int:
         return hash(self.id)
+
+    def __repr__(self) -> str:
+        name_infix = f"Job name {self.name}. " if self.name != self.callback.__name__ else ""
+        return (
+            f"Job ID {self.job.id}. {name_infix}Callback name {self.callback.__name__}. "
+            f"Next run: {self.next_t}"
+        )
