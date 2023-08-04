@@ -149,6 +149,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             Union[Generator[Optional[Future[object]], None, Any], Awaitable[Any]]
         ] = None
 
+    def __repr__(self) -> str:
+        return f"CallbackContext associated with update {self.update}"
+
     @property
     def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":
         """:class:`telegram.ext.Application`: The application associated with this context."""
