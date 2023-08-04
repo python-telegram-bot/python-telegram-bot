@@ -97,6 +97,9 @@ class JobQueue(Generic[CCT]):
             timezone=pytz.utc, executors={"default": self._executor}
         )
 
+    def __repr__(self) -> str:
+        return f"JobQueue for Application {self.application}"
+
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
 
