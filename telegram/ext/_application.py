@@ -80,7 +80,6 @@ _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-n
 _STOP_SIGNAL = object()
 _DEFAULT_0 = DefaultValue(0)
 
-
 # Since python 3.12, the coroutine passed to create_task should not be an (async) generator. Remove
 # this check when we drop support for python 3.11.
 if sys.version_info >= (3, 12):
@@ -89,7 +88,6 @@ else:
     _CoroType = Union[Generator["asyncio.Future[object]", None, RT], Awaitable[RT]]
 
 _ErrorCoroType = Optional[_CoroType[RT]]
-
 
 _LOGGER = get_logger(__name__)
 
@@ -344,6 +342,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__update_persistence_event = asyncio.Event()
         self.__update_persistence_lock = asyncio.Lock()
         self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
+
+    def __repr__(self) -> str:
+        return f"PTB application with bot {self.bot}"
 
     def _check_initialized(self) -> None:
         if not self._initialized:
