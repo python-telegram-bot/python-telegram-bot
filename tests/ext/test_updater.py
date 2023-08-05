@@ -367,6 +367,7 @@ class TestUpdater:
     async def test_start_polling_get_updates_parameters(self, updater, monkeypatch):
         update_queue = asyncio.Queue()
         await update_queue.put(Update(update_id=1))
+        on_stop_flag = False
 
         expected = {
             "timeout": 10,
@@ -379,6 +380,11 @@ class TestUpdater:
         }
 
         async def get_updates(*args, **kwargs):
+            if on_stop_flag:
+                # This is tested in test_polling_mark_updates_as_read
+                await asyncio.sleep(0)
+                return []
+
             for key, value in expected.items():
                 assert kwargs.pop(key, None) == value
 
@@ -403,7 +409,9 @@ class TestUpdater:
         async with updater:
             await updater.start_polling()
             await update_queue.join()
+            on_stop_flag = True
             await updater.stop()
+            on_stop_flag = False
 
             expected = {
                 "timeout": 42,
@@ -425,6 +433,7 @@ class TestUpdater:
                 allowed_updates=["message"],
             )
             await update_queue.join()
+            on_stop_flag = True
             await updater.stop()
 
     @pytest.mark.parametrize("exception_class", [InvalidToken, TelegramError])
