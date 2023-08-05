@@ -380,7 +380,8 @@ class Updater(AsyncContextManager["Updater"]):
             )
             await self.bot.get_updates(
                 offset=self._last_update_id,
-                timeout=timeout,
+                # We don't want to do long polling here!
+                timeout=0,
                 read_timeout=read_timeout,
                 connect_timeout=connect_timeout,
                 write_timeout=write_timeout,

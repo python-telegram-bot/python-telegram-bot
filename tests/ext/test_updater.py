@@ -277,7 +277,7 @@ class TestUpdater:
         tracking_flag = False
         received_kwargs = {}
         expected_kwargs = {
-            "timeout": "timeout",
+            "timeout": 0,
             "read_timeout": "read_timeout",
             "connect_timeout": "connect_timeout",
             "write_timeout": "write_timeout",
