@@ -769,6 +769,13 @@ class Job(Generic[CCT]):
 
         self._job = cast("APSJob", None)  # skipcq: PTC-W0052
 
+    def __repr__(self) -> str:
+        name_infix = f"Job name {self.name}. " if self.name != self.callback.__name__ else ""
+        return (
+            f"Job ID {self.job.id}. {name_infix}Callback name {self.callback.__name__}. "
+            f"Next run: {self.next_t}"
+        )
+
     @property
     def job(self) -> "APSJob":
         """:class:`apscheduler.job.Job`: The APS Job this job is a wrapper for.
@@ -885,10 +892,3 @@ class Job(Generic[CCT]):
 
     def __hash__(self) -> int:
         return hash(self.id)
-
-    def __repr__(self) -> str:
-        name_infix = f"Job name {self.name}. " if self.name != self.callback.__name__ else ""
-        return (
-            f"Job ID {self.job.id}. {name_infix}Callback name {self.callback.__name__}. "
-            f"Next run: {self.next_t}"
-        )
