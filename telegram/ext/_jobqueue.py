@@ -773,7 +773,7 @@ class Job(Generic[CCT]):
         name_infix = f"Job name {self.name}. " if self.name != self.callback.__name__ else ""
         return (
             f"Job ID {self.job.id}. {name_infix}Callback name {self.callback.__name__}. "
-            f"Next run: {self.next_t}"
+            f"APS job trigger: {self.job.trigger}. Next run: {self.next_t}."
         )
 
     @property
