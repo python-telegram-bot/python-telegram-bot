@@ -96,7 +96,7 @@ class BaseHandler(Generic[UT, CCT], ABC):
         self.block: DVType[bool] = block
 
     def __repr__(self) -> str:
-        return f"Handler {self.__class__.__name__}. Callback: {self.callback}."
+        return f"Handler {self.__class__.__name__}. Callback: {self.callback.__qualname__}."
 
     @abstractmethod
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
