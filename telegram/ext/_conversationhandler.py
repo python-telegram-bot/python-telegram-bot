@@ -440,6 +440,13 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                     stacklevel=2,
                 )
 
+    def __repr__(self) -> str:
+        name = self.name or "(no name)"
+        return (
+            f"ConversationHandler {name} with {len(self.states)} states, "
+            f"{len(self.entry_points)} entry point(s) and {len(self.fallbacks)} fallbacks"
+        )
+
     @property
     def entry_points(self) -> List[BaseHandler[Update, CCT]]:
         """List[:class:`telegram.ext.BaseHandler`]: A list of :obj:`BaseHandler` objects that can
