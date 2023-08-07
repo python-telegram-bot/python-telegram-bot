@@ -122,6 +122,12 @@ class Updater(AsyncContextManager["Updater"]):
         self.__lock = asyncio.Lock()
         self.__polling_task: Optional[asyncio.Task] = None
 
+    def __repr__(self) -> str:
+        return (
+            f"Updater for bot {self.bot}. Number of updates currently in the queue: "
+            f"{self.update_queue.qsize()}"
+        )
+
     @property
     def running(self) -> bool:
         return self._running
