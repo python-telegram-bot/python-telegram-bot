@@ -170,7 +170,6 @@ settings.configure(ROOT_URLCONF=__name__, SECRET_KEY=uuid4().hex)
 
 async def main() -> None:
     """Finalize configuration and run the applications."""
-
     webserver = uvicorn.Server(
         config=uvicorn.Config(
             app=get_asgi_application(),
