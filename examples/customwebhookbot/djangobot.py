@@ -64,7 +64,7 @@ logger = logging.getLogger(__name__)
 URL = "https://domain.tld"
 ADMIN_CHAT_ID = 123456
 PORT = 8000
-TOKEN = "123:ABC"
+TOKEN = "123:ABC"  # nosec B105
 
 
 @dataclass
