@@ -54,6 +54,7 @@ from typing import (
 from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
@@ -344,7 +345,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
 
     def __repr__(self) -> str:
-        return f"PTB application with bot {self.bot}"
+        return build_repr_with_selected_attrs(self, bot=self.bot)
 
     def _check_initialized(self) -> None:
         if not self._initialized:
