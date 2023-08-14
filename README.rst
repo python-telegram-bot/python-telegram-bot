@@ -6,66 +6,6 @@
    :target: https://python-telegram-bot.org
    :alt: python-telegram-bot Logo
 
-.. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
-   :target: https://pypi.org/project/python-telegram-bot/
-   :alt: PyPi Package Version
-
-.. image:: https://img.shields.io/pypi/pyversions/python-telegram-bot.svg
-   :target: https://pypi.org/project/python-telegram-bot/
-   :alt: Supported Python versions
-
-.. image:: https://img.shields.io/badge/Bot%20API-6.7-blue?logo=telegram
-   :target: https://core.telegram.org/bots/api-changelog
-   :alt: Supported Bot API versions
-
-.. image:: https://img.shields.io/pypi/dm/python-telegram-bot
-   :target: https://pypistats.org/packages/python-telegram-bot
-   :alt: PyPi Package Monthly Download
-
-.. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=stable
-   :target: https://docs.python-telegram-bot.org/en/stable/
-   :alt: Documentation Status
-
-.. image:: https://img.shields.io/pypi/l/python-telegram-bot.svg
-   :target: https://www.gnu.org/licenses/lgpl-3.0.html
-   :alt: LGPLv3 License
-
-.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/GitHub%20Actions/badge.svg
-   :target: https://github.com/python-telegram-bot/python-telegram-bot/
-   :alt: Github Actions workflow
-
-.. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
-   :target: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot
-   :alt: Code coverage
-
-.. image:: https://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
-   :target: https://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
-   :alt: Median time to resolve an issue
-
-.. image:: https://api.codacy.com/project/badge/Grade/99d901eaa09b44b4819aec05c330c968
-   :target: https://app.codacy.com/gh/python-telegram-bot/python-telegram-bot/dashboard
-   :alt: Code quality: Codacy
-
-.. image:: https://app.deepsource.com/gh/python-telegram-bot/python-telegram-bot.svg/?label=active+issues
-   :target: https://app.deepsource.com/gh/python-telegram-bot/python-telegram-bot/?ref=repository-badge
-   :alt: Code quality: DeepSource
-
-.. image:: https://results.pre-commit.ci/badge/github/python-telegram-bot/python-telegram-bot/master.svg
-   :target: https://results.pre-commit.ci/latest/github/python-telegram-bot/python-telegram-bot/master
-   :alt: pre-commit.ci status
-
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://github.com/psf/black
-   :alt: Code Style: Black
-
-.. image:: https://img.shields.io/badge/Telegram-Channel-blue.svg?logo=telegram
-   :target: https://t.me/pythontelegrambotchannel
-   :alt: Telegram Channel
-
-.. image:: https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram
-   :target: https://telegram.me/pythontelegrambotgroup
-   :alt: Telegram Group
-
 We have made you a wrapper you can't refuse
 
 We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
