@@ -1427,7 +1427,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_polling_basic(self, app, monkeypatch):
+    def test_run_polling_basic(self, app, monkeypatch, caplog):
         exception_event = threading.Event()
         update_event = threading.Event()
         exception = TelegramError("This is a test error")
@@ -1481,12 +1481,19 @@ class TestApplication:
 
         thread = Thread(target=thread_target)
         thread.start()
-        app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        with caplog.at_level(logging.DEBUG):
+            app.run_polling(drop_pending_updates=True, close_loop=False)
+            thread.join()
 
         assert len(assertions) == 8
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
+
+        found_log = False
+        for record in caplog.records:
+            if "received stop signal" in record.getMessage() and record.levelno == logging.DEBUG:
+                found_log = True
+        assert found_log
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
@@ -1695,7 +1702,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_webhook_basic(self, app, monkeypatch):
+    def test_run_webhook_basic(self, app, monkeypatch, caplog):
         assertions = {}
 
         async def delete_webhook(*args, **kwargs):
@@ -1744,18 +1751,25 @@ class TestApplication:
         ip = "127.0.0.1"
         port = randrange(1024, 49152)
 
-        app.run_webhook(
-            ip_address=ip,
-            port=port,
-            url_path="TOKEN",
-            drop_pending_updates=True,
-            close_loop=False,
-        )
-        thread.join()
+        with caplog.at_level(logging.DEBUG):
+            app.run_webhook(
+                ip_address=ip,
+                port=port,
+                url_path="TOKEN",
+                drop_pending_updates=True,
+                close_loop=False,
+            )
+            thread.join()
 
         assert len(assertions) == 7
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
+
+        found_log = False
+        for record in caplog.records:
+            if "received stop signal" in record.getMessage() and record.levelno == logging.DEBUG:
+                found_log = True
+        assert found_log
 
     @pytest.mark.skipif(
         platform.system() == "Windows",

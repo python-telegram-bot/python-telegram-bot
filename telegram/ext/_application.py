@@ -957,7 +957,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             loop.run_until_complete(self.start())
             loop.run_forever()
         except (KeyboardInterrupt, SystemExit):
-            pass
+            _LOGGER.debug("Application received stop signal. Shutting down.")
         except Exception as exc:
             # In case the coroutine wasn't awaited, we don't need to bother the user with a warning
             updater_coroutine.close()
