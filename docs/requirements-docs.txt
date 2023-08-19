@@ -1,4 +1,4 @@
-sphinx==7.1.2
+sphinx==7.2.2
 sphinx-pypi-upload
 furo==2023.7.26
 git+https://github.com/harshil21/furo-sphinx-search@01efc7be422d7dc02390aab9be68d6f5ce1a5618#egg=furo-sphinx-search
