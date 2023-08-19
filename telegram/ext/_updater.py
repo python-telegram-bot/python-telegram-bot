@@ -24,6 +24,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import (
     TYPE_CHECKING,
+    Any,
     AsyncContextManager,
     Callable,
     Coroutine,
@@ -121,6 +122,7 @@ class Updater(AsyncContextManager["Updater"]):
         self._httpd: Optional[WebhookServer] = None
         self.__lock = asyncio.Lock()
         self.__polling_task: Optional[asyncio.Task] = None
+        self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
 
     @property
     def running(self) -> bool:
@@ -366,6 +368,28 @@ class Updater(AsyncContextManager["Updater"]):
             ),
             name="Updater:start_polling:polling_task",
         )
+
+        # Prepare a cleanup callback to await on _stop_polling
+        # Calling get_updates one more time with the latest `offset` parameter ensures that
+        # all updates that where put into the update queue are also marked as "read" to TG,
+        # so we do not receive them again on the next startup
+        # We define this here so that we can use the same parameters as in the polling task
+        async def _get_updates_cleanup() -> None:
+            _LOGGER.debug(
+                "Calling `get_updates` one more time to mark all fetched updates as read."
+            )
+            await self.bot.get_updates(
+                offset=self._last_update_id,
+                # We don't want to do long polling here!
+                timeout=0,
+                read_timeout=read_timeout,
+                connect_timeout=connect_timeout,
+                write_timeout=write_timeout,
+                pool_timeout=pool_timeout,
+                allowed_updates=allowed_updates,
+            )
+
+        self.__polling_cleanup_cb = _get_updates_cleanup
 
         if ready is not None:
             ready.set()
@@ -748,3 +772,12 @@ class Updater(AsyncContextManager["Updater"]):
                 # after start_polling(), but lets better be safe than sorry ...
 
             self.__polling_task = None
+
+            if self.__polling_cleanup_cb:
+                await self.__polling_cleanup_cb()
+                self.__polling_cleanup_cb = None
+            else:
+                _LOGGER.warning(
+                    "No polling cleanup callback defined. The last fetched updates may be "
+                    "fetched again on the next polling start."
+                )
