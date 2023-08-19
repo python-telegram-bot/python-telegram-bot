@@ -884,6 +884,11 @@ class TestFilters:
         assert filters.Sticker.VIDEO.check_update(update)
         assert filters.Sticker.PREMIUM.check_update(update)
 
+    def test_filters_story(self, update):
+        assert not filters.STORY.check_update(update)
+        update.message.story = "test"
+        assert filters.STORY.check_update(update)
+
     def test_filters_video(self, update):
         assert not filters.VIDEO.check_update(update)
         update.message.video = "test"

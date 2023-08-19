@@ -2904,6 +2904,37 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    async def unpin_all_general_forum_topic_messages(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.unpin_all_general_forum_topic_messages(chat_id=update.effective_chat.id,
+                *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.unpin_all_general_forum_topic_messages`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().unpin_all_general_forum_topic_messages(
+            chat_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def edit_general_forum_topic(
         self,
         name: str,

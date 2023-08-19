@@ -1075,6 +1075,31 @@ class TestChatWithoutRequest(TestChatBase):
         monkeypatch.setattr(chat.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
         assert await chat.unpin_all_forum_topic_messages(message_thread_id=42)
 
+    async def test_unpin_all_general_forum_topic_messages(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.unpin_all_general_forum_topic_messages,
+            Bot.unpin_all_general_forum_topic_messages,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.unpin_all_general_forum_topic_messages,
+            chat.get_bot(),
+            "unpin_all_general_forum_topic_messages",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(
+            chat.unpin_all_general_forum_topic_messages, chat.get_bot()
+        )
+
+        monkeypatch.setattr(
+            chat.get_bot(), "unpin_all_general_forum_topic_messages", make_assertion
+        )
+        assert await chat.unpin_all_general_forum_topic_messages()
+
     async def test_edit_general_forum_topic(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == chat.id and kwargs["name"] == "WhatAName"
