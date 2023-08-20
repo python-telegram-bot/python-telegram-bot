@@ -90,7 +90,7 @@ def poll_answer():
 
 class TestPollAnswerBase:
     poll_id = "id"
-    voter_chat = Chat(1, "private")
+    voter_chat = Chat(1, "")
     user = User(1, "", False)
     option_ids = [2]
 
@@ -122,7 +122,7 @@ class TestPollAnswerWithoutRequest(TestPollAnswerBase):
 
     def test_equality(self):
         a = PollAnswer(123, self.voter_chat, self.user, [2])
-        b = PollAnswer(123, Chat(1, "private"), self.user, [2])
+        b = PollAnswer(123, Chat(1, ""), self.user, [2])
         c = PollAnswer(123, self.voter_chat, User(1, "first", False), [2])
         d = PollAnswer(123, self.voter_chat, self.user, [1, 2])
         e = PollAnswer(456, self.voter_chat, self.user, [2])
