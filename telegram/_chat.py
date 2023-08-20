@@ -176,7 +176,7 @@ class Chat(TelegramObject):
             the other party in a private chat, in seconds. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: 20.5
+            .. versionadded:: NEXT.VERSION
         has_aggressive_anti_spam_enabled (:obj:`bool`, optional): :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators. Returned only in :meth:`telegram.Bot.get_chat`.
@@ -274,7 +274,7 @@ class Chat(TelegramObject):
             the other party in a private chat, in seconds. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: 20.5
+            .. versionadded:: NEXT.VERSION
         has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators. Returned only in :meth:`telegram.Bot.get_chat`.

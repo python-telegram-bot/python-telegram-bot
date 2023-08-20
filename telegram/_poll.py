@@ -90,7 +90,7 @@ class PollAnswer(TelegramObject):
         voter_chat (:class:`telegram.Chat`): The chat that changed the answer to the poll,
             if the voter is anonymous.
 
-            .. versionadded:: 20.5
+            .. versionadded:: NEXT.VERSION
         user (:class:`telegram.User`): The user that changed the answer to the poll,
             if the voter isn't anonymous.
         option_ids (Sequence[:obj:`int`]): 0-based identifiers of chosen answer options.
@@ -104,7 +104,7 @@ class PollAnswer(TelegramObject):
         voter_chat (:class:`telegram.Chat`): The chat that changed the answer to the poll,
             if the voter is anonymous.
 
-            .. versionadded:: 20.5
+            .. versionadded:: NEXT.VERSION
         user (:class:`telegram.User`): The user, who changed the answer to the poll,
             if the voter isn't anonymous.
         option_ids (Tuple[:obj:`int`]): Identifiers of answer options, chosen by the user.  May be
