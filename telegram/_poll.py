@@ -21,6 +21,7 @@ import datetime
 from typing import TYPE_CHECKING, Dict, Final, List, Optional, Sequence, Tuple
 
 from telegram import constants
+from telegram._chat import Chat
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -86,7 +87,12 @@ class PollAnswer(TelegramObject):
 
     Args:
         poll_id (:obj:`str`): Unique poll identifier.
-        user (:class:`telegram.User`): The user, who changed the answer to the poll.
+        voter_chat (:class:`telegram.Chat`): The chat that changed the answer to the poll,
+            if the voter is anonymous.
+
+            .. versionadded:: 20.5
+        user (:class:`telegram.User`): The user, who changed the answer to the poll,
+            if the voter isn't anonymous.
         option_ids (Sequence[:obj:`int`]): 0-based identifiers of answer options, chosen by the
             user. May be empty if the user retracted their vote.
 
@@ -95,7 +101,12 @@ class PollAnswer(TelegramObject):
 
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
-        user (:class:`telegram.User`): The user, who changed the answer to the poll.
+        voter_chat (:class:`telegram.Chat`): The chat that changed the answer to the poll,
+            if the voter is anonymous.
+
+            .. versionadded:: 20.5
+        user (:class:`telegram.User`): The user, who changed the answer to the poll,
+            if the voter isn't anonymous.
         option_ids (Tuple[:obj:`int`]): Identifiers of answer options, chosen by the user.  May be
             empty if the user retracted their vote.
 
@@ -104,11 +115,12 @@ class PollAnswer(TelegramObject):
 
     """
 
-    __slots__ = ("option_ids", "user", "poll_id")
+    __slots__ = ("option_ids", "user", "poll_id", "voter_chat")
 
     def __init__(
         self,
         poll_id: str,
+        voter_chat: Chat,
         user: User,
         option_ids: Sequence[int],
         *,
@@ -116,10 +128,11 @@ class PollAnswer(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.poll_id: str = poll_id
+        self.voter_chat = voter_chat
         self.user: User = user
         self.option_ids: Tuple[int, ...] = parse_sequence_arg(option_ids)
 
-        self._id_attrs = (self.poll_id, self.user, tuple(self.option_ids))
+        self._id_attrs = (self.poll_id, self.voter_chat, self.user, tuple(self.option_ids))
 
         self._freeze()
 
@@ -132,6 +145,7 @@ class PollAnswer(TelegramObject):
             return None
 
         data["user"] = User.de_json(data.get("user"), bot)
+        data["voter_chat"] = Chat.de_json(data.get("voter_chat"), bot)
 
         return super().de_json(data=data, bot=bot)
 

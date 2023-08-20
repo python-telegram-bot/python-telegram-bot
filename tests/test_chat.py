@@ -52,6 +52,7 @@ def chat(bot):
         is_forum=True,
         active_usernames=TestChatBase.active_usernames,
         emoji_status_custom_emoji_id=TestChatBase.emoji_status_custom_emoji_id,
+        emoji_status_expiration_date=TestChatBase.emoji_status_expiration_date,
         has_aggressive_anti_spam_enabled=TestChatBase.has_aggressive_anti_spam_enabled,
         has_hidden_members=TestChatBase.has_hidden_members,
     )
@@ -85,6 +86,7 @@ class TestChatBase:
     is_forum = True
     active_usernames = ["These", "Are", "Usernames!"]
     emoji_status_custom_emoji_id = "VeryUniqueCustomEmojiID"
+    emoji_status_expiration_date = 123456789
     has_aggressive_anti_spam_enabled = True
     has_hidden_members = True
 
@@ -119,6 +121,7 @@ class TestChatWithoutRequest(TestChatBase):
             "is_forum": self.is_forum,
             "active_usernames": self.active_usernames,
             "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id,
+            "emoji_status_expiration_date": self.emoji_status_expiration_date,
             "has_aggressive_anti_spam_enabled": self.has_aggressive_anti_spam_enabled,
             "has_hidden_members": self.has_hidden_members,
         }
@@ -150,6 +153,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.is_forum == self.is_forum
         assert chat.active_usernames == tuple(self.active_usernames)
         assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
+        assert chat.emoji_status_expiration_date == self.emoji_status_expiration_date
         assert chat.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
         assert chat.has_hidden_members == self.has_hidden_members
 
@@ -177,6 +181,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_dict["is_forum"] == chat.is_forum
         assert chat_dict["active_usernames"] == list(chat.active_usernames)
         assert chat_dict["emoji_status_custom_emoji_id"] == chat.emoji_status_custom_emoji_id
+        assert chat_dict["emoji_status_expiration_date"] == chat.emoji_status_expiration_date
         assert (
             chat_dict["has_aggressive_anti_spam_enabled"] == chat.has_aggressive_anti_spam_enabled
         )

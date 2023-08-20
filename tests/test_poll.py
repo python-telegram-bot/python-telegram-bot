@@ -19,7 +19,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from telegram import MessageEntity, Poll, PollAnswer, PollOption, User
+from telegram import Chat, MessageEntity, Poll, PollAnswer, PollOption, User
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
 from tests.auxil.slots import mro_slots
@@ -81,12 +81,16 @@ class TestPollOptionWithoutRequest(TestPollOptionBase):
 @pytest.fixture(scope="module")
 def poll_answer():
     return PollAnswer(
-        TestPollAnswerBase.poll_id, TestPollAnswerBase.user, TestPollAnswerBase.poll_id
+        TestPollAnswerBase.poll_id,
+        TestPollAnswerBase.voter_chat,
+        TestPollAnswerBase.user,
+        TestPollAnswerBase.option_ids,
     )
 
 
 class TestPollAnswerBase:
     poll_id = "id"
+    voter_chat = Chat(1, "private")
     user = User(1, "", False)
     option_ids = [2]
 
@@ -95,6 +99,7 @@ class TestPollAnswerWithoutRequest(TestPollAnswerBase):
     def test_de_json(self):
         json_dict = {
             "poll_id": self.poll_id,
+            "voter_chat": self.voter_chat.to_dict(),
             "user": self.user.to_dict(),
             "option_ids": self.option_ids,
         }
@@ -102,6 +107,7 @@ class TestPollAnswerWithoutRequest(TestPollAnswerBase):
         assert poll_answer.api_kwargs == {}
 
         assert poll_answer.poll_id == self.poll_id
+        assert poll_answer.voter_chat == self.voter_chat
         assert poll_answer.user == self.user
         assert poll_answer.option_ids == tuple(self.option_ids)
 
@@ -110,27 +116,32 @@ class TestPollAnswerWithoutRequest(TestPollAnswerBase):
 
         assert isinstance(poll_answer_dict, dict)
         assert poll_answer_dict["poll_id"] == poll_answer.poll_id
+        assert poll_answer_dict["voter_chat"] == poll_answer.voter_chat.to_dict()
         assert poll_answer_dict["user"] == poll_answer.user.to_dict()
         assert poll_answer_dict["option_ids"] == list(poll_answer.option_ids)
 
     def test_equality(self):
-        a = PollAnswer(123, self.user, [2])
-        b = PollAnswer(123, User(1, "first", False), [2])
-        c = PollAnswer(123, self.user, [1, 2])
-        d = PollAnswer(456, self.user, [2])
-        e = PollOption("Text", 1)
+        a = PollAnswer(123, self.voter_chat, self.user, [2])
+        b = PollAnswer(123, Chat(1, "private"), self.user, [2])
+        c = PollAnswer(123, self.voter_chat, User(1, "first", False), [2])
+        d = PollAnswer(123, self.voter_chat, self.user, [1, 2])
+        e = PollAnswer(456, self.voter_chat, self.user, [2])
+        f = PollOption("Text", 1)
 
         assert a == b
         assert hash(a) == hash(b)
 
-        assert a != c
-        assert hash(a) != hash(c)
+        assert a == c
+        assert hash(a) == hash(c)
 
         assert a != d
         assert hash(a) != hash(d)
 
         assert a != e
         assert hash(a) != hash(e)
+
+        assert a != f
+        assert hash(a) != hash(f)
 
 
 @pytest.fixture(scope="module")

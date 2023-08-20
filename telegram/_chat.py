@@ -172,6 +172,11 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        emoji_status_expiration_date (:obj:`int`, optional): Expiration date of emoji status of
+            the other party in a private chat, in seconds. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 20.5
         has_aggressive_anti_spam_enabled (:obj:`bool`, optional): :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators. Returned only in :meth:`telegram.Bot.get_chat`.
@@ -265,6 +270,11 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        emoji_status_expiration_date (:obj:`int`, optional): Expiration date of emoji status of
+            the other party in a private chat, in seconds. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 20.5
         has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators. Returned only in :meth:`telegram.Bot.get_chat`.
@@ -306,6 +316,7 @@ class Chat(TelegramObject):
         "is_forum",
         "active_usernames",
         "emoji_status_custom_emoji_id",
+        "emoji_status_expiration_date",
         "has_hidden_members",
         "has_aggressive_anti_spam_enabled",
     )
@@ -352,6 +363,7 @@ class Chat(TelegramObject):
         is_forum: Optional[bool] = None,
         active_usernames: Optional[Sequence[str]] = None,
         emoji_status_custom_emoji_id: Optional[str] = None,
+        emoji_status_expiration_date: Optional[int] = None,
         has_aggressive_anti_spam_enabled: Optional[bool] = None,
         has_hidden_members: Optional[bool] = None,
         *,
@@ -390,6 +402,7 @@ class Chat(TelegramObject):
         self.is_forum: Optional[bool] = is_forum
         self.active_usernames: Tuple[str, ...] = parse_sequence_arg(active_usernames)
         self.emoji_status_custom_emoji_id: Optional[str] = emoji_status_custom_emoji_id
+        self.emoji_status_expiration_date: Optional[int] = emoji_status_expiration_date
         self.has_aggressive_anti_spam_enabled: Optional[bool] = has_aggressive_anti_spam_enabled
         self.has_hidden_members: Optional[bool] = has_hidden_members
 
