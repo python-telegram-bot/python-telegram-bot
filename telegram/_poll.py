@@ -91,10 +91,10 @@ class PollAnswer(TelegramObject):
             if the voter is anonymous.
 
             .. versionadded:: 20.5
-        user (:class:`telegram.User`): The user, who changed the answer to the poll,
+        user (:class:`telegram.User`): The user that changed the answer to the poll,
             if the voter isn't anonymous.
-        option_ids (Sequence[:obj:`int`]): 0-based identifiers of answer options, chosen by the
-            user. May be empty if the user retracted their vote.
+        option_ids (Sequence[:obj:`int`]): 0-based identifiers of chosen answer options.
+            May be empty if the vote was retracted.
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|
