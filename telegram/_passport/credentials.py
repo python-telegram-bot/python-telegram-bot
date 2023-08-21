@@ -154,7 +154,7 @@ class EncryptedCredentials(TelegramObject):
         self._id_attrs = (self.data, self.hash, self.secret)
 
         self._decrypted_secret: Optional[str] = None
-        self._decrypted_data: Optional["Credentials"] = None
+        self._decrypted_data: Optional[Credentials] = None
 
         self._freeze()
 
@@ -442,8 +442,8 @@ class SecureValue(TelegramObject):
         self.front_side: Optional[FileCredentials] = front_side
         self.reverse_side: Optional[FileCredentials] = reverse_side
         self.selfie: Optional[FileCredentials] = selfie
-        self.files: Tuple["FileCredentials", ...] = parse_sequence_arg(files)
-        self.translation: Tuple["FileCredentials", ...] = parse_sequence_arg(translation)
+        self.files: Tuple[FileCredentials, ...] = parse_sequence_arg(files)
+        self.translation: Tuple[FileCredentials, ...] = parse_sequence_arg(translation)
 
         self._freeze()
 

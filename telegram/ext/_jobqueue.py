@@ -91,7 +91,7 @@ class JobQueue(Generic[CCT]):
                 '"python-telegram-bot[job-queue]"`.'
             )
 
-        self._application: "Optional[weakref.ReferenceType[Application]]" = None
+        self._application: Optional[weakref.ReferenceType[Application]] = None
         self._executor = AsyncIOExecutor()
         self.scheduler: AsyncIOScheduler = AsyncIOScheduler(
             timezone=pytz.utc, executors={"default": self._executor}

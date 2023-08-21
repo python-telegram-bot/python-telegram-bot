@@ -294,7 +294,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             )
 
         self.bot: BT = bot
-        self.update_queue: "asyncio.Queue[object]" = update_queue
+        self.update_queue: asyncio.Queue[object] = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
         self.updater: Optional[Updater] = updater
         self.handlers: Dict[int, List[BaseHandler[Any, CCT]]] = {}
@@ -302,13 +302,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             HandlerCallback[object, CCT, None], Union[bool, DefaultValue[bool]]
         ] = {}
         self.post_init: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
         ] = post_init
         self.post_shutdown: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
         ] = post_shutdown
         self.post_stop: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
         ] = post_stop
         self._update_processor = update_processor
         self.bot_data: BD = self.context_types.bot_data()
@@ -653,6 +653,24 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         _LOGGER.info("Application.stop() complete")
 
+    def stop_running(self) -> None:
+        """This method can be used to stop the execution of :meth:`run_polling` or
+        :meth:`run_webhook` from within a handler, job or error callback. This allows a graceful
+        shutdown of the application, i.e. the methods listed in :attr:`run_polling` and
+        :attr:`run_webhook` will still be executed.
+
+        Note:
+            If the application is not running, this method does nothing.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        if self.running:
+            # This works because `__run` is using `loop.run_forever()`. If that changes, this
+            # method needs to be adapted.
+            asyncio.get_running_loop().stop()
+        else:
+            _LOGGER.debug("Application is not running, stop_running() does nothing.")
+
     def run_polling(
         self,
         poll_interval: float = 0.0,
@@ -939,7 +957,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             loop.run_until_complete(self.start())
             loop.run_forever()
         except (KeyboardInterrupt, SystemExit):
-            pass
+            _LOGGER.debug("Application received stop signal. Shutting down.")
         except Exception as exc:
             # In case the coroutine wasn't awaited, we don't need to bother the user with a warning
             updater_coroutine.close()
@@ -1012,7 +1030,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         # but by passing `is_error_handler=True` from `process_error`, we can make sure that we
         # get at most one recursion of the user calls `create_task` manually with an error handler
         # function
-        task: "asyncio.Task[RT]" = asyncio.create_task(
+        task: asyncio.Task[RT] = asyncio.create_task(
             self.__create_task_callback(
                 coroutine=coroutine, update=update, is_error_handler=is_error_handler
             ),
@@ -1671,7 +1689,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update: Optional[object],
         error: Exception,
         job: Optional["Job[CCT]"] = None,
-        coroutine: _ErrorCoroType[RT] = None,  # noqa: RUF013
+        coroutine: _ErrorCoroType[RT] = None,
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises
