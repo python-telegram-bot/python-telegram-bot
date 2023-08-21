@@ -167,6 +167,7 @@ Feel free to copy (parts of) the checklist to the PR description to remind you o
 **If the PR contains API changes (otherwise, you can ignore this passage)**
 
 - Checked the Bot API specific sections of the `Stability Policy <https://docs.python-telegram-bot.org/stability_policy.html>`_
+- Created a PR to remove functionality deprecated in the previous Bot API release (`see here <https://docs.python-telegram-bot.org/en/stable/stability_policy.html#case-2>`_)
 
 -  New classes:
 
