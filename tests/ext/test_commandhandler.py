@@ -270,6 +270,7 @@ class TestCommandHandler(BaseTest):
         handler_false = CommandHandler(["test"], self.callback_basic, has_args=False)
         handler_int_one = CommandHandler(["test"], self.callback_basic, has_args=1)
         handler_int_two = CommandHandler(["test"], self.callback_basic, has_args=2)
+        handler_int_negative = CommandHandler(["test"], self.callback_basic, has_args=-1)
 
         assert is_match(handler_true, make_command_update("/test helloworld", bot=bot))
         assert not is_match(handler_true, make_command_update("/test", bot=bot))
@@ -279,6 +280,14 @@ class TestCommandHandler(BaseTest):
 
         assert is_match(handler_int_one, make_command_update("/test helloworld", bot=bot))
         assert not is_match(handler_int_one, make_command_update("/test hello world", bot=bot))
+        assert not is_match(handler_int_one, make_command_update("/test", bot=bot))
 
         assert is_match(handler_int_two, make_command_update("/test hello world", bot=bot))
         assert not is_match(handler_int_two, make_command_update("/test helloworld", bot=bot))
+        assert not is_match(handler_int_two, make_command_update("/test", bot=bot))
+
+        # Test for ValueError when has_args is a negative integer
+        with pytest.raises(
+            ValueError, match="CommandHandler argument has_args cannot be a negative integer"
+        ):
+            is_match(handler_int_negative, make_command_update("/test hello world", bot=bot))

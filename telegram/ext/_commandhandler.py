@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CommandHandler class."""
 import re
-from enum import Enum, auto
 from typing import TYPE_CHECKING, Any, FrozenSet, List, Optional, Tuple, TypeVar, Union
 
 from telegram import MessageEntity, Update
@@ -96,6 +95,8 @@ class CommandHandler(BaseHandler[Update, CCT]):
             if :obj:`int`, the handler will only process if there are exactly that many args.
             Defaults to :obj:`None`, which means the handler will process any or no args.
 
+            .. versionadded:: NEXT.VERSION
+
     Raises:
         :exc:`ValueError`: When the command is too long or has illegal chars.
 
@@ -110,6 +111,8 @@ class CommandHandler(BaseHandler[Update, CCT]):
         has_args (:obj:`bool` | :obj:`int` | None):
             Optional argument, otherwise all implementations of :class:`CommandHandler` will break.
             Defaults to :obj:`None`, which means the handler will process any args or no args.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = ("commands", "filters", "has_args")
@@ -137,38 +140,32 @@ class CommandHandler(BaseHandler[Update, CCT]):
             filters if filters is not None else filters_module.UpdateType.MESSAGES
         )
 
-        self.has_args = has_args
+        self.has_args: Union[bool, None, int] = has_args
 
     def _check_correct_args(self, args: List[str]) -> Optional[bool]:
-        class ArgsCondition(Enum):
-            HAS_ARGS_TRUE_ARGS_PRESENT = auto()
-            HAS_ARGS_FALSE_ARGS_ABSENT = auto()
-            HAS_ARGS_NUM = auto()
-            HAS_ARGS_NONE = auto()
-            HAS_INVALID_ARGS = auto()
+        """Determines whether the args are correct for this handler. Implemented in check_update().
+        Args:
+            args (:obj:`list`): The args for the handler.
+        Returns:
+            :obj:`bool`: Whether the args are valid for this handler.
+        """
 
-        mapping = {
-            ArgsCondition.HAS_ARGS_TRUE_ARGS_PRESENT: True,
-            ArgsCondition.HAS_ARGS_FALSE_ARGS_ABSENT: True,
-            ArgsCondition.HAS_ARGS_NONE: True,
-            ArgsCondition.HAS_ARGS_NUM: True,
-            ArgsCondition.HAS_INVALID_ARGS: False,
-        }
+        has_args_none = self.has_args is None
+        has_args_true_args_present = self.has_args is True and args
+        has_args_false_args_absent = self.has_args is False and not args
+        has_args_num = isinstance(self.has_args, int) and len(args) == self.has_args
+        has_args_num_negative_int = isinstance(self.has_args, int) and self.has_args < 0
 
-        condition = (
-            ArgsCondition.HAS_ARGS_NONE
-            if (self.has_args is None)
-            else ArgsCondition.HAS_ARGS_TRUE_ARGS_PRESENT
-            if (self.has_args is True and args)
-            # Must specify is True, otherwise if has_args is int, it will default to Truthy value.
-            else ArgsCondition.HAS_ARGS_FALSE_ARGS_ABSENT
-            if (self.has_args is False and not args)
-            else ArgsCondition.HAS_ARGS_NUM
-            if (isinstance(self.has_args, int) and len(args) == self.has_args)
-            else ArgsCondition.HAS_INVALID_ARGS
-        )
-
-        return mapping.get(condition)
+        if has_args_num_negative_int:
+            raise ValueError("CommandHandler argument has_args cannot be a negative integer")
+        if (
+            (has_args_none)
+            or (has_args_true_args_present)
+            or (has_args_false_args_absent)
+            or (has_args_num)
+        ):
+            return True
+        return False
 
     def check_update(
         self, update: object
@@ -203,8 +200,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
                 ):
                     return None
 
-                _valid = self._check_correct_args(args)
-                if _valid is False:
+                if not self._check_correct_args(args):
                     return None
 
                 filter_result = self.filters.check_update(update)
