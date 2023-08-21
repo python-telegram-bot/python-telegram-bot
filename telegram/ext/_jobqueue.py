@@ -31,6 +31,7 @@ try:
 except ImportError:
     APS_AVAILABLE = False
 
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 from telegram.ext._extbot import ExtBot
@@ -98,7 +99,7 @@ class JobQueue(Generic[CCT]):
         )
 
     def __repr__(self) -> str:
-        return f"JobQueue for Application {self.application}"
+        return build_repr_with_selected_attrs(self, application=self.application)
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -770,10 +771,12 @@ class Job(Generic[CCT]):
         self._job = cast("APSJob", None)  # skipcq: PTC-W0052
 
     def __repr__(self) -> str:
-        name_infix = f"Job name {self.name}. " if self.name != self.callback.__name__ else ""
-        return (
-            f"Job ID {self.job.id}. {name_infix}Callback name {self.callback.__name__}. "
-            f"APS job trigger: {self.job.trigger}. Next run: {self.next_t}."
+        return build_repr_with_selected_attrs(
+            self,
+            id=self.job.id,
+            name=self.name,
+            callback=self.callback.__name__,
+            trigger=self.job.trigger,
         )
 
     @property

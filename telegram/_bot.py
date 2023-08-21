@@ -96,6 +96,7 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import (
     CorrectOptionID,
     DVInput,
@@ -303,7 +304,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self._freeze()
 
     def __repr__(self) -> str:
-        return f"Object of class Bot with token {self.token}"
+        return build_repr_with_selected_attrs(self, token=self.token)
 
     @property
     def token(self) -> str:
