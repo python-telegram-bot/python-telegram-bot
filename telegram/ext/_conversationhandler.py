@@ -38,6 +38,7 @@ from typing import (
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import DVType
 from telegram._utils.warnings import warn
 from telegram.ext._application import ApplicationHandlerStop
@@ -441,10 +442,10 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 )
 
     def __repr__(self) -> str:
-        name = self.name or "(no name)"
-        return (
-            f"ConversationHandler {name} with {len(self.states)} states, "
-            f"{len(self.entry_points)} entry point(s) and {len(self.fallbacks)} fallbacks"
+        return build_repr_with_selected_attrs(
+            self,
+            name=self.name,
+            states=f"{', '.join(tuple(str(item) for item in self.states.items())[:3])}",
         )
 
     @property
