@@ -3251,8 +3251,10 @@ class TestBotWithRequest:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] == replace_button
-            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
-            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = next(iter(bot.callback_data_cache._keyboard_data))
+            data = next(
+                iter(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())
+            )
             assert data == "replace_test"
         finally:
             bot.callback_data_cache.clear_callback_data()
@@ -3280,8 +3282,10 @@ class TestBotWithRequest:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] == replace_button
-            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
-            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = next(iter(bot.callback_data_cache._keyboard_data))
+            data = next(
+                iter(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())
+            )
             assert data == "replace_test"
         finally:
             bot.callback_data_cache.clear_callback_data()
@@ -3313,8 +3317,10 @@ class TestBotWithRequest:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] == replace_button
-            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
-            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = next(iter(bot.callback_data_cache._keyboard_data))
+            data = next(
+                iter(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())
+            )
             assert data == "replace_test"
         finally:
             bot.callback_data_cache.clear_callback_data()
@@ -3333,8 +3339,10 @@ class TestBotWithRequest:
             )
             await message.pin()
 
-            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
-            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = next(iter(bot.callback_data_cache._keyboard_data))
+            data = next(
+                iter(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())
+            )
             assert data == "callback_data"
 
             chat = await bot.get_chat(channel_id)

@@ -156,7 +156,7 @@ class TestAnimationWithoutRequest(TestAnimationBase):
 
     async def test_send_animation_custom_filename(self, bot, chat_id, animation_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+            return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_animation(chat_id, animation_file, filename="custom_filename")
