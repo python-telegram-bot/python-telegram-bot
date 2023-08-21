@@ -36,6 +36,7 @@ from typing import (
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import ODVInput
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 
@@ -123,10 +124,7 @@ class Updater(AsyncContextManager["Updater"]):
         self.__polling_task: Optional[asyncio.Task] = None
 
     def __repr__(self) -> str:
-        return (
-            f"Updater for bot {self.bot}. Number of updates currently in the queue: "
-            f"{self.update_queue.qsize()}"
-        )
+        return build_repr_with_selected_attrs(self, bot=self.bot)
 
     @property
     def running(self) -> bool:
