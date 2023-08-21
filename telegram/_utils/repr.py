@@ -37,6 +37,6 @@ def build_repr_with_selected_attrs(obj: object, **kwargs: Any) -> str:
 
     return (
         f"{obj.__class__.__name__}"
-        # add ellipsis to emphasize that an object cannot be just instantiated with these params
-        f"({', '.join(stringify(name, value) for name, value in kwargs.items())}, ...)"
+        # square brackets emphasize that an object cannot be instantiated with these params
+        f"[{', '.join(stringify(name, value) for name, value in kwargs.items())}]"
     )
