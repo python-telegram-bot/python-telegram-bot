@@ -29,6 +29,7 @@ from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -85,54 +86,82 @@ class PollAnswer(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`option_ids` are equal.
 
+    Note:
+        The order of :paramref:`option_ids` and :paramref:`user` is changed in v20.5 as the later
+        one became optional. We currently provide backward compatibility for  this but it will be
+        removed in the future. Please update your code to use the new order.
+
     Args:
         poll_id (:obj:`str`): Unique poll identifier.
-        voter_chat (:class:`telegram.Chat`): The chat that changed the answer to the poll,
-            if the voter is anonymous.
-
-            .. versionadded:: NEXT.VERSION
-        user (:class:`telegram.User`): The user that changed the answer to the poll,
-            if the voter isn't anonymous.
-        option_ids (Sequence[:obj:`int`]): 0-based identifiers of chosen answer options.
-            May be empty if the vote was retracted.
+        option_ids (Sequence[:obj:`int`]): Identifiers of answer options, chosen by the user. May
+            be empty if the user retracted their vote.
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|
+        user (:class:`telegram.User`, optional): The user that changed the answer to the poll,
+            if the voter isn't anonymous.
+
+            .. versionchanged:: NEXT.VERSION
+                paramref:`user` became optional.
+        voter_chat (:class:`telegram.Chat`, optional): The chat that changed the answer to the
+            poll, if the voter is anonymous.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
-        voter_chat (:class:`telegram.Chat`): The chat that changed the answer to the poll,
-            if the voter is anonymous.
-
-            .. versionadded:: NEXT.VERSION
-        user (:class:`telegram.User`): The user, who changed the answer to the poll,
-            if the voter isn't anonymous.
-        option_ids (Tuple[:obj:`int`]): Identifiers of answer options, chosen by the user.  May be
-            empty if the user retracted their vote.
+        option_ids (Tuple[:obj:`int`]): Identifiers of answer options, chosen by the user. May
+            be empty if the user retracted their vote.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
+        user (:class:`telegram.User`, optional): Optional. The user, who changed the answer to the
+            poll, if the voter isn't anonymous.
+
+            .. versionchanged:: NEXT.VERSION
+                :paramref:`user` became optional.
+        voter_chat (:class:`telegram.Chat`): Optional. The chat that changed the answer to the
+            poll, if the voter is anonymous.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ("option_ids", "user", "poll_id", "voter_chat")
+    __slots__ = ("option_ids", "poll_id", "user", "voter_chat")
 
     def __init__(
         self,
         poll_id: str,
-        voter_chat: Chat,
-        user: User,
         option_ids: Sequence[int],
+        user: Optional[User],
+        voter_chat: Optional[Chat],
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.poll_id: str = poll_id
-        self.voter_chat = voter_chat
-        self.user: User = user
-        self.option_ids: Tuple[int, ...] = parse_sequence_arg(option_ids)
+        self.voter_chat: Optional[Chat] = voter_chat
 
-        self._id_attrs = (self.poll_id, self.voter_chat, self.user, tuple(self.option_ids))
+        if isinstance(option_ids, User) or isinstance(user, Tuple):  # type: ignore[arg-type]
+            warn(
+                "From v20.5 the order of `option_ids` and `user` is changed as the later one"
+                " became optional. Please update your code to use the new order.",
+                stacklevel=2,
+            )
+            self.option_ids: Tuple[int, ...] = parse_sequence_arg(user)  # type: ignore[arg-type]
+            self.user: Optional[User] = option_ids  # type: ignore[assignment]
+        else:
+            self.option_ids: Tuple[int, ...] = parse_sequence_arg(  # type: ignore[no-redef]
+                option_ids
+            )
+            self.user: Optional[User] = user  # type: ignore[no-redef]
+
+        self._id_attrs = (
+            self.poll_id,
+            tuple(self.option_ids),
+            self.user,
+            self.voter_chat,
+        )
 
         self._freeze()
 
