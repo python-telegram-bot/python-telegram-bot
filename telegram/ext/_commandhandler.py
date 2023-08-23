@@ -123,7 +123,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         callback: HandlerCallback[Update, CCT, RT],
         filters: Optional[filters_module.BaseFilter] = None,
         block: DVType[bool] = DEFAULT_TRUE,
-        has_args: Union[bool, None, int] = None,
+        has_args: Optional[Union[bool, int]] = None,
     ):
         super().__init__(callback, block=block)
 
@@ -140,7 +140,10 @@ class CommandHandler(BaseHandler[Update, CCT]):
             filters if filters is not None else filters_module.UpdateType.MESSAGES
         )
 
-        self.has_args: Union[bool, None, int] = has_args
+        self.has_args: Optional[Union[bool, int]] = has_args
+
+        if (isinstance(self.has_args, int)) and (self.has_args < 0):
+            raise ValueError("CommandHandler argument has_args cannot be a negative integer")
 
     def _check_correct_args(self, args: List[str]) -> Optional[bool]:
         """Determines whether the args are correct for this handler. Implemented in check_update().
@@ -149,20 +152,12 @@ class CommandHandler(BaseHandler[Update, CCT]):
         Returns:
             :obj:`bool`: Whether the args are valid for this handler.
         """
-
-        has_args_none = self.has_args is None
-        has_args_true_args_present = self.has_args is True and args
-        has_args_false_args_absent = self.has_args is False and not args
-        has_args_num = isinstance(self.has_args, int) and len(args) == self.has_args
-        has_args_num_negative_int = isinstance(self.has_args, int) and self.has_args < 0
-
-        if has_args_num_negative_int:
-            raise ValueError("CommandHandler argument has_args cannot be a negative integer")
+        # pylint: disable=too-many-boolean-expressions
         if (
-            (has_args_none)
-            or (has_args_true_args_present)
-            or (has_args_false_args_absent)
-            or (has_args_num)
+            (self.has_args is None)
+            or (self.has_args is True and args)
+            or (self.has_args is False and not args)
+            or (isinstance(self.has_args, int) and len(args) == self.has_args)
         ):
             return True
         return False

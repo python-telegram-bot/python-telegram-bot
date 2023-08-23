@@ -181,11 +181,7 @@ class TestCommandHandler(BaseTest):
 
     @pytest.mark.parametrize(
         "cmd",
-        [
-            "way_too_longcommand1234567yes_way_toooooooLong",
-            "ïñválídletters",
-            "invalid #&* chars",
-        ],
+        ["way_too_longcommand1234567yes_way_toooooooLong", "ïñválídletters", "invalid #&* chars"],
         ids=["too long", "invalid letter", "invalid characters"],
     )
     def test_invalid_commands(self, cmd):
@@ -270,7 +266,6 @@ class TestCommandHandler(BaseTest):
         handler_false = CommandHandler(["test"], self.callback_basic, has_args=False)
         handler_int_one = CommandHandler(["test"], self.callback_basic, has_args=1)
         handler_int_two = CommandHandler(["test"], self.callback_basic, has_args=2)
-        handler_int_negative = CommandHandler(["test"], self.callback_basic, has_args=-1)
 
         assert is_match(handler_true, make_command_update("/test helloworld", bot=bot))
         assert not is_match(handler_true, make_command_update("/test", bot=bot))
@@ -286,8 +281,10 @@ class TestCommandHandler(BaseTest):
         assert not is_match(handler_int_two, make_command_update("/test helloworld", bot=bot))
         assert not is_match(handler_int_two, make_command_update("/test", bot=bot))
 
-        # Test for ValueError when has_args is a negative integer
+    def test_command_has_negative_args(self, bot):
+        """Test CHs with optional has_args specified with negative int"""
+        # Assert that CommandHandler cannot be instantiated.
         with pytest.raises(
             ValueError, match="CommandHandler argument has_args cannot be a negative integer"
         ):
-            is_match(handler_int_negative, make_command_update("/test hello world", bot=bot))
+            is_match(CommandHandler(["test"], self.callback_basic, has_args=-1))
