@@ -120,6 +120,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Wagner Macedo <https://github.com/wagnerluis1982>`_
 - `wjt <https://github.com/wjt>`_
 - `Yaw Danso <https://github.com/dglitxh>`_
+- `Yao Kuan <https://github.com/thatguylah>`_
 - `zeroone2numeral2 <https://github.com/zeroone2numeral2>`_
 - `zeshuaro <https://github.com/zeshuaro>`_
 - `zpavloudis <https://github.com/zpavloudis>`_
