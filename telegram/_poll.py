@@ -100,10 +100,11 @@ class PollAnswer(TelegramObject):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
         user (:class:`telegram.User`, optional): The user that changed the answer to the poll,
-            if the voter isn't anonymous.
+            if the voter isn't anonymous. If the voter is anonymous, this field will contain the
+            user :tg-const:`telegram.constants.ChatID.FAKE_CHANNEL` for backwards compatibility.
 
             .. versionchanged:: NEXT.VERSION
-                paramref:`user` became optional.
+                :paramref:`user` became optional.
         voter_chat (:class:`telegram.Chat`, optional): The chat that changed the answer to the
             poll, if the voter is anonymous.
 
@@ -117,7 +118,8 @@ class PollAnswer(TelegramObject):
             .. versionchanged:: 20.0
                 |tupleclassattrs|
         user (:class:`telegram.User`): Optional. The user, who changed the answer to the
-            poll, if the voter isn't anonymous.
+            poll, if the voter isn't anonymous. If the voter is anonymous, this field will contain
+            the user :tg-const:`telegram.constants.ChatID.FAKE_CHANNEL` for backwards compatibility
 
             .. versionchanged:: NEXT.VERSION
                 :paramref:`user` became optional.
