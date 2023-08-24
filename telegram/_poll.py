@@ -87,11 +87,10 @@ class PollAnswer(TelegramObject):
     considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`option_ids` are equal.
 
     .. versionchanged:: NEXT.VERSION
-        Note:
-            The order of :paramref:`option_ids` and :paramref:`user` is changed in
-            NEXT.VERSION as the later one became optional. We currently provide
-            backward compatibility for this but it will be removed in the future.
-            Please update your code to use the new order.
+        The order of :paramref:`option_ids` and :paramref:`user` is changed in
+        NEXT.VERSION as the latter one became optional. We currently provide
+        backward compatibility for this but it will be removed in the future.
+        Please update your code to use the new order.
 
     Args:
         poll_id (:obj:`str`): Unique poll identifier.
@@ -146,7 +145,7 @@ class PollAnswer(TelegramObject):
 
         if isinstance(option_ids, User) or isinstance(user, tuple):
             warn(
-                "From v20.5 the order of `option_ids` and `user` is changed as the later one"
+                "From v20.5 the order of `option_ids` and `user` is changed as the latter one"
                 " became optional. Please update your code to use the new order.",
                 stacklevel=2,
             )

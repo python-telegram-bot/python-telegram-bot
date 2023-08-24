@@ -146,7 +146,7 @@ class TestPollAnswerWithoutRequest(TestPollAnswerBase):
 
     def test_order_warning(self, recwarn):
         expected_warning = (
-            "From v20.5 the order of `option_ids` and `user` is changed as the later one"
+            "From v20.5 the order of `option_ids` and `user` is changed as the latter one"
             " became optional. Please update your code to use the new order."
         )
         PollAnswer(123, [2], self.user, self.voter_chat)
