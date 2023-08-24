@@ -2545,3 +2545,52 @@ class _Voice(MessageFilter):
 
 VOICE = _Voice("filters.VOICE")
 """Messages that contain :attr:`telegram.Message.voice`."""
+
+
+class Mention(MessageFilter):
+    """Mention messages. If a username is passed, it filters messages to only allow those
+    whose contains mention of username.
+
+    Examples:
+        A simple use case for passing username is to allow only messages that were sent with
+        mention username:
+            MessageHandler(filters.MENTION("username"), callback_method)
+        or without username with mention:
+            MessageHandler(filters.MENTION, callback_method)
+
+    Args:
+        username (:obj:`str`, optional): Which messages to allow with username. Only
+            exact matches are allowed. If not specified, will allow any text message with mention.
+    """
+
+    __slots__ = ("username",)
+    entity_type: str = MessageEntity.MENTION
+
+    def __init__(self, username: Optional[Union[List[str], Tuple[str, ...]]] = None):
+        self.username: Optional[Sequence[str]] = username
+        super().__init__(
+            name=f"filters.Regex(r'{username}') & filters.Entity({self.entity_type})"
+            if username
+            else "filters.Entity({self.entity_type})"
+        )
+
+    def filter(self, message: Message) -> bool:
+        if not any(entity.type == self.entity_type for entity in message.entities):
+            return False
+
+        if self.username:
+            if message.text and f"@{self.username}" in message.text:
+                return True
+            return False
+        return True
+
+
+MENTION = Mention()
+"""
+Shortcut for :class:`telegram.ext.filters.Mention()`.
+
+Examples:
+    To allow any text message that contains mention, simply use
+    ``MessageHandler(filters.MENTION, callback_method)`` or
+    ``MessageHandler(filters.MENTION("username"), callback_method)``.
+"""
