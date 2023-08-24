@@ -68,7 +68,6 @@ from telegram._utils.types import (
     ODVInput,
     ReplyMarkup,
 )
-from telegram._utils.warnings import warn
 from telegram._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -79,7 +78,6 @@ from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
 from telegram.constants import MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -599,9 +597,8 @@ class Message(TelegramObject):
         function. Instead, the supplied replacement for the emoji will be used.
 
     .. |custom_emoji_md1_deprecation| replace:: Since custom emoji entities are not supported by
-       :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method will raise a
-       :exc:`ValueError` in future versions instead of falling back to the supplied replacement
-       for the emoji.
+       :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
+       :exc:`ValueError` when encountering a custom emoji.
     """
 
     # fmt: on
@@ -3556,24 +3553,17 @@ class Message(TelegramObject):
                     insert = f"||{escaped_text}||"
                 elif entity.type == MessageEntity.CUSTOM_EMOJI:
                     if version == 1:
-                        # this ensures compatibility to previous PTB versions
-                        insert = escaped_text
-                        warn(
-                            "Custom emoji entities are not supported for Markdown version 1. "
-                            "Future version of PTB will raise a ValueError instead of falling "
-                            "back to the alternative standard emoji.",
-                            stacklevel=3,
-                            category=PTBDeprecationWarning,
+                        raise ValueError(
+                            "Custom emoji entities are not supported for Markdown version 1"
                         )
-                    else:
-                        # This should never be needed because ids are numeric but the documentation
-                        # specifically mentions it so here we are
-                        custom_emoji_id = escape_markdown(
-                            entity.custom_emoji_id,
-                            version=version,
-                            entity_type=MessageEntity.CUSTOM_EMOJI,
-                        )
-                        insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+                    # This should never be needed because ids are numeric but the documentation
+                    # specifically mentions it so here we are
+                    custom_emoji_id = escape_markdown(
+                        entity.custom_emoji_id,
+                        version=version,
+                        entity_type=MessageEntity.CUSTOM_EMOJI,
+                    )
+                    insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
                 else:
                     insert = escaped_text
 
@@ -3622,7 +3612,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: 20.3
+        .. versionchanged:: NEXT.VERSION
             |custom_emoji_md1_deprecation|
 
         Returns:
@@ -3669,7 +3659,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: 20.3
+        .. versionchanged:: NEXT.VERSION
             |custom_emoji_md1_deprecation|
 
         Returns:
@@ -3716,7 +3706,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: 20.3
+        .. versionchanged:: NEXT.VERSION
             |custom_emoji_md1_deprecation|
 
         Returns:
@@ -3765,7 +3755,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: 20.3
+        .. versionchanged:: NEXT.VERSION
             |custom_emoji_md1_deprecation|
 
         Returns:

@@ -2820,15 +2820,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         cache_time: Optional[int] = None,
         is_personal: Optional[bool] = None,
         next_offset: Optional[str] = None,
-        # Deprecated params since bot api 6.7
-        # <----
-        switch_pm_text: Optional[str] = None,
-        switch_pm_parameter: Optional[str] = None,
-        # --->
-        # New params since bot api 6.7
-        # <----
         button: Optional[InlineQueryResultsButton] = None,
-        # --->
         *,
         current_offset: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2849,8 +2841,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-        .. |api6_7_depr| replace:: Since Bot API 6.7, this argument is deprecated in favour of
-            :paramref:`button`.
+
+        .. versionchanged:: NEXT.VERSION
+           Removed deprecated arguments ``switch_pm_text`` and ``switch_pm_parameter``.
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
@@ -2869,20 +2862,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 next query with the same text to receive more results. Pass an empty string if
                 there are no more results or if you don't support pagination. Offset length can't
                 exceed :tg-const:`telegram.InlineQuery.MAX_OFFSET_LENGTH` bytes.
-            switch_pm_text (:obj:`str`, optional): If passed, clients will display a button with
-                specified text that switches the user to a private chat with the bot and sends the
-                bot a start message with the parameter :paramref:`switch_pm_parameter`.
-
-                .. deprecated:: 20.3
-                    |api6_7_depr|
-            switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the
-                :guilabel:`/start` message sent to the bot when user presses the switch button.
-                :tg-const:`telegram.InlineQuery.MIN_SWITCH_PM_TEXT_LENGTH`-
-                :tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
-                only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
-
-                .. deprecated:: 20.3
-                    |api6_7_depr|
             button (:class:`telegram.InlineQueryResultsButton`, optional): A button to be shown
                 above the inline query results.
 
@@ -2901,26 +2880,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        if (switch_pm_text or switch_pm_parameter) and button:
-            raise TypeError(
-                "Since Bot API 6.7, the parameter `button is mutually exclusive to the deprecated "
-                "parameters `switch_pm_text` and `switch_pm_parameter`. Please use the new "
-                "parameter `button`."
-            )
-
-        if switch_pm_text and switch_pm_parameter:
-            self._warn(
-                "Since Bot API 6.7, the parameters `switch_pm_text` and `switch_pm_parameter` are "
-                "deprecated in favour of the new parameter `button`. Please use the new parameter "
-                "`button` instead.",
-                category=PTBDeprecationWarning,
-                stacklevel=3,
-            )
-            button = InlineQueryResultsButton(
-                text=switch_pm_text,
-                start_parameter=switch_pm_parameter,
-            )
-
         effective_results, next_offset = self._effective_inline_results(
             results=results, next_offset=next_offset, current_offset=current_offset
         )
