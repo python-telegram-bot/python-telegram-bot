@@ -1427,7 +1427,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_polling_basic(self, app, monkeypatch):
+    def test_run_polling_basic(self, app, monkeypatch, caplog):
         exception_event = threading.Event()
         update_event = threading.Event()
         exception = TelegramError("This is a test error")
@@ -1464,6 +1464,9 @@ class TestApplication:
             time.sleep(0.05)
             assertions["exception_handling"] = self.received == exception.message
 
+            # So that the get_updates call on shutdown doesn't fail
+            exception_event.clear()
+
             os.kill(os.getpid(), signal.SIGINT)
             time.sleep(0.1)
 
@@ -1478,12 +1481,19 @@ class TestApplication:
 
         thread = Thread(target=thread_target)
         thread.start()
-        app.run_polling(drop_pending_updates=True, close_loop=False)
-        thread.join()
+        with caplog.at_level(logging.DEBUG):
+            app.run_polling(drop_pending_updates=True, close_loop=False)
+            thread.join()
 
         assert len(assertions) == 8
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
+
+        found_log = False
+        for record in caplog.records:
+            if "received stop signal" in record.getMessage() and record.levelno == logging.DEBUG:
+                found_log = True
+        assert found_log
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
@@ -1692,7 +1702,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_webhook_basic(self, app, monkeypatch):
+    def test_run_webhook_basic(self, app, monkeypatch, caplog):
         assertions = {}
 
         async def delete_webhook(*args, **kwargs):
@@ -1741,18 +1751,25 @@ class TestApplication:
         ip = "127.0.0.1"
         port = randrange(1024, 49152)
 
-        app.run_webhook(
-            ip_address=ip,
-            port=port,
-            url_path="TOKEN",
-            drop_pending_updates=True,
-            close_loop=False,
-        )
-        thread.join()
+        with caplog.at_level(logging.DEBUG):
+            app.run_webhook(
+                ip_address=ip,
+                port=port,
+                url_path="TOKEN",
+                drop_pending_updates=True,
+                close_loop=False,
+            )
+            thread.join()
 
         assert len(assertions) == 7
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
+
+        found_log = False
+        for record in caplog.records:
+            if "received stop signal" in record.getMessage() and record.levelno == logging.DEBUG:
+                found_log = True
+        assert found_log
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
@@ -2226,3 +2243,120 @@ class TestApplication:
             assert received_signals == []
         else:
             assert received_signals == [signal.SIGINT, signal.SIGTERM, signal.SIGABRT]
+
+    def test_stop_running_not_running(self, app, caplog):
+        with caplog.at_level(logging.DEBUG):
+            app.stop_running()
+
+        assert len(caplog.records) == 1
+        assert caplog.records[-1].name == "telegram.ext.Application"
+        assert caplog.records[-1].getMessage().endswith("stop_running() does nothing.")
+
+    @pytest.mark.parametrize("method", ["polling", "webhook"])
+    def test_stop_running(self, one_time_bot, monkeypatch, method):
+        # asyncio.Event() seems to be hard to use across different threads (awaiting in main
+        # thread, setting in another thread), so we use threading.Event() instead.
+        # This requires the use of run_in_executor, but that's fine.
+        put_update_event = threading.Event()
+        callback_done_event = threading.Event()
+        called_stop_running = threading.Event()
+        assertions = {}
+
+        async def get_updates(*args, **kwargs):
+            await asyncio.sleep(0)
+            return []
+
+        async def delete_webhook(*args, **kwargs):
+            return True
+
+        async def set_webhook(*args, **kwargs):
+            return True
+
+        async def post_init(app):
+            # Simply calling app.update_queue.put_nowait(method) in the thread_target doesn't work
+            # for some reason (probably threading magic), so we use an event from the thread_target
+            # to put the update into the queue in the main thread.
+            async def task(app):
+                await asyncio.get_running_loop().run_in_executor(None, put_update_event.wait)
+                await app.update_queue.put(method)
+
+            app.create_task(task(app))
+
+        app = ApplicationBuilder().bot(one_time_bot).post_init(post_init).build()
+        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+
+        events = []
+        monkeypatch.setattr(
+            app.updater,
+            "stop",
+            call_after(app.updater.stop, lambda _: events.append("updater.stop")),
+        )
+        monkeypatch.setattr(
+            app,
+            "stop",
+            call_after(app.stop, lambda _: events.append("app.stop")),
+        )
+        monkeypatch.setattr(
+            app,
+            "shutdown",
+            call_after(app.shutdown, lambda _: events.append("app.shutdown")),
+        )
+
+        def thread_target():
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
+
+            time.sleep(0.1)
+            assertions["called_stop_running_not_set"] = not called_stop_running.is_set()
+
+            put_update_event.set()
+            time.sleep(0.1)
+
+            assertions["called_stop_running_set"] = called_stop_running.is_set()
+
+            # App should have entered `stop` now but not finished it yet because the callback
+            # is still running
+            assertions["updater.stop_event"] = events == ["updater.stop"]
+            assertions["app.running_False"] = not app.running
+
+            callback_done_event.set()
+            time.sleep(0.1)
+
+            # Now that the update is fully handled, we expect the full shutdown
+            assertions["events"] = events == ["updater.stop", "app.stop", "app.shutdown"]
+
+        async def callback(update, context):
+            context.application.stop_running()
+            called_stop_running.set()
+            await asyncio.get_running_loop().run_in_executor(None, callback_done_event.wait)
+
+        app.add_handler(TypeHandler(object, callback))
+
+        thread = Thread(target=thread_target)
+        thread.start()
+
+        if method == "polling":
+            app.run_polling(close_loop=False, drop_pending_updates=True)
+        else:
+            ip = "127.0.0.1"
+            port = randrange(1024, 49152)
+
+            app.run_webhook(
+                ip_address=ip,
+                port=port,
+                url_path="TOKEN",
+                drop_pending_updates=False,
+                close_loop=False,
+            )
+
+        thread.join()
+
+        assert len(assertions) == 5
+        for key, value in assertions.items():
+            assert value, f"assertion '{key}' failed!"

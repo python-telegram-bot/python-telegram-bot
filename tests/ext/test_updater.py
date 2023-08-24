@@ -214,9 +214,13 @@ class TestUpdater:
         await updates.put(Update(update_id=2))
 
         async def get_updates(*args, **kwargs):
-            next_update = await updates.get()
-            updates.task_done()
-            return [next_update]
+            if not updates.empty():
+                next_update = await updates.get()
+                updates.task_done()
+                return [next_update]
+
+            await asyncio.sleep(0)
+            return []
 
         orig_del_webhook = updater.bot.delete_webhook
 
@@ -265,6 +269,91 @@ class TestUpdater:
         assert self.message_count == 4
         assert self.received == [1, 2, 3, 4]
 
+    async def test_polling_mark_updates_as_read(self, monkeypatch, updater, caplog):
+        updates = asyncio.Queue()
+        max_update_id = 3
+        for i in range(1, max_update_id + 1):
+            await updates.put(Update(update_id=i))
+        tracking_flag = False
+        received_kwargs = {}
+        expected_kwargs = {
+            "timeout": 0,
+            "read_timeout": "read_timeout",
+            "connect_timeout": "connect_timeout",
+            "write_timeout": "write_timeout",
+            "pool_timeout": "pool_timeout",
+            "allowed_updates": "allowed_updates",
+        }
+
+        async def get_updates(*args, **kwargs):
+            if tracking_flag:
+                received_kwargs.update(kwargs)
+            if not updates.empty():
+                next_update = await updates.get()
+                updates.task_done()
+                return [next_update]
+            await asyncio.sleep(0)
+            return []
+
+        monkeypatch.setattr(updater.bot, "get_updates", get_updates)
+
+        async with updater:
+            await updater.start_polling(**expected_kwargs)
+            await updates.join()
+            assert not received_kwargs
+            # Set the flag only now since we want to make sure that the get_updates
+            # is called one last time by updater.stop()
+            tracking_flag = True
+            with caplog.at_level(logging.DEBUG):
+                await updater.stop()
+
+        # ensure that the last fetched update was still marked as read
+        assert received_kwargs["offset"] == max_update_id + 1
+        # ensure that the correct arguments where passed to the last `get_updates` call
+        for name, value in expected_kwargs.items():
+            assert received_kwargs[name] == value
+
+        assert len(caplog.records) >= 1
+        log_found = False
+        for record in caplog.records:
+            if not record.getMessage().startswith("Calling `get_updates` one more time"):
+                continue
+
+            assert record.name == "telegram.ext.Updater"
+            assert record.levelno == logging.DEBUG
+            log_found = True
+            break
+
+        assert log_found
+
+    async def test_polling_mark_updates_as_read_failure(self, monkeypatch, updater, caplog):
+        async def get_updates(*args, **kwargs):
+            await asyncio.sleep(0)
+            return []
+
+        monkeypatch.setattr(updater.bot, "get_updates", get_updates)
+
+        async with updater:
+            await updater.start_polling()
+            # Unfortunately, there is no clean way to test this scenario as it should in fact
+            # never happen
+            updater._Updater__polling_cleanup_cb = None
+            with caplog.at_level(logging.DEBUG):
+                await updater.stop()
+
+        assert len(caplog.records) >= 1
+        log_found = False
+        for record in caplog.records:
+            if not record.getMessage().startswith("No polling cleanup callback defined"):
+                continue
+
+            assert record.name == "telegram.ext.Updater"
+            assert record.levelno == logging.WARNING
+            log_found = True
+            break
+
+        assert log_found
+
     async def test_start_polling_already_running(self, updater):
         async with updater:
             await updater.start_polling()
@@ -278,6 +367,7 @@ class TestUpdater:
     async def test_start_polling_get_updates_parameters(self, updater, monkeypatch):
         update_queue = asyncio.Queue()
         await update_queue.put(Update(update_id=1))
+        on_stop_flag = False
 
         expected = {
             "timeout": 10,
@@ -290,6 +380,11 @@ class TestUpdater:
         }
 
         async def get_updates(*args, **kwargs):
+            if on_stop_flag:
+                # This is tested in test_polling_mark_updates_as_read
+                await asyncio.sleep(0)
+                return []
+
             for key, value in expected.items():
                 assert kwargs.pop(key, None) == value
 
@@ -300,17 +395,23 @@ class TestUpdater:
             if offset is not None and self.message_count != 0:
                 assert offset == self.message_count + 1, "get_updates got wrong `offset` parameter"
 
-            update = await update_queue.get()
-            self.message_count = update.update_id
-            update_queue.task_done()
-            return [update]
+            if not update_queue.empty():
+                update = await update_queue.get()
+                self.message_count = update.update_id
+                update_queue.task_done()
+                return [update]
+
+            await asyncio.sleep(0)
+            return []
 
         monkeypatch.setattr(updater.bot, "get_updates", get_updates)
 
         async with updater:
             await updater.start_polling()
             await update_queue.join()
+            on_stop_flag = True
             await updater.stop()
+            on_stop_flag = False
 
             expected = {
                 "timeout": 42,
@@ -332,6 +433,7 @@ class TestUpdater:
                 allowed_updates=["message"],
             )
             await update_queue.join()
+            on_stop_flag = True
             await updater.stop()
 
     @pytest.mark.parametrize("exception_class", [InvalidToken, TelegramError])
@@ -368,11 +470,15 @@ class TestUpdater:
     async def test_start_polling_exceptions_and_error_callback(
         self, monkeypatch, updater, error, callback_should_be_called, custom_error_callback, caplog
     ):
+        raise_exception = True
         get_updates_event = asyncio.Event()
 
         async def get_updates(*args, **kwargs):
             # So that the main task has a chance to be called
             await asyncio.sleep(0)
+
+            if not raise_exception:
+                return []
 
             get_updates_event.set()
             raise error
@@ -428,6 +534,7 @@ class TestUpdater:
                         and record.name == "telegram.ext.Updater"
                         for record in caplog.records
                     )
+            raise_exception = False
             await updater.stop()
 
     async def test_start_polling_unexpected_shutdown(self, updater, monkeypatch, caplog):
@@ -490,9 +597,13 @@ class TestUpdater:
                 await asyncio.sleep(0.01)
                 raise TypeError("Invalid Data")
 
-            next_update = await updates.get()
-            updates.task_done()
-            return [next_update]
+            if not updates.empty():
+                next_update = await updates.get()
+                updates.task_done()
+                return [next_update]
+
+            await asyncio.sleep(0)
+            return []
 
         orig_del_webhook = updater.bot.delete_webhook
 
