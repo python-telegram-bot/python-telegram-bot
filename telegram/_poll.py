@@ -86,10 +86,12 @@ class PollAnswer(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`option_ids` are equal.
 
-    Note:
-        The order of :paramref:`option_ids` and :paramref:`user` is changed in v20.5 as the later
-        one became optional. We currently provide backward compatibility for  this but it will be
-        removed in the future. Please update your code to use the new order.
+    .. versionchanged:: NEXT.VERSION
+        Note:
+            The order of :paramref:`option_ids` and :paramref:`user` is changed in
+            NEXT.VERSION as the later one became optional. We currently provide
+            backward compatibility for this but it will be removed in the future.
+            Please update your code to use the new order.
 
     Args:
         poll_id (:obj:`str`): Unique poll identifier.
@@ -115,7 +117,7 @@ class PollAnswer(TelegramObject):
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
-        user (:class:`telegram.User`, optional): Optional. The user, who changed the answer to the
+        user (:class:`telegram.User`): Optional. The user, who changed the answer to the
             poll, if the voter isn't anonymous.
 
             .. versionchanged:: NEXT.VERSION
@@ -133,8 +135,8 @@ class PollAnswer(TelegramObject):
         self,
         poll_id: str,
         option_ids: Sequence[int],
-        user: Optional[User],
-        voter_chat: Optional[Chat],
+        user: Optional[User] = None,
+        voter_chat: Optional[Chat] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -142,14 +144,14 @@ class PollAnswer(TelegramObject):
         self.poll_id: str = poll_id
         self.voter_chat: Optional[Chat] = voter_chat
 
-        if isinstance(option_ids, User) or isinstance(user, Tuple):  # type: ignore[arg-type]
+        if isinstance(option_ids, User) or isinstance(user, tuple):
             warn(
                 "From v20.5 the order of `option_ids` and `user` is changed as the later one"
                 " became optional. Please update your code to use the new order.",
                 stacklevel=2,
             )
-            self.option_ids: Tuple[int, ...] = parse_sequence_arg(user)  # type: ignore[arg-type]
-            self.user: Optional[User] = option_ids  # type: ignore[assignment]
+            self.option_ids: Tuple[int, ...] = parse_sequence_arg(user)
+            self.user: Optional[User] = option_ids
         else:
             self.option_ids: Tuple[int, ...] = parse_sequence_arg(  # type: ignore[no-redef]
                 option_ids
@@ -158,7 +160,7 @@ class PollAnswer(TelegramObject):
 
         self._id_attrs = (
             self.poll_id,
-            tuple(self.option_ids),
+            self.option_ids,
             self.user,
             self.voter_chat,
         )
