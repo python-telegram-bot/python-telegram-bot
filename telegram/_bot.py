@@ -105,14 +105,13 @@ from telegram._utils.types import (
     ReplyMarkup,
 )
 from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit
 from telegram.error import InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -1173,9 +1172,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "duration": duration,
             "performer": performer,
             "title": title,
-            "thumbnail": self._parse_file_input(thumbnail, attach=True)
-            if thumbnail
-            else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
         }
 
         return await self._send_message(
@@ -1295,9 +1292,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "chat_id": chat_id,
             "document": self._parse_file_input(document, Document, filename=filename),
             "disable_content_type_detection": disable_content_type_detection,
-            "thumbnail": self._parse_file_input(thumbnail, attach=True)
-            if thumbnail
-            else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
         }
 
         return await self._send_message(
@@ -1521,9 +1516,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "width": width,
             "height": height,
             "supports_streaming": supports_streaming,
-            "thumbnail": self._parse_file_input(thumbnail, attach=True)
-            if thumbnail
-            else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
             "has_spoiler": has_spoiler,
         }
 
@@ -1639,9 +1632,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "video_note": self._parse_file_input(video_note, VideoNote, filename=filename),
             "duration": duration,
             "length": length,
-            "thumbnail": self._parse_file_input(thumbnail, attach=True)
-            if thumbnail
-            else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
         }
 
         return await self._send_message(
@@ -1768,9 +1759,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "duration": duration,
             "width": width,
             "height": height,
-            "thumbnail": self._parse_file_input(thumbnail, attach=True)
-            if thumbnail
-            else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
             "has_spoiler": has_spoiler,
         }
 

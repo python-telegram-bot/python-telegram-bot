@@ -21,8 +21,6 @@ from typing import Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram.warnings import PTBDeprecationWarning
 
 
 class ChatPermissions(TelegramObject):

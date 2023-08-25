@@ -24,9 +24,7 @@ from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
 from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUser
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
 from telegram._webappinfo import WebAppInfo
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
