@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # This program is dedicated to the public domain under the CC0 license.
-# pylint: disable=import-error,wrong-import-position,unused-argument
+# pylint: disable=import-error,unused-argument
 """
 Simple example of a bot that uses a custom webhook setup and handles custom updates.
 For the custom webhook setup, the libraries `quart` and `uvicorn` are used. Please
@@ -21,20 +21,6 @@ from http import HTTPStatus
 
 import uvicorn
 from quart import Quart, Response, abort, make_response, request
-
-from telegram import __version__ as TG_VER
-
-try:
-    from telegram import __version_info__
-except ImportError:
-    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
-
-if __version_info__ < (20, 0, 0, "alpha", 1):
-    raise RuntimeError(
-        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
-        f"{TG_VER} version of this example, "
-        f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
-    )
 
 from telegram import Update
 from telegram.constants import ParseMode
