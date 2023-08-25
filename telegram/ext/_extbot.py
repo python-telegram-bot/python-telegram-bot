@@ -147,6 +147,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         :attr:`bot.callback_data_cache.maxsize <telegram.ext.CallbackDataCache.maxsize>` to
         access the size of the cache.
 
+    .. versionchanged:: NEXT.VERSION
+        Removed deprecated methods ``set_sticker_set_thumb`` and ``setStickerSetThumb``.
+
     Args:
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
