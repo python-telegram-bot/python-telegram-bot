@@ -161,10 +161,6 @@ class KeyboardButton(TelegramObject):
 
         self._freeze()
 
-    def __hash__(self) -> int:
-        # Intend: Added so support the own __eq__ function (which otherwise breaks hashing)
-        return super().__hash__()
-
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["KeyboardButton"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

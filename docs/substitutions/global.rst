@@ -53,3 +53,9 @@
 .. |captionentitiesattr| replace:: Tuple of special entities that appear in the caption, which can be specified instead of ``parse_mode``.
 
 .. |datetime_localization| replace:: The default timezone of the bot is used for localization, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+
+.. |removed_thumb_note| replace:: Removed the deprecated argument and attribute ``thumb``.
+
+.. |removed_thumb_url_note| replace:: Removed the deprecated argument and attribute ``thumb_url``.
+
+.. |removed_thumb_wildcard_note| replace:: Removed the deprecated arguments and attributes ``thumb_*``.

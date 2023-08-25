@@ -31,10 +31,6 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict, ODVInput
-from telegram._utils.warnings_transition import (
-    warn_about_deprecated_attr_in_property,
-    warn_about_thumb_return_thumbnail,
-)
 from telegram.constants import InputMediaType
 
 MediaType = Union[Animation, Audio, Document, PhotoSize, Video]
@@ -107,11 +103,13 @@ class InputMedia(TelegramObject):
         self._freeze()
 
     @staticmethod
-    def _parse_thumb_input(thumb: Optional[FileInput]) -> Optional[Union[str, InputFile]]:
+    def _parse_thumb_input(thumbnail: Optional[FileInput]) -> Optional[Union[str, InputFile]]:
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
         return (
-            parse_file_input(thumb, attach=True, local_mode=True) if thumb is not None else thumb
+            parse_file_input(thumbnail, attach=True, local_mode=True)
+            if thumbnail is not None
+            else thumbnail
         )
 
 
@@ -125,6 +123,9 @@ class InputMediaAnimation(InputMedia):
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
+    .. versionchanged:: NEXT.VERSION
+      |removed_thumb_note|
+
     Args:
         media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.Animation`): File to send. |fileinputnopath|
@@ -137,14 +138,6 @@ class InputMediaAnimation(InputMedia):
             :obj:`tempfile` module.
 
             .. versionadded:: 13.1
-        thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): |thumbdocstringnopath|
-
-            .. versionchanged:: 13.2
-               Accept :obj:`bytes` as input.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail`.
         caption (:obj:`str`, optional): Caption of the animation to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
@@ -196,7 +189,6 @@ class InputMediaAnimation(InputMedia):
     def __init__(
         self,
         media: Union[FileInput, Animation],
-        thumb: Optional[FileInput] = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         width: Optional[int] = None,
@@ -219,7 +211,6 @@ class InputMediaAnimation(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        thumbnail = warn_about_thumb_return_thumbnail(deprecated_arg=thumb, new_arg=thumbnail)
         super().__init__(
             InputMediaType.ANIMATION,
             media,
@@ -234,20 +225,6 @@ class InputMediaAnimation(InputMedia):
             self.height: Optional[int] = height
             self.duration: Optional[int] = duration
             self.has_spoiler: Optional[bool] = has_spoiler
-
-    @property
-    def thumb(self) -> Optional[Union[str, InputFile]]:
-        """:class:`telegram.InputFile`: Optional. |thumbdocstringbase|
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb",
-            new_attr_name="thumbnail",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail
 
 
 class InputMediaPhoto(InputMedia):
@@ -337,9 +314,12 @@ class InputMediaVideo(InputMedia):
         *  When using a :class:`telegram.Video` for the :attr:`media` attribute, it will take the
            width, height and duration from that video, unless otherwise specified with the optional
            arguments.
-        *  :paramref:`thumb` will be ignored for small video files, for which Telegram can easily
-           generate thumbnails. However, this behaviour is undocumented and might be changed
-           by Telegram.
+        *  :paramref:`thumbnail` will be ignored for small video files, for which Telegram can
+            easily generate thumbnails. However, this behaviour is undocumented and might be
+            changed by Telegram.
+
+    .. versionchanged:: NEXT.VERSION
+      |removed_thumb_note|
 
     Args:
         media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
@@ -367,14 +347,6 @@ class InputMediaVideo(InputMedia):
         duration (:obj:`int`, optional): Video duration in seconds.
         supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
-        thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): |thumbdocstringnopath|
-
-            .. versionchanged:: 13.2
-               Accept :obj:`bytes` as input.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail`.
         has_spoiler (:obj:`bool`, optional): Pass :obj:`True`, if the video needs to be covered
             with a spoiler animation.
 
@@ -429,7 +401,6 @@ class InputMediaVideo(InputMedia):
         duration: Optional[int] = None,
         supports_streaming: Optional[bool] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: Optional[FileInput] = None,
         caption_entities: Optional[Sequence[MessageEntity]] = None,
         filename: Optional[str] = None,
         has_spoiler: Optional[bool] = None,
@@ -447,7 +418,6 @@ class InputMediaVideo(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        thumbnail = warn_about_thumb_return_thumbnail(deprecated_arg=thumb, new_arg=thumbnail)
         super().__init__(
             InputMediaType.VIDEO,
             media,
@@ -464,20 +434,6 @@ class InputMediaVideo(InputMedia):
             self.supports_streaming: Optional[bool] = supports_streaming
             self.has_spoiler: Optional[bool] = has_spoiler
 
-    @property
-    def thumb(self) -> Optional[Union[str, InputFile]]:
-        """:class:`telegram.InputFile`: Optional. |thumbdocstringbase|
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb",
-            new_attr_name="thumbnail",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail
-
 
 class InputMediaAudio(InputMedia):
     """Represents an audio file to be treated as music to be sent.
@@ -488,6 +444,9 @@ class InputMediaAudio(InputMedia):
         When using a :class:`telegram.Audio` for the :attr:`media` attribute, it will take the
         duration, performer and title from that video, unless otherwise specified with the
         optional arguments.
+
+    .. versionchanged:: NEXT.VERSION
+      |removed_thumb_note|
 
     Args:
         media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
@@ -514,14 +473,6 @@ class InputMediaAudio(InputMedia):
         performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
-        thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): |thumbdocstringnopath|
-
-            .. versionchanged:: 13.2
-               Accept :obj:`bytes` as input.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail`.
         thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|
 
@@ -555,7 +506,6 @@ class InputMediaAudio(InputMedia):
     def __init__(
         self,
         media: Union[FileInput, Audio],
-        thumb: Optional[FileInput] = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         duration: Optional[int] = None,
@@ -577,7 +527,6 @@ class InputMediaAudio(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        thumbnail = warn_about_thumb_return_thumbnail(deprecated_arg=thumb, new_arg=thumbnail)
         super().__init__(
             InputMediaType.AUDIO,
             media,
@@ -592,25 +541,14 @@ class InputMediaAudio(InputMedia):
             self.title: Optional[str] = title
             self.performer: Optional[str] = performer
 
-    @property
-    def thumb(self) -> Optional[Union[str, InputFile]]:
-        """:class:`telegram.InputFile`: Optional. |thumbdocstringbase|
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb",
-            new_attr_name="thumbnail",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail
-
 
 class InputMediaDocument(InputMedia):
     """Represents a general file to be sent.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionchanged:: NEXT.VERSION
+      |removed_thumb_note|
 
     Args:
         media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
@@ -633,14 +571,6 @@ class InputMediaDocument(InputMedia):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): |thumbdocstringnopath|
-
-            .. versionchanged:: 13.2
-               Accept :obj:`bytes` as input.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail`.
         disable_content_type_detection (:obj:`bool`, optional): Disables automatic server-side
             content type detection for files uploaded using multipart/form-data. Always
             :obj:`True`, if the document is sent as part of an album.
@@ -675,7 +605,6 @@ class InputMediaDocument(InputMedia):
     def __init__(
         self,
         media: Union[FileInput, Document],
-        thumb: Optional[FileInput] = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_content_type_detection: Optional[bool] = None,
@@ -689,7 +618,6 @@ class InputMediaDocument(InputMedia):
         # things to work in local mode.
         media = parse_file_input(media, Document, filename=filename, attach=True, local_mode=True)
 
-        thumbnail = warn_about_thumb_return_thumbnail(deprecated_arg=thumb, new_arg=thumbnail)
         super().__init__(
             InputMediaType.DOCUMENT,
             media,
@@ -701,17 +629,3 @@ class InputMediaDocument(InputMedia):
         with self._unfrozen():
             self.thumbnail: Optional[Union[str, InputFile]] = self._parse_thumb_input(thumbnail)
             self.disable_content_type_detection: Optional[bool] = disable_content_type_detection
-
-    @property
-    def thumb(self) -> Optional[Union[str, InputFile]]:
-        """:class:`telegram.InputFile`: Optional. |thumbdocstringbase|
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb",
-            new_attr_name="thumbnail",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail

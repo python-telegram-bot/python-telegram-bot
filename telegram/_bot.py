@@ -186,7 +186,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
           :obj:`False`, the file contents will be read in binary mode and uploaded. Otherwise,
           the file path will be passed in the
           `file URI scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
-          
+
     .. versionchanged:: NEXT.VERSION
         Removed deprecated methods ``set_sticker_set_thumb`` and ``setStickerSetThumb``.
 
@@ -1104,7 +1104,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         For sending voice messages, use the :meth:`send_voice` method instead.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
-        
+
         .. versionchanged:: NEXT.VERSION
             Removed deprecated parameter ``thumb``.
 
@@ -1226,7 +1226,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         changed in the future.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
-        
+
         .. versionchanged:: NEXT.VERSION
             Removed deprecated parameter ``thumb``.
 
@@ -1441,7 +1441,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             changed by Telegram.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
-        
+
         .. versionchanged:: NEXT.VERSION
             Removed deprecated parameter ``thumb``.
 
@@ -1571,7 +1571,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             changed by Telegram.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
-        
+
         .. versionchanged:: NEXT.VERSION
             Removed deprecated parameter ``thumb``.
 
@@ -1690,7 +1690,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             by Telegram.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
-        
+
         .. versionchanged:: NEXT.VERSION
             Removed deprecated parameter ``thumb``.
 

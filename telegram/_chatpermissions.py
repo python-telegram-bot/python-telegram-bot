@@ -222,10 +222,6 @@ class ChatPermissions(TelegramObject):
 
         self._freeze()
 
-    def __hash__(self) -> int:
-        # Intend: Added so support the own __eq__ function (which otherwise breaks hashing)
-        return super().__hash__()
-
     @classmethod
     def all_permissions(cls) -> "ChatPermissions":
         """
