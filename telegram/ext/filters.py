@@ -66,6 +66,8 @@ __all__ = (
     "LOCATION",
     "Language",
     "MessageFilter",
+    "Mention",
+    "MENTION",
     "PASSPORT_DATA",
     "PHOTO",
     "POLL",

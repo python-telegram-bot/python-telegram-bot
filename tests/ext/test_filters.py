@@ -2418,3 +2418,11 @@ class TestFilters:
             ),
         )
         assert filters.ATTACHMENT.check_update(up)
+
+    def test_filters_mention(self, update):
+        update.message.text = "@test"
+        assert filters.Mention("test").check_update(update)
+        assert filters.Mention().check_update(update)
+        update.message.text = "test"
+        assert not filters.Mention().check_update(update)
+        assert not filters.Mention("test").check_update(update)
