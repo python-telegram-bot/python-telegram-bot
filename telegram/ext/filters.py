@@ -2556,9 +2556,8 @@ class Mention(MessageFilter):
     Examples:
         A simple use case for passing username is to allow only messages that were sent with
         mention username:
-            MessageHandler(filters.MENTION("username"), callback_method)
-        or without username with mention:
-            MessageHandler(filters.MENTION, callback_method)
+        MessageHandler(filters.MENTION("username"), callback_method)
+        MessageHandler(filters.MENTION, callback_method)
 
     Args:
         username (:obj:`str`, optional): Which messages to allow with username. Only
@@ -2571,9 +2570,9 @@ class Mention(MessageFilter):
     def __init__(self, username: Optional[Union[List[str], Tuple[str, ...]]] = None):
         self.username: Optional[Sequence[str]] = username
         super().__init__(
-            name=f"filters.Regex(r'{username}') & filters.Entity({self.entity_type})"
+            name=f"filters.Regex(r'@{username}') & filters.Entity({self.entity_type})"
             if username
-            else "filters.Entity({self.entity_type})"
+            else f"filters.Entity({self.entity_type})"
         )
 
     def filter(self, message: Message) -> bool:
