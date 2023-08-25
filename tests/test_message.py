@@ -992,6 +992,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "photo",
             "poll",
             "sticker",
+            "story",
             "successful_payment",
             "video",
             "video_note",
