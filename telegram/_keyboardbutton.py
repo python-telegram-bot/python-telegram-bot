@@ -56,9 +56,9 @@ class KeyboardButton(TelegramObject):
     .. versionchanged:: 20.0
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.
-    .. deprecated:: 20.1
-       :paramref:`request_user` and :paramref:`request_chat` will be considered as well when
-       comparing objects of this type in terms of equality in V21.
+    .. versionchanged:: NEXT.VERSION
+       :attr:`request_user` and :attr:`request_chat` are considered as well when
+       comparing objects of this type in terms of equality.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -157,18 +157,11 @@ class KeyboardButton(TelegramObject):
             self.request_location,
             self.request_poll,
             self.web_app,
+            self.request_user,
+            self.request_chat,
         )
 
         self._freeze()
-
-    def __eq__(self, other: object) -> bool:
-        warn(
-            "In v21, `request_user` and `request_chat` will be considered as well when comparing"
-            " KeyboardButton instances.",
-            PTBDeprecationWarning,
-            stacklevel=2,
-        )
-        return super().__eq__(other)
 
     def __hash__(self) -> int:
         # Intend: Added so support the own __eq__ function (which otherwise breaks hashing)

@@ -31,17 +31,19 @@ class ChatPermissions(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`can_send_messages`, :attr:`can_send_media_messages`,
     :attr:`can_send_polls`, :attr:`can_send_other_messages`, :attr:`can_add_web_page_previews`,
-    :attr:`can_change_info`, :attr:`can_invite_users`, :attr:`can_pin_messages`, and
+    :attr:`can_change_info`, :attr:`can_invite_users`, :attr:`can_pin_messages`,
+    :attr:`can_send_audios`, :attr:`can_send_documents`, :attr:`can_send_photos`,
+    :attr:`can_send_videos`, :attr:`can_send_video_notes` and :attr:`can_send_voice_notes`and
     :attr:`can_manage_topics` are equal.
 
     .. versionchanged:: 20.0
         :attr:`can_manage_topics` is considered as well when comparing objects of
         this type in terms of equality.
-    .. deprecated:: 20.1
+    .. versionchanged:: NEXT.VERSION
         :attr:`can_send_audios`, :attr:`can_send_documents`, :attr:`can_send_photos`,
         :attr:`can_send_videos`, :attr:`can_send_video_notes` and :attr:`can_send_voice_notes`
-        will be considered as well when comparing objects of this type in terms of equality in
-        V21.
+        are considered as well when comparing objects of this type in terms of equality.
+
 
     Note:
         Though not stated explicitly in the official docs, Telegram changes not only the
@@ -212,18 +214,15 @@ class ChatPermissions(TelegramObject):
             self.can_invite_users,
             self.can_pin_messages,
             self.can_manage_topics,
+            self.can_send_audios,
+            self.can_send_documents,
+            self.can_send_photos,
+            self.can_send_videos,
+            self.can_send_video_notes,
+            self.can_send_voice_notes,
         )
 
         self._freeze()
-
-    def __eq__(self, other: object) -> bool:
-        warn(
-            "In v21, granular media settings will be considered as well when comparing"
-            " ChatPermissions instances.",
-            PTBDeprecationWarning,
-            stacklevel=2,
-        )
-        return super().__eq__(other)
 
     def __hash__(self) -> int:
         # Intend: Added so support the own __eq__ function (which otherwise breaks hashing)
