@@ -523,6 +523,22 @@ class ChatMemberRestricted(ChatMember):
             self.can_send_video_notes: bool = can_send_video_notes
             self.can_send_voice_notes: bool = can_send_voice_notes
 
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatMemberRestricted"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if data.get("can_send_media_messages") is not None:
+            api_kwargs["can_send_media_messages"] = data.pop("can_send_media_messages")
+
+        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
+
 
 class ChatMemberLeft(ChatMember):
     """

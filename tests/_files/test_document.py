@@ -31,10 +31,6 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import (
-    check_thumb_deprecation_warning_for_method_args,
-    check_thumb_deprecation_warnings_for_args_and_attrs,
-)
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -84,11 +80,6 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert document.thumbnail.file_size == self.thumb_file_size
         assert document.thumbnail.width == self.thumb_width
         assert document.thumbnail.height == self.thumb_height
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        document = Document(file_id="file_id", file_unique_id="file_unique_id", thumb=object())
-        assert document.thumb is document.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_de_json(self, bot, document):
         json_dict = {
@@ -160,19 +151,6 @@ class TestDocumentWithoutRequest(TestDocumentBase):
 
         assert message
 
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_send_document_thumb_deprecation_warning(
-        self, recwarn, monkeypatch, bot_class, bot, raw_bot, chat_id, document
-    ):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return True
-
-        bot = raw_bot if bot_class == "Bot" else bot
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        await bot.send_document(chat_id, document, thumb="thumb")
-        check_thumb_deprecation_warning_for_method_args(recwarn, __file__)
-
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_document_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
@@ -198,15 +176,6 @@ class TestDocumentWithoutRequest(TestDocumentBase):
             assert test_flag
         finally:
             bot._local_mode = False
-
-    async def test_send_document_with_local_files_throws_error_with_different_thumb_and_thumbnail(
-        self, bot, chat_id
-    ):
-        file = data_file("telegram.jpg")
-        different_file = data_file("telegram_no_standard_header.jpg")
-
-        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
-            await bot.send_document(chat_id, file, thumbnail=file, thumb=different_file)
 
     async def test_get_file_instance_method(self, monkeypatch, document):
         async def make_assertion(*_, **kwargs):

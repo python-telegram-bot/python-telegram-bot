@@ -31,10 +31,6 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import (
-    check_thumb_deprecation_warning_for_method_args,
-    check_thumb_deprecation_warnings_for_args_and_attrs,
-)
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -94,18 +90,6 @@ class TestVideoWithoutRequest(TestVideoBase):
         assert video.duration == self.duration
         assert video.file_size == self.file_size
         assert video.mime_type == self.mime_type
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        video = Video(
-            self.video_file_id,
-            self.video_file_unique_id,
-            self.width,
-            self.height,
-            self.duration,
-            thumb=object(),
-        )
-        assert video.thumb is video.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_de_json(self, bot):
         json_dict = {
@@ -174,19 +158,6 @@ class TestVideoWithoutRequest(TestVideoBase):
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_video(chat_id, video=video)
 
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_send_video_thumb_deprecation_warning(
-        self, recwarn, monkeypatch, bot_class, bot, raw_bot, chat_id, video
-    ):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return True
-
-        bot = raw_bot if bot_class == "Bot" else bot
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        await bot.send_video(chat_id, video, thumb="thumb")
-        check_thumb_deprecation_warning_for_method_args(recwarn, __file__)
-
     async def test_send_video_custom_filename(self, bot, chat_id, video_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
@@ -218,15 +189,6 @@ class TestVideoWithoutRequest(TestVideoBase):
             assert test_flag
         finally:
             bot._local_mode = False
-
-    async def test_send_video_with_local_files_throws_exception_with_different_thumb_and_thumbnail(
-        self, bot, chat_id
-    ):
-        file = data_file("telegram.jpg")
-        different_file = data_file("telegram_no_standard_header.jpg")
-
-        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
-            await bot.send_video(chat_id, file, thumbnail=file, thumb=different_file)
 
     async def test_get_file_instance_method(self, monkeypatch, video):
         async def make_assertion(*_, **kwargs):

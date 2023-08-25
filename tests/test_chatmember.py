@@ -106,7 +106,6 @@ def chat_member_restricted():
         CMDefaults.can_invite_users,
         CMDefaults.can_pin_messages,
         CMDefaults.can_send_messages,
-        CMDefaults.can_send_media_messages,
         CMDefaults.can_send_polls,
         CMDefaults.can_send_other_messages,
         CMDefaults.can_add_web_page_previews,
@@ -259,6 +258,14 @@ class TestChatMemberTypesWithoutRequest:
 
         for slot in chat_member_type.__slots__:  # additional verification for the optional args
             assert getattr(chat_member_type, slot) == chat_member_dict[slot]
+
+    def test_chat_member_restricted_api_kwargs(self, chat_member_type):
+        json_dict = make_json_dict(chat_member_restricted())
+        json_dict["can_send_media_messages"] = "can_send_media_messages"
+        chat_member_restricted_instance = ChatMember.de_json(json_dict, None)
+        assert chat_member_restricted_instance.api_kwargs == {
+            "can_send_media_messages": "can_send_media_messages",
+        }
 
     def test_equality(self, chat_member_type):
         a = ChatMember(status="status", user=CMDefaults.user)

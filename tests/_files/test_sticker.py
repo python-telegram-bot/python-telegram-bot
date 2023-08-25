@@ -44,7 +44,6 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -149,20 +148,6 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert sticker.needs_repainting == self.needs_repainting
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert sticker.premium_animation == self.premium_animation
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        sticker = Sticker(
-            file_id="id",
-            file_unique_id="unique_id",
-            width=1,
-            height=1,
-            thumb=object(),
-            is_animated=False,
-            is_video=False,
-            type=Sticker.REGULAR,
-        )
-        assert sticker.thumb is sticker.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_to_dict(self, sticker):
         sticker_dict = sticker.to_dict()
@@ -548,19 +533,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        sticker_set = StickerSet(
-            name=self.name,
-            title=self.title,
-            is_animated=self.is_animated,
-            stickers=self.stickers,
-            is_video=self.is_video,
-            sticker_type=self.sticker_type,
-            thumb=object(),
-        )
-        assert sticker_set.thumb is sticker_set.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
-
     def test_de_json(self, bot, sticker):
         name = f"test_by_{bot.username}"
         json_dict = {
@@ -637,34 +609,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_upload_sticker_file_warning(
-        self, bot, raw_bot, monkeypatch, chat_id, recwarn, bot_class
-    ):
-        async def make_assertion(*args, **kwargs):
-            return {"file_id": "file_id", "file_unique_id": "file_unique_id"}
-
-        bot = raw_bot if bot_class == "Bot" else bot
-        monkeypatch.setattr(bot, "_post", make_assertion)
-
-        await bot.upload_sticker_file(chat_id, "png_sticker_file_id")
-        assert len(recwarn) == 1
-        assert "Since Bot API 6.6, the parameter" in str(recwarn[0].message)
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__
-
-    async def test_upload_sticker_file_missing_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError, match="are required, please pass them as well"):
-            await bot.upload_sticker_file(chat_id)
-        with pytest.raises(TypeError, match="are required, please pass them as well"):
-            await bot.upload_sticker_file(chat_id, sticker="something")
-
-    async def test_upload_sticker_file_mutually_exclusive(self, bot, chat_id):
-        with pytest.raises(TypeError, match="mutually exclusive with the deprecated parameter"):
-            await bot.upload_sticker_file(
-                chat_id, "png_sticker_file_id", sticker="s", sticker_format="static"
-            )
-
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_upload_sticker_file_local_files(
         self, monkeypatch, bot, chat_id, local_mode, recwarn
@@ -704,34 +648,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             )
         finally:
             bot._local_mode = False
-
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_create_new_sticker_set_warning(
-        self, bot, raw_bot, bot_class, monkeypatch, chat_id, recwarn
-    ):
-        async def make_assertion(*args, **kwargs):
-            return True
-
-        bot = raw_bot if bot_class == "Bot" else bot
-        monkeypatch.setattr(bot, "_post", make_assertion)
-
-        await bot.create_new_sticker_set(chat_id, "name", "title", "some_str_emoji")
-        assert len(recwarn) == 1
-        assert "Since Bot API 6.6, the parameters" in str(recwarn[0].message)
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__
-
-    async def test_create_new_sticker_set_missing_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError, match="are required, please pass them as well"):
-            await bot.create_new_sticker_set(chat_id, "name", "title")
-        with pytest.raises(TypeError, match="are required, please pass them as well"):
-            await bot.create_new_sticker_set(chat_id, "name", "title", stickers=[])
-
-    async def test_create_new_sticker_set_mutually_exclusive(self, bot, chat_id):
-        with pytest.raises(TypeError, match="mutually exclusive with the deprecated parameters"):
-            await bot.create_new_sticker_set(
-                chat_id, "name", "title", "some_str_emoji", stickers=["s"], tgs_sticker="some_tgs"
-            )
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_create_new_sticker_set_local_files(
@@ -841,30 +757,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         )
         assert len(recwarn) == 0
 
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_add_sticker_to_set_warning(
-        self, bot, raw_bot, monkeypatch, bot_class, chat_id, recwarn
-    ):
-        async def make_assertion(*args, **kwargs):
-            return True
-
-        bot = raw_bot if bot_class == "Bot" else bot
-        monkeypatch.setattr(bot, "_post", make_assertion)
-
-        await bot.add_sticker_to_set(chat_id, "name", "emoji", "fake_file_id")
-        assert len(recwarn) == 1
-        assert "Since Bot API 6.6, the parameters" in str(recwarn[0].message)
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__
-
-    async def test_add_sticker_to_set_missing_required_arg(self, bot, chat_id):
-        with pytest.raises(TypeError, match="The parameter `sticker` is a required"):
-            await bot.add_sticker_to_set(chat_id, "name")
-
-    async def test_add_sticker_to_set_mutually_exclusive(self, bot, chat_id):
-        with pytest.raises(TypeError, match="mutually exclusive with the deprecated parameters"):
-            await bot.add_sticker_to_set(chat_id, "name", "emojis", sticker="something")
-
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_add_sticker_to_set_local_files(
         self, monkeypatch, bot, chat_id, local_mode, recwarn
@@ -934,27 +826,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             assert test_flag
         finally:
             bot._local_mode = False
-
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_set_sticker_set_thumb_deprecation_warning(
-        self, monkeypatch, bot, raw_bot, recwarn, bot_class
-    ):
-        bot = bot if bot_class == "ExtBot" else raw_bot
-
-        async def _post(*args, **kwargs):
-            return True
-
-        monkeypatch.setattr(bot, "_post", _post)
-        await bot.set_sticker_set_thumb("name", "user_id", "thumb")
-
-        assert len(recwarn) == 1
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert "renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail'" in str(
-            recwarn[0].message
-        )
-
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
-        recwarn.clear()
 
     async def test_get_file_instance_method(self, monkeypatch, sticker):
         async def make_assertion(*_, **kwargs):

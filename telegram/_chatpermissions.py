@@ -17,10 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPermission."""
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class ChatPermissions(TelegramObject):
@@ -226,3 +229,19 @@ class ChatPermissions(TelegramObject):
         .. versionadded:: 20.0
         """
         return cls(*(14 * (False,)))
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatPermissions"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if data.get("can_send_media_messages") is not None:
+            api_kwargs["can_send_media_messages"] = data.pop("can_send_media_messages")
+
+        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
