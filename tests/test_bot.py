@@ -218,6 +218,10 @@ class TestBotWithoutRequest:
         with pytest.raises(InvalidToken, match="You must pass the token"):
             Bot("")
 
+    async def test_repr(self):
+        bot = Bot(token="some_token", base_file_url="")
+        assert repr(bot) == "Bot[token=some_token]"
+
     async def test_to_dict(self, bot):
         to_dict_bot = bot.to_dict()
 
