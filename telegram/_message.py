@@ -981,6 +981,7 @@ class Message(TelegramObject):
         Sequence[PhotoSize],
         Poll,
         Sticker,
+        Story,
         SuccessfulPayment,
         Venue,
         Video,
@@ -1003,6 +1004,7 @@ class Message(TelegramObject):
         * List[:class:`telegram.PhotoSize`]
         * :class:`telegram.Poll`
         * :class:`telegram.Sticker`
+        * :class:`telegram.Story`
         * :class:`telegram.SuccessfulPayment`
         * :class:`telegram.Venue`
         * :class:`telegram.Video`

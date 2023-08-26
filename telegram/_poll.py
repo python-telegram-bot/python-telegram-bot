@@ -30,6 +30,7 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -149,6 +150,7 @@ class PollAnswer(TelegramObject):
             warn(
                 "From v20.5 the order of `option_ids` and `user` is changed as the latter one"
                 " became optional. Please update your code to use the new order.",
+                category=PTBDeprecationWarning,
                 stacklevel=2,
             )
             self.option_ids: Tuple[int, ...] = parse_sequence_arg(user)

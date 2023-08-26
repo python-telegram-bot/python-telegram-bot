@@ -22,7 +22,7 @@ import pytest
 from telegram import Chat, MessageEntity, Poll, PollAnswer, PollOption, User
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
-from telegram.warnings import PTBUserWarning
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -154,7 +154,7 @@ class TestPollAnswerWithoutRequest(TestPollAnswerBase):
         PollAnswer(123, self.user, [2], self.voter_chat)
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == expected_warning
-        assert recwarn[0].category is PTBUserWarning
+        assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
 
