@@ -35,6 +35,16 @@ class TestTypeHandler:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
+    def test_repr(self):
+        # This function tests behaviour inherited from BaseHandler.
+        # TODO should this test be repeated in all other subclasses of BaseHandler except for
+        #  ConversationHandler that has its own __repr__?
+        async def some_func():
+            return None
+
+        bh = TypeHandler(dict, callback=some_func)
+        assert repr(bh) == "TypeHandler[callback=TestTypeHandler.test_repr.<locals>.some_func]"
+
     @pytest.fixture(autouse=True)
     def _reset(self):
         self.test_flag = False
