@@ -116,6 +116,12 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
             request_chat=KeyboardButtonRequestChat(1, False),
             request_user=KeyboardButtonRequestUser(2),
         )
+        g = KeyboardButton(
+            "test",
+            request_contact=True,
+            request_chat=KeyboardButtonRequestChat(1, False),
+            request_user=KeyboardButtonRequestUser(2),
+        )
 
         assert a == b
         assert hash(a) == hash(b)
@@ -129,6 +135,8 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert a != e
         assert hash(a) != hash(e)
 
-        # we expect this to be true since we don't compare these in V20
-        assert a == f
-        assert hash(a) == hash(f)
+        assert a != f
+        assert hash(a) != hash(f)
+
+        assert f == g
+        assert hash(f) == hash(g)

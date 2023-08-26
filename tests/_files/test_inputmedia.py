@@ -288,7 +288,6 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
         assert input_media_animation.parse_mode == self.parse_mode
         assert input_media_animation.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_animation.thumbnail, InputFile)
-        assert input_media_animation.thumb is input_media_animation.thumbnail
         assert input_media_animation.has_spoiler == self.has_spoiler
 
     def test_caption_entities_always_tuple(self):
@@ -359,7 +358,6 @@ class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
         assert input_media_audio.parse_mode == self.parse_mode
         assert input_media_audio.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_audio.thumbnail, InputFile)
-        assert input_media_audio.thumb is input_media_audio.thumbnail
 
     def test_caption_entities_always_tuple(self):
         input_media_audio = InputMediaAudio(self.media)
@@ -430,7 +428,6 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
             == self.disable_content_type_detection
         )
         assert isinstance(input_media_document.thumbnail, InputFile)
-        assert input_media_document.thumb is input_media_document.thumbnail
 
     def test_caption_entities_always_tuple(self):
         input_media_document = InputMediaDocument(self.media)

@@ -154,6 +154,17 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
             can_send_video_notes=True,
             can_send_voice_notes=True,
         )
+        f = ChatPermissions(
+            can_send_messages=True,
+            can_send_polls=True,
+            can_send_other_messages=False,
+            can_send_audios=True,
+            can_send_documents=True,
+            can_send_photos=True,
+            can_send_videos=True,
+            can_send_video_notes=True,
+            can_send_voice_notes=True,
+        )
 
         assert a == b
         assert hash(a) == hash(b)
@@ -165,9 +176,11 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
         assert a != d
         assert hash(a) != hash(d)
 
-        # we expect this to be true since we don't compare these in V20
-        assert a == e
-        assert hash(a) == hash(e)
+        assert a != e
+        assert hash(a) != hash(e)
+
+        assert e == f
+        assert hash(e) == hash(f)
 
     def test_all_permissions(self):
         f = ChatPermissions()
