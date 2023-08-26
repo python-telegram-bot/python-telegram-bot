@@ -442,10 +442,17 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 )
 
     def __repr__(self) -> str:
+        truncation_threshold = 3
+        states_string = (
+            f"{', '.join(tuple(str(item) for item in self.states.items())[:truncation_threshold])}"
+        )
+        if len(self.states) > truncation_threshold:
+            states_string += ", ..."
+
         return build_repr_with_selected_attrs(
             self,
             name=self.name,
-            states=f"{', '.join(tuple(str(item) for item in self.states.items())[:3])}",
+            states=states_string,
         )
 
     @property
