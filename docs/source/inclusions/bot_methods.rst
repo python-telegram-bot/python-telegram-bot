@@ -237,7 +237,7 @@
       - Used for setting the keywords of a sticker
     * - :meth:`~telegram.Bot.set_sticker_mask_position`
       - Used for setting the mask position of a mask sticker
-    * - :meth:`~telegram.Bot.set_sticker_set_thumb`
+    * - :meth:`~telegram.Bot.set_sticker_set_thumbnail`
       - Used for setting the thumbnail of a sticker set
     * - :meth:`~telegram.Bot.set_custom_emoji_sticker_set_thumbnail`
       - Used for setting the thumbnail of a custom emoji sticker set

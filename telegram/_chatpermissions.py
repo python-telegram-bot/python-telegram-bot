@@ -34,7 +34,7 @@ class ChatPermissions(TelegramObject):
     :attr:`can_send_polls`, :attr:`can_send_other_messages`, :attr:`can_add_web_page_previews`,
     :attr:`can_change_info`, :attr:`can_invite_users`, :attr:`can_pin_messages`,
     :attr:`can_send_audios`, :attr:`can_send_documents`, :attr:`can_send_photos`,
-    :attr:`can_send_videos`, :attr:`can_send_video_notes` and :attr:`can_send_voice_notes`and
+    :attr:`can_send_videos`, :attr:`can_send_video_notes`, :attr:`can_send_voice_notes`, and
     :attr:`can_manage_topics` are equal.
 
     .. versionchanged:: 20.0

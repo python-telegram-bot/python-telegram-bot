@@ -596,7 +596,7 @@ class Message(TelegramObject):
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
         function. Instead, the supplied replacement for the emoji will be used.
 
-    .. |custom_emoji_md1_deprecation| replace:: Since custom emoji entities are not supported by
+    .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
        :exc:`ValueError` when encountering a custom emoji.
     """
@@ -3605,7 +3605,7 @@ class Message(TelegramObject):
             * |custom_emoji_formatting_note|
 
         .. versionchanged:: NEXT.VERSION
-            |custom_emoji_md1_deprecation|
+            |custom_emoji_no_md1_support|
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3652,7 +3652,7 @@ class Message(TelegramObject):
             * |custom_emoji_formatting_note|
 
         .. versionchanged:: NEXT.VERSION
-            |custom_emoji_md1_deprecation|
+            |custom_emoji_no_md1_support|
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3699,7 +3699,7 @@ class Message(TelegramObject):
             * |custom_emoji_formatting_note|
 
         .. versionchanged:: NEXT.VERSION
-            |custom_emoji_md1_deprecation|
+            |custom_emoji_no_md1_support|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -3748,7 +3748,7 @@ class Message(TelegramObject):
             * |custom_emoji_formatting_note|
 
         .. versionchanged:: NEXT.VERSION
-            |custom_emoji_md1_deprecation|
+            |custom_emoji_no_md1_support|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.

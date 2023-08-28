@@ -189,6 +189,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
     .. versionchanged:: NEXT.VERSION
         Removed deprecated methods ``set_sticker_set_thumb`` and ``setStickerSetThumb``.
+        Use :meth:`set_sticker_set_thumbnail` and :meth:`setStickerSetThumbnail` instead.
 
     Args:
         token (:obj:`str`): Bot's unique authentication token.
@@ -214,6 +215,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             .. versionadded:: 20.0.
 
     .. include:: inclusions/bot_methods.rst
+
+    .. |removed_thumb_arg| replace:: Removed deprecated argument ``thumb``. Use
+        ``thumbnail`` instead.
 
     """
 
@@ -1106,7 +1110,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionchanged:: NEXT.VERSION
-            Removed deprecated parameter ``thumb``.
+            |removed_thumb_arg|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1228,7 +1232,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionchanged:: NEXT.VERSION
-            Removed deprecated parameter ``thumb``.
+            |removed_thumb_arg|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1443,7 +1447,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionchanged:: NEXT.VERSION
-            Removed deprecated parameter ``thumb``.
+            |removed_thumb_arg|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1573,7 +1577,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionchanged:: NEXT.VERSION
-            Removed deprecated parameter ``thumb``.
+            |removed_thumb_arg|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1692,7 +1696,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
         .. versionchanged:: NEXT.VERSION
-            Removed deprecated parameter ``thumb``.
+            |removed_thumb_arg|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -5512,11 +5516,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.File`: On success, the uploaded File is returned.
 
         Raises:
-            :exc:`TypeError`: Raised when: 1) ``sticker`` and ``sticker_format`` are passed
-                  together with ``png_sticker``. 2) If neither the new parameters nor
-                  the deprecated parameters are passed.
-
-            :class:`telegram.error.TelegramError`: For other errors.
+            :class:`telegram.error.TelegramError`
 
         """
         data: JSONDict = {
@@ -5578,11 +5578,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :obj:`bool`: On success, :obj:`True` is returned.
 
         Raises:
-            :exc:`TypeError`: Raised when: 1) ``sticker`` is passed
-                  together with the deprecated parameters. 2) If neither the new parameter nor
-                  the deprecated parameters are passed.
-
-            :class:`telegram.error.TelegramError`: For other errors.
+            :class:`telegram.error.TelegramError`
 
         """
         data: JSONDict = {
@@ -5665,7 +5661,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionchanged:: 20.2
             Since Bot API 6.6, the parameters :paramref:`stickers` and :paramref:`sticker_format`
             replace the parameters ``png_sticker``, ``tgs_sticker``,``webm_sticker``, ``emojis``,
-            and ``mask_position`.
+            and ``mask_position``.
 
         .. versionchanged:: NEXT.VERSION
             Removed the deprecated parameters mentioned above and adjusted the order of the
@@ -5714,11 +5710,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :obj:`bool`: On success, :obj:`True` is returned.
 
         Raises:
-            :exc:`TypeError`: Raised when: 1) ``stickers`` and ``sticker_format`` are passed
-                  together with the deprecated parameters. 2) If neither the new parameters nor
-                  the deprecated parameters are passed.
-
-            :class:`telegram.error.TelegramError`: For other errors.
+            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             "user_id": user_id,
