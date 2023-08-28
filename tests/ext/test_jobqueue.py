@@ -86,18 +86,19 @@ class TestJobQueue:
     )
 
     async def test_repr(self, app):
-        import datetime
+        import datetime as dtm
 
         jq = JobQueue()
         jq.set_application(app)
         assert repr(jq) == f"JobQueue[application={app!r}]"
 
+        when = dtm.datetime.utcnow() + dtm.timedelta(days=1)
         callback = self.job_run_once
-        job = jq.run_once(callback, 0, name="name2")
+        job = jq.run_once(callback, when, name="name2")
         assert repr(job) == (
             f"Job[id={job.job.id}, name={job.name}, callback=job_run_once, "
             f"trigger=date["
-            f"{datetime.datetime.now(tz=datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}"
+            f"{when.strftime('%Y-%m-%d %H:%M:%S UTC')}"
             f"]]"
         )
 
