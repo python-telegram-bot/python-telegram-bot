@@ -110,6 +110,7 @@ from typing import (
     Tuple,
     Union,
     cast,
+    Iterable,
 )
 
 from telegram import Chat as TGChat
@@ -2550,48 +2551,67 @@ VOICE = _Voice("filters.VOICE")
 
 
 class Mention(MessageFilter):
-    """Mention messages. If a username is passed, it filters messages to only allow those
-    whose contains mention of username.
-
+    """Mention messages. If list of username or chat_id or `User` objects passed, it filters messages to only allow those
+    whose contains one of username  or chat_id or `User`.
+    Note:
+        Usernames only allowed with @ prefix. Example: "@username"
+        Chat id only allowed with positive numbers. Example: 123456
     Examples:
         A simple use case for passing username is to allow only messages that were sent with
         mention username:
-        MessageHandler(filters.MENTION("username"), callback_method)
-        MessageHandler(filters.MENTION, callback_method)
-
+        MessageHandler(filters.Mention("@username"), callback_method)
+        MessageHandler(filters.Mention(["@username",`123456`,`user`), callback_method)
     Args:
-        username (:obj:`str`, optional): Which messages to allow with username. Only
-            exact matches are allowed. If not specified, will allow any text message with mention.
+        mentions (Union[:obj:`str`,:obj:`str`,:obj:`User`] | Collection[Union[:obj:`str`,:obj:`str`,:obj:`User`]]): Which messages to allow with username or chat_id or `User` object.
+        If one of them matched it will allow. If not specified, will allow any text message with mention.
     """
 
-    __slots__ = ("username",)
-    entity_type: str = MessageEntity.MENTION
+    __slots__ = ("mention",)
 
-    def __init__(self, username: Optional[Union[List[str], Tuple[str, ...]]] = None):
-        self.username: Optional[Sequence[str]] = username
-        super().__init__(
-            name=f"filters.Regex(r'@{username}') & filters.Entity({self.entity_type})"
-            if username
-            else f"filters.Entity({self.entity_type})"
-        )
+    def __init__(self, mentions: SCT[Union[int, str, TGUser]]):
+        self._mentions = self._parse_mentions(mentions)
+        super().__init__(name=f"filters.Mention({mentions})")
+
+    @staticmethod
+    def _parse_mentions(mentions: SCT[Union[int, str, TGUser]]) -> Set[int]:
+        if isinstance(mentions, Iterable) and not isinstance(mentions, str):
+            return set(mentions)
+        return {mentions}
+
+    @property
+    def mentions(self) -> FrozenSet[int]:
+        return frozenset(self._mentions)
+
+    def check_mention(self, message: Message, mention: Union[int, str, TGUser]) -> bool:
+        if isinstance(mention, TGUser):
+            if bool(any(mention.id == e.user.id for e in message.entities if e.user)):
+                return True
+            return True
+        elif str(mention).isdigit():
+            if bool(any(mention == e.user.id for e in message.entities if e.user)):
+                return True
+            return True
+        elif isinstance(mention, str):
+            if (
+                bool(any(e.type == MessageEntity.MENTION for e in message.entities))
+                and mention in message.text
+            ):
+                return True
+            return True
+        return False
 
     def filter(self, message: Message) -> bool:
-        if not any(entity.type == self.entity_type for entity in message.entities):
-            return False
-
-        if self.username:
-            if message.text and f"@{self.username}" in message.text:
-                return True
-            return False
-        return True
+        if any(self.check_mention(message, mention) for mention in self.mentions):
+            return True
+        return False
 
 
-MENTION = Mention()
+MENTION = Mention
 """
 Shortcut for :class:`telegram.ext.filters.Mention()`.
 
 Examples:
     To allow any text message that contains mention, simply use
-    ``MessageHandler(filters.MENTION, callback_method)`` or
-    ``MessageHandler(filters.MENTION("username"), callback_method)``.
+    ``MessageHandler(filters.MENTION("@username"), callback_method)`` or
+    ``MessageHandler(filters.MENTION(["@username",`123456`,`user`), callback_method)``.
 """

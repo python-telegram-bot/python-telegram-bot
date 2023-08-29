@@ -2421,9 +2421,28 @@ class TestFilters:
 
     def test_filters_mention(self, update):
         update.message.text = "test"
-        assert not filters.Mention().check_update(update)
-        update.message.entities = [MessageEntity(MessageEntity.MENTION, 0, 5)]
-        update.message.text = "@test"
-        assert not filters.Mention("test1").check_update(update)
-        assert filters.Mention("test").check_update(update)
-        assert filters.Mention().check_update(update)
+        assert not filters.Mention("@test").check_update(update)
+        assert not filters.Mention(123456).check_update(update)
+        assert not filters.Mention("123456").check_update(update)
+        assert not filters.Mention(User(1, "first_name", False)).check_update(update)
+        assert not filters.Mention(
+            ["@test", 123456, "123456", User(1, "first_name", False)]
+        ).check_update(update)
+
+        update.message.text = "@test @test2 user"
+        update.message.entities = [
+            MessageEntity(MessageEntity.MENTION, 0, 5),
+            MessageEntity(MessageEntity.MENTION, 7, 12),
+            MessageEntity(
+                MessageEntity.TEXT_MENTION, 14, 18, user=User(123456, "first_name", False)
+            ),
+        ]
+        assert not filters.Mention("@test1").check_update(update)
+        assert not filters.Mention(["@test3", "@test4"]).check_update(update)
+
+        assert filters.Mention("@test").check_update(update)
+        assert filters.Mention(["@test", "@test3"]).check_update(update)
+        assert filters.Mention(["@test", "@test2"]).check_update(update)
+        assert filters.Mention(["@test", "@test2", "@test3"]).check_update(update)
+        assert filters.Mention(["123456"]).check_update(update)
+        assert filters.Mention([User(123456, "first_name", False)]).check_update(update)
