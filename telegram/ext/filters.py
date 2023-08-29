@@ -2551,8 +2551,8 @@ VOICE = _Voice("filters.VOICE")
 
 
 class Mention(MessageFilter):
-    """Mention messages. If list of username or chat_id or `User` objects passed, it filters messages to only allow those
-    whose contains one of username  or chat_id or `User`.
+    """Mention messages. If list of username or chat_id or `User` objects passed, it filters
+    messages to only allow those whose contains one of username  or chat_id or `User`.
     Note:
         Usernames only allowed with @ prefix. Example: "@username"
         Chat id only allowed with positive numbers. Example: 123456
@@ -2562,41 +2562,45 @@ class Mention(MessageFilter):
         MessageHandler(filters.Mention("@username"), callback_method)
         MessageHandler(filters.Mention(["@username",`123456`,`user`), callback_method)
     Args:
-        mentions (Union[:obj:`str`,:obj:`str`,:obj:`User`] | Collection[Union[:obj:`str`,:obj:`str`,:obj:`User`]]): Which messages to allow with username or chat_id or `User` object.
-        If one of them matched it will allow. If not specified, will allow any text message with mention.
+        mentions (Union[:obj:`str`,:obj:`str`,:obj:`User`] |
+        Collection[Union[:obj:`str`,:obj:`str`,:obj:`User`]]): Which messages to allow with
+        username or chat_id or `User` object.If one of them matched it will allow.
+        If not specified, will allow any text message with mention.
     """
 
-    __slots__ = ("mention",)
+    __slots__ = ("mention", "_mentions")
 
     def __init__(self, mentions: SCT[Union[int, str, TGUser]]):
         self._mentions = self._parse_mentions(mentions)
         super().__init__(name=f"filters.Mention({mentions})")
 
     @staticmethod
-    def _parse_mentions(mentions: SCT[Union[int, str, TGUser]]) -> Set[int]:
+    def _parse_mentions(
+        mentions: SCT[Union[int, str, TGUser]]
+    ) -> Iterable[Union[int, str, TGUser]]:
         if isinstance(mentions, Iterable) and not isinstance(mentions, str):
             return set(mentions)
-        return {mentions}
+        return set(mentions)
 
     @property
-    def mentions(self) -> FrozenSet[int]:
+    def mentions(self) -> FrozenSet[Union[int, str, TGUser]]:
         return frozenset(self._mentions)
 
     def check_mention(self, message: Message, mention: Union[int, str, TGUser]) -> bool:
-        if isinstance(mention, TGUser):
-            if bool(any(mention.id == e.user.id for e in message.entities if e.user)):
-                return True
+        if isinstance(mention, TGUser) and bool(
+            any(mention.id == e.user.id for e in message.entities if e.user)
+        ):
             return True
-        elif str(mention).isdigit():
-            if bool(any(mention == e.user.id for e in message.entities if e.user)):
-                return True
+        if str(mention).isdigit() and bool(
+            any(mention == e.user.id for e in message.entities if e.user)
+        ):
             return True
-        elif isinstance(mention, str):
-            if (
-                bool(any(e.type == MessageEntity.MENTION for e in message.entities))
-                and mention in message.text
-            ):
-                return True
+        if (
+            isinstance(mention, str)
+            and bool(any(e.type == MessageEntity.MENTION for e in message.entities))
+            and message.text
+            and mention in message.text
+        ):
             return True
         return False
 
