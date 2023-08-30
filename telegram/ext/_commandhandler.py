@@ -88,6 +88,14 @@ class CommandHandler(BaseHandler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
+        has_args (:obj:`bool` | :obj:`int`, optional):
+            Determines whether the command handler should process the update or not.
+            If :obj:`True`, the handler will process any non-zero number of args.
+            If :obj:`False`, the handler will only process if there are no args.
+            if :obj:`int`, the handler will only process if there are exactly that many args.
+            Defaults to :obj:`None`, which means the handler will process any or no args.
+
+            .. versionadded:: NEXT.VERSION
 
     Raises:
         :exc:`ValueError`: When the command is too long or has illegal chars.
@@ -100,9 +108,14 @@ class CommandHandler(BaseHandler[Update, CCT]):
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
+        has_args (:obj:`bool` | :obj:`int` | None):
+            Optional argument, otherwise all implementations of :class:`CommandHandler` will break.
+            Defaults to :obj:`None`, which means the handler will process any args or no args.
+
+            .. versionadded:: NEXT.VERSION
     """
 
-    __slots__ = ("commands", "filters")
+    __slots__ = ("commands", "filters", "has_args")
 
     def __init__(
         self,
@@ -110,6 +123,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         callback: HandlerCallback[Update, CCT, RT],
         filters: Optional[filters_module.BaseFilter] = None,
         block: DVType[bool] = DEFAULT_TRUE,
+        has_args: Optional[Union[bool, int]] = None,
     ):
         super().__init__(callback, block=block)
 
@@ -125,6 +139,28 @@ class CommandHandler(BaseHandler[Update, CCT]):
         self.filters: filters_module.BaseFilter = (
             filters if filters is not None else filters_module.UpdateType.MESSAGES
         )
+
+        self.has_args: Optional[Union[bool, int]] = has_args
+
+        if (isinstance(self.has_args, int)) and (self.has_args < 0):
+            raise ValueError("CommandHandler argument has_args cannot be a negative integer")
+
+    def _check_correct_args(self, args: List[str]) -> Optional[bool]:
+        """Determines whether the args are correct for this handler. Implemented in check_update().
+        Args:
+            args (:obj:`list`): The args for the handler.
+        Returns:
+            :obj:`bool`: Whether the args are valid for this handler.
+        """
+        # pylint: disable=too-many-boolean-expressions
+        if (
+            (self.has_args is None)
+            or (self.has_args is True and args)
+            or (self.has_args is False and not args)
+            or (isinstance(self.has_args, int) and len(args) == self.has_args)
+        ):
+            return True
+        return False
 
     def check_update(
         self, update: object
@@ -157,6 +193,9 @@ class CommandHandler(BaseHandler[Update, CCT]):
                     command_parts[0].lower() in self.commands
                     and command_parts[1].lower() == message.get_bot().username.lower()
                 ):
+                    return None
+
+                if not self._check_correct_args(args):
                     return None
 
                 filter_result = self.filters.check_update(update)
