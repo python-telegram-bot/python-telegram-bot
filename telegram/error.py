@@ -127,6 +127,9 @@ class NetworkError(TelegramError):
 
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
+
+    .. seealso::
+        :wiki:`Handling network errors <Handling-network-errors>`
     """
 
     __slots__ = ()
@@ -140,6 +143,9 @@ class BadRequest(NetworkError):
 
 class TimedOut(NetworkError):
     """Raised when a request took too long to finish.
+
+    .. seealso::
+        :wiki:`Handling network errors <Handling-network-errors>`
 
     Args:
         message (:obj:`str`, optional): Any additional information about the exception.
