@@ -16,10 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import time
 
 import pytest
 
 from telegram import Bot, Chat, ChatLocation, ChatPermissions, Location, User
+from telegram._utils.datetime import UTC, from_timestamp
 from telegram.constants import ChatAction, ChatType
 from telegram.helpers import escape_markdown
 from tests.auxil.bot_method_checks import (
@@ -86,7 +88,7 @@ class TestChatBase:
     is_forum = True
     active_usernames = ["These", "Are", "Usernames!"]
     emoji_status_custom_emoji_id = "VeryUniqueCustomEmojiID"
-    emoji_status_expiration_date = 123456789
+    emoji_status_expiration_date = time.time()
     has_aggressive_anti_spam_enabled = True
     has_hidden_members = True
 
@@ -153,9 +155,31 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.is_forum == self.is_forum
         assert chat.active_usernames == tuple(self.active_usernames)
         assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
-        assert chat.emoji_status_expiration_date == self.emoji_status_expiration_date
+        assert chat.emoji_status_expiration_date == from_timestamp(
+            self.emoji_status_expiration_date
+        )
         assert chat.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
         assert chat.has_hidden_members == self.has_hidden_members
+
+    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+        json_dict = {
+            "id": self.id_,
+            "type": self.type_,
+            "emoji_status_expiration_date": self.emoji_status_expiration_date,
+        }
+        chat_bot = Chat.de_json(json_dict, bot)
+        chat_bot_raw = Chat.de_json(json_dict, raw_bot)
+        chat_bot_tz = Chat.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing tzinfo objects is not reliable
+        emoji_expire_offset = chat_bot_tz.emoji_status_expiration_date.utcoffset()
+        emoji_expire_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
+            chat_bot_tz.emoji_status_expiration_date.replace(tzinfo=None)
+        )
+
+        assert chat_bot.emoji_status_expiration_date.tzinfo == UTC
+        assert chat_bot_raw.emoji_status_expiration_date.tzinfo == UTC
+        assert emoji_expire_offset_tz == emoji_expire_offset
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
