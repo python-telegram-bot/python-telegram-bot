@@ -16,10 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import time
 
 import pytest
 
 from telegram import Bot, Chat, ChatLocation, ChatPermissions, Location, User
+from telegram._utils.datetime import UTC, from_timestamp
 from telegram.constants import ChatAction, ChatType
 from telegram.helpers import escape_markdown
 from tests.auxil.bot_method_checks import (
@@ -52,6 +54,7 @@ def chat(bot):
         is_forum=True,
         active_usernames=TestChatBase.active_usernames,
         emoji_status_custom_emoji_id=TestChatBase.emoji_status_custom_emoji_id,
+        emoji_status_expiration_date=TestChatBase.emoji_status_expiration_date,
         has_aggressive_anti_spam_enabled=TestChatBase.has_aggressive_anti_spam_enabled,
         has_hidden_members=TestChatBase.has_hidden_members,
     )
@@ -85,6 +88,7 @@ class TestChatBase:
     is_forum = True
     active_usernames = ["These", "Are", "Usernames!"]
     emoji_status_custom_emoji_id = "VeryUniqueCustomEmojiID"
+    emoji_status_expiration_date = time.time()
     has_aggressive_anti_spam_enabled = True
     has_hidden_members = True
 
@@ -119,6 +123,7 @@ class TestChatWithoutRequest(TestChatBase):
             "is_forum": self.is_forum,
             "active_usernames": self.active_usernames,
             "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id,
+            "emoji_status_expiration_date": self.emoji_status_expiration_date,
             "has_aggressive_anti_spam_enabled": self.has_aggressive_anti_spam_enabled,
             "has_hidden_members": self.has_hidden_members,
         }
@@ -150,8 +155,31 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.is_forum == self.is_forum
         assert chat.active_usernames == tuple(self.active_usernames)
         assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
+        assert chat.emoji_status_expiration_date == from_timestamp(
+            self.emoji_status_expiration_date
+        )
         assert chat.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
         assert chat.has_hidden_members == self.has_hidden_members
+
+    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+        json_dict = {
+            "id": self.id_,
+            "type": self.type_,
+            "emoji_status_expiration_date": self.emoji_status_expiration_date,
+        }
+        chat_bot = Chat.de_json(json_dict, bot)
+        chat_bot_raw = Chat.de_json(json_dict, raw_bot)
+        chat_bot_tz = Chat.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing tzinfo objects is not reliable
+        emoji_expire_offset = chat_bot_tz.emoji_status_expiration_date.utcoffset()
+        emoji_expire_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
+            chat_bot_tz.emoji_status_expiration_date.replace(tzinfo=None)
+        )
+
+        assert chat_bot.emoji_status_expiration_date.tzinfo == UTC
+        assert chat_bot_raw.emoji_status_expiration_date.tzinfo == UTC
+        assert emoji_expire_offset_tz == emoji_expire_offset
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -177,6 +205,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_dict["is_forum"] == chat.is_forum
         assert chat_dict["active_usernames"] == list(chat.active_usernames)
         assert chat_dict["emoji_status_custom_emoji_id"] == chat.emoji_status_custom_emoji_id
+        assert chat_dict["emoji_status_expiration_date"] == chat.emoji_status_expiration_date
         assert (
             chat_dict["has_aggressive_anti_spam_enabled"] == chat.has_aggressive_anti_spam_enabled
         )
@@ -1074,6 +1103,31 @@ class TestChatWithoutRequest(TestChatBase):
 
         monkeypatch.setattr(chat.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
         assert await chat.unpin_all_forum_topic_messages(message_thread_id=42)
+
+    async def test_unpin_all_general_forum_topic_messages(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.unpin_all_general_forum_topic_messages,
+            Bot.unpin_all_general_forum_topic_messages,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.unpin_all_general_forum_topic_messages,
+            chat.get_bot(),
+            "unpin_all_general_forum_topic_messages",
+            shortcut_kwargs=["chat_id"],
+        )
+        assert await check_defaults_handling(
+            chat.unpin_all_general_forum_topic_messages, chat.get_bot()
+        )
+
+        monkeypatch.setattr(
+            chat.get_bot(), "unpin_all_general_forum_topic_messages", make_assertion
+        )
+        assert await chat.unpin_all_general_forum_topic_messages()
 
     async def test_edit_general_forum_topic(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):

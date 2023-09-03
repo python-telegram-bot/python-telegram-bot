@@ -19,9 +19,10 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from telegram import MessageEntity, Poll, PollAnswer, PollOption, User
+from telegram import Chat, MessageEntity, Poll, PollAnswer, PollOption, User
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -81,56 +82,80 @@ class TestPollOptionWithoutRequest(TestPollOptionBase):
 @pytest.fixture(scope="module")
 def poll_answer():
     return PollAnswer(
-        TestPollAnswerBase.poll_id, TestPollAnswerBase.user, TestPollAnswerBase.poll_id
+        TestPollAnswerBase.poll_id,
+        TestPollAnswerBase.option_ids,
+        TestPollAnswerBase.user,
+        TestPollAnswerBase.voter_chat,
     )
 
 
 class TestPollAnswerBase:
     poll_id = "id"
-    user = User(1, "", False)
     option_ids = [2]
+    user = User(1, "", False)
+    voter_chat = Chat(1, "")
 
 
 class TestPollAnswerWithoutRequest(TestPollAnswerBase):
     def test_de_json(self):
         json_dict = {
             "poll_id": self.poll_id,
-            "user": self.user.to_dict(),
             "option_ids": self.option_ids,
+            "user": self.user.to_dict(),
+            "voter_chat": self.voter_chat.to_dict(),
         }
         poll_answer = PollAnswer.de_json(json_dict, None)
         assert poll_answer.api_kwargs == {}
 
         assert poll_answer.poll_id == self.poll_id
-        assert poll_answer.user == self.user
         assert poll_answer.option_ids == tuple(self.option_ids)
+        assert poll_answer.user == self.user
+        assert poll_answer.voter_chat == self.voter_chat
 
     def test_to_dict(self, poll_answer):
         poll_answer_dict = poll_answer.to_dict()
 
         assert isinstance(poll_answer_dict, dict)
         assert poll_answer_dict["poll_id"] == poll_answer.poll_id
-        assert poll_answer_dict["user"] == poll_answer.user.to_dict()
         assert poll_answer_dict["option_ids"] == list(poll_answer.option_ids)
+        assert poll_answer_dict["user"] == poll_answer.user.to_dict()
+        assert poll_answer_dict["voter_chat"] == poll_answer.voter_chat.to_dict()
 
     def test_equality(self):
-        a = PollAnswer(123, self.user, [2])
-        b = PollAnswer(123, User(1, "first", False), [2])
-        c = PollAnswer(123, self.user, [1, 2])
-        d = PollAnswer(456, self.user, [2])
-        e = PollOption("Text", 1)
+        a = PollAnswer(123, [2], self.user, self.voter_chat)
+        b = PollAnswer(123, [2], self.user, Chat(1, ""))
+        c = PollAnswer(123, [2], User(1, "first", False), self.voter_chat)
+        d = PollAnswer(123, [1, 2], self.user, self.voter_chat)
+        e = PollAnswer(456, [2], self.user, self.voter_chat)
+        f = PollOption("Text", 1)
 
         assert a == b
         assert hash(a) == hash(b)
 
-        assert a != c
-        assert hash(a) != hash(c)
+        assert a == c
+        assert hash(a) == hash(c)
 
         assert a != d
         assert hash(a) != hash(d)
 
         assert a != e
         assert hash(a) != hash(e)
+
+        assert a != f
+        assert hash(a) != hash(f)
+
+    def test_order_warning(self, recwarn):
+        expected_warning = (
+            "From v20.5 the order of `option_ids` and `user` is changed as the latter one"
+            " became optional. Please update your code to use the new order."
+        )
+        PollAnswer(123, [2], self.user, self.voter_chat)
+        assert len(recwarn) == 0
+        PollAnswer(123, self.user, [2], self.voter_chat)
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
 
 @pytest.fixture(scope="module")

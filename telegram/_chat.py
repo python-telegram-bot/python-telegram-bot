@@ -31,6 +31,7 @@ from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import (
     CorrectOptionID,
@@ -172,6 +173,12 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        emoji_status_expiration_date (:class:`datetime.datetime`, optional): Expiration date of
+            emoji status of the other party in a private chat, in seconds. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+            |datetime_localization|
+
+            .. versionadded:: NEXT.VERSION
         has_aggressive_anti_spam_enabled (:obj:`bool`, optional): :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators. Returned only in :meth:`telegram.Bot.get_chat`.
@@ -265,6 +272,12 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        emoji_status_expiration_date (:class:`datetime.datetime`, optional): Expiration date of
+            emoji status of the other party in a private chat, in seconds. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+            |datetime_localization|
+
+            .. versionadded:: NEXT.VERSION
         has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators. Returned only in :meth:`telegram.Bot.get_chat`.
@@ -306,6 +319,7 @@ class Chat(TelegramObject):
         "is_forum",
         "active_usernames",
         "emoji_status_custom_emoji_id",
+        "emoji_status_expiration_date",
         "has_hidden_members",
         "has_aggressive_anti_spam_enabled",
     )
@@ -352,6 +366,7 @@ class Chat(TelegramObject):
         is_forum: Optional[bool] = None,
         active_usernames: Optional[Sequence[str]] = None,
         emoji_status_custom_emoji_id: Optional[str] = None,
+        emoji_status_expiration_date: Optional[datetime] = None,
         has_aggressive_anti_spam_enabled: Optional[bool] = None,
         has_hidden_members: Optional[bool] = None,
         *,
@@ -390,6 +405,7 @@ class Chat(TelegramObject):
         self.is_forum: Optional[bool] = is_forum
         self.active_usernames: Tuple[str, ...] = parse_sequence_arg(active_usernames)
         self.emoji_status_custom_emoji_id: Optional[str] = emoji_status_custom_emoji_id
+        self.emoji_status_expiration_date: Optional[datetime] = emoji_status_expiration_date
         self.has_aggressive_anti_spam_enabled: Optional[bool] = has_aggressive_anti_spam_enabled
         self.has_hidden_members: Optional[bool] = has_hidden_members
 
@@ -445,6 +461,13 @@ class Chat(TelegramObject):
 
         if not data:
             return None
+
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
+        data["emoji_status_expiration_date"] = from_timestamp(
+            data.get("emoji_status_expiration_date"), tzinfo=loc_tzinfo
+        )
 
         data["photo"] = ChatPhoto.de_json(data.get("photo"), bot)
         from telegram import Message  # pylint: disable=import-outside-toplevel
@@ -2897,6 +2920,37 @@ class Chat(TelegramObject):
         return await self.get_bot().unpin_all_forum_topic_messages(
             chat_id=self.id,
             message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def unpin_all_general_forum_topic_messages(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.unpin_all_general_forum_topic_messages(chat_id=update.effective_chat.id,
+                *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.unpin_all_general_forum_topic_messages`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().unpin_all_general_forum_topic_messages(
+            chat_id=self.id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

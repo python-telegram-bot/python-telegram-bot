@@ -328,6 +328,8 @@
       - Used to reopen the general topic
     * - :meth:`~telegram.Bot.unpin_all_forum_topic_messages`
       - Used to unpin all messages in a forum topic
+    * - :meth:`~telegram.Bot.unpin_all_general_forum_topic_messages`
+      - Used to unpin all messages in the general forum topic
 
 .. raw:: html
 

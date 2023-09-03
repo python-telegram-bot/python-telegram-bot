@@ -236,6 +236,7 @@ class TestForumMethodsWithRequest:
         assert result is True, "Failed to reopen forum topic"
 
     async def test_unpin_all_forum_topic_messages(self, bot, forum_group_id, real_topic):
+        # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
         message_thread_id = real_topic.message_thread_id
         pin_msg_tasks = set()
 
@@ -249,8 +250,21 @@ class TestForumMethodsWithRequest:
 
         assert all([await task for task in pin_msg_tasks]) is True, "Message(s) were not pinned"
 
-        # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
         result = await bot.unpin_all_forum_topic_messages(forum_group_id, message_thread_id)
+        assert result is True, "Failed to unpin all the messages in forum topic"
+
+    async def test_unpin_all_general_forum_topic_messages(self, bot, forum_group_id):
+        # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
+        pin_msg_tasks = set()
+
+        awaitables = {bot.send_message(forum_group_id, TEST_MSG_TEXT) for _ in range(2)}
+        for coro in asyncio.as_completed(awaitables):
+            msg = await coro
+            pin_msg_tasks.add(asyncio.create_task(msg.pin()))
+
+        assert all([await task for task in pin_msg_tasks]) is True, "Message(s) were not pinned"
+
+        result = await bot.unpin_all_general_forum_topic_messages(forum_group_id)
         assert result is True, "Failed to unpin all the messages in forum topic"
 
     async def test_edit_general_forum_topic(self, bot, forum_group_id):

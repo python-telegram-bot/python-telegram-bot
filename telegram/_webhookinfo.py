@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
+from datetime import datetime
 from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._telegramobject import TelegramObject
@@ -123,12 +124,12 @@ class WebhookInfo(TelegramObject):
         url: str,
         has_custom_certificate: bool,
         pending_update_count: int,
-        last_error_date: Optional[int] = None,
+        last_error_date: Optional[datetime] = None,
         last_error_message: Optional[str] = None,
         max_connections: Optional[int] = None,
         allowed_updates: Optional[Sequence[str]] = None,
         ip_address: Optional[str] = None,
-        last_synchronization_error_date: Optional[int] = None,
+        last_synchronization_error_date: Optional[datetime] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -140,11 +141,11 @@ class WebhookInfo(TelegramObject):
 
         # Optional
         self.ip_address: Optional[str] = ip_address
-        self.last_error_date: Optional[int] = last_error_date
+        self.last_error_date: Optional[datetime] = last_error_date
         self.last_error_message: Optional[str] = last_error_message
         self.max_connections: Optional[int] = max_connections
         self.allowed_updates: Tuple[str, ...] = parse_sequence_arg(allowed_updates)
-        self.last_synchronization_error_date: Optional[int] = last_synchronization_error_date
+        self.last_synchronization_error_date: Optional[datetime] = last_synchronization_error_date
 
         self._id_attrs = (
             self.url,
