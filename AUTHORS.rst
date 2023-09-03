@@ -21,6 +21,7 @@ Contributors
 
 The following wonderful people contributed directly or indirectly to this project:
 
+- `Abdelrahman <https://github.com/aelkheir>`_
 - `Abshar <https://github.com/abxhr>`_
 - `Alateas <https://github.com/alateas>`_
 - `Ales Dokshanin <https://github.com/alesdokshanin>`_

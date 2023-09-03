@@ -25,7 +25,7 @@ from telegram.ext._utils.types import CCT
 
 
 class ShippingQueryHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram :attr:`telegram.Update.shipping_query`.
+    """Handler class to handle Telegram :attr:`telegram.Update.shipping_query`.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom

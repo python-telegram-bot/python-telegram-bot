@@ -25,7 +25,7 @@ from telegram.ext._utils.types import CCT
 
 
 class PollAnswerHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram updates that contain a
+    """Handler class to handle Telegram updates that contain a
     :attr:`poll answer <telegram.Update.poll_answer>`.
 
     Warning:
