@@ -22,7 +22,6 @@ import pytest
 from telegram import Chat, MessageEntity, Poll, PollAnswer, PollOption, User
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -143,19 +142,6 @@ class TestPollAnswerWithoutRequest(TestPollAnswerBase):
 
         assert a != f
         assert hash(a) != hash(f)
-
-    def test_order_warning(self, recwarn):
-        expected_warning = (
-            "From v20.5 the order of `option_ids` and `user` is changed as the latter one"
-            " became optional. Please update your code to use the new order."
-        )
-        PollAnswer(123, [2], self.user, self.voter_chat)
-        assert len(recwarn) == 0
-        PollAnswer(123, self.user, [2], self.voter_chat)
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == expected_warning
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
 
 @pytest.fixture(scope="module")
