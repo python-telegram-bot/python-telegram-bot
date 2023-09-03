@@ -31,7 +31,7 @@ class VideoNote(_BaseThumbedMedium):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
       |removed_thumb_note|
 
     Args:

@@ -35,7 +35,7 @@ class InlineQueryResultArticle(InlineQueryResult):
     Examples:
         :any:`Inline Bot <examples.inlinebot>`
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
       Removed the deprecated arguments and attributes ``thumb_*``.
 
     Args:

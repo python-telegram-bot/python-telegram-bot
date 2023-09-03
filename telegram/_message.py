@@ -202,7 +202,7 @@ class Message(TelegramObject):
             about the sticker.
         story (:class:`telegram.Story`, optional): Message is a forwarded story.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.5
         video (:class:`telegram.Video`, optional): Message is a video, information about the
             video.
         voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
@@ -439,7 +439,7 @@ class Message(TelegramObject):
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
         story (:class:`telegram.Story`): Optional. Message is a forwarded story.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.5
         video (:class:`telegram.Video`): Optional. Message is a video, information about the
             video.
 
@@ -3604,7 +3604,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
         Returns:
@@ -3651,7 +3651,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
         Returns:
@@ -3698,7 +3698,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
         Returns:
@@ -3747,7 +3747,7 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
         Returns:

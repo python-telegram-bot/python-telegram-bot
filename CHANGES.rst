@@ -4,6 +4,57 @@
 Changelog
 =========
 
+Version 20.5
+============
+*Released 2023-09-03*
+
+This is the technical changelog for version 20.5. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
+
+Major Changes
+-------------
+
+-  API 6.8 (:pr:`3853`)
+-  Remove Functionality Deprecated Since Bot API 6.5, 6.6 or 6.7 (:pr:`3858`)
+
+New Features
+------------
+
+-  Extend Allowed Values for HTTP Version (:pr:`3823` closes :issue:`3821`)
+-  Add ``has_args`` Parameter to ``CommandHandler`` (:pr:`3854` by `@thatguylah <https://github.com/thatguylah>`__ closes :issue:`3798`)
+-  Add ``Application.stop_running()`` and Improve Marking Updates as Read on ``Updater.stop()`` (:pr:`3804`)
+
+Minor Changes
+-------------
+
+-  Type Hinting Fixes for ``WebhookInfo`` (:pr:`3871`)
+-  Test and Document ``Exception.__cause__`` on ``NetworkError`` (:pr:`3792` closes :issue:`3778`)
+-  Add Support for Python 3.12 RC (:pr:`3847`)
+
+Documentation Improvements
+--------------------------
+
+-  Remove Version Check from Examples (:pr:`3846`)
+-  Documentation Improvements (:pr:`3803`, :pr:`3797`, :pr:`3816` by `@trim21 <https://github.com/trim21>`__, :pr:`3829` by `@aelkheir <https://github.com/aelkheir>`__)
+-  Provide Versions of ``customwebhookbot.py`` with Different Frameworks (:pr:`3820` closes :issue:`3717`)
+
+Dependency Updates
+------------------
+
+-  ``pre-commit`` autoupdate (:pr:`3824`)
+-  Bump ``srvaroa/labeler`` from 1.6.0 to 1.6.1 (:pr:`3870`)
+-  Bump ``sphinx`` from 7.0.1 to 7.1.1 (:pr:`3818`)
+-  Bump ``sphinx`` from 7.2.3 to 7.2.5 (:pr:`3869`)
+-  Bump ``furo`` from 2023.5.20 to 2023.7.26 (:pr:`3817`)
+-  Update ``apscheduler`` requirement from ~=3.10.3 to ~=3.10.4 (:pr:`3862`)
+-  Bump ``sphinx`` from 7.2.2 to 7.2.3 (:pr:`3861`)
+-  Bump ``pytest-asyncio`` from 0.21.0 to 0.21.1 (:pr:`3801`)
+-  Bump ``sphinx-paramlinks`` from 0.5.4 to 0.6.0 (:pr:`3840`)
+-  Update ``apscheduler`` requirement from ~=3.10.1 to ~=3.10.3 (:pr:`3851`)
+-  Bump ``furo`` from 2023.7.26 to 2023.8.19 (:pr:`3850`)
+-  Bump ``sphinx`` from 7.1.2 to 7.2.2 (:pr:`3852`)
+-  Bump ``sphinx`` from 7.1.1 to 7.1.2 (:pr:`3827`)
+
+
 Version 20.4
 ============
 

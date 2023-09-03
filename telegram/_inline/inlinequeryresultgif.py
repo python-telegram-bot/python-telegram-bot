@@ -39,7 +39,7 @@ class InlineQueryResultGif(InlineQueryResult):
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
       |removed_thumb_wildcard_note|
 
     Args:

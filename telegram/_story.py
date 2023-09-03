@@ -29,7 +29,7 @@ class Story(TelegramObject):
     This object represents a message about a forwarded story in the chat. Currently holds no
     information.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.5
 
     """
 

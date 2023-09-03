@@ -39,7 +39,7 @@ class InlineQueryResultVenue(InlineQueryResult):
       Foursquare details and Google Pace details are mutually exclusive. However, this
       behaviour is undocumented and might be changed by Telegram.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
         |removed_thumb_wildcard_note|
 
     Args:

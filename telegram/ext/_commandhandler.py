@@ -95,7 +95,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
             if :obj:`int`, the handler will only process if there are exactly that many args.
             Defaults to :obj:`None`, which means the handler will process any or no args.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.5
 
     Raises:
         :exc:`ValueError`: When the command is too long or has illegal chars.
@@ -112,7 +112,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
             Optional argument, otherwise all implementations of :class:`CommandHandler` will break.
             Defaults to :obj:`None`, which means the handler will process any args or no args.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.5
     """
 
     __slots__ = ("commands", "filters", "has_args")

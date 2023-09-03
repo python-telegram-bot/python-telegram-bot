@@ -187,7 +187,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
           the file path will be passed in the
           `file URI scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
         Removed deprecated methods ``set_sticker_set_thumb`` and ``setStickerSetThumb``.
         Use :meth:`set_sticker_set_thumbnail` and :meth:`setStickerSetThumbnail` instead.
 
@@ -1109,7 +1109,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
             |removed_thumb_arg|
 
         Args:
@@ -1231,7 +1231,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
             |removed_thumb_arg|
 
         Args:
@@ -1446,7 +1446,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
             |removed_thumb_arg|
 
         Args:
@@ -1576,7 +1576,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
             |removed_thumb_arg|
 
         Args:
@@ -1695,7 +1695,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
             |removed_thumb_arg|
 
         Args:
@@ -2757,7 +2757,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
            Removed deprecated arguments ``switch_pm_text`` and ``switch_pm_parameter``.
 
         Args:
@@ -5493,7 +5493,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :meth:`create_new_sticker_set` and :meth:`add_sticker_to_set` methods (can be used multiple
         times).
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
            Removed deprecated parameter ``png_sticker``.
 
         Args:
@@ -5561,7 +5561,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             Since Bot API 6.6, the parameter :paramref:`sticker` replace the parameters
             ``png_sticker``, ``tgs_sticker``, ``webm_sticker``, ``emojis``, and ``mask_position``.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
            Removed deprecated parameters ``png_sticker``, ``tgs_sticker``, ``webm_sticker``,
            ``emojis``, and ``mask_position``.
 
@@ -5663,7 +5663,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             replace the parameters ``png_sticker``, ``tgs_sticker``,``webm_sticker``, ``emojis``,
             and ``mask_position``.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.5
             Removed the deprecated parameters mentioned above and adjusted the order of the
             parameters.
 
@@ -7346,7 +7346,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` administrator rights in the
         supergroup.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.5
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|

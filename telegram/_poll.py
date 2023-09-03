@@ -87,9 +87,9 @@ class PollAnswer(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`option_ids` are equal.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
         The order of :paramref:`option_ids` and :paramref:`user` is changed in
-        NEXT.VERSION as the latter one became optional. We currently provide
+        20.5 as the latter one became optional. We currently provide
         backward compatibility for this but it will be removed in the future.
         Please update your code to use the new order.
 
@@ -104,12 +104,12 @@ class PollAnswer(TelegramObject):
             if the voter isn't anonymous. If the voter is anonymous, this field will contain the
             user :tg-const:`telegram.constants.ChatID.FAKE_CHANNEL` for backwards compatibility.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.5
                 :paramref:`user` became optional.
         voter_chat (:class:`telegram.Chat`, optional): The chat that changed the answer to the
             poll, if the voter is anonymous.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.5
 
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
@@ -122,12 +122,12 @@ class PollAnswer(TelegramObject):
             poll, if the voter isn't anonymous. If the voter is anonymous, this field will contain
             the user :tg-const:`telegram.constants.ChatID.FAKE_CHANNEL` for backwards compatibility
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.5
                 :paramref:`user` became optional.
         voter_chat (:class:`telegram.Chat`): Optional. The chat that changed the answer to the
             poll, if the voter is anonymous.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.5
 
     """
 

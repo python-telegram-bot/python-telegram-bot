@@ -42,7 +42,7 @@ class Sticker(_BaseThumbedMedium):
         arguments had to be changed. Use keyword arguments to make sure that the arguments are
         passed correctly.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
       |removed_thumb_note|
 
     Args:
@@ -226,7 +226,7 @@ class StickerSet(TelegramObject):
     .. versionchanged:: 20.0
         The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
        |removed_thumb_note|
 
     Args:

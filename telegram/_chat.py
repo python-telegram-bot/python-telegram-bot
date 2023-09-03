@@ -178,7 +178,7 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
             |datetime_localization|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.5
         has_aggressive_anti_spam_enabled (:obj:`bool`, optional): :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators. Returned only in :meth:`telegram.Bot.get_chat`.
@@ -277,7 +277,7 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
             |datetime_localization|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.5
         has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
             anti-spam checks are enabled in the supergroup. The field is only available to chat
             administrators. Returned only in :meth:`telegram.Bot.get_chat`.
@@ -2934,7 +2934,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.unpin_all_general_forum_topic_messages`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.5
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

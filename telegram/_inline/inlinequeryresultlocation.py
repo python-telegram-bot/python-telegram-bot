@@ -35,7 +35,7 @@ class InlineQueryResultLocation(InlineQueryResult):
     Alternatively, you can use :attr:`input_message_content` to send a message with the specified
     content instead of the location.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
         |removed_thumb_wildcard_note|
 
     Args:

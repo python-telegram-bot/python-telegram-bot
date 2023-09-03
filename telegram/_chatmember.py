@@ -366,7 +366,7 @@ class ChatMemberRestricted(ChatMember):
        All arguments were made positional and their order was changed.
        The argument can_manage_topics was added.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
       Removed deprecated argument and attribute ``can_send_media_messages``.
 
     Args:

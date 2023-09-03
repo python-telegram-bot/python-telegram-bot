@@ -662,7 +662,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         Note:
             If the application is not running, this method does nothing.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.5
         """
         if self.running:
             # This works because `__run` is using `loop.run_forever()`. If that changes, this

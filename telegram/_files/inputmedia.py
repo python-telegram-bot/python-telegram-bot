@@ -123,7 +123,7 @@ class InputMediaAnimation(InputMedia):
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
       |removed_thumb_note|
 
     Args:
@@ -320,7 +320,7 @@ class InputMediaVideo(InputMedia):
             easily generate thumbnails. However, this behaviour is undocumented and might be
             changed by Telegram.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
       |removed_thumb_note|
 
     Args:
@@ -449,7 +449,7 @@ class InputMediaAudio(InputMedia):
         duration, performer and title from that video, unless otherwise specified with the
         optional arguments.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
       |removed_thumb_note|
 
     Args:
@@ -553,7 +553,7 @@ class InputMediaDocument(InputMedia):
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
       |removed_thumb_note|
 
     Args:

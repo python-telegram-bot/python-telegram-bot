@@ -54,7 +54,7 @@ class KeyboardButton(TelegramObject):
     .. versionchanged:: 20.0
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.5
        :attr:`request_user` and :attr:`request_chat` are considered as well when
        comparing objects of this type in terms of equality.
 

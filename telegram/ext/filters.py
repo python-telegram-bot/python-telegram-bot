@@ -2154,7 +2154,7 @@ class _Story(MessageFilter):
 STORY = _Story(name="filters.STORY")
 """Messages that contain :attr:`telegram.Message.story`.
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 20.5
 """
 
 
