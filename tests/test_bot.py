@@ -78,7 +78,7 @@ from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
@@ -657,7 +657,7 @@ class TestBotWithoutRequest:
         )
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
-    @pytest.mark.parametrize("button_type", ["start", "web_app", "backward_compat"])
+    @pytest.mark.parametrize("button_type", ["start", "web_app"])
     async def test_answer_inline_query(self, monkeypatch, bot, raw_bot, button_type):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -692,7 +692,7 @@ class TestBotWithoutRequest:
                 "is_personal": True,
             }
 
-            if button_type in ["start", "backward_compat"]:
+            if button_type == "start":
                 button_dict = {"text": "button_text", "start_parameter": "start_parameter"}
             else:
                 button_dict = {
@@ -741,10 +741,6 @@ class TestBotWithoutRequest:
                 cache_time=300,
                 is_personal=True,
                 next_offset="42",
-                switch_pm_text="button_text" if button_type == "backward_compat" else None,
-                switch_pm_parameter="start_parameter"
-                if button_type == "backward_compat"
-                else None,
                 button=button,
             )
 
@@ -765,43 +761,6 @@ class TestBotWithoutRequest:
                     )
 
             monkeypatch.delattr(bot.request, "post")
-
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_answer_inline_query_deprecated_args(
-        self, monkeypatch, recwarn, bot_class, bot, raw_bot
-    ):
-        async def mock_post(*args, **kwargs):
-            return True
-
-        bot = raw_bot if bot_class == "Bot" else bot
-
-        monkeypatch.setattr(bot.request, "post", mock_post)
-
-        with pytest.raises(
-            TypeError, match="6.7, the parameter `button is mutually exclusive to the deprecated"
-        ):
-            await bot.answer_inline_query(
-                inline_query_id="123",
-                results=[],
-                button=True,
-                switch_pm_text="text",
-                switch_pm_parameter="param",
-            )
-
-        recwarn.clear()
-        assert await bot.answer_inline_query(
-            inline_query_id="123",
-            results=[],
-            switch_pm_text="text",
-            switch_pm_parameter="parameter",
-        )
-        assert len(recwarn) == 1
-        assert recwarn[-1].category is PTBDeprecationWarning
-        assert str(recwarn[-1].message).startswith(
-            "Since Bot API 6.7, the parameters `switch_pm_text` and `switch_pm_parameter` are "
-            "deprecated"
-        )
-        assert recwarn[-1].filename == __file__, "stacklevel is incorrect!"
 
     async def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):

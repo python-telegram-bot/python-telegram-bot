@@ -85,23 +85,3 @@ def warn_about_deprecated_attr_in_property(
         PTBDeprecationWarning,
         stacklevel=stacklevel + 1,
     )
-
-
-def warn_about_thumb_return_thumbnail(
-    deprecated_arg: Any,
-    new_arg: Any,
-    stacklevel: int = 2,
-    warn_callback: Callable[[str, Type[Warning], int], None] = warn,
-) -> Any:
-    """A helper function to warn about using a deprecated 'thumb' argument and return it or the
-    new 'thumbnail' argument, introduced in API 6.6.
-    """
-    return warn_about_deprecated_arg_return_new_arg(
-        deprecated_arg=deprecated_arg,
-        new_arg=new_arg,
-        warn_callback=warn_callback,
-        deprecated_arg_name="thumb",
-        new_arg_name="thumbnail",
-        bot_api_version="6.6",
-        stacklevel=stacklevel + 1,
-    )

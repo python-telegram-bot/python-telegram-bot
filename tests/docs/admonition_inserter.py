@@ -147,8 +147,8 @@ class TestAdmonitionInserter:
             ),
             (
                 "use_in",
-                telegram.MaskPosition,
-                ":meth:`telegram.Bot.add_sticker_to_set`",  # optional
+                telegram.InlineKeyboardMarkup,
+                ":meth:`telegram.Bot.send_message`",  # optional
             ),
             (
                 "use_in",

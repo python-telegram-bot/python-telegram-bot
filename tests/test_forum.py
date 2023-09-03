@@ -186,15 +186,15 @@ class TestForumMethodsWithRequest:
         assert not first_sticker.is_video
         assert first_sticker.set_name == "Topics"
         assert first_sticker.type == Sticker.CUSTOM_EMOJI
-        assert first_sticker.thumb.width == 128
-        assert first_sticker.thumb.height == 128
+        assert first_sticker.thumbnail.width == 128
+        assert first_sticker.thumbnail.height == 128
 
         # The following data of first item returned has changed in the past already,
         # so check sizes loosely and ID's only by length of string
-        assert first_sticker.thumb.file_size in range(2000, 7000)
+        assert first_sticker.thumbnail.file_size in range(2000, 7000)
         assert first_sticker.file_size in range(20000, 70000)
         assert len(first_sticker.custom_emoji_id) == 19
-        assert len(first_sticker.thumb.file_unique_id) == 16
+        assert len(first_sticker.thumbnail.file_unique_id) == 16
         assert len(first_sticker.file_unique_id) == 15
 
     async def test_edit_forum_topic(self, emoji_id, forum_group_id, bot, real_topic):

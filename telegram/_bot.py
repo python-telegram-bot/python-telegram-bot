@@ -105,14 +105,13 @@ from telegram._utils.types import (
     ReplyMarkup,
 )
 from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import warn_about_thumb_return_thumbnail
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit
 from telegram.error import InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -188,6 +187,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
           the file path will be passed in the
           `file URI scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
 
+    .. versionchanged:: NEXT.VERSION
+        Removed deprecated methods ``set_sticker_set_thumb`` and ``setStickerSetThumb``.
+        Use :meth:`set_sticker_set_thumbnail` and :meth:`setStickerSetThumbnail` instead.
+
     Args:
         token (:obj:`str`): Bot's unique authentication token.
         base_url (:obj:`str`, optional): Telegram Bot API service URL.
@@ -212,6 +215,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             .. versionadded:: 20.0.
 
     .. include:: inclusions/bot_methods.rst
+
+    .. |removed_thumb_arg| replace:: Removed deprecated argument ``thumb``. Use
+        ``thumbnail`` instead.
 
     """
 
@@ -1078,7 +1084,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -1103,6 +1108,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         For sending voice messages, use the :meth:`send_voice` method instead.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. versionchanged:: NEXT.VERSION
+            |removed_thumb_arg|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1143,18 +1151,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): |thumbdocstring|
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
@@ -1174,21 +1170,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb,
-            new_arg=thumbnail,
-            warn_callback=self._warn,
-            stacklevel=3,
-        )
         data: JSONDict = {
             "chat_id": chat_id,
             "audio": self._parse_file_input(audio, Audio, filename=filename),
             "duration": duration,
             "performer": performer,
             "title": title,
-            "thumbnail": self._parse_file_input(thumbnail_or_thumb, attach=True)
-            if thumbnail_or_thumb
-            else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
         }
 
         return await self._send_message(
@@ -1220,7 +1208,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: Optional[FileInput] = None,
         disable_content_type_detection: Optional[bool] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
@@ -1243,6 +1230,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         changed in the future.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. versionchanged:: NEXT.VERSION
+            |removed_thumb_arg|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1285,18 +1275,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): |thumbdocstring|
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
@@ -1314,20 +1292,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb,
-            new_arg=thumbnail,
-            warn_callback=self._warn,
-            stacklevel=3,
-        )
-
         data: JSONDict = {
             "chat_id": chat_id,
             "document": self._parse_file_input(document, Document, filename=filename),
             "disable_content_type_detection": disable_content_type_detection,
-            "thumbnail": self._parse_file_input(thumbnail_or_thumb, attach=True)
-            if thumbnail_or_thumb
-            else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
         }
 
         return await self._send_message(
@@ -1449,7 +1418,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         height: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         supports_streaming: Optional[bool] = None,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -1472,11 +1440,14 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         changed in the future.
 
         Note:
-            :paramref:`thumb` will be ignored for small video files, for which Telegram can
+            :paramref:`thumbnail` will be ignored for small video files, for which Telegram can
             easily generate thumbnails. However, this behaviour is undocumented and might be
             changed by Telegram.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. versionchanged:: NEXT.VERSION
+            |removed_thumb_arg|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1519,18 +1490,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): |thumbdocstring|
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             has_spoiler (:obj:`bool`, optional): Pass :obj:`True` if the video needs to be covered
                 with a spoiler animation.
 
@@ -1554,12 +1513,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb,
-            new_arg=thumbnail,
-            warn_callback=self._warn,
-            stacklevel=3,
-        )
         data: JSONDict = {
             "chat_id": chat_id,
             "video": self._parse_file_input(video, Video, filename=filename),
@@ -1567,9 +1520,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "width": width,
             "height": height,
             "supports_streaming": supports_streaming,
-            "thumbnail": self._parse_file_input(thumbnail_or_thumb, attach=True)
-            if thumbnail_or_thumb
-            else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
             "has_spoiler": has_spoiler,
         }
 
@@ -1602,7 +1553,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -1620,11 +1570,14 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Use this method to send video messages.
 
         Note:
-            :paramref:`thumb` will be ignored for small video files, for which Telegram can
+            :paramref:`thumbnail` will be ignored for small video files, for which Telegram can
             easily generate thumbnails. However, this behaviour is undocumented and might be
             changed by Telegram.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. versionchanged:: NEXT.VERSION
+            |removed_thumb_arg|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1659,18 +1612,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): |thumbdocstring|
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             thumbnail (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstring|
 
@@ -1690,20 +1631,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb,
-            new_arg=thumbnail,
-            warn_callback=self._warn,
-            stacklevel=3,
-        )
         data: JSONDict = {
             "chat_id": chat_id,
             "video_note": self._parse_file_input(video_note, VideoNote, filename=filename),
             "duration": duration,
             "length": length,
-            "thumbnail": self._parse_file_input(thumbnail_or_thumb, attach=True)
-            if thumbnail_or_thumb
-            else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
         }
 
         return await self._send_message(
@@ -1730,7 +1663,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         duration: Optional[int] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        thumb: Optional[FileInput] = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -1757,11 +1689,14 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         changed in the future.
 
         Note:
-            :paramref:`thumb` will be ignored for small files, for which Telegram can easily
+            :paramref:`thumbnail` will be ignored for small files, for which Telegram can easily
             generate thumbnails. However, this behaviour is undocumented and might be changed
             by Telegram.
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+        .. versionchanged:: NEXT.VERSION
+            |removed_thumb_arg|
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1775,18 +1710,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             duration (:obj:`int`, optional): Duration of sent animation in seconds.
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
-            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
-                optional): |thumbdocstring|
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                   |thumbargumentdeprecation| :paramref:`thumbnail`.
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
                 animations by file_id),
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
@@ -1834,21 +1757,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        thumbnail_or_thumb: FileInput = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb,
-            new_arg=thumbnail,
-            warn_callback=self._warn,
-            stacklevel=3,
-        )
         data: JSONDict = {
             "chat_id": chat_id,
             "animation": self._parse_file_input(animation, Animation, filename=filename),
             "duration": duration,
             "width": width,
             "height": height,
-            "thumbnail": self._parse_file_input(thumbnail_or_thumb, attach=True)
-            if thumbnail_or_thumb
-            else None,
+            "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
             "has_spoiler": has_spoiler,
         }
 
@@ -2820,15 +2735,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         cache_time: Optional[int] = None,
         is_personal: Optional[bool] = None,
         next_offset: Optional[str] = None,
-        # Deprecated params since bot api 6.7
-        # <----
-        switch_pm_text: Optional[str] = None,
-        switch_pm_parameter: Optional[str] = None,
-        # --->
-        # New params since bot api 6.7
-        # <----
         button: Optional[InlineQueryResultsButton] = None,
-        # --->
         *,
         current_offset: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2849,8 +2756,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
-        .. |api6_7_depr| replace:: Since Bot API 6.7, this argument is deprecated in favour of
-            :paramref:`button`.
+
+        .. versionchanged:: NEXT.VERSION
+           Removed deprecated arguments ``switch_pm_text`` and ``switch_pm_parameter``.
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
@@ -2869,20 +2777,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 next query with the same text to receive more results. Pass an empty string if
                 there are no more results or if you don't support pagination. Offset length can't
                 exceed :tg-const:`telegram.InlineQuery.MAX_OFFSET_LENGTH` bytes.
-            switch_pm_text (:obj:`str`, optional): If passed, clients will display a button with
-                specified text that switches the user to a private chat with the bot and sends the
-                bot a start message with the parameter :paramref:`switch_pm_parameter`.
-
-                .. deprecated:: 20.3
-                    |api6_7_depr|
-            switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the
-                :guilabel:`/start` message sent to the bot when user presses the switch button.
-                :tg-const:`telegram.InlineQuery.MIN_SWITCH_PM_TEXT_LENGTH`-
-                :tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
-                only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
-
-                .. deprecated:: 20.3
-                    |api6_7_depr|
             button (:class:`telegram.InlineQueryResultsButton`, optional): A button to be shown
                 above the inline query results.
 
@@ -2901,26 +2795,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.error.TelegramError`
 
         """
-        if (switch_pm_text or switch_pm_parameter) and button:
-            raise TypeError(
-                "Since Bot API 6.7, the parameter `button is mutually exclusive to the deprecated "
-                "parameters `switch_pm_text` and `switch_pm_parameter`. Please use the new "
-                "parameter `button`."
-            )
-
-        if switch_pm_text and switch_pm_parameter:
-            self._warn(
-                "Since Bot API 6.7, the parameters `switch_pm_text` and `switch_pm_parameter` are "
-                "deprecated in favour of the new parameter `button`. Please use the new parameter "
-                "`button` instead.",
-                category=PTBDeprecationWarning,
-                stacklevel=3,
-            )
-            button = InlineQueryResultsButton(
-                text=switch_pm_text,
-                start_parameter=switch_pm_parameter,
-            )
-
         effective_results, next_offset = self._effective_inline_results(
             results=results, next_offset=next_offset, current_offset=current_offset
         )
@@ -5605,14 +5479,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def upload_sticker_file(
         self,
         user_id: Union[str, int],
-        png_sticker: Optional[
-            FileInput
-        ] = None,  # Deprecated since bot api 6.6. Optional for compatiblity.
-        # New parameters since bot api 6.6:
-        # <---
-        sticker: Optional[FileInput] = None,  # Actually required, but optional for compatibility.
-        sticker_format: Optional[str] = None,  # Actually required, but optional for compatibility.
-        # --->
+        sticker: Optional[FileInput],
+        sticker_format: Optional[str],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -5624,6 +5492,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to upload a file with a sticker for later use in the
         :meth:`create_new_sticker_set` and :meth:`add_sticker_to_set` methods (can be used multiple
         times).
+
+        .. versionchanged:: NEXT.VERSION
+           Removed deprecated parameter ``png_sticker``.
 
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
@@ -5641,65 +5512,17 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionadded:: 20.2
 
-            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional):
-                **PNG** image with the sticker, must be up to 512 kilobytes in size,
-                dimensions must not exceed 512px, and either width or height must be exactly 512px.
-                |uploadinput|
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                    Since Bot API 6.6, this parameter has been deprecated in favor of
-                    :paramref:`sticker` and :paramref:`sticker_format`.
-
         Returns:
             :class:`telegram.File`: On success, the uploaded File is returned.
 
         Raises:
-            :exc:`TypeError`: Raised when: 1) ``sticker`` and ``sticker_format`` are passed
-                  together with ``png_sticker``. 2) If neither the new parameters nor
-                  the deprecated parameters are passed.
-
-            :class:`telegram.error.TelegramError`: For other errors.
+            :class:`telegram.error.TelegramError`
 
         """
-        if not png_sticker and not all((sticker, sticker_format)):
-            raise TypeError(
-                "Since Bot API 6.6, the parameters `sticker` and `sticker_format` "
-                "are required, please pass them as well."
-            )
-
-        if png_sticker and any((sticker, sticker_format)):
-            raise TypeError(
-                "Since Bot API 6.6, the parameters `sticker` and `sticker_format` "
-                "are mutually exclusive with the deprecated parameter "
-                "`png_sticker`. Please use the new parameters "
-                "`sticker` and `sticker_format` instead."
-            )
-            # If we had allowed this, the created sticker set would have used the newer parameters
-            # only, which would have been confusing.
-
-        if png_sticker:
-            self._warn(
-                "Since Bot API 6.6, the parameter `png_sticker` for "
-                "`upload_sticker_file` is deprecated. Please use the new parameters "
-                "`sticker` and `sticker_format` instead.",
-                stacklevel=3,
-                category=PTBDeprecationWarning,
-            )
-
         data: JSONDict = {
             "user_id": user_id,
             "sticker": self._parse_file_input(sticker),  # type: ignore[arg-type]
             "sticker_format": sticker_format,
-            # Deprecated param since bot api 6.6
-            "png_sticker": self._parse_file_input(png_sticker),  # type: ignore[arg-type]
         }
         result = await self._post(
             "uploadStickerFile",
@@ -5713,232 +5536,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         return File.de_json(result, self)  # type: ignore[return-value]
 
     @_log
-    async def create_new_sticker_set(
-        self,
-        user_id: Union[str, int],
-        name: str,
-        title: str,
-        # Deprecated params since bot api 6.6
-        # <----
-        emojis: Optional[str] = None,  # Was made optional for compatibility purposes
-        png_sticker: Optional[FileInput] = None,
-        mask_position: Optional[MaskPosition] = None,
-        tgs_sticker: Optional[FileInput] = None,
-        webm_sticker: Optional[FileInput] = None,
-        # ---->
-        sticker_type: Optional[str] = None,
-        # New params since bot api 6.6
-        # <----
-        stickers: Optional[
-            Sequence[InputSticker]
-        ] = None,  # Actually a required param. Optional for compat.
-        sticker_format: Optional[str] = None,  # Actually a required param. Optional for compat.
-        needs_repainting: Optional[bool] = None,
-        # ---->
-        *,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> bool:
-        """
-        Use this method to create new sticker set owned by a user.
-        The bot will be able to edit the created sticker set thus created.
-
-        .. versionchanged:: 20.0
-            The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type`
-            instead.
-
-        .. versionchanged:: 20.2
-            Since Bot API 6.6, the parameters :paramref:`stickers` and :paramref:`sticker_format`
-            replace the parameters :paramref:`png_sticker`, :paramref:`tgs_sticker`,
-            :paramref:`webm_sticker`, :paramref:`emojis`, and :paramref:`mask_position`.
-
-        .. |api6_6_depr| replace:: Since Bot API 6.6, this argument is deprecated in favour of
-            :paramref:`stickers` and :paramref:`sticker_format`.
-
-        Args:
-            user_id (:obj:`int`): User identifier of created sticker set owner.
-            name (:obj:`str`): Short name of sticker set, to be used in t.me/addstickers/ URLs
-                (e.g., animals). Can contain only english letters, digits and underscores.
-                Must begin with a letter, can't contain consecutive underscores and
-                must end in "_by_<bot username>". <bot_username> is case insensitive.
-                :tg-const:`telegram.constants.StickerLimit.MIN_NAME_AND_TITLE`-
-                :tg-const:`telegram.constants.StickerLimit.MAX_NAME_AND_TITLE` characters.
-            title (:obj:`str`): Sticker set title,
-                :tg-const:`telegram.constants.StickerLimit.MIN_NAME_AND_TITLE`-
-                :tg-const:`telegram.constants.StickerLimit.MAX_NAME_AND_TITLE` characters.
-
-            stickers (Sequence[:class:`telegram.InputSticker`]): A sequence of
-                :tg-const:`telegram.constants.StickerSetLimit.MIN_INITIAL_STICKERS`-
-                :tg-const:`telegram.constants.StickerSetLimit.MAX_INITIAL_STICKERS` initial
-                stickers to be added to the sticker set.
-
-                .. versionadded:: 20.2
-
-            sticker_format (:obj:`str`): Format of stickers in the set, must be one of
-                :attr:`~telegram.constants.StickerFormat.STATIC`,
-                :attr:`~telegram.constants.StickerFormat.ANIMATED` or
-                :attr:`~telegram.constants.StickerFormat.VIDEO`.
-
-                .. versionadded:: 20.2
-
-            sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
-                :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`, or
-                :attr:`telegram.Sticker.CUSTOM_EMOJI`. By default, a regular sticker set is created
-
-                .. versionadded:: 20.0
-
-            needs_repainting (:obj:`bool`, optional): Pass :obj:`True` if stickers in the sticker
-                set must be repainted to the color of text when used in messages, the accent color
-                if used as emoji status, white on chat photos, or another appropriate color based
-                on context; for custom emoji sticker sets only.
-
-                .. versionadded:: 20.2
-
-            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): **PNG** image with the sticker,
-                must be up to 512 kilobytes in size, dimensions must not exceed 512px,
-                and either width or height must be exactly 512px.
-                |fileinput|
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                    |api6_6_depr|
-
-            tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): **TGS** animation with the sticker. |uploadinput|
-                See https://core.telegram.org/stickers#animation-requirements for technical
-                requirements.
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                    |api6_6_depr|
-
-            webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
-                optional): **WEBM** video with the sticker. |uploadinput|
-                See https://core.telegram.org/stickers#video-requirements for
-                technical requirements.
-
-                .. versionadded:: 13.11
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                    |api6_6_depr|
-
-            emojis (:obj:`str`, optional): One or more emoji corresponding to the sticker.
-
-                .. deprecated:: 20.2
-                    |api6_6_depr|
-
-            mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
-                should be placed on faces.
-
-                .. deprecated:: 20.2
-                    |api6_6_depr|
-
-        Returns:
-            :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :exc:`TypeError`: Raised when: 1) ``stickers`` and ``sticker_format`` are passed
-                  together with the deprecated parameters. 2) If neither the new parameters nor
-                  the deprecated parameters are passed.
-
-            :class:`telegram.error.TelegramError`: For other errors.
-        """
-        pre_api_6_6_params = {
-            "emojis": emojis,
-            "png_sticker": png_sticker,
-            "mask_position": mask_position,
-            "tgs_sticker": tgs_sticker,
-            "webm_sticker": webm_sticker,
-        }
-
-        if not any(pre_api_6_6_params.values()) and not all((stickers, sticker_format)):
-            raise TypeError(
-                "Since Bot API 6.6, the parameters `stickers` and `sticker_format` "
-                "are required, please pass them as well."
-            )
-
-        if any(pre_api_6_6_params.values()) and any((stickers, sticker_format)):
-            raise TypeError(
-                "Since Bot API 6.6, the parameters `stickers` and `sticker_format` "
-                "are mutually exclusive with the deprecated parameters "
-                f"{set(pre_api_6_6_params)}. Please use the new parameter "
-                "`stickers` and `sticker_format` instead."
-            )
-            # If we had allowed this, the created sticker set would have used the newer parameters
-            # only, which would have been confusing.
-
-        if any(pre_api_6_6_params.values()):
-            self._warn(
-                f"Since Bot API 6.6, the parameters {set(pre_api_6_6_params)} for "
-                "`create_new_sticker_set` are deprecated. Please use the new parameter "
-                "`stickers` and `sticker_format` instead.",
-                stacklevel=3,
-                category=PTBDeprecationWarning,
-            )
-
-        data: JSONDict = {
-            "user_id": user_id,
-            "name": name,
-            "title": title,
-            "stickers": stickers,
-            "sticker_format": sticker_format,
-            "sticker_type": sticker_type,
-            "needs_repainting": needs_repainting,
-            # Deprecated params since bot api 6.6
-            "emojis": emojis,
-            "png_sticker": self._parse_file_input(png_sticker) if png_sticker else None,
-            "tgs_sticker": self._parse_file_input(tgs_sticker) if tgs_sticker else None,
-            "webm_sticker": self._parse_file_input(webm_sticker) if webm_sticker else None,
-            "mask_position": mask_position,
-        }
-
-        return await self._post(
-            "createNewStickerSet",
-            data,
-            read_timeout=read_timeout,
-            write_timeout=write_timeout,
-            connect_timeout=connect_timeout,
-            pool_timeout=pool_timeout,
-            api_kwargs=api_kwargs,
-        )
-
-    @_log
     async def add_sticker_to_set(
         self,
         user_id: Union[str, int],
         name: str,
-        # Deprecated params since bot api 6.6
-        # ----
-        emojis: Optional[str] = None,  # Was made optional for compatibility reasons
-        png_sticker: Optional[FileInput] = None,
-        mask_position: Optional[MaskPosition] = None,
-        tgs_sticker: Optional[FileInput] = None,
-        webm_sticker: Optional[FileInput] = None,
-        # ----
-        # New in bot api 6.6:
-        sticker: Optional[
-            InputSticker
-        ] = None,  # Actually a required param, but is optional for compat.
+        sticker: Optional[InputSticker],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -5955,13 +5557,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         sticker sets can have up to
         :tg-const:`telegram.constants.StickerSetLimit.MAX_STATIC_STICKERS` stickers.
 
-        .. |api6_6| replace:: Since Bot API 6.6, this argument is deprecated in favour of
-            :paramref:`sticker`.
-
         .. versionchanged:: 20.2
             Since Bot API 6.6, the parameter :paramref:`sticker` replace the parameters
-            :paramref:`png_sticker`, :paramref:`tgs_sticker`, :paramref:`webm_sticker`,
-            :paramref:`emojis`, and :paramref:`mask_position`.
+            ``png_sticker``, ``tgs_sticker``, ``webm_sticker``, ``emojis``, and ``mask_position``.
+
+        .. versionchanged:: NEXT.VERSION
+           Removed deprecated parameters ``png_sticker``, ``tgs_sticker``, ``webm_sticker``,
+           ``emojis``, and ``mask_position``.
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -5972,114 +5574,17 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionadded:: 20.2
 
-            emojis (:obj:`str`, optional): One or more emoji corresponding to the sticker.
-
-                .. deprecated:: 20.2
-                    |api6_6|
-
-            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): **PNG** image with the sticker,
-                must be up to 512 kilobytes in size, dimensions must not exceed 512px,
-                and either width or height must be exactly 512px.
-                |fileinput|
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                    |api6_6|
-
-            mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
-                should be placed on faces.
-
-                .. deprecated:: 20.2
-                    |api6_6|
-
-            tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): **TGS** animation with the sticker. |uploadinput|
-                See https://core.telegram.org/stickers#animation-requirements for technical
-                requirements.
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                    |api6_6|
-
-            webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
-                optional): **WEBM** video with the sticker. |uploadinput|
-                See https://core.telegram.org/stickers#video-requirements for
-                technical requirements.
-
-                .. versionadded:: 13.11
-
-                .. versionchanged:: 20.0
-                    File paths as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local_mode`.
-
-                .. deprecated:: 20.2
-                    |api6_6|
-
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
         Raises:
-            :exc:`TypeError`: Raised when: 1) ``sticker`` is passed
-                  together with the deprecated parameters. 2) If neither the new parameter nor
-                  the deprecated parameters are passed.
-
-            :class:`telegram.error.TelegramError`: For other errors.
+            :class:`telegram.error.TelegramError`
 
         """
-        pre_api_6_6_params = {
-            "emojis": emojis,
-            "png_sticker": png_sticker,
-            "mask_position": mask_position,
-            "tgs_sticker": tgs_sticker,
-            "webm_sticker": webm_sticker,
-        }
-
-        if not any(pre_api_6_6_params.values()) and not sticker:
-            raise TypeError(
-                "The parameter `sticker` is a required argument since Bot API 6.6 and"
-                " must be passed."
-            )
-
-        if any(pre_api_6_6_params.values()) and sticker:
-            raise TypeError(
-                "Since Bot API 6.6, the parameter `sticker` "
-                "is mutually exclusive with the deprecated parameters "
-                f"{set(pre_api_6_6_params)}. Please use the new parameter "
-                "`sticker` instead."
-            )
-
-        if any(pre_api_6_6_params.values()):
-            self._warn(
-                f"Since Bot API 6.6, the parameters {set(pre_api_6_6_params)} for "
-                "`add_sticker_to_set` are deprecated. Please use the new parameter `sticker` "
-                "instead.",
-                stacklevel=3,
-                category=PTBDeprecationWarning,
-            )
-
         data: JSONDict = {
             "user_id": user_id,
             "name": name,
             "sticker": sticker,
-            # Deprecated params since bot api 6.6:
-            "emojis": emojis,
-            "png_sticker": self._parse_file_input(png_sticker) if png_sticker else None,
-            "tgs_sticker": self._parse_file_input(tgs_sticker) if tgs_sticker else None,
-            "webm_sticker": self._parse_file_input(webm_sticker) if webm_sticker else None,
-            "mask_position": mask_position,
         }
 
         return await self._post(
@@ -6120,6 +5625,105 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         data: JSONDict = {"sticker": sticker, "position": position}
         return await self._post(
             "setStickerPositionInSet",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def create_new_sticker_set(
+        self,
+        user_id: Union[str, int],
+        name: str,
+        title: str,
+        stickers: Optional[Sequence[InputSticker]],
+        sticker_format: Optional[str],
+        sticker_type: Optional[str] = None,
+        needs_repainting: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Use this method to create new sticker set owned by a user.
+        The bot will be able to edit the created sticker set thus created.
+
+        .. versionchanged:: 20.0
+            The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type`
+            instead.
+
+        .. versionchanged:: 20.2
+            Since Bot API 6.6, the parameters :paramref:`stickers` and :paramref:`sticker_format`
+            replace the parameters ``png_sticker``, ``tgs_sticker``,``webm_sticker``, ``emojis``,
+            and ``mask_position``.
+
+        .. versionchanged:: NEXT.VERSION
+            Removed the deprecated parameters mentioned above and adjusted the order of the
+            parameters.
+
+        Args:
+            user_id (:obj:`int`): User identifier of created sticker set owner.
+            name (:obj:`str`): Short name of sticker set, to be used in t.me/addstickers/ URLs
+                (e.g., animals). Can contain only english letters, digits and underscores.
+                Must begin with a letter, can't contain consecutive underscores and
+                must end in "_by_<bot username>". <bot_username> is case insensitive.
+                :tg-const:`telegram.constants.StickerLimit.MIN_NAME_AND_TITLE`-
+                :tg-const:`telegram.constants.StickerLimit.MAX_NAME_AND_TITLE` characters.
+            title (:obj:`str`): Sticker set title,
+                :tg-const:`telegram.constants.StickerLimit.MIN_NAME_AND_TITLE`-
+                :tg-const:`telegram.constants.StickerLimit.MAX_NAME_AND_TITLE` characters.
+
+            stickers (Sequence[:class:`telegram.InputSticker`]): A sequence of
+                :tg-const:`telegram.constants.StickerSetLimit.MIN_INITIAL_STICKERS`-
+                :tg-const:`telegram.constants.StickerSetLimit.MAX_INITIAL_STICKERS` initial
+                stickers to be added to the sticker set.
+
+                .. versionadded:: 20.2
+
+            sticker_format (:obj:`str`): Format of stickers in the set, must be one of
+                :attr:`~telegram.constants.StickerFormat.STATIC`,
+                :attr:`~telegram.constants.StickerFormat.ANIMATED` or
+                :attr:`~telegram.constants.StickerFormat.VIDEO`.
+
+                .. versionadded:: 20.2
+
+            sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
+                :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`, or
+                :attr:`telegram.Sticker.CUSTOM_EMOJI`. By default, a regular sticker set is created
+
+                .. versionadded:: 20.0
+
+            needs_repainting (:obj:`bool`, optional): Pass :obj:`True` if stickers in the sticker
+                set must be repainted to the color of text when used in messages, the accent color
+                if used as emoji status, white on chat photos, or another appropriate color based
+                on context; for custom emoji sticker sets only.
+
+                .. versionadded:: 20.2
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "name": name,
+            "title": title,
+            "stickers": stickers,
+            "sticker_format": sticker_format,
+            "sticker_type": sticker_type,
+            "needs_repainting": needs_repainting,
+        }
+
+        return await self._post(
+            "createNewStickerSet",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -6248,95 +5852,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        return await self._set_sticker_set_thumbnail(
-            name=name,
-            user_id=user_id,
-            thumbnail=thumbnail,
-            read_timeout=read_timeout,
-            write_timeout=write_timeout,
-            connect_timeout=connect_timeout,
-            pool_timeout=pool_timeout,
-            api_kwargs=api_kwargs,
-        )
-
-    @_log
-    async def set_sticker_set_thumb(
-        self,
-        name: str,
-        user_id: Union[str, int],
-        thumb: Optional[FileInput] = None,
-        *,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> bool:
-        """Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set
-        for animated sticker sets only. Video thumbnails can be set only for video sticker sets
-        only.
-
-        .. deprecated:: 20.2
-           Bot API 6.6 renamed this method to :meth:`~Bot.set_sticker_set_thumbnail`.
-
-        Args:
-            name (:obj:`str`): Sticker set name
-            user_id (:obj:`int`): User identifier of created sticker set owner.
-            thumb (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): A **PNG** image with the thumbnail, must
-                be up to 128 kilobytes in size and have width and height exactly 100px, or a
-                **TGS** animation with the thumbnail up to 32 kilobytes in size; see
-                https://core.telegram.org/stickers#animation-requirements for animated
-                sticker technical requirements, or a **WEBM** video with the thumbnail up to 32
-                kilobytes in size; see
-                https://core.telegram.org/stickers#video-requirements for video sticker
-                technical requirements.
-                |fileinput|
-                Animated sticker set thumbnails can't be uploaded via HTTP URL.
-
-                .. versionchanged:: 13.2
-                   Accept :obj:`bytes` as input.
-        Returns:
-            :obj:`bool`: On success, :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
-        """
-        self._warn(
-            message=(
-                "Bot API 6.6 renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail', "
-                "hence method 'set_sticker_set_thumb' was renamed to 'set_sticker_set_thumbnail' "
-                "in PTB."
-            ),
-            category=PTBDeprecationWarning,
-            stacklevel=3,
-        )
-
-        return await self._set_sticker_set_thumbnail(
-            name=name,
-            user_id=user_id,
-            thumbnail=thumb,
-            read_timeout=read_timeout,
-            write_timeout=write_timeout,
-            connect_timeout=connect_timeout,
-            pool_timeout=pool_timeout,
-            api_kwargs=api_kwargs,
-        )
-
-    @_log
-    async def _set_sticker_set_thumbnail(
-        self,
-        name: str,
-        user_id: Union[str, int],
-        thumbnail: Optional[FileInput] = None,
-        *,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> bool:
         data: JSONDict = {
             "name": name,
             "user_id": user_id,
@@ -8483,12 +7998,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`set_sticker_position_in_set`"""
     deleteStickerFromSet = delete_sticker_from_set
     """Alias for :meth:`delete_sticker_from_set`"""
-    setStickerSetThumb = set_sticker_set_thumb
-    """Alias for :meth:`set_sticker_set_thumb`
-
-    .. deprecated:: 20.2
-       Bot API 6.6 renamed this method to :meth:`~Bot.set_sticker_set_thumbnail`.
-    """
     setStickerSetThumbnail = set_sticker_set_thumbnail
     """Alias for :meth:`set_sticker_set_thumbnail`"""
     setPassportDataErrors = set_passport_data_errors

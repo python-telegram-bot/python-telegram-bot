@@ -14,10 +14,6 @@
 
 .. |thumbdocstringnopath| replace:: |thumbdocstringbase| |uploadinputnopath|
 
-.. |thumbargumentdeprecation| replace:: As of Bot API 6.6 this argument is deprecated in favor of
-
-.. |thumbattributedeprecation| replace:: As of Bot API 6.6 this attribute is deprecated in favor of
-
 .. |editreplymarkup| replace:: It is currently only possible to edit messages without :attr:`telegram.Message.reply_markup` or with inline keyboards.
 
 .. |toapikwargsbase| replace:: These arguments are also considered by :meth:`~telegram.TelegramObject.to_dict` and :meth:`~telegram.TelegramObject.to_json`, i.e. when passing objects to Telegram. Passing them to Telegram is however not guaranteed to work for all kinds of objects, e.g. this will fail for objects that can not directly be JSON serialized.
@@ -59,3 +55,9 @@
 .. |datetime_localization| replace:: The default timezone of the bot is used for localization, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
 
 .. |post_methods_note| replace:: If you implement custom logic that implies that you will **not** be using :class:`~telegram.ext.Application`'s methods :meth:`~telegram.ext.Application.run_polling` or :meth:`~telegram.ext.Application.run_webhook` to run your application (like it's done in `Custom Webhook Bot Example <https://docs.python-telegram-bot.org/en/stable/examples.customwebhookbot.html>`__), the callback you set in this method **will not be called automatically**. So instead of setting a callback with this method, you have to explicitly ``await`` the function that you want to run at this stage of your application's life (in the `example mentioned above <https://docs.python-telegram-bot.org/en/stable/examples.customwebhookbot.html>`__, that would be in ``async with application`` context manager).
+
+.. |removed_thumb_note| replace:: Removed the deprecated argument and attribute ``thumb``.
+
+.. |removed_thumb_url_note| replace:: Removed the deprecated argument and attribute ``thumb_url``.
+
+.. |removed_thumb_wildcard_note| replace:: Removed the deprecated arguments and attributes ``thumb_*``.

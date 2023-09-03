@@ -46,8 +46,6 @@ from tests.auxil.slots import mro_slots
 # noinspection PyUnresolvedReferences
 from tests.test_forum import emoji_id, real_topic  # noqa: F401
 
-from ..auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
-
 # noinspection PyUnresolvedReferences
 from .test_audio import audio, audio_file  # noqa: F401
 
@@ -160,13 +158,7 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
         assert input_media_video.caption_entities == tuple(self.caption_entities)
         assert input_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_media_video.thumbnail, InputFile)
-        assert input_media_video.thumb is input_media_video.thumbnail
         assert input_media_video.has_spoiler == self.has_spoiler
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        input_media_video = InputMediaVideo(self.media, thumb=object())
-        assert input_media_video.thumb is input_media_video.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_video = InputMediaVideo(self.media)
@@ -210,14 +202,6 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
         )
         assert input_media_video.media == data_file("telegram.mp4").as_uri()
         assert input_media_video.thumbnail == data_file("telegram.jpg").as_uri()
-
-    def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
-        with pytest.raises(ValueError, match="You passed different entities as 'thumb' and "):
-            InputMediaVideo(
-                data_file("telegram.mp4"),
-                thumbnail=data_file("telegram.jpg"),
-                thumb=data_file("telegram_no_standard_header.jpg"),
-            )
 
 
 class TestInputMediaPhotoBase:
@@ -304,13 +288,7 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
         assert input_media_animation.parse_mode == self.parse_mode
         assert input_media_animation.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_animation.thumbnail, InputFile)
-        assert input_media_animation.thumb is input_media_animation.thumbnail
         assert input_media_animation.has_spoiler == self.has_spoiler
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        input_media_animation = InputMediaAnimation(self.media, thumb=object())
-        assert input_media_animation.thumb is input_media_animation.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_animation = InputMediaAnimation(self.media)
@@ -351,14 +329,6 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
         assert input_media_animation.media == data_file("telegram.mp4").as_uri()
         assert input_media_animation.thumbnail == data_file("telegram.jpg").as_uri()
 
-    def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
-        with pytest.raises(ValueError, match="You passed different entities as 'thumb' and "):
-            InputMediaAnimation(
-                data_file("telegram.mp4"),
-                thumbnail=data_file("telegram.jpg"),
-                thumb=data_file("telegram_no_standard_header.jpg"),
-            )
-
 
 class TestInputMediaAudioBase:
     type_ = "audio"
@@ -388,12 +358,6 @@ class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
         assert input_media_audio.parse_mode == self.parse_mode
         assert input_media_audio.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_audio.thumbnail, InputFile)
-        assert input_media_audio.thumb is input_media_audio.thumbnail
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        input_media_audio = InputMediaAudio(self.media, thumb=object())
-        assert input_media_audio.thumb is input_media_audio.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_audio = InputMediaAudio(self.media)
@@ -436,14 +400,6 @@ class TestInputMediaAudioWithoutRequest(TestInputMediaAudioBase):
         assert input_media_audio.media == data_file("telegram.mp4").as_uri()
         assert input_media_audio.thumbnail == data_file("telegram.jpg").as_uri()
 
-    def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
-        with pytest.raises(ValueError, match="You passed different entities as 'thumb' and "):
-            InputMediaAudio(
-                data_file("telegram.mp4"),
-                thumbnail=data_file("telegram.jpg"),
-                thumb=data_file("telegram_no_standard_header.jpg"),
-            )
-
 
 class TestInputMediaDocumentBase:
     type_ = "document"
@@ -472,12 +428,6 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
             == self.disable_content_type_detection
         )
         assert isinstance(input_media_document.thumbnail, InputFile)
-        assert input_media_document.thumb is input_media_document.thumbnail
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        input_media_document = InputMediaDocument(self.media, thumb=object())
-        assert input_media_document.thumb is input_media_document.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_caption_entities_always_tuple(self):
         input_media_document = InputMediaDocument(self.media)
@@ -517,14 +467,6 @@ class TestInputMediaDocumentWithoutRequest(TestInputMediaDocumentBase):
         )
         assert input_media_document.media == data_file("telegram.mp4").as_uri()
         assert input_media_document.thumbnail == data_file("telegram.jpg").as_uri()
-
-    def test_with_local_files_throws_exception_with_different_thumb_and_thumbnail(self):
-        with pytest.raises(ValueError, match="You passed different entities as 'thumb' and "):
-            InputMediaDocument(
-                data_file("telegram.mp4"),
-                thumbnail=data_file("telegram.jpg"),
-                thumb=data_file("telegram_no_standard_header.jpg"),
-            )
 
 
 @pytest.fixture(scope="module")

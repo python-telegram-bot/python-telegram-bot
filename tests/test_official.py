@@ -108,13 +108,6 @@ IGNORED_PARAM_REQUIREMENTS = {
     "send_venue": {"latitude", "longitude", "title", "address"},
     "send_contact": {"phone_number", "first_name"},
     # ---->
-    # These are optional for now for backwards compatibility
-    # <----
-    "InlineQueryResult(Article|Photo|Gif|Mpeg4Gif|Video|Document|Location|Venue)": {
-        "thumbnail_url",
-    },
-    "InlineQueryResultVideo": {"title"},
-    # ---->
 }
 
 
@@ -123,39 +116,7 @@ def ignored_param_requirements(object_name) -> Set[str]:
 
 
 # Arguments that are optional arguments for now for backwards compatibility
-BACKWARDS_COMPAT_KWARGS = {
-    "create_new_sticker_set": {
-        "stickers",
-        "sticker_format",
-        "emojis",
-        "png_sticker",
-        "tgs_sticker",
-        "mask_position",
-        "webm_sticker",
-    },
-    "add_sticker_to_set": {
-        "sticker",
-        "tgs_sticker",
-        "png_sticker",
-        "webm_sticker",
-        "mask_position",
-        "emojis",
-    },
-    "upload_sticker_file": {"sticker", "sticker_format", "png_sticker"},
-    "send_(animation|audio|document|video(_note)?)": {"thumb"},
-    "(Animation|Audio|Document|Photo|Sticker(Set)?|Video|VideoNote|Voice)": {"thumb"},
-    "InputMedia(Animation|Audio|Document|Video)": {"thumb"},
-    "Chat(MemberRestricted|Permissions)": {"can_send_media_messages"},
-    "InlineQueryResult(Article|Contact|Document|Location|Venue)": {
-        "thumb_height",
-        "thumb_width",
-    },
-    "InlineQueryResult(Article|Photo|Gif|Mpeg4Gif|Video|Contact|Document|Location|Venue)": {
-        "thumb_url",
-    },
-    "InlineQueryResult(Game|Gif|Mpeg4Gif)": {"thumb_mime_type"},
-    "answer_inline_query": {"switch_pm_text", "switch_pm_parameter"},
-}
+BACKWARDS_COMPAT_KWARGS = {}
 
 
 def backwards_compat_kwargs(object_name: str) -> Set[str]:

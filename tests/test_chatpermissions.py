@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import ChatPermissions, User
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -28,7 +27,6 @@ from tests.auxil.slots import mro_slots
 def chat_permissions():
     return ChatPermissions(
         can_send_messages=True,
-        can_send_media_messages=True,
         can_send_polls=True,
         can_send_other_messages=True,
         can_add_web_page_previews=True,
@@ -47,7 +45,6 @@ def chat_permissions():
 
 class TestChatPermissionsBase:
     can_send_messages = True
-    can_send_media_messages = True
     can_send_polls = True
     can_send_other_messages = False
     can_add_web_page_previews = False
@@ -73,7 +70,7 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
     def test_de_json(self, bot):
         json_dict = {
             "can_send_messages": self.can_send_messages,
-            "can_send_media_messages": self.can_send_media_messages,
+            "can_send_media_messages": "can_send_media_messages",
             "can_send_polls": self.can_send_polls,
             "can_send_other_messages": self.can_send_other_messages,
             "can_add_web_page_previews": self.can_add_web_page_previews,
@@ -88,10 +85,9 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
             "can_send_voice_notes": self.can_send_voice_notes,
         }
         permissions = ChatPermissions.de_json(json_dict, bot)
-        assert permissions.api_kwargs == {}
+        assert permissions.api_kwargs == {"can_send_media_messages": "can_send_media_messages"}
 
         assert permissions.can_send_messages == self.can_send_messages
-        assert permissions.can_send_media_messages == self.can_send_media_messages
         assert permissions.can_send_polls == self.can_send_polls
         assert permissions.can_send_other_messages == self.can_send_other_messages
         assert permissions.can_add_web_page_previews == self.can_add_web_page_previews
@@ -111,9 +107,6 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
 
         assert isinstance(permissions_dict, dict)
         assert permissions_dict["can_send_messages"] == chat_permissions.can_send_messages
-        assert (
-            permissions_dict["can_send_media_messages"] == chat_permissions.can_send_media_messages
-        )
         assert permissions_dict["can_send_polls"] == chat_permissions.can_send_polls
         assert (
             permissions_dict["can_send_other_messages"] == chat_permissions.can_send_other_messages
@@ -136,7 +129,6 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
     def test_equality(self):
         a = ChatPermissions(
             can_send_messages=True,
-            can_send_media_messages=True,
             can_send_polls=True,
             can_send_other_messages=False,
         )
@@ -144,18 +136,26 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
             can_send_polls=True,
             can_send_other_messages=False,
             can_send_messages=True,
-            can_send_media_messages=True,
         )
         c = ChatPermissions(
             can_send_messages=False,
-            can_send_media_messages=True,
             can_send_polls=True,
             can_send_other_messages=False,
         )
         d = User(123, "", False)
         e = ChatPermissions(
             can_send_messages=True,
-            can_send_media_messages=True,
+            can_send_polls=True,
+            can_send_other_messages=False,
+            can_send_audios=True,
+            can_send_documents=True,
+            can_send_photos=True,
+            can_send_videos=True,
+            can_send_video_notes=True,
+            can_send_voice_notes=True,
+        )
+        f = ChatPermissions(
+            can_send_messages=True,
             can_send_polls=True,
             can_send_other_messages=False,
             can_send_audios=True,
@@ -176,9 +176,11 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
         assert a != d
         assert hash(a) != hash(d)
 
-        # we expect this to be true since we don't compare these in V20
-        assert a == e
-        assert hash(a) == hash(e)
+        assert a != e
+        assert hash(a) != hash(e)
+
+        assert e == f
+        assert hash(e) == hash(f)
 
     def test_all_permissions(self):
         f = ChatPermissions()
@@ -203,14 +205,3 @@ class TestChatPermissionsWithoutRequest(TestChatPermissionsBase):
             assert t[key] is False
         # and as a finisher, make sure the default is different.
         assert f != t
-
-    def test_equality_warning(self, recwarn, chat_permissions):
-        recwarn.clear()
-        assert chat_permissions == ChatPermissions.all_permissions()
-
-        assert str(recwarn[0].message) == (
-            "In v21, granular media settings will be considered as well when comparing"
-            " ChatPermissions instances."
-        )
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__, "wrong stacklevel"

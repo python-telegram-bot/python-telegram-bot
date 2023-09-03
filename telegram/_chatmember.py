@@ -130,6 +130,12 @@ class ChatMember(TelegramObject):
 
             data["until_date"] = from_timestamp(data["until_date"], tzinfo=loc_tzinfo)
 
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if cls is ChatMemberRestricted and data.get("can_send_media_messages") is not None:
+            api_kwargs = {"can_send_media_messages": data.pop("can_send_media_messages")}
+            return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
+
         return super().de_json(data=data, bot=bot)
 
 
@@ -360,6 +366,9 @@ class ChatMemberRestricted(ChatMember):
        All arguments were made positional and their order was changed.
        The argument can_manage_topics was added.
 
+    .. versionchanged:: NEXT.VERSION
+      Removed deprecated argument and attribute ``can_send_media_messages``.
+
     Args:
         user (:class:`telegram.User`): Information about the user.
         is_member (:obj:`bool`): :obj:`True`, if the user is a
@@ -372,11 +381,6 @@ class ChatMemberRestricted(ChatMember):
             to pin messages; groups and supergroups only.
         can_send_messages (:obj:`bool`): :obj:`True`, if the user is allowed
             to send text messages, contacts, invoices, locations and venues.
-        can_send_media_messages (:obj:`bool`): :obj:`True`, if the user is allowed
-            to send audios, documents, photos, videos, video notes and voice notes.
-
-            .. deprecated:: 20.1
-               Bot API 6.5 replaced this argument with granular media settings.
         can_send_polls (:obj:`bool`): :obj:`True`, if the user is allowed
             to send polls.
         can_send_other_messages (:obj:`bool`): :obj:`True`, if the user is allowed
@@ -427,11 +431,6 @@ class ChatMemberRestricted(ChatMember):
             to pin messages; groups and supergroups only.
         can_send_messages (:obj:`bool`): :obj:`True`, if the user is allowed
             to send text messages, contacts, locations and venues.
-        can_send_media_messages (:obj:`bool`): :obj:`True`, if the user is allowed
-            to send audios, documents, photos, videos, video notes and voice notes.
-
-            .. deprecated:: 20.1
-               Bot API 6.5 replaced this attribute with granular media settings.
         can_send_polls (:obj:`bool`): :obj:`True`, if the user is allowed
             to send polls.
         can_send_other_messages (:obj:`bool`): :obj:`True`, if the user is allowed
@@ -476,7 +475,6 @@ class ChatMemberRestricted(ChatMember):
         "can_invite_users",
         "can_pin_messages",
         "can_send_messages",
-        "can_send_media_messages",
         "can_send_polls",
         "can_send_other_messages",
         "can_add_web_page_previews",
@@ -498,7 +496,6 @@ class ChatMemberRestricted(ChatMember):
         can_invite_users: bool,
         can_pin_messages: bool,
         can_send_messages: bool,
-        can_send_media_messages: bool,
         can_send_polls: bool,
         can_send_other_messages: bool,
         can_add_web_page_previews: bool,
@@ -520,7 +517,6 @@ class ChatMemberRestricted(ChatMember):
             self.can_invite_users: bool = can_invite_users
             self.can_pin_messages: bool = can_pin_messages
             self.can_send_messages: bool = can_send_messages
-            self.can_send_media_messages: bool = can_send_media_messages
             self.can_send_polls: bool = can_send_polls
             self.can_send_other_messages: bool = can_send_other_messages
             self.can_add_web_page_previews: bool = can_add_web_page_previews
