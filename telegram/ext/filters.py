@@ -72,6 +72,7 @@ __all__ = (
     "REPLY",
     "Regex",
     "Sticker",
+    "STORY",
     "SUCCESSFUL_PAYMENT",
     "SenderChat",
     "StatusUpdate",
@@ -2141,6 +2142,20 @@ class Sticker:
     .. versionadded:: 20.0
     """
     # neither mask nor emoji can be a message.sticker, so no filters for them
+
+
+class _Story(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.story)
+
+
+STORY = _Story(name="filters.STORY")
+"""Messages that contain :attr:`telegram.Message.story`.
+
+.. versionadded:: NEXT.VERSION
+"""
 
 
 class _SuccessfulPayment(MessageFilter):

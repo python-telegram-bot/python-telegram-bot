@@ -7815,6 +7815,46 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
 
     @_log
+    async def unpin_all_general_forum_topic_messages(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Use this method to clear the list of pinned messages in a General forum topic. The bot must
+        be an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` administrator rights in the
+        supergroup.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {"chat_id": chat_id}
+
+        return await self._post(
+            "unpinAllGeneralForumTopicMessages",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
     async def edit_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8527,3 +8567,5 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`set_my_name`"""
     getMyName = get_my_name
     """Alias for :meth:`get_my_name`"""
+    unpinAllGeneralForumTopicMessages = unpin_all_general_forum_topic_messages
+    """Alias for :meth:`unpin_all_general_forum_topic_messages`"""

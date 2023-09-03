@@ -53,6 +53,7 @@ from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._shared import ChatShared, UserShared
+from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -201,6 +202,9 @@ class Message(TelegramObject):
 
         sticker (:class:`telegram.Sticker`, optional): Message is a sticker, information
             about the sticker.
+        story (:class:`telegram.Story`, optional): Message is a forwarded story.
+
+            .. versionadded:: NEXT.VERSION
         video (:class:`telegram.Video`, optional): Message is a video, information about the
             video.
         voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
@@ -435,6 +439,9 @@ class Message(TelegramObject):
             about the sticker.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        story (:class:`telegram.Story`): Optional. Message is a forwarded story.
+
+            .. versionadded:: NEXT.VERSION
         video (:class:`telegram.Video`): Optional. Message is a video, information about the
             video.
 
@@ -671,6 +678,7 @@ class Message(TelegramObject):
         "has_media_spoiler",
         "user_shared",
         "chat_shared",
+        "story",
     )
 
     def __init__(
@@ -746,6 +754,7 @@ class Message(TelegramObject):
         has_media_spoiler: Optional[bool] = None,
         user_shared: Optional[UserShared] = None,
         chat_shared: Optional[ChatShared] = None,
+        story: Optional[Story] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -834,6 +843,7 @@ class Message(TelegramObject):
         self.has_media_spoiler: Optional[bool] = has_media_spoiler
         self.user_shared: Optional[UserShared] = user_shared
         self.chat_shared: Optional[ChatShared] = chat_shared
+        self.story: Optional[Story] = story
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -903,6 +913,7 @@ class Message(TelegramObject):
         data["game"] = Game.de_json(data.get("game"), bot)
         data["photo"] = PhotoSize.de_list(data.get("photo"), bot)
         data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
+        data["story"] = Story.de_json(data.get("story"), bot)
         data["video"] = Video.de_json(data.get("video"), bot)
         data["voice"] = Voice.de_json(data.get("voice"), bot)
         data["video_note"] = VideoNote.de_json(data.get("video_note"), bot)
@@ -973,6 +984,7 @@ class Message(TelegramObject):
         Sequence[PhotoSize],
         Poll,
         Sticker,
+        Story,
         SuccessfulPayment,
         Venue,
         Video,
@@ -995,6 +1007,7 @@ class Message(TelegramObject):
         * List[:class:`telegram.PhotoSize`]
         * :class:`telegram.Poll`
         * :class:`telegram.Sticker`
+        * :class:`telegram.Story`
         * :class:`telegram.SuccessfulPayment`
         * :class:`telegram.Venue`
         * :class:`telegram.Video`

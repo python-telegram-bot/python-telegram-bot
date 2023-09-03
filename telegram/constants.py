@@ -116,7 +116,7 @@ class _BotAPIVersion(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=6, minor=7)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=6, minor=8)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -285,7 +285,8 @@ class ChatID(IntEnum):
     __slots__ = ()
 
     ANONYMOUS_ADMIN = 1087968824
-    """:obj:`int`: User ID in groups for messages sent by anonymous admins.
+    """:obj:`int`: User ID in groups for messages sent by anonymous admins. Telegram chat:
+    `@GroupAnonymousBot <https://t.me/GroupAnonymousBot>`_.
 
     Note:
         :attr:`telegram.Message.from_user` will contain this ID for backwards compatibility only.
@@ -293,19 +294,21 @@ class ChatID(IntEnum):
     """
     SERVICE_CHAT = 777000
     """:obj:`int`: Telegram service chat, that also acts as sender of channel posts forwarded to
-    discussion groups.
+    discussion groups. Telegram chat: `Telegram <https://t.me/+42777>`_.
 
     Note:
         :attr:`telegram.Message.from_user` will contain this ID for backwards compatibility only.
         It's recommended to use :attr:`telegram.Message.sender_chat` instead.
     """
     FAKE_CHANNEL = 136817688
-    """:obj:`int`: User ID in groups when message is sent on behalf of a channel.
+    """:obj:`int`: User ID in groups when message is sent on behalf of a channel, or when a channel
+    votes on a poll. Telegram chat: `@Channel_Bot <https://t.me/Channel_Bot>`_.
 
     Note:
         * :attr:`telegram.Message.from_user` will contain this ID for backwards compatibility only.
           It's recommended to use :attr:`telegram.Message.sender_chat` instead.
-        * This value is undocumented and might be changed by Telegram.
+        * :attr:`telegram.PollAnswer.user` will contain this ID for backwards compatibility only.
+          It's recommended to use :attr:`telegram.PollAnswer.voter_chat` instead.
     """
 
 
@@ -1065,6 +1068,8 @@ class MessageAttachmentType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
     STICKER = "sticker"
     """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
+    STORY = "story"
+    """:obj:`str`: Messages with :attr:`telegram.Message.story`."""
     SUCCESSFUL_PAYMENT = "successful_payment"
     """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
     VIDEO = "video"
@@ -1219,6 +1224,8 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
     STICKER = "sticker"
     """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
+    STORY = "story"
+    """:obj:`str`: Messages with :attr:`telegram.Message.story`."""
     SUCCESSFUL_PAYMENT = "successful_payment"
     """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
     VIDEO = "video"

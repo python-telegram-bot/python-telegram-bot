@@ -3486,6 +3486,26 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def unpin_all_general_forum_topic_messages(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().unpin_all_general_forum_topic_messages(
+            chat_id=chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def upload_sticker_file(
         self,
         user_id: Union[str, int],
@@ -3884,3 +3904,4 @@ class ExtBot(Bot, Generic[RLARGS]):
     setStickerMaskPosition = set_sticker_mask_position
     setMyName = set_my_name
     getMyName = get_my_name
+    unpinAllGeneralForumTopicMessages = unpin_all_general_forum_topic_messages

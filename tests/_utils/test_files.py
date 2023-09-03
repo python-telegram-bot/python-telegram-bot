@@ -35,8 +35,6 @@ class TestFiles:
         [
             (str(data_file("game.gif")), True),
             (str(TEST_DATA_PATH), False),
-            (str(data_file("game.gif")), True),
-            (str(TEST_DATA_PATH), False),
             (data_file("game.gif"), True),
             (TEST_DATA_PATH, False),
             ("https:/api.org/file/botTOKEN/document/file_3", False),
