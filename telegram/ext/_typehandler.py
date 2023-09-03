@@ -30,7 +30,7 @@ UT = TypeVar("UT")
 
 
 class TypeHandler(BaseHandler[UT, CCT]):
-    """BaseHandler class to handle updates of custom types.
+    """Handler class to handle updates of custom types.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom

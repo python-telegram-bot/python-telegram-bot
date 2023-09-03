@@ -28,7 +28,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 
 
 class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram updates that contain
+    """Handler class to handle Telegram updates that contain
     :attr:`telegram.Update.chat_join_request`.
 
     Note:

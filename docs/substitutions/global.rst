@@ -57,3 +57,5 @@
 .. |captionentitiesattr| replace:: Tuple of special entities that appear in the caption, which can be specified instead of ``parse_mode``.
 
 .. |datetime_localization| replace:: The default timezone of the bot is used for localization, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
+
+.. |post_methods_note| replace:: If you implement custom logic that implies that you will **not** be using :class:`~telegram.ext.Application`'s methods :meth:`~telegram.ext.Application.run_polling` or :meth:`~telegram.ext.Application.run_webhook` to run your application (like it's done in `Custom Webhook Bot Example <https://docs.python-telegram-bot.org/en/stable/examples.customwebhookbot.html>`__), the callback you set in this method **will not be called automatically**. So instead of setting a callback with this method, you have to explicitly ``await`` the function that you want to run at this stage of your application's life (in the `example mentioned above <https://docs.python-telegram-bot.org/en/stable/examples.customwebhookbot.html>`__, that would be in ``async with application`` context manager).

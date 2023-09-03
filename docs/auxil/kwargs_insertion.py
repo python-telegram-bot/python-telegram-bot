@@ -42,7 +42,7 @@ keyword_args = [
 ]
 write_timeout_sub = [":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`", "``20``"]
 read_timeout_sub = [
-    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
+    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`",
     "``2``. :paramref:`timeout` will be added to this value",
 ]
 read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]

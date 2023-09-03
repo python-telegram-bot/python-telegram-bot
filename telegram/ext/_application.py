@@ -693,7 +693,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         On unix, the app will also shut down on receiving the signals specified by
         :paramref:`stop_signals`.
 
-        The order of execution by `run_polling` is roughly as follows:
+        The order of execution by :meth:`run_polling` is roughly as follows:
 
         - :meth:`initialize`
         - :meth:`post_init`
@@ -707,11 +707,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         - :meth:`post_shutdown`
 
         .. include:: inclusions/application_run_tip.rst
-
-        .. seealso::
-            :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_polling`, :meth:`telegram.ext.Updater.stop`,
-            :meth:`run_webhook`
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -816,7 +811,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as
         required.
 
-        The order of execution by `run_webhook` is roughly as follows:
+        The order of execution by :meth:`run_webhook` is roughly as follows:
 
         - :meth:`initialize`
         - :meth:`post_init`
@@ -840,9 +835,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         .. include:: inclusions/application_run_tip.rst
 
         .. seealso::
-            :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_webhook`, :meth:`telegram.ext.Updater.stop`,
-            :meth:`run_polling`, :wiki:`Webhooks`
+            :wiki:`Webhooks`
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Defaults to

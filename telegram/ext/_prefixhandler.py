@@ -34,7 +34,7 @@ RT = TypeVar("RT")
 
 
 class PrefixHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle custom prefix commands.
+    """Handler class to handle custom prefix commands.
 
     This is an intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
     It supports configurable commands with the same options as :class:`CommandHandler`. It will
