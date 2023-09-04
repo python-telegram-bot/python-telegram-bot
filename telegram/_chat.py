@@ -677,7 +677,7 @@ class Chat(TelegramObject):
 
     async def get_member(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -707,7 +707,7 @@ class Chat(TelegramObject):
 
     async def ban_member(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         revoke_messages: Optional[bool] = None,
         until_date: Optional[Union[int, datetime]] = None,
         *,
@@ -877,7 +877,7 @@ class Chat(TelegramObject):
 
     async def unban_member(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         only_if_banned: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -909,7 +909,7 @@ class Chat(TelegramObject):
 
     async def promote_member(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         can_change_info: Optional[bool] = None,
         can_post_messages: Optional[bool] = None,
         can_edit_messages: Optional[bool] = None,
@@ -970,7 +970,7 @@ class Chat(TelegramObject):
 
     async def restrict_member(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         permissions: ChatPermissions,
         until_date: Optional[Union[int, datetime]] = None,
         use_independent_chat_permissions: Optional[bool] = None,

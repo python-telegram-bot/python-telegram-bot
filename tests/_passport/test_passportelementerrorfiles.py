@@ -34,7 +34,7 @@ def passport_element_error_files():
 class TestPassportElementErrorFilesBase:
     source = "files"
     type_ = "test_type"
-    file_hashes = ["hash1", "hash2"]
+    file_hashes = ("hash1", "hash2")
     message = "Error message"
 
 
@@ -48,7 +48,7 @@ class TestPassportElementErrorFilesWithoutRequest(TestPassportElementErrorFilesB
     def test_expected_values(self, passport_element_error_files):
         assert passport_element_error_files.source == self.source
         assert passport_element_error_files.type == self.type_
-        assert isinstance(passport_element_error_files.file_hashes, list)
+        assert isinstance(passport_element_error_files.file_hashes, tuple)
         assert passport_element_error_files.file_hashes == self.file_hashes
         assert passport_element_error_files.message == self.message
 
@@ -59,7 +59,7 @@ class TestPassportElementErrorFilesWithoutRequest(TestPassportElementErrorFilesB
         assert passport_element_error_files_dict["source"] == passport_element_error_files.source
         assert passport_element_error_files_dict["type"] == passport_element_error_files.type
         assert (
-            passport_element_error_files_dict["file_hashes"]
+            tuple(passport_element_error_files_dict["file_hashes"])
             == passport_element_error_files.file_hashes
         )
         assert passport_element_error_files_dict["message"] == passport_element_error_files.message

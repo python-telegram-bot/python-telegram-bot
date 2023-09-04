@@ -2771,7 +2771,7 @@ class Message(TelegramObject):
 
     async def set_game_score(
         self,
-        user_id: Union[int, str],
+        user_id: int,
         score: int,
         force: Optional[bool] = None,
         disable_edit_message: Optional[bool] = None,
@@ -2816,7 +2816,7 @@ class Message(TelegramObject):
 
     async def get_game_high_scores(
         self,
-        user_id: Union[int, str],
+        user_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
