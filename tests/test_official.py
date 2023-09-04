@@ -20,15 +20,16 @@ import inspect
 import os
 import re
 from datetime import datetime
-from typing import Any, ForwardRef, Sequence, get_args, get_origin
+from types import FunctionType
+from typing import Any, Callable, ForwardRef, Sequence, get_args, get_origin
 
 import httpx
 import pytest
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, PageElement, Tag
 
 import telegram
 from telegram._utils.defaultvalue import DefaultValue
-from telegram._utils.types import DVInput, FileInput, ODVInput, ReplyMarkup
+from telegram._utils.types import DVInput, FileInput, ODVInput
 from tests.auxil.envvars import env_var_2_bool
 
 IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
@@ -64,7 +65,7 @@ PTB_EXTRA_PARAMS = {
 }
 
 
-def _get_params_base(object_name: str, search_dict: dict[str, set[str]]) -> set[str]:
+def _get_params_base(object_name: str, search_dict: dict[str, set[Any]]) -> set[Any]:
     """Helper function for the *_params functions below.
     Given an object name and a search dict, goes through the keys of the search dict and checks if
     the object name matches any of the regexes (keys). The union of all the sets (values) of the
@@ -81,7 +82,7 @@ def _get_params_base(object_name: str, search_dict: dict[str, set[str]]) -> set[
     return out
 
 
-def ptb_extra_params(object_name) -> set[str]:
+def ptb_extra_params(object_name: str) -> set[str]:
     return _get_params_base(object_name, PTB_EXTRA_PARAMS)
 
 
@@ -98,7 +99,7 @@ PTB_IGNORED_PARAMS = {
 }
 
 
-def ptb_ignored_params(object_name) -> set[str]:
+def ptb_ignored_params(object_name: str) -> set[str]:
     return _get_params_base(object_name, PTB_IGNORED_PARAMS)
 
 
@@ -113,12 +114,12 @@ IGNORED_PARAM_REQUIREMENTS = {
 }
 
 
-def ignored_param_requirements(object_name) -> set[str]:
+def ignored_param_requirements(object_name: str) -> set[str]:
     return _get_params_base(object_name, IGNORED_PARAM_REQUIREMENTS)
 
 
 # Arguments that are optional arguments for now for backwards compatibility
-BACKWARDS_COMPAT_KWARGS = {}
+BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {}
 
 
 def backwards_compat_kwargs(object_name: str) -> set[str]:
@@ -128,7 +129,7 @@ def backwards_compat_kwargs(object_name: str) -> set[str]:
 IGNORED_PARAM_REQUIREMENTS.update(BACKWARDS_COMPAT_KWARGS)
 
 
-def find_next_sibling_until(tag, name, until):
+def find_next_sibling_until(tag: Tag, name: str, until: Tag) -> PageElement | None:
     for sibling in tag.next_siblings:
         if sibling is until:
             return None
@@ -137,7 +138,7 @@ def find_next_sibling_until(tag, name, until):
     return None
 
 
-def parse_table(h4) -> list[list[str]]:
+def parse_table(h4: Tag) -> list[list[str]]:
     """Parses the Telegram doc table and has an output of a 2D list."""
     table = find_next_sibling_until(h4, "table", h4.find_next_sibling("h4"))
     if not table:
@@ -145,9 +146,9 @@ def parse_table(h4) -> list[list[str]]:
     return [[td.text for td in tr.find_all("td")] for tr in table.find_all("tr")[1:]]
 
 
-def check_method(h4):
+def check_method(h4: Tag) -> None:
     name = h4.text  # name of the method in telegram's docs.
-    method = getattr(telegram.Bot, name, False)  # Retrieve our lib method
+    method: FunctionType | None = getattr(telegram.Bot, name, None)  # Retrieve our lib method
     if not method:
         raise AssertionError(f"Method {name} not found in telegram.Bot")
 
@@ -169,7 +170,7 @@ def check_method(h4):
             raise AssertionError(
                 f"Param {param.name!r} of {method.__name__!r} should have a type annotation"
             )
-        if not check_param_type(param, tg_parameter, name):
+        if not check_param_type(param, tg_parameter, method):
             raise AssertionError(
                 f"Param {param.name!r} of {method.__name__!r} should be {tg_parameter[1]}"
             )
@@ -209,7 +210,7 @@ def check_method(h4):
         )
 
 
-def check_object(h4):
+def check_object(h4: Tag) -> None:
     name = h4.text
     obj = getattr(telegram, name)
     table = parse_table(h4)
@@ -231,7 +232,15 @@ def check_object(h4):
         param = sig.parameters.get(field)
         if param is None:
             raise AssertionError(f"Attribute {field} not found in {obj.__name__}")
-        # TODO: Check type via docstring
+        # Check if type annotation is present and correct
+        if param.annotation is inspect.Parameter.empty:
+            raise AssertionError(
+                f"Param {param.name!r} of {obj.__name__!r} should have a type annotation"
+            )
+        if not check_param_type(param, tg_parameter, obj):
+            raise AssertionError(
+                f"Param {param.name!r} of {obj.__name__!r} should be {tg_parameter[1]}"
+            )
         if not check_required_param(tg_parameter, param, obj.__name__):
             raise AssertionError(f"{obj.__name__!r} parameter {param.name!r} requirement mismatch")
 
@@ -278,14 +287,16 @@ def check_defaults_type(ptb_param: inspect.Parameter) -> bool:
     return DefaultValue.get_value(ptb_param.default) is None
 
 
-def check_param_type(ptb_param: inspect.Parameter, tg_parameter: list[str], name: str) -> bool:
+def check_param_type(
+    ptb_param: inspect.Parameter, tg_parameter: list[str], obj: FunctionType | type
+) -> bool:
     """This function checks whether the type annotation of the parameter is the same as the one
     specified in the official API. It also checks for some special cases where we accept more types
 
     Args:
         ptb_param (inspect.Parameter): The parameter object from our methods/classes
         tg_parameter (list[str]): The table row corresponding to the parameter from official API.
-        name (str): The name of the method/class
+        obj (object): The object (method/class) that we are checking.
 
     Returns:
         :obj:`bool`: The boolean returned represents whether our parameter's type annotation is the
@@ -293,41 +304,43 @@ def check_param_type(ptb_param: inspect.Parameter, tg_parameter: list[str], name
     """
     # In order to evaluate the type annotation, we need to first have a mapping of the types
     # specified in the official API to our types. The keys are types in the column of official API.
-    TYPE_MAPPING = {
+    TYPE_MAPPING: dict[str, set[Any]] = {
         "Integer or String": {int | str},
         "Integer": {int},
         "String": {str},
-        "Boolean": {bool},
-        "Float number": {float},
-        r"Array of [\w\,\s]*": {Sequence},
-        r"Array of Array of [\w\,\s]*": {Sequence, Sequence},
-        "InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply": {
-            ReplyMarkup
-        },
+        r"Boolean|True": {bool},
+        r"Float(?: number)?": {float},
+        r"Array of (?:Array of )?[\w\,\s]*": {Sequence},
         r"InputFile(?: or String)?": {FileInput},
     }
 
-    tg_param_type = tg_parameter[1]  # Type of parameter as specified in the docs
+    tg_param_type: str = tg_parameter[1]  # Type of parameter as specified in the docs
+    is_class = inspect.isclass(obj)
     mapped: set[type] = _get_params_base(tg_param_type, TYPE_MAPPING)
-    if len(mapped) == 0:
+
+    if not mapped:  # no match found, it's from telegram module
+        # it could be a list of objects, so let's check that:
+        objs = _extract_words(tg_param_type)
         # We want to store both string version of class and the class obj itself. e.g. "InputMedia"
         # and InputMedia because some annotations might be ForwardRefs.
-        mapped_type: list = [
-            getattr(telegram, tg_param_type),
-            ForwardRef(tg_param_type),
-            tg_param_type,
-        ]
+        if len(objs) >= 2:  # We have to unionize the objects
+            mapped_type: tuple[Any, ...] = (_unionizer(objs, False), _unionizer(objs, True))
+        else:
+            mapped_type = (
+                getattr(telegram, tg_param_type),  # This will fail if it's not from telegram mod
+                ForwardRef(tg_param_type),
+                tg_param_type,  # for some reason, some annotations are not ForwardRefs, i.e. str.
+            )
+        print("len mapped 0 ", mapped_type)
     elif len(mapped) == 1:
-        mapped_type: set = mapped.pop()
-    else:
-        mapped_type = mapped
-        # print("SHOULDNOT REACH HERE")
+        print("len mapped 1 ", mapped)
+        mapped_type = mapped.pop()
 
     # Resolve nested annotations to get inner types.
     if (ptb_annotation := list(get_args(ptb_param.annotation))) == []:
         ptb_annotation = ptb_param.annotation  # if it's not nested, just use the annotation
 
-    # print(f"{tg_param_type=} ||| {mapped_type=} ||| {ptb_annotation=}")
+    print(f"{tg_param_type=} ||| {mapped_type=} ||| {ptb_annotation=}")
 
     if isinstance(ptb_annotation, list):
         # Some cleaning:
@@ -342,6 +355,7 @@ def check_param_type(ptb_param: inspect.Parameter, tg_parameter: list[str], name
         # Cleaning done... now let's put it back together.
         # Join all the annotations back (i.e. Union)
         ptb_annotation = _unionizer(ptb_annotation, False)
+        print(ptb_annotation, "after unionizer")
 
         # Last step, we need to use get_origin to get the original type, since using get_args
         # above will strip that out.
@@ -351,48 +365,50 @@ def check_param_type(ptb_param: inspect.Parameter, tg_parameter: list[str], name
             if "collections.abc.Sequence" in str(wrapped):
                 wrapped = Sequence
             ptb_annotation = wrapped[ptb_annotation]
+            print(wrapped, "after wrapped", ptb_annotation)
         # We have put back our annotation together after removing the NoneType!
 
-    # Now let's do the checking
-    # Loose type checking for "Array of " annotations for now. TODO: make it strict later
+    # Now let's do the checking, starting with "Array of ..." types.
     if "Array of " in tg_param_type:
-        # print("array of ", ptb_param.annotation)
+        print("array of ", ptb_param.annotation)
 
         # For exceptions just check if they contain the annotation
-        array_of_exceptions = {
+        array_of_exceptions = {  # We accept more types than the official API
             "results": "InlineQueryResult",
             "commands": "BotCommand",
+            "keyboard": "KeyboardButton",
         }
         if ptb_param.name in array_of_exceptions:
             return array_of_exceptions[ptb_param.name] in str(ptb_annotation)
 
         # let's import obj
-        pattern = r"Array of(?: Array of)? ([\w\,\s]*)"  # matches "Array of [Array of] [obj]"
-        obj_str: str = re.search(pattern, tg_param_type).group(1)  # extract obj from string
+        pattern = r"Array of(?: Array of)? ([\w\,\s]*)"
+        obj_match: re.Match | None = re.search(pattern, tg_param_type)  # extract obj from string
+        if obj_match is None:
+            raise AssertionError(f"Array of {tg_param_type} not found in {ptb_param.name}")
+        obj_str: str = obj_match.group(1)
         # is obj a regular type like str?
         array_of_mapped: set[type] = _get_params_base(obj_str, TYPE_MAPPING)
 
         if len(array_of_mapped) == 0:  # no match found, it's from telegram module
-            # print('from tg module')
+            print("from tg module")
             # it could be a list of objects, so let's check that:
             objs = _extract_words(obj_str)
-            # let's unionize all the objects
-            obj = _unionizer(objs, True)
+            # let's unionize all the objects, with and without ForwardRefs.
+            unionized_objs: list[type] = [_unionizer(objs, True), _unionizer(objs, False)]
         else:
             print("from TYPE_MAPPING")
-            obj = array_of_mapped.pop()
+            unionized_objs = [array_of_mapped.pop()]
+
+        assert mapped_type is Sequence
+        # This means it is Array of Array of [obj]
+        if "Array of Array of" in tg_param_type:
+            # print('isinstance 1', Sequence[Sequence[obj]], ptb_annotation)
+            return any(Sequence[Sequence[o]] == ptb_annotation for o in unionized_objs)
 
         # This means it is Array of [obj]
-        if isinstance(mapped_type, type) or "Sequence" in str(mapped_type):
-            # print('isinstance', mapped_type[obj], ptb_annotation)
-            return mapped_type[obj] == ptb_annotation
-        # This means it is Array of Array of [obj]
-        if len(mapped_type) == 1:
-            ele = mapped_type.pop()
-            seq_1: Sequence = ele[0]
-            seq_2: Sequence = ele[1]
-            # print('isinstance 2', seq_1[seq_2[obj]], ptb_annotation)
-            return seq_1[seq_2[obj]] == ptb_annotation
+        # print('isinstance 2', mapped_type[obj], ptb_annotation)
+        return any(mapped_type[o] == ptb_annotation for o in unionized_objs)
 
     DEFAULT_VAL_PARAMS = {
         "parse_mode",
@@ -427,57 +443,66 @@ def check_param_type(ptb_param: inspect.Parameter, tg_parameter: list[str], name
 
     if (
         ptb_param.name in additional_types
-        and not isinstance(mapped_type, list)
-        and name.startswith("send")
+        and not isinstance(mapped_type, tuple)
+        and obj.__name__.startswith("send")
     ):
         print("additional_types ")
         mapped_type = mapped_type | additional_types[ptb_param.name]
 
-    # Special cases for other methods that accept more types than the official API
-    exceptions = {  # param_name: reduced form of annotation
-        "correct_option_id": int,
-        "file_id": str,
-        "invite_link": str,
-        "provider_data": str,
+    # Special cases for other methods that accept more types than the official API, and are
+    # too complex to compare/predict with official API:
+    exceptions = {  # (param_name, is_class): reduced form of annotation
+        ("correct_option_id", False): int,  # actual: Literal
+        ("file_id", False): str,  # actual: Union[str, objs_with_file_id_attr]
+        ("invite_link", False): str,  # actual: Union[str, ChatInviteLink]
+        ("provider_data", False): str,  # actual: Union[str, obj]
+        ("callback_data", True): str,  # actual: Union[str, obj]
+        ("media", True): str,  # actual: Union[str, InputMedia*, FileInput]
+        ("data", True): str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
     }
 
-    if ptb_param.name in exceptions:
-        ptb_annotation = exceptions[ptb_param.name]
+    for (param_name, expected_class), exception_type in exceptions.items():
+        if ptb_param.name == param_name and is_class is expected_class:
+            ptb_annotation = exception_type
 
     # Special case for datetimes
     if re.search(r"([_]+|\b)date[^\w]*\b", ptb_param.name):
-        mapped_type = mapped_type | datetime
+        print("datetime found")
+        # If it's a class, we only accept datetime as the parameter
+        mapped_type = datetime if is_class else mapped_type | datetime
 
     # Final check for the basic types
-    if isinstance(mapped_type, list) and any(ptb_annotation == t for t in mapped_type):
+    if isinstance(mapped_type, tuple) and any(ptb_annotation == t for t in mapped_type):
         return True
 
-    if mapped_type != ptb_annotation:
-        # print(f"cause {mapped_type} != {ptb_annotation} for {ptb_param.name}")
-        return False
+    if mapped_type == ptb_annotation:
+        return True
 
-    return True
+    print(f"cause {mapped_type=} != {ptb_annotation=} for {ptb_param.name}")
+    return False
 
 
 def _extract_words(text: str) -> set[str]:
-    """Extracts all words from a string, removing all punctuation and words like 'and'."""
-    return set(re.sub(r"[^\w\s]", "", text).split()) - {"and"}
+    """Extracts all words from a string, removing all punctuation and words like 'and' & 'or'."""
+    return set(re.sub(r"[^\w\s]", "", text).split()) - {"and", "or"}
 
 
-def _unionizer(annotation: Sequence, forward_ref: bool) -> Any:
+def _unionizer(annotation: Sequence[Any] | set[Any], forward_ref: bool) -> Any:
     """Returns a union of all the types in the annotation. If forward_ref is True, it wraps the
     annotation in a ForwardRef and then unionizes."""
     union = None
     for t in annotation:
         if forward_ref:
             t = ForwardRef(t)  # noqa: PLW2901
+        elif not forward_ref and isinstance(t, str):  # we have to import objects from lib
+            t = getattr(telegram, t)  # noqa: PLW2901
         union = t if union is None else union | t
     return union
 
 
 to_run = env_var_2_bool(os.getenv("TEST_OFFICIAL"))
-argvalues = []
-names = []
+argvalues: list[tuple[Callable[[Tag], None], Tag]] = []
+names: list[str] = []
 
 if to_run:
     argvalues = []
@@ -489,8 +514,10 @@ if to_run:
         # Methods and types don't have spaces in them, luckily all other sections of the docs do
         # TODO: don't depend on that
         if "-" not in thing["name"]:
-            h4 = thing.parent
+            h4: Tag | None = thing.parent
 
+            if h4 is None:
+                raise AssertionError("h4 is None")
             # Is it a method
             if h4.text[0].lower() == h4.text[0]:
                 argvalues.append((check_method, h4))
