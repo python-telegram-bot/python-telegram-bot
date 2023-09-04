@@ -19,9 +19,10 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram PassportElementError."""
 
-from typing import Optional
+from typing import Optional, Sequence, Tuple
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 
@@ -166,14 +167,14 @@ class PassportElementErrorFiles(PassportElementError):
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
             ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
+        file_hashes (Sequence[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
             ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
+        file_hashes (Tuple[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
 
     """
@@ -181,12 +182,17 @@ class PassportElementErrorFiles(PassportElementError):
     __slots__ = ("file_hashes",)
 
     def __init__(
-        self, type: str, file_hashes: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self,
+        type: str,
+        file_hashes: Sequence[str],
+        message: str,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # Required
         super().__init__("files", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hashes: str = file_hashes
+            self.file_hashes: Tuple[str, ...] = parse_sequence_arg(file_hashes)
 
             self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
 
@@ -357,7 +363,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
             ``"internal_passport"``, ``"utility_bill"``, ``"bank_statement"``,
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
+        file_hashes (Sequence[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
 
     Attributes:
@@ -365,7 +371,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
             ``"internal_passport"``, ``"utility_bill"``, ``"bank_statement"``,
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
+        file_hashes (Tuple[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
 
     """
@@ -373,12 +379,17 @@ class PassportElementErrorTranslationFiles(PassportElementError):
     __slots__ = ("file_hashes",)
 
     def __init__(
-        self, type: str, file_hashes: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self,
+        type: str,
+        file_hashes: Sequence[str],
+        message: str,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # Required
         super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hashes: str = file_hashes
+            self.file_hashes: Tuple[str, ...] = parse_sequence_arg(file_hashes)
 
             self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
 

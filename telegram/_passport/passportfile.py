@@ -18,9 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Encrypted PassportFile."""
 
+from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional, Tuple
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -43,7 +45,7 @@ class PassportFile(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): File size in bytes.
-        file_date (:obj:`int`): Unix time when the file was uploaded.
+        file_date (:class:`datetime.datetime`): Datetime when the file was uploaded.
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -52,9 +54,7 @@ class PassportFile(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): File size in bytes.
-        file_date (:obj:`int`): Unix time when the file was uploaded.
-
-
+        file_date (:class:`datetime.datetime`): Datetime when the file was uploaded.
     """
 
     __slots__ = (
@@ -69,7 +69,7 @@ class PassportFile(TelegramObject):
         self,
         file_id: str,
         file_unique_id: str,
-        file_date: int,
+        file_date: datetime,
         file_size: int,
         credentials: Optional["FileCredentials"] = None,
         *,
@@ -81,7 +81,7 @@ class PassportFile(TelegramObject):
         self.file_id: str = file_id
         self.file_unique_id: str = file_unique_id
         self.file_size: int = file_size
-        self.file_date: int = file_date
+        self.file_date: datetime = file_date
         # Optionals
 
         self._credentials: Optional[FileCredentials] = credentials
@@ -111,6 +111,9 @@ class PassportFile(TelegramObject):
         if not data:
             return None
 
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
+        data["file_date"] = from_timestamp(data.get("last_error_date"), tzinfo=loc_tzinfo)
         data["credentials"] = credentials
 
         return super().de_json(data=data, bot=bot)
