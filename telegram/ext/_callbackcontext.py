@@ -34,7 +34,6 @@ from typing import (
 
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
-from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.warnings import warn
 from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import BD, BT, CD, UD
@@ -149,9 +148,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.coroutine: Optional[
             Union[Generator[Optional[Future[object]], None, Any], Awaitable[Any]]
         ] = None
-
-    def __repr__(self) -> str:
-        return build_repr_with_selected_attrs(self, update=self.update)
 
     @property
     def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":

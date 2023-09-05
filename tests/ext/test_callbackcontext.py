@@ -47,11 +47,6 @@ class TestCallbackContext:
         assert not c.__dict__, f"got missing slot(s): {c.__dict__}"
         assert len(mro_slots(c)) == len(set(mro_slots(c))), "duplicate slot"
 
-    async def test_repr(self, app):
-        c = CallbackContext(app)
-        c.update = Update(update_id=123456)
-        assert repr(c) == f"CallbackContext[update={c.update!r}]"
-
     def test_from_job(self, app):
         job = app.job_queue.run_once(lambda x: x, 10)
 
