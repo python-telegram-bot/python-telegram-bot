@@ -196,6 +196,11 @@ class PassportElementErrorFiles(PassportElementError):
 
             self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
 
+    def to_dict(self, recursive: bool = True) -> JSONDict:
+        data = super().to_dict(recursive)
+        data["file_hashes"] = self._file_hashes
+        return data
+
     @property
     def file_hashes(self) -> List[str]:
         """List of base64-encoded file hashes.
@@ -405,6 +410,11 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             self._file_hashes: List[str] = file_hashes
 
             self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
+        data = super().to_dict(recursive)
+        data["file_hashes"] = self._file_hashes
+        return data
 
     @property
     def file_hashes(self) -> List[str]:

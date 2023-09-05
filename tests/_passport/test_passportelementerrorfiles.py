@@ -60,15 +60,10 @@ class TestPassportElementErrorFilesWithoutRequest(TestPassportElementErrorFilesB
         assert passport_element_error_files_dict["source"] == passport_element_error_files.source
         assert passport_element_error_files_dict["type"] == passport_element_error_files.type
         assert passport_element_error_files_dict["message"] == passport_element_error_files.message
-
-    def test_file_hashes_deprecated(self, passport_element_error_files, recwarn):
-        passport_element_error_files.file_hashes
-        assert len(recwarn) == 1
-        assert "The attribute `file_hashes` will return a tuple instead of a list in v22." in str(
-            recwarn[0].message
+        assert (
+            passport_element_error_files_dict["file_hashes"]
+            == passport_element_error_files.file_hashes
         )
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert recwarn[0].filename == __file__
 
     def test_equality(self):
         a = PassportElementErrorFiles(self.type_, self.file_hashes, self.message)
@@ -93,3 +88,12 @@ class TestPassportElementErrorFilesWithoutRequest(TestPassportElementErrorFilesB
 
         assert a != f
         assert hash(a) != hash(f)
+
+    def test_file_hashes_deprecated(self, passport_element_error_files, recwarn):
+        passport_element_error_files.file_hashes
+        assert len(recwarn) == 1
+        assert "The attribute `file_hashes` will return a tuple instead of a list in v22." in str(
+            recwarn[0].message
+        )
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert recwarn[0].filename == __file__
