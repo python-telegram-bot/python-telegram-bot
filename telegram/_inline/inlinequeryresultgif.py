@@ -25,10 +25,6 @@ from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
-from telegram._utils.warnings_transition import (
-    warn_about_deprecated_arg_return_new_arg,
-    warn_about_deprecated_attr_in_property,
-)
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -42,6 +38,9 @@ class InlineQueryResultGif(InlineQueryResult):
     send a message with the specified content instead of the animation.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionchanged:: 20.5
+      |removed_thumb_wildcard_note|
 
     Args:
         id (:obj:`str`): Unique identifier for this result,
@@ -79,16 +78,6 @@ class InlineQueryResultGif(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the GIF animation.
-        thumb_mime_type (:obj:`str`, optional): MIME type of the thumbnail, must be one of
-            ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail_mime_type`.
-        thumb_url (:obj:`str`, optional): URL of the static (JPEG or GIF) or animated (MPEG4)
-            thumbnail for the result.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail_url`.
 
     Raises:
         :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
@@ -148,10 +137,7 @@ class InlineQueryResultGif(InlineQueryResult):
         self,
         id: str,  # pylint: disable=redefined-builtin
         gif_url: str,
-        # thumbnail_url is not optional in Telegram API, but we want to support thumb_url as well,
-        # so thumbnail_url may not be passed.  We will raise ValueError manually if neither
-        # thumbnail_url nor thumb_url are passed
-        thumbnail_url: Optional[str] = None,
+        thumbnail_url: str,
         gif_width: Optional[int] = None,
         gif_height: Optional[int] = None,
         title: Optional[str] = None,
@@ -160,31 +146,16 @@ class InlineQueryResultGif(InlineQueryResult):
         input_message_content: Optional["InputMessageContent"] = None,
         gif_duration: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb_mime_type: Optional[str] = None,
         caption_entities: Optional[Sequence[MessageEntity]] = None,
         thumbnail_mime_type: Optional[str] = None,
-        # thumb_url is not optional in Telegram API, but it is here, along with thumbnail_url.
-        thumb_url: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
-        if not (thumbnail_url or thumb_url):
-            raise ValueError(
-                "You must pass either 'thumbnail_url' or 'thumb_url'. Note that 'thumb_url' is "
-                "deprecated."
-            )
-
         # Required
         super().__init__(InlineQueryResultType.GIF, id, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.gif_url: str = gif_url
-            self.thumbnail_url: str = warn_about_deprecated_arg_return_new_arg(
-                deprecated_arg=thumb_url,
-                new_arg=thumbnail_url,
-                deprecated_arg_name="thumb_url",
-                new_arg_name="thumbnail_url",
-                bot_api_version="6.6",
-            )
+            self.thumbnail_url: str = thumbnail_url
 
             # Optionals
             self.gif_width: Optional[int] = gif_width
@@ -196,40 +167,4 @@ class InlineQueryResultGif(InlineQueryResult):
             self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.thumbnail_mime_type: Optional[str] = warn_about_deprecated_arg_return_new_arg(
-                deprecated_arg=thumb_mime_type,
-                new_arg=thumbnail_mime_type,
-                deprecated_arg_name="thumb_mime_type",
-                new_arg_name="thumbnail_mime_type",
-                bot_api_version="6.6",
-            )
-
-    @property
-    def thumb_url(self) -> str:
-        """:obj:`str`: URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the
-        result.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail_url`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb_url",
-            new_attr_name="thumbnail_url",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail_url
-
-    @property
-    def thumb_mime_type(self) -> Optional[str]:
-        """:obj:`str`: Optional. Optional. MIME type of the thumbnail, must be one of
-        ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail_mime_type`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb_mime_type",
-            new_attr_name="thumbnail_mime_type",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail_mime_type
+            self.thumbnail_mime_type: Optional[str] = thumbnail_mime_type

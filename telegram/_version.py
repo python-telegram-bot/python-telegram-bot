@@ -51,7 +51,7 @@ class Version(NamedTuple):
 
 
 __version_info__: Final[Version] = Version(
-    major=20, minor=4, micro=0, releaselevel="final", serial=0
+    major=20, minor=5, micro=0, releaselevel="final", serial=0
 )
 __version__: Final[str] = str(__version_info__)
 
@@ -62,6 +62,4 @@ __version__: Final[str] = str(__version_info__)
 from telegram import constants  # noqa: E402  # pylint: disable=wrong-import-position
 
 __bot_api_version__: Final[str] = constants.BOT_API_VERSION
-__bot_api_version_info__: Final[
-    constants._BotAPIVersion
-] = constants.BOT_API_VERSION_INFO  # pylint: disable=protected-access
+__bot_api_version_info__: Final[constants._BotAPIVersion] = constants.BOT_API_VERSION_INFO

@@ -53,6 +53,7 @@ from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._shared import ChatShared, UserShared
+from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -67,7 +68,6 @@ from telegram._utils.types import (
     ODVInput,
     ReplyMarkup,
 )
-from telegram._utils.warnings import warn
 from telegram._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -78,7 +78,6 @@ from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
 from telegram.constants import MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -201,6 +200,9 @@ class Message(TelegramObject):
 
         sticker (:class:`telegram.Sticker`, optional): Message is a sticker, information
             about the sticker.
+        story (:class:`telegram.Story`, optional): Message is a forwarded story.
+
+            .. versionadded:: 20.5
         video (:class:`telegram.Video`, optional): Message is a video, information about the
             video.
         voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
@@ -435,6 +437,9 @@ class Message(TelegramObject):
             about the sticker.
 
             .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+        story (:class:`telegram.Story`): Optional. Message is a forwarded story.
+
+            .. versionadded:: 20.5
         video (:class:`telegram.Video`): Optional. Message is a video, information about the
             video.
 
@@ -591,10 +596,9 @@ class Message(TelegramObject):
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
         function. Instead, the supplied replacement for the emoji will be used.
 
-    .. |custom_emoji_md1_deprecation| replace:: Since custom emoji entities are not supported by
-       :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method will raise a
-       :exc:`ValueError` in future versions instead of falling back to the supplied replacement
-       for the emoji.
+    .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
+       :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
+       :exc:`ValueError` when encountering a custom emoji.
     """
 
     # fmt: on
@@ -671,6 +675,7 @@ class Message(TelegramObject):
         "has_media_spoiler",
         "user_shared",
         "chat_shared",
+        "story",
     )
 
     def __init__(
@@ -746,6 +751,7 @@ class Message(TelegramObject):
         has_media_spoiler: Optional[bool] = None,
         user_shared: Optional[UserShared] = None,
         chat_shared: Optional[ChatShared] = None,
+        story: Optional[Story] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -834,6 +840,7 @@ class Message(TelegramObject):
         self.has_media_spoiler: Optional[bool] = has_media_spoiler
         self.user_shared: Optional[UserShared] = user_shared
         self.chat_shared: Optional[ChatShared] = chat_shared
+        self.story: Optional[Story] = story
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -903,6 +910,7 @@ class Message(TelegramObject):
         data["game"] = Game.de_json(data.get("game"), bot)
         data["photo"] = PhotoSize.de_list(data.get("photo"), bot)
         data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
+        data["story"] = Story.de_json(data.get("story"), bot)
         data["video"] = Video.de_json(data.get("video"), bot)
         data["voice"] = Voice.de_json(data.get("voice"), bot)
         data["video_note"] = VideoNote.de_json(data.get("video_note"), bot)
@@ -973,6 +981,7 @@ class Message(TelegramObject):
         Sequence[PhotoSize],
         Poll,
         Sticker,
+        Story,
         SuccessfulPayment,
         Venue,
         Video,
@@ -995,6 +1004,7 @@ class Message(TelegramObject):
         * List[:class:`telegram.PhotoSize`]
         * :class:`telegram.Poll`
         * :class:`telegram.Sticker`
+        * :class:`telegram.Story`
         * :class:`telegram.SuccessfulPayment`
         * :class:`telegram.Venue`
         * :class:`telegram.Video`
@@ -1410,7 +1420,6 @@ class Message(TelegramObject):
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -1452,7 +1461,6 @@ class Message(TelegramObject):
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
-            thumb=thumb,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
@@ -1474,7 +1482,6 @@ class Message(TelegramObject):
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: Optional[FileInput] = None,
         disable_content_type_detection: Optional[bool] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
@@ -1519,7 +1526,6 @@ class Message(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             parse_mode=parse_mode,
-            thumb=thumb,
             api_kwargs=api_kwargs,
             disable_content_type_detection=disable_content_type_detection,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1535,7 +1541,6 @@ class Message(TelegramObject):
         duration: Optional[int] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        thumb: Optional[FileInput] = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -1579,7 +1584,6 @@ class Message(TelegramObject):
             duration=duration,
             width=width,
             height=height,
-            thumb=thumb,
             caption=caption,
             parse_mode=parse_mode,
             disable_notification=disable_notification,
@@ -1662,7 +1666,6 @@ class Message(TelegramObject):
         height: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         supports_streaming: Optional[bool] = None,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -1710,7 +1713,6 @@ class Message(TelegramObject):
             height=height,
             parse_mode=parse_mode,
             supports_streaming=supports_streaming,
-            thumb=thumb,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
@@ -1729,7 +1731,6 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -1772,7 +1773,6 @@ class Message(TelegramObject):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            thumb=thumb,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             filename=filename,
@@ -3545,24 +3545,17 @@ class Message(TelegramObject):
                     insert = f"||{escaped_text}||"
                 elif entity.type == MessageEntity.CUSTOM_EMOJI:
                     if version == 1:
-                        # this ensures compatibility to previous PTB versions
-                        insert = escaped_text
-                        warn(
-                            "Custom emoji entities are not supported for Markdown version 1. "
-                            "Future version of PTB will raise a ValueError instead of falling "
-                            "back to the alternative standard emoji.",
-                            stacklevel=3,
-                            category=PTBDeprecationWarning,
+                        raise ValueError(
+                            "Custom emoji entities are not supported for Markdown version 1"
                         )
-                    else:
-                        # This should never be needed because ids are numeric but the documentation
-                        # specifically mentions it so here we are
-                        custom_emoji_id = escape_markdown(
-                            entity.custom_emoji_id,
-                            version=version,
-                            entity_type=MessageEntity.CUSTOM_EMOJI,
-                        )
-                        insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+                    # This should never be needed because ids are numeric but the documentation
+                    # specifically mentions it so here we are
+                    custom_emoji_id = escape_markdown(
+                        entity.custom_emoji_id,
+                        version=version,
+                        entity_type=MessageEntity.CUSTOM_EMOJI,
+                    )
+                    insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
                 else:
                     insert = escaped_text
 
@@ -3611,8 +3604,8 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: 20.3
-            |custom_emoji_md1_deprecation|
+        .. versionchanged:: 20.5
+            |custom_emoji_no_md1_support|
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3658,8 +3651,8 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: 20.3
-            |custom_emoji_md1_deprecation|
+        .. versionchanged:: 20.5
+            |custom_emoji_no_md1_support|
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3705,8 +3698,8 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: 20.3
-            |custom_emoji_md1_deprecation|
+        .. versionchanged:: 20.5
+            |custom_emoji_no_md1_support|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -3754,8 +3747,8 @@ class Message(TelegramObject):
 
             * |custom_emoji_formatting_note|
 
-        .. deprecated:: 20.3
-            |custom_emoji_md1_deprecation|
+        .. versionchanged:: 20.5
+            |custom_emoji_no_md1_support|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.

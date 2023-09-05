@@ -24,9 +24,7 @@ from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
 from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUser
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
 from telegram._webappinfo import WebAppInfo
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -56,9 +54,9 @@ class KeyboardButton(TelegramObject):
     .. versionchanged:: 20.0
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.
-    .. deprecated:: 20.1
-       :paramref:`request_user` and :paramref:`request_chat` will be considered as well when
-       comparing objects of this type in terms of equality in V21.
+    .. versionchanged:: 20.5
+       :attr:`request_user` and :attr:`request_chat` are considered as well when
+       comparing objects of this type in terms of equality.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -157,22 +155,11 @@ class KeyboardButton(TelegramObject):
             self.request_location,
             self.request_poll,
             self.web_app,
+            self.request_user,
+            self.request_chat,
         )
 
         self._freeze()
-
-    def __eq__(self, other: object) -> bool:
-        warn(
-            "In v21, `request_user` and `request_chat` will be considered as well when comparing"
-            " KeyboardButton instances.",
-            PTBDeprecationWarning,
-            stacklevel=2,
-        )
-        return super().__eq__(other)
-
-    def __hash__(self) -> int:
-        # Intend: Added so support the own __eq__ function (which otherwise breaks hashing)
-        return super().__hash__()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["KeyboardButton"]:

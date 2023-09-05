@@ -79,6 +79,7 @@ Available Types
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
     telegram.sentwebappmessage
+    telegram.story
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
     telegram.update

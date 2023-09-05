@@ -42,6 +42,7 @@ from telegram import (
     PollOption,
     ProximityAlertTriggered,
     Sticker,
+    Story,
     SuccessfulPayment,
     Update,
     User,
@@ -59,7 +60,6 @@ from telegram import (
 from telegram._utils.datetime import UTC
 from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
-from telegram.warnings import PTBDeprecationWarning
 from tests._passport.test_passport import RAW_PASSPORT_DATA
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
@@ -123,6 +123,7 @@ def message(bot):
         },
         {"photo": [PhotoSize("photo_id", "unique_id", 50, 50)], "caption": "photo_file"},
         {"sticker": Sticker("sticker_id", "unique_id", 50, 50, True, False, Sticker.REGULAR)},
+        {"story": Story()},
         {"video": Video("video_id", "unique_id", 12, 12, 12), "caption": "video_file"},
         {"voice": Voice("voice_id", "unique_id", 5)},
         {"video_note": VideoNote("video_note_id", "unique_id", 20, 12)},
@@ -227,6 +228,7 @@ def message(bot):
         "game",
         "photo",
         "sticker",
+        "story",
         "video",
         "voice",
         "video_note",
@@ -645,7 +647,6 @@ class TestMessageWithoutRequest(TestMessageBase):
     )
     def test_text_custom_emoji_md_v1(self, type_, recwarn):
         text = "Look a custom emoji: 😎"
-        expected = "Look a custom emoji: 😎"
         emoji_entity = MessageEntity(
             type=MessageEntity.CUSTOM_EMOJI,
             offset=21,
@@ -660,14 +661,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             text=text,
             entities=[emoji_entity],
         )
-        assert expected == getattr(message, type_)
-
-        assert len(recwarn) == 1
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert str(recwarn[0].message).startswith(
-            "Custom emoji entities are not supported for Markdown version 1"
-        )
-        assert recwarn[0].filename == __file__
+        with pytest.raises(ValueError, match="Custom emoji entities are not supported for"):
+            getattr(message, type_)
 
     @pytest.mark.parametrize(
         "type_",
@@ -842,7 +837,6 @@ class TestMessageWithoutRequest(TestMessageBase):
     )
     def test_caption_custom_emoji_md_v1(self, type_, recwarn):
         caption = "Look a custom emoji: 😎"
-        expected = "Look a custom emoji: 😎"
         emoji_entity = MessageEntity(
             type=MessageEntity.CUSTOM_EMOJI,
             offset=21,
@@ -857,14 +851,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             caption=caption,
             caption_entities=[emoji_entity],
         )
-        assert expected == getattr(message, type_)
-
-        assert len(recwarn) == 1
-        assert recwarn[0].category is PTBDeprecationWarning
-        assert str(recwarn[0].message).startswith(
-            "Custom emoji entities are not supported for Markdown version 1"
-        )
-        assert recwarn[0].filename == __file__
+        with pytest.raises(ValueError, match="Custom emoji entities are not supported for"):
+            getattr(message, type_)
 
     @pytest.mark.parametrize(
         "type_",
@@ -989,6 +977,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "photo",
             "poll",
             "sticker",
+            "story",
             "successful_payment",
             "video",
             "video_note",

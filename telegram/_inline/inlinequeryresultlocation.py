@@ -24,10 +24,6 @@ from telegram import constants
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings_transition import (
-    warn_about_deprecated_arg_return_new_arg,
-    warn_about_deprecated_attr_in_property,
-)
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
@@ -38,6 +34,9 @@ class InlineQueryResultLocation(InlineQueryResult):
     Represents a location on a map. By default, the location will be sent by the user.
     Alternatively, you can use :attr:`input_message_content` to send a message with the specified
     content instead of the location.
+
+    .. versionchanged:: 20.5
+        |removed_thumb_wildcard_note|
 
     Args:
         id (:obj:`str`): Unique identifier for this result,
@@ -66,18 +65,6 @@ class InlineQueryResultLocation(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the location.
-        thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail_url`.
-        thumb_width (:obj:`int`, optional): Thumbnail width.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail_width`.
-        thumb_height (:obj:`int`, optional): Thumbnail height.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail_height`.
         thumbnail_url (:obj:`str`, optional): Url of the thumbnail for the result.
 
             .. versionadded:: 20.2
@@ -152,9 +139,6 @@ class InlineQueryResultLocation(InlineQueryResult):
         live_period: Optional[int] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         input_message_content: Optional["InputMessageContent"] = None,
-        thumb_url: Optional[str] = None,
-        thumb_width: Optional[int] = None,
-        thumb_height: Optional[int] = None,
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
@@ -175,74 +159,14 @@ class InlineQueryResultLocation(InlineQueryResult):
             self.live_period: Optional[int] = live_period
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.thumbnail_url: Optional[str] = warn_about_deprecated_arg_return_new_arg(
-                deprecated_arg=thumb_url,
-                new_arg=thumbnail_url,
-                deprecated_arg_name="thumb_url",
-                new_arg_name="thumbnail_url",
-                bot_api_version="6.6",
-            )
-            self.thumbnail_width: Optional[int] = warn_about_deprecated_arg_return_new_arg(
-                deprecated_arg=thumb_width,
-                new_arg=thumbnail_width,
-                deprecated_arg_name="thumb_width",
-                new_arg_name="thumbnail_width",
-                bot_api_version="6.6",
-            )
-            self.thumbnail_height: Optional[int] = warn_about_deprecated_arg_return_new_arg(
-                deprecated_arg=thumb_height,
-                new_arg=thumbnail_height,
-                deprecated_arg_name="thumb_height",
-                new_arg_name="thumbnail_height",
-                bot_api_version="6.6",
-            )
+            self.thumbnail_url: Optional[str] = thumbnail_url
+            self.thumbnail_width: Optional[int] = thumbnail_width
+            self.thumbnail_height: Optional[int] = thumbnail_height
             self.horizontal_accuracy: Optional[float] = horizontal_accuracy
             self.heading: Optional[int] = heading
             self.proximity_alert_radius: Optional[int] = (
                 int(proximity_alert_radius) if proximity_alert_radius else None
             )
-
-    @property
-    def thumb_url(self) -> Optional[str]:
-        """:obj:`str`: Optional. Url of the thumbnail for the result.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail_url`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb_url",
-            new_attr_name="thumbnail_url",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail_url
-
-    @property
-    def thumb_width(self) -> Optional[int]:
-        """:obj:`str`: Optional. Thumbnail width.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail_width`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb_width",
-            new_attr_name="thumbnail_width",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail_width
-
-    @property
-    def thumb_height(self) -> Optional[int]:
-        """:obj:`str`: Optional. Thumbnail height.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail_height`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb_height",
-            new_attr_name="thumbnail_height",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail_height
 
     HORIZONTAL_ACCURACY: Final[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`

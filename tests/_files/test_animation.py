@@ -31,10 +31,6 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import (
-    check_thumb_deprecation_warning_for_method_args,
-    check_thumb_deprecation_warnings_for_args_and_attrs,
-)
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -85,18 +81,6 @@ class TestAnimationWithoutRequest(TestAnimationBase):
         assert animation.mime_type == self.mime_type
         assert animation.file_name.startswith("game.gif") == self.file_name.startswith("game.gif")
         assert isinstance(animation.thumbnail, PhotoSize)
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        animation = Animation(
-            self.animation_file_id,
-            self.animation_file_unique_id,
-            thumb=object(),
-            width=self.width,
-            height=self.height,
-            duration=self.duration,
-        )
-        assert animation.thumb is animation.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_de_json(self, bot, animation):
         json_dict = {
@@ -193,28 +177,6 @@ class TestAnimationWithoutRequest(TestAnimationBase):
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_animation(animation=animation, chat_id=chat_id)
-
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_send_animation_thumb_deprecation_warning(
-        self, recwarn, monkeypatch, bot_class, bot, raw_bot, chat_id, animation
-    ):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return True
-
-        bot = raw_bot if bot_class == "Bot" else bot
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        await bot.send_animation(chat_id, animation, thumb="thumb")
-        check_thumb_deprecation_warning_for_method_args(recwarn, __file__)
-
-    async def test_send_animation_with_local_files_throws_error_with_different_thumb_and_thumbnail(
-        self, bot, chat_id
-    ):
-        file = data_file("telegram.jpg")
-        different_file = data_file("telegram_no_standard_header.jpg")
-
-        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
-            await bot.send_animation(chat_id, file, thumbnail=file, thumb=different_file)
 
     async def test_get_file_instance_method(self, monkeypatch, animation):
         async def make_assertion(*_, **kwargs):

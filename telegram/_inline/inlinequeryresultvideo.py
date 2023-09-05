@@ -25,10 +25,6 @@ from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
-from telegram._utils.warnings_transition import (
-    warn_about_deprecated_arg_return_new_arg,
-    warn_about_deprecated_attr_in_property,
-)
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -47,6 +43,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         replace its content using :attr:`input_message_content`.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionchanged:: 20.5
+        |removed_thumb_url_note|
 
     Args:
         id (:obj:`str`): Unique identifier for this result,
@@ -89,10 +88,6 @@ class InlineQueryResultVideo(InlineQueryResult):
             message to be sent instead of the video. This field is required if
             ``InlineQueryResultVideo`` is used to send an HTML-page as a result
             (e.g., a YouTube video).
-        thumb_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the video.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail_url`.
 
     Raises:
         :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
@@ -156,13 +151,8 @@ class InlineQueryResultVideo(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         video_url: str,
         mime_type: str,
-        # thumbnail_url and title are not optional in Telegram API, but we want to support
-        # thumb_url as well, so thumbnail_url may not be passed if thumb_url is passed.
-        # We will raise ValueError manually if neither thumbnail_url nor thumb_url are passed.
-        thumbnail_url: Optional[str] = None,
-        # title had to be made optional because of thumbnail_url. This is compensated by raising
-        # TypeError manually if title is not passed.
-        title: Optional[str] = None,
+        thumbnail_url: str,
+        title: str,
         caption: Optional[str] = None,
         video_width: Optional[int] = None,
         video_height: Optional[int] = None,
@@ -172,35 +162,15 @@ class InlineQueryResultVideo(InlineQueryResult):
         input_message_content: Optional["InputMessageContent"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence[MessageEntity]] = None,
-        # thumb_url is not optional in Telegram API, but it is here, along with thumbnail_url.
-        thumb_url: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
-        if not (thumbnail_url or thumb_url):
-            raise ValueError(
-                "You must pass either 'thumbnail_url' or 'thumb_url'. Note that 'thumb_url' is "
-                "deprecated."
-            )
-
-        if title is None:
-            raise TypeError(
-                "InlineQueryResultVideo.__init__() missing a required argument: you forgot to pass"
-                " either 'title' or 'thumbnail_url'."
-            )
-
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.video_url: str = video_url
             self.mime_type: str = mime_type
-            self.thumbnail_url: str = warn_about_deprecated_arg_return_new_arg(
-                deprecated_arg=thumb_url,
-                new_arg=thumbnail_url,
-                deprecated_arg_name="thumb_url",
-                new_arg_name="thumbnail_url",
-                bot_api_version="6.6",
-            )
+            self.thumbnail_url: str = thumbnail_url
             self.title: str = title
 
             # Optional
@@ -213,17 +183,3 @@ class InlineQueryResultVideo(InlineQueryResult):
             self.description: Optional[str] = description
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
-
-    @property
-    def thumb_url(self) -> str:
-        """:obj:`str`: URL of the thumbnail (JPEG only) for the video.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail_url`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb_url",
-            new_attr_name="thumbnail_url",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail_url

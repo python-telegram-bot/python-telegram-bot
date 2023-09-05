@@ -148,6 +148,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         :attr:`bot.callback_data_cache.maxsize <telegram.ext.CallbackDataCache.maxsize>` to
         access the size of the cache.
 
+    .. versionchanged:: 20.5
+        Removed deprecated methods ``set_sticker_set_thumb`` and ``setStickerSetThumb``.
+
     Args:
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
@@ -736,14 +739,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         user_id: Union[str, int],
         name: str,
-        emojis: Optional[str] = None,  # Was made optional for compatibility reasons
-        png_sticker: Optional[FileInput] = None,
-        mask_position: Optional[MaskPosition] = None,
-        tgs_sticker: Optional[FileInput] = None,
-        webm_sticker: Optional[FileInput] = None,
-        sticker: Optional[
-            InputSticker
-        ] = None,  # Actually a required param, but is optional for compat.
+        sticker: Optional[InputSticker],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -756,11 +752,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             user_id=user_id,
             name=name,
             sticker=sticker,
-            emojis=emojis,
-            png_sticker=png_sticker,
-            mask_position=mask_position,
-            tgs_sticker=tgs_sticker,
-            webm_sticker=webm_sticker,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -805,8 +796,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         cache_time: Optional[int] = None,
         is_personal: Optional[bool] = None,
         next_offset: Optional[str] = None,
-        switch_pm_text: Optional[str] = None,
-        switch_pm_parameter: Optional[str] = None,
         button: Optional[InlineQueryResultsButton] = None,
         *,
         current_offset: Optional[str] = None,
@@ -823,8 +812,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             cache_time=cache_time,
             is_personal=is_personal,
             next_offset=next_offset,
-            switch_pm_text=switch_pm_text,
-            switch_pm_parameter=switch_pm_parameter,
             current_offset=current_offset,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1067,16 +1054,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         user_id: Union[str, int],
         name: str,
         title: str,
-        emojis: Optional[str] = None,  # Was made optional for compatibility purposes
-        png_sticker: Optional[FileInput] = None,
-        mask_position: Optional[MaskPosition] = None,
-        tgs_sticker: Optional[FileInput] = None,
-        webm_sticker: Optional[FileInput] = None,
+        stickers: Optional[Sequence[InputSticker]],
+        sticker_format: Optional[str],
         sticker_type: Optional[str] = None,
-        stickers: Optional[
-            Sequence[InputSticker]
-        ] = None,  # Actually a required param. Optional for compat.
-        sticker_format: Optional[str] = None,  # Actually a required param. Optional for compat.
         needs_repainting: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1092,13 +1072,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             title=title,
             stickers=stickers,
             sticker_format=sticker_format,
-            needs_repainting=needs_repainting,
-            emojis=emojis,
-            png_sticker=png_sticker,
-            mask_position=mask_position,
-            tgs_sticker=tgs_sticker,
-            webm_sticker=webm_sticker,
             sticker_type=sticker_type,
+            needs_repainting=needs_repainting,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2183,7 +2158,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         duration: Optional[int] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        thumb: Optional[FileInput] = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -2210,7 +2184,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             duration=duration,
             width=width,
             height=height,
-            thumb=thumb,
             caption=caption,
             parse_mode=parse_mode,
             disable_notification=disable_notification,
@@ -2242,7 +2215,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2268,7 +2240,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
-            thumb=thumb,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             protect_content=protect_content,
@@ -2391,7 +2362,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: Optional[FileInput] = None,
         disable_content_type_detection: Optional[bool] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
@@ -2415,7 +2385,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
-            thumb=thumb,
             disable_content_type_detection=disable_content_type_detection,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
@@ -2863,7 +2832,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         height: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         supports_streaming: Optional[bool] = None,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -2891,7 +2859,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             height=height,
             parse_mode=parse_mode,
             supports_streaming=supports_streaming,
-            thumb=thumb,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             protect_content=protect_content,
@@ -2915,7 +2882,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -2937,7 +2903,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            thumb=thumb,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -3298,30 +3263,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
-    async def set_sticker_set_thumb(
-        self,
-        name: str,
-        user_id: Union[str, int],
-        thumb: Optional[FileInput] = None,
-        *,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: Optional[JSONDict] = None,
-        rate_limit_args: Optional[RLARGS] = None,
-    ) -> bool:
-        return await super().set_sticker_set_thumb(
-            name=name,
-            user_id=user_id,
-            thumb=thumb,
-            read_timeout=read_timeout,
-            write_timeout=write_timeout,
-            connect_timeout=connect_timeout,
-            pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
-        )
-
     async def set_webhook(
         self,
         url: str,
@@ -3490,14 +3431,31 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def unpin_all_general_forum_topic_messages(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().unpin_all_general_forum_topic_messages(
+            chat_id=chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def upload_sticker_file(
         self,
         user_id: Union[str, int],
-        png_sticker: Optional[
-            FileInput
-        ] = None,  # Deprecated since bot api 6.6. Optional for compatiblity.
-        sticker: Optional[FileInput] = None,  # Actually required, but optional for compatibility.
-        sticker_format: Optional[str] = None,  # Actually required, but optional for compatibility.
+        sticker: Optional[FileInput],
+        sticker_format: Optional[str],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -3510,7 +3468,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             user_id=user_id,
             sticker=sticker,
             sticker_format=sticker_format,
-            png_sticker=png_sticker,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3848,7 +3805,6 @@ class ExtBot(Bot, Generic[RLARGS]):
     addStickerToSet = add_sticker_to_set
     setStickerPositionInSet = set_sticker_position_in_set
     deleteStickerFromSet = delete_sticker_from_set
-    setStickerSetThumb = set_sticker_set_thumb
     setStickerSetThumbnail = set_sticker_set_thumbnail
     setPassportDataErrors = set_passport_data_errors
     sendPoll = send_poll
@@ -3888,3 +3844,4 @@ class ExtBot(Bot, Generic[RLARGS]):
     setStickerMaskPosition = set_sticker_mask_position
     setMyName = set_my_name
     getMyName = get_my_name
+    unpinAllGeneralForumTopicMessages = unpin_all_general_forum_topic_messages

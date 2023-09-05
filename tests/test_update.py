@@ -70,7 +70,18 @@ params = [
     {"shipping_query": ShippingQuery("id", User(1, "", False), "", None)},
     {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
     {"poll": Poll("id", "?", [PollOption(".", 1)], False, False, False, Poll.REGULAR, True)},
-    {"poll_answer": PollAnswer("id", User(1, "", False), [1])},
+    {
+        "poll_answer": PollAnswer(
+            "id",
+            [1],
+            User(
+                1,
+                "",
+                False,
+            ),
+            Chat(1, ""),
+        )
+    },
     {"my_chat_member": chat_member_updated},
     {"chat_member": chat_member_updated},
     {"chat_join_request": chat_join_request},

@@ -33,7 +33,7 @@ RT = TypeVar("RT")
 
 
 class MessageHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram messages. They might contain text, media or status
+    """Handler class to handle Telegram messages. They might contain text, media or status
     updates.
 
     Warning:
