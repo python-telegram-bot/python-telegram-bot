@@ -93,6 +93,7 @@ class PassportFile(TelegramObject):
         self._freeze()
 
     def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict` for details."""
         data = super().to_dict(recursive)
         data["file_date"] = self._file_date
         return data
@@ -132,10 +133,6 @@ class PassportFile(TelegramObject):
         if not data:
             return None
 
-        # TODO: Uncomment for v22
-        # loc_tzinfo = extract_tzinfo_from_defaults(bot)
-
-        # data["file_date"] = from_timestamp(data.get("file_date"), tzinfo=loc_tzinfo)
         data["credentials"] = credentials
 
         return super().de_json(data=data, bot=bot)

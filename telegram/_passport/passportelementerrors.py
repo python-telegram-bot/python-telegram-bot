@@ -197,6 +197,7 @@ class PassportElementErrorFiles(PassportElementError):
             self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
 
     def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict` for details."""
         data = super().to_dict(recursive)
         data["file_hashes"] = self._file_hashes
         return data
@@ -412,6 +413,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
 
     def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict` for details."""
         data = super().to_dict(recursive)
         data["file_hashes"] = self._file_hashes
         return data

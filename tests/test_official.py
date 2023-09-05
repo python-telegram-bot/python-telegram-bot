@@ -87,6 +87,18 @@ ARRAY_OF_EXCEPTIONS = {
     "file_hashes": "list[str]",
 }
 
+# Special cases for other parameters that accept more types than the official API, and are
+# too complex to compare/predict with official API:
+EXCEPTIONS = {  # (param_name, is_class): reduced form of annotation
+    ("correct_option_id", False): int,  # actual: Literal
+    ("file_id", False): str,  # actual: Union[str, objs_with_file_id_attr]
+    ("invite_link", False): str,  # actual: Union[str, ChatInviteLink]
+    ("provider_data", False): str,  # actual: Union[str, obj]
+    ("callback_data", True): str,  # actual: Union[str, obj]
+    ("media", True): str,  # actual: Union[str, InputMedia*, FileInput]
+    ("data", True): str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
+}
+
 
 def _get_params_base(object_name: str, search_dict: dict[str, set[Any]]) -> set[Any]:
     """Helper function for the *_params functions below.
@@ -451,25 +463,18 @@ def check_param_type(
         print("additional_types ")
         mapped_type = mapped_type | ADDITIONAL_TYPES[ptb_param.name]
 
-    # Special cases for other methods that accept more types than the official API, and are
-    # too complex to compare/predict with official API:
-    exceptions = {  # (param_name, is_class): reduced form of annotation
-        ("correct_option_id", False): int,  # actual: Literal
-        ("file_id", False): str,  # actual: Union[str, objs_with_file_id_attr]
-        ("invite_link", False): str,  # actual: Union[str, ChatInviteLink]
-        ("provider_data", False): str,  # actual: Union[str, obj]
-        ("callback_data", True): str,  # actual: Union[str, obj]
-        ("media", True): str,  # actual: Union[str, InputMedia*, FileInput]
-        ("data", True): str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
-    }
-
-    for (param_name, expected_class), exception_type in exceptions.items():
+    for (param_name, expected_class), exception_type in EXCEPTIONS.items():
         if ptb_param.name == param_name and is_class is expected_class:
             ptb_annotation = exception_type
 
     # Special case for datetimes
     if re.search(r"([_]+|\b)date[^\w]*\b", ptb_param.name) or "Unix time" in tg_parameter[-1]:
-        print("datetime found")
+        # TODO: Remove this in v22 when it becomes a datetime
+        datetime_exceptions = {
+            "file_date",
+        }
+        if ptb_param.name in datetime_exceptions:
+            return True
         # If it's a class, we only accept datetime as the parameter
         mapped_type = datetime if is_class else mapped_type | datetime
 
