@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import PassportElementErrorSelfie, PassportElementErrorTranslationFiles
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -50,8 +51,8 @@ class TestPassportElementErrorTranslationFilesWithoutRequest(
     def test_expected_values(self, passport_element_error_translation_files):
         assert passport_element_error_translation_files.source == self.source
         assert passport_element_error_translation_files.type == self.type_
-        assert isinstance(passport_element_error_translation_files.file_hashes, tuple)
-        assert passport_element_error_translation_files.file_hashes == tuple(self.file_hashes)
+        assert isinstance(passport_element_error_translation_files.file_hashes, list)
+        assert passport_element_error_translation_files.file_hashes == self.file_hashes
         assert passport_element_error_translation_files.message == self.message
 
     def test_to_dict(self, passport_element_error_translation_files):
@@ -69,13 +70,18 @@ class TestPassportElementErrorTranslationFilesWithoutRequest(
             == passport_element_error_translation_files.type
         )
         assert (
-            tuple(passport_element_error_translation_files_dict["file_hashes"])
-            == passport_element_error_translation_files.file_hashes
-        )
-        assert (
             passport_element_error_translation_files_dict["message"]
             == passport_element_error_translation_files.message
         )
+
+    def test_file_hashes_deprecated(self, passport_element_error_translation_files, recwarn):
+        passport_element_error_translation_files.file_hashes
+        assert len(recwarn) == 1
+        assert "The attribute `file_hashes` will return a tuple instead of a list in v22." in str(
+            recwarn[0].message
+        )
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert recwarn[0].filename == __file__
 
     def test_equality(self):
         a = PassportElementErrorTranslationFiles(self.type_, self.file_hashes, self.message)

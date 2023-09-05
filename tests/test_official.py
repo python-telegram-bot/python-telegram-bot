@@ -30,6 +30,7 @@ from bs4 import BeautifulSoup, PageElement, Tag
 import telegram
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import DVInput, FileInput, ODVInput
+from telegram.ext import Defaults
 from tests.auxil.envvars import env_var_2_bool
 
 IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
@@ -62,6 +63,28 @@ PTB_EXTRA_PARAMS = {
     "InputMedia": {"caption", "caption_entities", "media", "media_type", "parse_mode"},
     "InputMedia(Animation|Audio|Document|Photo|Video|VideoNote|Voice)": {"filename"},
     "InputFile": {"attach", "filename", "obj"},
+}
+
+# Types for certain parameters accepted by PTB but not in the official API
+ADDITIONAL_TYPES = {
+    "photo": ForwardRef("PhotoSize"),
+    "video": ForwardRef("Video"),
+    "video_note": ForwardRef("VideoNote"),
+    "audio": ForwardRef("Audio"),
+    "document": ForwardRef("Document"),
+    "animation": ForwardRef("Animation"),
+    "voice": ForwardRef("Voice"),
+    "sticker": ForwardRef("Sticker"),
+}
+
+# Exceptions to the "Array of" types, where we accept more types than the official API
+# key: parameter name, value: type which must be present in the annotation
+ARRAY_OF_EXCEPTIONS = {
+    "results": "InlineQueryResult",  # + Callable
+    "commands": "BotCommand",  # + tuple[str, str]
+    "keyboard": "KeyboardButton",  # + sequence[sequence[str]]
+    # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
+    "file_hashes": "list[str]",
 }
 
 
@@ -316,7 +339,11 @@ def check_param_type(
 
     tg_param_type: str = tg_parameter[1]  # Type of parameter as specified in the docs
     is_class = inspect.isclass(obj)
+    # Let's check for a match:
     mapped: set[type] = _get_params_base(tg_param_type, TYPE_MAPPING)
+
+    # We should have a maximum of one match.
+    assert len(mapped) <= 1, f"More than one match found for {tg_param_type}"
 
     if not mapped:  # no match found, it's from telegram module
         # it could be a list of objects, so let's check that:
@@ -329,7 +356,7 @@ def check_param_type(
             mapped_type = (
                 getattr(telegram, tg_param_type),  # This will fail if it's not from telegram mod
                 ForwardRef(tg_param_type),
-                tg_param_type,  # for some reason, some annotations are not ForwardRefs, i.e. str.
+                tg_param_type,  # for some reason, some annotations are just a string.
             )
         print("len mapped 0 ", mapped_type)
     elif len(mapped) == 1:
@@ -346,8 +373,8 @@ def check_param_type(
         # Some cleaning:
         # Remove 'Optional[...]' from the annotation if it's present. We do it this way since: 1)
         # we already check if argument should be optional or not + type checkers will complain.
-        # 2) we don't want to deal with Optional[..] skewing the equality check of our annotation
-        # with the official API, i.e. Optional[int] == int.
+        # 2) we want to check if our `obj` is same as API's `obj`, and since python evaluates
+        # `Optional[obj] != obj` we have to remove the Optional, so that we can compare the two.
         if type(None) in ptb_annotation:
             print(f"found None in {ptb_param.name}")
             ptb_annotation.remove(type(None))
@@ -372,16 +399,11 @@ def check_param_type(
     if "Array of " in tg_param_type:
         print("array of ", ptb_param.annotation)
 
+        assert mapped_type is Sequence
         # For exceptions just check if they contain the annotation
-        array_of_exceptions = {  # We accept more types than the official API
-            "results": "InlineQueryResult",
-            "commands": "BotCommand",
-            "keyboard": "KeyboardButton",
-        }
-        if ptb_param.name in array_of_exceptions:
-            return array_of_exceptions[ptb_param.name] in str(ptb_annotation)
+        if ptb_param.name in ARRAY_OF_EXCEPTIONS:
+            return ARRAY_OF_EXCEPTIONS[ptb_param.name] in str(ptb_annotation)
 
-        # let's import obj
         pattern = r"Array of(?: Array of)? ([\w\,\s]*)"
         obj_match: re.Match | None = re.search(pattern, tg_param_type)  # extract obj from string
         if obj_match is None:
@@ -400,7 +422,6 @@ def check_param_type(
             print("from TYPE_MAPPING")
             unionized_objs = [array_of_mapped.pop()]
 
-        assert mapped_type is Sequence
         # This means it is Array of Array of [obj]
         if "Array of Array of" in tg_param_type:
             # print('isinstance 1', Sequence[Sequence[obj]], ptb_annotation)
@@ -410,44 +431,25 @@ def check_param_type(
         # print('isinstance 2', mapped_type[obj], ptb_annotation)
         return any(mapped_type[o] == ptb_annotation for o in unionized_objs)
 
-    DEFAULT_VAL_PARAMS = {
-        "parse_mode",
-        "disable_notification",
-        "allow_sending_without_reply",
-        "protect_content",
-        "disable_web_page_preview",
-        "explanation_parse_mode",
-    }
-
     # Special case for when the parameter is a default value parameter
-    if ptb_param.name in DEFAULT_VAL_PARAMS:
-        # Check if it's DVInput or ODVInput
-        for param_type in [DVInput, ODVInput]:
-            parsed = param_type[mapped_type]
-            if ptb_annotation == parsed:
-                return True
-        # print(f"cause {mapped_type} != {ptb_annotation} for {ptb_param.name}")
-        return False
+    for name, _ in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
+        if name in ptb_param.name:  # no strict == since we have a param: `explanation_parse_mode`
+            # Check if it's DVInput or ODVInput
+            for param_type in [DVInput, ODVInput]:
+                parsed = param_type[mapped_type]
+                if ptb_annotation == parsed:
+                    return True
+            # print(f"cause {mapped_type} != {ptb_annotation} for {ptb_param.name}")
+            return False
 
     # Special case for send_* methods where we accept more types than the official API:
-    additional_types = {
-        "photo": ForwardRef("PhotoSize"),
-        "video": ForwardRef("Video"),
-        "video_note": ForwardRef("VideoNote"),
-        "audio": ForwardRef("Audio"),
-        "document": ForwardRef("Document"),
-        "animation": ForwardRef("Animation"),
-        "voice": ForwardRef("Voice"),
-        "sticker": ForwardRef("Sticker"),
-    }
-
     if (
-        ptb_param.name in additional_types
+        ptb_param.name in ADDITIONAL_TYPES
         and not isinstance(mapped_type, tuple)
         and obj.__name__.startswith("send")
     ):
         print("additional_types ")
-        mapped_type = mapped_type | additional_types[ptb_param.name]
+        mapped_type = mapped_type | ADDITIONAL_TYPES[ptb_param.name]
 
     # Special cases for other methods that accept more types than the official API, and are
     # too complex to compare/predict with official API:
@@ -466,7 +468,7 @@ def check_param_type(
             ptb_annotation = exception_type
 
     # Special case for datetimes
-    if re.search(r"([_]+|\b)date[^\w]*\b", ptb_param.name):
+    if re.search(r"([_]+|\b)date[^\w]*\b", ptb_param.name) or "Unix time" in tg_parameter[-1]:
         print("datetime found")
         # If it's a class, we only accept datetime as the parameter
         mapped_type = datetime if is_class else mapped_type | datetime
