@@ -67,7 +67,6 @@ __all__ = (
     "Language",
     "MessageFilter",
     "Mention",
-    "MENTION",
     "PASSPORT_DATA",
     "PHOTO",
     "POLL",
@@ -92,7 +91,6 @@ __all__ = (
     "VOICE",
     "ViaBot",
 )
-
 import mimetypes
 import re
 from abc import ABC, abstractmethod
@@ -100,6 +98,7 @@ from typing import (
     Collection,
     Dict,
     FrozenSet,
+    Iterable,
     List,
     Match,
     NoReturn,
@@ -110,7 +109,6 @@ from typing import (
     Tuple,
     Union,
     cast,
-    Iterable,
 )
 
 from telegram import Chat as TGChat
@@ -2551,8 +2549,9 @@ VOICE = _Voice("filters.VOICE")
 
 
 class Mention(MessageFilter):
-    """Mention messages. If list of username or chat_id or `User` objects passed, it filters
-    messages to only allow those whose contains one of username  or chat_id or `User`.
+    """Mention messages. If list of username or chat_id or :attr:`telegram.User` objects passed,
+    it filters messages to only allow those whose contains one of username
+    or chat_id or :attr:`telegram.User`.
     Note:
         Usernames only allowed with @ prefix. Example: "@username"
         Chat id only allowed with positive numbers. Example: 123456
@@ -2560,12 +2559,13 @@ class Mention(MessageFilter):
         A simple use case for passing username is to allow only messages that were sent with
         mention username:
         MessageHandler(filters.Mention("@username"), callback_method)
-        MessageHandler(filters.Mention(["@username",`123456`,`user`), callback_method)
+        MessageHandler(filters.Mention(["@username",123456, `user` ), callback_method)
     Args:
-        mentions (Union[:obj:`str`,:obj:`str`,:obj:`User`] |
-        Collection[Union[:obj:`str`,:obj:`str`,:obj:`User`]]): Which messages to allow with
-        username or chat_id or `User` object.If one of them matched it will allow.
-        If not specified, will allow any text message with mention.
+        mentions (Union[:obj:`str` ,:obj:`str` ,:attr:`telegram.User` ] ||
+        Collection[Union[:obj:`str` ,:obj`str` ,:attr:`telegram.User` ]]):
+        Which messages to allow with username or chat_id or :attr:`telegram.User` object.
+        If one of them matched it will allow. If not specified,
+        will allow any text message with mention.
     """
 
     __slots__ = ("mention", "_mentions")
@@ -2575,47 +2575,31 @@ class Mention(MessageFilter):
         super().__init__(name=f"filters.Mention({mentions})")
 
     @staticmethod
-    def _parse_mentions(
-        mentions: SCT[Union[int, str, TGUser]]
-    ) -> Iterable[Union[int, str, TGUser]]:
+    def _parse_mentions(mentions: SCT[Union[int, str, TGUser]]) -> Set[Union[int, str, TGUser]]:
         if isinstance(mentions, Iterable) and not isinstance(mentions, str):
             return set(mentions)
-        return set(mentions)
+        return {mentions}
 
     @property
     def mentions(self) -> FrozenSet[Union[int, str, TGUser]]:
+        """Which mention(s) to allow through.
+        Returns:
+            frozenset(Union[:obj:`int` , :obj:`str`, :attr:`telegram.User` ])
+        """
         return frozenset(self._mentions)
 
-    def check_mention(self, message: Message, mention: Union[int, str, TGUser]) -> bool:
-        if isinstance(mention, TGUser) and bool(
-            any(mention.id == e.user.id for e in message.entities if e.user)
-        ):
-            return True
-        if str(mention).isdigit() and bool(
-            any(mention == e.user.id for e in message.entities if e.user)
-        ):
-            return True
-        if (
+    @staticmethod
+    def _check_mention(message: Message, mention: Union[int, str, TGUser]) -> bool:
+        if isinstance(mention, TGUser):
+            return bool(any(mention.id == e.user.id for e in message.entities if e.user))
+        if isinstance(mention, int):
+            return bool(any(mention == e.user.id for e in message.entities if e.user))
+        return bool(
             isinstance(mention, str)
-            and bool(any(e.type == MessageEntity.MENTION for e in message.entities))
+            and bool(any(e.type == MessageEntity.MENTION for e in message.parse_entities()))
             and message.text
             and mention in message.text
-        ):
-            return True
-        return False
+        )
 
     def filter(self, message: Message) -> bool:
-        if any(self.check_mention(message, mention) for mention in self.mentions):
-            return True
-        return False
-
-
-MENTION = Mention
-"""
-Shortcut for :class:`telegram.ext.filters.Mention()`.
-
-Examples:
-    To allow any text message that contains mention, simply use
-    ``MessageHandler(filters.MENTION("@username"), callback_method)`` or
-    ``MessageHandler(filters.MENTION(["@username",`123456`,`user`), callback_method)``.
-"""
+        return any(self._check_mention(message, mention) for mention in self.mentions)
