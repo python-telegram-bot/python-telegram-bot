@@ -127,7 +127,7 @@ class CallbackQuery(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.id: str = id  # pylint: disable=invalid-name
+        self.id: str = id
         self.from_user: User = from_user
         self.chat_instance: str = chat_instance
         # Optionals

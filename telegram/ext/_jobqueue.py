@@ -107,14 +107,14 @@ class JobQueue(Generic[CCT]):
     @overload
     def _parse_time_input(
         self,
-        time: Union[float, int, datetime.timedelta, datetime.datetime, datetime.time],
+        time: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
         shift_day: bool = False,
     ) -> datetime.datetime:
         ...
 
     def _parse_time_input(
         self,
-        time: Union[float, int, datetime.timedelta, datetime.datetime, datetime.time, None],
+        time: Union[float, datetime.timedelta, datetime.datetime, datetime.time, None],
         shift_day: bool = False,
     ) -> Optional[datetime.datetime]:
         if time is None:
