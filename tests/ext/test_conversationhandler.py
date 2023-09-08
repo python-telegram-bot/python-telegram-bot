@@ -291,8 +291,22 @@ class TestConversationHandler:
                 self.entry_points, states=self.states, fallbacks=[], persistent=True
             )
 
-    def test_repr(self):
-        # This function tests special behaviour not inherited from BaseHandler.
+    def test_repr_no_truncation(self):
+        # ConversationHandler's __repr__ is not inherited from BaseHandler.
+        ch = ConversationHandler(
+            name="test_handler",
+            entry_points=[],
+            states=self.drinking_states,
+            fallbacks=[],
+        )
+        assert repr(ch) == (
+            "ConversationHandler[name=test_handler, "
+            "states=('a', [CommandHandler[callback=TestConversationHandler.sip]]), "
+            "('b', [CommandHandler[callback=TestConversationHandler.swallow]]), "
+            "('c', [CommandHandler[callback=TestConversationHandler.hold]])]"
+        )
+
+    def test_repr_with_truncation(self):
         from copy import copy
 
         states = copy(self.drinking_states)
