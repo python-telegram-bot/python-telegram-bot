@@ -292,9 +292,7 @@ class TestConversationHandler:
             )
 
     def test_repr(self):
-        # This function tests behaviour inherited from BaseHandler.
-        # TODO should this test be repeated in all other subclasses of BaseHandler except for
-        #  ConversationHandler that has its own __repr__?
+        # This function tests special behaviour not inherited from BaseHandler.
         from copy import copy
 
         states = copy(self.drinking_states)
