@@ -93,8 +93,8 @@ class TestPassportFileWithoutRequest(TestPassportFileBase):
         passport_file.file_date
         assert len(recwarn) == 1
         assert (
-            "The attribute `file_date` will return a datetime instead of an integer in v22."
-            in str(recwarn[0].message)
+            "The attribute `file_date` will return a datetime instead of an integer in future"
+            " major versions." in str(recwarn[0].message)
         )
         assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__

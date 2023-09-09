@@ -48,7 +48,8 @@ class PassportFile(TelegramObject):
         file_date (:obj:`int`): Unix time when the file was uploaded.
 
             .. deprecated:: NEXT.VERSION
-                This argument will only accept a datetime instead of an integer in v22.
+                This argument will only accept a datetime instead of an integer in future
+                major versions.
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -103,10 +104,11 @@ class PassportFile(TelegramObject):
         """:obj:`int`: Unix time when the file was uploaded.
 
         .. deprecated:: NEXT.VERSION
-            This attribute will return a datetime instead of a integer in v22.
+            This attribute will return a datetime instead of a integer in future major versions.
         """
         warn(
-            "The attribute `file_date` will return a datetime instead of an integer in v22.",
+            "The attribute `file_date` will return a datetime instead of an integer in future"
+            " major versions.",
             PTBDeprecationWarning,
             stacklevel=2,
         )

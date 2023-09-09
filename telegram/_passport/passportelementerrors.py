@@ -207,10 +207,11 @@ class PassportElementErrorFiles(PassportElementError):
         """List of base64-encoded file hashes.
 
         .. deprecated:: NEXT.VERSION
-            This attribute will return a tuple instead of a list in v22.
+            This attribute will return a tuple instead of a list in future major versions.
         """
         warn(
-            "The attribute `file_hashes` will return a tuple instead of a list in v22.",
+            "The attribute `file_hashes` will return a tuple instead of a list in future major"
+            " versions.",
             PTBDeprecationWarning,
             stacklevel=2,
         )
@@ -423,12 +424,12 @@ class PassportElementErrorTranslationFiles(PassportElementError):
         """List of base64-encoded file hashes.
 
         .. deprecated:: NEXT.VERSION
-            This attribute will return a tuple instead of a list in v22.
+            This attribute will return a tuple instead of a list in future major versions.
         """
         warn(
-            "The attribute `file_hashes` will return a tuple instead of a list in v22. See the "
-            "stability policy: "
-            "https://docs.python-telegram-bot.org/en/stable/stability_policy.html",
+            "The attribute `file_hashes` will return a tuple instead of a list in future major"
+            " versions. See the stability policy:"
+            " https://docs.python-telegram-bot.org/en/stable/stability_policy.html",
             PTBDeprecationWarning,
             stacklevel=2,
         )
