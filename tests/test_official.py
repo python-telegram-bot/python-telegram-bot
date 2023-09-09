@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import inspect
-import os
 import re
 from datetime import datetime
 from types import FunctionType
@@ -31,7 +30,7 @@ import telegram
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import DVInput, FileInput, ODVInput
 from telegram.ext import Defaults
-from tests.auxil.envvars import env_var_2_bool
+from tests.auxil.envvars import RUN_TEST_OFFICIAL
 
 IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
 GLOBALLY_IGNORED_PARAMETERS = {
@@ -345,6 +344,7 @@ def check_param_type(
         "String": {str},
         r"Boolean|True": {bool},
         r"Float(?: number)?": {float},
+        # Distinguishing 1D and 2D Sequences and finding the inner type is done later.
         r"Array of (?:Array of )?[\w\,\s]*": {Sequence},
         r"InputFile(?: or String)?": {FileInput},
     }
@@ -507,11 +507,10 @@ def _unionizer(annotation: Sequence[Any] | set[Any], forward_ref: bool) -> Any:
     return union
 
 
-to_run = env_var_2_bool(os.getenv("TEST_OFFICIAL"))
 argvalues: list[tuple[Callable[[Tag], None], Tag]] = []
 names: list[str] = []
 
-if to_run:
+if RUN_TEST_OFFICIAL:
     argvalues = []
     names = []
     request = httpx.get("https://core.telegram.org/bots/api")
@@ -534,7 +533,7 @@ if to_run:
                 names.append(h4.text)
 
 
-@pytest.mark.skipif(not to_run, reason="test_official is not enabled")
+@pytest.mark.skipif(not RUN_TEST_OFFICIAL, reason="test_official is not enabled")
 @pytest.mark.parametrize(("method", "data"), argvalues=argvalues, ids=names)
 def test_official(method, data):
     method(data)
