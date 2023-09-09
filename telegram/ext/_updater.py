@@ -163,7 +163,7 @@ class Updater(AsyncContextManager["Updater"]):
         self._initialized = False
         _LOGGER.debug("Shut down of Updater complete")
 
-    async def __aenter__(self: _UpdaterType) -> _UpdaterType:
+    async def __aenter__(self: _UpdaterType) -> _UpdaterType:  # noqa: PYI019
         """Simple context manager which initializes the Updater."""
         try:
             await self.initialize()

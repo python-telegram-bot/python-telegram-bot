@@ -854,7 +854,7 @@ class Message(TelegramObject):
         return self.chat.id
 
     @property
-    def id(self) -> int:  # pylint: disable=invalid-name
+    def id(self) -> int:
         """
         :obj:`int`: Shortcut for :attr:`message_id`.
 
