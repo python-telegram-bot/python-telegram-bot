@@ -194,7 +194,7 @@ class AdmonitionInserter:
                         )
                     except NotImplementedError as e:
                         raise NotImplementedError(
-                            f"Error generating Sphinx 'Available in' admonition "
+                            "Error generating Sphinx 'Available in' admonition "
                             f"(admonition_inserter.py). Class {name_of_class_in_attr} present in "
                             f"attribute {target_attr} of class {name_of_inspected_class_in_docstr}"
                             f" could not be resolved. {str(e)}"
@@ -237,7 +237,7 @@ class AdmonitionInserter:
                         )
                     except NotImplementedError as e:
                         raise NotImplementedError(
-                            f"Error generating Sphinx 'Available in' admonition "
+                            "Error generating Sphinx 'Available in' admonition "
                             f"(admonition_inserter.py). Class {name_of_class_in_prop} present in "
                             f"property {prop_name} of class {name_of_inspected_class_in_docstr}"
                             f" could not be resolved. {str(e)}"
@@ -269,7 +269,7 @@ class AdmonitionInserter:
                     )
                 except NotImplementedError as e:
                     raise NotImplementedError(
-                        f"Error generating Sphinx 'Returned in' admonition "
+                        "Error generating Sphinx 'Returned in' admonition "
                         f"(admonition_inserter.py). {cls}, method {method_name}. "
                         f"Couldn't resolve type hint in return annotation {ret_annot}. {str(e)}"
                     )
@@ -342,7 +342,7 @@ class AdmonitionInserter:
                         )
                     except NotImplementedError as e:
                         raise NotImplementedError(
-                            f"Error generating Sphinx 'Use in' admonition "
+                            "Error generating Sphinx 'Use in' admonition "
                             f"(admonition_inserter.py). {cls}, method {method_name}, parameter "
                             f"{param}: Couldn't resolve type hint {param.annotation}. {str(e)}"
                         )
