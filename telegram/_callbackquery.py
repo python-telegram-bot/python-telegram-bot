@@ -771,9 +771,9 @@ class CallbackQuery(TelegramObject):
             message_thread_id=message_thread_id,
         )
 
-    MAX_ANSWER_TEXT_LENGTH: Final[
-        int
-    ] = constants.CallbackQueryLimit.ANSWER_CALLBACK_QUERY_TEXT_LENGTH
+    MAX_ANSWER_TEXT_LENGTH: Final[int] = (
+        constants.CallbackQueryLimit.ANSWER_CALLBACK_QUERY_TEXT_LENGTH
+    )
     """
     :const:`telegram.constants.CallbackQueryLimit.ANSWER_CALLBACK_QUERY_TEXT_LENGTH`
 

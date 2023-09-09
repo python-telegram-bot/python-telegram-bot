@@ -796,9 +796,9 @@ class Message(TelegramObject):
         self.migrate_to_chat_id: Optional[int] = migrate_to_chat_id
         self.migrate_from_chat_id: Optional[int] = migrate_from_chat_id
         self.channel_chat_created: Optional[bool] = bool(channel_chat_created)
-        self.message_auto_delete_timer_changed: Optional[
-            MessageAutoDeleteTimerChanged
-        ] = message_auto_delete_timer_changed
+        self.message_auto_delete_timer_changed: Optional[MessageAutoDeleteTimerChanged] = (
+            message_auto_delete_timer_changed
+        )
         self.pinned_message: Optional[Message] = pinned_message
         self.forward_from_message_id: Optional[int] = forward_from_message_id
         self.invoice: Optional[Invoice] = invoice
@@ -813,15 +813,15 @@ class Message(TelegramObject):
         self.poll: Optional[Poll] = poll
         self.dice: Optional[Dice] = dice
         self.via_bot: Optional[User] = via_bot
-        self.proximity_alert_triggered: Optional[
-            ProximityAlertTriggered
-        ] = proximity_alert_triggered
+        self.proximity_alert_triggered: Optional[ProximityAlertTriggered] = (
+            proximity_alert_triggered
+        )
         self.video_chat_scheduled: Optional[VideoChatScheduled] = video_chat_scheduled
         self.video_chat_started: Optional[VideoChatStarted] = video_chat_started
         self.video_chat_ended: Optional[VideoChatEnded] = video_chat_ended
-        self.video_chat_participants_invited: Optional[
-            VideoChatParticipantsInvited
-        ] = video_chat_participants_invited
+        self.video_chat_participants_invited: Optional[VideoChatParticipantsInvited] = (
+            video_chat_participants_invited
+        )
         self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
         self.web_app_data: Optional[WebAppData] = web_app_data
         self.is_topic_message: Optional[bool] = is_topic_message
@@ -830,12 +830,12 @@ class Message(TelegramObject):
         self.forum_topic_closed: Optional[ForumTopicClosed] = forum_topic_closed
         self.forum_topic_reopened: Optional[ForumTopicReopened] = forum_topic_reopened
         self.forum_topic_edited: Optional[ForumTopicEdited] = forum_topic_edited
-        self.general_forum_topic_hidden: Optional[
-            GeneralForumTopicHidden
-        ] = general_forum_topic_hidden
-        self.general_forum_topic_unhidden: Optional[
-            GeneralForumTopicUnhidden
-        ] = general_forum_topic_unhidden
+        self.general_forum_topic_hidden: Optional[GeneralForumTopicHidden] = (
+            general_forum_topic_hidden
+        )
+        self.general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = (
+            general_forum_topic_unhidden
+        )
         self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
         self.has_media_spoiler: Optional[bool] = has_media_spoiler
         self.user_shared: Optional[UserShared] = user_shared

@@ -106,11 +106,11 @@ class InlineQueryResultsButton(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    MIN_START_PARAMETER_LENGTH: Final[
-        int
-    ] = constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH
+    MIN_START_PARAMETER_LENGTH: Final[int] = (
+        constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH
+    )
     """:const:`telegram.constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH`"""
-    MAX_START_PARAMETER_LENGTH: Final[
-        int
-    ] = constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH
+    MAX_START_PARAMETER_LENGTH: Final[int] = (
+        constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH
+    )
     """:const:`telegram.constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`"""

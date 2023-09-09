@@ -245,9 +245,9 @@ class InlineKeyboardButton(TelegramObject):
         self.callback_game: Optional[CallbackGame] = callback_game
         self.pay: Optional[bool] = pay
         self.web_app: Optional[WebAppInfo] = web_app
-        self.switch_inline_query_chosen_chat: Optional[
-            SwitchInlineQueryChosenChat
-        ] = switch_inline_query_chosen_chat
+        self.switch_inline_query_chosen_chat: Optional[SwitchInlineQueryChosenChat] = (
+            switch_inline_query_chosen_chat
+        )
         self._id_attrs = ()
         self._set_id_attrs()
 

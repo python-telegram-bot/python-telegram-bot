@@ -394,21 +394,25 @@ class TestConversationHandler:
         assert len(recwarn) == 13
         # now we test the messages, they are raised in the order they are inserted
         # into the conversation handler
-        assert str(recwarn[0].message) == (
-            "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+        assert (
+            str(recwarn[0].message)
+            == "The `ConversationHandler` only handles updates of type `telegram.Update`. "
             "StringCommandHandler handles updates of type `str`."
         )
-        assert str(recwarn[1].message) == (
-            "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+        assert (
+            str(recwarn[1].message)
+            == "The `ConversationHandler` only handles updates of type `telegram.Update`. "
             "StringRegexHandler handles updates of type `str`."
         )
-        assert str(recwarn[2].message) == (
-            "PollHandler will never trigger in a conversation since it has no information "
+        assert (
+            str(recwarn[2].message)
+            == "PollHandler will never trigger in a conversation since it has no information "
             "about the chat or the user who voted in it. Do you mean the "
             "`PollAnswerHandler`?"
         )
-        assert str(recwarn[3].message) == (
-            "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+        assert (
+            str(recwarn[3].message)
+            == "The `ConversationHandler` only handles updates of type `telegram.Update`. "
             "The TypeHandler is set to handle NotUpdate."
         )
 
@@ -420,23 +424,28 @@ class TestConversationHandler:
 
         assert str(recwarn[4].message) == (
             "Updates handled by ShippingQueryHandler only have information about the user,"
-            " so this handler won't ever be triggered if `per_chat=True`." + per_faq_link
+            " so this handler won't ever be triggered if `per_chat=True`."
+            + per_faq_link
         )
         assert str(recwarn[5].message) == (
             "Updates handled by ChosenInlineResultHandler only have information about the user,"
-            " so this handler won't ever be triggered if `per_chat=True`." + per_faq_link
+            " so this handler won't ever be triggered if `per_chat=True`."
+            + per_faq_link
         )
         assert str(recwarn[6].message) == (
             "Updates handled by InlineQueryHandler only have information about the user,"
-            " so this handler won't ever be triggered if `per_chat=True`." + per_faq_link
+            " so this handler won't ever be triggered if `per_chat=True`."
+            + per_faq_link
         )
         assert str(recwarn[7].message) == (
             "Updates handled by PreCheckoutQueryHandler only have information about the user,"
-            " so this handler won't ever be triggered if `per_chat=True`." + per_faq_link
+            " so this handler won't ever be triggered if `per_chat=True`."
+            + per_faq_link
         )
         assert str(recwarn[8].message) == (
             "Updates handled by PollAnswerHandler only have information about the user,"
-            " so this handler won't ever be triggered if `per_chat=True`." + per_faq_link
+            " so this handler won't ever be triggered if `per_chat=True`."
+            + per_faq_link
         )
         assert str(recwarn[9].message) == (
             "If 'per_message=True', all entry points, state handlers, and fallbacks must be "
@@ -444,17 +453,19 @@ class TestConversationHandler:
             + per_faq_link
         )
         assert str(recwarn[10].message) == (
-            "If 'per_message=False', 'CallbackQueryHandler' will not be tracked for "
-            "every message." + per_faq_link
+            "If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message."
+            + per_faq_link
         )
-        assert str(recwarn[11].message) == (
-            "Using `conversation_timeout` with nested conversations is currently not "
+        assert (
+            str(recwarn[11].message)
+            == "Using `conversation_timeout` with nested conversations is currently not "
             "supported. You can still try to use it, but it will likely behave differently"
             " from what you expect."
         )
 
-        assert str(recwarn[12].message) == (
-            "If 'per_message=True' is used, 'per_chat=True' should also be used, "
+        assert (
+            str(recwarn[12].message)
+            == "If 'per_message=True' is used, 'per_chat=True' should also be used, "
             "since message IDs are not globally unique."
         )
 
@@ -684,8 +695,9 @@ class TestConversationHandler:
                 Path(recwarn[0].filename)
                 == PROJECT_ROOT_PATH / "telegram" / "ext" / "_conversationhandler.py"
             ), "wrong stacklevel!"
-            assert str(recwarn[0].message) == (
-                "'callback' returned state 69 which is unknown to the ConversationHandler xyz."
+            assert (
+                str(recwarn[0].message)
+                == "'callback' returned state 69 which is unknown to the ConversationHandler xyz."
             )
 
     async def test_conversation_handler_per_chat(self, app, bot, user1, user2):

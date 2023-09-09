@@ -938,7 +938,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             warn(
                 f"Could not add signal handlers for the stop signals {stop_signals} due to "
                 f"exception `{exc!r}`. If your event loop does not implement `add_signal_handler`,"
-                f" please pass `stop_signals=None`.",
+                " please pass `stop_signals=None`.",
                 stacklevel=3,
             )
 
@@ -1070,8 +1070,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(
-                    "ApplicationHandlerStop is not supported with handlers "
-                    "running non-blocking.",
+                    "ApplicationHandlerStop is not supported with handlers running non-blocking.",
                     stacklevel=1,
                 )
 
@@ -1176,8 +1175,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                             self.create_task(
                                 coroutine,
                                 update=update,
-                                name=f"Application:{self.bot.id}:process_update_non_blocking"
-                                f":{handler}",
+                                name=(
+                                    f"Application:{self.bot.id}:process_update_non_blocking"
+                                    f":{handler}"
+                                ),
                             )
                         else:
                             any_blocking = True
@@ -1246,7 +1247,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             if not self.persistence:
                 raise ValueError(
                     f"ConversationHandler {handler.name} "
-                    f"can not be persistent if application has no persistence"
+                    "can not be persistent if application has no persistence"
                 )
             if self._initialized:
                 self.create_task(

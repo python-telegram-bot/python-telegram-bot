@@ -12,6 +12,7 @@ repos:
         args:
         - --diff
         - --check
+        - --preview
 -   repo: https://github.com/PyCQA/flake8
     rev: 6.1.0
     hooks:

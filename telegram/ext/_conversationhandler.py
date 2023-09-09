@@ -331,9 +331,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         self._per_user: bool = per_user
         self._per_chat: bool = per_chat
         self._per_message: bool = per_message
-        self._conversation_timeout: Optional[
-            Union[float, datetime.timedelta]
-        ] = conversation_timeout
+        self._conversation_timeout: Optional[Union[float, datetime.timedelta]] = (
+            conversation_timeout
+        )
         self._name: Optional[str] = name
         self._map_to_parent: Optional[Dict[object, object]] = map_to_parent
 
@@ -413,7 +413,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             ):
                 warn(
                     f"Updates handled by {handler.__class__.__name__} only have information about "
-                    f"the user, so this handler won't ever be triggered if `per_chat=True`."
+                    "the user, so this handler won't ever be triggered if `per_chat=True`."
                     f"{per_faq_link}",
                     stacklevel=2,
                 )

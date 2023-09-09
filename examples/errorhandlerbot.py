@@ -40,7 +40,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
     # You might need to add some logic to deal with messages longer than the 4096 character limit.
     update_str = update.to_dict() if isinstance(update, Update) else str(update)
     message = (
-        f"An exception was raised while handling an update\n"
+        "An exception was raised while handling an update\n"
         f"<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}"
         "</pre>\n\n"
         f"<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>\n\n"
