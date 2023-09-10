@@ -301,9 +301,9 @@ class TestConversationHandler:
         )
         assert repr(ch) == (
             "ConversationHandler[name=test_handler, "
-            "states=('a', [CommandHandler[callback=TestConversationHandler.sip]]), "
-            "('b', [CommandHandler[callback=TestConversationHandler.swallow]]), "
-            "('c', [CommandHandler[callback=TestConversationHandler.hold]])]"
+            "states={'a': [CommandHandler[callback=TestConversationHandler.sip]], "
+            "'b': [CommandHandler[callback=TestConversationHandler.swallow]], "
+            "'c': [CommandHandler[callback=TestConversationHandler.hold]]}]"
         )
 
     def test_repr_with_truncation(self):
@@ -321,9 +321,9 @@ class TestConversationHandler:
         )
         assert repr(ch) == (
             "ConversationHandler[name=test_handler, "
-            "states=('a', [CommandHandler[callback=TestConversationHandler.sip]]), "
-            "('b', [CommandHandler[callback=TestConversationHandler.swallow]]), "
-            "('c', [CommandHandler[callback=TestConversationHandler.hold]]), ...]"
+            "states={'a': [CommandHandler[callback=TestConversationHandler.sip]], "
+            "'b': [CommandHandler[callback=TestConversationHandler.swallow]], "
+            "'c': [CommandHandler[callback=TestConversationHandler.hold]], ...}]"
         )
 
     async def test_check_update_returns_non(self, app, user1):
