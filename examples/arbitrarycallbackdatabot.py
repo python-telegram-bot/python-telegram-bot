@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument, import-error
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """This example showcases how PTBs "arbitrary callback data" feature can be used.

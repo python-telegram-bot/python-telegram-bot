@@ -302,7 +302,7 @@ class Poll(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id  # pylint: disable=invalid-name
+        self.id: str = id
         self.question: str = question
         self.options: Tuple[PollOption, ...] = parse_sequence_arg(options)
         self.total_voter_count: int = total_voter_count

@@ -67,7 +67,7 @@ class ShippingQuery(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id  # pylint: disable=invalid-name
+        self.id: str = id
         self.from_user: User = from_user
         self.invoice_payload: str = invoice_payload
         self.shipping_address: ShippingAddress = shipping_address
@@ -89,7 +89,7 @@ class ShippingQuery(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    async def answer(  # pylint: disable=invalid-name
+    async def answer(
         self,
         ok: bool,
         shipping_options: Optional[Sequence[ShippingOption]] = None,

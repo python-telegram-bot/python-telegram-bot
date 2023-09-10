@@ -153,7 +153,7 @@ class User(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.id: int = id  # pylint: disable=invalid-name
+        self.id: int = id
         self.first_name: str = first_name
         self.is_bot: bool = is_bot
         # Optionals
