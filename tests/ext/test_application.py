@@ -202,26 +202,8 @@ class TestApplication:
         assert isinstance(app.user_data[1], dict)
 
     @pytest.mark.filterwarnings("ignore: `Application` instances should")
-    async def test_repr(self, one_time_bot):
-        update_queue = asyncio.Queue()
-        job_queue = JobQueue()
-        context_types = ContextTypes()
-        update_processor = SimpleUpdateProcessor(1)
-
-        app = Application(
-            bot=one_time_bot,
-            update_queue=update_queue,
-            job_queue=job_queue,
-            persistence=None,
-            context_types=context_types,
-            updater=None,
-            update_processor=update_processor,
-            post_init=None,
-            post_shutdown=None,
-            post_stop=None,
-        )
-
-        assert repr(app) == f"Application[bot={app.bot!r}]"
+    async def test_repr(self, app):
+        assert repr(app) == f"PytestApplication[bot={app.bot!r}]"
 
     def test_job_queue(self, one_time_bot, app, recwarn):
         expected_warning = (
