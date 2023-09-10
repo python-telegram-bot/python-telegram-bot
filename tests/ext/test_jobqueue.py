@@ -86,8 +86,6 @@ class TestJobQueue:
     )
 
     async def test_repr(self, app):
-        import datetime as dtm
-
         jq = JobQueue()
         jq.set_application(app)
         assert repr(jq) == f"JobQueue[application={app!r}]"
