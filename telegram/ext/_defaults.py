@@ -239,6 +239,3 @@ class Defaults:
         if isinstance(other, Defaults):
             return all(getattr(self, attr) == getattr(other, attr) for attr in self.__slots__)
         return False
-
-    def __ne__(self, other: object) -> bool:
-        return not self == other
