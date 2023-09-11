@@ -97,6 +97,14 @@ class BaseHandler(Generic[UT, CCT], ABC):
         self.block: DVType[bool] = block
 
     def __repr__(self) -> str:
+        """Give a string representation of the handler in the form ``ClassName[callback=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
         return build_repr_with_selected_attrs(self, callback=self.callback.__qualname__)
 
     @abstractmethod
