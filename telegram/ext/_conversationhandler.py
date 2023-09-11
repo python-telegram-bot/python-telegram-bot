@@ -442,6 +442,17 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 )
 
     def __repr__(self) -> str:
+        """Give a string representation of the ConversationHandler in the form
+        ``ConversationHandler[name=..., states={...}]``.
+
+        If there are more than 3 states, only the first 3 states are listed.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
         truncation_threshold = 3
         states = dict(list(self.states.items())[:truncation_threshold])
         states_string = str(states)
