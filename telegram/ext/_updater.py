@@ -126,6 +126,14 @@ class Updater(AsyncContextManager["Updater"]):
         self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
 
     def __repr__(self) -> str:
+        """Give a string representation of the updater in the form ``Updater[bot=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
         return build_repr_with_selected_attrs(self, bot=self.bot)
 
     @property
