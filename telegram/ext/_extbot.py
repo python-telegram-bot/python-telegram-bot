@@ -248,6 +248,14 @@ class ExtBot(Bot, Generic[RLARGS]):
             self._callback_data_cache = CallbackDataCache(bot=self, maxsize=maxsize)
 
     def __repr__(self) -> str:
+        """Give a string representation of the bot in the form ``ExtBot[token=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
         return build_repr_with_selected_attrs(self, token=self.token)
 
     @classmethod

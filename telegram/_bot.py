@@ -310,6 +310,14 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self._freeze()
 
     def __repr__(self) -> str:
+        """Give a string representation of the bot in the form ``Bot[token=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
         return build_repr_with_selected_attrs(self, token=self.token)
 
     @property
