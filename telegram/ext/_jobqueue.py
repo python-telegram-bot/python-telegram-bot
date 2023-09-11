@@ -99,6 +99,14 @@ class JobQueue(Generic[CCT]):
         )
 
     def __repr__(self) -> str:
+        """Give a string representation of the JobQueue in the form ``JobQueue[application=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
         return build_repr_with_selected_attrs(self, application=self.application)
 
     def _tz_now(self) -> datetime.datetime:
@@ -771,6 +779,15 @@ class Job(Generic[CCT]):
         self._job = cast("APSJob", None)  # skipcq: PTC-W0052
 
     def __repr__(self) -> str:
+        """Give a string representation of the job in the form
+        ``Job[id=..., name=..., callback=..., trigger=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
         return build_repr_with_selected_attrs(
             self,
             id=self.job.id,
