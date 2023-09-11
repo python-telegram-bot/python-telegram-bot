@@ -345,6 +345,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
 
     def __repr__(self) -> str:
+        """Give a string representation of the application in the form ``Application[bot=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
         return build_repr_with_selected_attrs(self, bot=self.bot)
 
     def _check_initialized(self) -> None:
