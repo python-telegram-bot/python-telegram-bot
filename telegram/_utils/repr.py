@@ -27,7 +27,10 @@ from typing import Any
 
 
 def build_repr_with_selected_attrs(obj: object, **kwargs: Any) -> str:
-    """Create ``__repr__`` string in the style `Classname(arg1=1, arg2=2).`
+    """Create ``__repr__`` string in the style ``Classname[arg1=1, arg2=2]``.
+
+    The square brackets emphasize the fact that an object cannot be instantiated
+    from this string.
 
     Attributes that are to be used in the representation, are passed as kwargs.
     """
