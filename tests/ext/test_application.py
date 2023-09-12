@@ -201,7 +201,6 @@ class TestApplication:
         assert isinstance(app.chat_data[1], dict)
         assert isinstance(app.user_data[1], dict)
 
-    @pytest.mark.filterwarnings("ignore: `Application` instances should")
     async def test_repr(self, app):
         assert repr(app) == f"PytestApplication[bot={app.bot!r}]"
 
