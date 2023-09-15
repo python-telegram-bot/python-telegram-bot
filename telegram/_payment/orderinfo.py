@@ -56,7 +56,7 @@ class OrderInfo(TelegramObject):
         name: Optional[str] = None,
         phone_number: Optional[str] = None,
         email: Optional[str] = None,
-        shipping_address: Optional[str] = None,
+        shipping_address: Optional[ShippingAddress] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -64,7 +64,7 @@ class OrderInfo(TelegramObject):
         self.name: Optional[str] = name
         self.phone_number: Optional[str] = phone_number
         self.email: Optional[str] = email
-        self.shipping_address: Optional[str] = shipping_address
+        self.shipping_address: Optional[ShippingAddress] = shipping_address
 
         self._id_attrs = (self.name, self.phone_number, self.email, self.shipping_address)
 

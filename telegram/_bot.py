@@ -69,7 +69,6 @@ from telegram._files.contact import Contact
 from telegram._files.document import Document
 from telegram._files.file import File
 from telegram._files.inputmedia import InputMedia
-from telegram._files.inputsticker import InputSticker
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import MaskPosition, Sticker, StickerSet
@@ -79,13 +78,10 @@ from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
-from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
-from telegram._passport.passportelementerrors import PassportElementError
-from telegram._payment.shippingoption import ShippingOption
 from telegram._poll import Poll
 from telegram._sentwebappmessage import SentWebAppMessage
 from telegram._telegramobject import TelegramObject
@@ -115,14 +111,18 @@ from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
+        InlineKeyboardMarkup,
         InlineQueryResult,
         InputFile,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputSticker,
         LabeledPrice,
         MessageEntity,
+        PassportElementError,
+        ShippingOption,
     )
 
 BT = TypeVar("BT", bound="Bot")
@@ -2154,7 +2154,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         inline_message_id: Optional[str] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
@@ -2247,7 +2247,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         chat_id: Optional[Union[str, int]] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2521,11 +2521,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     @_log
     async def send_game(
         self,
-        chat_id: Union[int, str],
+        chat_id: int,
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -2539,7 +2539,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """Use this method to send a game.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat.
+            chat_id (:obj:`int`): Unique identifier for the target chat.
             game_short_name (:obj:`str`): Short name of the game, serves as the unique identifier
                 for the game. Set up your games via `@BotFather <https://t.me/BotFather>`_.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -2826,7 +2826,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     @_log
     async def get_user_profile_photos(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         offset: Optional[int] = None,
         limit: Optional[int] = None,
         *,
@@ -2938,7 +2938,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def ban_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         until_date: Optional[Union[int, datetime]] = None,
         revoke_messages: Optional[bool] = None,
         *,
@@ -3046,7 +3046,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def unban_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         only_if_banned: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3203,7 +3203,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         inline_message_id: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3279,7 +3279,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         caption: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
@@ -3349,7 +3349,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         chat_id: Optional[Union[str, int]] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3876,7 +3876,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def get_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4011,9 +4011,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     @_log
     async def set_game_score(
         self,
-        user_id: Union[int, str],
+        user_id: int,
         score: int,
-        chat_id: Optional[Union[str, int]] = None,
+        chat_id: Optional[int] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         force: Optional[bool] = None,
@@ -4037,7 +4037,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 decrease. This can be useful when fixing mistakes or banning cheaters.
             disable_edit_message (:obj:`bool`, optional): Pass :obj:`True`, if the game message
                 should not be automatically edited to include the current scoreboard.
-            chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
+            chat_id (:obj:`int`, optional): Required if :paramref:`inline_message_id`
                 is not specified. Unique identifier for the target chat.
             message_id (:obj:`int`, optional): Required if :paramref:`inline_message_id` is not
                 specified. Identifier of the sent message.
@@ -4076,8 +4076,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     @_log
     async def get_game_high_scores(
         self,
-        user_id: Union[int, str],
-        chat_id: Optional[Union[str, int]] = None,
+        user_id: int,
+        chat_id: Optional[int] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         *,
@@ -4101,7 +4101,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             user_id (:obj:`int`): Target user id.
-            chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
+            chat_id (:obj:`int`, optional): Required if :paramref:`inline_message_id`
                 is not specified. Unique identifier for the target chat.
             message_id (:obj:`int`, optional): Required if :paramref:`inline_message_id` is not
                 specified. Identifier of the sent message.
@@ -4156,7 +4156,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         is_flexible: Optional[bool] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         provider_data: Optional[Union[str, object]] = None,
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
@@ -4321,7 +4321,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self,
         shipping_query_id: str,
         ok: bool,
-        shipping_options: Optional[Sequence[ShippingOption]] = None,
+        shipping_options: Optional[Sequence["ShippingOption"]] = None,
         error_message: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4483,7 +4483,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def restrict_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         permissions: ChatPermissions,
         until_date: Optional[Union[int, datetime]] = None,
         use_independent_chat_permissions: Optional[bool] = None,
@@ -4557,7 +4557,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def promote_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         can_change_info: Optional[bool] = None,
         can_post_messages: Optional[bool] = None,
         can_edit_messages: Optional[bool] = None,
@@ -4723,7 +4723,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def set_chat_administrator_custom_title(
         self,
         chat_id: Union[int, str],
-        user_id: Union[int, str],
+        user_id: int,
         custom_title: str,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5478,7 +5478,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     @_log
     async def upload_sticker_file(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         sticker: Optional[FileInput],
         sticker_format: Optional[str],
         *,
@@ -5538,9 +5538,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     @_log
     async def add_sticker_to_set(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         name: str,
-        sticker: Optional[InputSticker],
+        sticker: Optional["InputSticker"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -5636,10 +5636,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     @_log
     async def create_new_sticker_set(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         name: str,
         title: str,
-        stickers: Optional[Sequence[InputSticker]],
+        stickers: Optional[Sequence["InputSticker"]],
         sticker_format: Optional[str],
         sticker_type: Optional[str] = None,
         needs_repainting: Optional[bool] = None,
@@ -5807,7 +5807,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def set_sticker_set_thumbnail(
         self,
         name: str,
-        user_id: Union[str, int],
+        user_id: int,
         thumbnail: Optional[FileInput] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6079,8 +6079,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     @_log
     async def set_passport_data_errors(
         self,
-        user_id: Union[str, int],
-        errors: Sequence[PassportElementError],
+        user_id: int,
+        errors: Sequence["PassportElementError"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6262,7 +6262,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[int, str],
         message_id: int,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,

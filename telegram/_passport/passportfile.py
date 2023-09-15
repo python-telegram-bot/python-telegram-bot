@@ -23,6 +23,8 @@ from typing import TYPE_CHECKING, List, Optional, Tuple
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot, File, FileCredentials
@@ -45,6 +47,10 @@ class PassportFile(TelegramObject):
         file_size (:obj:`int`): File size in bytes.
         file_date (:obj:`int`): Unix time when the file was uploaded.
 
+            .. deprecated:: NEXT.VERSION
+                This argument will only accept a datetime instead of an integer in future
+                major versions.
+
     Attributes:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -52,13 +58,10 @@ class PassportFile(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): File size in bytes.
-        file_date (:obj:`int`): Unix time when the file was uploaded.
-
-
     """
 
     __slots__ = (
-        "file_date",
+        "_file_date",
         "file_id",
         "file_size",
         "_credentials",
@@ -81,7 +84,7 @@ class PassportFile(TelegramObject):
         self.file_id: str = file_id
         self.file_unique_id: str = file_unique_id
         self.file_size: int = file_size
-        self.file_date: int = file_date
+        self._file_date: int = file_date
         # Optionals
 
         self._credentials: Optional[FileCredentials] = credentials
@@ -89,6 +92,27 @@ class PassportFile(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
         self._freeze()
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict` for details."""
+        data = super().to_dict(recursive)
+        data["file_date"] = self._file_date
+        return data
+
+    @property
+    def file_date(self) -> int:
+        """:obj:`int`: Unix time when the file was uploaded.
+
+        .. deprecated:: NEXT.VERSION
+            This attribute will return a datetime instead of a integer in future major versions.
+        """
+        warn(
+            "The attribute `file_date` will return a datetime instead of an integer in future"
+            " major versions.",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
+        return self._file_date
 
     @classmethod
     def de_json_decrypted(

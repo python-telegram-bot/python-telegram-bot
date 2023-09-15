@@ -19,10 +19,12 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram PassportElementError."""
 
-from typing import Optional
+from typing import List, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 
 class PassportElementError(TelegramObject):
@@ -173,22 +175,47 @@ class PassportElementErrorFiles(PassportElementError):
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
             ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
 
     """
 
-    __slots__ = ("file_hashes",)
+    __slots__ = ("_file_hashes",)
 
     def __init__(
-        self, type: str, file_hashes: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self,
+        type: str,
+        file_hashes: List[str],
+        message: str,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # Required
         super().__init__("files", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hashes: str = file_hashes
+            self._file_hashes: List[str] = file_hashes
 
             self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict` for details."""
+        data = super().to_dict(recursive)
+        data["file_hashes"] = self._file_hashes
+        return data
+
+    @property
+    def file_hashes(self) -> List[str]:
+        """List of base64-encoded file hashes.
+
+        .. deprecated:: NEXT.VERSION
+            This attribute will return a tuple instead of a list in future major versions.
+        """
+        warn(
+            "The attribute `file_hashes` will return a tuple instead of a list in future major"
+            " versions.",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
+        return self._file_hashes
 
 
 class PassportElementErrorFrontSide(PassportElementError):
@@ -365,22 +392,48 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
             ``"internal_passport"``, ``"utility_bill"``, ``"bank_statement"``,
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
 
     """
 
-    __slots__ = ("file_hashes",)
+    __slots__ = ("_file_hashes",)
 
     def __init__(
-        self, type: str, file_hashes: str, message: str, *, api_kwargs: Optional[JSONDict] = None
+        self,
+        type: str,
+        file_hashes: List[str],
+        message: str,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         # Required
         super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
         with self._unfrozen():
-            self.file_hashes: str = file_hashes
+            self._file_hashes: List[str] = file_hashes
 
             self._id_attrs = (self.source, self.type, self.message, *tuple(file_hashes))
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict` for details."""
+        data = super().to_dict(recursive)
+        data["file_hashes"] = self._file_hashes
+        return data
+
+    @property
+    def file_hashes(self) -> List[str]:
+        """List of base64-encoded file hashes.
+
+        .. deprecated:: NEXT.VERSION
+            This attribute will return a tuple instead of a list in future major versions.
+        """
+        warn(
+            "The attribute `file_hashes` will return a tuple instead of a list in future major"
+            " versions. See the stability policy:"
+            " https://docs.python-telegram-bot.org/en/stable/stability_policy.html",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
+        return self._file_hashes
 
 
 class PassportElementErrorUnspecified(PassportElementError):
