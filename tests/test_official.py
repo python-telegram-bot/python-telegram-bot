@@ -370,16 +370,12 @@ def check_param_type(
                 ForwardRef(tg_param_type),
                 tg_param_type,  # for some reason, some annotations are just a string.
             )
-        print("len mapped 0 ", mapped_type)
     elif len(mapped) == 1:
-        print("len mapped 1 ", mapped)
         mapped_type = mapped.pop()
 
     # Resolve nested annotations to get inner types.
     if (ptb_annotation := list(get_args(ptb_param.annotation))) == []:
         ptb_annotation = ptb_param.annotation  # if it's not nested, just use the annotation
-
-    print(f"{tg_param_type=} ||| {mapped_type=} ||| {ptb_annotation=}")
 
     if isinstance(ptb_annotation, list):
         # Some cleaning:
@@ -388,13 +384,11 @@ def check_param_type(
         # 2) we want to check if our `obj` is same as API's `obj`, and since python evaluates
         # `Optional[obj] != obj` we have to remove the Optional, so that we can compare the two.
         if type(None) in ptb_annotation:
-            print(f"found None in {ptb_param.name}")
             ptb_annotation.remove(type(None))
 
         # Cleaning done... now let's put it back together.
         # Join all the annotations back (i.e. Union)
         ptb_annotation = _unionizer(ptb_annotation, False)
-        print(ptb_annotation, "after unionizer")
 
         # Last step, we need to use get_origin to get the original type, since using get_args
         # above will strip that out.
@@ -404,13 +398,10 @@ def check_param_type(
             if "collections.abc.Sequence" in str(wrapped):
                 wrapped = Sequence
             ptb_annotation = wrapped[ptb_annotation]
-            print(wrapped, "after wrapped", ptb_annotation)
         # We have put back our annotation together after removing the NoneType!
 
     # Now let's do the checking, starting with "Array of ..." types.
     if "Array of " in tg_param_type:
-        print("array of ", ptb_param.annotation)
-
         assert mapped_type is Sequence
         # For exceptions just check if they contain the annotation
         if ptb_param.name in ARRAY_OF_EXCEPTIONS:
@@ -425,22 +416,18 @@ def check_param_type(
         array_of_mapped: set[type] = _get_params_base(obj_str, TYPE_MAPPING)
 
         if len(array_of_mapped) == 0:  # no match found, it's from telegram module
-            print("from tg module")
             # it could be a list of objects, so let's check that:
             objs = _extract_words(obj_str)
             # let's unionize all the objects, with and without ForwardRefs.
             unionized_objs: list[type] = [_unionizer(objs, True), _unionizer(objs, False)]
         else:
-            print("from TYPE_MAPPING")
             unionized_objs = [array_of_mapped.pop()]
 
         # This means it is Array of Array of [obj]
         if "Array of Array of" in tg_param_type:
-            # print('isinstance 1', Sequence[Sequence[obj]], ptb_annotation)
             return any(Sequence[Sequence[o]] == ptb_annotation for o in unionized_objs)
 
         # This means it is Array of [obj]
-        # print('isinstance 2', mapped_type[obj], ptb_annotation)
         return any(mapped_type[o] == ptb_annotation for o in unionized_objs)
 
     # Special case for when the parameter is a default value parameter
@@ -451,7 +438,6 @@ def check_param_type(
                 parsed = param_type[mapped_type]
                 if ptb_annotation == parsed:
                     return True
-            # print(f"cause {mapped_type} != {ptb_annotation} for {ptb_param.name}")
             return False
 
     # Special case for send_* methods where we accept more types than the official API:
@@ -460,7 +446,6 @@ def check_param_type(
         and not isinstance(mapped_type, tuple)
         and obj.__name__.startswith("send")
     ):
-        print("additional_types ")
         mapped_type = mapped_type | ADDITIONAL_TYPES[ptb_param.name]
 
     for (param_name, expected_class), exception_type in EXCEPTIONS.items():
@@ -468,7 +453,17 @@ def check_param_type(
             ptb_annotation = exception_type
 
     # Special case for datetimes
-    if re.search(r"([_]+|\b)date[^\w]*\b", ptb_param.name) or "Unix time" in tg_parameter[-1]:
+    if (
+        re.search(
+            r"""([_]+|\b)  # check for word boundary or underscore
+                date       # check for "date"
+                [^\w]*\b   # optionally check for a word after 'date'
+            """,
+            ptb_param.name,
+            re.VERBOSE,
+        )
+        or "Unix time" in tg_parameter[-1]
+    ):
         # TODO: Remove this in v22 when it becomes a datetime
         datetime_exceptions = {
             "file_date",
@@ -485,7 +480,6 @@ def check_param_type(
     if mapped_type == ptb_annotation:
         return True
 
-    print(f"cause {mapped_type=} != {ptb_annotation=} for {ptb_param.name}")
     return False
 
 

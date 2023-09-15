@@ -78,7 +78,6 @@ from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
-from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
@@ -112,6 +111,7 @@ from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
+        InlineKeyboardMarkup,
         InlineQueryResult,
         InputFile,
         InputMediaAudio,
@@ -2154,7 +2154,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         inline_message_id: Optional[str] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
@@ -2247,7 +2247,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         chat_id: Optional[Union[str, int]] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2525,7 +2525,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -3203,7 +3203,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         inline_message_id: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3279,7 +3279,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         caption: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
@@ -3349,7 +3349,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         chat_id: Optional[Union[str, int]] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3412,7 +3412,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         chat_id: Optional[Union[str, int]] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4156,7 +4156,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         is_flexible: Optional[bool] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         provider_data: Optional[Union[str, object]] = None,
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
@@ -6262,7 +6262,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[int, str],
         message_id: int,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
