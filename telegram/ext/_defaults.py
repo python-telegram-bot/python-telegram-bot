@@ -123,9 +123,6 @@ class Defaults:
             return all(getattr(self, attr) == getattr(other, attr) for attr in self.__slots__)
         return False
 
-    def __ne__(self, other: object) -> bool:
-        return not self == other
-
     @property
     def api_defaults(self) -> Dict[str, Any]:  # skip-cq: PY-D0003
         return self._api_defaults

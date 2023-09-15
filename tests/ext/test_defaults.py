@@ -28,7 +28,7 @@ from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
 
 
-class TestDefault:
+class TestDefaults:
     def test_slot_behaviour(self):
         a = Defaults(parse_mode="HTML", quote=True)
         for attr in a.__slots__:
