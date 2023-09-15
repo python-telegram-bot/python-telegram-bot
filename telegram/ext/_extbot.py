@@ -85,6 +85,7 @@ from telegram import (
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import (
     CorrectOptionID,
     DVInput,
@@ -245,6 +246,17 @@ class ExtBot(Bot, Generic[RLARGS]):
                 maxsize = 1024
 
             self._callback_data_cache = CallbackDataCache(bot=self, maxsize=maxsize)
+
+    def __repr__(self) -> str:
+        """Give a string representation of the bot in the form ``ExtBot[token=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, token=self.token)
 
     @classmethod
     def _warn(

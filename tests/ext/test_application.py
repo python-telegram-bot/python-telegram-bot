@@ -201,6 +201,9 @@ class TestApplication:
         assert isinstance(app.chat_data[1], dict)
         assert isinstance(app.user_data[1], dict)
 
+    async def test_repr(self, app):
+        assert repr(app) == f"PytestApplication[bot={app.bot!r}]"
+
     def test_job_queue(self, one_time_bot, app, recwarn):
         expected_warning = (
             "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "

@@ -31,6 +31,7 @@ try:
 except ImportError:
     APS_AVAILABLE = False
 
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 from telegram.ext._extbot import ExtBot
@@ -96,6 +97,17 @@ class JobQueue(Generic[CCT]):
         self.scheduler: AsyncIOScheduler = AsyncIOScheduler(
             timezone=pytz.utc, executors={"default": self._executor}
         )
+
+    def __repr__(self) -> str:
+        """Give a string representation of the JobQueue in the form ``JobQueue[application=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, application=self.application)
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -765,6 +777,24 @@ class Job(Generic[CCT]):
         self._enabled = False
 
         self._job = cast("APSJob", None)  # skipcq: PTC-W0052
+
+    def __repr__(self) -> str:
+        """Give a string representation of the job in the form
+        ``Job[id=..., name=..., callback=..., trigger=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(
+            self,
+            id=self.job.id,
+            name=self.name,
+            callback=self.callback.__name__,
+            trigger=self.job.trigger,
+        )
 
     @property
     def job(self) -> "APSJob":

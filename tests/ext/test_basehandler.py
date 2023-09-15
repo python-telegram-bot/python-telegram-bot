@@ -36,3 +36,19 @@ class TestHandler:
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_repr(self):
+        async def some_func():
+            return None
+
+        class SubclassHandler(BaseHandler):
+            __slots__ = ()
+
+            def __init__(self):
+                super().__init__(callback=some_func)
+
+            def check_update(self, update: object):
+                pass
+
+        sh = SubclassHandler()
+        assert repr(sh) == "SubclassHandler[callback=TestHandler.test_repr.<locals>.some_func]"

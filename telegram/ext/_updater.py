@@ -37,6 +37,7 @@ from typing import (
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import ODVInput
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 
@@ -123,6 +124,17 @@ class Updater(AsyncContextManager["Updater"]):
         self.__lock = asyncio.Lock()
         self.__polling_task: Optional[asyncio.Task] = None
         self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
+
+    def __repr__(self) -> str:
+        """Give a string representation of the updater in the form ``Updater[bot=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, bot=self.bot)
 
     @property
     def running(self) -> bool:
