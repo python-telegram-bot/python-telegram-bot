@@ -668,7 +668,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         return self._bot_user
 
     @property
-    def id(self) -> int:  # pylint: disable=invalid-name
+    def id(self) -> int:
         """:obj:`int`: Unique identifier for this bot. Shortcut for the corresponding attribute of
         :attr:`bot`.
         """
@@ -4317,7 +4317,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
 
     @_log
-    async def answer_shipping_query(  # pylint: disable=invalid-name
+    async def answer_shipping_query(
         self,
         shipping_query_id: str,
         ok: bool,
@@ -4376,7 +4376,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
 
     @_log
-    async def answer_pre_checkout_query(  # pylint: disable=invalid-name
+    async def answer_pre_checkout_query(
         self,
         pre_checkout_query_id: str,
         ok: bool,

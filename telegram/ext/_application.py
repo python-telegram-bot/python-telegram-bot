@@ -486,7 +486,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         self._initialized = False
 
-    async def __aenter__(self: _AppType) -> _AppType:
+    async def __aenter__(self: _AppType) -> _AppType:  # noqa: PYI019
         """Simple context manager which initializes the App."""
         try:
             await self.initialize()
