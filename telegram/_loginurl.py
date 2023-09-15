@@ -86,7 +86,7 @@ class LoginUrl(TelegramObject):
     def __init__(
         self,
         url: str,
-        forward_text: Optional[bool] = None,
+        forward_text: Optional[str] = None,
         bot_username: Optional[str] = None,
         request_write_access: Optional[bool] = None,
         *,
@@ -96,7 +96,7 @@ class LoginUrl(TelegramObject):
         # Required
         self.url: str = url
         # Optional
-        self.forward_text: Optional[bool] = forward_text
+        self.forward_text: Optional[str] = forward_text
         self.bot_username: Optional[str] = bot_username
         self.request_write_access: Optional[bool] = request_write_access
 

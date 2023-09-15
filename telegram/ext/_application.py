@@ -54,6 +54,7 @@ from typing import (
 from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
@@ -80,7 +81,6 @@ _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-n
 _STOP_SIGNAL = object()
 _DEFAULT_0 = DefaultValue(0)
 
-
 # Since python 3.12, the coroutine passed to create_task should not be an (async) generator. Remove
 # this check when we drop support for python 3.11.
 if sys.version_info >= (3, 12):
@@ -89,7 +89,6 @@ else:
     _CoroType = Union[Generator["asyncio.Future[object]", None, RT], Awaitable[RT]]
 
 _ErrorCoroType = Optional[_CoroType[RT]]
-
 
 _LOGGER = get_logger(__name__)
 
@@ -364,6 +363,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
+
+    def __repr__(self) -> str:
+        """Give a string representation of the application in the form ``Application[bot=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, bot=self.bot)
 
     @property
     def running(self) -> bool:

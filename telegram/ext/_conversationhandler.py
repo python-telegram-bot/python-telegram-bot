@@ -38,6 +38,7 @@ from typing import (
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import DVType
 from telegram._utils.warnings import warn
 from telegram.ext._application import ApplicationHandlerStop
@@ -439,6 +440,30 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                     "differently from what you expect.",
                     stacklevel=2,
                 )
+
+    def __repr__(self) -> str:
+        """Give a string representation of the ConversationHandler in the form
+        ``ConversationHandler[name=..., states={...}]``.
+
+        If there are more than 3 states, only the first 3 states are listed.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        truncation_threshold = 3
+        states = dict(list(self.states.items())[:truncation_threshold])
+        states_string = str(states)
+        if len(self.states) > truncation_threshold:
+            states_string = states_string[:-1] + ", ...}"
+
+        return build_repr_with_selected_attrs(
+            self,
+            name=self.name,
+            states=states_string,
+        )
 
     @property
     def entry_points(self) -> List[BaseHandler[Update, CCT]]:
