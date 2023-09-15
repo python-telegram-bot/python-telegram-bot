@@ -125,6 +125,26 @@ class Updater(AsyncContextManager["Updater"]):
         self.__polling_task: Optional[asyncio.Task] = None
         self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
 
+    async def __aenter__(self: _UpdaterType) -> _UpdaterType:  # noqa: PYI019
+        """Simple context manager which initializes the Updater."""
+        try:
+            await self.initialize()
+            return self
+        except Exception as exc:
+            await self.shutdown()
+            raise exc
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        """Shutdown the Updater from the context manager."""
+        # Make sure not to return `True` so that exceptions are not suppressed
+        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
+        await self.shutdown()
+
     def __repr__(self) -> str:
         """Give a string representation of the updater in the form ``Updater[bot=...]``.
 
@@ -174,26 +194,6 @@ class Updater(AsyncContextManager["Updater"]):
         await self.bot.shutdown()
         self._initialized = False
         _LOGGER.debug("Shut down of Updater complete")
-
-    async def __aenter__(self: _UpdaterType) -> _UpdaterType:  # noqa: PYI019
-        """Simple context manager which initializes the Updater."""
-        try:
-            await self.initialize()
-            return self
-        except Exception as exc:
-            await self.shutdown()
-            raise exc
-
-    async def __aexit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ) -> None:
-        """Shutdown the Updater from the context manager."""
-        # Make sure not to return `True` so that exceptions are not suppressed
-        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
-        await self.shutdown()
 
     async def start_polling(
         self,

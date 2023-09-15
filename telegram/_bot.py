@@ -309,6 +309,54 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         self._freeze()
 
+    async def __aenter__(self: BT) -> BT:
+        try:
+            await self.initialize()
+            return self
+        except Exception as exc:
+            await self.shutdown()
+            raise exc
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        # Make sure not to return `True` so that exceptions are not suppressed
+        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
+        await self.shutdown()
+
+    def __reduce__(self) -> NoReturn:
+        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
+        be pickled and this method will always raise an exception.
+
+        .. versionadded:: 20.0
+
+        Raises:
+            :exc:`pickle.PicklingError`
+        """
+        raise pickle.PicklingError("Bot objects cannot be pickled!")
+
+    def __deepcopy__(self, memodict: Dict[int, object]) -> NoReturn:
+        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
+        be deepcopied and this method will always raise an exception.
+
+        .. versionadded:: 20.0
+
+        Raises:
+            :exc:`TypeError`
+        """
+        raise TypeError("Bot objects cannot be deepcopied!")
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, self.__class__):
+            return self.bot == other.bot
+        return False
+
+    def __hash__(self) -> int:
+        return hash((self.__class__, self.bot))
+
     def __repr__(self) -> str:
         """Give a string representation of the bot in the form ``Bot[token=...]``.
 
@@ -365,6 +413,93 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         return self._private_key
 
+    @property
+    def request(self) -> BaseRequest:
+        """The :class:`~telegram.request.BaseRequest` object used by this bot.
+
+        Warning:
+            Requests to the Bot API are made by the various methods of this class. This attribute
+            should *not* be used manually.
+        """
+        return self._request[1]
+
+    @property
+    def bot(self) -> User:
+        """:class:`telegram.User`: User instance for the bot as returned by :meth:`get_me`.
+
+        Warning:
+            This value is the cached return value of :meth:`get_me`. If the bots profile is
+            changed during runtime, this value won't reflect the changes until :meth:`get_me` is
+            called again.
+
+        .. seealso:: :meth:`initialize`
+        """
+        if self._bot_user is None:
+            raise RuntimeError(
+                f"{self.__class__.__name__} is not properly initialized. Call "
+                f"`{self.__class__.__name__}.initialize` before accessing this property."
+            )
+        return self._bot_user
+
+    @property
+    def id(self) -> int:
+        """:obj:`int`: Unique identifier for this bot. Shortcut for the corresponding attribute of
+        :attr:`bot`.
+        """
+        return self.bot.id
+
+    @property
+    def first_name(self) -> str:
+        """:obj:`str`: Bot's first name. Shortcut for the corresponding attribute of
+        :attr:`bot`.
+        """
+        return self.bot.first_name
+
+    @property
+    def last_name(self) -> str:
+        """:obj:`str`: Optional. Bot's last name. Shortcut for the corresponding attribute of
+        :attr:`bot`.
+        """
+        return self.bot.last_name  # type: ignore
+
+    @property
+    def username(self) -> str:
+        """:obj:`str`: Bot's username. Shortcut for the corresponding attribute of
+        :attr:`bot`.
+        """
+        return self.bot.username  # type: ignore
+
+    @property
+    def link(self) -> str:
+        """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
+        return f"https://t.me/{self.username}"
+
+    @property
+    def can_join_groups(self) -> bool:
+        """:obj:`bool`: Bot's :attr:`telegram.User.can_join_groups` attribute. Shortcut for the
+        corresponding attribute of :attr:`bot`.
+        """
+        return self.bot.can_join_groups  # type: ignore
+
+    @property
+    def can_read_all_group_messages(self) -> bool:
+        """:obj:`bool`: Bot's :attr:`telegram.User.can_read_all_group_messages` attribute.
+        Shortcut for the corresponding attribute of :attr:`bot`.
+        """
+        return self.bot.can_read_all_group_messages  # type: ignore
+
+    @property
+    def supports_inline_queries(self) -> bool:
+        """:obj:`bool`: Bot's :attr:`telegram.User.supports_inline_queries` attribute.
+        Shortcut for the corresponding attribute of :attr:`bot`.
+        """
+        return self.bot.supports_inline_queries  # type: ignore
+
+    @property
+    def name(self) -> str:
+        """:obj:`str`: Bot's @username. Shortcut for the corresponding attribute of :attr:`bot`."""
+        return f"@{self.username}"
+
     @classmethod
     def _warn(
         cls, message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0
@@ -373,28 +508,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         for ExtBot to add 1 level to all warning calls.
         """
         warn(message=message, category=category, stacklevel=stacklevel + 1)
-
-    def __reduce__(self) -> NoReturn:
-        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
-        be pickled and this method will always raise an exception.
-
-        .. versionadded:: 20.0
-
-        Raises:
-            :exc:`pickle.PicklingError`
-        """
-        raise pickle.PicklingError("Bot objects cannot be pickled!")
-
-    def __deepcopy__(self, memodict: Dict[int, object]) -> NoReturn:
-        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
-        be deepcopied and this method will always raise an exception.
-
-        .. versionadded:: 20.0
-
-        Raises:
-            :exc:`TypeError`
-        """
-        raise TypeError("Bot objects cannot be deepcopied!")
 
     # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
     # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
@@ -632,111 +745,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())
         self._initialized = False
-
-    async def __aenter__(self: BT) -> BT:
-        try:
-            await self.initialize()
-            return self
-        except Exception as exc:
-            await self.shutdown()
-            raise exc
-
-    async def __aexit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ) -> None:
-        # Make sure not to return `True` so that exceptions are not suppressed
-        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
-        await self.shutdown()
-
-    @property
-    def request(self) -> BaseRequest:
-        """The :class:`~telegram.request.BaseRequest` object used by this bot.
-
-        Warning:
-            Requests to the Bot API are made by the various methods of this class. This attribute
-            should *not* be used manually.
-        """
-        return self._request[1]
-
-    @property
-    def bot(self) -> User:
-        """:class:`telegram.User`: User instance for the bot as returned by :meth:`get_me`.
-
-        Warning:
-            This value is the cached return value of :meth:`get_me`. If the bots profile is
-            changed during runtime, this value won't reflect the changes until :meth:`get_me` is
-            called again.
-
-        .. seealso:: :meth:`initialize`
-        """
-        if self._bot_user is None:
-            raise RuntimeError(
-                f"{self.__class__.__name__} is not properly initialized. Call "
-                f"`{self.__class__.__name__}.initialize` before accessing this property."
-            )
-        return self._bot_user
-
-    @property
-    def id(self) -> int:
-        """:obj:`int`: Unique identifier for this bot. Shortcut for the corresponding attribute of
-        :attr:`bot`.
-        """
-        return self.bot.id
-
-    @property
-    def first_name(self) -> str:
-        """:obj:`str`: Bot's first name. Shortcut for the corresponding attribute of
-        :attr:`bot`.
-        """
-        return self.bot.first_name
-
-    @property
-    def last_name(self) -> str:
-        """:obj:`str`: Optional. Bot's last name. Shortcut for the corresponding attribute of
-        :attr:`bot`.
-        """
-        return self.bot.last_name  # type: ignore
-
-    @property
-    def username(self) -> str:
-        """:obj:`str`: Bot's username. Shortcut for the corresponding attribute of
-        :attr:`bot`.
-        """
-        return self.bot.username  # type: ignore
-
-    @property
-    def link(self) -> str:
-        """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
-        return f"https://t.me/{self.username}"
-
-    @property
-    def can_join_groups(self) -> bool:
-        """:obj:`bool`: Bot's :attr:`telegram.User.can_join_groups` attribute. Shortcut for the
-        corresponding attribute of :attr:`bot`.
-        """
-        return self.bot.can_join_groups  # type: ignore
-
-    @property
-    def can_read_all_group_messages(self) -> bool:
-        """:obj:`bool`: Bot's :attr:`telegram.User.can_read_all_group_messages` attribute.
-        Shortcut for the corresponding attribute of :attr:`bot`.
-        """
-        return self.bot.can_read_all_group_messages  # type: ignore
-
-    @property
-    def supports_inline_queries(self) -> bool:
-        """:obj:`bool`: Bot's :attr:`telegram.User.supports_inline_queries` attribute.
-        Shortcut for the corresponding attribute of :attr:`bot`.
-        """
-        return self.bot.supports_inline_queries  # type: ignore
-
-    @property
-    def name(self) -> str:
-        """:obj:`str`: Bot's @username. Shortcut for the corresponding attribute of :attr:`bot`."""
-        return f"@{self.username}"
 
     @_log
     async def get_me(
@@ -7854,14 +7862,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             data["last_name"] = self.last_name
 
         return data
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
-            return self.bot == other.bot
-        return False
-
-    def __hash__(self) -> int:
-        return hash((self.__class__, self.bot))
 
     # camelCase aliases
     getMe = get_me

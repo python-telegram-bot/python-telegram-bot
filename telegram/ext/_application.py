@@ -344,6 +344,26 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__update_persistence_lock = asyncio.Lock()
         self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
 
+    async def __aenter__(self: _AppType) -> _AppType:  # noqa: PYI019
+        """Simple context manager which initializes the App."""
+        try:
+            await self.initialize()
+            return self
+        except Exception as exc:
+            await self.shutdown()
+            raise exc
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        """Shutdown the App from the context manager."""
+        # Make sure not to return `True` so that exceptions are not suppressed
+        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
+        await self.shutdown()
+
     def __repr__(self) -> str:
         """Give a string representation of the application in the form ``Application[bot=...]``.
 
@@ -354,12 +374,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             :obj:`str`
         """
         return build_repr_with_selected_attrs(self, bot=self.bot)
-
-    def _check_initialized(self) -> None:
-        if not self._initialized:
-            raise RuntimeError(
-                "This Application was not initialized via `Application.initialize`!"
-            )
 
     @property
     def running(self) -> bool:
@@ -409,6 +423,27 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         .. versionadded:: 20.4
         """
         return self._update_processor
+
+    @staticmethod
+    def _raise_system_exit() -> NoReturn:
+        raise SystemExit
+
+    @staticmethod
+    def builder() -> "InitApplicationBuilder":
+        """Convenience method. Returns a new :class:`telegram.ext.ApplicationBuilder`.
+
+        .. versionadded:: 20.0
+        """
+        # Unfortunately this needs to be here due to cyclical imports
+        from telegram.ext import ApplicationBuilder  # pylint: disable=import-outside-toplevel
+
+        return ApplicationBuilder()
+
+    def _check_initialized(self) -> None:
+        if not self._initialized:
+            raise RuntimeError(
+                "This Application was not initialized via `Application.initialize`!"
+            )
 
     async def initialize(self) -> None:
         """Initializes the Application by initializing:
@@ -496,26 +531,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         self._initialized = False
 
-    async def __aenter__(self: _AppType) -> _AppType:  # noqa: PYI019
-        """Simple context manager which initializes the App."""
-        try:
-            await self.initialize()
-            return self
-        except Exception as exc:
-            await self.shutdown()
-            raise exc
-
-    async def __aexit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ) -> None:
-        """Shutdown the App from the context manager."""
-        # Make sure not to return `True` so that exceptions are not suppressed
-        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
-        await self.shutdown()
-
     async def _initialize_persistence(self) -> None:
         """This method basically just loads all the data by awaiting the BP methods"""
         if not self.persistence:
@@ -544,17 +559,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 self.bot.callback_data_cache.load_persistence_data(  # type: ignore[attr-defined]
                     persistent_data
                 )
-
-    @staticmethod
-    def builder() -> "InitApplicationBuilder":
-        """Convenience method. Returns a new :class:`telegram.ext.ApplicationBuilder`.
-
-        .. versionadded:: 20.0
-        """
-        # Unfortunately this needs to be here due to cyclical imports
-        from telegram.ext import ApplicationBuilder  # pylint: disable=import-outside-toplevel
-
-        return ApplicationBuilder()
 
     async def start(self) -> None:
         """Starts
@@ -921,10 +925,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             close_loop=close_loop,
             stop_signals=stop_signals,
         )
-
-    @staticmethod
-    def _raise_system_exit() -> NoReturn:
-        raise SystemExit
 
     def __run(
         self,

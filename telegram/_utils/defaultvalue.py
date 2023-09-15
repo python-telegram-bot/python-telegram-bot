@@ -88,6 +88,14 @@ class DefaultValue(Generic[DVType]):
     def __bool__(self) -> bool:
         return bool(self.value)
 
+    # This is mostly here for readability during debugging
+    def __str__(self) -> str:
+        return f"DefaultValue({self.value})"
+
+    # This is here to have the default instances nicely rendered in the docs
+    def __repr__(self) -> str:
+        return repr(self.value)
+
     @overload
     @staticmethod
     def get_value(obj: "DefaultValue[OT]") -> OT:
@@ -111,14 +119,6 @@ class DefaultValue(Generic[DVType]):
             Same type as input, or the value of the input: The value
         """
         return obj.value if isinstance(obj, DefaultValue) else obj
-
-    # This is mostly here for readability during debugging
-    def __str__(self) -> str:
-        return f"DefaultValue({self.value})"
-
-    # This is here to have the default instances nicely rendered in the docs
-    def __repr__(self) -> str:
-        return repr(self.value)
 
 
 DEFAULT_NONE: DefaultValue[None] = DefaultValue(None)
