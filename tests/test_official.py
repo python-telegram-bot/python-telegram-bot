@@ -477,10 +477,7 @@ def check_param_type(
     if isinstance(mapped_type, tuple) and any(ptb_annotation == t for t in mapped_type):
         return True
 
-    if mapped_type == ptb_annotation:
-        return True
-
-    return False
+    return mapped_type == ptb_annotation
 
 
 def _extract_words(text: str) -> set[str]:
