@@ -3453,7 +3453,6 @@ class Message(TelegramObject):
         version: MarkdownVersion = 1,
         offset: int = 0,
     ) -> Optional[str]:
-        # dummy change
         version = int(version)  # type: ignore
 
         if message_text is None:
