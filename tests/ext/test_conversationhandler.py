@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Persistence of conversations is tested in test_basepersistence.py"""
 import asyncio
+import functools
 import logging
 from pathlib import Path
 from warnings import filterwarnings
@@ -75,6 +76,7 @@ def user2():
 
 
 def raise_ahs(func):
+    @functools.wraps(func)  # for checking __repr__
     async def decorator(self, *args, **kwargs):
         result = await func(self, *args, **kwargs)
         if self.raise_app_handler_stop:
@@ -288,6 +290,41 @@ class TestConversationHandler:
             ConversationHandler(
                 self.entry_points, states=self.states, fallbacks=[], persistent=True
             )
+
+    def test_repr_no_truncation(self):
+        # ConversationHandler's __repr__ is not inherited from BaseHandler.
+        ch = ConversationHandler(
+            name="test_handler",
+            entry_points=[],
+            states=self.drinking_states,
+            fallbacks=[],
+        )
+        assert repr(ch) == (
+            "ConversationHandler[name=test_handler, "
+            "states={'a': [CommandHandler[callback=TestConversationHandler.sip]], "
+            "'b': [CommandHandler[callback=TestConversationHandler.swallow]], "
+            "'c': [CommandHandler[callback=TestConversationHandler.hold]]}]"
+        )
+
+    def test_repr_with_truncation(self):
+        from copy import copy
+
+        states = copy(self.drinking_states)
+        # there are exactly 3 drinking states. adding one more to make sure it's truncated
+        states["extra_to_be_truncated"] = [CommandHandler("foo", self.start)]
+
+        ch = ConversationHandler(
+            name="test_handler",
+            entry_points=[],
+            states=states,
+            fallbacks=[],
+        )
+        assert repr(ch) == (
+            "ConversationHandler[name=test_handler, "
+            "states={'a': [CommandHandler[callback=TestConversationHandler.sip]], "
+            "'b': [CommandHandler[callback=TestConversationHandler.swallow]], "
+            "'c': [CommandHandler[callback=TestConversationHandler.hold]], ...}]"
+        )
 
     async def test_check_update_returns_non(self, app, user1):
         """checks some cases where updates should not be handled"""

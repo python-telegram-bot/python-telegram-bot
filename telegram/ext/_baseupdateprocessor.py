@@ -48,6 +48,24 @@ class BaseUpdateProcessor(ABC):
             raise ValueError("`max_concurrent_updates` must be a positive integer!")
         self._semaphore = BoundedSemaphore(self.max_concurrent_updates)
 
+    async def __aenter__(self) -> "BaseUpdateProcessor":
+        """Simple context manager which initializes the Processor."""
+        try:
+            await self.initialize()
+            return self
+        except Exception as exc:
+            await self.shutdown()
+            raise exc
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        """Simple context manager which shuts down the Processor."""
+        await self.shutdown()
+
     @property
     def max_concurrent_updates(self) -> int:
         """:obj:`int`: The maximum number of updates that can be processed concurrently."""
@@ -104,24 +122,6 @@ class BaseUpdateProcessor(ABC):
         """
         async with self._semaphore:
             await self.do_process_update(update, coroutine)
-
-    async def __aenter__(self) -> "BaseUpdateProcessor":
-        """Simple context manager which initializes the Processor."""
-        try:
-            await self.initialize()
-            return self
-        except Exception as exc:
-            await self.shutdown()
-            raise exc
-
-    async def __aexit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ) -> None:
-        """Shutdown the Processor from the context manager."""
-        await self.shutdown()
 
 
 class SimpleUpdateProcessor(BaseUpdateProcessor):

@@ -54,6 +54,14 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
         super().__init__()
         self._write_access_keys: Set[_KT] = set()
 
+    def __setitem__(self, key: _KT, value: _VT) -> None:
+        self.__track_write(key)
+        super().__setitem__(key, value)
+
+    def __delitem__(self, key: _KT) -> None:
+        self.__track_write(key)
+        super().__delitem__(key)
+
     def __track_write(self, key: Union[_KT, Set[_KT]]) -> None:
         if isinstance(key, set):
             self._write_access_keys |= key
@@ -82,14 +90,6 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
         self._write_access_keys.add(key)
 
     # Override methods to track access
-
-    def __setitem__(self, key: _KT, value: _VT) -> None:
-        self.__track_write(key)
-        super().__setitem__(key, value)
-
-    def __delitem__(self, key: _KT) -> None:
-        self.__track_write(key)
-        super().__delitem__(key)
 
     def update_no_track(self, mapping: Mapping[_KT, _VT]) -> None:
         """Like ``update``, but doesn't count towards write access."""

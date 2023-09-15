@@ -110,43 +110,53 @@ class TelegramObject:
         # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
         self.api_kwargs: Mapping[str, Any] = MappingProxyType(api_kwargs or {})
 
-    def _freeze(self) -> None:
-        self._frozen = True
+    def __eq__(self, other: object) -> bool:
+        """Compares this object with :paramref:`other` in terms of equality.
+        If this object and :paramref:`other` are `not` objects of the same class,
+        this comparison will fall back to Python's default implementation of :meth:`object.__eq__`.
+        Otherwise, both objects may be compared in terms of equality, if the corresponding
+        subclass of :class:`TelegramObject` has defined a set of attributes to compare and
+        the objects are considered to be equal, if all of these attributes are equal.
+        If the subclass has not defined a set of attributes to compare, a warning will be issued.
 
-    def _unfreeze(self) -> None:
-        self._frozen = False
+        Tip:
+            If instances of a class in the :mod:`telegram` module are comparable in terms of
+            equality, the documentation of the class will state the attributes that will be used
+            for this comparison.
 
-    @contextmanager
-    def _unfrozen(self: Tele_co) -> Iterator[Tele_co]:
-        """Context manager to temporarily unfreeze the object. For internal use only.
+        Args:
+            other (:obj:`object`): The object to compare with.
 
-        Note:
-            with to._unfrozen() as other_to:
-                assert to is other_to
+        Returns:
+            :obj:`bool`
+
         """
-        self._unfreeze()
-        yield self
-        self._freeze()
+        if isinstance(other, self.__class__):
+            if not self._id_attrs:
+                warn(
+                    f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
+                    " equivalence.",
+                    stacklevel=2,
+                )
+            if not other._id_attrs:
+                warn(
+                    f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
+                    " for equivalence.",
+                    stacklevel=2,
+                )
+            return self._id_attrs == other._id_attrs
+        return super().__eq__(other)
 
-    def _apply_api_kwargs(self, api_kwargs: JSONDict) -> None:
-        """Loops through the api kwargs and for every key that exists as attribute of the
-        object (and is None), it moves the value from `api_kwargs` to the attribute.
-        *Edits `api_kwargs` in place!*
+    def __hash__(self) -> int:
+        """Builds a hash value for this object such that the hash of two objects is equal if and
+        only if the objects are equal in terms of :meth:`__eq__`.
 
-        This method is currently only called in the unpickling process, i.e. not on "normal" init.
-        This is because
-        * automating this is tricky to get right: It should be called at the *end* of the __init__,
-          preferably only once at the end of the __init__ of the last child class. This could be
-          done via __init_subclass__, but it's hard to not destroy the signature of __init__ in the
-          process.
-        * calling it manually in every __init__ is tedious
-        * There probably is no use case for it anyway. If you manually initialize a TO subclass,
-          then you can pass everything as proper argument.
+        Returns:
+            :obj:`int`
         """
-        # we convert to list to ensure that the list doesn't change length while we loop
-        for key in list(api_kwargs.keys()):
-            if getattr(self, key, True) is None:
-                setattr(self, key, api_kwargs.pop(key))
+        if self._id_attrs:
+            return hash((self.__class__, self._id_attrs))
+        return super().__hash__()
 
     def __setattr__(self, key: str, value: object) -> None:
         """Overrides :meth:`object.__setattr__` to prevent the overriding of attributes.
@@ -364,6 +374,122 @@ class TelegramObject:
         self.set_bot(bot)
         return result
 
+    @staticmethod
+    def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
+        """Should be called by subclasses that override de_json to ensure that the input
+        is not altered. Whoever calls de_json might still want to use the original input
+        for something else.
+        """
+        return None if data is None else data.copy()
+
+    @classmethod
+    def _de_json(
+        cls: Type[Tele_co],
+        data: Optional[JSONDict],
+        bot: "Bot",
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Optional[Tele_co]:
+        if data is None:
+            return None
+
+        # try-except is significantly faster in case we already have a correct argument set
+        try:
+            obj = cls(**data, api_kwargs=api_kwargs)
+        except TypeError as exc:
+            if "__init__() got an unexpected keyword argument" not in str(exc):
+                raise exc
+
+            if cls.__INIT_PARAMS_CHECK is not cls:
+                signature = inspect.signature(cls)
+                cls.__INIT_PARAMS = set(signature.parameters.keys())
+                cls.__INIT_PARAMS_CHECK = cls
+
+            api_kwargs = api_kwargs or {}
+            existing_kwargs: JSONDict = {}
+            for key, value in data.items():
+                (existing_kwargs if key in cls.__INIT_PARAMS else api_kwargs)[key] = value
+
+            obj = cls(api_kwargs=api_kwargs, **existing_kwargs)
+
+        obj.set_bot(bot=bot)
+        return obj
+
+    @classmethod
+    def de_json(cls: Type[Tele_co], data: Optional[JSONDict], bot: "Bot") -> Optional[Tele_co]:
+        """Converts JSON data to a Telegram object.
+
+        Args:
+            data (Dict[:obj:`str`, ...]): The JSON data.
+            bot (:class:`telegram.Bot`): The bot associated with this object.
+
+        Returns:
+            The Telegram object.
+
+        """
+        return cls._de_json(data=data, bot=bot)
+
+    @classmethod
+    def de_list(
+        cls: Type[Tele_co], data: Optional[List[JSONDict]], bot: "Bot"
+    ) -> Tuple[Tele_co, ...]:
+        """Converts a list of JSON objects to a tuple of Telegram objects.
+
+        .. versionchanged:: 20.0
+
+           * Returns a tuple instead of a list.
+           * Filters out any :obj:`None` values.
+
+        Args:
+            data (List[Dict[:obj:`str`, ...]]): The JSON data.
+            bot (:class:`telegram.Bot`): The bot associated with these objects.
+
+        Returns:
+            A tuple of Telegram objects.
+
+        """
+        if not data:
+            return ()
+
+        return tuple(obj for obj in (cls.de_json(d, bot) for d in data) if obj is not None)
+
+    @contextmanager
+    def _unfrozen(self: Tele_co) -> Iterator[Tele_co]:
+        """Context manager to temporarily unfreeze the object. For internal use only.
+
+        Note:
+            with to._unfrozen() as other_to:
+                assert to is other_to
+        """
+        self._unfreeze()
+        yield self
+        self._freeze()
+
+    def _freeze(self) -> None:
+        self._frozen = True
+
+    def _unfreeze(self) -> None:
+        self._frozen = False
+
+    def _apply_api_kwargs(self, api_kwargs: JSONDict) -> None:
+        """Loops through the api kwargs and for every key that exists as attribute of the
+        object (and is None), it moves the value from `api_kwargs` to the attribute.
+        *Edits `api_kwargs` in place!*
+
+        This method is currently only called in the unpickling process, i.e. not on "normal" init.
+        This is because
+        * automating this is tricky to get right: It should be called at the *end* of the __init__,
+          preferably only once at the end of the __init__ of the last child class. This could be
+          done via __init_subclass__, but it's hard to not destroy the signature of __init__ in the
+          process.
+        * calling it manually in every __init__ is tedious
+        * There probably is no use case for it anyway. If you manually initialize a TO subclass,
+          then you can pass everything as proper argument.
+        """
+        # we convert to list to ensure that the list doesn't change length while we loop
+        for key in list(api_kwargs.keys()):
+            if getattr(self, key, True) is None:
+                setattr(self, key, api_kwargs.pop(key))
+
     def _get_attrs_names(self, include_private: bool) -> Iterator[str]:
         """
         Returns the names of the attributes of this object. This is used to determine which
@@ -422,84 +548,6 @@ class TelegramObject:
         if remove_bot:
             data.pop("_bot", None)
         return data
-
-    @staticmethod
-    def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
-        """Should be called by subclasses that override de_json to ensure that the input
-        is not altered. Whoever calls de_json might still want to use the original input
-        for something else.
-        """
-        return None if data is None else data.copy()
-
-    @classmethod
-    def de_json(cls: Type[Tele_co], data: Optional[JSONDict], bot: "Bot") -> Optional[Tele_co]:
-        """Converts JSON data to a Telegram object.
-
-        Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
-
-        Returns:
-            The Telegram object.
-
-        """
-        return cls._de_json(data=data, bot=bot)
-
-    @classmethod
-    def _de_json(
-        cls: Type[Tele_co],
-        data: Optional[JSONDict],
-        bot: "Bot",
-        api_kwargs: Optional[JSONDict] = None,
-    ) -> Optional[Tele_co]:
-        if data is None:
-            return None
-
-        # try-except is significantly faster in case we already have a correct argument set
-        try:
-            obj = cls(**data, api_kwargs=api_kwargs)
-        except TypeError as exc:
-            if "__init__() got an unexpected keyword argument" not in str(exc):
-                raise exc
-
-            if cls.__INIT_PARAMS_CHECK is not cls:
-                signature = inspect.signature(cls)
-                cls.__INIT_PARAMS = set(signature.parameters.keys())
-                cls.__INIT_PARAMS_CHECK = cls
-
-            api_kwargs = api_kwargs or {}
-            existing_kwargs: JSONDict = {}
-            for key, value in data.items():
-                (existing_kwargs if key in cls.__INIT_PARAMS else api_kwargs)[key] = value
-
-            obj = cls(api_kwargs=api_kwargs, **existing_kwargs)
-
-        obj.set_bot(bot=bot)
-        return obj
-
-    @classmethod
-    def de_list(
-        cls: Type[Tele_co], data: Optional[List[JSONDict]], bot: "Bot"
-    ) -> Tuple[Tele_co, ...]:
-        """Converts a list of JSON objects to a tuple of Telegram objects.
-
-        .. versionchanged:: 20.0
-
-           * Returns a tuple instead of a list.
-           * Filters out any :obj:`None` values.
-
-        Args:
-            data (List[Dict[:obj:`str`, ...]]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with these objects.
-
-        Returns:
-            A tuple of Telegram objects.
-
-        """
-        if not data:
-            return ()
-
-        return tuple(obj for obj in (cls.de_json(d, bot) for d in data) if obj is not None)
 
     def to_json(self) -> str:
         """Gives a JSON representation of object.
@@ -596,51 +644,3 @@ class TelegramObject:
             bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.
         """
         self._bot = bot
-
-    def __eq__(self, other: object) -> bool:
-        """Compares this object with :paramref:`other` in terms of equality.
-        If this object and :paramref:`other` are `not` objects of the same class,
-        this comparison will fall back to Python's default implementation of :meth:`object.__eq__`.
-        Otherwise, both objects may be compared in terms of equality, if the corresponding
-        subclass of :class:`TelegramObject` has defined a set of attributes to compare and
-        the objects are considered to be equal, if all of these attributes are equal.
-        If the subclass has not defined a set of attributes to compare, a warning will be issued.
-
-        Tip:
-            If instances of a class in the :mod:`telegram` module are comparable in terms of
-            equality, the documentation of the class will state the attributes that will be used
-            for this comparison.
-
-        Args:
-            other (:obj:`object`): The object to compare with.
-
-        Returns:
-            :obj:`bool`
-
-        """
-        if isinstance(other, self.__class__):
-            if not self._id_attrs:
-                warn(
-                    f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
-                    " equivalence.",
-                    stacklevel=2,
-                )
-            if not other._id_attrs:
-                warn(
-                    f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
-                    " for equivalence.",
-                    stacklevel=2,
-                )
-            return self._id_attrs == other._id_attrs
-        return super().__eq__(other)
-
-    def __hash__(self) -> int:
-        """Builds a hash value for this object such that the hash of two objects is equal if and
-        only if the objects are equal in terms of :meth:`__eq__`.
-
-        Returns:
-            :obj:`int`
-        """
-        if self._id_attrs:
-            return hash((self.__class__, self._id_attrs))
-        return super().__hash__()
