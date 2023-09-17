@@ -331,9 +331,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         self._per_user: bool = per_user
         self._per_chat: bool = per_chat
         self._per_message: bool = per_message
-        self._conversation_timeout: Optional[Union[float, datetime.timedelta]] = (
-            conversation_timeout
-        )
+        self._conversation_timeout: Optional[
+            Union[float, datetime.timedelta]
+        ] = conversation_timeout
         self._name: Optional[str] = name
         self._map_to_parent: Optional[Dict[object, object]] = map_to_parent
 

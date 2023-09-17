@@ -1705,8 +1705,7 @@ class TestBotWithoutRequest:
         )
         assert (
             "You set the HTTP version for the get_updates_request and request HTTPXRequest "
-            "instance"
-            in str(recwarn[2].message)
+            "instance" in str(recwarn[2].message)
         )
         for warning in recwarn:
             assert warning.filename == __file__, "wrong stacklevel!"

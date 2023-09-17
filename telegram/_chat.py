@@ -399,9 +399,9 @@ class Chat(TelegramObject):
         self.location: Optional[ChatLocation] = location
         self.join_to_send_messages: Optional[bool] = join_to_send_messages
         self.join_by_request: Optional[bool] = join_by_request
-        self.has_restricted_voice_and_video_messages: Optional[bool] = (
-            has_restricted_voice_and_video_messages
-        )
+        self.has_restricted_voice_and_video_messages: Optional[
+            bool
+        ] = has_restricted_voice_and_video_messages
         self.is_forum: Optional[bool] = is_forum
         self.active_usernames: Tuple[str, ...] = parse_sequence_arg(active_usernames)
         self.emoji_status_custom_emoji_id: Optional[str] = emoji_status_custom_emoji_id
