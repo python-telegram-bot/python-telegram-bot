@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 from base64 import b64decode
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple, Union
 
 from telegram._passport.credentials import decrypt_json
 from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
@@ -54,7 +54,7 @@ class EncryptedPassportElement(TelegramObject):
         data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocumentData` | \
             :class:`telegram.ResidentialAddress` | :obj:`str`, optional):
             Decrypted or encrypted data, available for "personal_details", "passport",
-            "driver_license", "identity_card", "identity_passport" and "address" types.
+            "driver_license", "identity_card", "internal_passport" and "address" types.
         phone_number (:obj:`str`, optional): User's verified phone number, available only for
             "phone_number" type.
         email (:obj:`str`, optional): User's verified email address, available only for "email"
@@ -96,7 +96,7 @@ class EncryptedPassportElement(TelegramObject):
         data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocumentData` | \
             :class:`telegram.ResidentialAddress` | :obj:`str`):
             Optional. Decrypted or encrypted data, available for "personal_details", "passport",
-            "driver_license", "identity_card", "identity_passport" and "address" types.
+            "driver_license", "identity_card", "internal_passport" and "address" types.
         phone_number (:obj:`str`): Optional. User's verified phone number, available only for
             "phone_number" type.
         email (:obj:`str`): Optional. User's verified email address, available only for "email"
@@ -151,24 +151,24 @@ class EncryptedPassportElement(TelegramObject):
         self,
         type: str,  # pylint: disable=redefined-builtin
         hash: str,  # pylint: disable=redefined-builtin
-        data: PersonalDetails = None,
-        phone_number: str = None,
-        email: str = None,
-        files: Sequence[PassportFile] = None,
-        front_side: PassportFile = None,
-        reverse_side: PassportFile = None,
-        selfie: PassportFile = None,
-        translation: Sequence[PassportFile] = None,
-        credentials: "Credentials" = None,  # pylint: disable=unused-argument
+        data: Optional[Union[PersonalDetails, IdDocumentData, ResidentialAddress]] = None,
+        phone_number: Optional[str] = None,
+        email: Optional[str] = None,
+        files: Optional[Sequence[PassportFile]] = None,
+        front_side: Optional[PassportFile] = None,
+        reverse_side: Optional[PassportFile] = None,
+        selfie: Optional[PassportFile] = None,
+        translation: Optional[Sequence[PassportFile]] = None,
+        credentials: Optional["Credentials"] = None,  # pylint: disable=unused-argument
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
         self.type: str = type
         # Optionals
-        self.data: Optional[PersonalDetails] = data
+        self.data: Optional[Union[PersonalDetails, IdDocumentData, ResidentialAddress]] = data
         self.phone_number: Optional[str] = phone_number
         self.email: Optional[str] = email
         self.files: Tuple[PassportFile, ...] = parse_sequence_arg(files)

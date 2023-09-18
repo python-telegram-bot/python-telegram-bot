@@ -20,12 +20,12 @@
 
 
 from telegram import Update
-from telegram.ext._handler import BaseHandler
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._utils.types import CCT
 
 
 class PollHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram updates that contain a
+    """Handler class to handle Telegram updates that contain a
     :attr:`poll <telegram.Update.poll>`.
 
     Warning:

@@ -62,7 +62,7 @@ class WebhookServer:
         self._server_lock = asyncio.Lock()
         self._shutdown_lock = asyncio.Lock()
 
-    async def serve_forever(self, ready: asyncio.Event = None) -> None:
+    async def serve_forever(self, ready: Optional[asyncio.Event] = None) -> None:
         async with self._server_lock:
             self._http_server.listen(self.port, address=self.listen)
 
@@ -87,7 +87,11 @@ class WebhookAppClass(tornado.web.Application):
     """Application used in the Webserver"""
 
     def __init__(
-        self, webhook_path: str, bot: "Bot", update_queue: asyncio.Queue, secret_token: str = None
+        self,
+        webhook_path: str,
+        bot: "Bot",
+        update_queue: asyncio.Queue,
+        secret_token: Optional[str] = None,
     ):
         self.shared_objects = {
             "bot": bot,

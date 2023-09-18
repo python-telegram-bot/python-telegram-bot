@@ -61,7 +61,7 @@ class InvalidCallbackData(TelegramError):
 
     __slots__ = ("callback_data",)
 
-    def __init__(self, callback_data: str = None) -> None:
+    def __init__(self, callback_data: Optional[str] = None) -> None:
         super().__init__(
             "The object belonging to this callback_data was deleted or the callback_data was "
             "manipulated."
@@ -76,7 +76,10 @@ class _KeyboardData:
     __slots__ = ("keyboard_uuid", "button_data", "access_time")
 
     def __init__(
-        self, keyboard_uuid: str, access_time: float = None, button_data: Dict[str, object] = None
+        self,
+        keyboard_uuid: str,
+        access_time: Optional[float] = None,
+        button_data: Optional[Dict[str, object]] = None,
     ):
         self.keyboard_uuid = keyboard_uuid
         self.button_data = button_data or {}
@@ -110,7 +113,7 @@ class CallbackDataCache:
 
         .. code-block:: bash
 
-           pip install python-telegram-bot[callback-data]
+           pip install "python-telegram-bot[callback-data]"
 
     Examples:
         :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
@@ -122,7 +125,7 @@ class CallbackDataCache:
 
     .. versionchanged:: 20.0
         To use this class, PTB must be installed via
-        ``pip install python-telegram-bot[callback-data]``.
+        ``pip install "python-telegram-bot[callback-data]"``.
 
     Args:
         bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
@@ -145,12 +148,12 @@ class CallbackDataCache:
         self,
         bot: "ExtBot[Any]",
         maxsize: int = 1024,
-        persistent_data: CDCData = None,
+        persistent_data: Optional[CDCData] = None,
     ):
         if not CACHE_TOOLS_AVAILABLE:
             raise RuntimeError(
                 "To use `CallbackDataCache`, PTB must be installed via `pip install "
-                "python-telegram-bot[callback-data]`."
+                '"python-telegram-bot[callback-data]"`.'
             )
 
         self.bot: ExtBot[Any] = bot
@@ -419,7 +422,7 @@ class CallbackDataCache:
         except KeyError:
             return
 
-    def clear_callback_data(self, time_cutoff: Union[float, datetime] = None) -> None:
+    def clear_callback_data(self, time_cutoff: Optional[Union[float, datetime]] = None) -> None:
         """Clears the stored callback data.
 
         Args:
@@ -436,7 +439,9 @@ class CallbackDataCache:
         """Clears the stored callback query IDs."""
         self.__clear(self._callback_queries)
 
-    def __clear(self, mapping: MutableMapping, time_cutoff: Union[float, datetime] = None) -> None:
+    def __clear(
+        self, mapping: MutableMapping, time_cutoff: Optional[Union[float, datetime]] = None
+    ) -> None:
         if not time_cutoff:
             mapping.clear()
             return

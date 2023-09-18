@@ -84,7 +84,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         * :any:`Custom Webhook Bot <examples.customwebhookbot>`
 
     .. seealso:: :attr:`telegram.ext.ContextTypes.DEFAULT_TYPE`,
-        :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+        :wiki:`Job Queue <Extensions---JobQueue>`
 
     Args:
         application (:class:`telegram.ext.Application`): The application associated with this
@@ -135,8 +135,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     def __init__(
         self: "CCT",
         application: "Application[BT, CCT, UD, CD, BD, Any]",
-        chat_id: int = None,
-        user_id: int = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
     ):
         self._application: Application[BT, CCT, UD, CD, BD, Any] = application
         self._chat_id: Optional[int] = chat_id
@@ -144,9 +144,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match[str]]] = None
         self.error: Optional[Exception] = None
-        self.job: Optional["Job[CCT]"] = None
+        self.job: Optional[Job[CCT]] = None
         self.coroutine: Optional[
-            Union[Generator[Optional["Future[object]"], None, Any], Awaitable[Any]]
+            Union[Generator[Optional[Future[object]], None, Any], Awaitable[Any]]
         ] = None
 
     @property
@@ -278,8 +278,10 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         update: object,
         error: Exception,
         application: "Application[BT, CCT, UD, CD, BD, Any]",
-        job: "Job[Any]" = None,
-        coroutine: Union[Generator[Optional["Future[object]"], None, Any], Awaitable[Any]] = None,
+        job: Optional["Job[Any]"] = None,
+        coroutine: Optional[
+            Union[Generator[Optional["Future[object]"], None, Any], Awaitable[Any]]
+        ] = None,
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
@@ -397,12 +399,12 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
         :class:`telegram.ext.Application`.
 
-        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+        .. seealso:: :wiki:`Job Queue <Extensions---JobQueue>`
         """
         if self._application._job_queue is None:  # pylint: disable=protected-access
             warn(
                 "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-                "`pip install python-telegram-bot[job-queue]`.",
+                '`pip install "python-telegram-bot[job-queue]"`.',
                 stacklevel=2,
             )
         return self._application._job_queue  # pylint: disable=protected-access

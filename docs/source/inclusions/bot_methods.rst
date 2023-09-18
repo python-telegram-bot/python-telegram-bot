@@ -196,6 +196,10 @@
       - Used for setting the short description of the bot
     * - :meth:`~telegram.Bot.get_my_short_description`
       - Used for obtaining the short description of the bot
+    * - :meth:`~telegram.Bot.set_my_name`
+      - Used for setting the name of the bot
+    * - :meth:`~telegram.Bot.get_my_name`
+      - Used for obtaining the name of the bot
 
 .. raw:: html
 
@@ -233,7 +237,7 @@
       - Used for setting the keywords of a sticker
     * - :meth:`~telegram.Bot.set_sticker_mask_position`
       - Used for setting the mask position of a mask sticker
-    * - :meth:`~telegram.Bot.set_sticker_set_thumb`
+    * - :meth:`~telegram.Bot.set_sticker_set_thumbnail`
       - Used for setting the thumbnail of a sticker set
     * - :meth:`~telegram.Bot.set_custom_emoji_sticker_set_thumbnail`
       - Used for setting the thumbnail of a custom emoji sticker set
@@ -324,6 +328,8 @@
       - Used to reopen the general topic
     * - :meth:`~telegram.Bot.unpin_all_forum_topic_messages`
       - Used to unpin all messages in a forum topic
+    * - :meth:`~telegram.Bot.unpin_all_general_forum_topic_messages`
+      - Used to unpin all messages in the general forum topic
 
 .. raw:: html
 

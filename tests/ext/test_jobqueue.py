@@ -26,6 +26,7 @@ import time
 import pytest
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
+from telegram.warnings import PTBUserWarning
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
@@ -83,6 +84,21 @@ class TestJobQueue:
         "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
         " We recommend double checking if the passed value is correct."
     )
+
+    async def test_repr(self, app):
+        jq = JobQueue()
+        jq.set_application(app)
+        assert repr(jq) == f"JobQueue[application={app!r}]"
+
+        when = dtm.datetime.utcnow() + dtm.timedelta(days=1)
+        callback = self.job_run_once
+        job = jq.run_once(callback, when, name="name2")
+        assert repr(job) == (
+            f"Job[id={job.job.id}, name={job.name}, callback=job_run_once, "
+            f"trigger=date["
+            f"{when.strftime('%Y-%m-%d %H:%M:%S UTC')}"
+            f"]]"
+        )
 
     @pytest.fixture(autouse=True)
     def _reset(self):
@@ -359,6 +375,7 @@ class TestJobQueue:
         job_queue.run_daily(self.job_run_once, time_of_day, days=(0, 1, 2, 3))
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == self.expected_warning
+        assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     @pytest.mark.parametrize("weekday", [0, 1, 2, 3, 4, 5, 6])
@@ -376,6 +393,7 @@ class TestJobQueue:
         assert scheduled_time == pytest.approx(expected_reschedule_time)
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == self.expected_warning
+        assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     async def test_run_monthly(self, job_queue, timezone):
@@ -489,7 +507,7 @@ class TestJobQueue:
         job_2 = job_queue.run_repeating(self.job_run_once, 0.2)
         job_3 = Job(self.job_run_once, 0.2)
         job_3._job = job.job
-        assert job == job
+        assert job == job  # noqa: PLR0124
         assert job != job_queue
         assert job != job_2
         assert job == job_3
@@ -612,3 +630,29 @@ class TestJobQueue:
         else:
             await asyncio.sleep(0.1)  # unfortunately we will get a CancelledError here
             assert task.done()
+
+    async def test_from_aps_job(self, job_queue):
+        job = job_queue.run_once(self.job_run_once, 0.1, name="test_job")
+        aps_job = job_queue.scheduler.get_job(job.id)
+
+        tg_job = Job.from_aps_job(aps_job)
+        assert tg_job is job
+        assert tg_job.job is aps_job
+
+    async def test_from_aps_job_missing_reference(self, job_queue):
+        """We manually create a ext.Job and an aps job such that the former has no reference to the
+        latter. Then we test that Job.from_aps_job() still sets the reference correctly.
+        """
+        job = Job(self.job_run_once)
+        aps_job = job_queue.scheduler.add_job(
+            func=job_queue.job_callback,
+            args=(job_queue, job),
+            trigger="interval",
+            seconds=2,
+            id="test_id",
+        )
+
+        assert job.job is None
+        tg_job = Job.from_aps_job(aps_job)
+        assert tg_job is job
+        assert tg_job.job is aps_job

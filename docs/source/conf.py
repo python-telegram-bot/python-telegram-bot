@@ -21,9 +21,9 @@ author = "Leandro Toledo"
 # built documents.
 #
 # The short X.Y version.
-version = "20.2"  # telegram.__version__[:3]
+version = "20.5"  # telegram.__version__[:3]
 # The full version, including alpha/beta/rc tags.
-release = "20.2"  # telegram.__version__
+release = "20.5"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "6.1.3"
@@ -39,12 +39,17 @@ extensions = [
     "sphinx.ext.extlinks",
     "sphinx_paramlinks",
     "sphinx_copybutton",
+    "sphinx_inline_tabs",
     "sphinxcontrib.mermaid",
     "sphinx_search.extension",
 ]
 
 # For shorter links to Wiki in docstrings
-extlinks = {"wiki": ("https://github.com/python-telegram-bot/python-telegram-bot/wiki/%s", "%s")}
+extlinks = {
+    "wiki": ("https://github.com/python-telegram-bot/python-telegram-bot/wiki/%s", "%s"),
+    "pr": ("https://github.com/python-telegram-bot/python-telegram-bot/pull/%s", "#%s"),
+    "issue": ("https://github.com/python-telegram-bot/python-telegram-bot/issues/%s", "#%s"),
+}
 
 # Use intersphinx to reference the python builtin library docs
 intersphinx_mapping = {

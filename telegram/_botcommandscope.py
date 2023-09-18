@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains objects representing Telegram bot command scopes."""
-from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type, Union
+from typing import TYPE_CHECKING, Dict, Final, Optional, Type, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -60,22 +60,22 @@ class BotCommandScope(TelegramObject):
 
     __slots__ = ("type",)
 
-    DEFAULT: ClassVar[str] = constants.BotCommandScopeType.DEFAULT
+    DEFAULT: Final[str] = constants.BotCommandScopeType.DEFAULT
     """:const:`telegram.constants.BotCommandScopeType.DEFAULT`"""
-    ALL_PRIVATE_CHATS: ClassVar[str] = constants.BotCommandScopeType.ALL_PRIVATE_CHATS
+    ALL_PRIVATE_CHATS: Final[str] = constants.BotCommandScopeType.ALL_PRIVATE_CHATS
     """:const:`telegram.constants.BotCommandScopeType.ALL_PRIVATE_CHATS`"""
-    ALL_GROUP_CHATS: ClassVar[str] = constants.BotCommandScopeType.ALL_GROUP_CHATS
+    ALL_GROUP_CHATS: Final[str] = constants.BotCommandScopeType.ALL_GROUP_CHATS
     """:const:`telegram.constants.BotCommandScopeType.ALL_GROUP_CHATS`"""
-    ALL_CHAT_ADMINISTRATORS: ClassVar[str] = constants.BotCommandScopeType.ALL_CHAT_ADMINISTRATORS
+    ALL_CHAT_ADMINISTRATORS: Final[str] = constants.BotCommandScopeType.ALL_CHAT_ADMINISTRATORS
     """:const:`telegram.constants.BotCommandScopeType.ALL_CHAT_ADMINISTRATORS`"""
-    CHAT: ClassVar[str] = constants.BotCommandScopeType.CHAT
+    CHAT: Final[str] = constants.BotCommandScopeType.CHAT
     """:const:`telegram.constants.BotCommandScopeType.CHAT`"""
-    CHAT_ADMINISTRATORS: ClassVar[str] = constants.BotCommandScopeType.CHAT_ADMINISTRATORS
+    CHAT_ADMINISTRATORS: Final[str] = constants.BotCommandScopeType.CHAT_ADMINISTRATORS
     """:const:`telegram.constants.BotCommandScopeType.CHAT_ADMINISTRATORS`"""
-    CHAT_MEMBER: ClassVar[str] = constants.BotCommandScopeType.CHAT_MEMBER
+    CHAT_MEMBER: Final[str] = constants.BotCommandScopeType.CHAT_MEMBER
     """:const:`telegram.constants.BotCommandScopeType.CHAT_MEMBER`"""
 
-    def __init__(self, type: str, *, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = type
         self._id_attrs = (self.type,)
@@ -100,7 +100,7 @@ class BotCommandScope(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type["BotCommandScope"]] = {
+        _class_mapping: Dict[str, Type[BotCommandScope]] = {
             cls.DEFAULT: BotCommandScopeDefault,
             cls.ALL_PRIVATE_CHATS: BotCommandScopeAllPrivateChats,
             cls.ALL_GROUP_CHATS: BotCommandScopeAllGroupChats,
@@ -128,7 +128,7 @@ class BotCommandScopeDefault(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None):
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(type=BotCommandScope.DEFAULT, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -144,7 +144,7 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None):
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(type=BotCommandScope.ALL_PRIVATE_CHATS, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -159,7 +159,7 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None):
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(type=BotCommandScope.ALL_GROUP_CHATS, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -174,7 +174,7 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None):
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(type=BotCommandScope.ALL_CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -197,7 +197,7 @@ class BotCommandScopeChat(BotCommandScope):
 
     __slots__ = ("chat_id",)
 
-    def __init__(self, chat_id: Union[str, int], *, api_kwargs: JSONDict = None):
+    def __init__(self, chat_id: Union[str, int], *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(type=BotCommandScope.CHAT, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.chat_id: Union[str, int] = (
@@ -224,7 +224,7 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
 
     __slots__ = ("chat_id",)
 
-    def __init__(self, chat_id: Union[str, int], *, api_kwargs: JSONDict = None):
+    def __init__(self, chat_id: Union[str, int], *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(type=BotCommandScope.CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.chat_id: Union[str, int] = (
@@ -254,7 +254,9 @@ class BotCommandScopeChatMember(BotCommandScope):
 
     __slots__ = ("chat_id", "user_id")
 
-    def __init__(self, chat_id: Union[str, int], user_id: int, *, api_kwargs: JSONDict = None):
+    def __init__(
+        self, chat_id: Union[str, int], user_id: int, *, api_kwargs: Optional[JSONDict] = None
+    ):
         super().__init__(type=BotCommandScope.CHAT_MEMBER, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.chat_id: Union[str, int] = (

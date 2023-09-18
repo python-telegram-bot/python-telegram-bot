@@ -22,9 +22,10 @@ import copy
 import enum
 import functools
 import logging
+import sys
 import time
 from pathlib import Path
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 import pytest
 
@@ -70,7 +71,7 @@ class TrackingPersistence(BasePersistence):
 
     def __init__(
         self,
-        store_data: PersistenceInput = None,
+        store_data: Optional[PersistenceInput] = None,
         update_interval: float = 60,
         fill_data: bool = False,
     ):
@@ -219,20 +220,20 @@ class TrackingConversationHandler(ConversationHandler):
 
 
 class PappInput(NamedTuple):
-    bot_data: bool = None
-    chat_data: bool = None
-    user_data: bool = None
-    callback_data: bool = None
+    bot_data: Optional[bool] = None
+    chat_data: Optional[bool] = None
+    user_data: Optional[bool] = None
+    callback_data: Optional[bool] = None
     conversations: bool = True
     update_interval: float = None
     fill_data: bool = False
 
 
 def build_papp(
-    bot_info: dict = None,
-    token: str = None,
-    store_data: dict = None,
-    update_interval: float = None,
+    bot_info: Optional[dict] = None,
+    token: Optional[str] = None,
+    store_data: Optional[dict] = None,
+    update_interval: Optional[float] = None,
     fill_data: bool = False,
 ) -> Application:
     store_data = PersistenceInput(**(store_data or {}))
@@ -311,7 +312,7 @@ class TestBasePersistence:
     """Tests basic behavior of BasePersistence and (most importantly) the integration of
     persistence into the Application."""
 
-    def job_callback(self, chat_id: int = None):
+    def job_callback(self, chat_id: Optional[int] = None):
         async def callback(context):
             if context.user_data:
                 context.user_data["key"] = "value"
@@ -330,7 +331,7 @@ class TestBasePersistence:
 
         return callback
 
-    def handler_callback(self, chat_id: int = None, sleep: float = None):
+    def handler_callback(self, chat_id: Optional[int] = None, sleep: Optional[float] = None):
         async def callback(update, context):
             if sleep:
                 await asyncio.sleep(sleep)
@@ -377,15 +378,13 @@ class TestBasePersistence:
         assert persistence.store_data.callback_data == callback_data
 
     def test_abstract_methods(self):
+        methods = list(BasePersistence.__abstractmethods__)
+        methods.sort()
         with pytest.raises(
             TypeError,
-            match=(
-                "drop_chat_data, drop_user_data, flush, get_bot_data, get_callback_data, "
-                "get_chat_data, get_conversations, "
-                "get_user_data, refresh_bot_data, refresh_chat_data, "
-                "refresh_user_data, update_bot_data, update_callback_data, "
-                "update_chat_data, update_conversation, update_user_data"
-            ),
+            match=", ".join(methods)
+            if sys.version_info < (3, 12)
+            else ", ".join(f"'{i}'" for i in methods),
         ):
             BasePersistence()
 
@@ -552,6 +551,8 @@ class TestBasePersistence:
             papp.add_handler(conversation)
 
             assert len(recwarn) >= 1
+            tasks = asyncio.all_tasks()
+            assert any("conversation_handler_after_init" in t.get_name() for t in tasks)
             found = False
             for warning in recwarn:
                 if "after `Application.initialize` was called" in str(warning.message):
@@ -583,6 +584,28 @@ class TestBasePersistence:
     async def test_add_conversation_handler_without_name(self, papp: Application):
         with pytest.raises(ValueError, match="when handler is unnamed"):
             papp.add_handler(build_conversation_handler(name=None, persistent=True))
+
+    @pytest.mark.parametrize(
+        "papp",
+        [
+            PappInput(update_interval=0.0),
+        ],
+        indirect=True,
+    )
+    async def test_update_persistence_called(self, papp: Application, monkeypatch):
+        """Tests if Application.update_persistence is called from app.start()"""
+        called = asyncio.Event()
+
+        async def update_persistence(*args, **kwargs):
+            called.set()
+
+        monkeypatch.setattr(papp, "update_persistence", update_persistence)
+        async with papp:
+            await papp.start()
+            tasks = asyncio.all_tasks()
+            assert any(":persistence_updater" in task.get_name() for task in tasks)
+            assert await called.wait()
+            await papp.stop()
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(

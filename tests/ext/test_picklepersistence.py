@@ -20,6 +20,7 @@ import datetime
 import gzip
 import os
 import pickle
+import sys
 from pathlib import Path
 
 import pytest
@@ -27,6 +28,7 @@ import pytest
 from telegram import Chat, Message, TelegramObject, Update, User
 from telegram.ext import ContextTypes, PersistenceInput, PicklePersistence
 from telegram.warnings import PTBUserWarning
+from tests.auxil.files import PROJECT_ROOT_PATH
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
 
@@ -871,7 +873,8 @@ class TestPicklePersistence:
             "function was specified."
         )
         with Path("pickletest_chat_data").open("rb") as f, pytest.raises(
-            pickle.UnpicklingError, match=err_msg
+            pickle.UnpicklingError,
+            match=err_msg if sys.version_info < (3, 12) else err_msg.replace("\n", " "),
         ):
             pickle.load(f)
 
@@ -892,6 +895,10 @@ class TestPicklePersistence:
         assert len(recwarn) == 1
         assert recwarn[-1].category is PTBUserWarning
         assert str(recwarn[-1].message).startswith("Unknown bot instance found.")
+        assert (
+            Path(recwarn[-1].filename)
+            == PROJECT_ROOT_PATH / "telegram" / "ext" / "_picklepersistence.py"
+        ), "wrong stacklevel!"
         pp = PicklePersistence("pickletest", single_file=False, on_flush=False)
         pp.set_bot(bot)
         assert (await pp.get_chat_data())[12345]["unknown_bot_in_user"]._bot is None
@@ -986,7 +993,7 @@ class TestPicklePersistence:
         await pickle_persistence.update_callback_data(callback_data)
 
         assert pickle_persistence.filepath.is_file()
-        pickle_persistence.filepath.unlink()
+        pickle_persistence.filepath.unlink(missing_ok=True)
         assert not pickle_persistence.filepath.is_file()
 
         await pickle_persistence.update_bot_data(bot_data)

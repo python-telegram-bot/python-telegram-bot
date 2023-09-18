@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Any, Callable, Match, Optional, Pattern, TypeV
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
-from telegram.ext._handler import BaseHandler
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
@@ -34,7 +34,7 @@ RT = TypeVar("RT")
 
 
 class CallbackQueryHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram
+    """Handler class to handle Telegram
     :attr:`callback queries <telegram.Update.callback_query>`. Optionally based on a regex.
 
     Read the documentation of the :mod:`re` module for more information.
@@ -109,7 +109,9 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        pattern: Union[str, Pattern[str], type, Callable[[object], Optional[bool]]] = None,
+        pattern: Optional[
+            Union[str, Pattern[str], type, Callable[[object], Optional[bool]]]
+        ] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
@@ -148,8 +150,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
                     return self.pattern(callback_data)
                 if not isinstance(callback_data, str):
                     return False
-                match = re.match(self.pattern, callback_data)
-                if match:
+                if match := re.match(self.pattern, callback_data):
                     return match
             else:
                 return True

@@ -35,7 +35,7 @@ __all__ = (
     "TimedOut",
 )
 
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 
 def _lstrip_str(in_s: str, lstr: str) -> str:
@@ -54,6 +54,12 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
 class TelegramError(Exception):
     """
     Base class for Telegram errors.
+
+    Tip:
+        Objects of this type can be serialized via Python's :mod:`pickle` module and pickled
+        objects from one version of PTB are usually loadable in future versions. However, we can
+        not guarantee that this compatibility will always be provided. At least a manual one-time
+        conversion of the data may be needed on major updates of the library.
 
     .. seealso:: :wiki:`Exceptions, Warnings and Logging <Exceptions%2C-Warnings-and-Logging>`
     """
@@ -105,15 +111,25 @@ class InvalidToken(TelegramError):
 
     __slots__ = ()
 
-    def __init__(self, message: str = None) -> None:
+    def __init__(self, message: Optional[str] = None) -> None:
         super().__init__("Invalid token" if message is None else message)
 
 
 class NetworkError(TelegramError):
     """Base class for exceptions due to networking errors.
 
+    Tip:
+        This exception (and its subclasses) usually originates from the networking backend
+        used by :class:`~telegram.request.HTTPXRequest`, or a custom implementation of
+        :class:`~telegram.request.BaseRequest`. In this case, the original exception can be
+        accessed via the ``__cause__``
+        `attribute <https://docs.python.org/3/library/exceptions.html#exception-context>`_.
+
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
+
+    .. seealso::
+        :wiki:`Handling network errors <Handling-network-errors>`
     """
 
     __slots__ = ()
@@ -128,6 +144,9 @@ class BadRequest(NetworkError):
 class TimedOut(NetworkError):
     """Raised when a request took too long to finish.
 
+    .. seealso::
+        :wiki:`Handling network errors <Handling-network-errors>`
+
     Args:
         message (:obj:`str`, optional): Any additional information about the exception.
 
@@ -136,7 +155,7 @@ class TimedOut(NetworkError):
 
     __slots__ = ()
 
-    def __init__(self, message: str = None) -> None:
+    def __init__(self, message: Optional[str] = None) -> None:
         super().__init__(message or "Timed out")
 
 

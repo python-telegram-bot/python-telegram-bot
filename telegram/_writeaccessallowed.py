@@ -17,21 +17,37 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to the write access allowed service message."""
+from typing import Optional
+
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 
 class WriteAccessAllowed(TelegramObject):
     """
-    This object represents a service message about a user allowing a bot added to the attachment
-    menu to write messages. Currently holds no information.
+    This object represents a service message about a user allowing a bot to write messages after
+    adding the bot to the attachment menu or launching a Web App from a link.
 
     .. versionadded:: 20.0
+
+    Args:
+        web_app_name (:obj:`str`, optional): Name of the Web App which was launched from a link.
+
+            .. versionadded:: 20.3
+
+    Attributes:
+        web_app_name (:obj:`str`): Optional. Name of the Web App which was launched from a link.
+
+            .. versionadded:: 20.3
+
     """
 
-    __slots__ = ()
+    __slots__ = ("web_app_name",)
 
-    def __init__(self, *, api_kwargs: JSONDict = None):
+    def __init__(
+        self, web_app_name: Optional[str] = None, *, api_kwargs: Optional[JSONDict] = None
+    ):
         super().__init__(api_kwargs=api_kwargs)
+        self.web_app_name: Optional[str] = web_app_name
 
         self._freeze()

@@ -26,7 +26,7 @@ Warning:
     the changelog.
 """
 from collections import UserDict
-from typing import ClassVar, Generic, List, Mapping, Set, Tuple, TypeVar, Union
+from typing import Final, Generic, List, Mapping, Optional, Set, Tuple, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 
@@ -45,7 +45,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
         * deleting values is considered writing
     """
 
-    DELETED: ClassVar = object()
+    DELETED: Final = object()
     """Special marker indicating that an entry was deleted."""
 
     __slots__ = ("_write_access_keys",)
@@ -53,6 +53,14 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
     def __init__(self) -> None:
         super().__init__()
         self._write_access_keys: Set[_KT] = set()
+
+    def __setitem__(self, key: _KT, value: _VT) -> None:
+        self.__track_write(key)
+        super().__setitem__(key, value)
+
+    def __delitem__(self, key: _KT) -> None:
+        self.__track_write(key)
+        super().__delitem__(key)
 
     def __track_write(self, key: Union[_KT, Set[_KT]]) -> None:
         if isinstance(key, set):
@@ -83,14 +91,6 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
 
     # Override methods to track access
 
-    def __setitem__(self, key: _KT, value: _VT) -> None:
-        self.__track_write(key)
-        super().__setitem__(key, value)
-
-    def __delitem__(self, key: _KT) -> None:
-        self.__track_write(key)
-        super().__delitem__(key)
-
     def update_no_track(self, mapping: Mapping[_KT, _VT]) -> None:
         """Like ``update``, but doesn't count towards write access."""
         for key, value in mapping.items():
@@ -113,7 +113,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
 
     # Mypy seems a bit inconsistent about what it wants as types for `default` and return value
     # so we just ignore a bit
-    def setdefault(self: "TrackingDict[_KT, _T]", key: _KT, default: _T = None) -> _T:
+    def setdefault(self: "TrackingDict[_KT, _T]", key: _KT, default: Optional[_T] = None) -> _T:
         if key in self:
             return self[key]
 

@@ -19,10 +19,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
-from typing import TYPE_CHECKING, Callable, ClassVar, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Callable, Final, Optional, Sequence, Union
 
 from telegram import constants
 from telegram._files.location import Location
+from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -103,14 +104,14 @@ class InlineQuery(TelegramObject):
         from_user: User,
         query: str,
         offset: str,
-        location: Location = None,
-        chat_type: str = None,
+        location: Optional[Location] = None,
+        chat_type: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.id: str = id  # pylint: disable=invalid-name
+        self.id: str = id
         self.from_user: User = from_user
         self.query: str = query
         self.offset: str = offset
@@ -141,19 +142,18 @@ class InlineQuery(TelegramObject):
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
-        cache_time: int = None,
-        is_personal: bool = None,
-        next_offset: str = None,
-        switch_pm_text: str = None,
-        switch_pm_parameter: str = None,
+        cache_time: Optional[int] = None,
+        is_personal: Optional[bool] = None,
+        next_offset: Optional[str] = None,
+        button: Optional[InlineQueryResultsButton] = None,
         *,
-        current_offset: str = None,
+        current_offset: Optional[str] = None,
         auto_pagination: bool = False,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 
@@ -190,8 +190,7 @@ class InlineQuery(TelegramObject):
             cache_time=cache_time,
             is_personal=is_personal,
             next_offset=next_offset,
-            switch_pm_text=switch_pm_text,
-            switch_pm_parameter=switch_pm_parameter,
+            button=button,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -199,27 +198,27 @@ class InlineQuery(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    MAX_RESULTS: ClassVar[int] = constants.InlineQueryLimit.RESULTS
+    MAX_RESULTS: Final[int] = constants.InlineQueryLimit.RESULTS
     """:const:`telegram.constants.InlineQueryLimit.RESULTS`
 
     .. versionadded:: 13.2
     """
-    MIN_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH
+    MIN_SWITCH_PM_TEXT_LENGTH: Final[int] = constants.InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH
     """:const:`telegram.constants.InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH
+    MAX_SWITCH_PM_TEXT_LENGTH: Final[int] = constants.InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH
     """:const:`telegram.constants.InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_OFFSET_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MAX_OFFSET_LENGTH
+    MAX_OFFSET_LENGTH: Final[int] = constants.InlineQueryLimit.MAX_OFFSET_LENGTH
     """:const:`telegram.constants.InlineQueryLimit.MAX_OFFSET_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_QUERY_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MAX_QUERY_LENGTH
+    MAX_QUERY_LENGTH: Final[int] = constants.InlineQueryLimit.MAX_QUERY_LENGTH
     """:const:`telegram.constants.InlineQueryLimit.MAX_QUERY_LENGTH`
 
     .. versionadded:: 20.0

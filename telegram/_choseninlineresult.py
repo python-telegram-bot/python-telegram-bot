@@ -72,10 +72,10 @@ class ChosenInlineResult(TelegramObject):
         result_id: str,
         from_user: User,
         query: str,
-        location: Location = None,
-        inline_message_id: str = None,
+        location: Optional[Location] = None,
+        inline_message_id: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 

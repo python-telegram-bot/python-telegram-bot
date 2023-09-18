@@ -20,12 +20,12 @@
 
 
 from telegram import Update
-from telegram.ext._handler import BaseHandler
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._utils.types import CCT
 
 
 class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram :attr:`telegram.Update.pre_checkout_query`.
+    """Handler class to handle Telegram :attr:`telegram.Update.pre_checkout_query`.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom

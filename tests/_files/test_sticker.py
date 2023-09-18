@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import os
+import random
+import string
 from pathlib import Path
 
 import pytest
@@ -35,15 +37,12 @@ from telegram import (
 )
 from telegram.constants import StickerFormat
 from telegram.error import BadRequest, TelegramError
-from telegram.ext import ExtBot
 from telegram.request import RequestData
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -148,20 +147,6 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert sticker.needs_repainting == self.needs_repainting
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert sticker.premium_animation == self.premium_animation
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        sticker = Sticker(
-            file_id="id",
-            file_unique_id="unique_id",
-            width=1,
-            height=1,
-            thumb=object(),
-            is_animated=False,
-            is_video=False,
-            type=Sticker.REGULAR,
-        )
-        assert sticker.thumb is sticker.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_to_dict(self, sticker):
         sticker_dict = sticker.to_dict()
@@ -333,20 +318,16 @@ class TestStickerWithRequest(TestStickerBase):
         assert message.sticker.thumbnail.height == sticker.thumbnail.height
         assert message.sticker.thumbnail.file_size == sticker.thumbnail.file_size
 
-    async def test_get_and_download(self, bot, sticker):
-        path = Path("telegram.webp")
-        if path.is_file():
-            path.unlink()
-
+    async def test_get_and_download(self, bot, sticker, tmp_file):
         new_file = await bot.get_file(sticker.file_id)
 
         assert new_file.file_size == sticker.file_size
         assert new_file.file_unique_id == sticker.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram.webp")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_resend(self, bot, chat_id, sticker):
         message = await bot.send_sticker(chat_id=chat_id, sticker=sticker.file_id)
@@ -551,19 +532,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        sticker_set = StickerSet(
-            name=self.name,
-            title=self.title,
-            is_animated=self.is_animated,
-            stickers=self.stickers,
-            is_video=self.is_video,
-            sticker_type=self.sticker_type,
-            thumb=object(),
-        )
-        assert sticker_set.thumb is sticker_set.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
-
     def test_de_json(self, bot, sticker):
         name = f"test_by_{bot.username}"
         json_dict = {
@@ -640,29 +608,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert a != e
         assert hash(a) != hash(e)
 
-    async def test_upload_sticker_file_warning(self, bot, monkeypatch, chat_id, recwarn):
-        async def make_assertion(*args, **kwargs):
-            return {"file_id": "file_id", "file_unique_id": "file_unique_id"}
-
-        monkeypatch.setattr(bot, "_post", make_assertion)
-
-        await bot.upload_sticker_file(chat_id, "png_sticker_file_id")
-        assert len(recwarn) == 1
-        assert "Since Bot API 6.6, the parameter" in str(recwarn[0].message)
-        assert recwarn[0].filename == __file__
-
-    async def test_upload_sticker_file_missing_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError, match="are required, please pass them as well"):
-            await bot.upload_sticker_file(chat_id)
-        with pytest.raises(TypeError, match="are required, please pass them as well"):
-            await bot.upload_sticker_file(chat_id, sticker="something")
-
-    async def test_upload_sticker_file_mutually_exclusive(self, bot, chat_id):
-        with pytest.raises(TypeError, match="mutually exclusive with the deprecated parameter"):
-            await bot.upload_sticker_file(
-                chat_id, "png_sticker_file_id", sticker="s", sticker_format="static"
-            )
-
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_upload_sticker_file_local_files(
         self, monkeypatch, bot, chat_id, local_mode, recwarn
@@ -676,89 +621,39 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
 
             async def make_assertion(_, data, *args, **kwargs):
                 nonlocal test_flag
-                if local_mode:
-                    test_flag = (
-                        data.get("png_sticker") == expected or data.get("sticker") == expected
-                    )
-                else:
-                    test_flag = isinstance(data.get("png_sticker"), InputFile) or isinstance(
-                        data.get("sticker"), InputFile
-                    )
+                test_flag = (
+                    data.get("sticker") == expected
+                    if local_mode
+                    else isinstance(data.get("sticker"), InputFile)
+                )
 
             monkeypatch.setattr(bot, "_post", make_assertion)
             await bot.upload_sticker_file(chat_id, sticker=file, sticker_format="static")
             assert test_flag
-            # Now test with the deprecated parameters
-            test_flag = False
-            await bot.upload_sticker_file(chat_id, file)
-            assert test_flag
-            assert len(recwarn) in (1, 2)  # second warning is for unclosed file
         finally:
             bot._local_mode = False
 
-    async def test_create_new_sticker_set_warning(self, bot, monkeypatch, chat_id, recwarn):
-        async def make_assertion(*args, **kwargs):
-            return True
-
-        monkeypatch.setattr(bot, "_post", make_assertion)
-
-        await bot.create_new_sticker_set(chat_id, "name", "title", "some_str_emoji")
-        assert len(recwarn) == 1
-        assert "Since Bot API 6.6, the parameters" in str(recwarn[0].message)
-        assert recwarn[0].filename == __file__
-
-    async def test_create_new_sticker_set_missing_required_args(self, bot, chat_id):
-        with pytest.raises(TypeError, match="are required, please pass them as well"):
-            await bot.create_new_sticker_set(chat_id, "name", "title")
-        with pytest.raises(TypeError, match="are required, please pass them as well"):
-            await bot.create_new_sticker_set(chat_id, "name", "title", stickers=[])
-
-    async def test_create_new_sticker_set_mutually_exclusive(self, bot, chat_id):
-        with pytest.raises(TypeError, match="mutually exclusive with the deprecated parameters"):
-            await bot.create_new_sticker_set(
-                chat_id, "name", "title", "some_str_emoji", stickers=["s"], tgs_sticker="some_tgs"
-            )
-
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_create_new_sticker_set_local_files(
-        self, monkeypatch, bot, chat_id, local_mode, recwarn
+        self,
+        monkeypatch,
+        bot,
+        chat_id,
+        local_mode,
     ):
         monkeypatch.setattr(bot, "_local_mode", local_mode)
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         file = data_file("telegram.jpg")
+        # always assumed to be local mode because we don't have access to local_mode setting
+        # within InputFile
         expected = file.as_uri()
 
         async def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
-            if data.get("stickers"):  # because we don't have access to local_mode setting
-                test_flag = data.get("stickers")[0].sticker == expected
-            elif local_mode:
-                test_flag = (
-                    data.get("png_sticker") == expected
-                    and data.get("tgs_sticker") == expected
-                    and data.get("webm_sticker") == expected
-                )
-            else:
-                test_flag = (
-                    isinstance(data.get("png_sticker"), InputFile)
-                    and isinstance(data.get("tgs_sticker"), InputFile)
-                    and isinstance(data.get("webm_sticker"), InputFile)
-                )
+            test_flag = data.get("stickers")[0].sticker == expected
 
         monkeypatch.setattr(bot, "_post", make_assertion)
-        await bot.create_new_sticker_set(
-            chat_id,
-            "name",
-            "title",
-            "emoji",
-            png_sticker=file,
-            tgs_sticker=file,
-            webm_sticker=file,
-        )
-        assert test_flag
-        assert len(recwarn) in (1, 2)  # The second one is an unclosed file warning
-        test_flag = False
         await bot.create_new_sticker_set(
             chat_id,
             "name",
@@ -767,23 +662,9 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             sticker_format=StickerFormat.STATIC,
         )
         assert test_flag
-        assert len(recwarn) in (1, 2)
 
-    async def test_create_new_sticker_all_params(
-        self, monkeypatch, bot, chat_id, mask_position, recwarn
-    ):
-        async def make_assertion_old_params(_, data, *args, **kwargs):
-            assert data["user_id"] == chat_id
-            assert data["name"] == "name"
-            assert data["title"] == "title"
-            assert data["emojis"] == "emoji"
-            assert data["mask_position"] == mask_position
-            assert data["png_sticker"] == "wow.png"
-            assert data["tgs_sticker"] == "wow.tgs"
-            assert data["webm_sticker"] == "wow.webm"
-            assert data["sticker_type"] == Sticker.MASK
-
-        async def make_assertion_new_params(_, data, *args, **kwargs):
+    async def test_create_new_sticker_all_params(self, monkeypatch, bot, chat_id, mask_position):
+        async def make_assertion(_, data, *args, **kwargs):
             assert data["user_id"] == chat_id
             assert data["name"] == "name"
             assert data["title"] == "title"
@@ -791,20 +672,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             assert data["sticker_format"] == "static"
             assert data["needs_repainting"] is True
 
-        monkeypatch.setattr(bot, "_post", make_assertion_old_params)
-        await bot.create_new_sticker_set(
-            chat_id,
-            "name",
-            "title",
-            "emoji",
-            mask_position=mask_position,
-            png_sticker="wow.png",
-            tgs_sticker="wow.tgs",
-            webm_sticker="wow.webm",
-            sticker_type=Sticker.MASK,
-        )
-        assert len(recwarn) == 1
-        monkeypatch.setattr(bot, "_post", make_assertion_new_params)
+        monkeypatch.setattr(bot, "_post", make_assertion)
         await bot.create_new_sticker_set(
             chat_id,
             "name",
@@ -813,66 +681,26 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             sticker_format=StickerFormat.STATIC,
             needs_repainting=True,
         )
-        assert len(recwarn) == 1
-
-    async def test_add_sticker_to_set_warning(self, bot, monkeypatch, chat_id, recwarn):
-        async def make_assertion(*args, **kwargs):
-            return True
-
-        monkeypatch.setattr(bot, "_post", make_assertion)
-
-        await bot.add_sticker_to_set(chat_id, "name", "emoji", "fake_file_id")
-        assert len(recwarn) == 1
-        assert "Since Bot API 6.6, the parameters" in str(recwarn[0].message)
-        assert recwarn[0].filename == __file__
-
-    async def test_add_sticker_to_set_missing_required_arg(self, bot, chat_id):
-        with pytest.raises(TypeError, match="The parameter `sticker` is a required"):
-            await bot.add_sticker_to_set(chat_id, "name")
-
-    async def test_add_sticker_to_set_mutually_exclusive(self, bot, chat_id):
-        with pytest.raises(TypeError, match="mutually exclusive with the deprecated parameters"):
-            await bot.add_sticker_to_set(chat_id, "name", "emojis", sticker="something")
 
     @pytest.mark.parametrize("local_mode", [True, False])
-    async def test_add_sticker_to_set_local_files(
-        self, monkeypatch, bot, chat_id, local_mode, recwarn
-    ):
+    async def test_add_sticker_to_set_local_files(self, monkeypatch, bot, chat_id, local_mode):
         monkeypatch.setattr(bot, "_local_mode", local_mode)
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         file = data_file("telegram.jpg")
+        # always assumed to be local mode because we don't have access to local_mode setting
+        # within InputFile
         expected = file.as_uri()
 
         async def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
-            if data.get("sticker"):  # because we don't have access to local_mode setting
-                test_flag = data.get("sticker").sticker == expected
-            elif local_mode:
-                test_flag = (
-                    data.get("png_sticker") == expected and data.get("tgs_sticker") == expected
-                )
-            else:
-                test_flag = isinstance(data.get("png_sticker"), InputFile) and isinstance(
-                    data.get("tgs_sticker"), InputFile
-                )
+            test_flag = data.get("sticker").sticker == expected
 
         monkeypatch.setattr(bot, "_post", make_assertion)
-        await bot.add_sticker_to_set(
-            chat_id,
-            "name",
-            "emoji",
-            png_sticker=file,
-            tgs_sticker=file,
-        )
-        assert test_flag
-        assert len(recwarn) in (1, 2)  # The second one is an unclosed file warning
-        test_flag = False
         await bot.add_sticker_to_set(
             chat_id, "name", sticker=InputSticker(sticker=file, emoji_list=["this"])
         )
         assert test_flag
-        assert len(recwarn) in (1, 2)
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_set_sticker_set_thumbnail_local_files(
@@ -897,35 +725,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             assert test_flag
         finally:
             bot._local_mode = False
-
-    async def test_set_sticker_set_thumb_deprecation_warning(
-        self, monkeypatch, bot, raw_bot, recwarn
-    ):
-        ext_bot = bot
-
-        async def _post(*args, **kwargs):
-            return True
-
-        for bot in (ext_bot, raw_bot):
-            cls_name = bot.__class__.__name__
-            monkeypatch.setattr(bot, "_post", _post)
-            await bot.set_sticker_set_thumb("name", "user_id", "thumb")
-
-            if isinstance(bot, ExtBot):
-                # Unfortunately, warnings.catch_warnings doesn't play well with pytest apparently
-                assert len(recwarn) == 2, f"Wrong warning number for class {cls_name}!"
-            else:
-                assert len(recwarn) == 1, f"No warning for class {cls_name}!"
-
-            assert (
-                recwarn[0].category is PTBDeprecationWarning
-            ), f"Wrong warning for class {cls_name}!"
-            assert "renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail'" in str(
-                recwarn[0].message
-            ), f"Wrong message for class {cls_name}!"
-
-            assert recwarn[0].filename == __file__, f"incorrect stacklevel for class {cls_name}!"
-            recwarn.clear()
 
     async def test_get_file_instance_method(self, monkeypatch, sticker):
         async def make_assertion(*_, **kwargs):
@@ -985,17 +784,22 @@ class TestStickerSetWithRequest:
                     assert v
 
     async def test_delete_sticker_set(self, bot, chat_id, sticker_file):
-        try:
-            # try creating a new sticker set - just in case the last deletion test failed
-            assert await bot.create_new_sticker_set(
-                chat_id,
-                name=f"temp_set_by_{bot.username}",
-                title="Stickerset delete Test",
-                stickers=[InputSticker(sticker_file, emoji_list=["😄"])],
-                sticker_format=StickerFormat.STATIC,
-            )
-        finally:
-            assert await bot.delete_sticker_set(f"temp_set_by_{bot.username}")
+        # there is currently an issue in the API where this function claims it successfully
+        # creates an already deleted sticker set while it does not. This happens when calling it
+        # too soon after deleting the set. This then leads to delete_sticker_set failing since the
+        # pack does not exist. Making the name random prevents this issue.
+        name = f"{''.join(random.choices(string.ascii_lowercase, k=5))}_temp_set_by_{bot.username}"
+        assert await bot.create_new_sticker_set(
+            chat_id,
+            name=name,
+            title="Stickerset delete Test",
+            stickers=[InputSticker(sticker_file, emoji_list=["😄"])],
+            sticker_format=StickerFormat.STATIC,
+        )
+        # this prevents a second issue when calling delete too soon after creating the set leads
+        # to it failing as well
+        await asyncio.sleep(1)
+        assert await bot.delete_sticker_set(name)
 
     async def test_set_custom_emoji_sticker_set_thumbnail(
         self, bot, chat_id, animated_sticker_file

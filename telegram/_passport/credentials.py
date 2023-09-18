@@ -71,7 +71,7 @@ def decrypt(secret, hash, data):  # skipcq: PYL-W0622
     if not CRYPTO_INSTALLED:
         raise RuntimeError(
             "To use Telegram Passports, PTB must be installed via `pip install "
-            "python-telegram-bot[passport]`."
+            '"python-telegram-bot[passport]"`.'
         )
     # Make a SHA512 hash of secret + update
     digest = Hash(SHA512(), backend=default_backend())
@@ -143,7 +143,7 @@ class EncryptedCredentials(TelegramObject):
         hash: str,  # skipcq: PYL-W0622
         secret: str,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -154,7 +154,7 @@ class EncryptedCredentials(TelegramObject):
         self._id_attrs = (self.data, self.hash, self.secret)
 
         self._decrypted_secret: Optional[str] = None
-        self._decrypted_data: Optional["Credentials"] = None
+        self._decrypted_data: Optional[Credentials] = None
 
         self._freeze()
 
@@ -171,7 +171,7 @@ class EncryptedCredentials(TelegramObject):
             if not CRYPTO_INSTALLED:
                 raise RuntimeError(
                     "To use Telegram Passports, PTB must be installed via `pip install "
-                    "python-telegram-bot[passport]`."
+                    '"python-telegram-bot[passport]"`.'
                 )
             # Try decrypting according to step 1 at
             # https://core.telegram.org/passport#decrypting-data
@@ -222,7 +222,7 @@ class Credentials(TelegramObject):
         secure_data: "SecureData",
         nonce: str,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -310,19 +310,19 @@ class SecureData(TelegramObject):
 
     def __init__(
         self,
-        personal_details: "SecureValue" = None,
-        passport: "SecureValue" = None,
-        internal_passport: "SecureValue" = None,
-        driver_license: "SecureValue" = None,
-        identity_card: "SecureValue" = None,
-        address: "SecureValue" = None,
-        utility_bill: "SecureValue" = None,
-        bank_statement: "SecureValue" = None,
-        rental_agreement: "SecureValue" = None,
-        passport_registration: "SecureValue" = None,
-        temporary_registration: "SecureValue" = None,
+        personal_details: Optional["SecureValue"] = None,
+        passport: Optional["SecureValue"] = None,
+        internal_passport: Optional["SecureValue"] = None,
+        driver_license: Optional["SecureValue"] = None,
+        identity_card: Optional["SecureValue"] = None,
+        address: Optional["SecureValue"] = None,
+        utility_bill: Optional["SecureValue"] = None,
+        bank_statement: Optional["SecureValue"] = None,
+        rental_agreement: Optional["SecureValue"] = None,
+        passport_registration: Optional["SecureValue"] = None,
+        temporary_registration: Optional["SecureValue"] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -428,22 +428,22 @@ class SecureValue(TelegramObject):
 
     def __init__(
         self,
-        data: "DataCredentials" = None,
-        front_side: "FileCredentials" = None,
-        reverse_side: "FileCredentials" = None,
-        selfie: "FileCredentials" = None,
-        files: Sequence["FileCredentials"] = None,
-        translation: Sequence["FileCredentials"] = None,
+        data: Optional["DataCredentials"] = None,
+        front_side: Optional["FileCredentials"] = None,
+        reverse_side: Optional["FileCredentials"] = None,
+        selfie: Optional["FileCredentials"] = None,
+        files: Optional[Sequence["FileCredentials"]] = None,
+        translation: Optional[Sequence["FileCredentials"]] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.data: Optional[DataCredentials] = data
         self.front_side: Optional[FileCredentials] = front_side
         self.reverse_side: Optional[FileCredentials] = reverse_side
         self.selfie: Optional[FileCredentials] = selfie
-        self.files: Tuple["FileCredentials", ...] = parse_sequence_arg(files)
-        self.translation: Tuple["FileCredentials", ...] = parse_sequence_arg(translation)
+        self.files: Tuple[FileCredentials, ...] = parse_sequence_arg(files)
+        self.translation: Tuple[FileCredentials, ...] = parse_sequence_arg(translation)
 
         self._freeze()
 
@@ -471,7 +471,7 @@ class _CredentialsBase(TelegramObject):
     __slots__ = ("hash", "secret", "file_hash", "data_hash")
 
     def __init__(
-        self, hash: str, secret: str, *, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
+        self, hash: str, secret: str, *, api_kwargs: Optional[JSONDict] = None  # skipcq: PYL-W0622
     ):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -499,7 +499,7 @@ class DataCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, data_hash: str, secret: str, *, api_kwargs: JSONDict = None):
+    def __init__(self, data_hash: str, secret: str, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(hash=data_hash, secret=secret, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -520,6 +520,6 @@ class FileCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, file_hash: str, secret: str, *, api_kwargs: JSONDict = None):
+    def __init__(self, file_hash: str, secret: str, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(hash=file_hash, secret=secret, api_kwargs=api_kwargs)
         self._freeze()

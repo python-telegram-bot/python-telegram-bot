@@ -85,8 +85,9 @@ class TestNoSocksHTTP2WithoutRequest:
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")
 class TestHTTP2WithRequest:
-    async def test_http_2_response(self):
-        httpx_request = HTTPXRequest(http_version="2")
+    @pytest.mark.parametrize("http_version", ["2", "2.0"])
+    async def test_http_2_response(self, http_version):
+        httpx_request = HTTPXRequest(http_version=http_version)
         async with httpx_request:
             resp = await httpx_request._client.request(
                 url="https://python-telegram-bot.org",
@@ -295,7 +296,7 @@ class TestRequestWithoutRequest:
             (TelegramError("TelegramError"), TelegramError, "TelegramError"),
             (
                 RuntimeError("CustomError"),
-                Exception,
+                NetworkError,
                 r"HTTP implementation: RuntimeError\('CustomError'\)",
             ),
         ],
@@ -312,8 +313,11 @@ class TestRequestWithoutRequest:
             do_request,
         )
 
-        with pytest.raises(catch_class, match=match):
+        with pytest.raises(catch_class, match=match) as exc_info:
             await httpx_request.post(None, None, None)
+
+        if catch_class is NetworkError:
+            assert exc_info.value.__cause__ is exception
 
     async def test_retrieve(self, monkeypatch, httpx_request):
         """Here we just test that retrieve gives us the raw bytes instead of trying to parse them
@@ -539,7 +543,7 @@ class TestHTTPXRequestWithoutRequest:
         assert code == HTTPStatus.OK
 
     async def test_do_request_params_with_data(
-        self, monkeypatch, httpx_request, mixed_rqs  # noqa: 9811
+        self, monkeypatch, httpx_request, mixed_rqs  # noqa: F811
     ):
         async def make_assertion(self, **kwargs):
             method_assertion = kwargs.get("method") == "method"
@@ -571,42 +575,48 @@ class TestHTTPXRequestWithoutRequest:
         assert content == b"content"
 
     @pytest.mark.parametrize(
-        ("raised_class", "expected_class", "expected_message"),
+        ("raised_exception", "expected_class", "expected_message"),
         [
-            (httpx.TimeoutException, TimedOut, "Timed out"),
-            (httpx.ReadError, NetworkError, "httpx.ReadError: message"),
+            (httpx.TimeoutException("timeout"), TimedOut, "Timed out"),
+            (httpx.ReadError("read_error"), NetworkError, "httpx.ReadError: read_error"),
         ],
     )
     async def test_do_request_exceptions(
-        self, monkeypatch, httpx_request, raised_class, expected_class, expected_message
+        self, monkeypatch, httpx_request, raised_exception, expected_class, expected_message
     ):
         async def make_assertion(self, method, url, headers, timeout, files, data):
-            raise raised_class("message")
+            raise raised_exception
 
         monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
 
-        with pytest.raises(expected_class, match=expected_message):
+        with pytest.raises(expected_class, match=expected_message) as exc_info:
             await httpx_request.do_request(
                 "method",
                 "url",
             )
 
+        assert exc_info.value.__cause__ is raised_exception
+
     async def test_do_request_pool_timeout(self, monkeypatch):
+        pool_timeout = httpx.PoolTimeout("pool timeout")
+
         async def request(_, **kwargs):
             if self.test_flag is None:
                 self.test_flag = True
             else:
-                raise httpx.PoolTimeout("pool timeout")
+                raise pool_timeout
             return httpx.Response(HTTPStatus.OK)
 
         monkeypatch.setattr(httpx.AsyncClient, "request", request)
 
         async with HTTPXRequest(pool_timeout=0.02) as httpx_request:
-            with pytest.raises(TimedOut, match="Pool timeout"):
+            with pytest.raises(TimedOut, match="Pool timeout") as exc_info:
                 await asyncio.gather(
                     httpx_request.do_request(method="GET", url="URL"),
                     httpx_request.do_request(method="GET", url="URL"),
                 )
+
+            assert exc_info.value.__cause__ is pool_timeout
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")

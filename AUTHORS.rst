@@ -21,9 +21,11 @@ Contributors
 
 The following wonderful people contributed directly or indirectly to this project:
 
+- `Abdelrahman <https://github.com/aelkheir>`_
 - `Abshar <https://github.com/abxhr>`_
 - `Alateas <https://github.com/alateas>`_
 - `Ales Dokshanin <https://github.com/alesdokshanin>`_
+- `Alizia <https://github.com/thefunkycat>`_
 - `Ambro17 <https://github.com/Ambro17>`_
 - `Andrej Zhilenkov <https://github.com/Andrej730>`_
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
@@ -56,6 +58,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Harshil <https://github.com/harshil21>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_
+- `Iulian Onofrei <https://github.com/revolter>`_
 - `Jasmin Bom <https://github.com/jsmnbom>`_
 - `JASON0916 <https://github.com/JASON0916>`_
 - `jeffffc <https://github.com/jeffffc>`_
@@ -77,6 +80,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Matheus Lemos <https://github.com/mlemosf>`_
 - `Michael Dix <https://github.com/Eisberge>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
+- `Miguel C. R. <https://github.com/MiguelX413>`_
 - `miles <https://github.com/miles170>`_
 - `Mischa Krüger <https://github.com/Makman2>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
@@ -117,6 +121,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Wagner Macedo <https://github.com/wagnerluis1982>`_
 - `wjt <https://github.com/wjt>`_
 - `Yaw Danso <https://github.com/dglitxh>`_
+- `Yao Kuan <https://github.com/thatguylah>`_
 - `zeroone2numeral2 <https://github.com/zeroone2numeral2>`_
 - `zeshuaro <https://github.com/zeshuaro>`_
 - `zpavloudis <https://github.com/zpavloudis>`_

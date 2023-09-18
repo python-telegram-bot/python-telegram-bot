@@ -23,6 +23,7 @@ import inspect
 import itertools
 import platform
 import signal
+import sys
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -53,22 +54,25 @@ from typing import (
 from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._basepersistence import BasePersistence
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
-from telegram.ext._handler import BaseHandler
 from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
 from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, RT, UD, ConversationKey, HandlerCallback
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Message
     from telegram.ext import ConversationHandler, JobQueue
     from telegram.ext._applicationbuilder import InitApplicationBuilder
+    from telegram.ext._baseupdateprocessor import BaseUpdateProcessor
     from telegram.ext._jobqueue import Job
 
 DEFAULT_GROUP: int = 0
@@ -76,6 +80,15 @@ DEFAULT_GROUP: int = 0
 _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-name
 _STOP_SIGNAL = object()
 _DEFAULT_0 = DefaultValue(0)
+
+# Since python 3.12, the coroutine passed to create_task should not be an (async) generator. Remove
+# this check when we drop support for python 3.11.
+if sys.version_info >= (3, 12):
+    _CoroType = Awaitable[RT]
+else:
+    _CoroType = Union[Generator["asyncio.Future[object]", None, RT], Awaitable[RT]]
+
+_ErrorCoroType = Optional[_CoroType[RT]]
 
 _LOGGER = get_logger(__name__)
 
@@ -106,7 +119,7 @@ class ApplicationHandlerStop(Exception):
 
     __slots__ = ("state",)
 
-    def __init__(self, state: object = None) -> None:
+    def __init__(self, state: Optional[object] = None) -> None:
         super().__init__()
         self.state: Optional[object] = state
 
@@ -228,12 +241,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         "_chat_data",
         "_chat_ids_to_be_deleted_in_persistence",
         "_chat_ids_to_be_updated_in_persistence",
-        "_concurrent_updates",
-        "_concurrent_updates_sem",
         "_conversation_handler_conversations",
         "_initialized",
         "_job_queue",
         "_running",
+        "_update_processor",
         "_user_data",
         "_user_ids_to_be_deleted_in_persistence",
         "_user_ids_to_be_updated_in_persistence",
@@ -259,7 +271,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update_queue: "asyncio.Queue[object]",
         updater: Optional[Updater],
         job_queue: JQ,
-        concurrent_updates: Union[bool, int],
+        update_processor: "BaseUpdateProcessor",
         persistence: Optional[BasePersistence[UD, CD, BD]],
         context_types: ContextTypes[CCT, UD, CD, BD],
         post_init: Optional[
@@ -281,7 +293,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             )
 
         self.bot: BT = bot
-        self.update_queue: "asyncio.Queue[object]" = update_queue
+        self.update_queue: asyncio.Queue[object] = update_queue
         self.context_types: ContextTypes[CCT, UD, CD, BD] = context_types
         self.updater: Optional[Updater] = updater
         self.handlers: Dict[int, List[BaseHandler[Any, CCT]]] = {}
@@ -289,22 +301,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             HandlerCallback[object, CCT, None], Union[bool, DefaultValue[bool]]
         ] = {}
         self.post_init: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
         ] = post_init
         self.post_shutdown: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
         ] = post_shutdown
         self.post_stop: Optional[
-            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+            Callable[[Application[BT, CCT, UD, CD, BD, JQ]], Coroutine[Any, Any, None]]
         ] = post_stop
-
-        if isinstance(concurrent_updates, int) and concurrent_updates < 0:
-            raise ValueError("`concurrent_updates` must be a non-negative integer!")
-        if concurrent_updates is True:
-            concurrent_updates = 256
-        self._concurrent_updates_sem = asyncio.BoundedSemaphore(concurrent_updates or 1)
-        self._concurrent_updates: int = concurrent_updates or 0
-
+        self._update_processor = update_processor
         self.bot_data: BD = self.context_types.bot_data()
         self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
         self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
@@ -339,11 +344,36 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__update_persistence_lock = asyncio.Lock()
         self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
 
-    def _check_initialized(self) -> None:
-        if not self._initialized:
-            raise RuntimeError(
-                "This Application was not initialized via `Application.initialize`!"
-            )
+    async def __aenter__(self: _AppType) -> _AppType:  # noqa: PYI019
+        """Simple context manager which initializes the App."""
+        try:
+            await self.initialize()
+            return self
+        except Exception as exc:
+            await self.shutdown()
+            raise exc
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        """Shutdown the App from the context manager."""
+        # Make sure not to return `True` so that exceptions are not suppressed
+        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
+        await self.shutdown()
+
+    def __repr__(self) -> str:
+        """Give a string representation of the application in the form ``Application[bot=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, bot=self.bot)
 
     @property
     def running(self) -> bool:
@@ -359,9 +389,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         """:obj:`int`: The number of concurrent updates that will be processed in parallel. A
         value of ``0`` indicates updates are *not* being processed concurrently.
 
+        .. versionchanged:: 20.4
+            This is now just a shortcut to :attr:`update_processor.max_concurrent_updates
+            <telegram.ext.BaseUpdateProcessor.max_concurrent_updates>`.
+
         .. seealso:: :wiki:`Concurrency`
         """
-        return self._concurrent_updates
+        return self._update_processor.max_concurrent_updates
 
     @property
     def job_queue(self) -> Optional["JobQueue[CCT]"]:
@@ -369,15 +403,47 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.
 
-        .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+        .. seealso:: :wiki:`Job Queue <Extensions---JobQueue>`
         """
         if self._job_queue is None:
             warn(
                 "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-                "`pip install python-telegram-bot[job-queue]`.",
+                '`pip install "python-telegram-bot[job-queue]"`.',
                 stacklevel=2,
             )
         return self._job_queue
+
+    @property
+    def update_processor(self) -> "BaseUpdateProcessor":
+        """:class:`telegram.ext.BaseUpdateProcessor`: The update processor used by this
+        application.
+
+        .. seealso:: :wiki:`Concurrency`
+
+        .. versionadded:: 20.4
+        """
+        return self._update_processor
+
+    @staticmethod
+    def _raise_system_exit() -> NoReturn:
+        raise SystemExit
+
+    @staticmethod
+    def builder() -> "InitApplicationBuilder":
+        """Convenience method. Returns a new :class:`telegram.ext.ApplicationBuilder`.
+
+        .. versionadded:: 20.0
+        """
+        # Unfortunately this needs to be here due to cyclical imports
+        from telegram.ext import ApplicationBuilder  # pylint: disable=import-outside-toplevel
+
+        return ApplicationBuilder()
+
+    def _check_initialized(self) -> None:
+        if not self._initialized:
+            raise RuntimeError(
+                "This Application was not initialized via `Application.initialize`!"
+            )
 
     async def initialize(self) -> None:
         """Initializes the Application by initializing:
@@ -385,6 +451,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         * The :attr:`bot`, by calling :meth:`telegram.Bot.initialize`.
         * The :attr:`updater`, by calling :meth:`telegram.ext.Updater.initialize`.
         * The :attr:`persistence`, by loading persistent conversations and data.
+        * The :attr:`update_processor` by calling
+          :meth:`telegram.ext.BaseUpdateProcessor.initialize`.
 
         Does *not* call :attr:`post_init` - that is only done by :meth:`run_polling` and
         :meth:`run_webhook`.
@@ -397,6 +465,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             return
 
         await self.bot.initialize()
+        await self._update_processor.initialize()
+
         if self.updater:
             await self.updater.initialize()
 
@@ -429,6 +499,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         * :attr:`updater` by calling :meth:`telegram.ext.Updater.shutdown`
         * :attr:`persistence` by calling :meth:`update_persistence` and
           :meth:`BasePersistence.flush`
+        * :attr:`update_processor` by calling :meth:`telegram.ext.BaseUpdateProcessor.shutdown`
 
         Does *not* call :attr:`post_shutdown` - that is only done by :meth:`run_polling` and
         :meth:`run_webhook`.
@@ -447,6 +518,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             return
 
         await self.bot.shutdown()
+        await self._update_processor.shutdown()
+
         if self.updater:
             await self.updater.shutdown()
 
@@ -457,26 +530,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             _LOGGER.debug("Updated and flushed persistence")
 
         self._initialized = False
-
-    async def __aenter__(self: _AppType) -> _AppType:
-        """Simple context manager which initializes the App."""
-        try:
-            await self.initialize()
-            return self
-        except Exception as exc:
-            await self.shutdown()
-            raise exc
-
-    async def __aexit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ) -> None:
-        """Shutdown the App from the context manager."""
-        # Make sure not to return `True` so that exceptions are not suppressed
-        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
-        await self.shutdown()
 
     async def _initialize_persistence(self) -> None:
         """This method basically just loads all the data by awaiting the BP methods"""
@@ -506,17 +559,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 self.bot.callback_data_cache.load_persistence_data(  # type: ignore[attr-defined]
                     persistent_data
                 )
-
-    @staticmethod
-    def builder() -> "InitApplicationBuilder":
-        """Convenience method. Returns a new :class:`telegram.ext.ApplicationBuilder`.
-
-        .. versionadded:: 20.0
-        """
-        # Unfortunately this needs to be here due to cyclical imports
-        from telegram.ext import ApplicationBuilder  # pylint: disable=import-outside-toplevel
-
-        return ApplicationBuilder()
 
     async def start(self) -> None:
         """Starts
@@ -553,9 +595,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         try:
             if self.persistence:
                 self.__update_persistence_task = asyncio.create_task(
-                    self._persistence_updater()
-                    # TODO: Add this once we drop py3.7
-                    # name=f'Application:{self.bot.id}:persistence_updater'
+                    self._persistence_updater(),
+                    name=f"Application:{self.bot.id}:persistence_updater",
                 )
                 _LOGGER.debug("Loop for updating persistence started")
 
@@ -564,9 +605,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 _LOGGER.debug("JobQueue started")
 
             self.__update_fetcher_task = asyncio.create_task(
-                self._update_fetcher(),
-                # TODO: Add this once we drop py3.7
-                # name=f'Application:{self.bot.id}:update_fetcher'
+                self._update_fetcher(), name=f"Application:{self.bot.id}:update_fetcher"
             )
             _LOGGER.info("Application started")
 
@@ -628,6 +667,24 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         _LOGGER.info("Application.stop() complete")
 
+    def stop_running(self) -> None:
+        """This method can be used to stop the execution of :meth:`run_polling` or
+        :meth:`run_webhook` from within a handler, job or error callback. This allows a graceful
+        shutdown of the application, i.e. the methods listed in :attr:`run_polling` and
+        :attr:`run_webhook` will still be executed.
+
+        Note:
+            If the application is not running, this method does nothing.
+
+        .. versionadded:: 20.5
+        """
+        if self.running:
+            # This works because `__run` is using `loop.run_forever()`. If that changes, this
+            # method needs to be adapted.
+            asyncio.get_running_loop().stop()
+        else:
+            _LOGGER.debug("Application is not running, stop_running() does nothing.")
+
     def run_polling(
         self,
         poll_interval: float = 0.0,
@@ -637,8 +694,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        allowed_updates: List[str] = None,
-        drop_pending_updates: bool = None,
+        allowed_updates: Optional[List[str]] = None,
+        drop_pending_updates: Optional[bool] = None,
         close_loop: bool = True,
         stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
     ) -> None:
@@ -650,7 +707,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         On unix, the app will also shut down on receiving the signals specified by
         :paramref:`stop_signals`.
 
-        The order of execution by `run_polling` is roughly as follows:
+        The order of execution by :meth:`run_polling` is roughly as follows:
 
         - :meth:`initialize`
         - :meth:`post_init`
@@ -665,15 +722,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         .. include:: inclusions/application_run_tip.rst
 
-        .. seealso::
-            :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_polling`, :meth:`telegram.ext.Updater.stop`,
-            :meth:`run_webhook`
-
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is ``0.0``.
-            timeout (:obj:`float`, optional): Passed to
+            timeout (:obj:`int`, optional): Passed to
                 :paramref:`telegram.Bot.get_updates.timeout`. Default is ``10`` seconds.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
@@ -746,17 +798,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         listen: str = "127.0.0.1",
         port: int = 80,
         url_path: str = "",
-        cert: Union[str, Path] = None,
-        key: Union[str, Path] = None,
+        cert: Optional[Union[str, Path]] = None,
+        key: Optional[Union[str, Path]] = None,
         bootstrap_retries: int = 0,
-        webhook_url: str = None,
-        allowed_updates: List[str] = None,
-        drop_pending_updates: bool = None,
-        ip_address: str = None,
+        webhook_url: Optional[str] = None,
+        allowed_updates: Optional[List[str]] = None,
+        drop_pending_updates: Optional[bool] = None,
+        ip_address: Optional[str] = None,
         max_connections: int = 40,
         close_loop: bool = True,
         stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
-        secret_token: str = None,
+        secret_token: Optional[str] = None,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         listening for updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
@@ -773,7 +825,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as
         required.
 
-        The order of execution by `run_webhook` is roughly as follows:
+        The order of execution by :meth:`run_webhook` is roughly as follows:
 
         - :meth:`initialize`
         - :meth:`post_init`
@@ -792,14 +844,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
             .. code-block:: bash
 
-               pip install python-telegram-bot[webhooks]
+               pip install "python-telegram-bot[webhooks]"
 
         .. include:: inclusions/application_run_tip.rst
 
         .. seealso::
-            :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_webhook`, :meth:`telegram.ext.Updater.stop`,
-            :meth:`run_polling`, :wiki:`Webhooks`
+            :wiki:`Webhooks`
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Defaults to
@@ -876,10 +926,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             stop_signals=stop_signals,
         )
 
-    @staticmethod
-    def _raise_system_exit() -> NoReturn:
-        raise SystemExit
-
     def __run(
         self,
         updater_coroutine: Coroutine,
@@ -914,7 +960,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             loop.run_until_complete(self.start())
             loop.run_forever()
         except (KeyboardInterrupt, SystemExit):
-            pass
+            _LOGGER.debug("Application received stop signal. Shutting down.")
         except Exception as exc:
             # In case the coroutine wasn't awaited, we don't need to bother the user with a warning
             updater_coroutine.close()
@@ -938,8 +984,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     def create_task(
         self,
-        coroutine: Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]],
-        update: object = None,
+        coroutine: _CoroType[RT],
+        update: Optional[object] = None,
+        *,
+        name: Optional[str] = None,
     ) -> "asyncio.Task[RT]":
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
         the :paramref:`coroutine` with :meth:`process_error`.
@@ -957,30 +1005,39 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
                 .. versionchanged:: 20.2
                     Accepts :class:`asyncio.Future` and generator-based coroutine functions.
+                .. deprecated:: 20.4
+                    Since Python 3.12, generator-based coroutine functions are no longer accepted.
             update (:obj:`object`, optional): If set, will be passed to :meth:`process_error`
                 as additional information for the error handlers. Moreover, the corresponding
                 :attr:`chat_data` and :attr:`user_data` entries will be updated in the next run of
                 :meth:`update_persistence` after the :paramref:`coroutine` is finished.
 
+        Keyword Args:
+            name (:obj:`str`, optional): The name of the task.
+
+                .. versionadded:: 20.4
+
         Returns:
             :class:`asyncio.Task`: The created task.
         """
-        return self.__create_task(coroutine=coroutine, update=update)
+        return self.__create_task(coroutine=coroutine, update=update, name=name)
 
     def __create_task(
         self,
-        coroutine: Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]],
-        update: object = None,
+        coroutine: _CoroType[RT],
+        update: Optional[object] = None,
         is_error_handler: bool = False,
+        name: Optional[str] = None,
     ) -> "asyncio.Task[RT]":
         # Unfortunately, we can't know if `coroutine` runs one of the error handler functions
         # but by passing `is_error_handler=True` from `process_error`, we can make sure that we
         # get at most one recursion of the user calls `create_task` manually with an error handler
         # function
-        task: "asyncio.Task[RT]" = asyncio.create_task(
+        task: asyncio.Task[RT] = asyncio.create_task(
             self.__create_task_callback(
                 coroutine=coroutine, update=update, is_error_handler=is_error_handler
-            )
+            ),
+            name=name,
         )
 
         if self.running:
@@ -1004,18 +1061,22 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     async def __create_task_callback(
         self,
-        coroutine: Union[Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]],
-        update: object = None,
+        coroutine: _CoroType[RT],
+        update: Optional[object] = None,
         is_error_handler: bool = False,
     ) -> RT:
         try:
-            if isinstance(coroutine, Generator):
+            # Generator-based coroutines are not supported in Python 3.12+
+            if sys.version_info < (3, 12) and isinstance(coroutine, Generator):
+                warn(
+                    "Generator-based coroutines are deprecated in create_task and will not work"
+                    " in Python 3.12+",
+                    category=PTBDeprecationWarning,
+                )
                 return await asyncio.create_task(coroutine)
-            return await coroutine
-        except asyncio.CancelledError as cancel:
-            # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop this
-            #  clause when we drop py3.7
-            raise cancel
+            # If user uses generator in python 3.12+, Exception will happen and we cannot do
+            # anything about it. (hence the type ignore if mypy is run on python 3.12-)
+            return await coroutine  # type: ignore
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(
@@ -1046,29 +1107,42 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     async def _update_fetcher(self) -> None:
         # Continuously fetch updates from the queue. Exit only once the signal object is found.
         while True:
-            update = await self.update_queue.get()
+            try:
+                update = await self.update_queue.get()
 
-            if update is _STOP_SIGNAL:
-                _LOGGER.debug("Dropping pending updates")
-                while not self.update_queue.empty():
+                if update is _STOP_SIGNAL:
+                    _LOGGER.debug("Dropping pending updates")
+                    while not self.update_queue.empty():
+                        self.update_queue.task_done()
+
+                    # For the _STOP_SIGNAL
                     self.update_queue.task_done()
+                    return
 
-                # For the _STOP_SIGNAL
-                self.update_queue.task_done()
-                return
+                _LOGGER.debug("Processing update %s", update)
 
-            _LOGGER.debug("Processing update %s", update)
+                if self._update_processor.max_concurrent_updates > 1:
+                    # We don't await the below because it has to be run concurrently
+                    self.create_task(
+                        self.__process_update_wrapper(update),
+                        update=update,
+                        name=f"Application:{self.bot.id}:process_concurrent_update",
+                    )
+                else:
+                    await self.__process_update_wrapper(update)
 
-            if self._concurrent_updates:
-                # We don't await the below because it has to be run concurrently
-                self.create_task(self.__process_update_wrapper(update), update=update)
-            else:
-                await self.__process_update_wrapper(update)
+            except asyncio.CancelledError:
+                # This may happen if the application is manually run via application.start() and
+                # then a KeyboardInterrupt is sent. We must prevent this loop to die since
+                # application.stop() will wait for it's clean shutdown.
+                _LOGGER.warning(
+                    "Fetching updates got a asyncio.CancelledError. Ignoring as this task may only"
+                    "be closed via `Application.stop`."
+                )
 
     async def __process_update_wrapper(self, update: object) -> None:
-        async with self._concurrent_updates_sem:
-            await self.process_update(update)
-            self.update_queue.task_done()
+        await self._update_processor.process_update(update, self.process_update(update))
+        self.update_queue.task_done()
 
     async def process_update(self, update: object) -> None:
         """Processes a single update and marks the update to be updated by the persistence later.
@@ -1109,7 +1183,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                             and self.bot.defaults
                             and not self.bot.defaults.block
                         ):
-                            self.create_task(coroutine, update=update)
+                            self.create_task(
+                                coroutine,
+                                update=update,
+                                name=f"Application:{self.bot.id}:process_update_non_blocking"
+                                f":{handler}",
+                            )
                         else:
                             any_blocking = True
                             await coroutine
@@ -1180,7 +1259,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     f"can not be persistent if application has no persistence"
                 )
             if self._initialized:
-                self.create_task(self._add_ch_to_persistence(handler))
+                self.create_task(
+                    self._add_ch_to_persistence(handler),
+                    name=f"Application:{self.bot.id}:add_handler:conversation_handler_after_init",
+                )
                 warn(
                     "A persistent `ConversationHandler` was passed to `add_handler`, "
                     "after `Application.initialize` was called. This is discouraged."
@@ -1297,7 +1379,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self._user_ids_to_be_deleted_in_persistence.add(user_id)
 
     def migrate_chat_data(
-        self, message: "Message" = None, old_chat_id: int = None, new_chat_id: int = None
+        self,
+        message: Optional["Message"] = None,
+        old_chat_id: Optional[int] = None,
+        new_chat_id: Optional[int] = None,
     ) -> None:
         """Moves the contents of :attr:`chat_data` at key :paramref:`old_chat_id` to the key
         :paramref:`new_chat_id`. Also marks the entries to be updated accordingly in the next run
@@ -1360,7 +1445,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self._chat_ids_to_be_updated_in_persistence.add(new_chat_id)
         # old_chat_id is marked for deletion by drop_chat_data above
 
-    def _mark_for_persistence_update(self, *, update: object = None, job: "Job" = None) -> None:
+    def _mark_for_persistence_update(
+        self, *, update: Optional[object] = None, job: Optional["Job"] = None
+    ) -> None:
         if isinstance(update, Update):
             if update.effective_chat:
                 self._chat_ids_to_be_updated_in_persistence.add(update.effective_chat.id)
@@ -1374,7 +1461,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 self._user_ids_to_be_updated_in_persistence.add(job.user_id)
 
     def mark_data_for_update_persistence(
-        self, chat_ids: SCT[int] = None, user_ids: SCT[int] = None
+        self, chat_ids: Optional[SCT[int]] = None, user_ids: Optional[SCT[int]] = None
     ) -> None:
         """Mark entries of :attr:`chat_data` and :attr:`user_data` to be updated on the next
         run of :meth:`update_persistence`.
@@ -1385,7 +1472,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             Note that for data which should be available globally in all handler callbacks
             independent of the chat/user, it is recommended to use :attr:`bot_data` instead.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.3
 
         Args:
             chat_ids (:obj:`int` | Collection[:obj:`int`], optional): Chat IDs to mark.
@@ -1604,10 +1691,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self,
         update: Optional[object],
         error: Exception,
-        job: "Job[CCT]" = None,
-        coroutine: Union[
-            Generator[Optional["asyncio.Future[object]"], None, RT], Awaitable[RT]
-        ] = None,
+        job: Optional["Job[CCT]"] = None,
+        coroutine: _ErrorCoroType[RT] = None,
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises
@@ -1655,7 +1740,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     and not self.bot.defaults.block
                 ):
                     self.__create_task(
-                        callback(update, context), update=update, is_error_handler=True
+                        callback(update, context),
+                        update=update,
+                        is_error_handler=True,
+                        name=f"Application:{self.bot.id}:process_error:non_blocking",
                     )
                 else:
                     try:

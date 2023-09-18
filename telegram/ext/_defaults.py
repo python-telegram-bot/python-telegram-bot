@@ -18,11 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
 import datetime
-from typing import Any, Dict, NoReturn, Optional
+from typing import Any, Dict, NoReturn, Optional, final
 
 from telegram._utils.datetime import UTC
 
 
+@final
 class Defaults:
     """Convenience Class to gather all parameters with a (user defined) default value
 
@@ -71,14 +72,14 @@ class Defaults:
 
     def __init__(
         self,
-        parse_mode: str = None,
-        disable_notification: bool = None,
-        disable_web_page_preview: bool = None,
-        quote: bool = None,
+        parse_mode: Optional[str] = None,
+        disable_notification: Optional[bool] = None,
+        disable_web_page_preview: Optional[bool] = None,
+        quote: Optional[bool] = None,
         tzinfo: datetime.tzinfo = UTC,
         block: bool = True,
-        allow_sending_without_reply: bool = None,
-        protect_content: bool = None,
+        allow_sending_without_reply: Optional[bool] = None,
+        protect_content: Optional[bool] = None,
     ):
         self._parse_mode: Optional[str] = parse_mode
         self._disable_notification: Optional[bool] = disable_notification
@@ -102,6 +103,25 @@ class Defaults:
             value = getattr(self, kwarg)
             if value is not None:
                 self._api_defaults[kwarg] = value
+
+    def __hash__(self) -> int:
+        return hash(
+            (
+                self._parse_mode,
+                self._disable_notification,
+                self._disable_web_page_preview,
+                self._allow_sending_without_reply,
+                self._quote,
+                self._tzinfo,
+                self._block,
+                self._protect_content,
+            )
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Defaults):
+            return all(getattr(self, attr) == getattr(other, attr) for attr in self.__slots__)
+        return False
 
     @property
     def api_defaults(self) -> Dict[str, Any]:  # skip-cq: PY-D0003
@@ -219,25 +239,3 @@ class Defaults:
         raise AttributeError(
             "You can't assign a new value to protect_content after initialization."
         )
-
-    def __hash__(self) -> int:
-        return hash(
-            (
-                self._parse_mode,
-                self._disable_notification,
-                self._disable_web_page_preview,
-                self._allow_sending_without_reply,
-                self._quote,
-                self._tzinfo,
-                self._block,
-                self._protect_content,
-            )
-        )
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, Defaults):
-            return all(getattr(self, attr) == getattr(other, attr) for attr in self.__slots__)
-        return False
-
-    def __ne__(self, other: object) -> bool:
-        return not self == other

@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
-from telegram.ext._handler import BaseHandler
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ RT = TypeVar("RT")
 
 
 class StringRegexHandler(BaseHandler[str, CCT]):
-    """BaseHandler class to handle string updates based on a regex which checks the update content.
+    """Handler class to handle string updates based on a regex which checks the update content.
 
     Read the documentation of the :mod:`re` module for more information. The :func:`re.match`
     function is used to determine if an update should be handled by this handler.
@@ -96,10 +96,8 @@ class StringRegexHandler(BaseHandler[str, CCT]):
             :obj:`None` | :obj:`re.match`
 
         """
-        if isinstance(update, str):
-            match = re.match(self.pattern, update)
-            if match:
-                return match
+        if isinstance(update, str) and (match := re.match(self.pattern, update)):
+            return match
         return None
 
     def collect_additional_context(

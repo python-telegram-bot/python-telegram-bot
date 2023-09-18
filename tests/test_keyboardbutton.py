@@ -116,6 +116,12 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
             request_chat=KeyboardButtonRequestChat(1, False),
             request_user=KeyboardButtonRequestUser(2),
         )
+        g = KeyboardButton(
+            "test",
+            request_contact=True,
+            request_chat=KeyboardButtonRequestChat(1, False),
+            request_user=KeyboardButtonRequestUser(2),
+        )
 
         assert a == b
         assert hash(a) == hash(b)
@@ -129,15 +135,8 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert a != e
         assert hash(a) != hash(e)
 
-        # we expect this to be true since we don't compare these in V20
-        assert a == f
-        assert hash(a) == hash(f)
+        assert a != f
+        assert hash(a) != hash(f)
 
-    def test_equality_warning(self, recwarn, keyboard_button):
-        recwarn.clear()
-        assert keyboard_button == keyboard_button
-
-        assert str(recwarn[0].message) == (
-            "In v21, granular media settings will be considered as well when comparing"
-            " ChatPermissions instances."
-        )
+        assert f == g
+        assert hash(f) == hash(g)

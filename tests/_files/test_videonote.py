@@ -30,7 +30,6 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -83,13 +82,6 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         assert video_note.length == self.length
         assert video_note.duration == self.duration
         assert video_note.file_size == self.file_size
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        video_note = VideoNote(
-            file_id="id", file_unique_id="unique_id", length=1, duration=1, thumb=object()
-        )
-        assert video_note.thumb is video_note.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_de_json(self, bot):
         json_dict = {
@@ -153,7 +145,7 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
         self, bot, chat_id, video_note_file, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+            return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
 
@@ -184,15 +176,6 @@ class TestVideoNoteWithoutRequest(TestVideoNoteBase):
             assert test_flag
         finally:
             bot._local_mode = False
-
-    async def test_send_videonote_local_files_throws_exception_with_different_thumb_and_thumbnail(
-        self, bot, chat_id
-    ):
-        file = data_file("telegram.jpg")
-        different_file = data_file("telegram_no_standard_header.jpg")
-
-        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
-            await bot.send_video_note(chat_id, file, thumbnail=file, thumb=different_file)
 
     async def test_get_file_instance_method(self, monkeypatch, video_note):
         async def make_assertion(*_, **kwargs):
@@ -232,20 +215,16 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
         assert message.video_note.thumbnail.height == self.thumb_height
         assert message.has_protected_content
 
-    async def test_get_and_download(self, bot, video_note, chat_id):
-        path = Path("telegram2.mp4")
-        if path.is_file():
-            path.unlink()
-
+    async def test_get_and_download(self, bot, video_note, chat_id, tmp_file):
         new_file = await bot.get_file(video_note.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_unique_id == video_note.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram2.mp4")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_resend(self, bot, chat_id, video_note):
         message = await bot.send_video_note(chat_id, video_note.file_id)

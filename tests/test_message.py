@@ -42,6 +42,7 @@ from telegram import (
     PollOption,
     ProximityAlertTriggered,
     Sticker,
+    Story,
     SuccessfulPayment,
     Update,
     User,
@@ -122,6 +123,7 @@ def message(bot):
         },
         {"photo": [PhotoSize("photo_id", "unique_id", 50, 50)], "caption": "photo_file"},
         {"sticker": Sticker("sticker_id", "unique_id", 50, 50, True, False, Sticker.REGULAR)},
+        {"story": Story()},
         {"video": Video("video_id", "unique_id", 12, 12, 12), "caption": "video_file"},
         {"voice": Voice("voice_id", "unique_id", 5)},
         {"video_note": VideoNote("video_note_id", "unique_id", 20, 12)},
@@ -226,6 +228,7 @@ def message(bot):
         "game",
         "photo",
         "sticker",
+        "story",
         "video",
         "voice",
         "video_note",
@@ -322,10 +325,11 @@ class TestMessageBase:
         {"length": 9, "offset": 101, "type": "strikethrough"},
         {"length": 10, "offset": 129, "type": "pre", "language": "python"},
         {"length": 7, "offset": 141, "type": "spoiler"},
+        {"length": 2, "offset": 150, "type": "custom_emoji", "custom_emoji_id": "1"},
     ]
     test_text_v2 = (
         r"Test for <bold, ita_lic, \`code, links, text-mention and `\pre. "
-        "http://google.com and bold nested in strk>trgh nested in italic. Python pre. Spoiled."
+        "http://google.com and bold nested in strk>trgh nested in italic. Python pre. Spoiled. 👍."
     )
     test_message = Message(
         message_id=1,
@@ -513,7 +517,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             r"<pre>`\pre</pre>. http://google.com "
             "and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. "
             '<pre><code class="python">Python pre</code></pre>. '
-            '<span class="tg-spoiler">Spoiled</span>.'
+            '<span class="tg-spoiler">Spoiled</span>. '
+            '<tg-emoji emoji-id="1">👍</tg-emoji>.'
         )
         text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
@@ -532,7 +537,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             r'<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
             "and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. "
             '<pre><code class="python">Python pre</code></pre>. '
-            '<span class="tg-spoiler">Spoiled</span>.'
+            '<span class="tg-spoiler">Spoiled</span>. '
+            '<tg-emoji emoji-id="1">👍</tg-emoji>.'
         )
         text_html = self.test_message_v2.text_html_urled
         assert text_html == test_html_string
@@ -553,7 +559,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "[links](http://github.com/abc\\\\\\)def), "
             "[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. "
             r"http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. "
-            "```python\nPython pre```\\. ||Spoiled||\\."
+            "```python\nPython pre```\\. ||Spoiled||\\. ![👍](tg://emoji?id=1)\\."
         )
         text_markdown = self.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
@@ -603,7 +609,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             "[links](http://github.com/abc\\\\\\)def), "
             "[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. "
             r"[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ "
-            "nested in* italic_\\. ```python\nPython pre```\\. ||Spoiled||\\."
+            "nested in* italic_\\. ```python\nPython pre```\\. ||Spoiled||\\. "
+            "![👍](tg://emoji?id=1)\\."
         )
         text_markdown = self.test_message_v2.text_markdown_v2_urled
         assert text_markdown == test_md_string
@@ -634,17 +641,65 @@ class TestMessageWithoutRequest(TestMessageBase):
     @pytest.mark.parametrize(
         "type_",
         argvalues=[
-            "text_html",
-            "text_html_urled",
             "text_markdown",
             "text_markdown_urled",
+        ],
+    )
+    def test_text_custom_emoji_md_v1(self, type_, recwarn):
+        text = "Look a custom emoji: 😎"
+        emoji_entity = MessageEntity(
+            type=MessageEntity.CUSTOM_EMOJI,
+            offset=21,
+            length=2,
+            custom_emoji_id="5472409228461217725",
+        )
+        message = Message(
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            text=text,
+            entities=[emoji_entity],
+        )
+        with pytest.raises(ValueError, match="Custom emoji entities are not supported for"):
+            getattr(message, type_)
+
+    @pytest.mark.parametrize(
+        "type_",
+        argvalues=[
             "text_markdown_v2",
             "text_markdown_v2_urled",
         ],
     )
-    def test_text_custom_emoji(self, type_):
+    def test_text_custom_emoji_md_v2(self, type_):
         text = "Look a custom emoji: 😎"
-        expected = "Look a custom emoji: 😎"
+        expected = "Look a custom emoji: ![😎](tg://emoji?id=5472409228461217725)"
+        emoji_entity = MessageEntity(
+            type=MessageEntity.CUSTOM_EMOJI,
+            offset=21,
+            length=2,
+            custom_emoji_id="5472409228461217725",
+        )
+        message = Message(
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            text=text,
+            entities=[emoji_entity],
+        )
+        assert expected == message[type_]
+
+    @pytest.mark.parametrize(
+        "type_",
+        argvalues=[
+            "text_html",
+            "text_html_urled",
+        ],
+    )
+    def test_text_custom_emoji_html(self, type_):
+        text = "Look a custom emoji: 😎"
+        expected = 'Look a custom emoji: <tg-emoji emoji-id="5472409228461217725">😎</tg-emoji>'
         emoji_entity = MessageEntity(
             type=MessageEntity.CUSTOM_EMOJI,
             offset=21,
@@ -670,7 +725,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             r"<pre>`\pre</pre>. http://google.com "
             "and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. "
             '<pre><code class="python">Python pre</code></pre>. '
-            '<span class="tg-spoiler">Spoiled</span>.'
+            '<span class="tg-spoiler">Spoiled</span>. '
+            '<tg-emoji emoji-id="1">👍</tg-emoji>.'
         )
         caption_html = self.test_message_v2.caption_html
         assert caption_html == test_html_string
@@ -689,7 +745,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             r'<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
             "and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. "
             '<pre><code class="python">Python pre</code></pre>. '
-            '<span class="tg-spoiler">Spoiled</span>.'
+            '<span class="tg-spoiler">Spoiled</span>. '
+            '<tg-emoji emoji-id="1">👍</tg-emoji>.'
         )
         caption_html = self.test_message_v2.caption_html_urled
         assert caption_html == test_html_string
@@ -710,7 +767,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "[links](http://github.com/abc\\\\\\)def), "
             "[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. "
             r"http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. "
-            "```python\nPython pre```\\. ||Spoiled||\\."
+            "```python\nPython pre```\\. ||Spoiled||\\. ![👍](tg://emoji?id=1)\\."
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2
         assert caption_markdown == test_md_string
@@ -737,7 +794,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             "[links](http://github.com/abc\\\\\\)def), "
             "[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. "
             r"[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ "
-            "nested in* italic_\\. ```python\nPython pre```\\. ||Spoiled||\\."
+            "nested in* italic_\\. ```python\nPython pre```\\. ||Spoiled||\\. "
+            "![👍](tg://emoji?id=1)\\."
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2_urled
         assert caption_markdown == test_md_string
@@ -773,17 +831,65 @@ class TestMessageWithoutRequest(TestMessageBase):
     @pytest.mark.parametrize(
         "type_",
         argvalues=[
-            "caption_html",
-            "caption_html_urled",
             "caption_markdown",
             "caption_markdown_urled",
+        ],
+    )
+    def test_caption_custom_emoji_md_v1(self, type_, recwarn):
+        caption = "Look a custom emoji: 😎"
+        emoji_entity = MessageEntity(
+            type=MessageEntity.CUSTOM_EMOJI,
+            offset=21,
+            length=2,
+            custom_emoji_id="5472409228461217725",
+        )
+        message = Message(
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            caption=caption,
+            caption_entities=[emoji_entity],
+        )
+        with pytest.raises(ValueError, match="Custom emoji entities are not supported for"):
+            getattr(message, type_)
+
+    @pytest.mark.parametrize(
+        "type_",
+        argvalues=[
             "caption_markdown_v2",
             "caption_markdown_v2_urled",
         ],
     )
-    def test_caption_custom_emoji(self, type_):
+    def test_caption_custom_emoji_md_v2(self, type_):
         caption = "Look a custom emoji: 😎"
-        expected = "Look a custom emoji: 😎"
+        expected = "Look a custom emoji: ![😎](tg://emoji?id=5472409228461217725)"
+        emoji_entity = MessageEntity(
+            type=MessageEntity.CUSTOM_EMOJI,
+            offset=21,
+            length=2,
+            custom_emoji_id="5472409228461217725",
+        )
+        message = Message(
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            caption=caption,
+            caption_entities=[emoji_entity],
+        )
+        assert expected == message[type_]
+
+    @pytest.mark.parametrize(
+        "type_",
+        argvalues=[
+            "caption_html",
+            "caption_html_urled",
+        ],
+    )
+    def test_caption_custom_emoji_html(self, type_):
+        caption = "Look a custom emoji: 😎"
+        expected = 'Look a custom emoji: <tg-emoji emoji-id="5472409228461217725">😎</tg-emoji>'
         emoji_entity = MessageEntity(
             type=MessageEntity.CUSTOM_EMOJI,
             offset=21,
@@ -871,6 +977,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "photo",
             "poll",
             "sticker",
+            "story",
             "successful_payment",
             "video",
             "video_note",
@@ -955,7 +1062,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "[links](http://github.com/abc\\\\\\)def), "
             "[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. "
             r"http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. "
-            "```python\nPython pre```\\. ||Spoiled||\\."
+            "```python\nPython pre```\\. ||Spoiled||\\. ![👍](tg://emoji?id=1)\\."
         )
 
         async def make_assertion(*_, **kwargs):
@@ -995,7 +1102,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             r"<pre>`\pre</pre>. http://google.com "
             "and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. "
             '<pre><code class="python">Python pre</code></pre>. '
-            '<span class="tg-spoiler">Spoiled</span>.'
+            '<span class="tg-spoiler">Spoiled</span>. '
+            '<tg-emoji emoji-id="1">👍</tg-emoji>.'
         )
 
         async def make_assertion(*_, **kwargs):

@@ -23,7 +23,7 @@ import httpx
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
-from telegram._utils.types import ODVInput
+from telegram._utils.types import HTTPVersion, ODVInput
 from telegram.error import NetworkError, TimedOut
 from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
@@ -56,7 +56,7 @@ class HTTPXRequest(BaseRequest):
                 * The proxy URL can also be set via the environment variables ``HTTPS_PROXY`` or
                   ``ALL_PROXY``. See `the docs of httpx`_ for more info.
                 * For Socks5 support, additional dependencies are required. Make sure to install
-                  PTB via :command:`pip install python-telegram-bot[socks]` in this case.
+                  PTB via :command:`pip install "python-telegram-bot[socks]"` in this case.
                 * Socks5 proxies can not be set via environment variables.
 
             .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
@@ -82,12 +82,15 @@ class HTTPXRequest(BaseRequest):
                 With a finite pool timeout, you must expect :exc:`telegram.error.TimedOut`
                 exceptions to be thrown when more requests are made simultaneously than there are
                 connections in the connection pool!
-        http_version (:obj:`str`, optional): If ``"2"``, HTTP/2 will be used instead of HTTP/1.1.
-            Defaults to ``"1.1"``.
+        http_version (:obj:`str`, optional): If ``"2"`` or ``"2.0"``, HTTP/2 will be used instead
+            of HTTP/1.1. Defaults to ``"1.1"``.
 
             .. versionadded:: 20.1
             .. versionchanged:: 20.2
                 Reset the default version to 1.1.
+
+            .. versionchanged:: 20.5
+                Accept ``"2"`` as a valid value.
 
     """
 
@@ -96,12 +99,12 @@ class HTTPXRequest(BaseRequest):
     def __init__(
         self,
         connection_pool_size: int = 1,
-        proxy_url: str = None,
+        proxy_url: Optional[str] = None,
         read_timeout: Optional[float] = 5.0,
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
-        http_version: str = "1.1",
+        http_version: HTTPVersion = "1.1",
     ):
         self._http_version = http_version
         timeout = httpx.Timeout(
@@ -115,8 +118,8 @@ class HTTPXRequest(BaseRequest):
             max_keepalive_connections=connection_pool_size,
         )
 
-        if http_version not in ("1.1", "2"):
-            raise ValueError("`http_version` must be either '1.1' or '2'.")
+        if http_version not in ("1.1", "2", "2.0"):
+            raise ValueError("`http_version` must be either '1.1', '2.0' or '2'.")
 
         http1 = http_version == "1.1"
 
@@ -139,11 +142,11 @@ class HTTPXRequest(BaseRequest):
             if "httpx[socks]" in str(exc):
                 raise RuntimeError(
                     "To use Socks5 proxies, PTB must be installed via `pip install "
-                    "python-telegram-bot[socks]`."
+                    '"python-telegram-bot[socks]"`.'
                 ) from exc
             raise RuntimeError(
                 "To use HTTP/2, PTB must be installed via `pip install "
-                "python-telegram-bot[http2]`."
+                '"python-telegram-bot[http2]"`.'
             ) from exc
 
     @property
@@ -175,7 +178,7 @@ class HTTPXRequest(BaseRequest):
         self,
         url: str,
         method: str,
-        request_data: RequestData = None,
+        request_data: Optional[RequestData] = None,
         read_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,

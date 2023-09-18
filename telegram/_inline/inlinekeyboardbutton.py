@@ -18,11 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, ClassVar, Optional, Union
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 from telegram import constants
 from telegram._games.callbackgame import CallbackGame
 from telegram._loginurl import LoginUrl
+from telegram._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
@@ -111,6 +112,10 @@ class InlineKeyboardButton(TelegramObject):
             in inline mode when they are currently in a private chat with it. Especially useful
             when combined with ``switch_pm*`` actions - in this case the user will be automatically
             returned to the chat they switched from, skipping the chat selection screen.
+
+            Tip:
+                This is similar to the new parameter :paramref:`switch_inline_query_chosen_chat`,
+                but gives no control over which chats can be selected.
         switch_inline_query_current_chat (:obj:`str`, optional): If set, pressing the button will
             insert the bot's username and the specified inline query in the current chat's input
             field. Can be empty, in which case only the bot's username will be inserted. This
@@ -122,6 +127,20 @@ class InlineKeyboardButton(TelegramObject):
         pay (:obj:`bool`, optional): Specify :obj:`True`, to send a Pay button. This type of button
             **must** always be the **first** button in the first row and can only be used in
             invoice messages.
+        switch_inline_query_chosen_chat (:obj:`telegram.SwitchInlineQueryChosenChat`, optional):
+            If set, pressing the button will prompt the user to select one of their chats of the
+            specified type, open that chat and insert the bot's username and the specified inline
+            query in the input field.
+
+            .. versionadded:: 20.3
+
+            Tip:
+                This is similar to :paramref:`switch_inline_query`, but gives more control on
+                which chats can be selected.
+
+            Caution:
+                The PTB team has discovered that this field works correctly only if your Telegram
+                client is released after April 20th 2023.
 
     Attributes:
         text (:obj:`str`): Label text on the button.
@@ -154,6 +173,10 @@ class InlineKeyboardButton(TelegramObject):
             in inline mode when they are currently in a private chat with it. Especially useful
             when combined with ``switch_pm*`` actions - in this case the user will be automatically
             returned to the chat they switched from, skipping the chat selection screen.
+
+            Tip:
+                This is similar to the new parameter :paramref:`switch_inline_query_chosen_chat`,
+                but gives no control over which chats can be selected.
         switch_inline_query_current_chat (:obj:`str`): Optional. If set, pressing the button will
             insert the bot's username and the specified inline query in the current chat's input
             field. Can be empty, in which case only the bot's username will be inserted. This
@@ -165,7 +188,20 @@ class InlineKeyboardButton(TelegramObject):
         pay (:obj:`bool`): Optional. Specify :obj:`True`, to send a Pay button. This type of button
             **must** always be the **first** button in the first row and can only be used in
             invoice messages.
+        switch_inline_query_chosen_chat (:obj:`telegram.SwitchInlineQueryChosenChat`): Optional.
+            If set, pressing the button will prompt the user to select one of their chats of the
+            specified type, open that chat and insert the bot's username and the specified inline
+            query in the input field.
 
+            .. versionadded:: 20.3
+
+            Tip:
+                This is similar to :attr:`switch_inline_query`, but gives more control on
+                which chats can be selected.
+
+            Caution:
+                The PTB team has discovered that this field works correctly only if your Telegram
+                client is released after April 20th 2023.
     """
 
     __slots__ = (
@@ -178,21 +214,23 @@ class InlineKeyboardButton(TelegramObject):
         "text",
         "login_url",
         "web_app",
+        "switch_inline_query_chosen_chat",
     )
 
     def __init__(
         self,
         text: str,
-        url: str = None,
-        callback_data: Union[str, object] = None,
-        switch_inline_query: str = None,
-        switch_inline_query_current_chat: str = None,
-        callback_game: CallbackGame = None,
-        pay: bool = None,
-        login_url: LoginUrl = None,
-        web_app: WebAppInfo = None,
+        url: Optional[str] = None,
+        callback_data: Optional[Union[str, object]] = None,
+        switch_inline_query: Optional[str] = None,
+        switch_inline_query_current_chat: Optional[str] = None,
+        callback_game: Optional[CallbackGame] = None,
+        pay: Optional[bool] = None,
+        login_url: Optional[LoginUrl] = None,
+        web_app: Optional[WebAppInfo] = None,
+        switch_inline_query_chosen_chat: Optional[SwitchInlineQueryChosenChat] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -207,6 +245,9 @@ class InlineKeyboardButton(TelegramObject):
         self.callback_game: Optional[CallbackGame] = callback_game
         self.pay: Optional[bool] = pay
         self.web_app: Optional[WebAppInfo] = web_app
+        self.switch_inline_query_chosen_chat: Optional[
+            SwitchInlineQueryChosenChat
+        ] = switch_inline_query_chosen_chat
         self._id_attrs = ()
         self._set_id_attrs()
 
@@ -236,6 +277,9 @@ class InlineKeyboardButton(TelegramObject):
         data["login_url"] = LoginUrl.de_json(data.get("login_url"), bot)
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
         data["callback_game"] = CallbackGame.de_json(data.get("callback_game"), bot)
+        data["switch_inline_query_chosen_chat"] = SwitchInlineQueryChosenChat.de_json(
+            data.get("switch_inline_query_chosen_chat"), bot
+        )
 
         return super().de_json(data=data, bot=bot)
 
@@ -253,12 +297,12 @@ class InlineKeyboardButton(TelegramObject):
             self.callback_data = callback_data
             self._set_id_attrs()
 
-    MIN_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA
+    MIN_CALLBACK_DATA: Final[int] = constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA
     """:const:`telegram.constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA`
 
     .. versionadded:: 20.0
     """
-    MAX_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA
+    MAX_CALLBACK_DATA: Final[int] = constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA
     """:const:`telegram.constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA`
 
     .. versionadded:: 20.0

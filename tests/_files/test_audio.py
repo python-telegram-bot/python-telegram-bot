@@ -31,7 +31,6 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -89,11 +88,6 @@ class TestAudioWithoutRequest(TestAudioBase):
         assert audio.thumbnail.file_size == self.thumb_file_size
         assert audio.thumbnail.width == self.thumb_width
         assert audio.thumbnail.height == self.thumb_height
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        audio = Audio(self.audio_file_id, self.audio_file_unique_id, self.duration, thumb=object())
-        assert audio.thumb is audio.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_de_json(self, bot, audio):
         json_dict = {
@@ -160,7 +154,7 @@ class TestAudioWithoutRequest(TestAudioBase):
 
     async def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+            return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_audio(chat_id, audio_file, filename="custom_filename")
@@ -188,15 +182,6 @@ class TestAudioWithoutRequest(TestAudioBase):
             assert test_flag
         finally:
             bot._local_mode = False
-
-    async def test_send_audio_with_local_files_throws_error_with_different_thumb_and_thumbnail(
-        self, bot, chat_id
-    ):
-        file = data_file("telegram.jpg")
-        different_file = data_file("telegram_no_standard_header.jpg")
-
-        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
-            await bot.send_audio(chat_id, file, thumbnail=file, thumb=different_file)
 
     async def test_get_file_instance_method(self, monkeypatch, audio):
         async def make_assertion(*_, **kwargs):
@@ -243,19 +228,15 @@ class TestAudioWithRequest(TestAudioBase):
         assert message.audio.thumbnail.height == self.thumb_height
         assert message.has_protected_content
 
-    async def test_get_and_download(self, bot, chat_id, audio):
-        path = Path("telegram.mp3")
-        if path.is_file():
-            path.unlink()
-
+    async def test_get_and_download(self, bot, chat_id, audio, tmp_file):
         new_file = await bot.get_file(audio.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_unique_id == audio.file_unique_id
         assert str(new_file.file_path).startswith("https://")
 
-        await new_file.download_to_drive("telegram.mp3")
-        assert path.is_file()
+        await new_file.download_to_drive(tmp_file)
+        assert tmp_file.is_file()
 
     async def test_send_mp3_url_file(self, bot, chat_id, audio):
         message = await bot.send_audio(

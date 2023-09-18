@@ -72,7 +72,7 @@ class InlineKeyboardMarkup(TelegramObject):
         self,
         inline_keyboard: Sequence[Sequence[InlineKeyboardButton]],
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(inline_keyboard):

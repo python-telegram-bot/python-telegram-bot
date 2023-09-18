@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
-import warnings
 from copy import copy
 from datetime import datetime
 from typing import (
@@ -31,6 +30,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    Type,
     TypeVar,
     Union,
     cast,
@@ -46,6 +46,7 @@ from telegram import (
     BotCommand,
     BotCommandScope,
     BotDescription,
+    BotName,
     BotShortDescription,
     CallbackQuery,
     Chat,
@@ -60,18 +61,16 @@ from telegram import (
     ForumTopic,
     GameHighScore,
     InlineKeyboardMarkup,
+    InlineQueryResultsButton,
     InputMedia,
-    InputSticker,
     Location,
     MaskPosition,
     MenuButton,
     Message,
     MessageId,
-    PassportElementError,
     PhotoSize,
     Poll,
     SentWebAppMessage,
-    ShippingOption,
     Sticker,
     StickerSet,
     Update,
@@ -86,12 +85,19 @@ from telegram import (
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.logging import get_logger
-from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
-from telegram._utils.warnings import warn
+from telegram._utils.repr import build_repr_with_selected_attrs
+from telegram._utils.types import (
+    CorrectOptionID,
+    DVInput,
+    FileInput,
+    JSONDict,
+    ODVInput,
+    ReplyMarkup,
+)
 from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.ext._utils.types import RLARGS
 from telegram.request import BaseRequest
-from telegram.warnings import PTBDeprecationWarning
+from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -100,8 +106,11 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputSticker,
         LabeledPrice,
         MessageEntity,
+        PassportElementError,
+        ShippingOption,
     )
     from telegram.ext import BaseRateLimiter, Defaults
 
@@ -139,6 +148,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         :attr:`bot.callback_data_cache.maxsize <telegram.ext.CallbackDataCache.maxsize>` to
         access the size of the cache.
 
+    .. versionchanged:: 20.5
+        Removed deprecated methods ``set_sticker_set_thumb`` and ``setStickerSetThumb``.
+
     Args:
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
@@ -168,11 +180,11 @@ class ExtBot(Bot, Generic[RLARGS]):
         token: str,
         base_url: str = "https://api.telegram.org/bot",
         base_file_url: str = "https://api.telegram.org/file/bot",
-        request: BaseRequest = None,
-        get_updates_request: BaseRequest = None,
-        private_key: bytes = None,
-        private_key_password: bytes = None,
-        defaults: "Defaults" = None,
+        request: Optional[BaseRequest] = None,
+        get_updates_request: Optional[BaseRequest] = None,
+        private_key: Optional[bytes] = None,
+        private_key_password: Optional[bytes] = None,
+        defaults: Optional["Defaults"] = None,
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
     ):
@@ -184,14 +196,14 @@ class ExtBot(Bot, Generic[RLARGS]):
         token: str,
         base_url: str = "https://api.telegram.org/bot",
         base_file_url: str = "https://api.telegram.org/file/bot",
-        request: BaseRequest = None,
-        get_updates_request: BaseRequest = None,
-        private_key: bytes = None,
-        private_key_password: bytes = None,
-        defaults: "Defaults" = None,
+        request: Optional[BaseRequest] = None,
+        get_updates_request: Optional[BaseRequest] = None,
+        private_key: Optional[bytes] = None,
+        private_key_password: Optional[bytes] = None,
+        defaults: Optional["Defaults"] = None,
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
-        rate_limiter: "BaseRateLimiter[RLARGS]" = None,
+        rate_limiter: Optional["BaseRateLimiter[RLARGS]"] = None,
     ):
         ...
 
@@ -200,14 +212,14 @@ class ExtBot(Bot, Generic[RLARGS]):
         token: str,
         base_url: str = "https://api.telegram.org/bot",
         base_file_url: str = "https://api.telegram.org/file/bot",
-        request: BaseRequest = None,
-        get_updates_request: BaseRequest = None,
-        private_key: bytes = None,
-        private_key_password: bytes = None,
-        defaults: "Defaults" = None,
+        request: Optional[BaseRequest] = None,
+        get_updates_request: Optional[BaseRequest] = None,
+        private_key: Optional[bytes] = None,
+        private_key_password: Optional[bytes] = None,
+        defaults: Optional["Defaults"] = None,
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
-        rate_limiter: "BaseRateLimiter[RLARGS]" = None,
+        rate_limiter: Optional["BaseRateLimiter[RLARGS]"] = None,
     ):
         super().__init__(
             token=token,
@@ -234,6 +246,26 @@ class ExtBot(Bot, Generic[RLARGS]):
                 maxsize = 1024
 
             self._callback_data_cache = CallbackDataCache(bot=self, maxsize=maxsize)
+
+    def __repr__(self) -> str:
+        """Give a string representation of the bot in the form ``ExtBot[token=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, token=self.token)
+
+    @classmethod
+    def _warn(
+        cls, message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0
+    ) -> None:
+        """We override this method to add one more level to the stacklevel, so that the warning
+        points to the user's code, not to the PTB code.
+        """
+        super()._warn(message=message, category=category, stacklevel=stacklevel + 2)
 
     @property
     def callback_data_cache(self) -> Optional[CallbackDataCache]:
@@ -475,22 +507,22 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         endpoint: str,
         data: JSONDict,
-        reply_to_message_id: int = None,
+        reply_to_message_id: Optional[int] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        caption: str = None,
+        message_thread_id: Optional[int] = None,
+        caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> Any:
         # We override this method to call self._replace_keyboard and self._insert_callback_data.
         # This covers most methods that have a reply_markup
@@ -519,16 +551,16 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_updates(
         self,
-        offset: int = None,
-        limit: int = None,
-        timeout: float = None,
-        allowed_updates: Sequence[str] = None,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+        timeout: Optional[int] = None,
+        allowed_updates: Optional[Sequence[str]] = None,
         *,
         read_timeout: float = 2,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> Tuple[Update, ...]:
         updates = await super().get_updates(
             offset=offset,
@@ -552,8 +584,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
-        next_offset: str = None,
-        current_offset: str = None,
+        next_offset: Optional[str] = None,
+        current_offset: Optional[str] = None,
     ) -> Tuple[Sequence["InlineQueryResult"], Optional[str]]:
         """This method is called by Bot.answer_inline_query to build the actual results list.
         Overriding this to call self._replace_keyboard suffices
@@ -625,14 +657,14 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         message_id: int,
-        reply_markup: InlineKeyboardMarkup = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Poll:
         # We override this method to call self._replace_keyboard
         return await super().stop_poll(
@@ -651,22 +683,22 @@ class ExtBot(Bot, Generic[RLARGS]):
         chat_id: Union[int, str],
         from_chat_id: Union[str, int],
         message_id: int,
-        caption: str = None,
+        caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
+        reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> MessageId:
         # We override this method to call self._replace_keyboard
         return await super().copy_message(
@@ -697,8 +729,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Chat:
         # We override this method to call self._insert_callback_data
         result = await super().get_chat(
@@ -713,31 +745,21 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def add_sticker_to_set(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         name: str,
-        emojis: str = None,  # Was made optional for compatibility reasons
-        png_sticker: FileInput = None,
-        mask_position: MaskPosition = None,
-        tgs_sticker: FileInput = None,
-        webm_sticker: FileInput = None,
-        sticker: InputSticker = None,  # Actually a required param, but is optional for compat.
+        sticker: Optional["InputSticker"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().add_sticker_to_set(
             user_id=user_id,
             name=name,
             sticker=sticker,
-            emojis=emojis,
-            png_sticker=png_sticker,
-            mask_position=mask_position,
-            tgs_sticker=tgs_sticker,
-            webm_sticker=webm_sticker,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -748,17 +770,17 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def answer_callback_query(
         self,
         callback_query_id: str,
-        text: str = None,
-        show_alert: bool = None,
-        url: str = None,
-        cache_time: int = None,
+        text: Optional[str] = None,
+        show_alert: Optional[bool] = None,
+        url: Optional[str] = None,
+        cache_time: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().answer_callback_query(
             callback_query_id=callback_query_id,
@@ -779,19 +801,18 @@ class ExtBot(Bot, Generic[RLARGS]):
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
-        cache_time: int = None,
-        is_personal: bool = None,
-        next_offset: str = None,
-        switch_pm_text: str = None,
-        switch_pm_parameter: str = None,
+        cache_time: Optional[int] = None,
+        is_personal: Optional[bool] = None,
+        next_offset: Optional[str] = None,
+        button: Optional[InlineQueryResultsButton] = None,
         *,
-        current_offset: str = None,
+        current_offset: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().answer_inline_query(
             inline_query_id=inline_query_id,
@@ -799,13 +820,12 @@ class ExtBot(Bot, Generic[RLARGS]):
             cache_time=cache_time,
             is_personal=is_personal,
             next_offset=next_offset,
-            switch_pm_text=switch_pm_text,
-            switch_pm_parameter=switch_pm_parameter,
             current_offset=current_offset,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            button=button,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
@@ -813,14 +833,14 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         pre_checkout_query_id: str,
         ok: bool,
-        error_message: str = None,
+        error_message: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().answer_pre_checkout_query(
             pre_checkout_query_id=pre_checkout_query_id,
@@ -837,15 +857,15 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         shipping_query_id: str,
         ok: bool,
-        shipping_options: Sequence[ShippingOption] = None,
-        error_message: str = None,
+        shipping_options: Optional[Sequence["ShippingOption"]] = None,
+        error_message: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().answer_shipping_query(
             shipping_query_id=shipping_query_id,
@@ -868,8 +888,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> SentWebAppMessage:
         return await super().answer_web_app_query(
             web_app_query_id=web_app_query_id,
@@ -890,8 +910,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().approve_chat_join_request(
             chat_id=chat_id,
@@ -906,16 +926,16 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def ban_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
-        until_date: Union[int, datetime] = None,
-        revoke_messages: bool = None,
+        user_id: int,
+        until_date: Optional[Union[int, datetime]] = None,
+        revoke_messages: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().ban_chat_member(
             chat_id=chat_id,
@@ -938,8 +958,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().ban_chat_sender_chat(
             chat_id=chat_id,
@@ -954,17 +974,17 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def create_chat_invite_link(
         self,
         chat_id: Union[str, int],
-        expire_date: Union[int, datetime] = None,
-        member_limit: int = None,
-        name: str = None,
-        creates_join_request: bool = None,
+        expire_date: Optional[Union[int, datetime]] = None,
+        member_limit: Optional[int] = None,
+        name: Optional[str] = None,
+        creates_join_request: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> ChatInviteLink:
         return await super().create_chat_invite_link(
             chat_id=chat_id,
@@ -987,27 +1007,27 @@ class ExtBot(Bot, Generic[RLARGS]):
         provider_token: str,
         currency: str,
         prices: Sequence["LabeledPrice"],
-        max_tip_amount: int = None,
-        suggested_tip_amounts: Sequence[int] = None,
-        provider_data: Union[str, object] = None,
-        photo_url: str = None,
-        photo_size: int = None,
-        photo_width: int = None,
-        photo_height: int = None,
-        need_name: bool = None,
-        need_phone_number: bool = None,
-        need_email: bool = None,
-        need_shipping_address: bool = None,
-        send_phone_number_to_provider: bool = None,
-        send_email_to_provider: bool = None,
-        is_flexible: bool = None,
+        max_tip_amount: Optional[int] = None,
+        suggested_tip_amounts: Optional[Sequence[int]] = None,
+        provider_data: Optional[Union[str, object]] = None,
+        photo_url: Optional[str] = None,
+        photo_size: Optional[int] = None,
+        photo_width: Optional[int] = None,
+        photo_height: Optional[int] = None,
+        need_name: Optional[bool] = None,
+        need_phone_number: Optional[bool] = None,
+        need_email: Optional[bool] = None,
+        need_shipping_address: Optional[bool] = None,
+        send_phone_number_to_provider: Optional[bool] = None,
+        send_email_to_provider: Optional[bool] = None,
+        is_flexible: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> str:
         return await super().create_invoice_link(
             title=title,
@@ -1039,25 +1059,20 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def create_new_sticker_set(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         name: str,
         title: str,
-        emojis: str = None,  # Was made optional for compatibility purposes
-        png_sticker: FileInput = None,
-        mask_position: MaskPosition = None,
-        tgs_sticker: FileInput = None,
-        webm_sticker: FileInput = None,
-        sticker_type: str = None,
-        stickers: Sequence[InputSticker] = None,  # Actually a required param. Optional for compat.
-        sticker_format: str = None,  # Actually a required param. Optional for compat.
-        needs_repainting: bool = None,
+        stickers: Optional[Sequence["InputSticker"]],
+        sticker_format: Optional[str],
+        sticker_type: Optional[str] = None,
+        needs_repainting: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().create_new_sticker_set(
             user_id=user_id,
@@ -1065,13 +1080,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             title=title,
             stickers=stickers,
             sticker_format=sticker_format,
-            needs_repainting=needs_repainting,
-            emojis=emojis,
-            png_sticker=png_sticker,
-            mask_position=mask_position,
-            tgs_sticker=tgs_sticker,
-            webm_sticker=webm_sticker,
             sticker_type=sticker_type,
+            needs_repainting=needs_repainting,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1088,8 +1098,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().decline_chat_join_request(
             chat_id=chat_id,
@@ -1109,8 +1119,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().delete_chat_photo(
             chat_id=chat_id,
@@ -1129,8 +1139,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().delete_chat_sticker_set(
             chat_id=chat_id,
@@ -1150,8 +1160,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().delete_forum_topic(
             chat_id=chat_id,
@@ -1172,8 +1182,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().delete_message(
             chat_id=chat_id,
@@ -1187,15 +1197,15 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def delete_my_commands(
         self,
-        scope: BotCommandScope = None,
-        language_code: str = None,
+        scope: Optional[BotCommandScope] = None,
+        language_code: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().delete_my_commands(
             scope=scope,
@@ -1215,8 +1225,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().delete_sticker_from_set(
             sticker=sticker,
@@ -1229,14 +1239,14 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def delete_webhook(
         self,
-        drop_pending_updates: bool = None,
+        drop_pending_updates: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().delete_webhook(
             drop_pending_updates=drop_pending_updates,
@@ -1251,17 +1261,17 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[str, int],
         invite_link: Union[str, "ChatInviteLink"],
-        expire_date: Union[int, datetime] = None,
-        member_limit: int = None,
-        name: str = None,
-        creates_join_request: bool = None,
+        expire_date: Optional[Union[int, datetime]] = None,
+        member_limit: Optional[int] = None,
+        name: Optional[str] = None,
+        creates_join_request: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> ChatInviteLink:
         return await super().edit_chat_invite_link(
             chat_id=chat_id,
@@ -1281,15 +1291,15 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[str, int],
         message_thread_id: int,
-        name: str = None,
-        icon_custom_emoji_id: str = None,
+        name: Optional[str] = None,
+        icon_custom_emoji_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().edit_forum_topic(
             chat_id=chat_id,
@@ -1312,8 +1322,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().edit_general_forum_topic(
             chat_id=chat_id,
@@ -1327,20 +1337,20 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def edit_message_caption(
         self,
-        chat_id: Union[str, int] = None,
-        message_id: int = None,
-        inline_message_id: str = None,
-        caption: str = None,
-        reply_markup: InlineKeyboardMarkup = None,
+        chat_id: Optional[Union[str, int]] = None,
+        message_id: Optional[int] = None,
+        inline_message_id: Optional[str] = None,
+        caption: Optional[str] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Union[Message, bool]:
         return await super().edit_message_caption(
             chat_id=chat_id,
@@ -1359,23 +1369,23 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def edit_message_live_location(
         self,
-        chat_id: Union[str, int] = None,
-        message_id: int = None,
-        inline_message_id: str = None,
-        latitude: float = None,
-        longitude: float = None,
-        reply_markup: InlineKeyboardMarkup = None,
-        horizontal_accuracy: float = None,
-        heading: int = None,
-        proximity_alert_radius: int = None,
+        chat_id: Optional[Union[str, int]] = None,
+        message_id: Optional[int] = None,
+        inline_message_id: Optional[str] = None,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        horizontal_accuracy: Optional[float] = None,
+        heading: Optional[int] = None,
+        proximity_alert_radius: Optional[int] = None,
         *,
-        location: Location = None,
+        location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Union[Message, bool]:
         return await super().edit_message_live_location(
             chat_id=chat_id,
@@ -1398,17 +1408,17 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def edit_message_media(
         self,
         media: "InputMedia",
-        chat_id: Union[str, int] = None,
-        message_id: int = None,
-        inline_message_id: str = None,
-        reply_markup: InlineKeyboardMarkup = None,
+        chat_id: Optional[Union[str, int]] = None,
+        message_id: Optional[int] = None,
+        inline_message_id: Optional[str] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Union[Message, bool]:
         return await super().edit_message_media(
             media=media,
@@ -1425,17 +1435,17 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def edit_message_reply_markup(
         self,
-        chat_id: Union[str, int] = None,
-        message_id: int = None,
-        inline_message_id: str = None,
+        chat_id: Optional[Union[str, int]] = None,
+        message_id: Optional[int] = None,
+        inline_message_id: Optional[str] = None,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Union[Message, bool]:
         return await super().edit_message_reply_markup(
             chat_id=chat_id,
@@ -1452,20 +1462,20 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def edit_message_text(
         self,
         text: str,
-        chat_id: Union[str, int] = None,
-        message_id: int = None,
-        inline_message_id: str = None,
+        chat_id: Optional[Union[str, int]] = None,
+        message_id: Optional[int] = None,
+        inline_message_id: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: InlineKeyboardMarkup = None,
-        entities: Sequence["MessageEntity"] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Union[Message, bool]:
         return await super().edit_message_text(
             text=text,
@@ -1491,8 +1501,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> str:
         return await super().export_chat_invite_link(
             chat_id=chat_id,
@@ -1510,14 +1520,14 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_id: int,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().forward_message(
             chat_id=chat_id,
@@ -1541,8 +1551,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Tuple[ChatMember, ...]:
         return await super().get_chat_administrators(
             chat_id=chat_id,
@@ -1556,14 +1566,14 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def get_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> ChatMember:
         return await super().get_chat_member(
             chat_id=chat_id,
@@ -1583,8 +1593,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> int:
         return await super().get_chat_member_count(
             chat_id=chat_id,
@@ -1597,14 +1607,14 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_chat_menu_button(
         self,
-        chat_id: int = None,
+        chat_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> MenuButton:
         return await super().get_chat_menu_button(
             chat_id=chat_id,
@@ -1625,8 +1635,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> File:
         return await super().get_file(
             file_id=file_id,
@@ -1644,8 +1654,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Tuple[Sticker, ...]:
         return await super().get_forum_topic_icon_stickers(
             read_timeout=read_timeout,
@@ -1657,17 +1667,17 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_game_high_scores(
         self,
-        user_id: Union[int, str],
-        chat_id: Union[str, int] = None,
-        message_id: int = None,
-        inline_message_id: str = None,
+        user_id: int,
+        chat_id: Optional[int] = None,
+        message_id: Optional[int] = None,
+        inline_message_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Tuple[GameHighScore, ...]:
         return await super().get_game_high_scores(
             user_id=user_id,
@@ -1688,8 +1698,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> User:
         return await super().get_me(
             read_timeout=read_timeout,
@@ -1701,15 +1711,15 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_my_commands(
         self,
-        scope: BotCommandScope = None,
-        language_code: str = None,
+        scope: Optional[BotCommandScope] = None,
+        language_code: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Tuple[BotCommand, ...]:
         return await super().get_my_commands(
             scope=scope,
@@ -1723,14 +1733,14 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_my_default_administrator_rights(
         self,
-        for_channels: bool = None,
+        for_channels: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> ChatAdministratorRights:
         return await super().get_my_default_administrator_rights(
             for_channels=for_channels,
@@ -1749,8 +1759,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> StickerSet:
         return await super().get_sticker_set(
             name=name,
@@ -1769,8 +1779,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Tuple[Sticker, ...]:
         return await super().get_custom_emoji_stickers(
             custom_emoji_ids=custom_emoji_ids,
@@ -1783,16 +1793,16 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_user_profile_photos(
         self,
-        user_id: Union[str, int],
-        offset: int = None,
-        limit: int = None,
+        user_id: int,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> UserProfilePhotos:
         return await super().get_user_profile_photos(
             user_id=user_id,
@@ -1812,8 +1822,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> WebhookInfo:
         return await super().get_webhook_info(
             read_timeout=read_timeout,
@@ -1831,8 +1841,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().leave_chat(
             chat_id=chat_id,
@@ -1850,8 +1860,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().log_out(
             read_timeout=read_timeout,
@@ -1868,8 +1878,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().close(
             read_timeout=read_timeout,
@@ -1888,8 +1898,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().close_forum_topic(
             chat_id=chat_id,
@@ -1909,8 +1919,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().close_general_forum_topic(
             chat_id=chat_id,
@@ -1925,15 +1935,15 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[str, int],
         name: str,
-        icon_color: int = None,
-        icon_custom_emoji_id: str = None,
+        icon_color: Optional[int] = None,
+        icon_custom_emoji_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> ForumTopic:
         return await super().create_forum_topic(
             chat_id=chat_id,
@@ -1955,8 +1965,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().reopen_general_forum_topic(
             chat_id=chat_id,
@@ -1975,8 +1985,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().hide_general_forum_topic(
             chat_id=chat_id,
@@ -1995,8 +2005,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().unhide_general_forum_topic(
             chat_id=chat_id,
@@ -2017,8 +2027,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().pin_chat_message(
             chat_id=chat_id,
@@ -2034,26 +2044,26 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def promote_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
-        can_change_info: bool = None,
-        can_post_messages: bool = None,
-        can_edit_messages: bool = None,
-        can_delete_messages: bool = None,
-        can_invite_users: bool = None,
-        can_restrict_members: bool = None,
-        can_pin_messages: bool = None,
-        can_promote_members: bool = None,
-        is_anonymous: bool = None,
-        can_manage_chat: bool = None,
-        can_manage_video_chats: bool = None,
-        can_manage_topics: bool = None,
+        user_id: int,
+        can_change_info: Optional[bool] = None,
+        can_post_messages: Optional[bool] = None,
+        can_edit_messages: Optional[bool] = None,
+        can_delete_messages: Optional[bool] = None,
+        can_invite_users: Optional[bool] = None,
+        can_restrict_members: Optional[bool] = None,
+        can_pin_messages: Optional[bool] = None,
+        can_promote_members: Optional[bool] = None,
+        is_anonymous: Optional[bool] = None,
+        can_manage_chat: Optional[bool] = None,
+        can_manage_video_chats: Optional[bool] = None,
+        can_manage_topics: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().promote_chat_member(
             chat_id=chat_id,
@@ -2086,8 +2096,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().reopen_forum_topic(
             chat_id=chat_id,
@@ -2102,17 +2112,17 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def restrict_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         permissions: ChatPermissions,
-        until_date: Union[int, datetime] = None,
-        use_independent_chat_permissions: bool = None,
+        until_date: Optional[Union[int, datetime]] = None,
+        use_independent_chat_permissions: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().restrict_chat_member(
             chat_id=chat_id,
@@ -2136,8 +2146,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> ChatInviteLink:
         return await super().revoke_chat_invite_link(
             chat_id=chat_id,
@@ -2153,29 +2163,28 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         animation: Union[FileInput, "Animation"],
-        duration: int = None,
-        width: int = None,
-        height: int = None,
-        thumb: FileInput = None,
-        caption: str = None,
+        duration: Optional[int] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        has_spoiler: bool = None,
-        thumbnail: FileInput = None,
+        message_thread_id: Optional[int] = None,
+        has_spoiler: Optional[bool] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_animation(
             chat_id=chat_id,
@@ -2183,7 +2192,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             duration=duration,
             width=width,
             height=height,
-            thumb=thumb,
             caption=caption,
             parse_mode=parse_mode,
             disable_notification=disable_notification,
@@ -2207,28 +2215,27 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         audio: Union[FileInput, "Audio"],
-        duration: int = None,
-        performer: str = None,
-        title: str = None,
-        caption: str = None,
+        duration: Optional[int] = None,
+        performer: Optional[str] = None,
+        title: Optional[str] = None,
+        caption: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        thumbnail: FileInput = None,
+        message_thread_id: Optional[int] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_audio(
             chat_id=chat_id,
@@ -2241,7 +2248,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
-            thumb=thumb,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             protect_content=protect_content,
@@ -2259,14 +2265,14 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[str, int],
         action: str,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().send_chat_action(
             chat_id=chat_id,
@@ -2282,24 +2288,24 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def send_contact(
         self,
         chat_id: Union[int, str],
-        phone_number: str = None,
-        first_name: str = None,
-        last_name: str = None,
+        phone_number: Optional[str] = None,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        vcard: str = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        vcard: Optional[str] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
-        contact: Contact = None,
+        contact: Optional[Contact] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_contact(
             chat_id=chat_id,
@@ -2325,19 +2331,19 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        emoji: str = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        emoji: Optional[str] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_dice(
             chat_id=chat_id,
@@ -2359,26 +2365,25 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         document: Union[FileInput, "Document"],
-        caption: str = None,
+        caption: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: FileInput = None,
-        disable_content_type_detection: bool = None,
+        disable_content_type_detection: Optional[bool] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        thumbnail: FileInput = None,
+        message_thread_id: Optional[int] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_document(
             chat_id=chat_id,
@@ -2388,7 +2393,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
-            thumb=thumb,
             disable_content_type_detection=disable_content_type_detection,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
@@ -2405,21 +2409,21 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def send_game(
         self,
-        chat_id: Union[int, str],
+        chat_id: int,
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: InlineKeyboardMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_game(
             chat_id=chat_id,
@@ -2446,34 +2450,34 @@ class ExtBot(Bot, Generic[RLARGS]):
         provider_token: str,
         currency: str,
         prices: Sequence["LabeledPrice"],
-        start_parameter: str = None,
-        photo_url: str = None,
-        photo_size: int = None,
-        photo_width: int = None,
-        photo_height: int = None,
-        need_name: bool = None,
-        need_phone_number: bool = None,
-        need_email: bool = None,
-        need_shipping_address: bool = None,
-        is_flexible: bool = None,
+        start_parameter: Optional[str] = None,
+        photo_url: Optional[str] = None,
+        photo_size: Optional[int] = None,
+        photo_width: Optional[int] = None,
+        photo_height: Optional[int] = None,
+        need_name: Optional[bool] = None,
+        need_phone_number: Optional[bool] = None,
+        need_email: Optional[bool] = None,
+        need_shipping_address: Optional[bool] = None,
+        is_flexible: Optional[bool] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: InlineKeyboardMarkup = None,
-        provider_data: Union[str, object] = None,
-        send_phone_number_to_provider: bool = None,
-        send_email_to_provider: bool = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        provider_data: Optional[Union[str, object]] = None,
+        send_phone_number_to_provider: Optional[bool] = None,
+        send_email_to_provider: Optional[bool] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        max_tip_amount: int = None,
-        suggested_tip_amounts: Sequence[int] = None,
+        max_tip_amount: Optional[int] = None,
+        suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_invoice(
             chat_id=chat_id,
@@ -2514,26 +2518,26 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def send_location(
         self,
         chat_id: Union[int, str],
-        latitude: float = None,
-        longitude: float = None,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        live_period: int = None,
-        horizontal_accuracy: float = None,
-        heading: int = None,
-        proximity_alert_radius: int = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        live_period: Optional[int] = None,
+        horizontal_accuracy: Optional[float] = None,
+        heading: Optional[int] = None,
+        proximity_alert_radius: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
-        location: Location = None,
+        location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_location(
             chat_id=chat_id,
@@ -2564,20 +2568,20 @@ class ExtBot(Bot, Generic[RLARGS]):
             Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
+        reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
     ) -> Tuple[Message, ...]:
         return await super().send_media_group(
             chat_id=chat_id,
@@ -2602,21 +2606,21 @@ class ExtBot(Bot, Generic[RLARGS]):
         chat_id: Union[int, str],
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        entities: Sequence["MessageEntity"] = None,
+        entities: Optional[Sequence["MessageEntity"]] = None,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
+        reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: ReplyMarkup = None,
-        message_thread_id: int = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_message(
             chat_id=chat_id,
@@ -2641,24 +2645,24 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         photo: Union[FileInput, "PhotoSize"],
-        caption: str = None,
+        caption: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        has_spoiler: bool = None,
+        message_thread_id: Optional[int] = None,
+        has_spoiler: Optional[bool] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_photo(
             chat_id=chat_id,
@@ -2686,29 +2690,29 @@ class ExtBot(Bot, Generic[RLARGS]):
         chat_id: Union[int, str],
         question: str,
         options: Sequence[str],
-        is_anonymous: bool = None,
-        type: str = None,  # pylint: disable=redefined-builtin
-        allows_multiple_answers: bool = None,
-        correct_option_id: int = None,
-        is_closed: bool = None,
+        is_anonymous: Optional[bool] = None,
+        type: Optional[str] = None,  # pylint: disable=redefined-builtin
+        allows_multiple_answers: Optional[bool] = None,
+        correct_option_id: Optional[CorrectOptionID] = None,
+        is_closed: Optional[bool] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        explanation: str = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        open_period: int = None,
-        close_date: Union[int, datetime] = None,
+        open_period: Optional[int] = None,
+        close_date: Optional[Union[int, datetime]] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        explanation_entities: Sequence["MessageEntity"] = None,
+        explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_poll(
             chat_id=chat_id,
@@ -2742,19 +2746,19 @@ class ExtBot(Bot, Generic[RLARGS]):
         chat_id: Union[int, str],
         sticker: Union[FileInput, "Sticker"],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        emoji: str = None,
+        message_thread_id: Optional[int] = None,
+        emoji: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_sticker(
             chat_id=chat_id,
@@ -2776,28 +2780,28 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def send_venue(
         self,
         chat_id: Union[int, str],
-        latitude: float = None,
-        longitude: float = None,
-        title: str = None,
-        address: str = None,
-        foursquare_id: str = None,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None,
+        title: Optional[str] = None,
+        address: Optional[str] = None,
+        foursquare_id: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        foursquare_type: str = None,
-        google_place_id: str = None,
-        google_place_type: str = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        foursquare_type: Optional[str] = None,
+        google_place_id: Optional[str] = None,
+        google_place_type: Optional[str] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
-        venue: Venue = None,
+        venue: Optional[Venue] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_venue(
             chat_id=chat_id,
@@ -2827,30 +2831,29 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         video: Union[FileInput, "Video"],
-        duration: int = None,
-        caption: str = None,
+        duration: Optional[int] = None,
+        caption: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        width: int = None,
-        height: int = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        supports_streaming: bool = None,
-        thumb: FileInput = None,
+        supports_streaming: Optional[bool] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        has_spoiler: bool = None,
-        thumbnail: FileInput = None,
+        message_thread_id: Optional[int] = None,
+        has_spoiler: Optional[bool] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_video(
             chat_id=chat_id,
@@ -2864,7 +2867,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             height=height,
             parse_mode=parse_mode,
             supports_streaming=supports_streaming,
-            thumb=thumb,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             protect_content=protect_content,
@@ -2883,24 +2885,23 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         video_note: Union[FileInput, "VideoNote"],
-        duration: int = None,
-        length: int = None,
+        duration: Optional[int] = None,
+        length: Optional[int] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
-        thumb: FileInput = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
-        thumbnail: FileInput = None,
+        message_thread_id: Optional[int] = None,
+        thumbnail: Optional[FileInput] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_video_note(
             chat_id=chat_id,
@@ -2910,7 +2911,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            thumb=thumb,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -2927,24 +2927,24 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         voice: Union[FileInput, "Voice"],
-        duration: int = None,
-        caption: str = None,
+        duration: Optional[int] = None,
+        caption: Optional[str] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: int = None,
-        reply_markup: ReplyMarkup = None,
+        reply_to_message_id: Optional[int] = None,
+        reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Sequence["MessageEntity"] = None,
+        caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: int = None,
+        message_thread_id: Optional[int] = None,
         *,
-        filename: str = None,
+        filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Message:
         return await super().send_voice(
             chat_id=chat_id,
@@ -2970,15 +2970,15 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_chat_administrator_custom_title(
         self,
         chat_id: Union[int, str],
-        user_id: Union[int, str],
+        user_id: int,
         custom_title: str,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_chat_administrator_custom_title(
             chat_id=chat_id,
@@ -2994,14 +2994,14 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_chat_description(
         self,
         chat_id: Union[str, int],
-        description: str = None,
+        description: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_chat_description(
             chat_id=chat_id,
@@ -3015,15 +3015,15 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_chat_menu_button(
         self,
-        chat_id: int = None,
-        menu_button: MenuButton = None,
+        chat_id: Optional[int] = None,
+        menu_button: Optional[MenuButton] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_chat_menu_button(
             chat_id=chat_id,
@@ -3039,14 +3039,14 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[str, int],
         permissions: ChatPermissions,
-        use_independent_chat_permissions: bool = None,
+        use_independent_chat_permissions: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_chat_permissions(
             chat_id=chat_id,
@@ -3068,8 +3068,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_chat_photo(
             chat_id=chat_id,
@@ -3090,8 +3090,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_chat_sticker_set(
             chat_id=chat_id,
@@ -3112,8 +3112,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_chat_title(
             chat_id=chat_id,
@@ -3127,20 +3127,20 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_game_score(
         self,
-        user_id: Union[int, str],
+        user_id: int,
         score: int,
-        chat_id: Union[str, int] = None,
-        message_id: int = None,
-        inline_message_id: str = None,
-        force: bool = None,
-        disable_edit_message: bool = None,
+        chat_id: Optional[int] = None,
+        message_id: Optional[int] = None,
+        inline_message_id: Optional[str] = None,
+        force: Optional[bool] = None,
+        disable_edit_message: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Union[Message, bool]:
         return await super().set_game_score(
             user_id=user_id,
@@ -3160,15 +3160,15 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_my_commands(
         self,
         commands: Sequence[Union[BotCommand, Tuple[str, str]]],
-        scope: BotCommandScope = None,
-        language_code: str = None,
+        scope: Optional[BotCommandScope] = None,
+        language_code: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_my_commands(
             commands=commands,
@@ -3183,15 +3183,15 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_my_default_administrator_rights(
         self,
-        rights: ChatAdministratorRights = None,
-        for_channels: bool = None,
+        rights: Optional[ChatAdministratorRights] = None,
+        for_channels: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_my_default_administrator_rights(
             rights=rights,
@@ -3205,15 +3205,15 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_passport_data_errors(
         self,
-        user_id: Union[str, int],
-        errors: Sequence[PassportElementError],
+        user_id: int,
+        errors: Sequence["PassportElementError"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_passport_data_errors(
             user_id=user_id,
@@ -3234,8 +3234,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_sticker_position_in_set(
             sticker=sticker,
@@ -3250,15 +3250,15 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_sticker_set_thumbnail(
         self,
         name: str,
-        user_id: Union[str, int],
-        thumbnail: FileInput = None,
+        user_id: int,
+        thumbnail: Optional[FileInput] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_sticker_set_thumbnail(
             name=name,
@@ -3271,60 +3271,22 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
-    async def set_sticker_set_thumb(
-        self,
-        name: str,
-        user_id: Union[str, int],
-        thumb: FileInput = None,
-        *,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
-    ) -> bool:
-        # Manually issue deprecation here to get the stacklevel right
-        # Suppress the warning issued by super().set_sticker_set_thumb just in case
-        # the user explicitly enables deprecation warnings
-        # Unfortunately this is not entirely reliable (see tests), but it's a best effort solution
-        warn(
-            message=(
-                "Bot API 6.6 renamed the method 'setStickerSetThumb' to 'setStickerSetThumbnail', "
-                "hence method 'set_sticker_set_thumb' was renamed to 'set_sticker_set_thumbnail' "
-                "in PTB."
-            ),
-            category=PTBDeprecationWarning,
-            stacklevel=2,
-        )
-        with warnings.catch_warnings():
-            return await super().set_sticker_set_thumb(
-                name=name,
-                user_id=user_id,
-                thumb=thumb,
-                read_timeout=read_timeout,
-                write_timeout=write_timeout,
-                connect_timeout=connect_timeout,
-                pool_timeout=pool_timeout,
-                api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
-            )
-
     async def set_webhook(
         self,
         url: str,
-        certificate: FileInput = None,
-        max_connections: int = None,
-        allowed_updates: Sequence[str] = None,
-        ip_address: str = None,
-        drop_pending_updates: bool = None,
-        secret_token: str = None,
+        certificate: Optional[FileInput] = None,
+        max_connections: Optional[int] = None,
+        allowed_updates: Optional[Sequence[str]] = None,
+        ip_address: Optional[str] = None,
+        drop_pending_updates: Optional[bool] = None,
+        secret_token: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_webhook(
             url=url,
@@ -3343,17 +3305,17 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def stop_message_live_location(
         self,
-        chat_id: Union[str, int] = None,
-        message_id: int = None,
-        inline_message_id: str = None,
-        reply_markup: InlineKeyboardMarkup = None,
+        chat_id: Optional[Union[str, int]] = None,
+        message_id: Optional[int] = None,
+        inline_message_id: Optional[str] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> Union[Message, bool]:
         return await super().stop_message_live_location(
             chat_id=chat_id,
@@ -3370,15 +3332,15 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def unban_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
-        only_if_banned: bool = None,
+        user_id: int,
+        only_if_banned: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().unban_chat_member(
             chat_id=chat_id,
@@ -3400,8 +3362,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().unban_chat_sender_chat(
             chat_id=chat_id,
@@ -3421,8 +3383,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().unpin_all_chat_messages(
             chat_id=chat_id,
@@ -3436,14 +3398,14 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def unpin_chat_message(
         self,
         chat_id: Union[str, int],
-        message_id: int = None,
+        message_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().unpin_chat_message(
             chat_id=chat_id,
@@ -3464,8 +3426,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().unpin_all_forum_topic_messages(
             chat_id=chat_id,
@@ -3477,25 +3439,43 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def unpin_all_general_forum_topic_messages(
+        self,
+        chat_id: Union[str, int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().unpin_all_general_forum_topic_messages(
+            chat_id=chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def upload_sticker_file(
         self,
-        user_id: Union[str, int],
-        png_sticker: FileInput = None,  # Deprecated since bot api 6.6. Optional for compatiblity.
-        sticker: FileInput = None,  # Actually required, but optional for compatibility.
-        sticker_format: str = None,  # Actually required, but optional for compatibility.
+        user_id: int,
+        sticker: Optional[FileInput],
+        sticker_format: Optional[str],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> File:
         return await super().upload_sticker_file(
             user_id=user_id,
             sticker=sticker,
             sticker_format=sticker_format,
-            png_sticker=png_sticker,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3505,15 +3485,15 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_my_description(
         self,
-        description: str = None,
-        language_code: str = None,
+        description: Optional[str] = None,
+        language_code: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_my_description(
             description=description,
@@ -3527,15 +3507,15 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_my_short_description(
         self,
-        short_description: str = None,
-        language_code: str = None,
+        short_description: Optional[str] = None,
+        language_code: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_my_short_description(
             short_description=short_description,
@@ -3549,14 +3529,14 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_my_description(
         self,
-        language_code: str = None,
+        language_code: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> BotDescription:
         return await super().get_my_description(
             language_code=language_code,
@@ -3569,16 +3549,58 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_my_short_description(
         self,
-        language_code: str = None,
+        language_code: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> BotShortDescription:
         return await super().get_my_short_description(
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def set_my_name(
+        self,
+        name: Optional[str] = None,
+        language_code: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().set_my_name(
+            name=name,
+            language_code=language_code,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_my_name(
+        self,
+        language_code: Optional[str] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> BotName:
+        return await super().get_my_name(
             language_code=language_code,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -3590,14 +3612,14 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_custom_emoji_sticker_set_thumbnail(
         self,
         name: str,
-        custom_emoji_id: str = None,
+        custom_emoji_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_custom_emoji_sticker_set_thumbnail(
             name=name,
@@ -3618,8 +3640,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_sticker_set_title(
             name=name,
@@ -3639,8 +3661,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().delete_sticker_set(
             name=name,
@@ -3660,8 +3682,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_sticker_emoji_list(
             sticker=sticker,
@@ -3676,14 +3698,14 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_sticker_keywords(
         self,
         sticker: str,
-        keywords: Sequence[str] = None,
+        keywords: Optional[Sequence[str]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_sticker_keywords(
             sticker=sticker,
@@ -3698,14 +3720,14 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_sticker_mask_position(
         self,
         sticker: str,
-        mask_position: MaskPosition = None,
+        mask_position: Optional[MaskPosition] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-        rate_limit_args: RLARGS = None,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
     ) -> bool:
         return await super().set_sticker_mask_position(
             sticker=sticker,
@@ -3791,7 +3813,6 @@ class ExtBot(Bot, Generic[RLARGS]):
     addStickerToSet = add_sticker_to_set
     setStickerPositionInSet = set_sticker_position_in_set
     deleteStickerFromSet = delete_sticker_from_set
-    setStickerSetThumb = set_sticker_set_thumb
     setStickerSetThumbnail = set_sticker_set_thumbnail
     setPassportDataErrors = set_passport_data_errors
     sendPoll = send_poll
@@ -3829,3 +3850,6 @@ class ExtBot(Bot, Generic[RLARGS]):
     setStickerEmojiList = set_sticker_emoji_list
     setStickerKeywords = set_sticker_keywords
     setStickerMaskPosition = set_sticker_mask_position
+    setMyName = set_my_name
+    getMyName = get_my_name
+    unpinAllGeneralForumTopicMessages = unpin_all_general_forum_topic_messages

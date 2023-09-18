@@ -34,6 +34,7 @@ from telegram import (
     BotCommand,
     BotCommandScopeChat,
     BotDescription,
+    BotName,
     BotShortDescription,
     CallbackQuery,
     Chat,
@@ -44,6 +45,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultArticle,
     InlineQueryResultDocument,
+    InlineQueryResultsButton,
     InlineQueryResultVoice,
     InputFile,
     InputMessageContent,
@@ -76,6 +78,7 @@ from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
+from telegram.warnings import PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
@@ -214,6 +217,10 @@ class TestBotWithoutRequest:
     async def test_no_token_passed(self):
         with pytest.raises(InvalidToken, match="You must pass the token"):
             Bot("")
+
+    async def test_repr(self):
+        bot = Bot(token="some_token", base_file_url="")
+        assert repr(bot) == "Bot[token=some_token]"
 
     async def test_to_dict(self, bot):
         to_dict_bot = bot.to_dict()
@@ -654,10 +661,11 @@ class TestBotWithoutRequest:
         )
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
-    async def test_answer_inline_query(self, monkeypatch, bot, raw_bot):
+    @pytest.mark.parametrize("button_type", ["start", "web_app"])
+    async def test_answer_inline_query(self, monkeypatch, bot, raw_bot, button_type):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.parameters == {
+            expected = {
                 "cache_time": 300,
                 "results": [
                     {
@@ -684,11 +692,21 @@ class TestBotWithoutRequest:
                     },
                 ],
                 "next_offset": "42",
-                "switch_pm_parameter": "start_pm",
                 "inline_query_id": 1234,
                 "is_personal": True,
-                "switch_pm_text": "switch pm",
             }
+
+            if button_type == "start":
+                button_dict = {"text": "button_text", "start_parameter": "start_parameter"}
+            else:
+                button_dict = {
+                    "text": "button_text",
+                    "web_app": {"url": "https://python-telegram-bot.org"},
+                }
+
+            expected["button"] = button_dict
+
+            return request_data.parameters == expected
 
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
@@ -704,6 +722,17 @@ class TestBotWithoutRequest:
             ),
         ]
 
+        if button_type == "start":
+            button = InlineQueryResultsButton(
+                text="button_text", start_parameter="start_parameter"
+            )
+        elif button_type == "web_app":
+            button = InlineQueryResultsButton(
+                text="button_text", web_app=WebAppInfo("https://python-telegram-bot.org")
+            )
+        else:
+            button = None
+
         copied_results = copy.copy(results)
         ext_bot = bot
         for bot in (ext_bot, raw_bot):
@@ -716,8 +745,7 @@ class TestBotWithoutRequest:
                 cache_time=300,
                 is_personal=True,
                 next_offset="42",
-                switch_pm_text="switch pm",
-                switch_pm_parameter="start_pm",
+                button=button,
             )
 
             # 1)
@@ -768,10 +796,8 @@ class TestBotWithoutRequest:
                     },
                 ],
                 "next_offset": "42",
-                "switch_pm_parameter": "start_pm",
                 "inline_query_id": 1234,
                 "is_personal": True,
-                "switch_pm_text": "switch pm",
             }
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
@@ -796,8 +822,6 @@ class TestBotWithoutRequest:
             cache_time=300,
             is_personal=True,
             next_offset="42",
-            switch_pm_text="switch pm",
-            switch_pm_parameter="start_pm",
         )
         # make sure that the results were not edited in-place
         assert results == copied_results
@@ -861,10 +885,8 @@ class TestBotWithoutRequest:
                     },
                 ],
                 "next_offset": "42",
-                "switch_pm_parameter": "start_pm",
                 "inline_query_id": 1234,
                 "is_personal": True,
-                "switch_pm_text": "switch pm",
             }
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
@@ -889,8 +911,6 @@ class TestBotWithoutRequest:
             cache_time=300,
             is_personal=True,
             next_offset="42",
-            switch_pm_text="switch pm",
-            switch_pm_parameter="start_pm",
         )
         # make sure that the results were not edited in-place
         assert results == copied_results
@@ -1650,22 +1670,21 @@ class TestBotWithoutRequest:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    async def test_http2_runtime_error(self, recwarn):
-        Bot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
-        Bot(
+    @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
+    async def test_http2_runtime_error(self, recwarn, bot_class):
+        bot_class("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
+        bot_class(
             "12345:ABCDE",
             base_url="http://",
             get_updates_request=HTTPXRequest(http_version="2"),
         )
-        Bot(
+        bot_class(
             "12345:ABCDE",
             base_url="http://",
             request=HTTPXRequest(http_version="2"),
             get_updates_request=HTTPXRequest(http_version="2"),
         )
-        # this exists to make sure the error is also raised by extbot
-        ExtBot("12345:ABCDE", base_url="http://", request=HTTPXRequest(http_version="2"))
-        assert len(recwarn) == 4
+        assert len(recwarn) == 3
         assert "You set the HTTP version for the request HTTPXRequest instance" in str(
             recwarn[0].message
         )
@@ -1676,6 +1695,83 @@ class TestBotWithoutRequest:
             "You set the HTTP version for the get_updates_request and request HTTPXRequest "
             "instance" in str(recwarn[2].message)
         )
+        for warning in recwarn:
+            assert warning.filename == __file__, "wrong stacklevel!"
+            assert warning.category is PTBUserWarning
+
+    async def test_set_get_my_name(self, bot, monkeypatch):
+        """We only test that we pass the correct values to TG since this endpoint is heavily
+        rate limited which makes automated tests rather infeasible."""
+        default_name = "default_bot_name"
+        en_name = "en_bot_name"
+        de_name = "de_bot_name"
+
+        # We predefine the responses that we would TG expect to send us
+        set_stack = asyncio.Queue()
+        get_stack = asyncio.Queue()
+        await set_stack.put({"name": default_name})
+        await set_stack.put({"name": en_name, "language_code": "en"})
+        await set_stack.put({"name": de_name, "language_code": "de"})
+        await get_stack.put({"name": default_name, "language_code": None})
+        await get_stack.put({"name": en_name, "language_code": "en"})
+        await get_stack.put({"name": de_name, "language_code": "de"})
+
+        await set_stack.put({"name": default_name})
+        await set_stack.put({"language_code": "en"})
+        await set_stack.put({"language_code": "de"})
+        await get_stack.put({"name": default_name, "language_code": None})
+        await get_stack.put({"name": default_name, "language_code": "en"})
+        await get_stack.put({"name": default_name, "language_code": "de"})
+
+        async def post(url, request_data: RequestData, *args, **kwargs):
+            # The mock-post now just fetches the predefined responses from the queues
+            if "setMyName" in url:
+                expected = await set_stack.get()
+                assert request_data.json_parameters == expected
+                set_stack.task_done()
+                return True
+
+            bot_name = await get_stack.get()
+            if "language_code" in request_data.json_parameters:
+                assert request_data.json_parameters == {"language_code": bot_name["language_code"]}
+            else:
+                assert request_data.json_parameters == {}
+            get_stack.task_done()
+            return bot_name
+
+        monkeypatch.setattr(bot.request, "post", post)
+
+        # Set the names
+        assert all(
+            await asyncio.gather(
+                bot.set_my_name(default_name),
+                bot.set_my_name(en_name, language_code="en"),
+                bot.set_my_name(de_name, language_code="de"),
+            )
+        )
+
+        # Check that they were set correctly
+        assert await asyncio.gather(
+            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
+        ) == [
+            BotName(default_name),
+            BotName(en_name),
+            BotName(de_name),
+        ]
+
+        # Delete the names
+        assert all(
+            await asyncio.gather(
+                bot.set_my_name(default_name),
+                bot.set_my_name(None, language_code="en"),
+                bot.set_my_name(None, language_code="de"),
+            )
+        )
+
+        # Check that they were deleted correctly
+        assert await asyncio.gather(
+            bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
+        ) == 3 * [BotName(default_name)]
 
 
 class TestBotWithRequest:
@@ -3118,8 +3214,10 @@ class TestBotWithRequest:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] == replace_button
-            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
-            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = next(iter(bot.callback_data_cache._keyboard_data))
+            data = next(
+                iter(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())
+            )
             assert data == "replace_test"
         finally:
             bot.callback_data_cache.clear_callback_data()
@@ -3147,8 +3245,10 @@ class TestBotWithRequest:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] == replace_button
-            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
-            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = next(iter(bot.callback_data_cache._keyboard_data))
+            data = next(
+                iter(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())
+            )
             assert data == "replace_test"
         finally:
             bot.callback_data_cache.clear_callback_data()
@@ -3180,8 +3280,10 @@ class TestBotWithRequest:
 
             assert inline_keyboard[0][1] == no_replace_button
             assert inline_keyboard[0][0] == replace_button
-            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
-            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = next(iter(bot.callback_data_cache._keyboard_data))
+            data = next(
+                iter(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())
+            )
             assert data == "replace_test"
         finally:
             bot.callback_data_cache.clear_callback_data()
@@ -3200,8 +3302,10 @@ class TestBotWithRequest:
             )
             await message.pin()
 
-            keyboard = list(bot.callback_data_cache._keyboard_data)[0]
-            data = list(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())[0]
+            keyboard = next(iter(bot.callback_data_cache._keyboard_data))
+            data = next(
+                iter(bot.callback_data_cache._keyboard_data[keyboard].button_data.values())
+            )
             assert data == "callback_data"
 
             chat = await bot.get_chat(channel_id)

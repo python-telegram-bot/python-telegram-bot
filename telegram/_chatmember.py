@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
-from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
+from typing import TYPE_CHECKING, Dict, Final, Optional, Type
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -74,17 +74,17 @@ class ChatMember(TelegramObject):
 
     __slots__ = ("user", "status")
 
-    ADMINISTRATOR: ClassVar[str] = constants.ChatMemberStatus.ADMINISTRATOR
+    ADMINISTRATOR: Final[str] = constants.ChatMemberStatus.ADMINISTRATOR
     """:const:`telegram.constants.ChatMemberStatus.ADMINISTRATOR`"""
-    OWNER: ClassVar[str] = constants.ChatMemberStatus.OWNER
+    OWNER: Final[str] = constants.ChatMemberStatus.OWNER
     """:const:`telegram.constants.ChatMemberStatus.OWNER`"""
-    BANNED: ClassVar[str] = constants.ChatMemberStatus.BANNED
+    BANNED: Final[str] = constants.ChatMemberStatus.BANNED
     """:const:`telegram.constants.ChatMemberStatus.BANNED`"""
-    LEFT: ClassVar[str] = constants.ChatMemberStatus.LEFT
+    LEFT: Final[str] = constants.ChatMemberStatus.LEFT
     """:const:`telegram.constants.ChatMemberStatus.LEFT`"""
-    MEMBER: ClassVar[str] = constants.ChatMemberStatus.MEMBER
+    MEMBER: Final[str] = constants.ChatMemberStatus.MEMBER
     """:const:`telegram.constants.ChatMemberStatus.MEMBER`"""
-    RESTRICTED: ClassVar[str] = constants.ChatMemberStatus.RESTRICTED
+    RESTRICTED: Final[str] = constants.ChatMemberStatus.RESTRICTED
     """:const:`telegram.constants.ChatMemberStatus.RESTRICTED`"""
 
     def __init__(
@@ -92,7 +92,7 @@ class ChatMember(TelegramObject):
         user: User,
         status: str,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
@@ -111,7 +111,7 @@ class ChatMember(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type["ChatMember"]] = {
+        _class_mapping: Dict[str, Type[ChatMember]] = {
             cls.OWNER: ChatMemberOwner,
             cls.ADMINISTRATOR: ChatMemberAdministrator,
             cls.MEMBER: ChatMemberMember,
@@ -129,6 +129,12 @@ class ChatMember(TelegramObject):
             loc_tzinfo = extract_tzinfo_from_defaults(bot)
 
             data["until_date"] = from_timestamp(data["until_date"], tzinfo=loc_tzinfo)
+
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if cls is ChatMemberRestricted and data.get("can_send_media_messages") is not None:
+            api_kwargs = {"can_send_media_messages": data.pop("can_send_media_messages")}
+            return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
         return super().de_json(data=data, bot=bot)
 
@@ -162,9 +168,9 @@ class ChatMemberOwner(ChatMember):
         self,
         user: User,
         is_anonymous: bool,
-        custom_title: str = None,
+        custom_title: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.OWNER, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -295,13 +301,13 @@ class ChatMemberAdministrator(ChatMember):
         can_promote_members: bool,
         can_change_info: bool,
         can_invite_users: bool,
-        can_post_messages: bool = None,
-        can_edit_messages: bool = None,
-        can_pin_messages: bool = None,
-        can_manage_topics: bool = None,
-        custom_title: str = None,
+        can_post_messages: Optional[bool] = None,
+        can_edit_messages: Optional[bool] = None,
+        can_pin_messages: Optional[bool] = None,
+        can_manage_topics: Optional[bool] = None,
+        custom_title: Optional[str] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.ADMINISTRATOR, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -344,7 +350,7 @@ class ChatMemberMember(ChatMember):
         self,
         user: User,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
         self._freeze()
@@ -360,6 +366,9 @@ class ChatMemberRestricted(ChatMember):
        All arguments were made positional and their order was changed.
        The argument can_manage_topics was added.
 
+    .. versionchanged:: 20.5
+      Removed deprecated argument and attribute ``can_send_media_messages``.
+
     Args:
         user (:class:`telegram.User`): Information about the user.
         is_member (:obj:`bool`): :obj:`True`, if the user is a
@@ -372,11 +381,6 @@ class ChatMemberRestricted(ChatMember):
             to pin messages; groups and supergroups only.
         can_send_messages (:obj:`bool`): :obj:`True`, if the user is allowed
             to send text messages, contacts, invoices, locations and venues.
-        can_send_media_messages (:obj:`bool`): :obj:`True`, if the user is allowed
-            to send audios, documents, photos, videos, video notes and voice notes.
-
-            .. deprecated:: 20.1
-               Bot API 6.5 replaced this argument with granular media settings.
         can_send_polls (:obj:`bool`): :obj:`True`, if the user is allowed
             to send polls.
         can_send_other_messages (:obj:`bool`): :obj:`True`, if the user is allowed
@@ -390,7 +394,7 @@ class ChatMemberRestricted(ChatMember):
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
 
@@ -427,11 +431,6 @@ class ChatMemberRestricted(ChatMember):
             to pin messages; groups and supergroups only.
         can_send_messages (:obj:`bool`): :obj:`True`, if the user is allowed
             to send text messages, contacts, locations and venues.
-        can_send_media_messages (:obj:`bool`): :obj:`True`, if the user is allowed
-            to send audios, documents, photos, videos, video notes and voice notes.
-
-            .. deprecated:: 20.1
-               Bot API 6.5 replaced this attribute with granular media settings.
         can_send_polls (:obj:`bool`): :obj:`True`, if the user is allowed
             to send polls.
         can_send_other_messages (:obj:`bool`): :obj:`True`, if the user is allowed
@@ -445,7 +444,7 @@ class ChatMemberRestricted(ChatMember):
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         can_send_audios (:obj:`bool`): :obj:`True`, if the user is allowed to send audios.
 
@@ -476,7 +475,6 @@ class ChatMemberRestricted(ChatMember):
         "can_invite_users",
         "can_pin_messages",
         "can_send_messages",
-        "can_send_media_messages",
         "can_send_polls",
         "can_send_other_messages",
         "can_add_web_page_previews",
@@ -498,7 +496,6 @@ class ChatMemberRestricted(ChatMember):
         can_invite_users: bool,
         can_pin_messages: bool,
         can_send_messages: bool,
-        can_send_media_messages: bool,
         can_send_polls: bool,
         can_send_other_messages: bool,
         can_add_web_page_previews: bool,
@@ -511,7 +508,7 @@ class ChatMemberRestricted(ChatMember):
         can_send_video_notes: bool,
         can_send_voice_notes: bool,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():
@@ -520,7 +517,6 @@ class ChatMemberRestricted(ChatMember):
             self.can_invite_users: bool = can_invite_users
             self.can_pin_messages: bool = can_pin_messages
             self.can_send_messages: bool = can_send_messages
-            self.can_send_media_messages: bool = can_send_media_messages
             self.can_send_polls: bool = can_send_polls
             self.can_send_other_messages: bool = can_send_other_messages
             self.can_add_web_page_previews: bool = can_add_web_page_previews
@@ -556,7 +552,7 @@ class ChatMemberLeft(ChatMember):
         self,
         user: User,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
         self._freeze()
@@ -574,7 +570,7 @@ class ChatMemberBanned(ChatMember):
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
 
     Attributes:
@@ -584,7 +580,7 @@ class ChatMemberBanned(ChatMember):
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
 
     """
@@ -596,7 +592,7 @@ class ChatMemberBanned(ChatMember):
         user: User,
         until_date: datetime.datetime,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
         with self._unfrozen():

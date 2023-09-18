@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
-from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
+from typing import TYPE_CHECKING, Dict, Final, Optional, Type
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -55,7 +55,7 @@ class MenuButton(TelegramObject):
     __slots__ = ("type",)
 
     def __init__(
-        self, type: str, *, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
+        self, type: str, *, api_kwargs: Optional[JSONDict] = None  # skipcq: PYL-W0622
     ):  # pylint: disable=redefined-builtin
         super().__init__(api_kwargs=api_kwargs)
         self.type: str = type
@@ -85,7 +85,7 @@ class MenuButton(TelegramObject):
         if not data and cls is MenuButton:
             return None
 
-        _class_mapping: Dict[str, Type["MenuButton"]] = {
+        _class_mapping: Dict[str, Type[MenuButton]] = {
             cls.COMMANDS: MenuButtonCommands,
             cls.WEB_APP: MenuButtonWebApp,
             cls.DEFAULT: MenuButtonDefault,
@@ -95,11 +95,11 @@ class MenuButton(TelegramObject):
             return _class_mapping[data.pop("type")].de_json(data, bot=bot)
         return super().de_json(data=data, bot=bot)
 
-    COMMANDS: ClassVar[str] = constants.MenuButtonType.COMMANDS
+    COMMANDS: Final[str] = constants.MenuButtonType.COMMANDS
     """:const:`telegram.constants.MenuButtonType.COMMANDS`"""
-    WEB_APP: ClassVar[str] = constants.MenuButtonType.WEB_APP
+    WEB_APP: Final[str] = constants.MenuButtonType.WEB_APP
     """:const:`telegram.constants.MenuButtonType.WEB_APP`"""
-    DEFAULT: ClassVar[str] = constants.MenuButtonType.DEFAULT
+    DEFAULT: Final[str] = constants.MenuButtonType.DEFAULT
     """:const:`telegram.constants.MenuButtonType.DEFAULT`"""
 
 
@@ -115,7 +115,7 @@ class MenuButtonCommands(MenuButton):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None):
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(type=constants.MenuButtonType.COMMANDS, api_kwargs=api_kwargs)
         self._freeze()
 
@@ -148,7 +148,7 @@ class MenuButtonWebApp(MenuButton):
 
     __slots__ = ("text", "web_app")
 
-    def __init__(self, text: str, web_app: WebAppInfo, *, api_kwargs: JSONDict = None):
+    def __init__(self, text: str, web_app: WebAppInfo, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(type=constants.MenuButtonType.WEB_APP, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.text: str = text
@@ -179,6 +179,6 @@ class MenuButtonDefault(MenuButton):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict = None):
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(type=constants.MenuButtonType.DEFAULT, api_kwargs=api_kwargs)
         self._freeze()

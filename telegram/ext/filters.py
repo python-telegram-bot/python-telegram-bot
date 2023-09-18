@@ -72,6 +72,7 @@ __all__ = (
     "REPLY",
     "Regex",
     "Sticker",
+    "STORY",
     "SUCCESSFUL_PAYMENT",
     "SenderChat",
     "StatusUpdate",
@@ -141,7 +142,7 @@ class BaseFilter:
 
     Also works with more than two filters::
 
-        filters.TEXT & (filters.Entity(URL) | filters.Entity(TEXT_LINK))
+        filters.TEXT & (filters.Entity("url") | filters.Entity("text_link"))
         filters.TEXT & (~ filters.FORWARDED)
 
     Note:
@@ -177,9 +178,42 @@ class BaseFilter:
 
     __slots__ = ("_name", "_data_filter")
 
-    def __init__(self, name: str = None, data_filter: bool = False):
+    def __init__(self, name: Optional[str] = None, data_filter: bool = False):
         self._name = self.__class__.__name__ if name is None else name
         self._data_filter = data_filter
+
+    def __and__(self, other: "BaseFilter") -> "BaseFilter":
+        return _MergedFilter(self, and_filter=other)
+
+    def __or__(self, other: "BaseFilter") -> "BaseFilter":
+        return _MergedFilter(self, or_filter=other)
+
+    def __xor__(self, other: "BaseFilter") -> "BaseFilter":
+        return _XORFilter(self, other)
+
+    def __invert__(self) -> "BaseFilter":
+        return _InvertedFilter(self)
+
+    def __repr__(self) -> str:
+        return self.name
+
+    @property
+    def data_filter(self) -> bool:
+        """:obj:`bool`: Whether this filter is a data filter."""
+        return self._data_filter
+
+    @data_filter.setter
+    def data_filter(self, value: bool) -> None:
+        self._data_filter = value
+
+    @property
+    def name(self) -> str:
+        """:obj:`str`: Name for this filter."""
+        return self._name
+
+    @name.setter
+    def name(self, name: str) -> None:
+        self._name = name
 
     def check_update(  # skipcq: PYL-R0201
         self, update: Update
@@ -203,39 +237,6 @@ class BaseFilter:
         ):
             return True
         return False
-
-    def __and__(self, other: "BaseFilter") -> "BaseFilter":
-        return _MergedFilter(self, and_filter=other)
-
-    def __or__(self, other: "BaseFilter") -> "BaseFilter":
-        return _MergedFilter(self, or_filter=other)
-
-    def __xor__(self, other: "BaseFilter") -> "BaseFilter":
-        return _XORFilter(self, other)
-
-    def __invert__(self) -> "BaseFilter":
-        return _InvertedFilter(self)
-
-    @property
-    def data_filter(self) -> bool:
-        """:obj:`bool`: Whether this filter is a data filter."""
-        return self._data_filter
-
-    @data_filter.setter
-    def data_filter(self, value: bool) -> None:
-        self._data_filter = value
-
-    @property
-    def name(self) -> str:
-        """:obj:`str`: Name for this filter."""
-        return self._name
-
-    @name.setter
-    def name(self, name: str) -> None:
-        self._name = name
-
-    def __repr__(self) -> str:
-        return self.name
 
 
 class MessageFilter(BaseFilter):
@@ -358,7 +359,10 @@ class _MergedFilter(UpdateFilter):
     __slots__ = ("base_filter", "and_filter", "or_filter")
 
     def __init__(
-        self, base_filter: BaseFilter, and_filter: BaseFilter = None, or_filter: BaseFilter = None
+        self,
+        base_filter: BaseFilter,
+        and_filter: Optional[BaseFilter] = None,
+        or_filter: Optional[BaseFilter] = None,
     ):
         super().__init__()
         self.base_filter = base_filter
@@ -514,7 +518,7 @@ class Caption(MessageFilter):
     allow those whose caption is appearing in the given list.
 
     Examples:
-        ``MessageHandler(filters.Caption(['PTB rocks!', 'PTB'], callback_method_2)``
+        ``MessageHandler(filters.Caption(['PTB rocks!', 'PTB']), callback_method_2)``
 
     .. seealso::
         :attr:`telegram.ext.filters.CAPTION`
@@ -526,7 +530,7 @@ class Caption(MessageFilter):
 
     __slots__ = ("strings",)
 
-    def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
+    def __init__(self, strings: Optional[Union[List[str], Tuple[str, ...]]] = None):
         self.strings: Optional[Sequence[str]] = strings
         super().__init__(name=f"filters.Caption({strings})" if strings else "filters.CAPTION")
 
@@ -596,10 +600,8 @@ class CaptionRegex(MessageFilter):
         super().__init__(name=f"filters.CaptionRegex({self.pattern})", data_filter=True)
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match[str]]]]:
-        if message.caption:
-            match = self.pattern.search(message.caption)
-            if match:
-                return {"matches": [match]}
+        if message.caption and (match := self.pattern.search(message.caption)):
+            return {"matches": [match]}
         return {}
 
 
@@ -614,8 +616,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
 
     def __init__(
         self,
-        chat_id: SCT[int] = None,
-        username: SCT[str] = None,
+        chat_id: Optional[SCT[int]] = None,
+        username: Optional[SCT[str]] = None,
         allow_empty: bool = False,
     ):
         super().__init__()
@@ -956,7 +958,7 @@ CONTACT = _Contact(name="filters.CONTACT")
 class _Dice(MessageFilter):
     __slots__ = ("emoji", "values")
 
-    def __init__(self, values: SCT[int] = None, emoji: DiceEmojiEnum = None):
+    def __init__(self, values: Optional[SCT[int]] = None, emoji: Optional[DiceEmojiEnum] = None):
         super().__init__()
         self.emoji: Optional[DiceEmojiEnum] = emoji
         self.values: Optional[Collection[int]] = [values] if isinstance(values, int) else values
@@ -971,15 +973,15 @@ class _Dice(MessageFilter):
             self.name = "filters.Dice.ALL"
 
     def filter(self, message: Message) -> bool:
-        if not message.dice:  # no dice
+        if not (dice := message.dice):  # no dice
             return False
 
         if self.emoji:
-            emoji_match = message.dice.emoji == self.emoji
+            emoji_match = dice.emoji == self.emoji
             if self.values:
-                return message.dice.value in self.values and emoji_match  # emoji and value
+                return dice.value in self.values and emoji_match  # emoji and value
             return emoji_match  # emoji, no value
-        return message.dice.value in self.values if self.values else True  # no emoji, only value
+        return dice.value in self.values if self.values else True  # no emoji, only value
 
 
 class Dice(_Dice):
@@ -1594,10 +1596,8 @@ class Regex(MessageFilter):
         super().__init__(name=f"filters.Regex({self.pattern})", data_filter=True)
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match[str]]]]:
-        if message.text:
-            match = self.pattern.search(message.text)
-            if match:
-                return {"matches": [match]}
+        if message.text and (match := self.pattern.search(message.text)):
+            return {"matches": [match]}
         return {}
 
 
@@ -2144,6 +2144,20 @@ class Sticker:
     # neither mask nor emoji can be a message.sticker, so no filters for them
 
 
+class _Story(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.story)
+
+
+STORY = _Story(name="filters.STORY")
+"""Messages that contain :attr:`telegram.Message.story`.
+
+.. versionadded:: 20.5
+"""
+
+
 class _SuccessfulPayment(MessageFilter):
     __slots__ = ()
 
@@ -2186,7 +2200,7 @@ class Text(MessageFilter):
 
     __slots__ = ("strings",)
 
-    def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
+    def __init__(self, strings: Optional[Union[List[str], Tuple[str, ...]]] = None):
         self.strings: Optional[Sequence[str]] = strings
         super().__init__(name=f"filters.Text({strings})" if strings else "filters.TEXT")
 
@@ -2316,8 +2330,8 @@ class User(_ChatUserBaseFilter):
 
     def __init__(
         self,
-        user_id: SCT[int] = None,
-        username: SCT[str] = None,
+        user_id: Optional[SCT[int]] = None,
+        username: Optional[SCT[str]] = None,
         allow_empty: bool = False,
     ):
         super().__init__(chat_id=user_id, username=username, allow_empty=allow_empty)
@@ -2452,8 +2466,8 @@ class ViaBot(_ChatUserBaseFilter):
 
     def __init__(
         self,
-        bot_id: SCT[int] = None,
-        username: SCT[str] = None,
+        bot_id: Optional[SCT[int]] = None,
+        username: Optional[SCT[str]] = None,
         allow_empty: bool = False,
     ):
         super().__init__(chat_id=bot_id, username=username, allow_empty=allow_empty)

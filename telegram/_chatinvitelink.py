@@ -55,7 +55,7 @@ class ChatInviteLink(TelegramObject):
         expire_date (:class:`datetime.datetime`, optional): Date when the link will expire or
             has been expired.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         member_limit (:obj:`int`, optional): Maximum number of users that can be members of the
             chat simultaneously after joining the chat via this invite link;
@@ -82,7 +82,7 @@ class ChatInviteLink(TelegramObject):
         expire_date (:class:`datetime.datetime`): Optional. Date when the link will expire or
             has been expired.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         member_limit (:obj:`int`): Optional. Maximum number of users that can be members
             of the chat simultaneously after joining the chat via this invite link;
@@ -118,12 +118,12 @@ class ChatInviteLink(TelegramObject):
         creates_join_request: bool,
         is_primary: bool,
         is_revoked: bool,
-        expire_date: datetime.datetime = None,
-        member_limit: int = None,
-        name: str = None,
-        pending_join_request_count: int = None,
+        expire_date: Optional[datetime.datetime] = None,
+        member_limit: Optional[int] = None,
+        name: Optional[str] = None,
+        pending_join_request_count: Optional[int] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required

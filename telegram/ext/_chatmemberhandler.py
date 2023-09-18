@@ -17,19 +17,19 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatMemberHandler class."""
-from typing import ClassVar, Optional, TypeVar
+from typing import Final, Optional, TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
-from telegram.ext._handler import BaseHandler
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar("RT")
 
 
 class ChatMemberHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram updates that contain a chat member update.
+    """Handler class to handle Telegram updates that contain a chat member update.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
@@ -71,11 +71,11 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
     """
 
     __slots__ = ("chat_member_types",)
-    MY_CHAT_MEMBER: ClassVar[int] = -1
+    MY_CHAT_MEMBER: Final[int] = -1
     """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.my_chat_member`."""
-    CHAT_MEMBER: ClassVar[int] = 0
+    CHAT_MEMBER: Final[int] = 0
     """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.chat_member`."""
-    ANY_CHAT_MEMBER: ClassVar[int] = 1
+    ANY_CHAT_MEMBER: Final[int] = 1
     """:obj:`int`: Used as a constant to handle both :attr:`telegram.Update.my_chat_member`
     and :attr:`telegram.Update.chat_member`."""
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=wrong-import-position
 """Simple Bot to reply to Telegram messages.
 
 This is built on the API wrapper, see echobot.py to see the same example built
@@ -11,25 +10,15 @@ import contextlib
 import logging
 from typing import NoReturn
 
-from telegram import __version__ as TG_VER
-
-try:
-    from telegram import __version_info__
-except ImportError:
-    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]  # type: ignore[assignment]
-
-if __version_info__ < (20, 0, 0, "alpha", 1):
-    raise RuntimeError(
-        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
-        f"{TG_VER} version of this example, "
-        f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
-    )
-from telegram import Bot
+from telegram import Bot, Update
 from telegram.error import Forbidden, NetworkError
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 
@@ -58,7 +47,7 @@ async def main() -> NoReturn:
 async def echo(bot: Bot, update_id: int) -> int:
     """Echo the message the user sent."""
     # Request updates after the last update_id
-    updates = await bot.get_updates(offset=update_id, timeout=10)
+    updates = await bot.get_updates(offset=update_id, timeout=10, allowed_updates=Update.ALL_TYPES)
     for update in updates:
         next_update_id = update.update_id + 1
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2023
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
@@ -17,22 +16,30 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-from telegram.ext._handler import BaseHandler
+import pytest
+
+from telegram import Story
 from tests.auxil.slots import mro_slots
 
 
-class TestHandler:
+@pytest.fixture(scope="module")
+def story():
+    return Story()
+
+
+class TestStoryWithoutRequest:
     def test_slot_behaviour(self):
-        class SubclassHandler(BaseHandler):
-            __slots__ = ()
+        story = Story()
+        for attr in story.__slots__:
+            assert getattr(story, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(story)) == len(set(mro_slots(story))), "duplicate slot"
 
-            def __init__(self):
-                super().__init__(lambda x: None)
+    def test_de_json(self):
+        story = Story.de_json({}, None)
+        assert story.api_kwargs == {}
+        assert isinstance(story, Story)
 
-            def check_update(self, update: object):
-                pass
-
-        inst = SubclassHandler()
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+    def test_to_dict(self):
+        story = Story()
+        story_dict = story.to_dict()
+        assert story_dict == {}

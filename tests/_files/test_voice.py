@@ -129,7 +129,7 @@ class TestVoiceWithoutRequest(TestVoiceBase):
 
     async def test_send_voice_custom_filename(self, bot, chat_id, voice_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return list(request_data.multipart_data.values())[0][0] == "custom_filename"
+            return next(iter(request_data.multipart_data.values()))[0] == "custom_filename"
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
 
@@ -199,20 +199,16 @@ class TestVoiceWithRequest(TestVoiceBase):
         assert message.caption == self.caption.replace("*", "")
         assert message.has_protected_content
 
-    async def test_get_and_download(self, bot, voice, chat_id):
-        path = Path("telegram.ogg")
-        if path.is_file():
-            path.unlink()
-
+    async def test_get_and_download(self, bot, voice, chat_id, tmp_file):
         new_file = await bot.get_file(voice.file_id)
 
         assert new_file.file_size == voice.file_size
         assert new_file.file_unique_id == voice.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram.ogg")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_send_ogg_url_file(self, bot, chat_id, voice):
         message = await bot.sendVoice(chat_id, self.voice_file_url, duration=self.duration)

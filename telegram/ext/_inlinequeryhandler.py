@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any, List, Match, Optional, Pattern, TypeVar, 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
-from telegram.ext._handler import BaseHandler
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
@@ -89,9 +89,9 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        pattern: Union[str, Pattern[str]] = None,
+        pattern: Optional[Union[str, Pattern[str]]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
-        chat_types: List[str] = None,
+        chat_types: Optional[List[str]] = None,
     ):
         super().__init__(callback, block=block)
 
@@ -117,12 +117,13 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
                 update.inline_query.chat_type not in self.chat_types
             ):
                 return False
-            if self.pattern:
-                if update.inline_query.query:
-                    match = re.match(self.pattern, update.inline_query.query)
-                    if match:
-                        return match
-            else:
+            if (
+                self.pattern
+                and update.inline_query.query
+                and (match := re.match(self.pattern, update.inline_query.query))
+            ):
+                return match
+            if not self.pattern:
                 return True
         return None
 

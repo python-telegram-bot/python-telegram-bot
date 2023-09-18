@@ -23,8 +23,8 @@ from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
-    ClassVar,
     Dict,
+    Final,
     Generic,
     List,
     NoReturn,
@@ -38,13 +38,14 @@ from typing import (
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import DVType
 from telegram._utils.warnings import warn
 from telegram.ext._application import ApplicationHandlerStop
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._callbackqueryhandler import CallbackQueryHandler
 from telegram.ext._choseninlineresulthandler import ChosenInlineResultHandler
 from telegram.ext._extbot import ExtBot
-from telegram.ext._handler import BaseHandler
 from telegram.ext._inlinequeryhandler import InlineQueryHandler
 from telegram.ext._stringcommandhandler import StringCommandHandler
 from telegram.ext._stringregexhandler import StringRegexHandler
@@ -283,13 +284,13 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         "timeout_jobs",
     )
 
-    END: ClassVar[int] = -1
+    END: Final[int] = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
-    TIMEOUT: ClassVar[int] = -2
+    TIMEOUT: Final[int] = -2
     """:obj:`int`: Used as a constant to handle state when a conversation is timed out
     (exceeded :attr:`conversation_timeout`).
     """
-    WAITING: ClassVar[int] = -3
+    WAITING: Final[int] = -3
     """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
     previous :attr:`block=False <block>` handler to finish."""
 
@@ -303,10 +304,10 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         per_chat: bool = True,
         per_user: bool = True,
         per_message: bool = False,
-        conversation_timeout: Union[float, datetime.timedelta] = None,
-        name: str = None,
+        conversation_timeout: Optional[Union[float, datetime.timedelta]] = None,
+        name: Optional[str] = None,
         persistent: bool = False,
-        map_to_parent: Dict[object, object] = None,
+        map_to_parent: Optional[Dict[object, object]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         # these imports need to be here because of circular import error otherwise
@@ -339,10 +340,10 @@ class ConversationHandler(BaseHandler[Update, CCT]):
 
         # if conversation_timeout is used, this dict is used to schedule a job which runs when the
         # conv has timed out.
-        self.timeout_jobs: Dict[ConversationKey, "Job[Any]"] = {}
+        self.timeout_jobs: Dict[ConversationKey, Job[Any]] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
-        self._child_conversations: Set["ConversationHandler"] = set()
+        self._child_conversations: Set[ConversationHandler] = set()
 
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
@@ -439,6 +440,30 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                     "differently from what you expect.",
                     stacklevel=2,
                 )
+
+    def __repr__(self) -> str:
+        """Give a string representation of the ConversationHandler in the form
+        ``ConversationHandler[name=..., states={...}]``.
+
+        If there are more than 3 states, only the first 3 states are listed.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        truncation_threshold = 3
+        states = dict(list(self.states.items())[:truncation_threshold])
+        states_string = str(states)
+        if len(self.states) > truncation_threshold:
+            states_string = states_string[:-1] + ", ...}"
+
+        return build_repr_with_selected_attrs(
+            self,
+            name=self.name,
+            states=states_string,
+        )
 
     @property
     def entry_points(self) -> List[BaseHandler[Update, CCT]]:
@@ -831,6 +856,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                         update, application, handler_check_result, context
                     ),
                     update=update,
+                    name=f"ConversationHandler:{update.update_id}:handle_update:non_blocking_cb",
                 )
         except ApplicationHandlerStop as exception:
             new_state = exception.state
@@ -840,11 +866,13 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                 if application.job_queue is None:
                     warn(
                         "Ignoring `conversation_timeout` because the Application has no JobQueue.",
+                        stacklevel=1,
                     )
                 elif not application.job_queue.scheduler.running:
                     warn(
                         "Ignoring `conversation_timeout` because the Applications JobQueue is "
                         "not running.",
+                        stacklevel=1,
                     )
                 elif isinstance(new_state, asyncio.Task):
                     # Add the new timeout job
@@ -854,6 +882,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                             new_state, application, update, context, conversation_key
                         ),
                         update=update,
+                        name=f"ConversationHandler:{update.update_id}:handle_update:timeout_job",
                     )
                 else:
                     self._schedule_job(new_state, application, update, context, conversation_key)
@@ -875,7 +904,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return None
 
     def _update_state(
-        self, new_state: object, key: ConversationKey, handler: BaseHandler = None
+        self, new_state: object, key: ConversationKey, handler: Optional[BaseHandler] = None
     ) -> None:
         if new_state == self.END:
             if key in self._conversations:
@@ -931,6 +960,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                     warn(
                         "ApplicationHandlerStop in TIMEOUT state of "
                         "ConversationHandler has no effect. Ignoring.",
+                        stacklevel=2,
                     )
 
         self._update_state(self.END, ctxt.conversation_key)

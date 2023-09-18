@@ -14,7 +14,7 @@
    :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-6.6-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-6.8-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -30,7 +30,7 @@
    :target: https://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
 
-.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/GitHub%20Actions/badge.svg
+.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/Unit%20Tests/badge.svg
    :target: https://github.com/python-telegram-bot/python-telegram-bot/
    :alt: Github Actions workflow
 
@@ -46,8 +46,8 @@
    :target: https://app.codacy.com/gh/python-telegram-bot/python-telegram-bot/dashboard
    :alt: Code quality: Codacy
 
-.. image:: https://deepsource.io/gh/python-telegram-bot/python-telegram-bot.svg/?label=active+issues
-   :target: https://deepsource.io/gh/python-telegram-bot/python-telegram-bot/?ref=repository-badge
+.. image:: https://app.deepsource.com/gh/python-telegram-bot/python-telegram-bot.svg/?label=active+issues
+   :target: https://app.deepsource.com/gh/python-telegram-bot/python-telegram-bot/?ref=repository-badge
    :alt: Code quality: DeepSource
 
 .. image:: https://results.pre-commit.ci/badge/github/python-telegram-bot/python-telegram-bot/master.svg
@@ -77,7 +77,7 @@ Introduction
 
 This library provides a pure Python, asynchronous interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions **3.7+**.
+It's compatible with Python versions **3.8+**.
 
 ``python-telegram-bot-raw`` is part of the `python-telegram-bot <https://python-telegram-bot.org>`_ ecosystem and provides the pure API functionality extracted from PTB. It therefore does not have independent release schedules, changelogs or documentation.
 
@@ -89,7 +89,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **6.6** are supported.
+All types and methods of the Telegram Bot API **6.8** are supported.
 
 Installing
 ==========
@@ -136,7 +136,7 @@ As these features are *optional*, the corresponding 3rd party dependencies are n
 Instead, they are listed as optional dependencies.
 This allows to avoid unnecessary dependency conflicts for users who don't need the optional features.
 
-The only required dependency is `httpx ~= 0.23.3 <https://www.python-httpx.org>`_ for
+The only required dependency is `httpx ~= 0.24.1 <https://www.python-httpx.org>`_ for
 ``telegram.request.HTTPXRequest``, the default networking backend.
 
 ``python-telegram-bot`` is most useful when used along with additional libraries.
@@ -149,13 +149,13 @@ Optional Dependencies
 
 PTB can be installed with optional dependencies:
 
-* ``pip install python-telegram-bot-raw[passport]`` installs the `cryptography>=39.0.1 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
-* ``pip install python-telegram-bot-raw[socks]`` installs `httpx[socks] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to work behind a Socks5 server.
-* ``pip install python-telegram-bot[http2]`` installs `httpx[http2] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to use HTTP/2.
+* ``pip install "python-telegram-bot-raw[passport]"`` installs the `cryptography>=39.0.1 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
+* ``pip install "python-telegram-bot-raw[socks]"`` installs `httpx[socks] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to work behind a Socks5 server.
+* ``pip install "python-telegram-bot-raw[http2]"`` installs `httpx[http2] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to use HTTP/2.
 
-To install multiple optional dependencies, separate them by commas, e.g. ``pip install python-telegram-bot-raw[passport,socks]``.
+To install multiple optional dependencies, separate them by commas, e.g. ``pip install "python-telegram-bot-raw[passport,socks]"``.
 
-Additionally, the shortcut ``pip install python-telegram-bot-raw[all]`` installs all optional dependencies.
+Additionally, the shortcut ``pip install "python-telegram-bot-raw[all]"`` installs all optional dependencies.
 
 Quick Start
 ===========
@@ -195,7 +195,7 @@ Contributing
 
 Contributions of all sizes are welcome.
 Please review our `contribution guidelines <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.github/CONTRIBUTING.rst>`_ to get started.
-You can also help by `reporting bugs or feature requests <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
+You can also help by `reporting bugs or feature requests <https://github.com/python-telegram-bot/python-telegram-bot/issues/new/choose>`_.
 
 Donating
 ========

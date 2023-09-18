@@ -31,7 +31,6 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.deprecations import check_thumb_deprecation_warnings_for_args_and_attrs
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -81,11 +80,6 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         assert document.thumbnail.file_size == self.thumb_file_size
         assert document.thumbnail.width == self.thumb_width
         assert document.thumbnail.height == self.thumb_height
-
-    def test_thumb_property_deprecation_warning(self, recwarn):
-        document = Document(file_id="file_id", file_unique_id="file_unique_id", thumb=object())
-        assert document.thumb is document.thumbnail
-        check_thumb_deprecation_warnings_for_args_and_attrs(recwarn, __file__)
 
     def test_de_json(self, bot, document):
         json_dict = {
@@ -183,15 +177,6 @@ class TestDocumentWithoutRequest(TestDocumentBase):
         finally:
             bot._local_mode = False
 
-    async def test_send_document_with_local_files_throws_error_with_different_thumb_and_thumbnail(
-        self, bot, chat_id
-    ):
-        file = data_file("telegram.jpg")
-        different_file = data_file("telegram_no_standard_header.jpg")
-
-        with pytest.raises(ValueError, match="different entities as 'thumb' and 'thumbnail'"):
-            await bot.send_document(chat_id, file, thumbnail=file, thumb=different_file)
-
     async def test_get_file_instance_method(self, monkeypatch, document):
         async def make_assertion(*_, **kwargs):
             return kwargs["file_id"] == document.file_id
@@ -213,20 +198,16 @@ class TestDocumentWithRequest(TestDocumentBase):
         with pytest.raises(TelegramError):
             await bot.send_document(chat_id=chat_id, document="")
 
-    async def test_get_and_download(self, bot, document, chat_id):
-        path = Path("telegram.png")
-        if path.is_file():
-            path.unlink()
-
+    async def test_get_and_download(self, bot, document, chat_id, tmp_file):
         new_file = await bot.get_file(document.file_id)
 
         assert new_file.file_size == document.file_size
         assert new_file.file_unique_id == document.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_drive("telegram.png")
+        await new_file.download_to_drive(tmp_file)
 
-        assert path.is_file()
+        assert tmp_file.is_file()
 
     async def test_send_resend(self, bot, chat_id, document):
         message = await bot.send_document(chat_id=chat_id, document=document.file_id)

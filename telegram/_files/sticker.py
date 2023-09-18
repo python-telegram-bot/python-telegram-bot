@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
-from typing import TYPE_CHECKING, ClassVar, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
@@ -26,10 +26,6 @@ from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings_transition import (
-    warn_about_deprecated_attr_in_property,
-    warn_about_thumb_return_thumbnail,
-)
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -45,6 +41,9 @@ class Sticker(_BaseThumbedMedium):
         As of v13.11 :paramref:`is_video` is a required argument and therefore the order of the
         arguments had to be changed. Use keyword arguments to make sure that the arguments are
         passed correctly.
+
+    .. versionchanged:: 20.5
+      |removed_thumb_note|
 
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -63,11 +62,6 @@ class Sticker(_BaseThumbedMedium):
             format, which is determined by the fields :attr:`is_animated` and :attr:`is_video`.
 
             .. versionadded:: 20.0
-        thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
-            ``.JPG`` format.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail`.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
         set_name (:obj:`str`, optional): Name of the sticker set to which the sticker belongs.
         mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the position
@@ -157,23 +151,21 @@ class Sticker(_BaseThumbedMedium):
         is_animated: bool,
         is_video: bool,
         type: str,  # pylint: disable=redefined-builtin
-        thumb: PhotoSize = None,
-        emoji: str = None,
-        file_size: int = None,
-        set_name: str = None,
-        mask_position: "MaskPosition" = None,
-        premium_animation: "File" = None,
-        custom_emoji_id: str = None,
-        thumbnail: PhotoSize = None,
-        needs_repainting: bool = None,
+        emoji: Optional[str] = None,
+        file_size: Optional[int] = None,
+        set_name: Optional[str] = None,
+        mask_position: Optional["MaskPosition"] = None,
+        premium_animation: Optional["File"] = None,
+        custom_emoji_id: Optional[str] = None,
+        thumbnail: Optional[PhotoSize] = None,
+        needs_repainting: Optional[bool] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(
             file_id=file_id,
             file_unique_id=file_unique_id,
             file_size=file_size,
-            thumb=thumb,
             thumbnail=thumbnail,
             api_kwargs=api_kwargs,
         )
@@ -192,11 +184,11 @@ class Sticker(_BaseThumbedMedium):
             self.custom_emoji_id: Optional[str] = custom_emoji_id
             self.needs_repainting: Optional[bool] = needs_repainting
 
-    REGULAR: ClassVar[str] = constants.StickerType.REGULAR
+    REGULAR: Final[str] = constants.StickerType.REGULAR
     """:const:`telegram.constants.StickerType.REGULAR`"""
-    MASK: ClassVar[str] = constants.StickerType.MASK
+    MASK: Final[str] = constants.StickerType.MASK
     """:const:`telegram.constants.StickerType.MASK`"""
-    CUSTOM_EMOJI: ClassVar[str] = constants.StickerType.CUSTOM_EMOJI
+    CUSTOM_EMOJI: Final[str] = constants.StickerType.CUSTOM_EMOJI
     """:const:`telegram.constants.StickerType.CUSTOM_EMOJI`"""
 
     @classmethod
@@ -234,6 +226,9 @@ class StickerSet(TelegramObject):
     .. versionchanged:: 20.0
         The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
 
+    .. versionchanged:: 20.5
+       |removed_thumb_note|
+
     Args:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
@@ -251,11 +246,6 @@ class StickerSet(TelegramObject):
             :attr:`telegram.Sticker.CUSTOM_EMOJI`.
 
             .. versionadded:: 20.0
-        thumb (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
-            ``.TGS``, or ``.WEBM`` format.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
@@ -302,10 +292,9 @@ class StickerSet(TelegramObject):
         stickers: Sequence[Sticker],
         is_video: bool,
         sticker_type: str,
-        thumb: PhotoSize = None,
-        thumbnail: PhotoSize = None,
+        thumbnail: Optional[PhotoSize] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.name: str = name
@@ -316,27 +305,10 @@ class StickerSet(TelegramObject):
         self.sticker_type: str = sticker_type
         # Optional
 
-        self.thumbnail: Optional[PhotoSize] = warn_about_thumb_return_thumbnail(
-            deprecated_arg=thumb, new_arg=thumbnail
-        )
+        self.thumbnail: Optional[PhotoSize] = thumbnail
         self._id_attrs = (self.name,)
 
         self._freeze()
-
-    @property
-    def thumb(self) -> Optional[PhotoSize]:
-        """:class:`telegram.PhotoSize`: Optional. Sticker set thumbnail in the ``.WEBP``,
-        ``.TGS``, or ``.WEBM`` format.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb",
-            new_attr_name="thumbnail",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StickerSet"]:
@@ -390,13 +362,13 @@ class MaskPosition(TelegramObject):
 
     __slots__ = ("point", "scale", "x_shift", "y_shift")
 
-    FOREHEAD: ClassVar[str] = constants.MaskPosition.FOREHEAD
+    FOREHEAD: Final[str] = constants.MaskPosition.FOREHEAD
     """:const:`telegram.constants.MaskPosition.FOREHEAD`"""
-    EYES: ClassVar[str] = constants.MaskPosition.EYES
+    EYES: Final[str] = constants.MaskPosition.EYES
     """:const:`telegram.constants.MaskPosition.EYES`"""
-    MOUTH: ClassVar[str] = constants.MaskPosition.MOUTH
+    MOUTH: Final[str] = constants.MaskPosition.MOUTH
     """:const:`telegram.constants.MaskPosition.MOUTH`"""
-    CHIN: ClassVar[str] = constants.MaskPosition.CHIN
+    CHIN: Final[str] = constants.MaskPosition.CHIN
     """:const:`telegram.constants.MaskPosition.CHIN`"""
 
     def __init__(
@@ -406,7 +378,7 @@ class MaskPosition(TelegramObject):
         y_shift: float,
         scale: float,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.point: str = point

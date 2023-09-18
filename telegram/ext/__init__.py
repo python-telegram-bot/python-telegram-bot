@@ -26,6 +26,7 @@ __all__ = (
     "BaseHandler",
     "BasePersistence",
     "BaseRateLimiter",
+    "BaseUpdateProcessor",
     "CallbackContext",
     "CallbackDataCache",
     "CallbackQueryHandler",
@@ -51,6 +52,7 @@ __all__ = (
     "PreCheckoutQueryHandler",
     "PrefixHandler",
     "ShippingQueryHandler",
+    "SimpleUpdateProcessor",
     "StringCommandHandler",
     "StringRegexHandler",
     "TypeHandler",
@@ -61,8 +63,10 @@ from . import filters
 from ._aioratelimiter import AIORateLimiter
 from ._application import Application, ApplicationHandlerStop
 from ._applicationbuilder import ApplicationBuilder
+from ._basehandler import BaseHandler
 from ._basepersistence import BasePersistence, PersistenceInput
 from ._baseratelimiter import BaseRateLimiter
+from ._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
 from ._callbackcontext import CallbackContext
 from ._callbackdatacache import CallbackDataCache, InvalidCallbackData
 from ._callbackqueryhandler import CallbackQueryHandler
@@ -75,7 +79,6 @@ from ._conversationhandler import ConversationHandler
 from ._defaults import Defaults
 from ._dictpersistence import DictPersistence
 from ._extbot import ExtBot
-from ._handler import BaseHandler
 from ._inlinequeryhandler import InlineQueryHandler
 from ._jobqueue import Job, JobQueue
 from ._messagehandler import MessageHandler

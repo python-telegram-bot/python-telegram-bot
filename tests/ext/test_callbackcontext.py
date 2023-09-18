@@ -31,6 +31,7 @@ from telegram import (
 )
 from telegram.error import TelegramError
 from telegram.ext import ApplicationBuilder, CallbackContext, Job
+from telegram.warnings import PTBUserWarning
 from tests.auxil.slots import mro_slots
 
 """
@@ -62,7 +63,7 @@ class TestCallbackContext:
     def test_job_queue(self, bot, app, recwarn):
         expected_warning = (
             "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
-            "`pip install python-telegram-bot[job-queue]`."
+            '`pip install "python-telegram-bot[job-queue]"`.'
         )
 
         callback_context = CallbackContext(app)
@@ -72,6 +73,7 @@ class TestCallbackContext:
         assert callback_context.job_queue is None
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].category is PTBUserWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_from_update(self, app):
@@ -226,7 +228,7 @@ class TestCallbackContext:
                 ),
             )
         keyboard_uuid = app.bot.callback_data_cache.persistence_data[0][0][0]
-        button_uuid = list(app.bot.callback_data_cache.persistence_data[0][0][2])[0]
+        button_uuid = next(iter(app.bot.callback_data_cache.persistence_data[0][0][2]))
         callback_data = keyboard_uuid + button_uuid
         callback_query = CallbackQuery(
             id="1",

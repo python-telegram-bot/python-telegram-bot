@@ -25,19 +25,22 @@ from typing import TYPE_CHECKING, Any, Generic, Optional, Tuple, Union, cast, ov
 try:
     import pytz
     from apscheduler.executors.asyncio import AsyncIOExecutor
-    from apscheduler.job import Job as APSJob
     from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
     APS_AVAILABLE = True
 except ImportError:
     APS_AVAILABLE = False
 
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import CCT, JobCallback
 
 if TYPE_CHECKING:
+    if APS_AVAILABLE:
+        from apscheduler.job import Job as APSJob
+
     from telegram.ext import Application
 
 
@@ -58,17 +61,17 @@ class JobQueue(Generic[CCT]):
 
         .. code-block:: bash
 
-           pip install python-telegram-bot[job-queue]
+           pip install "python-telegram-bot[job-queue]"
 
     Examples:
         :any:`Timer Bot <examples.timerbot>`
 
     .. seealso:: :wiki:`Architecture Overview <Architecture>`,
-        :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+        :wiki:`Job Queue <Extensions---JobQueue>`
 
     .. versionchanged:: 20.0
         To use this class, PTB must be installed via
-        ``pip install python-telegram-bot[job-queue]``.
+        ``pip install "python-telegram-bot[job-queue]"``.
 
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
@@ -86,14 +89,35 @@ class JobQueue(Generic[CCT]):
         if not APS_AVAILABLE:
             raise RuntimeError(
                 "To use `JobQueue`, PTB must be installed via `pip install "
-                "python-telegram-bot[job-queue]`."
+                '"python-telegram-bot[job-queue]"`.'
             )
 
-        self._application: "Optional[weakref.ReferenceType[Application]]" = None
+        self._application: Optional[weakref.ReferenceType[Application]] = None
         self._executor = AsyncIOExecutor()
         self.scheduler: AsyncIOScheduler = AsyncIOScheduler(
             timezone=pytz.utc, executors={"default": self._executor}
         )
+
+    def __repr__(self) -> str:
+        """Give a string representation of the JobQueue in the form ``JobQueue[application=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, application=self.application)
+
+    @property
+    def application(self) -> "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]":
+        """The application this JobQueue is associated with."""
+        if self._application is None:
+            raise RuntimeError("No application was set for this JobQueue.")
+        application = self._application()
+        if application is not None:
+            return application
+        raise RuntimeError("The application instance is no longer alive.")
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -105,14 +129,14 @@ class JobQueue(Generic[CCT]):
     @overload
     def _parse_time_input(
         self,
-        time: Union[float, int, datetime.timedelta, datetime.datetime, datetime.time],
+        time: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
         shift_day: bool = False,
     ) -> datetime.datetime:
         ...
 
     def _parse_time_input(
         self,
-        time: Union[float, int, datetime.timedelta, datetime.datetime, datetime.time, None],
+        time: Union[float, datetime.timedelta, datetime.datetime, datetime.time, None],
         shift_day: bool = False,
     ) -> Optional[datetime.datetime]:
         if time is None:
@@ -148,25 +172,39 @@ class JobQueue(Generic[CCT]):
                 executors={"default": self._executor},
             )
 
-    @property
-    def application(self) -> "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]":
-        """The application this JobQueue is associated with."""
-        if self._application is None:
-            raise RuntimeError("No application was set for this JobQueue.")
-        application = self._application()
-        if application is not None:
-            return application
-        raise RuntimeError("The application instance is no longer alive.")
+    @staticmethod
+    async def job_callback(job_queue: "JobQueue[CCT]", job: "Job[CCT]") -> None:
+        """This method is used as a callback for the APScheduler jobs.
+
+        More precisely, the ``func`` argument of :class:`apscheduler.job.Job` is set to this method
+        and the ``arg`` argument (representing positional arguments to ``func``) is set to a tuple
+        containing the :class:`JobQueue` itself and the :class:`~telegram.ext.Job` instance.
+
+        Tip:
+            This method is a static method rather than a bound method. This makes the arguments
+            more transparent and allows for easier handling of PTBs integration of APScheduler
+            when utilizing advanced features of APScheduler.
+
+        Hint:
+            This method is effectively a wrapper for :meth:`telegram.ext.Job.run`.
+
+        .. versionadded:: 20.4
+
+        Args:
+            job_queue (:class:`JobQueue`): The job queue that created the job.
+            job (:class:`~telegram.ext.Job`): The job to run.
+        """
+        await job.run(job_queue.application)
 
     def run_once(
         self,
         callback: JobCallback[CCT],
         when: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
-        job_kwargs: JSONDict = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+        job_kwargs: Optional[JSONDict] = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` instance that runs once and adds it to the queue.
 
@@ -230,11 +268,11 @@ class JobQueue(Generic[CCT]):
         date_time = self._parse_time_input(when, shift_day=True)
 
         j = self.scheduler.add_job(
-            job.run,
+            self.job_callback,
             name=name,
             trigger="date",
             run_date=date_time,
-            args=(self.application,),
+            args=(self, job),
             timezone=date_time.tzinfo or self.scheduler.timezone,
             **job_kwargs,
         )
@@ -246,13 +284,13 @@ class JobQueue(Generic[CCT]):
         self,
         callback: JobCallback[CCT],
         interval: Union[float, datetime.timedelta],
-        first: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
-        last: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
-        job_kwargs: JSONDict = None,
+        first: Optional[Union[float, datetime.timedelta, datetime.datetime, datetime.time]] = None,
+        last: Optional[Union[float, datetime.timedelta, datetime.datetime, datetime.time]] = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+        job_kwargs: Optional[JSONDict] = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` instance that runs at specified intervals and adds it to the
         queue.
@@ -291,6 +329,18 @@ class JobQueue(Generic[CCT]):
                   :attr:`telegram.ext.Defaults.tzinfo` is used.
 
                 Defaults to :paramref:`interval`
+
+                Note:
+                    Setting :paramref:`first` to ``0``, ``datetime.datetime.now()`` or another
+                    value that indicates that the job should run immediately will not work due
+                    to how the APScheduler library works. If you want to run a job immediately,
+                    we recommend to use an approach along the lines of::
+
+                        job = context.job_queue.run_repeating(callback, interval=5)
+                        await job.run(context.application)
+
+                    .. seealso:: :meth:`telegram.ext.Job.run`
+
             last (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                        \
                    :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
                 Latest possible time for the job to run. This parameter will be interpreted
@@ -344,9 +394,9 @@ class JobQueue(Generic[CCT]):
             interval = interval.total_seconds()
 
         j = self.scheduler.add_job(
-            job.run,
+            self.job_callback,
             trigger="interval",
-            args=(self.application,),
+            args=(self, job),
             start_date=dt_first,
             end_date=dt_last,
             seconds=interval,
@@ -362,11 +412,11 @@ class JobQueue(Generic[CCT]):
         callback: JobCallback[CCT],
         when: datetime.time,
         day: int,
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
-        job_kwargs: JSONDict = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+        job_kwargs: Optional[JSONDict] = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
 
@@ -421,9 +471,9 @@ class JobQueue(Generic[CCT]):
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         j = self.scheduler.add_job(
-            job.run,
+            self.job_callback,
             trigger="cron",
-            args=(self.application,),
+            args=(self, job),
             name=name,
             day="last" if day == -1 else day,
             hour=when.hour,
@@ -440,11 +490,11 @@ class JobQueue(Generic[CCT]):
         callback: JobCallback[CCT],
         time: datetime.time,
         days: Tuple[int, ...] = _ALL_DAYS,
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
-        job_kwargs: JSONDict = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
+        job_kwargs: Optional[JSONDict] = None,
     ) -> "Job[CCT]":
         """Creates a new :class:`Job` that runs on a daily basis and adds it to the queue.
 
@@ -511,9 +561,9 @@ class JobQueue(Generic[CCT]):
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         j = self.scheduler.add_job(
-            job.run,
+            self.job_callback,
             name=name,
-            args=(self.application,),
+            args=(self, job),
             trigger="cron",
             day_of_week=",".join([self._CRON_MAPPING[d] for d in days]),
             hour=time.hour,
@@ -530,10 +580,10 @@ class JobQueue(Generic[CCT]):
         self,
         callback: JobCallback[CCT],
         job_kwargs: JSONDict,
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
     ) -> "Job[CCT]":
         """Creates a new custom defined :class:`Job`.
 
@@ -573,7 +623,7 @@ class JobQueue(Generic[CCT]):
         name = name or callback.__name__
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
-        j = self.scheduler.add_job(job.run, args=(self.application,), name=name, **job_kwargs)
+        j = self.scheduler.add_job(self.job_callback, args=(self, job), name=name, **job_kwargs)
 
         job._job = j  # pylint: disable=protected-access
         return job
@@ -613,10 +663,7 @@ class JobQueue(Generic[CCT]):
         Returns:
             Tuple[:class:`Job`]: Tuple of all *scheduled* jobs.
         """
-        return tuple(
-            Job._from_aps_job(job)  # pylint: disable=protected-access
-            for job in self.scheduler.get_jobs()
-        )
+        return tuple(Job.from_aps_job(job) for job in self.scheduler.get_jobs())
 
     def get_jobs_by_name(self, name: str) -> Tuple["Job[CCT]", ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
@@ -645,7 +692,7 @@ class Job(Generic[CCT]):
 
         .. code-block:: bash
 
-           pip install python-telegram-bot[job-queue]
+           pip install "python-telegram-bot[job-queue]"
 
     Note:
         All attributes and instance methods of :attr:`job` are also directly available as
@@ -655,7 +702,7 @@ class Job(Generic[CCT]):
         This class should not be instantiated manually.
         Use the methods of :class:`telegram.ext.JobQueue` to schedule jobs.
 
-    .. seealso:: :wiki:`Job Queue <Extensions-%E2%80%93-JobQueue>`
+    .. seealso:: :wiki:`Job Queue <Extensions---JobQueue>`
 
     .. versionchanged:: 20.0
 
@@ -663,7 +710,7 @@ class Job(Generic[CCT]):
        * Renamed ``Job.context`` to :attr:`Job.data`.
        * Removed argument ``job``
        * To use this class, PTB must be installed via
-         ``pip install python-telegram-bot[job-queue]``.
+         ``pip install "python-telegram-bot[job-queue]"``.
 
     Args:
         callback (:term:`coroutine function`): The callback function that should be executed by the
@@ -709,15 +756,15 @@ class Job(Generic[CCT]):
     def __init__(
         self,
         callback: JobCallback[CCT],
-        data: object = None,
-        name: str = None,
-        chat_id: int = None,
-        user_id: int = None,
+        data: Optional[object] = None,
+        name: Optional[str] = None,
+        chat_id: Optional[int] = None,
+        user_id: Optional[int] = None,
     ):
         if not APS_AVAILABLE:
             raise RuntimeError(
                 "To use `Job`, PTB must be installed via `pip install "
-                "python-telegram-bot[job-queue]`."
+                '"python-telegram-bot[job-queue]"`.'
             )
 
         self.callback: JobCallback[CCT] = callback
@@ -731,6 +778,40 @@ class Job(Generic[CCT]):
 
         self._job = cast("APSJob", None)  # skipcq: PTC-W0052
 
+    def __getattr__(self, item: str) -> object:
+        try:
+            return getattr(self.job, item)
+        except AttributeError as exc:
+            raise AttributeError(
+                f"Neither 'telegram.ext.Job' nor 'apscheduler.job.Job' has attribute '{item}'"
+            ) from exc
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, self.__class__):
+            return self.id == other.id
+        return False
+
+    def __hash__(self) -> int:
+        return hash(self.id)
+
+    def __repr__(self) -> str:
+        """Give a string representation of the job in the form
+        ``Job[id=..., name=..., callback=..., trigger=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(
+            self,
+            id=self.job.id,
+            name=self.name,
+            callback=self.callback.__name__,
+            trigger=self.job.trigger,
+        )
+
     @property
     def job(self) -> "APSJob":
         """:class:`apscheduler.job.Job`: The APS Job this job is a wrapper for.
@@ -739,43 +820,6 @@ class Job(Generic[CCT]):
             This property is now read-only.
         """
         return self._job
-
-    async def run(
-        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
-    ) -> None:
-        """Executes the callback function independently of the jobs schedule. Also calls
-        :meth:`telegram.ext.Application.update_persistence`.
-
-        .. versionchanged:: 20.0
-            Calls :meth:`telegram.ext.Application.update_persistence`.
-
-        Args:
-            application (:class:`telegram.ext.Application`): The application this job is associated
-                with.
-        """
-        # We shield the task such that the job isn't cancelled mid-run
-        await asyncio.shield(self._run(application))
-
-    async def _run(
-        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
-    ) -> None:
-        try:
-            context = application.context_types.context.from_job(self, application)
-            await context.refresh_data()
-            await self.callback(context)
-        except Exception as exc:
-            await application.create_task(application.process_error(None, exc, job=self))
-        finally:
-            # This is internal logic of application - let's keep it private for now
-            application._mark_for_persistence_update(job=self)  # pylint: disable=protected-access
-
-    def schedule_removal(self) -> None:
-        """
-        Schedules this job for removal from the :class:`JobQueue`. It will be removed without
-        executing its callback function again.
-        """
-        self.job.remove()
-        self._removed = True
 
     @property
     def removed(self) -> bool:
@@ -809,21 +853,62 @@ class Job(Generic[CCT]):
         return self.job.next_run_time
 
     @classmethod
-    def _from_aps_job(cls, job: "APSJob") -> "Job[CCT]":
-        return job.func.__self__
+    def from_aps_job(cls, aps_job: "APSJob") -> "Job[CCT]":
+        """Provides the :class:`telegram.ext.Job` that is associated with the given APScheduler
+        job.
 
-    def __getattr__(self, item: str) -> object:
+        Tip:
+            This method can be useful when using advanced APScheduler features along with
+            :class:`telegram.ext.JobQueue`.
+
+        .. versionadded:: 20.4
+
+        Args:
+            aps_job (:class:`apscheduler.job.Job`): The APScheduler job
+
+        Returns:
+            :class:`telegram.ext.Job`
+        """
+        ext_job = aps_job.args[1]
+        ext_job._job = aps_job  # pylint: disable=protected-access
+        return ext_job
+
+    async def run(
+        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
+    ) -> None:
+        """Executes the callback function independently of the jobs schedule. Also calls
+        :meth:`telegram.ext.Application.update_persistence`.
+
+        .. versionchanged:: 20.0
+            Calls :meth:`telegram.ext.Application.update_persistence`.
+
+        Args:
+            application (:class:`telegram.ext.Application`): The application this job is associated
+                with.
+        """
+        # We shield the task such that the job isn't cancelled mid-run
+        await asyncio.shield(self._run(application))
+
+    async def _run(
+        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
+    ) -> None:
         try:
-            return getattr(self.job, item)
-        except AttributeError as exc:
-            raise AttributeError(
-                f"Neither 'telegram.ext.Job' nor 'apscheduler.job.Job' has attribute '{item}'"
-            ) from exc
+            context = application.context_types.context.from_job(self, application)
+            await context.refresh_data()
+            await self.callback(context)
+        except Exception as exc:
+            await application.create_task(
+                application.process_error(None, exc, job=self),
+                name=f"Job:{self.id}:run:process_error",
+            )
+        finally:
+            # This is internal logic of application - let's keep it private for now
+            application._mark_for_persistence_update(job=self)  # pylint: disable=protected-access
 
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
-            return self.id == other.id
-        return False
-
-    def __hash__(self) -> int:
-        return hash(self.id)
+    def schedule_removal(self) -> None:
+        """
+        Schedules this job for removal from the :class:`JobQueue`. It will be removed without
+        executing its callback function again.
+        """
+        self.job.remove()
+        self._removed = True

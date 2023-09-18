@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import ClassVar, Optional, Sequence, Tuple, Union
+from typing import Final, Optional, Sequence, Tuple, Union
 
 from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
@@ -131,13 +131,13 @@ class ReplyKeyboardMarkup(TelegramObject):
     def __init__(
         self,
         keyboard: Sequence[Sequence[Union[str, KeyboardButton]]],
-        resize_keyboard: bool = None,
-        one_time_keyboard: bool = None,
-        selective: bool = None,
-        input_field_placeholder: str = None,
-        is_persistent: bool = None,
+        resize_keyboard: Optional[bool] = None,
+        one_time_keyboard: Optional[bool] = None,
+        selective: Optional[bool] = None,
+        input_field_placeholder: Optional[str] = None,
+        is_persistent: Optional[bool] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(keyboard):
@@ -170,8 +170,8 @@ class ReplyKeyboardMarkup(TelegramObject):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        input_field_placeholder: str = None,
-        is_persistent: bool = None,
+        input_field_placeholder: Optional[str] = None,
+        is_persistent: Optional[bool] = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -228,8 +228,8 @@ class ReplyKeyboardMarkup(TelegramObject):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        input_field_placeholder: str = None,
-        is_persistent: bool = None,
+        input_field_placeholder: Optional[str] = None,
+        is_persistent: Optional[bool] = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -290,8 +290,8 @@ class ReplyKeyboardMarkup(TelegramObject):
         resize_keyboard: bool = False,
         one_time_keyboard: bool = False,
         selective: bool = False,
-        input_field_placeholder: str = None,
-        is_persistent: bool = None,
+        input_field_placeholder: Optional[str] = None,
+        is_persistent: Optional[bool] = None,
         **kwargs: object,
     ) -> "ReplyKeyboardMarkup":
         """Shortcut for::
@@ -346,12 +346,12 @@ class ReplyKeyboardMarkup(TelegramObject):
             **kwargs,  # type: ignore[arg-type]
         )
 
-    MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
+    MIN_INPUT_FIELD_PLACEHOLDER: Final[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
     """:const:`telegram.constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER`
 
     .. versionadded:: 20.0
     """
-    MAX_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
+    MAX_INPUT_FIELD_PLACEHOLDER: Final[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
     """:const:`telegram.constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER`
 
     .. versionadded:: 20.0

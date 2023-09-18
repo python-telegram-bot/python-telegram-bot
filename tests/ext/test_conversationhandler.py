@@ -18,7 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Persistence of conversations is tested in test_basepersistence.py"""
 import asyncio
+import functools
 import logging
+from pathlib import Path
 from warnings import filterwarnings
 
 import pytest
@@ -58,6 +60,7 @@ from telegram.ext import (
 )
 from telegram.warnings import PTBUserWarning
 from tests.auxil.build_messages import make_command_message
+from tests.auxil.files import PROJECT_ROOT_PATH
 from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.slots import mro_slots
 
@@ -73,6 +76,7 @@ def user2():
 
 
 def raise_ahs(func):
+    @functools.wraps(func)  # for checking __repr__
     async def decorator(self, *args, **kwargs):
         result = await func(self, *args, **kwargs)
         if self.raise_app_handler_stop:
@@ -287,6 +291,41 @@ class TestConversationHandler:
                 self.entry_points, states=self.states, fallbacks=[], persistent=True
             )
 
+    def test_repr_no_truncation(self):
+        # ConversationHandler's __repr__ is not inherited from BaseHandler.
+        ch = ConversationHandler(
+            name="test_handler",
+            entry_points=[],
+            states=self.drinking_states,
+            fallbacks=[],
+        )
+        assert repr(ch) == (
+            "ConversationHandler[name=test_handler, "
+            "states={'a': [CommandHandler[callback=TestConversationHandler.sip]], "
+            "'b': [CommandHandler[callback=TestConversationHandler.swallow]], "
+            "'c': [CommandHandler[callback=TestConversationHandler.hold]]}]"
+        )
+
+    def test_repr_with_truncation(self):
+        from copy import copy
+
+        states = copy(self.drinking_states)
+        # there are exactly 3 drinking states. adding one more to make sure it's truncated
+        states["extra_to_be_truncated"] = [CommandHandler("foo", self.start)]
+
+        ch = ConversationHandler(
+            name="test_handler",
+            entry_points=[],
+            states=states,
+            fallbacks=[],
+        )
+        assert repr(ch) == (
+            "ConversationHandler[name=test_handler, "
+            "states={'a': [CommandHandler[callback=TestConversationHandler.sip]], "
+            "'b': [CommandHandler[callback=TestConversationHandler.swallow]], "
+            "'c': [CommandHandler[callback=TestConversationHandler.hold]], ...}]"
+        )
+
     async def test_check_update_returns_non(self, app, user1):
         """checks some cases where updates should not be handled"""
         conv_handler = ConversationHandler([], {}, [], per_message=True, per_chat=True)
@@ -458,6 +497,7 @@ class TestConversationHandler:
 
         # this for loop checks if the correct stacklevel is used when generating the warning
         for warning in recwarn:
+            assert warning.category is PTBUserWarning
             assert warning.filename == __file__, "incorrect stacklevel!"
 
     @pytest.mark.parametrize(
@@ -676,6 +716,11 @@ class TestConversationHandler:
                 print(exc)
                 raise exc
             assert len(recwarn) == 1
+            assert recwarn[0].category is PTBUserWarning
+            assert (
+                Path(recwarn[0].filename)
+                == PROJECT_ROOT_PATH / "telegram" / "ext" / "_conversationhandler.py"
+            ), "wrong stacklevel!"
             assert str(recwarn[0].message) == (
                 "'callback' returned state 69 which is unknown to the ConversationHandler xyz."
             )
@@ -1044,10 +1089,17 @@ class TestConversationHandler:
                 assert len(recwarn) == 1
             else:
                 assert len(recwarn) == 2
+
             assert str(recwarn[0].message if jq else recwarn[1].message).startswith(
                 "Ignoring `conversation_timeout`"
             )
             assert ("is not running" if jq else "No `JobQueue` set up.") in str(recwarn[0].message)
+            for warning in recwarn:
+                assert warning.category is PTBUserWarning
+                assert (
+                    Path(warning.filename)
+                    == PROJECT_ROOT_PATH / "telegram" / "ext" / "_conversationhandler.py"
+                ), "wrong stacklevel!"
             # now set app.job_queue back to it's original value
 
     async def test_schedule_job_exception(self, app, bot, user1, monkeypatch, caplog):
@@ -1363,6 +1415,11 @@ class TestConversationHandler:
             assert handler.check_update(Update(0, message=message))
             assert len(recwarn) == 1
             assert str(recwarn[0].message).startswith("ApplicationHandlerStop in TIMEOUT")
+            assert recwarn[0].category is PTBUserWarning
+            assert (
+                Path(recwarn[0].filename)
+                == PROJECT_ROOT_PATH / "telegram" / "ext" / "_jobqueue.py"
+            ), "wrong stacklevel!"
 
             await app.stop()
 
@@ -2048,6 +2105,9 @@ class TestConversationHandler:
             assert conv_handler.check_update(Update(0, message=message))
             await app.process_update(Update(0, message=message))
             await asyncio.sleep(0.7)
+            tasks = asyncio.all_tasks()
+            assert any(":handle_update:non_blocking_cb" in t.get_name() for t in tasks)
+            assert any(":handle_update:timeout_job" in t.get_name() for t in tasks)
             assert not self.is_timeout
             event.set()
             await asyncio.sleep(0.7)

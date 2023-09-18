@@ -155,11 +155,7 @@ class TestChatPhotoWithoutRequest(TestChatPhotoBase):
 
 
 class TestChatPhotoWithRequest:
-    async def test_get_and_download(self, bot, chat_photo):
-        jpg_file = Path("telegram.jpg")
-        if jpg_file.is_file():
-            jpg_file.unlink()
-
+    async def test_get_and_download(self, bot, chat_photo, tmp_file):
         tasks = {bot.get_file(chat_photo.small_file_id), bot.get_file(chat_photo.big_file_id)}
         asserts = []
 
@@ -171,8 +167,8 @@ class TestChatPhotoWithRequest:
                 asserts.append("big")
             assert file.file_path.startswith("https://")
 
-            await file.download_to_drive(jpg_file)
-            assert jpg_file.is_file()
+            await file.download_to_drive(tmp_file)
+            assert tmp_file.is_file()
 
         assert "small" in asserts
         assert "big" in asserts

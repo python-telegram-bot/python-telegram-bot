@@ -53,9 +53,9 @@ def _localize(datetime: dtm.datetime, tzinfo: dtm.tzinfo) -> dtm.datetime:
 
 
 def to_float_timestamp(
-    time_object: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time],
-    reference_timestamp: float = None,
-    tzinfo: dtm.tzinfo = None,
+    time_object: Union[float, dtm.timedelta, dtm.datetime, dtm.time],
+    reference_timestamp: Optional[float] = None,
+    tzinfo: Optional[dtm.tzinfo] = None,
 ) -> float:
     """
     Converts a given time object to a float POSIX timestamp.
@@ -65,12 +65,11 @@ def to_float_timestamp(
     to be in UTC, if ``bot`` is not passed or ``bot.defaults`` is :obj:`None`.
 
     Args:
-        time_object (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | \
+        time_object (:obj:`float` | :obj:`datetime.timedelta` | \
             :obj:`datetime.datetime` | :obj:`datetime.time`):
             Time value to convert. The semantics of this parameter will depend on its type:
 
-            * :obj:`int` or :obj:`float` will be interpreted as "seconds from
-              :paramref:`reference_t`"
+            * :obj:`float` will be interpreted as "seconds from :paramref:`reference_t`"
             * :obj:`datetime.timedelta` will be interpreted as
               "time increment from :paramref:`reference_timestamp`"
             * :obj:`datetime.datetime` will be interpreted as an absolute date/time value
@@ -148,9 +147,9 @@ def to_float_timestamp(
 
 
 def to_timestamp(
-    dt_obj: Union[int, float, dtm.timedelta, dtm.datetime, dtm.time, None],
-    reference_timestamp: float = None,
-    tzinfo: dtm.tzinfo = None,
+    dt_obj: Union[float, dtm.timedelta, dtm.datetime, dtm.time, None],
+    reference_timestamp: Optional[float] = None,
+    tzinfo: Optional[dtm.tzinfo] = None,
 ) -> Optional[int]:
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated

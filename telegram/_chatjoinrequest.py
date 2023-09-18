@@ -57,7 +57,7 @@ class ChatJoinRequest(TelegramObject):
         from_user (:class:`telegram.User`): User that sent the join request.
         date (:class:`datetime.datetime`): Date the request was sent.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
             request. This number may have more than 32 significant bits and some programming
@@ -77,7 +77,7 @@ class ChatJoinRequest(TelegramObject):
         from_user (:class:`telegram.User`): User that sent the join request.
         date (:class:`datetime.datetime`): Date the request was sent.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.3
                 |datetime_localization|
         user_chat_id (:obj:`int`): Identifier of a private chat with the user who sent the join
             request. This number may have more than 32 significant bits and some programming
@@ -92,6 +92,12 @@ class ChatJoinRequest(TelegramObject):
         invite_link (:class:`telegram.ChatInviteLink`): Optional. Chat invite link that was used
             by the user to send the join request.
 
+            Note:
+                When a user joins a *public* group via an invite link, this attribute may not
+                be present. However, this behavior is undocument and may be subject to change.
+                See `this GitHub thread <https://github.com/tdlib/telegram-bot-api/issues/428>`_
+                for some discussion.
+
     """
 
     __slots__ = ("chat", "from_user", "date", "bio", "invite_link", "user_chat_id")
@@ -102,10 +108,10 @@ class ChatJoinRequest(TelegramObject):
         from_user: User,
         date: datetime.datetime,
         user_chat_id: int,
-        bio: str = None,
-        invite_link: ChatInviteLink = None,
+        bio: Optional[str] = None,
+        invite_link: Optional[ChatInviteLink] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -147,7 +153,7 @@ class ChatJoinRequest(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 
@@ -179,7 +185,7 @@ class ChatJoinRequest(TelegramObject):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
         """Shortcut for::
 

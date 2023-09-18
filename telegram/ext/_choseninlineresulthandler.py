@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union,
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
-from telegram.ext._handler import BaseHandler
+from telegram.ext._basehandler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar("RT")
@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 
 class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram updates that contain
+    """Handler class to handle Telegram updates that contain
     :attr:`telegram.Update.chosen_inline_result`.
 
     Warning:
@@ -79,7 +79,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
         self,
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
-        pattern: Union[str, Pattern[str]] = None,
+        pattern: Optional[Union[str, Pattern[str]]] = None,
     ):
         super().__init__(callback, block=block)
 
@@ -100,8 +100,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
         """
         if isinstance(update, Update) and update.chosen_inline_result:
             if self.pattern:
-                match = re.match(self.pattern, update.chosen_inline_result.result_id)
-                if match:
+                if match := re.match(self.pattern, update.chosen_inline_result.result_id):
                     return match
             else:
                 return True

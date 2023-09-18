@@ -30,6 +30,9 @@ class Video(_BaseThumbedMedium):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
+    .. versionchanged:: 20.5
+      |removed_thumb_note|
+
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -39,10 +42,6 @@ class Video(_BaseThumbedMedium):
         width (:obj:`int`): Video width as defined by sender.
         height (:obj:`int`): Video height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
-        thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail`.
         file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of a file as defined by sender.
         file_size (:obj:`int`, optional): File size in bytes.
@@ -76,19 +75,17 @@ class Video(_BaseThumbedMedium):
         width: int,
         height: int,
         duration: int,
-        thumb: PhotoSize = None,
-        mime_type: str = None,
-        file_size: int = None,
-        file_name: str = None,
-        thumbnail: PhotoSize = None,
+        mime_type: Optional[str] = None,
+        file_size: Optional[int] = None,
+        file_name: Optional[str] = None,
+        thumbnail: Optional[PhotoSize] = None,
         *,
-        api_kwargs: JSONDict = None,
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(
             file_id=file_id,
             file_unique_id=file_unique_id,
             file_size=file_size,
-            thumb=thumb,
             thumbnail=thumbnail,
             api_kwargs=api_kwargs,
         )
