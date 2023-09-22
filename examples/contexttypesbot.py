@@ -115,8 +115,7 @@ async def count_click(update: Update, context: CustomContext) -> None:
 async def print_users(update: Update, context: CustomContext) -> None:
     """Show which users have been using this bot."""
     await update.message.reply_text(
-        "The following user IDs have used this bot: "
-        f'{", ".join(map(str, context.bot_user_ids))}'
+        f"The following user IDs have used this bot: {', '.join(map(str, context.bot_user_ids))}"
     )
 
 

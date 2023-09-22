@@ -57,8 +57,7 @@ async def deep_linked_level_1(update: Update, context: ContextTypes.DEFAULT_TYPE
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, SO_COOL)
     text = (
-        "Awesome, you just accessed hidden functionality! "
-        "Now let's get back to the private chat."
+        "Awesome, you just accessed hidden functionality! Now let's get back to the private chat."
     )
     keyboard = InlineKeyboardMarkup.from_button(
         InlineKeyboardButton(text="Continue here!", url=url)

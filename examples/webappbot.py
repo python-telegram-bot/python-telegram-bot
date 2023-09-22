@@ -45,8 +45,10 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     # (see webappbot.html)
     data = json.loads(update.effective_message.web_app_data.data)
     await update.message.reply_html(
-        text=f"You selected the color with the HEX value <code>{data['hex']}</code>. The "
-        f"corresponding RGB value is <code>{tuple(data['rgb'].values())}</code>.",
+        text=(
+            f"You selected the color with the HEX value <code>{data['hex']}</code>. The "
+            f"corresponding RGB value is <code>{tuple(data['rgb'].values())}</code>."
+        ),
         reply_markup=ReplyKeyboardRemove(),
     )
 

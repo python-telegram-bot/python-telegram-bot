@@ -414,7 +414,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             ):
                 warn(
                     f"Updates handled by {handler.__class__.__name__} only have information about "
-                    f"the user, so this handler won't ever be triggered if `per_chat=True`."
+                    "the user, so this handler won't ever be triggered if `per_chat=True`."
                     f"{per_faq_link}",
                     stacklevel=2,
                 )

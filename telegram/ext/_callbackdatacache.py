@@ -227,14 +227,16 @@ class CallbackDataCache:
         # Built a new nested list of buttons by replacing the callback data if needed
         buttons = [
             [
-                # We create a new button instead of replacing callback_data in case the
-                # same object is used elsewhere
-                InlineKeyboardButton(
-                    btn.text,
-                    callback_data=self.__put_button(btn.callback_data, keyboard_data),
+                (
+                    # We create a new button instead of replacing callback_data in case the
+                    # same object is used elsewhere
+                    InlineKeyboardButton(
+                        btn.text,
+                        callback_data=self.__put_button(btn.callback_data, keyboard_data),
+                    )
+                    if btn.callback_data
+                    else btn
                 )
-                if btn.callback_data
-                else btn
                 for btn in column
             ]
             for column in reply_markup.inline_keyboard
