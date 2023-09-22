@@ -382,9 +382,11 @@ class TestBasePersistence:
         methods.sort()
         with pytest.raises(
             TypeError,
-            match=", ".join(methods)
-            if sys.version_info < (3, 12)
-            else ", ".join(f"'{i}'" for i in methods),
+            match=(
+                ", ".join(methods)
+                if sys.version_info < (3, 12)
+                else ", ".join(f"'{i}'" for i in methods)
+            ),
         ):
             BasePersistence()
 
@@ -1256,7 +1258,7 @@ class TestBasePersistence:
                 await papp.update_persistence()
                 await asyncio.sleep(0.01)
                 # Conversation should have been updated with the current state, i.e. None
-                assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
+                assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
                 assert papp.persistence.conversations == {"conv": {(1, 1): None}}
 
             # Ensure that we warn the user about this!
@@ -1326,7 +1328,7 @@ class TestBasePersistence:
 
             await papp.update_persistence()
             await asyncio.sleep(0.05)
-            assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
+            assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
             # The result of the pending state wasn't retrieved by the CH yet, so we must be in
             # state `None`
             assert papp.persistence.conversations == {"conv": {(1, 1): None}}
@@ -1436,7 +1438,7 @@ class TestBasePersistence:
             assert papp.persistence.updated_conversations == {}
 
             await papp.update_persistence()
-            assert papp.persistence.updated_conversations == {"conv_1": ({(1, 1): 1})}
+            assert papp.persistence.updated_conversations == {"conv_1": {(1, 1): 1}}
             # This is the important part: the persistence is updated with `None` when the conv ends
             assert papp.persistence.conversations == {"conv_1": {(1, 1): None}}
 
@@ -1468,7 +1470,7 @@ class TestBasePersistence:
             )
             assert papp.persistence.updated_conversations == {}
             await papp.update_persistence()
-            assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
+            assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
             assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.STATE_1}}
 
             papp.persistence.reset_tracking()

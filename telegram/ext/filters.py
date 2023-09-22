@@ -763,7 +763,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
     def name(self) -> str:
         return (
             f"filters.{self.__class__.__name__}("
-            f'{", ".join(str(s) for s in (self.usernames or self.chat_ids))})'
+            f"{', '.join(str(s) for s in (self.usernames or self.chat_ids))})"
         )
 
     @name.setter
