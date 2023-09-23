@@ -224,6 +224,18 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
+        can_post_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can post
+            stories in the channel; channels only.
+
+            .. versionadded:: NEXT.VERSION
+        can_edit_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can edit
+            stories posted by other users; channels only.
+
+            .. versionadded:: NEXT.VERSION
+        can_delete_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can delete
+            stories posted by other users; channels only.
+
+            .. versionadded:: NEXT.VERSION
         can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
@@ -265,6 +277,18 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
+        can_post_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can post
+            stories in the channel; channels only.
+
+            .. versionadded:: NEXT.VERSION
+        can_edit_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
+            stories posted by other users; channels only.
+
+            .. versionadded:: NEXT.VERSION
+        can_delete_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can delete
+            stories posted by other users; channels only.
+
+            .. versionadded:: NEXT.VERSION
         can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only
 
@@ -287,6 +311,9 @@ class ChatMemberAdministrator(ChatMember):
         "can_pin_messages",
         "can_manage_topics",
         "custom_title",
+        "can_post_stories",
+        "can_edit_stories",
+        "can_delete_stories",
     )
 
     def __init__(
@@ -306,6 +333,9 @@ class ChatMemberAdministrator(ChatMember):
         can_pin_messages: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
         custom_title: Optional[str] = None,
+        can_post_stories: Optional[bool] = None,
+        can_edit_stories: Optional[bool] = None,
+        can_delete_stories: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -325,6 +355,9 @@ class ChatMemberAdministrator(ChatMember):
             self.can_pin_messages: Optional[bool] = can_pin_messages
             self.can_manage_topics: Optional[bool] = can_manage_topics
             self.custom_title: Optional[str] = custom_title
+            self.can_post_stories: Optional[bool] = can_post_stories
+            self.can_edit_stories: Optional[bool] = can_edit_stories
+            self.can_delete_stories: Optional[bool] = can_delete_stories
 
 
 class ChatMemberMember(ChatMember):

@@ -65,6 +65,18 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
+        can_post_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can post
+            stories in the channel; channels only.
+
+            .. versionadded:: NEXT.VERSION
+        can_edit_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can edit
+            stories posted by other users; channels only.
+
+            .. versionadded:: NEXT.VERSION
+        can_delete_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can delete
+            stories posted by other users; channels only.
+
+            .. versionadded:: NEXT.VERSION
         can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
@@ -96,6 +108,18 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
+        can_post_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can post
+            stories in the channel; channels only.
+
+            .. versionadded:: NEXT.VERSION
+        can_edit_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
+            stories posted by other users; channels only.
+
+            .. versionadded:: NEXT.VERSION
+        can_delete_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can delete
+            stories posted by other users; channels only.
+
+            .. versionadded:: NEXT.VERSION
         can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
@@ -115,6 +139,9 @@ class ChatAdministratorRights(TelegramObject):
         "can_edit_messages",
         "can_pin_messages",
         "can_manage_topics",
+        "can_post_stories",
+        "can_edit_stories",
+        "can_delete_stories",
     )
 
     def __init__(
@@ -131,6 +158,9 @@ class ChatAdministratorRights(TelegramObject):
         can_edit_messages: Optional[bool] = None,
         can_pin_messages: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
+        can_post_stories: Optional[bool] = None,
+        can_edit_stories: Optional[bool] = None,
+        can_delete_stories: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -148,6 +178,9 @@ class ChatAdministratorRights(TelegramObject):
         self.can_post_messages: Optional[bool] = can_post_messages
         self.can_edit_messages: Optional[bool] = can_edit_messages
         self.can_pin_messages: Optional[bool] = can_pin_messages
+        self.can_post_stories: Optional[bool] = can_post_stories
+        self.can_edit_stories: Optional[bool] = can_edit_stories
+        self.can_delete_stories: Optional[bool] = can_delete_stories
         self.can_manage_topics: Optional[bool] = can_manage_topics
 
         self._id_attrs = (
@@ -176,7 +209,7 @@ class ChatAdministratorRights(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(True, True, True, True, True, True, True, True, True, True, True, True)
+        return cls(*(True,) * len(cls.__slots__))
 
     @classmethod
     def no_rights(cls) -> "ChatAdministratorRights":
@@ -186,6 +219,4 @@ class ChatAdministratorRights(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(
-            False, False, False, False, False, False, False, False, False, False, False, False
-        )
+        return cls(*(False,) * len(cls.__slots__))

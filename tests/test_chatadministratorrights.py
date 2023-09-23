@@ -37,6 +37,9 @@ def chat_admin_rights():
         can_manage_video_chats=True,
         can_manage_topics=True,
         is_anonymous=True,
+        can_post_stories=True,
+        can_edit_stories=True,
+        can_delete_stories=True,
     )
 
 
@@ -61,6 +64,9 @@ class TestChatAdministratorRightsWithoutRequest:
             "can_manage_video_chats": True,
             "can_manage_topics": True,
             "is_anonymous": True,
+            "can_post_stories": True,
+            "can_edit_stories": True,
+            "can_delete_stories": True,
         }
         chat_administrator_rights_de = ChatAdministratorRights.de_json(json_dict, bot)
         assert chat_administrator_rights_de.api_kwargs == {}
@@ -84,6 +90,9 @@ class TestChatAdministratorRightsWithoutRequest:
         assert admin_rights_dict["is_anonymous"] == car.is_anonymous
         assert admin_rights_dict["can_manage_video_chats"] == car.can_manage_video_chats
         assert admin_rights_dict["can_manage_topics"] == car.can_manage_topics
+        assert admin_rights_dict["can_post_stories"] == car.can_post_stories
+        assert admin_rights_dict["can_edit_stories"] == car.can_edit_stories
+        assert admin_rights_dict["can_delete_stories"] == car.can_delete_stories
 
     def test_equality(self):
         a = ChatAdministratorRights(True, False, False, False, False, False, False, False, False)
@@ -110,7 +119,7 @@ class TestChatAdministratorRightsWithoutRequest:
         t = ChatAdministratorRights.all_rights()
         # if the dirs are the same, the attributes will all be there
         assert dir(f) == dir(t)
-        # now we just need to check that all attributes are True. _id_attrs returns all values,
+        # now we just need to check that all attributes are True. __slots__ returns all values,
         # if a new one is added without defaulting to True, this will fail
         for key in t.__slots__:
             assert t[key] is True
@@ -122,7 +131,7 @@ class TestChatAdministratorRightsWithoutRequest:
         t = ChatAdministratorRights.no_rights()
         # if the dirs are the same, the attributes will all be there
         assert dir(f) == dir(t)
-        # now we just need to check that all attributes are True. _id_attrs returns all values,
+        # now we just need to check that all attributes are True. __slots__ returns all values,
         # if a new one is added without defaulting to True, this will fail
         for key in t.__slots__:
             assert t[key] is False
