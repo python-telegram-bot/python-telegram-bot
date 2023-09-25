@@ -37,12 +37,12 @@ class WriteAccessAllowed(TelegramObject):
 
             .. versionadded:: 20.3
         from_request (:obj:`bool`, optional): :obj:`True`, if the access was granted after the user
-        accepted an explicit request from a Web App sent by the method
-        requestWriteAccess <https://core.telegram.org/bots/webapps#initializing-mini-apps>`_.
+         accepted an explicit request from a Web App sent by the method
+         `requestWriteAccess <https://core.telegram.org/bots/webapps#initializing-mini-apps>`_.
 
             .. versionadded:: NEXT.VERSION
         from_attachment_menu (:obj:`bool`, optional): :obj:`True`, if the access was granted when
-        the bot was added to the attachment or side menu.
+         the bot was added to the attachment or side menu.
 
             .. versionadded:: NEXT.VERSION
 
@@ -51,11 +51,11 @@ class WriteAccessAllowed(TelegramObject):
 
             .. versionadded:: 20.3
         from_request (:obj:`bool`): Optional. :obj:`True`, if the access was granted after the user
-        accepted an explicit request from a Web App.
+         accepted an explicit request from a Web App.
 
             .. versionadded:: NEXT.VERSION
         from_attachment_menu (:obj:`bool`): Optional. :obj:`True`, if the access was granted when
-        the bot was added to the attachment or side menu.
+         the bot was added to the attachment or side menu.
 
             .. versionadded:: NEXT.VERSION
 
