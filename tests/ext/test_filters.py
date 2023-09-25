@@ -829,20 +829,22 @@ class TestFilters:
         )
 
     def test_filters_file_extension_name(self):
-        assert filters.Document.FileExtension("jpg").name == (
-            "filters.Document.FileExtension('jpg')"
+        assert (
+            filters.Document.FileExtension("jpg").name == "filters.Document.FileExtension('jpg')"
         )
-        assert filters.Document.FileExtension("JPG").name == (
-            "filters.Document.FileExtension('jpg')"
+        assert (
+            filters.Document.FileExtension("JPG").name == "filters.Document.FileExtension('jpg')"
         )
-        assert filters.Document.FileExtension("jpg", case_sensitive=True).name == (
-            "filters.Document.FileExtension('jpg', case_sensitive=True)"
+        assert (
+            filters.Document.FileExtension("jpg", case_sensitive=True).name
+            == "filters.Document.FileExtension('jpg', case_sensitive=True)"
         )
-        assert filters.Document.FileExtension("JPG", case_sensitive=True).name == (
-            "filters.Document.FileExtension('JPG', case_sensitive=True)"
+        assert (
+            filters.Document.FileExtension("JPG", case_sensitive=True).name
+            == "filters.Document.FileExtension('JPG', case_sensitive=True)"
         )
-        assert filters.Document.FileExtension(".jpg").name == (
-            "filters.Document.FileExtension('.jpg')"
+        assert (
+            filters.Document.FileExtension(".jpg").name == "filters.Document.FileExtension('.jpg')"
         )
         assert filters.Document.FileExtension("").name == "filters.Document.FileExtension('')"
         assert filters.Document.FileExtension(None).name == "filters.Document.FileExtension(None)"
@@ -2015,8 +2017,7 @@ class TestFilters:
 
         assert (
             str(filters.TEXT & (filters.FORWARDED | filters.Entity(MessageEntity.MENTION)))
-            == "<filters.TEXT and <filters.FORWARDED or "
-            "filters.Entity(mention)>>"
+            == "<filters.TEXT and <filters.FORWARDED or filters.Entity(mention)>>"
         )
 
     def test_xor_filters(self, update):
@@ -2056,8 +2057,7 @@ class TestFilters:
 
         assert (
             str(filters.FORWARDED & (filters.TEXT ^ filters.User(123)))
-            == "<filters.FORWARDED and <filters.TEXT xor "
-            "filters.User(123)>>"
+            == "<filters.FORWARDED and <filters.TEXT xor filters.User(123)>>"
         )
 
     def test_xor_regex_filters(self, update):

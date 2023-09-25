@@ -291,8 +291,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         if warning_string:
             self._warn(
                 f"You set the HTTP version for the {warning_string} HTTPXRequest instance to "
-                f"HTTP/2. The self hosted bot api instances only support HTTP/1.1. You should "
-                f"either run a HTTP proxy in front of it which supports HTTP/2 or use HTTP/1.1.",
+                "HTTP/2. The self hosted bot api instances only support HTTP/1.1. You should "
+                "either run a HTTP proxy in front of it which supports HTTP/2 or use HTTP/1.1.",
                 PTBUserWarning,
                 stacklevel=2,
             )

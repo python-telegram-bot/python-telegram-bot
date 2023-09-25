@@ -29,7 +29,7 @@ repos:
 
         additional_dependencies:
           - httpx~=0.24.1
-          - tornado~=6.2
+          - tornado~=6.3.3
           - APScheduler~=3.10.4
           - cachetools~=5.3.1
           - aiolimiter~=1.1.0
@@ -45,7 +45,7 @@ repos:
           - types-cryptography
           - types-cachetools
           - httpx~=0.24.1
-          - tornado~=6.2
+          - tornado~=6.3.3
           - APScheduler~=3.10.4
           - cachetools~=5.3.1
           - aiolimiter~=1.1.0
@@ -57,7 +57,7 @@ repos:
         - --no-strict-optional
         - --follow-imports=silent
       additional_dependencies:
-        - tornado~=6.2
+        - tornado~=6.3.3
         - APScheduler~=3.10.4
         - cachetools~=5.3.1
         - . # this basically does `pip install -e .`
@@ -84,7 +84,7 @@ repos:
         files: ^(telegram|examples|tests)/.*\.py$
         additional_dependencies:
           - httpx~=0.24.1
-          - tornado~=6.2
+          - tornado~=6.3.3
           - APScheduler~=3.10.4
           - cachetools~=5.3.1
           - aiolimiter~=1.1.0
