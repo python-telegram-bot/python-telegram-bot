@@ -941,7 +941,7 @@ class Chat(TelegramObject):
 
         .. versionadded:: 13.2
         .. versionchanged:: 20.0
-           The argument `can_manage_voice_chats`` was renamed to
+           The argument ``can_manage_voice_chats`` was renamed to
            :paramref:`~telegram.Bot.promote_chat_member.can_manage_video_chats` in accordance to
            Bot API 6.0.
         .. versionchanged:: NEXT.VERSION
