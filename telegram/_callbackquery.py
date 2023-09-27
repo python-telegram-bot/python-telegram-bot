@@ -729,7 +729,7 @@ class CallbackQuery(TelegramObject):
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: DVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
