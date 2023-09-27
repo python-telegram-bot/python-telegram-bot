@@ -26,8 +26,8 @@ from telegram._utils.types import JSONDict
 class WriteAccessAllowed(TelegramObject):
     """
     This object represents a service message about a user allowing a bot to write messages after
-    adding the bot to the attachment menu, launching a Web App from a link, or accepting an
-    explicit request from a Web App sent by the method
+    adding it to the attachment menu, launching a Web App from a link, or accepting an explicit
+    request from a Web App sent by the method
     `requestWriteAccess <https://core.telegram.org/bots/webapps#initializing-mini-apps>`_.
 
     .. versionadded:: 20.0
