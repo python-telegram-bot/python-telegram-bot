@@ -2553,19 +2553,17 @@ class Mention(MessageFilter):
     it filters messages to only allow those whose contains one of username
     or chat_id or :attr:`telegram.User`.
     Note:
-        Usernames only allowed with @ prefix. Example: "@username"
         Chat id only allowed with positive numbers. Example: 123456
     Examples:
         A simple use case for passing username is to allow only messages that were sent with
         mention username:
-        MessageHandler(filters.Mention("@username"), callback_method)
+        MessageHandler(filters.Mention("username"), callback_method)
         MessageHandler(filters.Mention(["@username",123456, `user` ), callback_method)
     Args:
         mentions (Union[:obj:`str` ,:obj:`str` ,:attr:`telegram.User` ] ||
         Collection[Union[:obj:`str` ,:obj`str` ,:attr:`telegram.User` ]]):
         Which messages to allow with username or chat_id or :attr:`telegram.User` object.
-        If one of them matched it will allow. If not specified,
-        will allow any text message with mention.
+        If one of them matched it will allow.
     """
 
     __slots__ = ("mention", "_mentions")
@@ -2580,13 +2578,23 @@ class Mention(MessageFilter):
             return set(mentions)
         return {mentions}
 
+    @staticmethod
+    def _fix_mention_username(mention: Union[int, str, TGUser]) -> Union[int, str, TGUser]:
+        if not isinstance(mention, str):
+            return mention
+        if mention.startswith("@"):
+            return mention
+        return f"@{mention}"
+
     @property
     def mentions(self) -> FrozenSet[Union[int, str, TGUser]]:
         """Which mention(s) to allow through.
         Returns:
             frozenset(Union[:obj:`int` , :obj:`str`, :attr:`telegram.User` ])
         """
-        return frozenset(self._mentions)
+        # correcting str usernames.
+        _mentions = {self._fix_mention_username(mention) for mention in self._mentions}
+        return frozenset(_mentions)
 
     @staticmethod
     def _check_mention(message: Message, mention: Union[int, str, TGUser]) -> bool:
@@ -2596,9 +2604,13 @@ class Mention(MessageFilter):
             return bool(any(mention == e.user.id for e in message.entities if e.user))
         return bool(
             isinstance(mention, str)
-            and bool(any(e.type == MessageEntity.MENTION for e in message.parse_entities()))
+            and bool(
+                any(
+                    (entity.type == MessageEntity.MENTION and message.text == entity_value)
+                    for entity, entity_value in message.parse_entities().items()
+                )
+            )
             and message.text
-            and mention in message.text
         )
 
     def filter(self, message: Message) -> bool:
