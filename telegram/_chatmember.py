@@ -218,7 +218,7 @@ class ChatMemberAdministrator(ChatMember):
         can_invite_users (:obj:`bool`): :obj:`True`, if the user can invite
             new users to the chat.
         can_post_messages (:obj:`bool`, optional): :obj:`True`, if the
-            administrator can post in the channel, channels only.
+            administrator can post messages in the channel, channels only.
         can_edit_messages (:obj:`bool`, optional): :obj:`True`, if the
             administrator can edit messages of other users and can pin
             messages; channels only.
@@ -259,7 +259,8 @@ class ChatMemberAdministrator(ChatMember):
         can_invite_users (:obj:`bool`): :obj:`True`, if the user can invite
             new users to the chat.
         can_post_messages (:obj:`bool`): Optional. :obj:`True`, if the
-            administrator can post in the channel or access channel statistics; channels only.
+            administrator can post messages in the channel or access channel statistics;
+            channels only.
         can_edit_messages (:obj:`bool`): Optional. :obj:`True`, if the
             administrator can edit messages of other users and can pin
             messages; channels only.
