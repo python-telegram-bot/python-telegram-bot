@@ -95,11 +95,11 @@ class TestChatAdministratorRightsWithoutRequest:
         assert admin_rights_dict["can_delete_stories"] == car.can_delete_stories
 
     def test_equality(self):
-        a = ChatAdministratorRights(True, False, False, False, False, False, False, False, False)
-        b = ChatAdministratorRights(True, False, False, False, False, False, False, False, False)
-        c = ChatAdministratorRights(False, False, False, False, False, False, False, False, False)
-        d = ChatAdministratorRights(True, True, False, False, False, False, False, False, False)
-        e = ChatAdministratorRights(True, True, False, False, False, False, False, False, False)
+        a = ChatAdministratorRights(True, *((False,) * 11))
+        b = ChatAdministratorRights(True, *((False,) * 11))
+        c = ChatAdministratorRights(*(False,) * 12)
+        d = ChatAdministratorRights(True, True, *((False,) * 10))
+        e = ChatAdministratorRights(True, True, *((False,) * 10))
 
         assert a == b
         assert hash(a) == hash(b)

@@ -31,11 +31,16 @@ class ChatAdministratorRights(TelegramObject):
     :attr:`can_delete_messages`, :attr:`can_manage_video_chats`, :attr:`can_restrict_members`,
     :attr:`can_promote_members`, :attr:`can_change_info`, :attr:`can_invite_users`,
     :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages`,
-    :attr:`can_manage_topics` are equal.
+    :attr:`can_manage_topics`, :attr:`can_post_stories`, :attr:`can_delete_stories`, and
+    :attr:`can_edit_stories` are equal.
 
     .. versionchanged:: 20.0
         :attr:`can_manage_topics` is considered as well when comparing objects of
         this type in terms of equality.
+
+    .. versionchanged:: NEXT.VERSION
+        :attr:`can_post_stories`, :attr:`can_edit_stories`, and :attr:`can_delete_stories` are
+        considered as well when comparing objects of this type in terms of equality.
 
     .. versionadded:: 20.0
 
@@ -196,6 +201,9 @@ class ChatAdministratorRights(TelegramObject):
             self.can_edit_messages,
             self.can_pin_messages,
             self.can_manage_topics,
+            self.can_post_stories,
+            self.can_edit_stories,
+            self.can_delete_stories,
         )
 
         self._freeze()
