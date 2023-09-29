@@ -345,7 +345,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
 
     async def __aenter__(self: _AppType) -> _AppType:  # noqa: PYI019
-        """Simple context manager which initializes the App."""
+        """|async_context_manager| initializes the App.
+
+        If no exceptions are raised during initialization, returns the App instance.
+        If an exception is raised, shuts down the App and re-raises the exception.
+
+        Returns:
+            The initialized App instance.
+
+        Raises:
+            :exc:`Exception`: If an exception is raised during initialization.
+        """
         try:
             await self.initialize()
             return self
@@ -359,7 +369,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        """Shutdown the App from the context manager."""
+        """|async_context_manager| shuts down the App.
+
+        This function is called when exiting the context manager.
+        It shuts down the App and does not suppress any exceptions.
+        """
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()

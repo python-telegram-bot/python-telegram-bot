@@ -61,3 +61,5 @@
 .. |removed_thumb_url_note| replace:: Removed the deprecated argument and attribute ``thumb_url``.
 
 .. |removed_thumb_wildcard_note| replace:: Removed the deprecated arguments and attributes ``thumb_*``.
+
+.. |async_context_manager| replace:: Asynchronous context manager which

@@ -126,7 +126,18 @@ class Updater(AsyncContextManager["Updater"]):
         self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
 
     async def __aenter__(self: _UpdaterType) -> _UpdaterType:  # noqa: PYI019
-        """Simple context manager which initializes the Updater."""
+        """
+        |async_context_manager| initializes the Updater.
+
+        If no exceptions are raised during initialization, returns the Updater instance.
+        If an exception is raised, shuts down the Updater and re-raises the exception.
+
+        Returns:
+            The initialized Updater instance.
+
+        Raises:
+            :exc:`Exception`: If an exception is raised during initialization.
+        """
         try:
             await self.initialize()
             return self
@@ -140,7 +151,12 @@ class Updater(AsyncContextManager["Updater"]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        """Shutdown the Updater from the context manager."""
+        """
+        |async_context_manager| shuts down the Updater.
+
+        This function is called when exiting the context manager.
+        It shuts down the Updater and does not suppress any exceptions.
+        """
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
