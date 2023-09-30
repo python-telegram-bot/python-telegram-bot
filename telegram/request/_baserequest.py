@@ -99,10 +99,7 @@ class BaseRequest(
     """
 
     async def __aenter__(self: RT) -> RT:
-        """|async_context_manager| initializes the Request.
-
-        If no exceptions are raised during initialization, returns the Request instance.
-        If an exception is raised, shuts down the Request and re-raises the exception.
+        """|async_context_manager| :meth:`initializes <initialize>` the Request.
 
         Returns:
             The initialized Request instance.
@@ -123,12 +120,7 @@ class BaseRequest(
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        """
-        |async_context_manager| shuts down the Request.
-
-        This function is called when exiting the context manager.
-        It shuts down the Request and does not suppress any exceptions.
-        """
+        """|async_context_manager| :meth:`shuts down <shutdown>` the Request."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()

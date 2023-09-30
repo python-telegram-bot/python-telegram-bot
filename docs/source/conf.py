@@ -82,6 +82,7 @@ autodoc_special_members = ["__aenter__", "__aexit__"]
 
 autodoc_default_options = {
     "special-members": True,
+    "exclude-members": "__init__",
 }
 
 # Fail on warnings & unresolved references etc

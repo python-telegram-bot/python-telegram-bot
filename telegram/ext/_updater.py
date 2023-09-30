@@ -127,10 +127,7 @@ class Updater(AsyncContextManager["Updater"]):
 
     async def __aenter__(self: _UpdaterType) -> _UpdaterType:  # noqa: PYI019
         """
-        |async_context_manager| initializes the Updater.
-
-        If no exceptions are raised during initialization, returns the Updater instance.
-        If an exception is raised, shuts down the Updater and re-raises the exception.
+        |async_context_manager| :meth:`initializes <initialize>` the Updater.
 
         Returns:
             The initialized Updater instance.
@@ -151,12 +148,7 @@ class Updater(AsyncContextManager["Updater"]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        """
-        |async_context_manager| shuts down the Updater.
-
-        This function is called when exiting the context manager.
-        It shuts down the Updater and does not suppress any exceptions.
-        """
+        """|async_context_manager| :meth:`shuts down <shutdown>` the Updater."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()

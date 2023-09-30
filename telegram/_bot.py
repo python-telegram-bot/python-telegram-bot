@@ -311,10 +311,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
     async def __aenter__(self: BT) -> BT:
         """
-        |async_context_manager| initializes the Bot.
-
-        If no exceptions are raised during initialization, returns the Bot instance.
-        If an exception is raised, shuts down the Bot and re-raises the exception.
+        |async_context_manager| :meth:`initializes <initialize>` the Bot.
 
         Returns:
             The initialized Bot instance.
@@ -335,12 +332,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        """
-        |async_context_manager| shuts down the Bot.
-
-        This function is called when exiting the context manager.
-        It shuts down the Bot and does not suppress any exceptions.
-        """
+        """|async_context_manager| :meth:`shuts down <shutdown>` the Bot."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()

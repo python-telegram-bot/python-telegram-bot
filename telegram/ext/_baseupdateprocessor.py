@@ -49,10 +49,7 @@ class BaseUpdateProcessor(ABC):
         self._semaphore = BoundedSemaphore(self.max_concurrent_updates)
 
     async def __aenter__(self) -> "BaseUpdateProcessor":
-        """|async_context_manager| initializes the Processor.
-
-        If no exceptions are raised during initialization, returns the Processor instance.
-        If an exception is raised, shuts down the Processor and re-raises the exception.
+        """|async_context_manager| :meth:`initializes <initialize>` the Processor.
 
         Returns:
             The initialized Processor instance.
@@ -73,11 +70,7 @@ class BaseUpdateProcessor(ABC):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        """|async_context_manager| shuts down the Processor.
-
-        This function is called when exiting the context manager.
-        It shuts down the Processor and does not suppress any exceptions.
-        """
+        """|async_context_manager| :meth:`shuts down <shutdown>` the Processor."""
         await self.shutdown()
 
     @property
