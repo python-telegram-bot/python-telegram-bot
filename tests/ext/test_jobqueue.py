@@ -25,7 +25,7 @@ import time
 
 import pytest
 
-from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
+from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Defaults, Job, JobQueue
 from telegram.warnings import PTBUserWarning
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.pytest_classes import make_bot
@@ -105,6 +105,15 @@ class TestJobQueue:
         self.result = 0
         self.job_time = 0
         self.received_error = None
+
+    def test_scheduler_configuration(self, job_queue, timezone, bot):
+        # Unfortunately, we can't really test the executor setting explicitly without relying
+        # on protected attributes. However, this should be tested enough implicitly via all the
+        # other tests in here
+        assert "timezone" not in job_queue.scheduler_configuration
+
+        tz_app = ApplicationBuilder().defaults(Defaults(tzinfo=timezone)).token(bot.token).build()
+        assert tz_app.job_queue.scheduler_configuration["timezone"] is timezone
 
     async def job_run_once(self, context):
         if (
