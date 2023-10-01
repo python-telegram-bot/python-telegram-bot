@@ -83,6 +83,9 @@ class JobQueue(Generic[CCT]):
                 previous configuration settings. Therefore, please make sure to pass the values
                 returned by :attr:`scheduler_configuration` to the method call in addition to your
                 custom values.
+                Alternatively, you cas also use methods like
+                :meth:`~apscheduler.schedulers.base.BaseScheduler.add_jobstore` to avoid using
+                :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` altogether.
 
             .. versionchanged:: 20.0
                 Uses :class:`~apscheduler.schedulers.asyncio.AsyncIOScheduler` instead of
@@ -135,9 +138,15 @@ class JobQueue(Generic[CCT]):
             Since calling
             :meth:`scheduler.configure() <apscheduler.schedulers.base.BaseScheduler.configure>`
             deletes any previous setting, please make sure to pass these values to the method call
-            in addition to your custom values::
+            in addition to your custom values:
+
+            .. code-block:: python
 
                 scheduler.configure(..., **job_queue.scheduler_configuration)
+
+            Alternatively, you cas also use methods like
+            :meth:`~apscheduler.schedulers.base.BaseScheduler.add_jobstore` to avoid using
+            :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` altogether.
 
         .. versionadded:: NEXT.VERSION
 
