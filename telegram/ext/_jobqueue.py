@@ -105,9 +105,7 @@ class JobQueue(Generic[CCT]):
 
         self._application: Optional[weakref.ReferenceType[Application]] = None
         self._executor = AsyncIOExecutor()
-        self.scheduler: AsyncIOScheduler = AsyncIOScheduler(
-            timezone=pytz.utc, executors={"default": self._executor}
-        )
+        self.scheduler: AsyncIOScheduler = AsyncIOScheduler(**self.scheduler_configuration)
 
     def __repr__(self) -> str:
         """Give a string representation of the JobQueue in the form ``JobQueue[application=...]``.
@@ -154,13 +152,18 @@ class JobQueue(Generic[CCT]):
             Dict[:obj:`str`, :obj:`object`]: The configuration values as dictionary.
 
         """
-        if isinstance(self.application.bot, ExtBot) and self.application.bot.defaults:
-            return {
-                "timezone": self.application.bot.defaults.tzinfo or pytz.utc,
-                "executors": {"default": self._executor},
-            }
+        timezone: object = pytz.utc
+        if (
+            self._application
+            and isinstance(self.application.bot, ExtBot)
+            and self.application.bot.defaults
+        ):
+            timezone = self.application.bot.defaults.tzinfo or pytz.utc
 
-        return {"executors": {"default": self._executor}}
+        return {
+            "timezone": timezone,
+            "executors": {"default": self._executor},
+        }
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)

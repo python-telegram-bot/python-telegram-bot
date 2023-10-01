@@ -110,7 +110,7 @@ class TestJobQueue:
         # Unfortunately, we can't really test the executor setting explicitly without relying
         # on protected attributes. However, this should be tested enough implicitly via all the
         # other tests in here
-        assert "timezone" not in job_queue.scheduler_configuration
+        assert job_queue.scheduler_configuration["timezone"] is UTC
 
         tz_app = ApplicationBuilder().defaults(Defaults(tzinfo=timezone)).token(bot.token).build()
         assert tz_app.job_queue.scheduler_configuration["timezone"] is timezone
@@ -587,7 +587,7 @@ class TestJobQueue:
         assert rec.name == "telegram.ext.Application"
         assert "No error handlers are registered" in rec.getMessage()
 
-    async def test_custom_context(self, bot, job_queue):
+    async def test_custom_context(self, bot):
         application = (
             ApplicationBuilder()
             .token(bot.token)
@@ -598,6 +598,7 @@ class TestJobQueue:
             )
             .build()
         )
+        job_queue = JobQueue()
         job_queue.set_application(application)
 
         async def callback(context):
@@ -608,9 +609,11 @@ class TestJobQueue:
                 type(context.bot_data),
             )
 
+        await job_queue.start()
         job_queue.run_once(callback, 0.1)
         await asyncio.sleep(0.15)
         assert self.result == (CustomContext, None, None, int)
+        await job_queue.stop()
 
     async def test_attribute_error(self):
         job = Job(self.job_run_once)
