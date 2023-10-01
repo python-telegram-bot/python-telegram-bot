@@ -34,6 +34,8 @@ class ChatAdministratorRights(TelegramObject):
     :attr:`can_manage_topics`, :attr:`can_post_stories`, :attr:`can_delete_stories`, and
     :attr:`can_edit_stories` are equal.
 
+    .. versionadded:: 20.0
+
     .. versionchanged:: 20.0
         :attr:`can_manage_topics` is considered as well when comparing objects of
         this type in terms of equality.
@@ -41,8 +43,6 @@ class ChatAdministratorRights(TelegramObject):
     .. versionchanged:: NEXT.VERSION
         :attr:`can_post_stories`, :attr:`can_edit_stories`, and :attr:`can_delete_stories` are
         considered as well when comparing objects of this type in terms of equality.
-
-    .. versionadded:: 20.0
 
     Args:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
