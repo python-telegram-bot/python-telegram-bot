@@ -4606,7 +4606,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
             can_post_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                create channel posts, or access channel statistics; channels only.
+                post messages in the channel, or access channel statistics; channels only.
             can_edit_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 edit messages of other users and can pin messages, channels only.
             can_delete_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
