@@ -33,7 +33,8 @@ class WriteAccessAllowed(TelegramObject):
     .. versionadded:: 20.0
 
     Args:
-        web_app_name (:obj:`str`, optional): Name of the Web App which was launched from a link.
+        web_app_name (:obj:`str`, optional): Name of the Web App, if the access was granted when
+            the Web App was launched from a link.
 
             .. versionadded:: 20.3
         from_request (:obj:`bool`, optional): :obj:`True`, if the access was granted after the user
@@ -47,7 +48,8 @@ class WriteAccessAllowed(TelegramObject):
             .. versionadded:: NEXT.VERSION
 
     Attributes:
-        web_app_name (:obj:`str`): Optional. Name of the Web App which was launched from a link.
+        web_app_name (:obj:`str`): Optional. Name of the Web App, if the access was granted when
+            the Web App was launched from a link.
 
             .. versionadded:: 20.3
         from_request (:obj:`bool`): Optional. :obj:`True`, if the access was granted after the user
