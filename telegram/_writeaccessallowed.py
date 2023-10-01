@@ -28,7 +28,12 @@ class WriteAccessAllowed(TelegramObject):
     This object represents a service message about a user allowing a bot to write messages after
     adding the bot to the attachment menu or launching a Web App from a link.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`web_app_name` is equal.
+
     .. versionadded:: 20.0
+    .. versionchanged:: NEXT.VERSION
+       Added custom equality comparison for objects of this class.
 
     Args:
         web_app_name (:obj:`str`, optional): Name of the Web App which was launched from a link.
@@ -49,5 +54,7 @@ class WriteAccessAllowed(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.web_app_name: Optional[str] = web_app_name
+
+        self._id_attrs = (self.web_app_name,)
 
         self._freeze()
