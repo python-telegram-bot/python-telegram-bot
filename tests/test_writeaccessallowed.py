@@ -36,3 +36,22 @@ class TestWriteAccessAllowed:
         action = WriteAccessAllowed()
         action_dict = action.to_dict()
         assert action_dict == {}
+
+    def test_equality(self):
+        a = WriteAccessAllowed()
+        b = WriteAccessAllowed()
+        c = WriteAccessAllowed(web_app_name="foo")
+        d = WriteAccessAllowed(web_app_name="foo")
+        e = WriteAccessAllowed(web_app_name="bar")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert c == d
+        assert hash(c) == hash(d)
+
+        assert c != e
+        assert hash(c) != hash(e)
