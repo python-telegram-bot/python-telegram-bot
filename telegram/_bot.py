@@ -149,6 +149,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         finally:
             await bot.shutdown()
 
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
+
     Note:
         * Most bot methods have the argument ``api_kwargs`` which allows passing arbitrary keywords
           to the Telegram API. This can be used to access new features of the API before they are
@@ -317,7 +319,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             The initialized Bot instance.
 
         Raises:
-            :exc:`Exception`: If an exception is raised during initialization.
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+            is called in this case.
         """
         try:
             await self.initialize()

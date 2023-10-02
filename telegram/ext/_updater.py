@@ -78,6 +78,8 @@ class Updater(AsyncContextManager["Updater"]):
         finally:
             await updater.shutdown()
 
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
+
     .. seealso:: :wiki:`Architecture Overview <Architecture>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
 
@@ -133,7 +135,8 @@ class Updater(AsyncContextManager["Updater"]):
             The initialized Updater instance.
 
         Raises:
-            :exc:`Exception`: If an exception is raised during initialization.
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+            is called in this case.
         """
         try:
             await self.initialize()

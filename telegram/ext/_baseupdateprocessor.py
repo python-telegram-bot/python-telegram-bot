@@ -27,6 +27,25 @@ class BaseUpdateProcessor(ABC):
     """An abstract base class for update processors. You can use this class to implement
     your own update processor.
 
+    Instances of this class can be used as asyncio context managers, where
+
+    .. code:: python
+
+        async with processor:
+            # code
+
+    is roughly equivalent to
+
+    .. code:: python
+
+        try:
+            await processor.initialize()
+            # code
+        finally:
+            await processor.shutdown()
+
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
+
     .. seealso:: :wiki:`Concurrency`
 
     .. versionadded:: 20.4
@@ -55,7 +74,8 @@ class BaseUpdateProcessor(ABC):
             The initialized Processor instance.
 
         Raises:
-            :exc:`Exception`: If an exception is raised during initialization.
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+            is called in this case
         """
         try:
             await self.initialize()

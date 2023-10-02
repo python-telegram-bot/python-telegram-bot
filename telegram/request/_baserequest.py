@@ -70,6 +70,8 @@ class BaseRequest(
         finally:
             await request_object.shutdown()
 
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
+
     Tip:
         JSON encoding and decoding is done with the standard library's :mod:`json` by default.
         To use a custom library for this, you can override :meth:`parse_json_payload` and implement
@@ -105,7 +107,8 @@ class BaseRequest(
             The initialized Request instance.
 
         Raises:
-            :exc:`Exception`: If an exception is raised during initialization.
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+            is called in this case.
         """
         try:
             await self.initialize()

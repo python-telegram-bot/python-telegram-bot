@@ -149,6 +149,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         finally:
             await application.shutdown()
 
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
+
     Examples:
         :any:`Echo Bot <examples.echobot>`
 
@@ -351,7 +353,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             The initialized App instance.
 
         Raises:
-            :exc:`Exception`: If an exception is raised during initialization.
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+            is called in this case.
         """
         try:
             await self.initialize()
