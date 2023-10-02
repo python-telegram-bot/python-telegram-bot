@@ -6,7 +6,7 @@ ci:
 
 repos:
 -   repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 23.9.1
     hooks:
     -   id: black
         args:
@@ -17,7 +17,7 @@ repos:
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.0.0a7
+    rev: v3.0.0
     hooks:
     -   id: pylint
         files: ^(telegram|examples)/.*\.py$
@@ -62,7 +62,7 @@ repos:
         - cachetools~=5.3.1
         - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.10.1
+    rev: v3.13.0
     hooks:
     -   id: pyupgrade
         files: ^(telegram|examples|tests|docs)/.*\.py$
@@ -77,7 +77,7 @@ repos:
         - --diff
         - --check
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.0.287'
+    rev: 'v0.0.292'
     hooks:
     -   id: ruff
         name: ruff
