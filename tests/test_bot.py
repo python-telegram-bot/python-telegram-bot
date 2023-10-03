@@ -2699,6 +2699,9 @@ class TestBotWithRequest:
                 can_manage_chat=True,
                 can_manage_video_chats=True,
                 can_manage_topics=True,
+                can_post_stories=True,
+                can_edit_stories=True,
+                can_delete_stories=True,
             )
 
         # Test that we pass the correct params to TG
@@ -2719,6 +2722,9 @@ class TestBotWithRequest:
                 and data.get("can_manage_chat") == 10
                 and data.get("can_manage_video_chats") == 11
                 and data.get("can_manage_topics") == 12
+                and data.get("can_post_stories") == 13
+                and data.get("can_edit_stories") == 14
+                and data.get("can_delete_stories") == 15
             )
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -2737,6 +2743,9 @@ class TestBotWithRequest:
             can_manage_chat=10,
             can_manage_video_chats=11,
             can_manage_topics=12,
+            can_post_stories=13,
+            can_edit_stories=14,
+            can_delete_stories=15,
         )
 
     async def test_export_chat_invite_link(self, bot, channel_id):

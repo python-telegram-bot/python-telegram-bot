@@ -4590,6 +4590,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         can_manage_chat: Optional[bool] = None,
         can_manage_video_chats: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
+        can_post_stories: Optional[bool] = None,
+        can_edit_stories: Optional[bool] = None,
+        can_delete_stories: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4645,6 +4648,18 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 allowed to create, rename, close, and reopen forum topics; supergroups only.
 
                 .. versionadded:: 20.0
+            can_post_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                post stories in the channel; channels only.
+
+                .. versionadded:: NEXT.VERSION
+            can_edit_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                edit stories posted by other users; channels only.
+
+                .. versionadded:: NEXT.VERSION
+            can_delete_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                delete stories posted by other users; channels only.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4668,6 +4683,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "can_manage_chat": can_manage_chat,
             "can_manage_video_chats": can_manage_video_chats,
             "can_manage_topics": can_manage_topics,
+            "can_post_stories": can_post_stories,
+            "can_edit_stories": can_edit_stories,
+            "can_delete_stories": can_delete_stories,
         }
 
         return await self._post(

@@ -330,7 +330,10 @@ class Message(TelegramObject):
 
             .. versionadded:: 20.0
         write_access_allowed (:class:`telegram.WriteAccessAllowed`, optional): Service message:
-            the user allowed the bot added to the attachment menu to write messages.
+            the user allowed the bot to write messages after adding it to the attachment or side
+            menu, launching a Web App from a link, or accepting an explicit request from a Web App
+            sent by the method
+            `requestWriteAccess <https://core.telegram.org/bots/webapps#initializing-mini-apps>`_.
 
             .. versionadded:: 20.0
         has_media_spoiler (:obj:`bool`, optional): :obj:`True`, if the message media is covered

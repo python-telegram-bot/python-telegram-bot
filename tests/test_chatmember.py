@@ -68,6 +68,9 @@ class CMDefaults:
     can_send_videos: bool = True
     can_send_video_notes: bool = True
     can_send_voice_notes: bool = True
+    can_post_stories: bool = True
+    can_edit_stories: bool = True
+    can_delete_stories: bool = True
 
 
 def chat_member_owner():
@@ -91,6 +94,9 @@ def chat_member_administrator():
         CMDefaults.can_pin_messages,
         CMDefaults.can_manage_topics,
         CMDefaults.custom_title,
+        CMDefaults.can_post_stories,
+        CMDefaults.can_edit_stories,
+        CMDefaults.can_delete_stories,
     )
 
 
