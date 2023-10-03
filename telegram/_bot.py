@@ -4614,10 +4614,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             user_id (:obj:`int`): Unique identifier of the target user.
             is_anonymous (:obj:`bool`, optional): Pass :obj:`True`, if the administrator's presence
                 in the chat is hidden.
-            can_manage_chat (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                access the chat event log, chat statistics, message statistics in channels, see
-                channel members, see anonymous administrators in supergroups and ignore slow mode.
-                Implied by any other administrator privilege.
+            can_manage_chat (:obj:`bool`, optional): Pass  :obj:`True`, if the administrator can
+                access the chat event log, chat statistics, boost list in channels, see channel
+                members, report spam messages, see anonymous administrators in supergroups and
+                ignore slow mode. Implied by any other administrator privilege.
 
                 .. versionadded:: 13.4
 
@@ -4629,7 +4629,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
             can_post_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                create channel posts, channels only.
+                post messages in the channel, or access channel statistics; channels only.
             can_edit_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 edit messages of other users and can pin messages, channels only.
             can_delete_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -4637,7 +4637,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             can_invite_users (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 invite new users to the chat.
             can_restrict_members (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
-                can restrict, ban or unban chat members.
+                can restrict, ban or unban chat members, or access supergroup statistics.
             can_pin_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 pin messages, supergroups only.
             can_promote_members (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can

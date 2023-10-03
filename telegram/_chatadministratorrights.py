@@ -47,15 +47,15 @@ class ChatAdministratorRights(TelegramObject):
     Args:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
         can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator can access the chat event
-            log, chat statistics, message statistics in channels, see channel members, see
-            anonymous administrators in supergroups and ignore slow mode. Implied by any other
-            administrator privilege.
+            log, chat statistics, boost list in channels, see channel members, report spam
+            messages, see anonymous administrators in supergroups and ignore slow mode.
+            Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the administrator can delete messages of
             other users.
         can_manage_video_chats (:obj:`bool`): :obj:`True`, if the administrator can manage video
             chats.
         can_restrict_members (:obj:`bool`): :obj:`True`, if the administrator can restrict, ban or
-            unban chat members.
+            unban chat members, or access supergroup statistics.
         can_promote_members (:obj:`bool`): :obj:`True`, if the administrator can add new
             administrators with a subset of their own privileges or demote administrators
             that they have promoted, directly or indirectly (promoted by administrators that
@@ -65,7 +65,7 @@ class ChatAdministratorRights(TelegramObject):
         can_invite_users (:obj:`bool`): :obj:`True`, if the user is allowed to invite new users to
             the chat.
         can_post_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can post
-            messages in the channel; channels only.
+            messages in the channel, or access channel statistics; channels only.
         can_edit_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can edit
             messages of other users.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
@@ -90,15 +90,15 @@ class ChatAdministratorRights(TelegramObject):
     Attributes:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
         can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator can access the chat event
-            log, chat statistics, message statistics in channels, see channel members, see
-            anonymous administrators in supergroups and ignore slow mode. Implied by any other
-            administrator privilege.
+            log, chat statistics, boost list in channels, see channel members, report spam
+            messages, see anonymous administrators in supergroups and ignore slow mode.
+            Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the administrator can delete messages of
             other users.
         can_manage_video_chats (:obj:`bool`): :obj:`True`, if the administrator can manage video
             chats.
         can_restrict_members (:obj:`bool`): :obj:`True`, if the administrator can restrict, ban or
-            unban chat members.
+            unban chat members, or access supergroup statistics.
         can_promote_members (:obj:`bool`): :obj:`True`, if the administrator can add new
             administrators with a subset of their own privileges or demote administrators that he
             has promoted, directly or indirectly (promoted by administrators that were appointed by
@@ -108,7 +108,7 @@ class ChatAdministratorRights(TelegramObject):
         can_invite_users (:obj:`bool`): :obj:`True`, if the user is allowed to invite new users to
             the chat.
         can_post_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can post
-            messages in the channel; channels only.
+            messages in the channel, or access channel statistics; channels only.
         can_edit_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
             messages of other users.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
