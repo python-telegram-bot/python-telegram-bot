@@ -21,6 +21,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import DVType
 from telegram.ext._utils.types import CCT, HandlerCallback
 
@@ -94,6 +95,17 @@ class BaseHandler(Generic[UT, CCT], ABC):
     ):
         self.callback: HandlerCallback[UT, CCT, RT] = callback
         self.block: DVType[bool] = block
+
+    def __repr__(self) -> str:
+        """Give a string representation of the handler in the form ``ClassName[callback=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, callback=self.callback.__qualname__)
 
     @abstractmethod
     def check_update(self, update: object) -> Optional[Union[bool, object]]:

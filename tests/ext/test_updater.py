@@ -94,6 +94,11 @@ class TestUpdater:
         assert updater.bot is bot
         assert updater.update_queue is queue
 
+    def test_repr(self, bot):
+        queue = asyncio.Queue()
+        updater = Updater(bot=bot, update_queue=queue)
+        assert repr(updater) == f"Updater[bot={updater.bot!r}]"
+
     async def test_initialize(self, bot, monkeypatch):
         async def initialize_bot(*args, **kwargs):
             self.test_flag = True

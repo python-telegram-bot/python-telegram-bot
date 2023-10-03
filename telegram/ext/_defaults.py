@@ -104,6 +104,25 @@ class Defaults:
             if value is not None:
                 self._api_defaults[kwarg] = value
 
+    def __hash__(self) -> int:
+        return hash(
+            (
+                self._parse_mode,
+                self._disable_notification,
+                self._disable_web_page_preview,
+                self._allow_sending_without_reply,
+                self._quote,
+                self._tzinfo,
+                self._block,
+                self._protect_content,
+            )
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Defaults):
+            return all(getattr(self, attr) == getattr(other, attr) for attr in self.__slots__)
+        return False
+
     @property
     def api_defaults(self) -> Dict[str, Any]:  # skip-cq: PY-D0003
         return self._api_defaults
@@ -220,25 +239,3 @@ class Defaults:
         raise AttributeError(
             "You can't assign a new value to protect_content after initialization."
         )
-
-    def __hash__(self) -> int:
-        return hash(
-            (
-                self._parse_mode,
-                self._disable_notification,
-                self._disable_web_page_preview,
-                self._allow_sending_without_reply,
-                self._quote,
-                self._tzinfo,
-                self._block,
-                self._protect_content,
-            )
-        )
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, Defaults):
-            return all(getattr(self, attr) == getattr(other, attr) for attr in self.__slots__)
-        return False
-
-    def __ne__(self, other: object) -> bool:
-        return not self == other

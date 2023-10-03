@@ -63,17 +63,14 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
     InputMedia,
-    InputSticker,
     Location,
     MaskPosition,
     MenuButton,
     Message,
     MessageId,
-    PassportElementError,
     PhotoSize,
     Poll,
     SentWebAppMessage,
-    ShippingOption,
     Sticker,
     StickerSet,
     Update,
@@ -88,6 +85,7 @@ from telegram import (
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import (
     CorrectOptionID,
     DVInput,
@@ -108,8 +106,11 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputSticker,
         LabeledPrice,
         MessageEntity,
+        PassportElementError,
+        ShippingOption,
     )
     from telegram.ext import BaseRateLimiter, Defaults
 
@@ -245,6 +246,17 @@ class ExtBot(Bot, Generic[RLARGS]):
                 maxsize = 1024
 
             self._callback_data_cache = CallbackDataCache(bot=self, maxsize=maxsize)
+
+    def __repr__(self) -> str:
+        """Give a string representation of the bot in the form ``ExtBot[token=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, token=self.token)
 
     @classmethod
     def _warn(
@@ -645,7 +657,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         message_id: int,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -733,9 +745,9 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def add_sticker_to_set(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         name: str,
-        sticker: Optional[InputSticker],
+        sticker: Optional["InputSticker"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -845,7 +857,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         shipping_query_id: str,
         ok: bool,
-        shipping_options: Optional[Sequence[ShippingOption]] = None,
+        shipping_options: Optional[Sequence["ShippingOption"]] = None,
         error_message: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -914,7 +926,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def ban_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         until_date: Optional[Union[int, datetime]] = None,
         revoke_messages: Optional[bool] = None,
         *,
@@ -1047,10 +1059,10 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def create_new_sticker_set(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         name: str,
         title: str,
-        stickers: Optional[Sequence[InputSticker]],
+        stickers: Optional[Sequence["InputSticker"]],
         sticker_format: Optional[str],
         sticker_type: Optional[str] = None,
         needs_repainting: Optional[bool] = None,
@@ -1329,7 +1341,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         caption: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
@@ -1362,7 +1374,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         inline_message_id: Optional[str] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
@@ -1399,7 +1411,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         chat_id: Optional[Union[str, int]] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1455,7 +1467,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         inline_message_id: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1554,7 +1566,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def get_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1655,8 +1667,8 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_game_high_scores(
         self,
-        user_id: Union[int, str],
-        chat_id: Optional[Union[str, int]] = None,
+        user_id: int,
+        chat_id: Optional[int] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         *,
@@ -1781,7 +1793,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def get_user_profile_photos(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         offset: Optional[int] = None,
         limit: Optional[int] = None,
         *,
@@ -2032,7 +2044,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def promote_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         can_change_info: Optional[bool] = None,
         can_post_messages: Optional[bool] = None,
         can_edit_messages: Optional[bool] = None,
@@ -2100,7 +2112,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def restrict_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         permissions: ChatPermissions,
         until_date: Optional[Union[int, datetime]] = None,
         use_independent_chat_permissions: Optional[bool] = None,
@@ -2397,11 +2409,11 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def send_game(
         self,
-        chat_id: Union[int, str],
+        chat_id: int,
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -2450,7 +2462,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         is_flexible: Optional[bool] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         provider_data: Optional[Union[str, object]] = None,
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
@@ -2958,7 +2970,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_chat_administrator_custom_title(
         self,
         chat_id: Union[int, str],
-        user_id: Union[int, str],
+        user_id: int,
         custom_title: str,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3115,9 +3127,9 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_game_score(
         self,
-        user_id: Union[int, str],
+        user_id: int,
         score: int,
-        chat_id: Optional[Union[str, int]] = None,
+        chat_id: Optional[int] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         force: Optional[bool] = None,
@@ -3193,8 +3205,8 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def set_passport_data_errors(
         self,
-        user_id: Union[str, int],
-        errors: Sequence[PassportElementError],
+        user_id: int,
+        errors: Sequence["PassportElementError"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3238,7 +3250,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def set_sticker_set_thumbnail(
         self,
         name: str,
-        user_id: Union[str, int],
+        user_id: int,
         thumbnail: Optional[FileInput] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3296,7 +3308,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         chat_id: Optional[Union[str, int]] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3320,7 +3332,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     async def unban_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         only_if_banned: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3449,7 +3461,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def upload_sticker_file(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         sticker: Optional[FileInput],
         sticker_format: Optional[str],
         *,
