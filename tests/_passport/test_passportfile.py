@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import Bot, File, PassportElementError, PassportFile
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -87,6 +88,16 @@ class TestPassportFileWithoutRequest(TestPassportFileBase):
 
         assert a != e
         assert hash(a) != hash(e)
+
+    def test_file_date_deprecated(self, passport_file, recwarn):
+        passport_file.file_date
+        assert len(recwarn) == 1
+        assert (
+            "The attribute `file_date` will return a datetime instead of an integer in future"
+            " major versions." in str(recwarn[0].message)
+        )
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert recwarn[0].filename == __file__
 
     async def test_get_file_instance_method(self, monkeypatch, passport_file):
         async def make_assertion(*_, **kwargs):

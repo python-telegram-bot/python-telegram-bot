@@ -136,8 +136,10 @@ BASE_GAME_SCORE = 60  # Base game score for game tests
 
 xfail = pytest.mark.xfail(
     bool(GITHUB_ACTION),  # This condition is only relevant for github actions game tests.
-    reason="Can fail due to race conditions when multiple test suites "
-    "with the same bot token are run at the same time",
+    reason=(
+        "Can fail due to race conditions when multiple test suites "
+        "with the same bot token are run at the same time"
+    ),
 )
 
 
@@ -217,6 +219,10 @@ class TestBotWithoutRequest:
     async def test_no_token_passed(self):
         with pytest.raises(InvalidToken, match="You must pass the token"):
             Bot("")
+
+    async def test_repr(self):
+        bot = Bot(token="some_token", base_file_url="")
+        assert repr(bot) == "Bot[token=some_token]"
 
     async def test_to_dict(self, bot):
         to_dict_bot = bot.to_dict()
@@ -680,8 +686,10 @@ class TestBotWithoutRequest:
                         "title": "test_result",
                         "id": "123",
                         "type": "document",
-                        "document_url": "https://raw.githubusercontent.com/python-telegram-bot"
-                        "/logos/master/logo/png/ptb-logo_240.png",
+                        "document_url": (
+                            "https://raw.githubusercontent.com/python-telegram-bot"
+                            "/logos/master/logo/png/ptb-logo_240.png"
+                        ),
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
                         "input_message_content": {"message_text": "imc"},
@@ -709,8 +717,10 @@ class TestBotWithoutRequest:
             InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
-                document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
-                "logo/png/ptb-logo_240.png",
+                document_url=(
+                    "https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
+                    "logo/png/ptb-logo_240.png"
+                ),
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
@@ -783,9 +793,11 @@ class TestBotWithoutRequest:
                         "title": "test_result",
                         "id": "123",
                         "type": "document",
-                        "document_url": "https://raw.githubusercontent.com/"
-                        "python-telegram-bot/logos/master/logo/png/"
-                        "ptb-logo_240.png",
+                        "document_url": (
+                            "https://raw.githubusercontent.com/"
+                            "python-telegram-bot/logos/master/logo/png/"
+                            "ptb-logo_240.png"
+                        ),
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
                         "input_message_content": {"message_text": "imc"},
@@ -802,8 +814,10 @@ class TestBotWithoutRequest:
             InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
-                document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
-                "logo/png/ptb-logo_240.png",
+                document_url=(
+                    "https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
+                    "logo/png/ptb-logo_240.png"
+                ),
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
@@ -867,9 +881,11 @@ class TestBotWithoutRequest:
                         "title": "test_result",
                         "id": "123",
                         "type": "document",
-                        "document_url": "https://raw.githubusercontent.com/"
-                        "python-telegram-bot/logos/master/logo/png/"
-                        "ptb-logo_240.png",
+                        "document_url": (
+                            "https://raw.githubusercontent.com/"
+                            "python-telegram-bot/logos/master/logo/png/"
+                            "ptb-logo_240.png"
+                        ),
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
                         "parse_mode": "Markdown",
@@ -891,8 +907,10 @@ class TestBotWithoutRequest:
             InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
-                document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
-                "logo/png/ptb-logo_240.png",
+                document_url=(
+                    "https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
+                    "logo/png/ptb-logo_240.png"
+                ),
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
@@ -1394,9 +1412,11 @@ class TestBotWithoutRequest:
                     data.get("caption") == caption,
                     data["parse_mode"] == ParseMode.HTML,
                     data["reply_to_message_id"] == media_message.message_id,
-                    data["reply_markup"] == keyboard.to_json()
-                    if json_keyboard
-                    else keyboard.to_dict(),
+                    (
+                        data["reply_markup"] == keyboard.to_json()
+                        if json_keyboard
+                        else keyboard.to_dict()
+                    ),
                     data["disable_notification"] is True,
                     data["caption_entities"]
                     == [MessageEntity(MessageEntity.BOLD, 0, 4).to_dict()],
@@ -2240,7 +2260,7 @@ class TestBotWithRequest:
             await bot.send_chat_action(chat_id, "unknown action")
 
     async def test_answer_inline_query_current_offset_error(self, bot, inline_results):
-        with pytest.raises(ValueError, match=("`current_offset` and `next_offset`")):
+        with pytest.raises(ValueError, match="`current_offset` and `next_offset`"):
             await bot.answer_inline_query(
                 1234, results=inline_results, next_offset=42, current_offset=51
             )
@@ -2509,8 +2529,9 @@ class TestBotWithRequest:
         message = await bot.send_game(chat_id, game_short_name, protect_content=True)
 
         assert message.game
-        assert message.game.description == (
-            "A no-op test game, for python-telegram-bot bot framework testing."
+        assert (
+            message.game.description
+            == "A no-op test game, for python-telegram-bot bot framework testing."
         )
         assert message.game.animation.file_id
         # We added some test bots later and for some reason the file size is not the same for them
@@ -2678,6 +2699,9 @@ class TestBotWithRequest:
                 can_manage_chat=True,
                 can_manage_video_chats=True,
                 can_manage_topics=True,
+                can_post_stories=True,
+                can_edit_stories=True,
+                can_delete_stories=True,
             )
 
         # Test that we pass the correct params to TG
@@ -2698,6 +2722,9 @@ class TestBotWithRequest:
                 and data.get("can_manage_chat") == 10
                 and data.get("can_manage_video_chats") == 11
                 and data.get("can_manage_topics") == 12
+                and data.get("can_post_stories") == 13
+                and data.get("can_edit_stories") == 14
+                and data.get("can_delete_stories") == 15
             )
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -2716,6 +2743,9 @@ class TestBotWithRequest:
             can_manage_chat=10,
             can_manage_video_chats=11,
             can_manage_topics=12,
+            can_post_stories=13,
+            can_edit_stories=14,
+            can_delete_stories=15,
         )
 
     async def test_export_chat_invite_link(self, bot, channel_id):

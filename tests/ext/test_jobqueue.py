@@ -85,6 +85,21 @@ class TestJobQueue:
         " We recommend double checking if the passed value is correct."
     )
 
+    async def test_repr(self, app):
+        jq = JobQueue()
+        jq.set_application(app)
+        assert repr(jq) == f"JobQueue[application={app!r}]"
+
+        when = dtm.datetime.utcnow() + dtm.timedelta(days=1)
+        callback = self.job_run_once
+        job = jq.run_once(callback, when, name="name2")
+        assert repr(job) == (
+            f"Job[id={job.job.id}, name={job.name}, callback=job_run_once, "
+            f"trigger=date["
+            f"{when.strftime('%Y-%m-%d %H:%M:%S UTC')}"
+            f"]]"
+        )
+
     @pytest.fixture(autouse=True)
     def _reset(self):
         self.result = 0

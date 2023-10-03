@@ -69,7 +69,6 @@ from telegram._files.contact import Contact
 from telegram._files.document import Document
 from telegram._files.file import File
 from telegram._files.inputmedia import InputMedia
-from telegram._files.inputsticker import InputSticker
 from telegram._files.location import Location
 from telegram._files.photosize import PhotoSize
 from telegram._files.sticker import MaskPosition, Sticker, StickerSet
@@ -79,13 +78,10 @@ from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
-from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
-from telegram._passport.passportelementerrors import PassportElementError
-from telegram._payment.shippingoption import ShippingOption
 from telegram._poll import Poll
 from telegram._sentwebappmessage import SentWebAppMessage
 from telegram._telegramobject import TelegramObject
@@ -96,6 +92,7 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import (
     CorrectOptionID,
     DVInput,
@@ -115,14 +112,18 @@ from telegram.warnings import PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
+        InlineKeyboardMarkup,
         InlineQueryResult,
         InputFile,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputSticker,
         LabeledPrice,
         MessageEntity,
+        PassportElementError,
+        ShippingOption,
     )
 
 BT = TypeVar("BT", bound="Bot")
@@ -290,8 +291,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         if warning_string:
             self._warn(
                 f"You set the HTTP version for the {warning_string} HTTPXRequest instance to "
-                f"HTTP/2. The self hosted bot api instances only support HTTP/1.1. You should "
-                f"either run a HTTP proxy in front of it which supports HTTP/2 or use HTTP/1.1.",
+                "HTTP/2. The self hosted bot api instances only support HTTP/1.1. You should "
+                "either run a HTTP proxy in front of it which supports HTTP/2 or use HTTP/1.1.",
                 PTBUserWarning,
                 stacklevel=2,
             )
@@ -307,6 +308,65 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             )
 
         self._freeze()
+
+    async def __aenter__(self: BT) -> BT:
+        try:
+            await self.initialize()
+            return self
+        except Exception as exc:
+            await self.shutdown()
+            raise exc
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        # Make sure not to return `True` so that exceptions are not suppressed
+        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
+        await self.shutdown()
+
+    def __reduce__(self) -> NoReturn:
+        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
+        be pickled and this method will always raise an exception.
+
+        .. versionadded:: 20.0
+
+        Raises:
+            :exc:`pickle.PicklingError`
+        """
+        raise pickle.PicklingError("Bot objects cannot be pickled!")
+
+    def __deepcopy__(self, memodict: Dict[int, object]) -> NoReturn:
+        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
+        be deepcopied and this method will always raise an exception.
+
+        .. versionadded:: 20.0
+
+        Raises:
+            :exc:`TypeError`
+        """
+        raise TypeError("Bot objects cannot be deepcopied!")
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, self.__class__):
+            return self.bot == other.bot
+        return False
+
+    def __hash__(self) -> int:
+        return hash((self.__class__, self.bot))
+
+    def __repr__(self) -> str:
+        """Give a string representation of the bot in the form ``Bot[token=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, token=self.token)
 
     @property
     def token(self) -> str:
@@ -353,6 +413,93 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         return self._private_key
 
+    @property
+    def request(self) -> BaseRequest:
+        """The :class:`~telegram.request.BaseRequest` object used by this bot.
+
+        Warning:
+            Requests to the Bot API are made by the various methods of this class. This attribute
+            should *not* be used manually.
+        """
+        return self._request[1]
+
+    @property
+    def bot(self) -> User:
+        """:class:`telegram.User`: User instance for the bot as returned by :meth:`get_me`.
+
+        Warning:
+            This value is the cached return value of :meth:`get_me`. If the bots profile is
+            changed during runtime, this value won't reflect the changes until :meth:`get_me` is
+            called again.
+
+        .. seealso:: :meth:`initialize`
+        """
+        if self._bot_user is None:
+            raise RuntimeError(
+                f"{self.__class__.__name__} is not properly initialized. Call "
+                f"`{self.__class__.__name__}.initialize` before accessing this property."
+            )
+        return self._bot_user
+
+    @property
+    def id(self) -> int:
+        """:obj:`int`: Unique identifier for this bot. Shortcut for the corresponding attribute of
+        :attr:`bot`.
+        """
+        return self.bot.id
+
+    @property
+    def first_name(self) -> str:
+        """:obj:`str`: Bot's first name. Shortcut for the corresponding attribute of
+        :attr:`bot`.
+        """
+        return self.bot.first_name
+
+    @property
+    def last_name(self) -> str:
+        """:obj:`str`: Optional. Bot's last name. Shortcut for the corresponding attribute of
+        :attr:`bot`.
+        """
+        return self.bot.last_name  # type: ignore
+
+    @property
+    def username(self) -> str:
+        """:obj:`str`: Bot's username. Shortcut for the corresponding attribute of
+        :attr:`bot`.
+        """
+        return self.bot.username  # type: ignore
+
+    @property
+    def link(self) -> str:
+        """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
+        return f"https://t.me/{self.username}"
+
+    @property
+    def can_join_groups(self) -> bool:
+        """:obj:`bool`: Bot's :attr:`telegram.User.can_join_groups` attribute. Shortcut for the
+        corresponding attribute of :attr:`bot`.
+        """
+        return self.bot.can_join_groups  # type: ignore
+
+    @property
+    def can_read_all_group_messages(self) -> bool:
+        """:obj:`bool`: Bot's :attr:`telegram.User.can_read_all_group_messages` attribute.
+        Shortcut for the corresponding attribute of :attr:`bot`.
+        """
+        return self.bot.can_read_all_group_messages  # type: ignore
+
+    @property
+    def supports_inline_queries(self) -> bool:
+        """:obj:`bool`: Bot's :attr:`telegram.User.supports_inline_queries` attribute.
+        Shortcut for the corresponding attribute of :attr:`bot`.
+        """
+        return self.bot.supports_inline_queries  # type: ignore
+
+    @property
+    def name(self) -> str:
+        """:obj:`str`: Bot's @username. Shortcut for the corresponding attribute of :attr:`bot`."""
+        return f"@{self.username}"
+
     @classmethod
     def _warn(
         cls, message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0
@@ -361,28 +508,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         for ExtBot to add 1 level to all warning calls.
         """
         warn(message=message, category=category, stacklevel=stacklevel + 1)
-
-    def __reduce__(self) -> NoReturn:
-        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
-        be pickled and this method will always raise an exception.
-
-        .. versionadded:: 20.0
-
-        Raises:
-            :exc:`pickle.PicklingError`
-        """
-        raise pickle.PicklingError("Bot objects cannot be pickled!")
-
-    def __deepcopy__(self, memodict: Dict[int, object]) -> NoReturn:
-        """Customizes how :func:`copy.deepcopy` processes objects of this type. Bots can not
-        be deepcopied and this method will always raise an exception.
-
-        .. versionadded:: 20.0
-
-        Raises:
-            :exc:`TypeError`
-        """
-        raise TypeError("Bot objects cannot be deepcopied!")
 
     # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
     # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
@@ -620,111 +745,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())
         self._initialized = False
-
-    async def __aenter__(self: BT) -> BT:
-        try:
-            await self.initialize()
-            return self
-        except Exception as exc:
-            await self.shutdown()
-            raise exc
-
-    async def __aexit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ) -> None:
-        # Make sure not to return `True` so that exceptions are not suppressed
-        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
-        await self.shutdown()
-
-    @property
-    def request(self) -> BaseRequest:
-        """The :class:`~telegram.request.BaseRequest` object used by this bot.
-
-        Warning:
-            Requests to the Bot API are made by the various methods of this class. This attribute
-            should *not* be used manually.
-        """
-        return self._request[1]
-
-    @property
-    def bot(self) -> User:
-        """:class:`telegram.User`: User instance for the bot as returned by :meth:`get_me`.
-
-        Warning:
-            This value is the cached return value of :meth:`get_me`. If the bots profile is
-            changed during runtime, this value won't reflect the changes until :meth:`get_me` is
-            called again.
-
-        .. seealso:: :meth:`initialize`
-        """
-        if self._bot_user is None:
-            raise RuntimeError(
-                f"{self.__class__.__name__} is not properly initialized. Call "
-                f"`{self.__class__.__name__}.initialize` before accessing this property."
-            )
-        return self._bot_user
-
-    @property
-    def id(self) -> int:  # pylint: disable=invalid-name
-        """:obj:`int`: Unique identifier for this bot. Shortcut for the corresponding attribute of
-        :attr:`bot`.
-        """
-        return self.bot.id
-
-    @property
-    def first_name(self) -> str:
-        """:obj:`str`: Bot's first name. Shortcut for the corresponding attribute of
-        :attr:`bot`.
-        """
-        return self.bot.first_name
-
-    @property
-    def last_name(self) -> str:
-        """:obj:`str`: Optional. Bot's last name. Shortcut for the corresponding attribute of
-        :attr:`bot`.
-        """
-        return self.bot.last_name  # type: ignore
-
-    @property
-    def username(self) -> str:
-        """:obj:`str`: Bot's username. Shortcut for the corresponding attribute of
-        :attr:`bot`.
-        """
-        return self.bot.username  # type: ignore
-
-    @property
-    def link(self) -> str:
-        """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
-        return f"https://t.me/{self.username}"
-
-    @property
-    def can_join_groups(self) -> bool:
-        """:obj:`bool`: Bot's :attr:`telegram.User.can_join_groups` attribute. Shortcut for the
-        corresponding attribute of :attr:`bot`.
-        """
-        return self.bot.can_join_groups  # type: ignore
-
-    @property
-    def can_read_all_group_messages(self) -> bool:
-        """:obj:`bool`: Bot's :attr:`telegram.User.can_read_all_group_messages` attribute.
-        Shortcut for the corresponding attribute of :attr:`bot`.
-        """
-        return self.bot.can_read_all_group_messages  # type: ignore
-
-    @property
-    def supports_inline_queries(self) -> bool:
-        """:obj:`bool`: Bot's :attr:`telegram.User.supports_inline_queries` attribute.
-        Shortcut for the corresponding attribute of :attr:`bot`.
-        """
-        return self.bot.supports_inline_queries  # type: ignore
-
-    @property
-    def name(self) -> str:
-        """:obj:`str`: Bot's @username. Shortcut for the corresponding attribute of :attr:`bot`."""
-        return f"@{self.username}"
 
     @_log
     async def get_me(
@@ -2154,7 +2174,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         inline_message_id: Optional[str] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
@@ -2247,7 +2267,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         chat_id: Optional[Union[str, int]] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2521,11 +2541,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     @_log
     async def send_game(
         self,
-        chat_id: Union[int, str],
+        chat_id: int,
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -2539,7 +2559,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """Use this method to send a game.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat.
+            chat_id (:obj:`int`): Unique identifier for the target chat.
             game_short_name (:obj:`str`): Short name of the game, serves as the unique identifier
                 for the game. Set up your games via `@BotFather <https://t.me/BotFather>`_.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -2826,7 +2846,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     @_log
     async def get_user_profile_photos(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         offset: Optional[int] = None,
         limit: Optional[int] = None,
         *,
@@ -2938,7 +2958,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def ban_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         until_date: Optional[Union[int, datetime]] = None,
         revoke_messages: Optional[bool] = None,
         *,
@@ -3046,7 +3066,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def unban_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         only_if_banned: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3203,7 +3223,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         inline_message_id: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3279,7 +3299,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         caption: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
@@ -3349,7 +3369,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         chat_id: Optional[Union[str, int]] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3876,7 +3896,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def get_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4011,9 +4031,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     @_log
     async def set_game_score(
         self,
-        user_id: Union[int, str],
+        user_id: int,
         score: int,
-        chat_id: Optional[Union[str, int]] = None,
+        chat_id: Optional[int] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         force: Optional[bool] = None,
@@ -4037,7 +4057,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 decrease. This can be useful when fixing mistakes or banning cheaters.
             disable_edit_message (:obj:`bool`, optional): Pass :obj:`True`, if the game message
                 should not be automatically edited to include the current scoreboard.
-            chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
+            chat_id (:obj:`int`, optional): Required if :paramref:`inline_message_id`
                 is not specified. Unique identifier for the target chat.
             message_id (:obj:`int`, optional): Required if :paramref:`inline_message_id` is not
                 specified. Identifier of the sent message.
@@ -4076,8 +4096,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     @_log
     async def get_game_high_scores(
         self,
-        user_id: Union[int, str],
-        chat_id: Optional[Union[str, int]] = None,
+        user_id: int,
+        chat_id: Optional[int] = None,
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         *,
@@ -4101,7 +4121,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             user_id (:obj:`int`): Target user id.
-            chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
+            chat_id (:obj:`int`, optional): Required if :paramref:`inline_message_id`
                 is not specified. Unique identifier for the target chat.
             message_id (:obj:`int`, optional): Required if :paramref:`inline_message_id` is not
                 specified. Identifier of the sent message.
@@ -4156,7 +4176,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         is_flexible: Optional[bool] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         provider_data: Optional[Union[str, object]] = None,
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
@@ -4317,11 +4337,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
 
     @_log
-    async def answer_shipping_query(  # pylint: disable=invalid-name
+    async def answer_shipping_query(
         self,
         shipping_query_id: str,
         ok: bool,
-        shipping_options: Optional[Sequence[ShippingOption]] = None,
+        shipping_options: Optional[Sequence["ShippingOption"]] = None,
         error_message: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4376,7 +4396,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
 
     @_log
-    async def answer_pre_checkout_query(  # pylint: disable=invalid-name
+    async def answer_pre_checkout_query(
         self,
         pre_checkout_query_id: str,
         ok: bool,
@@ -4483,7 +4503,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def restrict_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         permissions: ChatPermissions,
         until_date: Optional[Union[int, datetime]] = None,
         use_independent_chat_permissions: Optional[bool] = None,
@@ -4557,7 +4577,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def promote_chat_member(
         self,
         chat_id: Union[str, int],
-        user_id: Union[str, int],
+        user_id: int,
         can_change_info: Optional[bool] = None,
         can_post_messages: Optional[bool] = None,
         can_edit_messages: Optional[bool] = None,
@@ -4570,6 +4590,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         can_manage_chat: Optional[bool] = None,
         can_manage_video_chats: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
+        can_post_stories: Optional[bool] = None,
+        can_edit_stories: Optional[bool] = None,
+        can_delete_stories: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4625,6 +4648,18 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 allowed to create, rename, close, and reopen forum topics; supergroups only.
 
                 .. versionadded:: 20.0
+            can_post_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                post stories in the channel; channels only.
+
+                .. versionadded:: NEXT.VERSION
+            can_edit_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                edit stories posted by other users; channels only.
+
+                .. versionadded:: NEXT.VERSION
+            can_delete_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                delete stories posted by other users; channels only.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4648,6 +4683,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "can_manage_chat": can_manage_chat,
             "can_manage_video_chats": can_manage_video_chats,
             "can_manage_topics": can_manage_topics,
+            "can_post_stories": can_post_stories,
+            "can_edit_stories": can_edit_stories,
+            "can_delete_stories": can_delete_stories,
         }
 
         return await self._post(
@@ -4723,7 +4761,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     async def set_chat_administrator_custom_title(
         self,
         chat_id: Union[int, str],
-        user_id: Union[int, str],
+        user_id: int,
         custom_title: str,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5478,7 +5516,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     @_log
     async def upload_sticker_file(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         sticker: Optional[FileInput],
         sticker_format: Optional[str],
         *,
@@ -5538,9 +5576,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     @_log
     async def add_sticker_to_set(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         name: str,
-        sticker: Optional[InputSticker],
+        sticker: Optional["InputSticker"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -5636,10 +5674,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     @_log
     async def create_new_sticker_set(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         name: str,
         title: str,
-        stickers: Optional[Sequence[InputSticker]],
+        stickers: Optional[Sequence["InputSticker"]],
         sticker_format: Optional[str],
         sticker_type: Optional[str] = None,
         needs_repainting: Optional[bool] = None,
@@ -5807,7 +5845,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def set_sticker_set_thumbnail(
         self,
         name: str,
-        user_id: Union[str, int],
+        user_id: int,
         thumbnail: Optional[FileInput] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6079,8 +6117,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     @_log
     async def set_passport_data_errors(
         self,
-        user_id: Union[str, int],
-        errors: Sequence[PassportElementError],
+        user_id: int,
+        errors: Sequence["PassportElementError"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6262,7 +6300,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[int, str],
         message_id: int,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7842,14 +7880,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             data["last_name"] = self.last_name
 
         return data
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
-            return self.bot == other.bot
-        return False
-
-    def __hash__(self) -> int:
-        return hash((self.__class__, self.bot))
 
     # camelCase aliases
     getMe = get_me

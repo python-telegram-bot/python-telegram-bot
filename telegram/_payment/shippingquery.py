@@ -21,7 +21,6 @@
 from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._payment.shippingaddress import ShippingAddress
-from telegram._payment.shippingoption import ShippingOption
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -29,6 +28,7 @@ from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot
+    from telegram._payment.shippingoption import ShippingOption
 
 
 class ShippingQuery(TelegramObject):
@@ -67,7 +67,7 @@ class ShippingQuery(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id  # pylint: disable=invalid-name
+        self.id: str = id
         self.from_user: User = from_user
         self.invoice_payload: str = invoice_payload
         self.shipping_address: ShippingAddress = shipping_address
@@ -89,10 +89,10 @@ class ShippingQuery(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    async def answer(  # pylint: disable=invalid-name
+    async def answer(
         self,
         ok: bool,
-        shipping_options: Optional[Sequence[ShippingOption]] = None,
+        shipping_options: Optional[Sequence["ShippingOption"]] = None,
         error_message: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

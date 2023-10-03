@@ -54,6 +54,7 @@ from typing import (
 from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
@@ -80,7 +81,6 @@ _AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-n
 _STOP_SIGNAL = object()
 _DEFAULT_0 = DefaultValue(0)
 
-
 # Since python 3.12, the coroutine passed to create_task should not be an (async) generator. Remove
 # this check when we drop support for python 3.11.
 if sys.version_info >= (3, 12):
@@ -89,7 +89,6 @@ else:
     _CoroType = Union[Generator["asyncio.Future[object]", None, RT], Awaitable[RT]]
 
 _ErrorCoroType = Optional[_CoroType[RT]]
-
 
 _LOGGER = get_logger(__name__)
 
@@ -345,11 +344,36 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__update_persistence_lock = asyncio.Lock()
         self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
 
-    def _check_initialized(self) -> None:
-        if not self._initialized:
-            raise RuntimeError(
-                "This Application was not initialized via `Application.initialize`!"
-            )
+    async def __aenter__(self: _AppType) -> _AppType:  # noqa: PYI019
+        """Simple context manager which initializes the App."""
+        try:
+            await self.initialize()
+            return self
+        except Exception as exc:
+            await self.shutdown()
+            raise exc
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        """Shutdown the App from the context manager."""
+        # Make sure not to return `True` so that exceptions are not suppressed
+        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
+        await self.shutdown()
+
+    def __repr__(self) -> str:
+        """Give a string representation of the application in the form ``Application[bot=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, bot=self.bot)
 
     @property
     def running(self) -> bool:
@@ -399,6 +423,27 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         .. versionadded:: 20.4
         """
         return self._update_processor
+
+    @staticmethod
+    def _raise_system_exit() -> NoReturn:
+        raise SystemExit
+
+    @staticmethod
+    def builder() -> "InitApplicationBuilder":
+        """Convenience method. Returns a new :class:`telegram.ext.ApplicationBuilder`.
+
+        .. versionadded:: 20.0
+        """
+        # Unfortunately this needs to be here due to cyclical imports
+        from telegram.ext import ApplicationBuilder  # pylint: disable=import-outside-toplevel
+
+        return ApplicationBuilder()
+
+    def _check_initialized(self) -> None:
+        if not self._initialized:
+            raise RuntimeError(
+                "This Application was not initialized via `Application.initialize`!"
+            )
 
     async def initialize(self) -> None:
         """Initializes the Application by initializing:
@@ -486,26 +531,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         self._initialized = False
 
-    async def __aenter__(self: _AppType) -> _AppType:
-        """Simple context manager which initializes the App."""
-        try:
-            await self.initialize()
-            return self
-        except Exception as exc:
-            await self.shutdown()
-            raise exc
-
-    async def __aexit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ) -> None:
-        """Shutdown the App from the context manager."""
-        # Make sure not to return `True` so that exceptions are not suppressed
-        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
-        await self.shutdown()
-
     async def _initialize_persistence(self) -> None:
         """This method basically just loads all the data by awaiting the BP methods"""
         if not self.persistence:
@@ -534,17 +559,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 self.bot.callback_data_cache.load_persistence_data(  # type: ignore[attr-defined]
                     persistent_data
                 )
-
-    @staticmethod
-    def builder() -> "InitApplicationBuilder":
-        """Convenience method. Returns a new :class:`telegram.ext.ApplicationBuilder`.
-
-        .. versionadded:: 20.0
-        """
-        # Unfortunately this needs to be here due to cyclical imports
-        from telegram.ext import ApplicationBuilder  # pylint: disable=import-outside-toplevel
-
-        return ApplicationBuilder()
 
     async def start(self) -> None:
         """Starts
@@ -912,10 +926,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             stop_signals=stop_signals,
         )
 
-    @staticmethod
-    def _raise_system_exit() -> NoReturn:
-        raise SystemExit
-
     def __run(
         self,
         updater_coroutine: Coroutine,
@@ -938,7 +948,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             warn(
                 f"Could not add signal handlers for the stop signals {stop_signals} due to "
                 f"exception `{exc!r}`. If your event loop does not implement `add_signal_handler`,"
-                f" please pass `stop_signals=None`.",
+                " please pass `stop_signals=None`.",
                 stacklevel=3,
             )
 
@@ -1070,8 +1080,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(
-                    "ApplicationHandlerStop is not supported with handlers "
-                    "running non-blocking.",
+                    "ApplicationHandlerStop is not supported with handlers running non-blocking.",
                     stacklevel=1,
                 )
 
@@ -1176,8 +1185,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                             self.create_task(
                                 coroutine,
                                 update=update,
-                                name=f"Application:{self.bot.id}:process_update_non_blocking"
-                                f":{handler}",
+                                name=(
+                                    f"Application:{self.bot.id}:process_update_non_blocking"
+                                    f":{handler}"
+                                ),
                             )
                         else:
                             any_blocking = True
@@ -1246,7 +1257,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             if not self.persistence:
                 raise ValueError(
                     f"ConversationHandler {handler.name} "
-                    f"can not be persistent if application has no persistence"
+                    "can not be persistent if application has no persistence"
                 )
             if self._initialized:
                 self.create_task(

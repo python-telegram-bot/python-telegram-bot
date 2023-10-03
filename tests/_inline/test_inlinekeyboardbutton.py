@@ -36,12 +36,16 @@ def inline_keyboard_button():
         url=TestInlineKeyboardButtonBase.url,
         callback_data=TestInlineKeyboardButtonBase.callback_data,
         switch_inline_query=TestInlineKeyboardButtonBase.switch_inline_query,
-        switch_inline_query_current_chat=TestInlineKeyboardButtonBase.switch_inline_query_current_chat,  # noqa: E501
+        switch_inline_query_current_chat=(
+            TestInlineKeyboardButtonBase.switch_inline_query_current_chat
+        ),
         callback_game=TestInlineKeyboardButtonBase.callback_game,
         pay=TestInlineKeyboardButtonBase.pay,
         login_url=TestInlineKeyboardButtonBase.login_url,
         web_app=TestInlineKeyboardButtonBase.web_app,
-        switch_inline_query_chosen_chat=TestInlineKeyboardButtonBase.switch_inline_query_chosen_chat,  # noqa: E501
+        switch_inline_query_chosen_chat=(
+            TestInlineKeyboardButtonBase.switch_inline_query_chosen_chat
+        ),
     )
 
 

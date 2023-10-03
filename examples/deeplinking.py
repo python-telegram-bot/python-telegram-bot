@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument, import-error
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """Bot that explains Telegram's "Deep Linking Parameters" functionality.
@@ -57,8 +57,7 @@ async def deep_linked_level_1(update: Update, context: ContextTypes.DEFAULT_TYPE
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, SO_COOL)
     text = (
-        "Awesome, you just accessed hidden functionality! "
-        "Now let's get back to the private chat."
+        "Awesome, you just accessed hidden functionality! Now let's get back to the private chat."
     )
     keyboard = InlineKeyboardMarkup.from_button(
         InlineKeyboardButton(text="Continue here!", url=url)

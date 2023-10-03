@@ -374,7 +374,7 @@ class Chat(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.id: int = id  # pylint: disable=invalid-name
+        self.id: int = id
         self.type: str = enum.get_member(constants.ChatType, type, type)
         # Optionals
         self.title: Optional[str] = title
@@ -677,7 +677,7 @@ class Chat(TelegramObject):
 
     async def get_member(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -707,7 +707,7 @@ class Chat(TelegramObject):
 
     async def ban_member(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         revoke_messages: Optional[bool] = None,
         until_date: Optional[Union[int, datetime]] = None,
         *,
@@ -877,7 +877,7 @@ class Chat(TelegramObject):
 
     async def unban_member(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         only_if_banned: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -909,7 +909,7 @@ class Chat(TelegramObject):
 
     async def promote_member(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         can_change_info: Optional[bool] = None,
         can_post_messages: Optional[bool] = None,
         can_edit_messages: Optional[bool] = None,
@@ -922,6 +922,9 @@ class Chat(TelegramObject):
         can_manage_chat: Optional[bool] = None,
         can_manage_video_chats: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
+        can_post_stories: Optional[bool] = None,
+        can_edit_stories: Optional[bool] = None,
+        can_delete_stories: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -941,6 +944,9 @@ class Chat(TelegramObject):
            The argument ``can_manage_voice_chats`` was renamed to
            :paramref:`~telegram.Bot.promote_chat_member.can_manage_video_chats` in accordance to
            Bot API 6.0.
+        .. versionchanged:: NEXT.VERSION
+           The arguments `can_post_stories`, `can_edit_stories` and `can_delete_stories` were
+           added.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -966,11 +972,14 @@ class Chat(TelegramObject):
             can_manage_chat=can_manage_chat,
             can_manage_video_chats=can_manage_video_chats,
             can_manage_topics=can_manage_topics,
+            can_post_stories=can_post_stories,
+            can_edit_stories=can_edit_stories,
+            can_delete_stories=can_delete_stories,
         )
 
     async def restrict_member(
         self,
-        user_id: Union[str, int],
+        user_id: int,
         permissions: ChatPermissions,
         until_date: Optional[Union[int, datetime]] = None,
         use_independent_chat_permissions: Optional[bool] = None,

@@ -72,7 +72,7 @@ complete and correct. To run it, export an environment variable first:
 
     $ export TEST_OFFICIAL=true
 
-and then run ``pytest tests/test_official.py``.
+and then run ``pytest tests/test_official.py``. Note: You need py 3.10+ to run this test.
 
 We also have another marker, ``@pytest.mark.dev``, which you can add to tests that you want to run selectively.
 Use as follows:

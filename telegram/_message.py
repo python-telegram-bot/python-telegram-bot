@@ -330,7 +330,10 @@ class Message(TelegramObject):
 
             .. versionadded:: 20.0
         write_access_allowed (:class:`telegram.WriteAccessAllowed`, optional): Service message:
-            the user allowed the bot added to the attachment menu to write messages.
+            the user allowed the bot to write messages after adding it to the attachment or side
+            menu, launching a Web App from a link, or accepting an explicit request from a Web App
+            sent by the method
+            `requestWriteAccess <https://core.telegram.org/bots/webapps#initializing-mini-apps>`_.
 
             .. versionadded:: 20.0
         has_media_spoiler (:obj:`bool`, optional): :obj:`True`, if the message media is covered
@@ -854,7 +857,7 @@ class Message(TelegramObject):
         return self.chat.id
 
     @property
-    def id(self) -> int:  # pylint: disable=invalid-name
+    def id(self) -> int:
         """
         :obj:`int`: Shortcut for :attr:`message_id`.
 
@@ -2504,7 +2507,7 @@ class Message(TelegramObject):
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2550,7 +2553,7 @@ class Message(TelegramObject):
     async def edit_caption(
         self,
         caption: Optional[str] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
@@ -2597,7 +2600,7 @@ class Message(TelegramObject):
     async def edit_media(
         self,
         media: "InputMedia",
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2681,7 +2684,7 @@ class Message(TelegramObject):
         self,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
@@ -2731,7 +2734,7 @@ class Message(TelegramObject):
 
     async def stop_live_location(
         self,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2771,7 +2774,7 @@ class Message(TelegramObject):
 
     async def set_game_score(
         self,
-        user_id: Union[int, str],
+        user_id: int,
         score: int,
         force: Optional[bool] = None,
         disable_edit_message: Optional[bool] = None,
@@ -2816,7 +2819,7 @@ class Message(TelegramObject):
 
     async def get_game_high_scores(
         self,
-        user_id: Union[int, str],
+        user_id: int,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2886,7 +2889,7 @@ class Message(TelegramObject):
 
     async def stop_poll(
         self,
-        reply_markup: Optional[InlineKeyboardMarkup] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
