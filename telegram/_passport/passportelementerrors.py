@@ -206,7 +206,7 @@ class PassportElementErrorFiles(PassportElementError):
     def file_hashes(self) -> List[str]:
         """List of base64-encoded file hashes.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.6
             This attribute will return a tuple instead of a list in future major versions.
         """
         warn(
@@ -423,7 +423,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
     def file_hashes(self) -> List[str]:
         """List of base64-encoded file hashes.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.6
             This attribute will return a tuple instead of a list in future major versions.
         """
         warn(

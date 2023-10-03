@@ -4651,15 +4651,15 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             can_post_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 post stories in the channel; channels only.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.6
             can_edit_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 edit stories posted by other users; channels only.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.6
             can_delete_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 delete stories posted by other users; channels only.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.6
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

@@ -51,7 +51,7 @@ class Version(NamedTuple):
 
 
 __version_info__: Final[Version] = Version(
-    major=20, minor=5, micro=0, releaselevel="final", serial=0
+    major=20, minor=6, micro=0, releaselevel="final", serial=0
 )
 __version__: Final[str] = str(__version_info__)
 

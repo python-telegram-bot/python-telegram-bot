@@ -89,7 +89,7 @@ class PollAnswer(TelegramObject):
         The order of :paramref:`option_ids` and :paramref:`user` is changed in
         20.5 as the latter one became optional.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.6
        Backward compatiblity for changed order of :paramref:`option_ids` and :paramref:`user`
        was removed.
 

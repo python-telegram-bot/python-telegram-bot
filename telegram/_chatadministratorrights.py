@@ -40,7 +40,7 @@ class ChatAdministratorRights(TelegramObject):
         :attr:`can_manage_topics` is considered as well when comparing objects of
         this type in terms of equality.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.6
         :attr:`can_post_stories`, :attr:`can_edit_stories`, and :attr:`can_delete_stories` are
         considered as well when comparing objects of this type in terms of equality.
 
@@ -73,15 +73,15 @@ class ChatAdministratorRights(TelegramObject):
         can_post_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can post
             stories in the channel; channels only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.6
         can_edit_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can edit
             stories posted by other users; channels only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.6
         can_delete_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can delete
             stories posted by other users; channels only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.6
         can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
@@ -116,15 +116,15 @@ class ChatAdministratorRights(TelegramObject):
         can_post_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can post
             stories in the channel; channels only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.6
         can_edit_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
             stories posted by other users; channels only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.6
         can_delete_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can delete
             stories posted by other users; channels only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.6
         can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
