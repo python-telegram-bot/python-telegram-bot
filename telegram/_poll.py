@@ -29,8 +29,6 @@ from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -89,9 +87,11 @@ class PollAnswer(TelegramObject):
 
     .. versionchanged:: 20.5
         The order of :paramref:`option_ids` and :paramref:`user` is changed in
-        20.5 as the latter one became optional. We currently provide
-        backward compatibility for this but it will be removed in the future.
-        Please update your code to use the new order.
+        20.5 as the latter one became optional.
+
+    .. versionchanged:: 20.6
+       Backward compatiblity for changed order of :paramref:`option_ids` and :paramref:`user`
+       was removed.
 
     Args:
         poll_id (:obj:`str`): Unique poll identifier.
@@ -145,21 +145,8 @@ class PollAnswer(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.poll_id: str = poll_id
         self.voter_chat: Optional[Chat] = voter_chat
-
-        if isinstance(option_ids, User) or isinstance(user, tuple):
-            warn(
-                "From v20.5 the order of `option_ids` and `user` is changed as the latter one"
-                " became optional. Please update your code to use the new order.",
-                category=PTBDeprecationWarning,
-                stacklevel=2,
-            )
-            self.option_ids: Tuple[int, ...] = parse_sequence_arg(user)
-            self.user: Optional[User] = option_ids
-        else:
-            self.option_ids: Tuple[int, ...] = parse_sequence_arg(  # type: ignore[no-redef]
-                option_ids
-            )
-            self.user: Optional[User] = user  # type: ignore[no-redef]
+        self.option_ids: Tuple[int, ...] = parse_sequence_arg(option_ids)
+        self.user: Optional[User] = user
 
         self._id_attrs = (
             self.poll_id,

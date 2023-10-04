@@ -47,7 +47,7 @@ class PassportFile(TelegramObject):
         file_size (:obj:`int`): File size in bytes.
         file_date (:obj:`int`): Unix time when the file was uploaded.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.6
                 This argument will only accept a datetime instead of an integer in future
                 major versions.
 
@@ -103,7 +103,7 @@ class PassportFile(TelegramObject):
     def file_date(self) -> int:
         """:obj:`int`: Unix time when the file was uploaded.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.6
             This attribute will return a datetime instead of a integer in future major versions.
         """
         warn(

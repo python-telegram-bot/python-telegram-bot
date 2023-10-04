@@ -4,6 +4,56 @@
 Changelog
 =========
 
+Version 20.6
+============
+
+*Released 2023-10-03*
+
+This is the technical changelog for version 20.6. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
+
+Major Changes
+-------------
+
+-  Drop Backward Compatibility Layer Introduced in :pr:`3853` (API 6.8) (:pr:`3873`)
+-  Full Support for Bot API 6.9 (:pr:`3898`)
+
+New Features
+------------
+
+-  Add Rich Equality Comparison to ``WriteAccessAllowed`` (:pr:`3911` closes :issue:`3909`)
+-  Add ``__repr__`` Methods Added in :pr:`3826` closes :issue:`3770` to Sphinx Documentation (:pr:`3901` closes :issue:`3889`)
+-  Add String Representation for Selected Classes (:pr:`3826` closes :issue:`3770`)
+
+Minor Changes
+-------------
+
+-  Add Support Python 3.12 (:pr:`3915`)
+-  Documentation Improvements (:pr:`3910`)
+
+Internal Changes
+----------------
+
+-  Verify Type Hints for Bot Method & Telegram Class Parameters (:pr:`3868`)
+-  Move Bot API Tests to Separate Workflow File (:pr:`3912`)
+-  Fix Failing ``file_size`` Tests (:pr:`3906`)
+-  Set Threshold for DeepSource’s PY-R1000 to High (:pr:`3888`)
+-  One-Time Code Formatting Improvement via ``--preview`` Flag of ``black`` (:pr:`3882`)
+-  Move Dunder Methods to the Top of Class Bodies (:pr:`3883`)
+-  Remove Superfluous ``Defaults.__ne__`` (:pr:`3884`)
+
+Dependency Updates
+------------------
+
+-  ``pre-commit`` autoupdate (:pr:`3876`)
+-  Update ``pre-commit`` Dependencies (:pr:`3916`)
+-  Bump ``actions/checkout`` from 3 to 4 (:pr:`3914`)
+-  Update ``httpx`` requirement from ~=0.24.1 to ~=0.25.0 (:pr:`3891`)
+-  Bump ``furo`` from 2023.8.19 to 2023.9.10 (:pr:`3890`)
+-  Bump ``sphinx`` from 7.2.5 to 7.2.6 (:pr:`3892`)
+-  Update ``tornado`` requirement from ~=6.2 to ~=6.3.3 (:pr:`3675`)
+-  Bump ``pytest`` from 7.4.0 to 7.4.2 (:pr:`3881`)
+
+
 Version 20.5
 ============
 *Released 2023-09-03*

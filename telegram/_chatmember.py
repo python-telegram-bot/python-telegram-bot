@@ -218,12 +218,25 @@ class ChatMemberAdministrator(ChatMember):
         can_invite_users (:obj:`bool`): :obj:`True`, if the user can invite
             new users to the chat.
         can_post_messages (:obj:`bool`, optional): :obj:`True`, if the
-            administrator can post in the channel, channels only.
+            administrator can post messages in the channel, or access channel statistics; channels
+            only.
         can_edit_messages (:obj:`bool`, optional): :obj:`True`, if the
             administrator can edit messages of other users and can pin
             messages; channels only.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
+        can_post_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can post
+            stories in the channel; channels only.
+
+            .. versionadded:: 20.6
+        can_edit_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can edit
+            stories posted by other users; channels only.
+
+            .. versionadded:: 20.6
+        can_delete_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can delete
+            stories posted by other users; channels only.
+
+            .. versionadded:: 20.6
         can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
@@ -238,10 +251,10 @@ class ChatMemberAdministrator(ChatMember):
             is allowed to edit administrator privileges of that user.
         is_anonymous (:obj:`bool`): :obj:`True`, if the  user's
             presence in the chat is hidden.
-        can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator
-            can access the chat event log, chat statistics, message statistics in
-            channels, see channel members, see anonymous administrators in supergroups
-            and ignore slow mode. Implied by any other administrator privilege.
+        can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator can access the chat event
+            log, chat statistics, boost list in channels, see channel members, report spam
+            messages, see anonymous administrators in supergroups and ignore slow mode.
+            Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the
             administrator can delete messages of other users.
         can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
@@ -249,7 +262,7 @@ class ChatMemberAdministrator(ChatMember):
 
             .. versionadded:: 20.0
         can_restrict_members (:obj:`bool`): :obj:`True`, if the
-            administrator can restrict, ban or unban chat members.
+            administrator can restrict, ban or unban chat members, or access supergroup statistics.
         can_promote_members (:obj:`bool`): :obj:`True`, if the administrator can add new
             administrators with a subset of their own privileges or demote administrators
             that they have promoted, directly or indirectly (promoted by administrators that
@@ -259,12 +272,25 @@ class ChatMemberAdministrator(ChatMember):
         can_invite_users (:obj:`bool`): :obj:`True`, if the user can invite
             new users to the chat.
         can_post_messages (:obj:`bool`): Optional. :obj:`True`, if the
-            administrator can post in the channel, channels only.
+            administrator can post messages in the channel or access channel statistics;
+            channels only.
         can_edit_messages (:obj:`bool`): Optional. :obj:`True`, if the
             administrator can edit messages of other users and can pin
             messages; channels only.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
+        can_post_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can post
+            stories in the channel; channels only.
+
+            .. versionadded:: 20.6
+        can_edit_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
+            stories posted by other users; channels only.
+
+            .. versionadded:: 20.6
+        can_delete_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can delete
+            stories posted by other users; channels only.
+
+            .. versionadded:: 20.6
         can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only
 
@@ -287,6 +313,9 @@ class ChatMemberAdministrator(ChatMember):
         "can_pin_messages",
         "can_manage_topics",
         "custom_title",
+        "can_post_stories",
+        "can_edit_stories",
+        "can_delete_stories",
     )
 
     def __init__(
@@ -306,6 +335,9 @@ class ChatMemberAdministrator(ChatMember):
         can_pin_messages: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
         custom_title: Optional[str] = None,
+        can_post_stories: Optional[bool] = None,
+        can_edit_stories: Optional[bool] = None,
+        can_delete_stories: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -325,6 +357,9 @@ class ChatMemberAdministrator(ChatMember):
             self.can_pin_messages: Optional[bool] = can_pin_messages
             self.can_manage_topics: Optional[bool] = can_manage_topics
             self.custom_title: Optional[str] = custom_title
+            self.can_post_stories: Optional[bool] = can_post_stories
+            self.can_edit_stories: Optional[bool] = can_edit_stories
+            self.can_delete_stories: Optional[bool] = can_delete_stories
 
 
 class ChatMemberMember(ChatMember):
