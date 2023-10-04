@@ -142,7 +142,7 @@ class JobQueue(Generic[CCT]):
 
                 scheduler.configure(..., **job_queue.scheduler_configuration)
 
-            Alternatively, you cas also use methods like
+            Alternatively, you can also use methods like
             :meth:`~apscheduler.schedulers.base.BaseScheduler.add_jobstore` to avoid using
             :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` altogether.
 
