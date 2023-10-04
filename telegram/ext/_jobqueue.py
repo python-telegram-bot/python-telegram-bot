@@ -83,7 +83,7 @@ class JobQueue(Generic[CCT]):
                 previous configuration settings. Therefore, please make sure to pass the values
                 returned by :attr:`scheduler_configuration` to the method call in addition to your
                 custom values.
-                Alternatively, you cas also use methods like
+                Alternatively, you can also use methods like
                 :meth:`~apscheduler.schedulers.base.BaseScheduler.add_jobstore` to avoid using
                 :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` altogether.
 
