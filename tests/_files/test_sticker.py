@@ -103,7 +103,7 @@ class TestStickerBase:
     file_size = 39518
     thumb_width = 319
     thumb_height = 320
-    thumb_file_size = 21472
+    thumb_file_size = 21448
     type = Sticker.REGULAR
     custom_emoji_id = "ThisIsSuchACustomEmojiID"
     needs_repainting = True

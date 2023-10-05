@@ -43,7 +43,9 @@ def input_invoice_message_content():
         need_phone_number=TestInputInvoiceMessageContentBase.need_phone_number,
         need_email=TestInputInvoiceMessageContentBase.need_email,
         need_shipping_address=TestInputInvoiceMessageContentBase.need_shipping_address,
-        send_phone_number_to_provider=TestInputInvoiceMessageContentBase.send_phone_number_to_provider,  # noqa: E501
+        send_phone_number_to_provider=(
+            TestInputInvoiceMessageContentBase.send_phone_number_to_provider
+        ),
         send_email_to_provider=TestInputInvoiceMessageContentBase.send_email_to_provider,
         is_flexible=TestInputInvoiceMessageContentBase.is_flexible,
     )
