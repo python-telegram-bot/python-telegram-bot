@@ -85,7 +85,6 @@ autodoc_default_options = {
 
 # Fail on warnings & unresolved references etc
 nitpicky = True
-nitpick_ignore = [("py:class", "type")]
 
 # Paramlink style
 paramlinks_hyperlink_param = "name"

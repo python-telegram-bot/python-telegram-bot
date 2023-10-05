@@ -354,7 +354,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         Raises:
             :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
-            is called in this case.
+                is called in this case.
         """
         try:
             await self.initialize()
