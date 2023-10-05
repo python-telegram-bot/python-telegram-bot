@@ -1,0 +1,47 @@
+name: Bot API Tests
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  schedule:
+    # Run monday and friday morning at 03:07 - odd time to spread load on GitHub Actions
+    - cron: '7 3 * * 1,5'
+
+jobs:
+  check-conformity:
+    name: check-conformity
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        python-version: [3.11]
+        os: [ubuntu-latest]
+      fail-fast: False
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -W ignore -m pip install --upgrade pip
+          python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-opts.txt
+          python -W ignore -m pip install -r requirements-dev.txt
+      - name: Compare to official api
+        run: |
+          pytest -v tests/test_official.py --junit-xml=.test_report_official.xml
+          exit $?
+        env:
+          TEST_OFFICIAL: "true"
+        shell: bash --noprofile --norc {0}
+
+      - name: Test Summary
+        id: test_summary
+        uses: test-summary/action@v2.1
+        if: always()  # always run, even if tests fail
+        with:
+          paths: .test_report_official.xml

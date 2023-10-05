@@ -42,7 +42,7 @@ class InlineQueryResultsButton(TelegramObject):
             `Web App <https://core.telegram.org/bots/webapps>`_ that will be launched when the
             user presses the button. The Web App will be able to switch back to the inline mode
             using the method
-            `switchInlineQuery <https://core.telegram.org/bots/webapps#initializing-web-apps>`_
+            `switchInlineQuery <https://core.telegram.org/bots/webapps#initializing-mini-apps>`_
             inside the Web App.
         start_parameter (:obj:`str`, optional):  Deep-linking parameter for the
             :guilabel:`/start` message sent to the bot when user presses the switch button.
