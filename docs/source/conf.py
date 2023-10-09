@@ -77,6 +77,12 @@ napoleon_use_admonition_for_examples = True
 # and we document the types anyway
 autodoc_typehints = "none"
 
+# Show docstring for special members
+autodoc_default_options = {
+    "special-members": True,
+    "exclude-members": "__init__",
+}
+
 # Fail on warnings & unresolved references etc
 nitpicky = True
 

@@ -149,6 +149,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         finally:
             await application.shutdown()
 
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
+
     Examples:
         :any:`Echo Bot <examples.echobot>`
 
@@ -345,7 +347,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
 
     async def __aenter__(self: _AppType) -> _AppType:  # noqa: PYI019
-        """Simple context manager which initializes the App."""
+        """|async_context_manager| :meth:`initializes <initialize>` the App.
+
+        Returns:
+            The initialized App instance.
+
+        Raises:
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+                is called in this case.
+        """
         try:
             await self.initialize()
             return self
@@ -359,7 +369,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        """Shutdown the App from the context manager."""
+        """|async_context_manager| :meth:`shuts down <shutdown>` the App."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()

@@ -78,6 +78,8 @@ class Updater(AsyncContextManager["Updater"]):
         finally:
             await updater.shutdown()
 
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
+
     .. seealso:: :wiki:`Architecture Overview <Architecture>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
 
@@ -126,7 +128,16 @@ class Updater(AsyncContextManager["Updater"]):
         self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
 
     async def __aenter__(self: _UpdaterType) -> _UpdaterType:  # noqa: PYI019
-        """Simple context manager which initializes the Updater."""
+        """
+        |async_context_manager| :meth:`initializes <initialize>` the Updater.
+
+        Returns:
+            The initialized Updater instance.
+
+        Raises:
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+                is called in this case.
+        """
         try:
             await self.initialize()
             return self
@@ -140,7 +151,7 @@ class Updater(AsyncContextManager["Updater"]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        """Shutdown the Updater from the context manager."""
+        """|async_context_manager| :meth:`shuts down <shutdown>` the Updater."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()

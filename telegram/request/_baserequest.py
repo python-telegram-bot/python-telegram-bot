@@ -70,6 +70,8 @@ class BaseRequest(
         finally:
             await request_object.shutdown()
 
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
+
     Tip:
         JSON encoding and decoding is done with the standard library's :mod:`json` by default.
         To use a custom library for this, you can override :meth:`parse_json_payload` and implement
@@ -99,6 +101,15 @@ class BaseRequest(
     """
 
     async def __aenter__(self: RT) -> RT:
+        """|async_context_manager| :meth:`initializes <initialize>` the Request.
+
+        Returns:
+            The initialized Request instance.
+
+        Raises:
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+                is called in this case.
+        """
         try:
             await self.initialize()
             return self
@@ -112,6 +123,7 @@ class BaseRequest(
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
+        """|async_context_manager| :meth:`shuts down <shutdown>` the Request."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
