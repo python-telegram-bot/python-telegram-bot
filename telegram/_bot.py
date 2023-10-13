@@ -363,6 +363,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         raise TypeError("Bot objects cannot be deepcopied!")
 
     def __eq__(self, other: object) -> bool:
+        """Defines equality condition for the :class:`telegram.Bot` object.
+        Two objects of this class are considered to be equal if their all parameters
+        are identical.
+
+        Returns:
+            :obj:`True` if both objects have all parameters identical. :obj:`False` otherwise.
+        """
         if isinstance(other, self.__class__):
             return self.bot == other.bot
         return False

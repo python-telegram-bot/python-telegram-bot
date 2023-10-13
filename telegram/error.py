@@ -78,12 +78,27 @@ class TelegramError(Exception):
         self.message: str = msg
 
     def __str__(self) -> str:
+        """Get the string representation of exception message.
+
+        Returns:
+           :obj:`str`
+        """
         return self.message
 
     def __repr__(self) -> str:
+        """Get the string representation of exception with name and message.
+
+        Returns:
+           :obj:`str`
+        """
         return f"{self.__class__.__name__}('{self.message}')"
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
+        """
+
+        Returns:
+            :obj:`tuple`
+        """
         return self.__class__, (self.message,)
 
 
