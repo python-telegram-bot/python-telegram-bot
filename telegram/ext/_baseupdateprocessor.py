@@ -27,6 +27,25 @@ class BaseUpdateProcessor(ABC):
     """An abstract base class for update processors. You can use this class to implement
     your own update processor.
 
+    Instances of this class can be used as asyncio context managers, where
+
+    .. code:: python
+
+        async with processor:
+            # code
+
+    is roughly equivalent to
+
+    .. code:: python
+
+        try:
+            await processor.initialize()
+            # code
+        finally:
+            await processor.shutdown()
+
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
+
     .. seealso:: :wiki:`Concurrency`
 
     .. versionadded:: 20.4
@@ -49,7 +68,15 @@ class BaseUpdateProcessor(ABC):
         self._semaphore = BoundedSemaphore(self.max_concurrent_updates)
 
     async def __aenter__(self) -> "BaseUpdateProcessor":
-        """Simple context manager which initializes the Processor."""
+        """|async_context_manager| :meth:`initializes <initialize>` the Processor.
+
+        Returns:
+            The initialized Processor instance.
+
+        Raises:
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+                is called in this case.
+        """
         try:
             await self.initialize()
             return self
@@ -63,7 +90,7 @@ class BaseUpdateProcessor(ABC):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        """Simple context manager which shuts down the Processor."""
+        """|async_context_manager| :meth:`shuts down <shutdown>` the Processor."""
         await self.shutdown()
 
     @property

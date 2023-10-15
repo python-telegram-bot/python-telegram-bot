@@ -149,6 +149,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         finally:
             await bot.shutdown()
 
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
+
     Note:
         * Most bot methods have the argument ``api_kwargs`` which allows passing arbitrary keywords
           to the Telegram API. This can be used to access new features of the API before they are
@@ -310,6 +312,16 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self._freeze()
 
     async def __aenter__(self: BT) -> BT:
+        """
+        |async_context_manager| :meth:`initializes <initialize>` the Bot.
+
+        Returns:
+            The initialized Bot instance.
+
+        Raises:
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+                is called in this case.
+        """
         try:
             await self.initialize()
             return self
@@ -323,6 +335,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
+        """|async_context_manager| :meth:`shuts down <shutdown>` the Bot."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
