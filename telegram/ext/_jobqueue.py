@@ -76,6 +76,17 @@ class JobQueue(Generic[CCT]):
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
 
+            Warning:
+                This scheduler is configured by :meth:`set_application`. Additional configuration
+                settings can be made by users. However, calling
+                :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` will delete any
+                previous configuration settings. Therefore, please make sure to pass the values
+                returned by :attr:`scheduler_configuration` to the method call in addition to your
+                custom values.
+                Alternatively, you can also use methods like
+                :meth:`~apscheduler.schedulers.base.BaseScheduler.add_jobstore` to avoid using
+                :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` altogether.
+
             .. versionchanged:: 20.0
                 Uses :class:`~apscheduler.schedulers.asyncio.AsyncIOScheduler` instead of
                 :class:`~apscheduler.schedulers.background.BackgroundScheduler`
@@ -94,9 +105,7 @@ class JobQueue(Generic[CCT]):
 
         self._application: Optional[weakref.ReferenceType[Application]] = None
         self._executor = AsyncIOExecutor()
-        self.scheduler: AsyncIOScheduler = AsyncIOScheduler(
-            timezone=pytz.utc, executors={"default": self._executor}
-        )
+        self.scheduler: AsyncIOScheduler = AsyncIOScheduler(**self.scheduler_configuration)
 
     def __repr__(self) -> str:
         """Give a string representation of the JobQueue in the form ``JobQueue[application=...]``.
@@ -118,6 +127,43 @@ class JobQueue(Generic[CCT]):
         if application is not None:
             return application
         raise RuntimeError("The application instance is no longer alive.")
+
+    @property
+    def scheduler_configuration(self) -> JSONDict:
+        """Provides configuration values that are used by :class:`JobQueue` for :attr:`scheduler`.
+
+        Tip:
+            Since calling
+            :meth:`scheduler.configure() <apscheduler.schedulers.base.BaseScheduler.configure>`
+            deletes any previous setting, please make sure to pass these values to the method call
+            in addition to your custom values:
+
+            .. code-block:: python
+
+                scheduler.configure(..., **job_queue.scheduler_configuration)
+
+            Alternatively, you can also use methods like
+            :meth:`~apscheduler.schedulers.base.BaseScheduler.add_jobstore` to avoid using
+            :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` altogether.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            Dict[:obj:`str`, :obj:`object`]: The configuration values as dictionary.
+
+        """
+        timezone: object = pytz.utc
+        if (
+            self._application
+            and isinstance(self.application.bot, ExtBot)
+            and self.application.bot.defaults
+        ):
+            timezone = self.application.bot.defaults.tzinfo or pytz.utc
+
+        return {
+            "timezone": timezone,
+            "executors": {"default": self._executor},
+        }
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -166,11 +212,7 @@ class JobQueue(Generic[CCT]):
 
         """
         self._application = weakref.ref(application)
-        if isinstance(application.bot, ExtBot) and application.bot.defaults:
-            self.scheduler.configure(
-                timezone=application.bot.defaults.tzinfo or pytz.utc,
-                executors={"default": self._executor},
-            )
+        self.scheduler.configure(**self.scheduler_configuration)
 
     @staticmethod
     async def job_callback(job_queue: "JobQueue[CCT]", job: "Job[CCT]") -> None:
