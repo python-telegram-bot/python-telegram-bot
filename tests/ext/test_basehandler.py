@@ -52,3 +52,23 @@ class TestHandler:
 
         sh = SubclassHandler()
         assert repr(sh) == "SubclassHandler[callback=TestHandler.test_repr.<locals>.some_func]"
+
+    def test_repr_no_qualname(self):
+        class ClassBasedCallback:
+            async def __call__(self, *args, **kwargs):
+                pass
+
+            def __repr__(self):
+                return "Repr of ClassBasedCallback"
+
+        class SubclassHandler(BaseHandler):
+            __slots__ = ()
+
+            def __init__(self):
+                super().__init__(callback=ClassBasedCallback())
+
+            def check_update(self, update: object):
+                pass
+
+        sh = SubclassHandler()
+        assert repr(sh) == "SubclassHandler[callback=Repr of ClassBasedCallback]"
