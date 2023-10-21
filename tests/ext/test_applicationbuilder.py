@@ -91,6 +91,7 @@ class TestApplicationBuilder:
             limits: object
             http1: object
             http2: object
+            transport: object = None
 
         monkeypatch.setattr(httpx, "AsyncClient", Client)
 
@@ -322,6 +323,7 @@ class TestApplicationBuilder:
             limits: object
             http1: object
             http2: object
+            transport: object = None
 
         monkeypatch.setattr(httpx, "AsyncClient", Client)
 
