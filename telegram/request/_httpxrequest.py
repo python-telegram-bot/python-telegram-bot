@@ -97,13 +97,14 @@ class HTTPXRequest(BaseRequest):
 
             .. versionchanged:: 20.5
                 Accept ``"2"`` as a valid value.
-        socket_options (Collection[Tuple], optional): A collection of socket options to set on
-            the underlying socket. For each entry, the first two elements must be integers
-            representing the socket level and the socket option, respectively. The third element
-            must be either an integer or a bytes-like object representing the value to set.
-            Alternatively, the entry can be a 4-tuple, where the third element is :obj:`None` and
-            the fourth element is an integer representing the timeout to set.
-            Defaults to :obj:`None`.
+        socket_options (Collection[:obj:`tuple`], optional): Socket options to be passed to the
+            underlying `library \
+            <https://www.encode.io/httpcore/async/#httpcore.AsyncConnectionPool.__init__>`_.
+
+            Note:
+                The values accepted by this parameter depend on the operating system.
+                This is a low-level parameter and should only be used if you are familiar with
+                these concepts.
 
             .. versionadded:: NEXT.VERSION
 
