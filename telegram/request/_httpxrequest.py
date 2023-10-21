@@ -147,15 +147,13 @@ class HTTPXRequest(BaseRequest):
             if socket_options
             else None
         )
-        # See https://github.com/python-telegram-bot/python-telegram-bot/pull/3542
-        # for why we need to use `dict()` here.
-        self._client_kwargs = dict(  # pylint: disable=use-dict-literal
-            timeout=timeout,
-            proxies=proxy_url,
-            limits=limits,
-            transport=transport,
+        self._client_kwargs = {
+            "timeout": timeout,
+            "proxies": proxy_url,
+            "limits": limits,
+            "transport": transport,
             **http_kwargs,
-        )
+        }
 
         try:
             self._client = self._build_client()
