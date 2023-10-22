@@ -105,7 +105,11 @@ class BaseHandler(Generic[UT, CCT], ABC):
         Returns:
             :obj:`str`
         """
-        return build_repr_with_selected_attrs(self, callback=self.callback.__qualname__)
+        try:
+            callback_name = self.callback.__qualname__
+        except AttributeError:
+            callback_name = repr(self.callback)
+        return build_repr_with_selected_attrs(self, callback=callback_name)
 
     @abstractmethod
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
