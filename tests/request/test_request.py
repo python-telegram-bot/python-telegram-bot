@@ -360,7 +360,9 @@ class TestHTTPXRequestWithoutRequest:
     def _reset(self):
         self.test_flag = None
 
-    def test_init(self, monkeypatch):
+    # We parametrize this to make sure that the legacy `proxy_url` argument is still supported
+    @pytest.mark.parametrize("proxy_argument", ["proxy", "proxy_url"])
+    def test_init(self, monkeypatch, proxy_argument):
         @dataclass
         class Client:
             timeout: object
@@ -381,14 +383,15 @@ class TestHTTPXRequestWithoutRequest:
         assert request._client.http1 is True
         assert not request._client.http2
 
-        request = HTTPXRequest(
-            connection_pool_size=42,
-            proxy="proxy",
-            connect_timeout=43,
-            read_timeout=44,
-            write_timeout=45,
-            pool_timeout=46,
-        )
+        kwargs = {
+            "connection_pool_size": 42,
+            proxy_argument: "proxy",
+            "connect_timeout": 43,
+            "read_timeout": 44,
+            "write_timeout": 45,
+            "pool_timeout": 46,
+        }
+        request = HTTPXRequest(**kwargs)
         assert request._client.proxies == "proxy"
         assert request._client.limits == httpx.Limits(
             max_connections=42, max_keepalive_connections=42
