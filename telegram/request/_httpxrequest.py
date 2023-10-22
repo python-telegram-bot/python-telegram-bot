@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
-from typing import Optional, Tuple
+from typing import Collection, Optional, Tuple, Union
 
 import httpx
 
@@ -34,6 +34,12 @@ from telegram.request._requestdata import RequestData
 # That also works with socks5. Just pass `--mode socks5` to mitmproxy
 
 _LOGGER = get_logger(__name__, "HTTPXRequest")
+
+_SocketOpt = Union[
+    Tuple[int, int, int],
+    Tuple[int, int, Union[bytes, bytearray]],
+    Tuple[int, int, None, int],
+]
 
 
 class HTTPXRequest(BaseRequest):
@@ -91,6 +97,16 @@ class HTTPXRequest(BaseRequest):
 
             .. versionchanged:: 20.5
                 Accept ``"2"`` as a valid value.
+        socket_options (Collection[:obj:`tuple`], optional): Socket options to be passed to the
+            underlying `library \
+            <https://www.encode.io/httpcore/async/#httpcore.AsyncConnectionPool.__init__>`_.
+
+            Note:
+                The values accepted by this parameter depend on the operating system.
+                This is a low-level parameter and should only be used if you are familiar with
+                these concepts.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -105,6 +121,7 @@ class HTTPXRequest(BaseRequest):
         connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
         http_version: HTTPVersion = "1.1",
+        socket_options: Optional[Collection[_SocketOpt]] = None,
     ):
         self._http_version = http_version
         timeout = httpx.Timeout(
@@ -122,16 +139,21 @@ class HTTPXRequest(BaseRequest):
             raise ValueError("`http_version` must be either '1.1', '2.0' or '2'.")
 
         http1 = http_version == "1.1"
-
-        # See https://github.com/python-telegram-bot/python-telegram-bot/pull/3542
-        # for why we need to use `dict()` here.
-        self._client_kwargs = dict(  # pylint: disable=use-dict-literal  # noqa: C408
-            timeout=timeout,
-            proxies=proxy_url,
-            limits=limits,
-            http1=http1,
-            http2=not http1,
+        http_kwargs = {"http1": http1, "http2": not http1}
+        transport = (
+            httpx.AsyncHTTPTransport(
+                socket_options=socket_options,
+            )
+            if socket_options
+            else None
         )
+        self._client_kwargs = {
+            "timeout": timeout,
+            "proxies": proxy_url,
+            "limits": limits,
+            "transport": transport,
+            **http_kwargs,
+        }
 
         try:
             self._client = self._build_client()
@@ -205,12 +227,6 @@ class HTTPXRequest(BaseRequest):
             write=write_timeout,
             pool=pool_timeout,
         )
-
-        # TODO p0: On Linux, use setsockopt to properly set socket level keepalive.
-        #          (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)
-        #          (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)
-        #          (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8)
-        # TODO p4: Support setsockopt on lesser platforms than Linux.
 
         files = request_data.multipart_data if request_data else None
         data = request_data.json_parameters if request_data else None

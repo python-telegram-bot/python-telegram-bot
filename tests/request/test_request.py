@@ -28,6 +28,7 @@ from typing import Any, Callable, Coroutine, Tuple
 
 import httpx
 import pytest
+from httpx import AsyncHTTPTransport
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import (
@@ -366,6 +367,7 @@ class TestHTTPXRequestWithoutRequest:
             limits: object
             http1: object
             http2: object
+            transport: object = None
 
         monkeypatch.setattr(httpx, "AsyncClient", Client)
 
@@ -617,6 +619,24 @@ class TestHTTPXRequestWithoutRequest:
                 )
 
             assert exc_info.value.__cause__ is pool_timeout
+
+    async def test_socket_opts(self, monkeypatch):
+        transport_kwargs = {}
+        transport_init = AsyncHTTPTransport.__init__
+
+        def init_transport(*args, **kwargs):
+            nonlocal transport_kwargs
+            transport_kwargs = kwargs.copy()
+            transport_init(*args, **kwargs)
+
+        monkeypatch.setattr(AsyncHTTPTransport, "__init__", init_transport)
+
+        HTTPXRequest()
+        assert "socket_options" not in transport_kwargs
+
+        transport_kwargs = {}
+        HTTPXRequest(socket_options=((1, 2, 3),))
+        assert transport_kwargs["socket_options"] == ((1, 2, 3),)
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
