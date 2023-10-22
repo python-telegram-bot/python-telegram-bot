@@ -102,9 +102,9 @@ class HTTPXRequest(BaseRequest):
                 these concepts.
 
             .. versionadded:: NEXT.VERSION
-        proxy (:obj:`str` | ``httpx.Proxy``, optional): The URL to a proxy server or an
-            ``httpx.Proxy`` object. For example ``'http://127.0.0.1:3128'`` or
-            ``'socks5://127.0.0.1:3128'``. Defaults to :obj:`None`.
+        proxy (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``, optional): The URL to a proxy server,
+            a ``httpx.Proxy`` object or a ``httpx.URL`` object. For example
+            ``'http://127.0.0.1:3128'`` or ``'socks5://127.0.0.1:3128'``. Defaults to :obj:`None`.
 
             Note:
                 * The proxy URL can also be set via the environment variables ``HTTPS_PROXY`` or
@@ -131,7 +131,7 @@ class HTTPXRequest(BaseRequest):
         pool_timeout: Optional[float] = 1.0,
         http_version: HTTPVersion = "1.1",
         socket_options: Optional[Collection[_SocketOpt]] = None,
-        proxy: Optional[Union[str, httpx.Proxy]] = None,
+        proxy: Optional[Union[str, httpx.Proxy, httpx.URL]] = None,
     ):
         if proxy_url is not None and proxy is not None:
             raise ValueError("The parameters `proxy_url` and `proxy` are mutually exclusive.")
