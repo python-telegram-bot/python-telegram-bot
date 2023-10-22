@@ -78,7 +78,7 @@ from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
-from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
+from telegram.warnings import PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
@@ -136,8 +136,10 @@ BASE_GAME_SCORE = 60  # Base game score for game tests
 
 xfail = pytest.mark.xfail(
     bool(GITHUB_ACTION),  # This condition is only relevant for github actions game tests.
-    reason="Can fail due to race conditions when multiple test suites "
-    "with the same bot token are run at the same time",
+    reason=(
+        "Can fail due to race conditions when multiple test suites "
+        "with the same bot token are run at the same time"
+    ),
 )
 
 
@@ -217,6 +219,10 @@ class TestBotWithoutRequest:
     async def test_no_token_passed(self):
         with pytest.raises(InvalidToken, match="You must pass the token"):
             Bot("")
+
+    async def test_repr(self):
+        bot = Bot(token="some_token", base_file_url="")
+        assert repr(bot) == "Bot[token=some_token]"
 
     async def test_to_dict(self, bot):
         to_dict_bot = bot.to_dict()
@@ -657,7 +663,7 @@ class TestBotWithoutRequest:
         )
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
-    @pytest.mark.parametrize("button_type", ["start", "web_app", "backward_compat"])
+    @pytest.mark.parametrize("button_type", ["start", "web_app"])
     async def test_answer_inline_query(self, monkeypatch, bot, raw_bot, button_type):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -680,8 +686,10 @@ class TestBotWithoutRequest:
                         "title": "test_result",
                         "id": "123",
                         "type": "document",
-                        "document_url": "https://raw.githubusercontent.com/python-telegram-bot"
-                        "/logos/master/logo/png/ptb-logo_240.png",
+                        "document_url": (
+                            "https://raw.githubusercontent.com/python-telegram-bot"
+                            "/logos/master/logo/png/ptb-logo_240.png"
+                        ),
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
                         "input_message_content": {"message_text": "imc"},
@@ -692,7 +700,7 @@ class TestBotWithoutRequest:
                 "is_personal": True,
             }
 
-            if button_type in ["start", "backward_compat"]:
+            if button_type == "start":
                 button_dict = {"text": "button_text", "start_parameter": "start_parameter"}
             else:
                 button_dict = {
@@ -709,8 +717,10 @@ class TestBotWithoutRequest:
             InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
-                document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
-                "logo/png/ptb-logo_240.png",
+                document_url=(
+                    "https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
+                    "logo/png/ptb-logo_240.png"
+                ),
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
@@ -741,10 +751,6 @@ class TestBotWithoutRequest:
                 cache_time=300,
                 is_personal=True,
                 next_offset="42",
-                switch_pm_text="button_text" if button_type == "backward_compat" else None,
-                switch_pm_parameter="start_parameter"
-                if button_type == "backward_compat"
-                else None,
                 button=button,
             )
 
@@ -765,43 +771,6 @@ class TestBotWithoutRequest:
                     )
 
             monkeypatch.delattr(bot.request, "post")
-
-    @pytest.mark.parametrize("bot_class", ["Bot", "ExtBot"])
-    async def test_answer_inline_query_deprecated_args(
-        self, monkeypatch, recwarn, bot_class, bot, raw_bot
-    ):
-        async def mock_post(*args, **kwargs):
-            return True
-
-        bot = raw_bot if bot_class == "Bot" else bot
-
-        monkeypatch.setattr(bot.request, "post", mock_post)
-
-        with pytest.raises(
-            TypeError, match="6.7, the parameter `button is mutually exclusive to the deprecated"
-        ):
-            await bot.answer_inline_query(
-                inline_query_id="123",
-                results=[],
-                button=True,
-                switch_pm_text="text",
-                switch_pm_parameter="param",
-            )
-
-        recwarn.clear()
-        assert await bot.answer_inline_query(
-            inline_query_id="123",
-            results=[],
-            switch_pm_text="text",
-            switch_pm_parameter="parameter",
-        )
-        assert len(recwarn) == 1
-        assert recwarn[-1].category is PTBDeprecationWarning
-        assert str(recwarn[-1].message).startswith(
-            "Since Bot API 6.7, the parameters `switch_pm_text` and `switch_pm_parameter` are "
-            "deprecated"
-        )
-        assert recwarn[-1].filename == __file__, "stacklevel is incorrect!"
 
     async def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -824,9 +793,11 @@ class TestBotWithoutRequest:
                         "title": "test_result",
                         "id": "123",
                         "type": "document",
-                        "document_url": "https://raw.githubusercontent.com/"
-                        "python-telegram-bot/logos/master/logo/png/"
-                        "ptb-logo_240.png",
+                        "document_url": (
+                            "https://raw.githubusercontent.com/"
+                            "python-telegram-bot/logos/master/logo/png/"
+                            "ptb-logo_240.png"
+                        ),
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
                         "input_message_content": {"message_text": "imc"},
@@ -843,8 +814,10 @@ class TestBotWithoutRequest:
             InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
-                document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
-                "logo/png/ptb-logo_240.png",
+                document_url=(
+                    "https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
+                    "logo/png/ptb-logo_240.png"
+                ),
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
@@ -908,9 +881,11 @@ class TestBotWithoutRequest:
                         "title": "test_result",
                         "id": "123",
                         "type": "document",
-                        "document_url": "https://raw.githubusercontent.com/"
-                        "python-telegram-bot/logos/master/logo/png/"
-                        "ptb-logo_240.png",
+                        "document_url": (
+                            "https://raw.githubusercontent.com/"
+                            "python-telegram-bot/logos/master/logo/png/"
+                            "ptb-logo_240.png"
+                        ),
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
                         "parse_mode": "Markdown",
@@ -932,8 +907,10 @@ class TestBotWithoutRequest:
             InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
-                document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
-                "logo/png/ptb-logo_240.png",
+                document_url=(
+                    "https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
+                    "logo/png/ptb-logo_240.png"
+                ),
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
@@ -1435,9 +1412,11 @@ class TestBotWithoutRequest:
                     data.get("caption") == caption,
                     data["parse_mode"] == ParseMode.HTML,
                     data["reply_to_message_id"] == media_message.message_id,
-                    data["reply_markup"] == keyboard.to_json()
-                    if json_keyboard
-                    else keyboard.to_dict(),
+                    (
+                        data["reply_markup"] == keyboard.to_json()
+                        if json_keyboard
+                        else keyboard.to_dict()
+                    ),
                     data["disable_notification"] is True,
                     data["caption_entities"]
                     == [MessageEntity(MessageEntity.BOLD, 0, 4).to_dict()],
@@ -2281,7 +2260,7 @@ class TestBotWithRequest:
             await bot.send_chat_action(chat_id, "unknown action")
 
     async def test_answer_inline_query_current_offset_error(self, bot, inline_results):
-        with pytest.raises(ValueError, match=("`current_offset` and `next_offset`")):
+        with pytest.raises(ValueError, match="`current_offset` and `next_offset`"):
             await bot.answer_inline_query(
                 1234, results=inline_results, next_offset=42, current_offset=51
             )
@@ -2550,8 +2529,9 @@ class TestBotWithRequest:
         message = await bot.send_game(chat_id, game_short_name, protect_content=True)
 
         assert message.game
-        assert message.game.description == (
-            "A no-op test game, for python-telegram-bot bot framework testing."
+        assert (
+            message.game.description
+            == "A no-op test game, for python-telegram-bot bot framework testing."
         )
         assert message.game.animation.file_id
         # We added some test bots later and for some reason the file size is not the same for them
@@ -2719,6 +2699,9 @@ class TestBotWithRequest:
                 can_manage_chat=True,
                 can_manage_video_chats=True,
                 can_manage_topics=True,
+                can_post_stories=True,
+                can_edit_stories=True,
+                can_delete_stories=True,
             )
 
         # Test that we pass the correct params to TG
@@ -2739,6 +2722,9 @@ class TestBotWithRequest:
                 and data.get("can_manage_chat") == 10
                 and data.get("can_manage_video_chats") == 11
                 and data.get("can_manage_topics") == 12
+                and data.get("can_post_stories") == 13
+                and data.get("can_edit_stories") == 14
+                and data.get("can_delete_stories") == 15
             )
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -2757,6 +2743,9 @@ class TestBotWithRequest:
             can_manage_chat=10,
             can_manage_video_chats=11,
             can_manage_topics=12,
+            can_post_stories=13,
+            can_edit_stories=14,
+            can_delete_stories=15,
         )
 
     async def test_export_chat_invite_link(self, bot, channel_id):

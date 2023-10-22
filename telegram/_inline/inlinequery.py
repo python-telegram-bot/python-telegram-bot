@@ -111,7 +111,7 @@ class InlineQuery(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.id: str = id  # pylint: disable=invalid-name
+        self.id: str = id
         self.from_user: User = from_user
         self.query: str = query
         self.offset: str = offset
@@ -145,8 +145,6 @@ class InlineQuery(TelegramObject):
         cache_time: Optional[int] = None,
         is_personal: Optional[bool] = None,
         next_offset: Optional[str] = None,
-        switch_pm_text: Optional[str] = None,
-        switch_pm_parameter: Optional[str] = None,
         button: Optional[InlineQueryResultsButton] = None,
         *,
         current_offset: Optional[str] = None,
@@ -192,8 +190,6 @@ class InlineQuery(TelegramObject):
             cache_time=cache_time,
             is_personal=is_personal,
             next_offset=next_offset,
-            switch_pm_text=switch_pm_text,
-            switch_pm_parameter=switch_pm_parameter,
             button=button,
             read_timeout=read_timeout,
             write_timeout=write_timeout,

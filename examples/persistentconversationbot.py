@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument, import-error
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -59,7 +59,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     if context.user_data:
         reply_text += (
             f" You already told me your {', '.join(context.user_data.keys())}. Why don't you "
-            f"tell me something more about yourself? Or change anything I already know."
+            "tell me something more about yourself? Or change anything I already know."
         )
     else:
         reply_text += (

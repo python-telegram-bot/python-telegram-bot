@@ -23,10 +23,6 @@ from typing import TYPE_CHECKING, Optional
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings_transition import (
-    warn_about_deprecated_arg_return_new_arg,
-    warn_about_deprecated_attr_in_property,
-)
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -38,6 +34,9 @@ class InlineQueryResultContact(InlineQueryResult):
     Represents a contact with a phone number. By default, this contact will be sent by the user.
     Alternatively, you can use :attr:`input_message_content` to send a message with the specified
     content instead of the contact.
+
+    .. versionchanged:: 20.5
+        |removed_thumb_wildcard_note|
 
     Args:
         id (:obj:`str`): Unique identifier for this result,
@@ -52,18 +51,6 @@ class InlineQueryResultContact(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the contact.
-        thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail_url`.
-        thumb_width (:obj:`int`, optional): Thumbnail width.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail_width`.
-        thumb_height (:obj:`int`, optional): Thumbnail height.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail_height`.
         thumbnail_url (:obj:`str`, optional): Url of the thumbnail for the result.
 
             .. versionadded:: 20.2
@@ -120,9 +107,6 @@ class InlineQueryResultContact(InlineQueryResult):
         last_name: Optional[str] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
         input_message_content: Optional["InputMessageContent"] = None,
-        thumb_url: Optional[str] = None,
-        thumb_width: Optional[int] = None,
-        thumb_height: Optional[int] = None,
         vcard: Optional[str] = None,
         thumbnail_url: Optional[str] = None,
         thumbnail_width: Optional[int] = None,
@@ -141,66 +125,6 @@ class InlineQueryResultContact(InlineQueryResult):
             self.vcard: Optional[str] = vcard
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
-            self.thumbnail_url: Optional[str] = warn_about_deprecated_arg_return_new_arg(
-                deprecated_arg=thumb_url,
-                new_arg=thumbnail_url,
-                deprecated_arg_name="thumb_url",
-                new_arg_name="thumbnail_url",
-                bot_api_version="6.6",
-            )
-            self.thumbnail_width: Optional[int] = warn_about_deprecated_arg_return_new_arg(
-                deprecated_arg=thumb_width,
-                new_arg=thumbnail_width,
-                deprecated_arg_name="thumb_width",
-                new_arg_name="thumbnail_width",
-                bot_api_version="6.6",
-            )
-            self.thumbnail_height: Optional[int] = warn_about_deprecated_arg_return_new_arg(
-                deprecated_arg=thumb_height,
-                new_arg=thumbnail_height,
-                deprecated_arg_name="thumb_height",
-                new_arg_name="thumbnail_height",
-                bot_api_version="6.6",
-            )
-
-    @property
-    def thumb_url(self) -> Optional[str]:
-        """:obj:`str`: Optional. Url of the thumbnail for the result.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail_url`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb_url",
-            new_attr_name="thumbnail_url",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail_url
-
-    @property
-    def thumb_width(self) -> Optional[int]:
-        """:obj:`str`: Optional. Thumbnail width.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail_width`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb_width",
-            new_attr_name="thumbnail_width",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail_width
-
-    @property
-    def thumb_height(self) -> Optional[int]:
-        """:obj:`str`: Optional. Thumbnail height.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail_height`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb_height",
-            new_attr_name="thumbnail_height",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail_height
+            self.thumbnail_url: Optional[str] = thumbnail_url
+            self.thumbnail_width: Optional[int] = thumbnail_width
+            self.thumbnail_height: Optional[int] = thumbnail_height

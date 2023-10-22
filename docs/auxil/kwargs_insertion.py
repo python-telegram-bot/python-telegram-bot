@@ -18,31 +18,47 @@
 import inspect
 
 keyword_args = [
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.read_timeout: Value to pass to "
-    ":paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to {read_timeout}.",
+    (
+        ":keyword _sphinx_paramlinks_telegram.Bot.{method}.read_timeout: Value to pass to "
+        ":paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to {read_timeout}."
+    ),
     ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.read_timeout: {read_timeout_type}, optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.write_timeout: Value to pass to "
-    ":paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to {write_timeout}.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.write_timeout: :obj:`float` | :obj:`None`, "
-    "optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.connect_timeout: Value to pass to "
-    ":paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to "
-    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.connect_timeout: :obj:`float` | "
-    ":obj:`None`, optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.pool_timeout: Value to pass to "
-    ":paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to "
-    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
-    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.pool_timeout: :obj:`float` | :obj:`None`, "
-    "optional",
-    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.api_kwargs: Arbitrary keyword arguments "
-    "to be passed to the Telegram API.",
+    (
+        ":keyword _sphinx_paramlinks_telegram.Bot.{method}.write_timeout: Value to pass to "
+        ":paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to {write_timeout}."
+    ),
+    (
+        ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.write_timeout: :obj:`float` |"
+        " :obj:`None`, optional"
+    ),
+    (
+        ":keyword _sphinx_paramlinks_telegram.Bot.{method}.connect_timeout: Value to pass to "
+        ":paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to "
+        ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`."
+    ),
+    (
+        ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.connect_timeout: :obj:`float` | "
+        ":obj:`None`, optional"
+    ),
+    (
+        ":keyword _sphinx_paramlinks_telegram.Bot.{method}.pool_timeout: Value to pass to "
+        ":paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to "
+        ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`."
+    ),
+    (
+        ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.pool_timeout: :obj:`float` |"
+        " :obj:`None`, optional"
+    ),
+    (
+        ":keyword _sphinx_paramlinks_telegram.Bot.{method}.api_kwargs: Arbitrary keyword arguments"
+        " to be passed to the Telegram API."
+    ),
     ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.api_kwargs: :obj:`dict`, optional",
     "",
 ]
 write_timeout_sub = [":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`", "``20``"]
 read_timeout_sub = [
-    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
+    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`",
     "``2``. :paramref:`timeout` will be added to this value",
 ]
 read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]

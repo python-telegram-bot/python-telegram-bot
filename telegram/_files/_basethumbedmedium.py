@@ -22,10 +22,6 @@ from typing import TYPE_CHECKING, Optional, Type, TypeVar
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings_transition import (
-    warn_about_deprecated_arg_return_new_arg,
-    warn_about_deprecated_attr_in_property,
-)
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -48,10 +44,6 @@ class _BaseThumbedMedium(_BaseMedium):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`, optional): File size.
-        thumb (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail`.
         thumbnail (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
 
             .. versionadded:: 20.2
@@ -75,7 +67,6 @@ class _BaseThumbedMedium(_BaseMedium):
         file_id: str,
         file_unique_id: str,
         file_size: Optional[int] = None,
-        thumb: Optional[PhotoSize] = None,
         thumbnail: Optional[PhotoSize] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -87,26 +78,7 @@ class _BaseThumbedMedium(_BaseMedium):
             api_kwargs=api_kwargs,
         )
 
-        self.thumbnail: Optional[PhotoSize] = warn_about_deprecated_arg_return_new_arg(
-            deprecated_arg=thumb,
-            new_arg=thumbnail,
-            deprecated_arg_name="thumb",
-            new_arg_name="thumbnail",
-            bot_api_version="6.6",
-            stacklevel=3,
-        )
-
-    @property
-    def thumb(self) -> Optional[PhotoSize]:
-        """:class:`telegram.PhotoSize`: Optional. Thumbnail as defined by sender.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb", new_attr_name="thumbnail", bot_api_version="6.6"
-        )
-        return self.thumbnail
+        self.thumbnail: Optional[PhotoSize] = thumbnail
 
     @classmethod
     def de_json(

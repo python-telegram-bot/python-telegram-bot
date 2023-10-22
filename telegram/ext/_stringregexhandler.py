@@ -33,7 +33,7 @@ RT = TypeVar("RT")
 
 
 class StringRegexHandler(BaseHandler[str, CCT]):
-    """BaseHandler class to handle string updates based on a regex which checks the update content.
+    """Handler class to handle string updates based on a regex which checks the update content.
 
     Read the documentation of the :mod:`re` module for more information. The :func:`re.match`
     function is used to determine if an update should be handled by this handler.

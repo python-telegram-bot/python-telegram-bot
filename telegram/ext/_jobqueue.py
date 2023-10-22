@@ -31,6 +31,7 @@ try:
 except ImportError:
     APS_AVAILABLE = False
 
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 from telegram.ext._extbot import ExtBot
@@ -75,6 +76,17 @@ class JobQueue(Generic[CCT]):
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
 
+            Warning:
+                This scheduler is configured by :meth:`set_application`. Additional configuration
+                settings can be made by users. However, calling
+                :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` will delete any
+                previous configuration settings. Therefore, please make sure to pass the values
+                returned by :attr:`scheduler_configuration` to the method call in addition to your
+                custom values.
+                Alternatively, you can also use methods like
+                :meth:`~apscheduler.schedulers.base.BaseScheduler.add_jobstore` to avoid using
+                :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` altogether.
+
             .. versionchanged:: 20.0
                 Uses :class:`~apscheduler.schedulers.asyncio.AsyncIOScheduler` instead of
                 :class:`~apscheduler.schedulers.background.BackgroundScheduler`
@@ -93,9 +105,65 @@ class JobQueue(Generic[CCT]):
 
         self._application: Optional[weakref.ReferenceType[Application]] = None
         self._executor = AsyncIOExecutor()
-        self.scheduler: AsyncIOScheduler = AsyncIOScheduler(
-            timezone=pytz.utc, executors={"default": self._executor}
-        )
+        self.scheduler: AsyncIOScheduler = AsyncIOScheduler(**self.scheduler_configuration)
+
+    def __repr__(self) -> str:
+        """Give a string representation of the JobQueue in the form ``JobQueue[application=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, application=self.application)
+
+    @property
+    def application(self) -> "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]":
+        """The application this JobQueue is associated with."""
+        if self._application is None:
+            raise RuntimeError("No application was set for this JobQueue.")
+        application = self._application()
+        if application is not None:
+            return application
+        raise RuntimeError("The application instance is no longer alive.")
+
+    @property
+    def scheduler_configuration(self) -> JSONDict:
+        """Provides configuration values that are used by :class:`JobQueue` for :attr:`scheduler`.
+
+        Tip:
+            Since calling
+            :meth:`scheduler.configure() <apscheduler.schedulers.base.BaseScheduler.configure>`
+            deletes any previous setting, please make sure to pass these values to the method call
+            in addition to your custom values:
+
+            .. code-block:: python
+
+                scheduler.configure(..., **job_queue.scheduler_configuration)
+
+            Alternatively, you can also use methods like
+            :meth:`~apscheduler.schedulers.base.BaseScheduler.add_jobstore` to avoid using
+            :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` altogether.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            Dict[:obj:`str`, :obj:`object`]: The configuration values as dictionary.
+
+        """
+        timezone: object = pytz.utc
+        if (
+            self._application
+            and isinstance(self.application.bot, ExtBot)
+            and self.application.bot.defaults
+        ):
+            timezone = self.application.bot.defaults.tzinfo or pytz.utc
+
+        return {
+            "timezone": timezone,
+            "executors": {"default": self._executor},
+        }
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -107,14 +175,14 @@ class JobQueue(Generic[CCT]):
     @overload
     def _parse_time_input(
         self,
-        time: Union[float, int, datetime.timedelta, datetime.datetime, datetime.time],
+        time: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
         shift_day: bool = False,
     ) -> datetime.datetime:
         ...
 
     def _parse_time_input(
         self,
-        time: Union[float, int, datetime.timedelta, datetime.datetime, datetime.time, None],
+        time: Union[float, datetime.timedelta, datetime.datetime, datetime.time, None],
         shift_day: bool = False,
     ) -> Optional[datetime.datetime]:
         if time is None:
@@ -144,21 +212,7 @@ class JobQueue(Generic[CCT]):
 
         """
         self._application = weakref.ref(application)
-        if isinstance(application.bot, ExtBot) and application.bot.defaults:
-            self.scheduler.configure(
-                timezone=application.bot.defaults.tzinfo or pytz.utc,
-                executors={"default": self._executor},
-            )
-
-    @property
-    def application(self) -> "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]":
-        """The application this JobQueue is associated with."""
-        if self._application is None:
-            raise RuntimeError("No application was set for this JobQueue.")
-        application = self._application()
-        if application is not None:
-            return application
-        raise RuntimeError("The application instance is no longer alive.")
+        self.scheduler.configure(**self.scheduler_configuration)
 
     @staticmethod
     async def job_callback(job_queue: "JobQueue[CCT]", job: "Job[CCT]") -> None:
@@ -766,6 +820,40 @@ class Job(Generic[CCT]):
 
         self._job = cast("APSJob", None)  # skipcq: PTC-W0052
 
+    def __getattr__(self, item: str) -> object:
+        try:
+            return getattr(self.job, item)
+        except AttributeError as exc:
+            raise AttributeError(
+                f"Neither 'telegram.ext.Job' nor 'apscheduler.job.Job' has attribute '{item}'"
+            ) from exc
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, self.__class__):
+            return self.id == other.id
+        return False
+
+    def __hash__(self) -> int:
+        return hash(self.id)
+
+    def __repr__(self) -> str:
+        """Give a string representation of the job in the form
+        ``Job[id=..., name=..., callback=..., trigger=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(
+            self,
+            id=self.job.id,
+            name=self.name,
+            callback=self.callback.__name__,
+            trigger=self.job.trigger,
+        )
+
     @property
     def job(self) -> "APSJob":
         """:class:`apscheduler.job.Job`: The APS Job this job is a wrapper for.
@@ -774,46 +862,6 @@ class Job(Generic[CCT]):
             This property is now read-only.
         """
         return self._job
-
-    async def run(
-        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
-    ) -> None:
-        """Executes the callback function independently of the jobs schedule. Also calls
-        :meth:`telegram.ext.Application.update_persistence`.
-
-        .. versionchanged:: 20.0
-            Calls :meth:`telegram.ext.Application.update_persistence`.
-
-        Args:
-            application (:class:`telegram.ext.Application`): The application this job is associated
-                with.
-        """
-        # We shield the task such that the job isn't cancelled mid-run
-        await asyncio.shield(self._run(application))
-
-    async def _run(
-        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
-    ) -> None:
-        try:
-            context = application.context_types.context.from_job(self, application)
-            await context.refresh_data()
-            await self.callback(context)
-        except Exception as exc:
-            await application.create_task(
-                application.process_error(None, exc, job=self),
-                name=f"Job:{self.id}:run:process_error",
-            )
-        finally:
-            # This is internal logic of application - let's keep it private for now
-            application._mark_for_persistence_update(job=self)  # pylint: disable=protected-access
-
-    def schedule_removal(self) -> None:
-        """
-        Schedules this job for removal from the :class:`JobQueue`. It will be removed without
-        executing its callback function again.
-        """
-        self.job.remove()
-        self._removed = True
 
     @property
     def removed(self) -> bool:
@@ -867,18 +915,42 @@ class Job(Generic[CCT]):
         ext_job._job = aps_job  # pylint: disable=protected-access
         return ext_job
 
-    def __getattr__(self, item: str) -> object:
+    async def run(
+        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
+    ) -> None:
+        """Executes the callback function independently of the jobs schedule. Also calls
+        :meth:`telegram.ext.Application.update_persistence`.
+
+        .. versionchanged:: 20.0
+            Calls :meth:`telegram.ext.Application.update_persistence`.
+
+        Args:
+            application (:class:`telegram.ext.Application`): The application this job is associated
+                with.
+        """
+        # We shield the task such that the job isn't cancelled mid-run
+        await asyncio.shield(self._run(application))
+
+    async def _run(
+        self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
+    ) -> None:
         try:
-            return getattr(self.job, item)
-        except AttributeError as exc:
-            raise AttributeError(
-                f"Neither 'telegram.ext.Job' nor 'apscheduler.job.Job' has attribute '{item}'"
-            ) from exc
+            context = application.context_types.context.from_job(self, application)
+            await context.refresh_data()
+            await self.callback(context)
+        except Exception as exc:
+            await application.create_task(
+                application.process_error(None, exc, job=self),
+                name=f"Job:{self.id}:run:process_error",
+            )
+        finally:
+            # This is internal logic of application - let's keep it private for now
+            application._mark_for_persistence_update(job=self)  # pylint: disable=protected-access
 
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
-            return self.id == other.id
-        return False
-
-    def __hash__(self) -> int:
-        return hash(self.id)
+    def schedule_removal(self) -> None:
+        """
+        Schedules this job for removal from the :class:`JobQueue`. It will be removed without
+        executing its callback function again.
+        """
+        self.job.remove()
+        self._removed = True

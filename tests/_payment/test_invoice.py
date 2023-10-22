@@ -301,8 +301,10 @@ class TestInvoiceWithRequest(TestInvoiceBase):
             suggested_tip_amounts=self.suggested_tip_amounts,
             start_parameter=self.start_parameter,
             provider_data=self.provider_data,
-            photo_url="https://raw.githubusercontent.com/"
-            "python-telegram-bot/logos/master/logo/png/ptb-logo_240.png",
+            photo_url=(
+                "https://raw.githubusercontent.com/"
+                "python-telegram-bot/logos/master/logo/png/ptb-logo_240.png"
+            ),
             photo_size=240,
             photo_width=240,
             photo_height=240,

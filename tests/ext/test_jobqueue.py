@@ -25,7 +25,7 @@ import time
 
 import pytest
 
-from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
+from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Defaults, Job, JobQueue
 from telegram.warnings import PTBUserWarning
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.pytest_classes import make_bot
@@ -85,11 +85,35 @@ class TestJobQueue:
         " We recommend double checking if the passed value is correct."
     )
 
+    async def test_repr(self, app):
+        jq = JobQueue()
+        jq.set_application(app)
+        assert repr(jq) == f"JobQueue[application={app!r}]"
+
+        when = dtm.datetime.utcnow() + dtm.timedelta(days=1)
+        callback = self.job_run_once
+        job = jq.run_once(callback, when, name="name2")
+        assert repr(job) == (
+            f"Job[id={job.job.id}, name={job.name}, callback=job_run_once, "
+            f"trigger=date["
+            f"{when.strftime('%Y-%m-%d %H:%M:%S UTC')}"
+            f"]]"
+        )
+
     @pytest.fixture(autouse=True)
     def _reset(self):
         self.result = 0
         self.job_time = 0
         self.received_error = None
+
+    def test_scheduler_configuration(self, job_queue, timezone, bot):
+        # Unfortunately, we can't really test the executor setting explicitly without relying
+        # on protected attributes. However, this should be tested enough implicitly via all the
+        # other tests in here
+        assert job_queue.scheduler_configuration["timezone"] is UTC
+
+        tz_app = ApplicationBuilder().defaults(Defaults(tzinfo=timezone)).token(bot.token).build()
+        assert tz_app.job_queue.scheduler_configuration["timezone"] is timezone
 
     async def job_run_once(self, context):
         if (
@@ -563,7 +587,7 @@ class TestJobQueue:
         assert rec.name == "telegram.ext.Application"
         assert "No error handlers are registered" in rec.getMessage()
 
-    async def test_custom_context(self, bot, job_queue):
+    async def test_custom_context(self, bot):
         application = (
             ApplicationBuilder()
             .token(bot.token)
@@ -574,6 +598,7 @@ class TestJobQueue:
             )
             .build()
         )
+        job_queue = JobQueue()
         job_queue.set_application(application)
 
         async def callback(context):
@@ -584,9 +609,11 @@ class TestJobQueue:
                 type(context.bot_data),
             )
 
+        await job_queue.start()
         job_queue.run_once(callback, 0.1)
         await asyncio.sleep(0.15)
         assert self.result == (CustomContext, None, None, int)
+        await job_queue.stop()
 
     async def test_attribute_error(self):
         job = Job(self.job_run_once)

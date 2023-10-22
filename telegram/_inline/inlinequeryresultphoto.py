@@ -25,10 +25,6 @@ from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
-from telegram._utils.warnings_transition import (
-    warn_about_deprecated_arg_return_new_arg,
-    warn_about_deprecated_attr_in_property,
-)
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -42,6 +38,9 @@ class InlineQueryResultPhoto(InlineQueryResult):
     specified content instead of the photo.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. versionchanged:: 20.5
+      |removed_thumb_url_note|
 
     Args:
         id (:obj:`str`): Unique identifier for this result,
@@ -75,10 +74,6 @@ class InlineQueryResultPhoto(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the photo.
-        thumb_url (:obj:`str`, optional): URL of the thumbnail for the photo.
-
-            .. deprecated:: 20.2
-               |thumbargumentdeprecation| :paramref:`thumbnail_url`.
 
     Raises:
         :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
@@ -131,10 +126,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         self,
         id: str,  # pylint: disable=redefined-builtin
         photo_url: str,
-        # thumbnail_url is not optional in Telegram API, but we want to support thumb_url as well,
-        # so thumbnail_url may not be passed.  We will raise ValueError manually if neither
-        # thumbnail_url nor thumb_url are passed
-        thumbnail_url: Optional[str] = None,
+        thumbnail_url: str,
         photo_width: Optional[int] = None,
         photo_height: Optional[int] = None,
         title: Optional[str] = None,
@@ -144,28 +136,14 @@ class InlineQueryResultPhoto(InlineQueryResult):
         input_message_content: Optional["InputMessageContent"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence[MessageEntity]] = None,
-        # thumb_url is not optional in Telegram API, but it is here, along with thumbnail_url.
-        thumb_url: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
-        if not (thumbnail_url or thumb_url):
-            raise ValueError(
-                "You must pass either 'thumbnail_url' or 'thumb_url'. Note that 'thumb_url' is "
-                "deprecated."
-            )
-
         # Required
         super().__init__(InlineQueryResultType.PHOTO, id, api_kwargs=api_kwargs)
         with self._unfrozen():
             self.photo_url: str = photo_url
-            self.thumbnail_url: str = warn_about_deprecated_arg_return_new_arg(
-                deprecated_arg=thumb_url,
-                new_arg=thumbnail_url,
-                deprecated_arg_name="thumb_url",
-                new_arg_name="thumbnail_url",
-                bot_api_version="6.6",
-            )
+            self.thumbnail_url: str = thumbnail_url
 
             # Optionals
             self.photo_width: Optional[int] = photo_width
@@ -177,17 +155,3 @@ class InlineQueryResultPhoto(InlineQueryResult):
             self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
-
-    @property
-    def thumb_url(self) -> Optional[str]:
-        """:obj:`str`: URL of the thumbnail for the photo.
-
-        .. deprecated:: 20.2
-           |thumbattributedeprecation| :attr:`thumbnail_url`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="thumb_url",
-            new_attr_name="thumbnail_url",
-            bot_api_version="6.6",
-        )
-        return self.thumbnail_url

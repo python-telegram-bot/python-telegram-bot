@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
 
 class StringCommandHandler(BaseHandler[str, CCT]):
-    """BaseHandler class to handle string commands. Commands are string updates that start with
+    """Handler class to handle string commands. Commands are string updates that start with
     ``/``. The handler will add a :obj:`list` to the
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
     which is the text following the command split on single whitespace characters.

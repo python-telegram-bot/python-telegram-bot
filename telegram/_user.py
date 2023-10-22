@@ -153,7 +153,7 @@ class User(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.id: int = id  # pylint: disable=invalid-name
+        self.id: int = id
         self.first_name: str = first_name
         self.is_bot: bool = is_bot
         # Optionals
@@ -555,7 +555,6 @@ class User(TelegramObject):
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -593,7 +592,6 @@ class User(TelegramObject):
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
-            thumb=thumb,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
@@ -751,7 +749,6 @@ class User(TelegramObject):
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: Optional[FileInput] = None,
         disable_content_type_detection: Optional[bool] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
@@ -792,7 +789,6 @@ class User(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             parse_mode=parse_mode,
-            thumb=thumb,
             thumbnail=thumbnail,
             api_kwargs=api_kwargs,
             disable_content_type_detection=disable_content_type_detection,
@@ -1005,7 +1001,6 @@ class User(TelegramObject):
         duration: Optional[int] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
-        thumb: Optional[FileInput] = None,
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -1044,7 +1039,6 @@ class User(TelegramObject):
             duration=duration,
             width=width,
             height=height,
-            thumb=thumb,
             caption=caption,
             parse_mode=parse_mode,
             disable_notification=disable_notification,
@@ -1123,7 +1117,6 @@ class User(TelegramObject):
         height: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         supports_streaming: Optional[bool] = None,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -1167,7 +1160,6 @@ class User(TelegramObject):
             height=height,
             parse_mode=parse_mode,
             supports_streaming=supports_streaming,
-            thumb=thumb,
             thumbnail=thumbnail,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1247,7 +1239,6 @@ class User(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
-        thumb: Optional[FileInput] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -1285,7 +1276,6 @@ class User(TelegramObject):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            thumb=thumb,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             filename=filename,

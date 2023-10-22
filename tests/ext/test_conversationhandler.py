@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Persistence of conversations is tested in test_basepersistence.py"""
 import asyncio
+import functools
 import logging
 from pathlib import Path
 from warnings import filterwarnings
@@ -75,6 +76,7 @@ def user2():
 
 
 def raise_ahs(func):
+    @functools.wraps(func)  # for checking __repr__
     async def decorator(self, *args, **kwargs):
         result = await func(self, *args, **kwargs)
         if self.raise_app_handler_stop:
@@ -289,6 +291,41 @@ class TestConversationHandler:
                 self.entry_points, states=self.states, fallbacks=[], persistent=True
             )
 
+    def test_repr_no_truncation(self):
+        # ConversationHandler's __repr__ is not inherited from BaseHandler.
+        ch = ConversationHandler(
+            name="test_handler",
+            entry_points=[],
+            states=self.drinking_states,
+            fallbacks=[],
+        )
+        assert repr(ch) == (
+            "ConversationHandler[name=test_handler, "
+            "states={'a': [CommandHandler[callback=TestConversationHandler.sip]], "
+            "'b': [CommandHandler[callback=TestConversationHandler.swallow]], "
+            "'c': [CommandHandler[callback=TestConversationHandler.hold]]}]"
+        )
+
+    def test_repr_with_truncation(self):
+        from copy import copy
+
+        states = copy(self.drinking_states)
+        # there are exactly 3 drinking states. adding one more to make sure it's truncated
+        states["extra_to_be_truncated"] = [CommandHandler("foo", self.start)]
+
+        ch = ConversationHandler(
+            name="test_handler",
+            entry_points=[],
+            states=states,
+            fallbacks=[],
+        )
+        assert repr(ch) == (
+            "ConversationHandler[name=test_handler, "
+            "states={'a': [CommandHandler[callback=TestConversationHandler.sip]], "
+            "'b': [CommandHandler[callback=TestConversationHandler.swallow]], "
+            "'c': [CommandHandler[callback=TestConversationHandler.hold]], ...}]"
+        )
+
     async def test_check_update_returns_non(self, app, user1):
         """checks some cases where updates should not be handled"""
         conv_handler = ConversationHandler([], {}, [], per_message=True, per_chat=True)
@@ -394,21 +431,25 @@ class TestConversationHandler:
         assert len(recwarn) == 13
         # now we test the messages, they are raised in the order they are inserted
         # into the conversation handler
-        assert str(recwarn[0].message) == (
-            "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+        assert (
+            str(recwarn[0].message)
+            == "The `ConversationHandler` only handles updates of type `telegram.Update`. "
             "StringCommandHandler handles updates of type `str`."
         )
-        assert str(recwarn[1].message) == (
-            "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+        assert (
+            str(recwarn[1].message)
+            == "The `ConversationHandler` only handles updates of type `telegram.Update`. "
             "StringRegexHandler handles updates of type `str`."
         )
-        assert str(recwarn[2].message) == (
-            "PollHandler will never trigger in a conversation since it has no information "
+        assert (
+            str(recwarn[2].message)
+            == "PollHandler will never trigger in a conversation since it has no information "
             "about the chat or the user who voted in it. Do you mean the "
             "`PollAnswerHandler`?"
         )
-        assert str(recwarn[3].message) == (
-            "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+        assert (
+            str(recwarn[3].message)
+            == "The `ConversationHandler` only handles updates of type `telegram.Update`. "
             "The TypeHandler is set to handle NotUpdate."
         )
 
@@ -444,17 +485,19 @@ class TestConversationHandler:
             + per_faq_link
         )
         assert str(recwarn[10].message) == (
-            "If 'per_message=False', 'CallbackQueryHandler' will not be tracked for "
-            "every message." + per_faq_link
+            "If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message."
+            + per_faq_link
         )
-        assert str(recwarn[11].message) == (
-            "Using `conversation_timeout` with nested conversations is currently not "
+        assert (
+            str(recwarn[11].message)
+            == "Using `conversation_timeout` with nested conversations is currently not "
             "supported. You can still try to use it, but it will likely behave differently"
             " from what you expect."
         )
 
-        assert str(recwarn[12].message) == (
-            "If 'per_message=True' is used, 'per_chat=True' should also be used, "
+        assert (
+            str(recwarn[12].message)
+            == "If 'per_message=True' is used, 'per_chat=True' should also be used, "
             "since message IDs are not globally unique."
         )
 
@@ -684,8 +727,9 @@ class TestConversationHandler:
                 Path(recwarn[0].filename)
                 == PROJECT_ROOT_PATH / "telegram" / "ext" / "_conversationhandler.py"
             ), "wrong stacklevel!"
-            assert str(recwarn[0].message) == (
-                "'callback' returned state 69 which is unknown to the ConversationHandler xyz."
+            assert (
+                str(recwarn[0].message)
+                == "'callback' returned state 69 which is unknown to the ConversationHandler xyz."
             )
 
     async def test_conversation_handler_per_chat(self, app, bot, user1, user2):

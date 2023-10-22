@@ -170,6 +170,7 @@ __all__ = (  # Keep this alphabetically ordered
     "ShippingQuery",
     "Sticker",
     "StickerSet",
+    "Story",
     "SuccessfulPayment",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
@@ -341,6 +342,7 @@ from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage
 from ._shared import ChatShared, UserShared
+from ._story import Story
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject
 from ._update import Update

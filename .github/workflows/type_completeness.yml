@@ -12,7 +12,7 @@ jobs:
     name:   test-type-completeness
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: git fetch --depth=1  # https://github.com/actions/checkout/issues/329#issuecomment-674881489
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4

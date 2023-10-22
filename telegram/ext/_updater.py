@@ -37,6 +37,7 @@ from typing import (
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.logging import get_logger
+from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import ODVInput
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 
@@ -76,6 +77,8 @@ class Updater(AsyncContextManager["Updater"]):
             # code
         finally:
             await updater.shutdown()
+
+    .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
 
     .. seealso:: :wiki:`Architecture Overview <Architecture>`,
         :wiki:`Builder Pattern <Builder-Pattern>`
@@ -124,6 +127,46 @@ class Updater(AsyncContextManager["Updater"]):
         self.__polling_task: Optional[asyncio.Task] = None
         self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
 
+    async def __aenter__(self: _UpdaterType) -> _UpdaterType:  # noqa: PYI019
+        """
+        |async_context_manager| :meth:`initializes <initialize>` the Updater.
+
+        Returns:
+            The initialized Updater instance.
+
+        Raises:
+            :exc:`Exception`: If an exception is raised during initialization, :meth:`shutdown`
+                is called in this case.
+        """
+        try:
+            await self.initialize()
+            return self
+        except Exception as exc:
+            await self.shutdown()
+            raise exc
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        """|async_context_manager| :meth:`shuts down <shutdown>` the Updater."""
+        # Make sure not to return `True` so that exceptions are not suppressed
+        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
+        await self.shutdown()
+
+    def __repr__(self) -> str:
+        """Give a string representation of the updater in the form ``Updater[bot=...]``.
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        return build_repr_with_selected_attrs(self, bot=self.bot)
+
     @property
     def running(self) -> bool:
         return self._running
@@ -162,26 +205,6 @@ class Updater(AsyncContextManager["Updater"]):
         await self.bot.shutdown()
         self._initialized = False
         _LOGGER.debug("Shut down of Updater complete")
-
-    async def __aenter__(self: _UpdaterType) -> _UpdaterType:
-        """Simple context manager which initializes the Updater."""
-        try:
-            await self.initialize()
-            return self
-        except Exception as exc:
-            await self.shutdown()
-            raise exc
-
-    async def __aexit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ) -> None:
-        """Shutdown the Updater from the context manager."""
-        # Make sure not to return `True` so that exceptions are not suppressed
-        # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
-        await self.shutdown()
 
     async def start_polling(
         self,

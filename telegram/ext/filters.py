@@ -73,6 +73,7 @@ __all__ = (
     "REPLY",
     "Regex",
     "Sticker",
+    "STORY",
     "SUCCESSFUL_PAYMENT",
     "SenderChat",
     "StatusUpdate",
@@ -182,6 +183,39 @@ class BaseFilter:
         self._name = self.__class__.__name__ if name is None else name
         self._data_filter = data_filter
 
+    def __and__(self, other: "BaseFilter") -> "BaseFilter":
+        return _MergedFilter(self, and_filter=other)
+
+    def __or__(self, other: "BaseFilter") -> "BaseFilter":
+        return _MergedFilter(self, or_filter=other)
+
+    def __xor__(self, other: "BaseFilter") -> "BaseFilter":
+        return _XORFilter(self, other)
+
+    def __invert__(self) -> "BaseFilter":
+        return _InvertedFilter(self)
+
+    def __repr__(self) -> str:
+        return self.name
+
+    @property
+    def data_filter(self) -> bool:
+        """:obj:`bool`: Whether this filter is a data filter."""
+        return self._data_filter
+
+    @data_filter.setter
+    def data_filter(self, value: bool) -> None:
+        self._data_filter = value
+
+    @property
+    def name(self) -> str:
+        """:obj:`str`: Name for this filter."""
+        return self._name
+
+    @name.setter
+    def name(self, name: str) -> None:
+        self._name = name
+
     def check_update(  # skipcq: PYL-R0201
         self, update: Update
     ) -> Optional[Union[bool, FilterDataDict]]:
@@ -204,39 +238,6 @@ class BaseFilter:
         ):
             return True
         return False
-
-    def __and__(self, other: "BaseFilter") -> "BaseFilter":
-        return _MergedFilter(self, and_filter=other)
-
-    def __or__(self, other: "BaseFilter") -> "BaseFilter":
-        return _MergedFilter(self, or_filter=other)
-
-    def __xor__(self, other: "BaseFilter") -> "BaseFilter":
-        return _XORFilter(self, other)
-
-    def __invert__(self) -> "BaseFilter":
-        return _InvertedFilter(self)
-
-    @property
-    def data_filter(self) -> bool:
-        """:obj:`bool`: Whether this filter is a data filter."""
-        return self._data_filter
-
-    @data_filter.setter
-    def data_filter(self, value: bool) -> None:
-        self._data_filter = value
-
-    @property
-    def name(self) -> str:
-        """:obj:`str`: Name for this filter."""
-        return self._name
-
-    @name.setter
-    def name(self, name: str) -> None:
-        self._name = name
-
-    def __repr__(self) -> str:
-        return self.name
 
 
 class MessageFilter(BaseFilter):
@@ -763,7 +764,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
     def name(self) -> str:
         return (
             f"filters.{self.__class__.__name__}("
-            f'{", ".join(str(s) for s in (self.usernames or self.chat_ids))})'
+            f"{', '.join(str(s) for s in (self.usernames or self.chat_ids))})"
         )
 
     @name.setter
@@ -2142,6 +2143,20 @@ class Sticker:
     .. versionadded:: 20.0
     """
     # neither mask nor emoji can be a message.sticker, so no filters for them
+
+
+class _Story(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.story)
+
+
+STORY = _Story(name="filters.STORY")
+"""Messages that contain :attr:`telegram.Message.story`.
+
+.. versionadded:: 20.5
+"""
 
 
 class _SuccessfulPayment(MessageFilter):

@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 
 class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram updates that contain
+    """Handler class to handle Telegram updates that contain
     :attr:`telegram.Update.chosen_inline_result`.
 
     Warning:
