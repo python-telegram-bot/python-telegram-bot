@@ -109,6 +109,8 @@ class HTTPXRequest(BaseRequest):
             Note:
                 * The proxy URL can also be set via the environment variables ``HTTPS_PROXY`` or
                   ``ALL_PROXY``. See `the docs of httpx`_ for more info.
+                * HTTPS proxies can be configured by passing a ``httpx.Proxy`` object with
+                  a corresponding ``ssl_context``.
                 * For Socks5 support, additional dependencies are required. Make sure to install
                   PTB via :command:`pip install "python-telegram-bot[socks]"` in this case.
                 * Socks5 proxies can not be set via environment variables.
@@ -124,7 +126,7 @@ class HTTPXRequest(BaseRequest):
     def __init__(
         self,
         connection_pool_size: int = 1,
-        proxy_url: Optional[Union[str, httpx.Proxy]] = None,
+        proxy_url: Optional[Union[str, httpx.Proxy, httpx.URL]] = None,
         read_timeout: Optional[float] = 5.0,
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
