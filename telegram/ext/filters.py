@@ -2564,69 +2564,67 @@ VOICE = _Voice("filters.VOICE")
 
 
 class Mention(MessageFilter):
-    """Mention messages. If list of username or chat_id or :attr:`telegram.User` objects passed,
-    it filters messages to only allow those whose contains one of username
-    or chat_id or :attr:`telegram.User`.
-    Note:
-        Chat id only allowed with positive numbers. Example: 123456
+    """Messages containing mentions of specified users or chats.
+
     Examples:
-        A simple use case for passing username is to allow only messages that were sent with
-        mention username:
-        MessageHandler(filters.Mention("username"), callback_method)
-        MessageHandler(filters.Mention(["@username",123456, `user` ), callback_method)
+        .. code-block:: python
+
+            MessageHandler(filters.Mention("username"), callback)
+            MessageHandler(filters.Mention(["@username", 123456]), callback)
+
+    .. versionadded:: NEXT.VERSION
+
     Args:
-        mentions (Union[:obj:`str` ,:obj:`str` ,:attr:`telegram.User` ] ||
-        Collection[Union[:obj:`str` ,:obj`str` ,:attr:`telegram.User` ]]):
-        Which messages to allow with username or chat_id or :attr:`telegram.User` object.
-        If one of them matched it will allow.
+        mentions (:obj:`str` | :obj:`str` | :class:`telegram.User` | Collection[:obj:`str` | \
+            :obj:`str` | :class:`telegram.User`]):
+            Specifies the users and chats to filter for. Messages that do not mention at least one
+            of the specified users or chats will not be handled. Leading ``'@'`` s in usernames
+            will be discarded.
     """
 
-    __slots__ = ("mention", "_mentions")
+    __slots__ = ("_mentions",)
 
     def __init__(self, mentions: SCT[Union[int, str, TGUser]]):
-        self._mentions = self._parse_mentions(mentions)
         super().__init__(name=f"filters.Mention({mentions})")
-
-    @staticmethod
-    def _parse_mentions(mentions: SCT[Union[int, str, TGUser]]) -> Set[Union[int, str, TGUser]]:
         if isinstance(mentions, Iterable) and not isinstance(mentions, str):
-            return set(mentions)
-        return {mentions}
+            self._mentions = {self._fix_mention_username(mention) for mention in mentions}
+        else:
+            self._mentions = {self._fix_mention_username(mentions)}
 
     @staticmethod
     def _fix_mention_username(mention: Union[int, str, TGUser]) -> Union[int, str, TGUser]:
         if not isinstance(mention, str):
             return mention
-        if mention.startswith("@"):
-            return mention
-        return f"@{mention}"
+        return mention.lstrip("@")
 
-    @property
-    def mentions(self) -> FrozenSet[Union[int, str, TGUser]]:
-        """Which mention(s) to allow through.
-        Returns:
-            frozenset(Union[:obj:`int` , :obj:`str`, :attr:`telegram.User` ])
-        """
-        # correcting str usernames.
-        _mentions = {self._fix_mention_username(mention) for mention in self._mentions}
-        return frozenset(_mentions)
+    @classmethod
+    def _check_mention(cls, message: Message, mention: Union[int, str, TGUser]) -> bool:
+        if not message.entities:
+            return False
 
-    @staticmethod
-    def _check_mention(message: Message, mention: Union[int, str, TGUser]) -> bool:
+        entity_texts = message.parse_entities(
+            types=[MessageEntity.MENTION, MessageEntity.TEXT_MENTION]
+        )
+
         if isinstance(mention, TGUser):
-            return bool(any(mention.id == e.user.id for e in message.entities if e.user))
-        if isinstance(mention, int):
-            return bool(any(mention == e.user.id for e in message.entities if e.user))
-        return bool(
-            isinstance(mention, str)
-            and bool(
-                any(
-                    (entity.type == MessageEntity.MENTION and message.text == entity_value)
-                    for entity, entity_value in message.parse_entities().items()
-                )
+            return any(
+                mention.id == entity.user.id
+                or mention.username == entity.user.username
+                or mention.username == cls._fix_mention_username(entity_texts[entity])
+                for entity in message.entities
+                if entity.user
+            ) or any(
+                mention.username == cls._fix_mention_username(entity_text)
+                for entity_text in entity_texts.values()
             )
-            and message.text
+        if isinstance(mention, int):
+            return bool(
+                any(mention == entity.user.id for entity in message.entities if entity.user)
+            )
+        return any(
+            mention == cls._fix_mention_username(entity_text)
+            for entity_text in entity_texts.values()
         )
 
     def filter(self, message: Message) -> bool:
-        return any(self._check_mention(message, mention) for mention in self.mentions)
+        return any(self._check_mention(message, mention) for mention in self._mentions)
