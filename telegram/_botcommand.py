@@ -18,66 +18,41 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Command."""
 
-from typing import Final, Optional
+from telegram import Bot, Update
+from telegram.ext import CallbackContext, MessageHandler, Filters, Updater
+import datetime
 
-from telegram import constants
-from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+# Your bot token from @BotFather
+TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+GROUP_CHAT_ID = '@YourGroupChatUsernameOrID'  # Replace with your group chat ID or username
 
+# When you want to expire the link (e.g., 7 days)
+LINK_EXPIRATION_DAYS = 7
 
-class BotCommand(TelegramObject):
-    """
-    This object represents a bot command.
+# Store the date when the bot starts/restarts
+start_date = datetime.datetime.now()
 
-    Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`command` and :attr:`description` are equal.
+def check_members(update: Update, context: CallbackContext):
+    bot: Bot = context.bot
+    current_time = datetime.datetime.now()
 
-    Args:
-        command (:obj:`str`): Text of the command; :tg-const:`telegram.BotCommand.MIN_COMMAND`-
-            :tg-const:`telegram.BotCommand.MAX_COMMAND` characters. Can contain only lowercase
-            English letters, digits and underscores.
-        description (:obj:`str`): Description of the command;
-            :tg-const:`telegram.BotCommand.MIN_DESCRIPTION`-
-            :tg-const:`telegram.BotCommand.MAX_DESCRIPTION` characters.
+    # If the current time exceeds the link expiration time
+    if (current_time - start_date).days > LINK_EXPIRATION_DAYS:
+        # Fetch list of group members
+        for member in bot.get_chat_members(chat_id=GROUP_CHAT_ID):
+            # If the member joined before the bot's start date (meaning they used the old link)
+            if member.user.date_joined and member.user.date_joined < start_date:
+                bot.kick_chat_member(chat_id=GROUP_CHAT_ID, user_id=member.user.id)
 
-    Attributes:
-        command (:obj:`str`): Text of the command; :tg-const:`telegram.BotCommand.MIN_COMMAND`-
-            :tg-const:`telegram.BotCommand.MAX_COMMAND` characters. Can contain only lowercase
-            English letters, digits and underscores.
-        description (:obj:`str`): Description of the command;
-            :tg-const:`telegram.BotCommand.MIN_DESCRIPTION`-
-            :tg-const:`telegram.BotCommand.MAX_DESCRIPTION` characters.
+    # Here, generate a new invite link and share/store it
+    # ... 
 
-    """
+# Setting up the bot
+updater = Updater(token=TOKEN, use_context=True)
+dp = updater.dispatcher
 
-    __slots__ = ("description", "command")
+# Check members every time a new member joins
+dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, check_members))
 
-    def __init__(self, command: str, description: str, *, api_kwargs: Optional[JSONDict] = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.command: str = command
-        self.description: str = description
-
-        self._id_attrs = (self.command, self.description)
-
-        self._freeze()
-
-    MIN_COMMAND: Final[int] = constants.BotCommandLimit.MIN_COMMAND
-    """:const:`telegram.constants.BotCommandLimit.MIN_COMMAND`
-
-    .. versionadded:: 20.0
-    """
-    MAX_COMMAND: Final[int] = constants.BotCommandLimit.MAX_COMMAND
-    """:const:`telegram.constants.BotCommandLimit.MAX_COMMAND`
-
-    .. versionadded:: 20.0
-    """
-    MIN_DESCRIPTION: Final[int] = constants.BotCommandLimit.MIN_DESCRIPTION
-    """:const:`telegram.constants.BotCommandLimit.MIN_DESCRIPTION`
-
-    .. versionadded:: 20.0
-    """
-    MAX_DESCRIPTION: Final[int] = constants.BotCommandLimit.MAX_DESCRIPTION
-    """:const:`telegram.constants.BotCommandLimit.MAX_DESCRIPTION`
-
-    .. versionadded:: 20.0
-    """
+updater.start_polling()
+updater.idle()
