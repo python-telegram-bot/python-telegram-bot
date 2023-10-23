@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
-from typing import Collection, Optional, Tuple, Union
+from typing import Collection, Optional, Tuple
 
 import httpx
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
-from telegram._utils.types import HTTPVersion, ODVInput
+from telegram._utils.types import HTTPVersion, ODVInput, SocketOpt
 from telegram.error import NetworkError, TimedOut
 from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
@@ -34,12 +34,6 @@ from telegram.request._requestdata import RequestData
 # That also works with socks5. Just pass `--mode socks5` to mitmproxy
 
 _LOGGER = get_logger(__name__, "HTTPXRequest")
-
-_SocketOpt = Union[
-    Tuple[int, int, int],
-    Tuple[int, int, Union[bytes, bytearray]],
-    Tuple[int, int, None, int],
-]
 
 
 class HTTPXRequest(BaseRequest):
@@ -121,7 +115,7 @@ class HTTPXRequest(BaseRequest):
         connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
         http_version: HTTPVersion = "1.1",
-        socket_options: Optional[Collection[_SocketOpt]] = None,
+        socket_options: Optional[Collection[SocketOpt]] = None,
     ):
         self._http_version = http_version
         timeout = httpx.Timeout(
