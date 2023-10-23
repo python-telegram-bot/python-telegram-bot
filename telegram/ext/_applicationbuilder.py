@@ -505,7 +505,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         warn(
             "`ApplicationBuilder.proxy_url` is deprecated since version "
-            "Next.VERSION. Use `ApplicationBuilder.proxy` instead.",
+            "NEXT.VERSION. Use `ApplicationBuilder.proxy` instead.",
             PTBDeprecationWarning,
             stacklevel=2,
         )
@@ -698,7 +698,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         warn(
             "`ApplicationBuilder.get_updates_proxy_url` is deprecated since version "
-            "Next.VERSION. Use `ApplicationBuilder.proxy` instead.",
+            "NEXT.VERSION. Use `ApplicationBuilder.get_updates_proxy` instead.",
             PTBDeprecationWarning,
             stacklevel=2,
         )
