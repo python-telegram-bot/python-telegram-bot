@@ -26,7 +26,7 @@ from telegram._message import Message
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import DVInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._utils.types import JSONDict, ODVInput, ReplyMarkup
 
 if TYPE_CHECKING:
     from telegram import (
@@ -725,9 +725,9 @@ class CallbackQuery(TelegramObject):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-        disable_notification: DVInput[bool] = DEFAULT_NONE,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
-        allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
