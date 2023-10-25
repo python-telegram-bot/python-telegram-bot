@@ -17,16 +17,18 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
-from typing import Collection, Optional, Tuple
+from typing import Collection, Optional, Tuple, Union
 
 import httpx
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
 from telegram._utils.types import HTTPVersion, ODVInput, SocketOpt
+from telegram._utils.warnings import warn
 from telegram.error import NetworkError, TimedOut
 from telegram.request._baserequest import BaseRequest
 from telegram.request._requestdata import RequestData
+from telegram.warnings import PTBDeprecationWarning
 
 # Note to future devs:
 # Proxies are currently only tested manually. The httpx development docs have a nice guide on that:
@@ -49,17 +51,10 @@ class HTTPXRequest(BaseRequest):
             Note:
                 Independent of the value, one additional connection will be reserved for
                 :meth:`telegram.Bot.get_updates`.
-        proxy_url (:obj:`str`, optional): The URL to the proxy server. For example
-            ``'http://127.0.0.1:3128'`` or ``'socks5://127.0.0.1:3128'``. Defaults to :obj:`None`.
+        proxy_url (:obj:`str`, optional): Legacy name for :paramref:`proxy`, kept for backward
+            compatibility. Defaults to :obj:`None`.
 
-            Note:
-                * The proxy URL can also be set via the environment variables ``HTTPS_PROXY`` or
-                  ``ALL_PROXY``. See `the docs of httpx`_ for more info.
-                * For Socks5 support, additional dependencies are required. Make sure to install
-                  PTB via :command:`pip install "python-telegram-bot[socks]"` in this case.
-                * Socks5 proxies can not be set via environment variables.
-
-            .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
+            .. deprecated:: NEXT.VERSION
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a response from Telegram's server.
             This value is used unless a different value is passed to :meth:`do_request`.
@@ -101,6 +96,22 @@ class HTTPXRequest(BaseRequest):
                 these concepts.
 
             .. versionadded:: NEXT.VERSION
+        proxy (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``, optional): The URL to a proxy server,
+            a ``httpx.Proxy`` object or a ``httpx.URL`` object. For example
+            ``'http://127.0.0.1:3128'`` or ``'socks5://127.0.0.1:3128'``. Defaults to :obj:`None`.
+
+            Note:
+                * The proxy URL can also be set via the environment variables ``HTTPS_PROXY`` or
+                  ``ALL_PROXY``. See `the docs of httpx`_ for more info.
+                * HTTPS proxies can be configured by passing a ``httpx.Proxy`` object with
+                  a corresponding ``ssl_context``.
+                * For Socks5 support, additional dependencies are required. Make sure to install
+                  PTB via :command:`pip install "python-telegram-bot[socks]"` in this case.
+                * Socks5 proxies can not be set via environment variables.
+
+            .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -109,14 +120,27 @@ class HTTPXRequest(BaseRequest):
     def __init__(
         self,
         connection_pool_size: int = 1,
-        proxy_url: Optional[str] = None,
+        proxy_url: Optional[Union[str, httpx.Proxy, httpx.URL]] = None,
         read_timeout: Optional[float] = 5.0,
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
         http_version: HTTPVersion = "1.1",
         socket_options: Optional[Collection[SocketOpt]] = None,
+        proxy: Optional[Union[str, httpx.Proxy, httpx.URL]] = None,
     ):
+        if proxy_url is not None and proxy is not None:
+            raise ValueError("The parameters `proxy_url` and `proxy` are mutually exclusive.")
+
+        if proxy_url is not None:
+            proxy = proxy_url
+            warn(
+                "The parameter `proxy_url` is deprecated since version NEXT.VERSION. Use `proxy` "
+                "instead.",
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
+
         self._http_version = http_version
         timeout = httpx.Timeout(
             connect=connect_timeout,
@@ -143,7 +167,7 @@ class HTTPXRequest(BaseRequest):
         )
         self._client_kwargs = {
             "timeout": timeout,
-            "proxies": proxy_url,
+            "proxies": proxy,
             "limits": limits,
             "transport": transport,
             **http_kwargs,

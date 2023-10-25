@@ -2423,3 +2423,65 @@ class TestFilters:
             ),
         )
         assert filters.ATTACHMENT.check_update(up)
+
+    def test_filters_mention_no_entities(self, update):
+        update.message.text = "test"
+        assert not filters.Mention("@test").check_update(update)
+        assert not filters.Mention(123456).check_update(update)
+        assert not filters.Mention("123456").check_update(update)
+        assert not filters.Mention(User(1, "first_name", False)).check_update(update)
+        assert not filters.Mention(
+            ["@test", 123456, "123456", User(1, "first_name", False)]
+        ).check_update(update)
+
+    def test_filters_mention_type_mention(self, update):
+        update.message.text = "@test1 @test2 user"
+        update.message.entities = [
+            MessageEntity(MessageEntity.MENTION, 0, 6),
+            MessageEntity(MessageEntity.MENTION, 7, 6),
+        ]
+
+        user_no_username = User(123456, "first_name", False)
+        user_wrong_username = User(123456, "first_name", False, username="wrong")
+        user_1 = User(111, "first_name", False, username="test1")
+        user_2 = User(222, "first_name", False, username="test2")
+
+        for username in ("@test1", "@test2"):
+            assert filters.Mention(username).check_update(update)
+            assert filters.Mention({username}).check_update(update)
+
+        for user in (user_1, user_2):
+            assert filters.Mention(user).check_update(update)
+            assert filters.Mention({user}).check_update(update)
+
+        assert not filters.Mention(
+            ["@test3", 123, user_no_username, user_wrong_username]
+        ).check_update(update)
+
+    def test_filters_mention_type_text_mention(self, update):
+        user_1 = User(111, "first_name", False, username="test1")
+        user_2 = User(222, "first_name", False, username="test2")
+        user_no_username = User(123456, "first_name", False)
+        user_wrong_username = User(123456, "first_name", False, username="wrong")
+
+        update.message.text = "test1 test2 user"
+        update.message.entities = [
+            MessageEntity(MessageEntity.TEXT_MENTION, 0, 5, user=user_1),
+            MessageEntity(MessageEntity.TEXT_MENTION, 6, 5, user=user_2),
+        ]
+
+        for username in ("@test1", "@test2"):
+            assert filters.Mention(username).check_update(update)
+            assert filters.Mention({username}).check_update(update)
+
+        for user in (user_1, user_2):
+            assert filters.Mention(user).check_update(update)
+            assert filters.Mention({user}).check_update(update)
+
+        for user_id in (111, 222):
+            assert filters.Mention(user_id).check_update(update)
+            assert filters.Mention({user_id}).check_update(update)
+
+        assert not filters.Mention(
+            ["@test3", 123, user_no_username, user_wrong_username]
+        ).check_update(update)
