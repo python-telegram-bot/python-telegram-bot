@@ -774,7 +774,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        self._request_param_check(name="get_updates_socket_options", get_updates=True)
+        self._request_param_check(name="socket_options", get_updates=True)
         self._get_updates_socket_options = get_updates_socket_options
         return self
 
