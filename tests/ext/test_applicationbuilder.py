@@ -72,12 +72,16 @@ class TestApplicationBuilder:
         arguments = inspect.signature(HTTPXRequest.__init__).parameters.keys()
         prefix = "get_updates_" if get_updates else ""
         for argument in arguments:
+            if argument == "self":
+                continue
             assert hasattr(builder, prefix + argument), f"missing method {prefix}{argument}"
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     def test_all_methods_bot(self, builder, bot_class):
         arguments = inspect.signature(bot_class.__init__).parameters.keys()
         for argument in arguments:
+            if argument == "self":
+                continue
             if argument == "private_key_password":
                 argument = "private_key"  # noqa: PLW2901
             assert hasattr(builder, argument), f"missing method {argument}"
@@ -85,6 +89,8 @@ class TestApplicationBuilder:
     def test_all_methods_application(self, builder):
         arguments = inspect.signature(Application.__init__).parameters.keys()
         for argument in arguments:
+            if argument == "self":
+                continue
             if argument == "update_processor":
                 argument = "concurrent_updates"  # noqa: PLW2901
             assert hasattr(builder, argument), f"missing method {argument}"
