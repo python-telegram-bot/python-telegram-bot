@@ -1,0 +1,38 @@
+python
+Copy code
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from selenium import webdriver
+
+def start(update: Update, context: CallbackContext):
+    update.message.reply_text("Привет! Отправь мне ссылку, и я сделаю скриншот сайта.")
+
+def screenshot_website(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    url = update.message.text
+
+    driver_path = '/путь/к/chromedriver'
+    driver = webdriver.Chrome(executable_path=driver_path)
+    driver.get(url)
+
+    screenshot_path = 'screenshot.png'
+    driver.save_screenshot(screenshot_path)
+    driver.quit()
+
+    update.message.reply_photo(open(screenshot_path, 'rb'))
+    
+def main():
+    updater = Updater(token='YOUR_BOT_TOKEN', use_context=True)
+    dispatcher = updater.dispatcher
+
+    start_handler = CommandHandler('start', start)
+    dispatcher.add_handler(start_handler)
+
+    screenshot_handler = MessageHandler(Filters.text & ~Filters.command, screenshot_website)
+    dispatcher.add_handler(screenshot_handler)
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
