@@ -22,7 +22,7 @@ def screenshot_website(update: Update, context: CallbackContext):
     update.message.reply_photo(open(screenshot_path, 'rb'))
     
 def main():
-    updater = Updater(token='YOUR_BOT_TOKEN', use_context=True)
+    updater = Updater(token='6377698537:AAG0hRQzSAIjnwq5IzrlP-EyPD_P0CN5In0', use_context=True)
     dispatcher = updater.dispatcher
 
     start_handler = CommandHandler('start', start)
