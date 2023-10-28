@@ -304,7 +304,7 @@ class BaseRequest(
                 "will default to `BaseRequest.DEFAULT_NONE` instead of 20 in future versions "
                 "for *all* methods of the `Bot` class, including methods sending media.",
                 PTBDeprecationWarning,
-                stacklevel=2,
+                stacklevel=3,
             )
             write_timeout = 20
 
