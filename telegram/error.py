@@ -94,7 +94,8 @@ class TelegramError(Exception):
         return f"{self.__class__.__name__}('{self.message}')"
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
-        """
+        """Defines how to serialize the exception for pickle. See
+        :py:meth:`object.__reduce__` for more info.
 
         Returns:
             :obj:`tuple`
