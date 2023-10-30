@@ -86,7 +86,7 @@ class TelegramError(Exception):
         return self.message
 
     def __repr__(self) -> str:
-        """Get the string representation of exception with name and message.
+        """Get the unambiguous string representation of exception.
 
         Returns:
            :obj:`str`

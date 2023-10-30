@@ -375,9 +375,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         return False
 
     def __hash__(self) -> int:
-        """Gives the hash value for the :class:`telegram.Bot` object.
-        Two objects that compare equal must also have the same hash value, but the
-        reverse is not necessarily true.
+        """Builds a hash value for this object such that the hash of two objects is
+        equal if and only if the objects are equal in terms of :meth:`__eq__`.
 
         Returns:
             :obj:`int` The hash value of the object.

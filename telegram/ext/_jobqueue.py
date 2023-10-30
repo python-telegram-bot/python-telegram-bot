@@ -779,6 +779,15 @@ class Job(Generic[CCT]):
         self._job = cast("APSJob", None)  # skipcq: PTC-W0052
 
     def __getattr__(self, item: str) -> object:
+        """Get the specific attribute of :class:`telegram.ext.Job` object.
+
+        Returns:
+            :object: The value of the attribute.
+
+        Raises:
+            :exc:`AttributeError`: If the attribute does not exist in both
+                :class:`telegram.ext.Job` and :class:`apscheduler.job.Job` objects.
+        """
         try:
             return getattr(self.job, item)
         except AttributeError as exc:
@@ -787,11 +796,25 @@ class Job(Generic[CCT]):
             ) from exc
 
     def __eq__(self, other: object) -> bool:
+        """Defines equality condition for the :class:`telegram.ext.Job` object.
+        Two objects of this class are considered to be equal if their :paramref:`id`
+        are equal.
+
+        Returns:
+            :obj:`True` if both objects have :paramref:`id` parameters identical.
+                :obj:`False` otherwise.
+        """
         if isinstance(other, self.__class__):
             return self.id == other.id
         return False
 
     def __hash__(self) -> int:
+        """Builds a hash value for this object such that the hash of two objects is
+        equal if and only if the objects are equal in terms of :meth:`__eq__`.
+
+        Returns:
+            :obj:`int`: The hash value of the object.
+        """
         return hash(self.id)
 
     def __repr__(self) -> str:

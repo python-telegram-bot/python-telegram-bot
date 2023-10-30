@@ -183,18 +183,39 @@ class BaseFilter:
         self._data_filter = data_filter
 
     def __and__(self, other: "BaseFilter") -> "BaseFilter":
+        """Defines `AND` bitwise operator for :class:`BaseFilter` object.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _MergedFilter(self, and_filter=other)
 
     def __or__(self, other: "BaseFilter") -> "BaseFilter":
+        """Defines `OR` bitwise operator for :class:`BaseFilter` object.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _MergedFilter(self, or_filter=other)
 
     def __xor__(self, other: "BaseFilter") -> "BaseFilter":
+        """Defines `XOR` bitwise operator for :class:`BaseFilter` object.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _XORFilter(self, other)
 
     def __invert__(self) -> "BaseFilter":
+        """Defines `NOT` bitwise operator for :class:`BaseFilter` object.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _InvertedFilter(self)
 
     def __repr__(self) -> str:
+        """:obj:`str`: Name for this filter."""
         return self.name
 
     @property
