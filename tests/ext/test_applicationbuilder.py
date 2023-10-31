@@ -17,11 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import inspect
 from dataclasses import dataclass
 
 import httpx
 import pytest
 
+from telegram import Bot
 from telegram.ext import (
     AIORateLimiter,
     Application,
@@ -64,6 +66,34 @@ class TestApplicationBuilder:
         for attr in builder.__slots__:
             assert getattr(builder, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(builder)) == len(set(mro_slots(builder))), "duplicate slot"
+
+    @pytest.mark.parametrize("get_updates", [True, False])
+    def test_all_methods_request(self, builder, get_updates):
+        arguments = inspect.signature(HTTPXRequest.__init__).parameters.keys()
+        prefix = "get_updates_" if get_updates else ""
+        for argument in arguments:
+            if argument == "self":
+                continue
+            assert hasattr(builder, prefix + argument), f"missing method {prefix}{argument}"
+
+    @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
+    def test_all_methods_bot(self, builder, bot_class):
+        arguments = inspect.signature(bot_class.__init__).parameters.keys()
+        for argument in arguments:
+            if argument == "self":
+                continue
+            if argument == "private_key_password":
+                argument = "private_key"  # noqa: PLW2901
+            assert hasattr(builder, argument), f"missing method {argument}"
+
+    def test_all_methods_application(self, builder):
+        arguments = inspect.signature(Application.__init__).parameters.keys()
+        for argument in arguments:
+            if argument == "self":
+                continue
+            if argument == "update_processor":
+                argument = "concurrent_updates"  # noqa: PLW2901
+            assert hasattr(builder, argument), f"missing method {argument}"
 
     def test_job_queue_init_exception(self, monkeypatch):
         def init_raises_runtime_error(*args, **kwargs):
@@ -172,6 +202,7 @@ class TestApplicationBuilder:
             "write_timeout",
             "proxy",
             "proxy_url",
+            "socket_options",
             "bot",
             "updater",
             "http_version",
@@ -201,6 +232,7 @@ class TestApplicationBuilder:
             "get_updates_write_timeout",
             "get_updates_proxy",
             "get_updates_proxy_url",
+            "get_updates_socket_options",
             "get_updates_http_version",
             "bot",
             "updater",
@@ -231,6 +263,7 @@ class TestApplicationBuilder:
             "get_updates_write_timeout",
             "get_updates_proxy_url",
             "get_updates_proxy",
+            "get_updates_socket_options",
             "get_updates_http_version",
             "connection_pool_size",
             "connect_timeout",
@@ -239,6 +272,7 @@ class TestApplicationBuilder:
             "write_timeout",
             "proxy",
             "proxy_url",
+            "socket_options",
             "http_version",
             "bot",
             "update_queue",
@@ -273,6 +307,7 @@ class TestApplicationBuilder:
             "get_updates_write_timeout",
             "get_updates_proxy",
             "get_updates_proxy_url",
+            "get_updates_socket_options",
             "get_updates_http_version",
             "connection_pool_size",
             "connect_timeout",
@@ -281,6 +316,7 @@ class TestApplicationBuilder:
             "write_timeout",
             "proxy",
             "proxy_url",
+            "socket_options",
             "bot",
             "http_version",
         ]
@@ -306,6 +342,7 @@ class TestApplicationBuilder:
     def test_all_bot_args_custom(
         self, builder, bot, monkeypatch, proxy_method, get_updates_proxy_method
     ):
+        # Only socket_options is tested in a standalone test, since that's easier
         defaults = Defaults()
         request = HTTPXRequest()
         get_updates_request = HTTPXRequest()
@@ -378,6 +415,36 @@ class TestApplicationBuilder:
         assert client.proxies == "get_updates_proxy"
         assert client.http1 is True
         assert client.http2 is False
+
+    def test_custom_socket_options(self, builder, monkeypatch, bot):
+        httpx_request_kwargs = []
+        httpx_request_init = HTTPXRequest.__init__
+
+        def init_transport(*args, **kwargs):
+            nonlocal httpx_request_kwargs
+            # This is called once for request and once for get_updates_request, so we make
+            # it a list
+            httpx_request_kwargs.append(kwargs.copy())
+            httpx_request_init(*args, **kwargs)
+
+        monkeypatch.setattr(HTTPXRequest, "__init__", init_transport)
+
+        builder.token(bot.token).build()
+        assert httpx_request_kwargs[0].get("socket_options") is None
+        assert httpx_request_kwargs[1].get("socket_options") is None
+
+        httpx_request_kwargs = []
+        ApplicationBuilder().token(bot.token).socket_options(((1, 2, 3),)).connection_pool_size(
+            "request"
+        ).get_updates_socket_options(((4, 5, 6),)).get_updates_connection_pool_size(
+            "get_updates"
+        ).build()
+
+        for kwargs in httpx_request_kwargs:
+            if kwargs.get("connection_pool_size") == "request":
+                assert kwargs.get("socket_options") == ((1, 2, 3),)
+            else:
+                assert kwargs.get("socket_options") == ((4, 5, 6),)
 
     def test_custom_application_class(self, bot, builder):
         class CustomApplication(Application):

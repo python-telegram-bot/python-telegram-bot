@@ -23,7 +23,7 @@ import httpx
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
-from telegram._utils.types import HTTPVersion, ODVInput
+from telegram._utils.types import HTTPVersion, ODVInput, SocketOpt
 from telegram._utils.warnings import warn
 from telegram.error import NetworkError, TimedOut
 from telegram.request._baserequest import BaseRequest
@@ -36,12 +36,6 @@ from telegram.warnings import PTBDeprecationWarning
 # That also works with socks5. Just pass `--mode socks5` to mitmproxy
 
 _LOGGER = get_logger(__name__, "HTTPXRequest")
-
-_SocketOpt = Union[
-    Tuple[int, int, int],
-    Tuple[int, int, Union[bytes, bytearray]],
-    Tuple[int, int, None, int],
-]
 
 
 class HTTPXRequest(BaseRequest):
@@ -132,7 +126,7 @@ class HTTPXRequest(BaseRequest):
         connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
         http_version: HTTPVersion = "1.1",
-        socket_options: Optional[Collection[_SocketOpt]] = None,
+        socket_options: Optional[Collection[SocketOpt]] = None,
         proxy: Optional[Union[str, httpx.Proxy, httpx.URL]] = None,
     ):
         if proxy_url is not None and proxy is not None:
