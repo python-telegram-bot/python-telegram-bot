@@ -55,6 +55,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `franciscod <https://github.com/franciscod>`_
 - `gamgi <https://github.com/gamgi>`_
 - `Gauthamram Ravichandran <https://github.com/GauthamramRavichandran>`_
+- `guillemap <https://github.com/guillemap>`_
 - `Harshil <https://github.com/harshil21>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_
