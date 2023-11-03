@@ -401,16 +401,22 @@ class Updater(AsyncContextManager["Updater"]):
             _LOGGER.debug(
                 "Calling `get_updates` one more time to mark all fetched updates as read."
             )
-            await self.bot.get_updates(
-                offset=self._last_update_id,
-                # We don't want to do long polling here!
-                timeout=2,
-                read_timeout=read_timeout,
-                connect_timeout=connect_timeout,
-                write_timeout=write_timeout,
-                pool_timeout=pool_timeout,
-                allowed_updates=allowed_updates,
-            )
+            try:
+                await self.bot.get_updates(
+                    offset=self._last_update_id,
+                    # We don't want to do long polling here!
+                    timeout=0,
+                    read_timeout=read_timeout,
+                    connect_timeout=connect_timeout,
+                    write_timeout=write_timeout,
+                    pool_timeout=pool_timeout,
+                    allowed_updates=allowed_updates,
+                )
+            except TimedOut:
+                _LOGGER.debug(
+                    "`get_updates` timed out while marking updates as read. The last fetched "
+                    "updates may be fetched again on the next polling start."
+                )
 
         self.__polling_cleanup_cb = _get_updates_cleanup
 
