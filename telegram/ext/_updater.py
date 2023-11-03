@@ -413,7 +413,7 @@ class Updater(AsyncContextManager["Updater"]):
                     allowed_updates=allowed_updates,
                 )
             except TimedOut:
-                _LOGGER.debug(
+                _LOGGER.warning(
                     "`get_updates` timed out while marking updates as read. The last fetched "
                     "updates may be fetched again on the next polling start."
                 )
