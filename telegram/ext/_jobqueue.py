@@ -783,7 +783,7 @@ class Job(Generic[CCT]):
         object :class:`telegram.ext.Job` object if exists.
 
         Args:
-           token (:obj:`str`): The name of the attribute.
+           item (:obj:`str`): The name of the attribute.
 
         Returns:
             :object: The value of the attribute.
