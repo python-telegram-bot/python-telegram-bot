@@ -1146,7 +1146,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 # application.stop() will wait for it's clean shutdown.
                 _LOGGER.warning(
                     "Fetching updates got a asyncio.CancelledError. Ignoring as this task may only"
-                    "be closed via `Application.stop`."
+                    " be closed via `Application.stop`."
                 )
 
     async def __process_update_wrapper(self, update: object) -> None:
