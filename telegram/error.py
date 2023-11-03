@@ -78,7 +78,7 @@ class TelegramError(Exception):
         self.message: str = msg
 
     def __str__(self) -> str:
-        """Get the string representation of exception message.
+        """Gives the string representation of exceptions message.
 
         Returns:
            :obj:`str`
@@ -86,7 +86,7 @@ class TelegramError(Exception):
         return self.message
 
     def __repr__(self) -> str:
-        """Get the unambiguous string representation of exception.
+        """Gives an unambiguous string representation of the exception.
 
         Returns:
            :obj:`str`
@@ -94,8 +94,10 @@ class TelegramError(Exception):
         return f"{self.__class__.__name__}('{self.message}')"
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
-        """Defines how to serialize the exception for pickle. See
-        :py:meth:`object.__reduce__` for more info.
+        """Defines how to serialize the exception for pickle.
+
+        .. seealso::
+               :py:meth:`object.__reduce__`, :mod:`pickle`.
 
         Returns:
             :obj:`tuple`

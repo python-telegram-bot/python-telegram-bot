@@ -779,7 +779,11 @@ class Job(Generic[CCT]):
         self._job = cast("APSJob", None)  # skipcq: PTC-W0052
 
     def __getattr__(self, item: str) -> object:
-        """Get the specific attribute of :class:`telegram.ext.Job` object.
+        """Overrides :py:meth:`object.__getattr__` to get specific attribute of
+        object :class:`telegram.ext.Job` object if exists.
+
+        Args:
+           token (:obj:`str`): The name of the attribute.
 
         Returns:
             :object: The value of the attribute.

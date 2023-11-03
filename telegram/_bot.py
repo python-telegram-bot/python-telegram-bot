@@ -364,23 +364,18 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
     def __eq__(self, other: object) -> bool:
         """Defines equality condition for the :class:`telegram.Bot` object.
-        Two objects of this class are considered to be equal if their all parameters
-        are identical.
+        Two objects of this class are considered to be equal if their attributes
+        :attr:`bot` are equal.
 
         Returns:
-            :obj:`True` if both objects have all parameters identical. :obj:`False` otherwise.
+            :obj:`True` if both attributes :attr:`bot` are equal. :obj:`False` otherwise.
         """
         if isinstance(other, self.__class__):
             return self.bot == other.bot
         return False
 
     def __hash__(self) -> int:
-        """Builds a hash value for this object such that the hash of two objects is
-        equal if and only if the objects are equal in terms of :meth:`__eq__`.
-
-        Returns:
-            :obj:`int` The hash value of the object.
-        """
+        """See :meth:`telegram.TelegramObject.__hash__`"""
         return hash((self.__class__, self.bot))
 
     def __repr__(self) -> str:

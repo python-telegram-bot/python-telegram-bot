@@ -184,6 +184,9 @@ class BaseFilter:
 
     def __and__(self, other: "BaseFilter") -> "BaseFilter":
         """Defines `AND` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by both filters.
+        For exampe, filters.PHOTO & filters.CAPTION will only accept messages that contain
+        both a photo and a caption
 
         Returns:
            :obj:`BaseFilter`
@@ -192,6 +195,9 @@ class BaseFilter:
 
     def __or__(self, other: "BaseFilter") -> "BaseFilter":
         """Defines `OR` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by any of the filters.
+        For example, filters.PHOTO | filters.CAPTION will only accept messages that contain
+        photo or caption or both.
 
         Returns:
            :obj:`BaseFilter`
@@ -200,6 +206,9 @@ class BaseFilter:
 
     def __xor__(self, other: "BaseFilter") -> "BaseFilter":
         """Defines `XOR` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by any of the filters and
+        not both of them. For example, filters.PHOTO ^ filters.CAPTION will only accept messages
+        that contain photo or caption, not both of them.
 
         Returns:
            :obj:`BaseFilter`
@@ -208,6 +217,8 @@ class BaseFilter:
 
     def __invert__(self) -> "BaseFilter":
         """Defines `NOT` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by any of the filters.
+        For example, ~ filters.PHOTO will only accept messages that do not contain photo.
 
         Returns:
            :obj:`BaseFilter`
@@ -215,7 +226,14 @@ class BaseFilter:
         return _InvertedFilter(self)
 
     def __repr__(self) -> str:
-        """:obj:`str`: Name for this filter."""
+        """Gives name for this filter.
+
+        .. seealso::
+               :meth:`name`
+
+        Returns:
+            :obj:`str`:
+        """
         return self.name
 
     @property
