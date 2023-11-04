@@ -128,6 +128,23 @@ class BaseRequest(
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
 
+    @property
+    def read_timeout(self) -> Optional[float]:
+        """This property must return the default read timeout in seconds used by this class.
+        More precisely, the returned value should be the one used when
+        :paramref:`post.read_timeout` is not passed/equal to :attr:`DEFAULT_NONE`.
+
+        .. versionadded:: NEXT.VERSION
+        .. deprecated:: NEXT.VERSION
+            For now this property does not need to be implemented by subclasses and will raise
+            :exc:`NotImplementedError` if accessed without being overridden. However, in future
+            versions, this property will be abstract and must be implemented by subclasses.
+
+        Returns:
+            :obj:`float` | :obj:`None`: The read timeout in seconds.
+        """
+        raise NotImplementedError
+
     @abc.abstractmethod
     async def initialize(self) -> None:
         """Initialize resources used by this class. Must be implemented by a subclass."""

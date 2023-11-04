@@ -198,6 +198,16 @@ class HTTPXRequest(BaseRequest):
         """
         return self._http_version
 
+    @property
+    def read_timeout(self) -> Optional[float]:
+        """See :attr:`BaseRequest.read_timeout`.
+
+        Returns:
+            :obj:`float` | :obj:`None`: The default read timeout in seconds as passed to
+                :paramref:`HTTPXRequest.read_timeout`.
+        """
+        return self._client.timeout.read
+
     def _build_client(self) -> httpx.AsyncClient:
         return httpx.AsyncClient(**self._client_kwargs)  # type: ignore[arg-type]
 
