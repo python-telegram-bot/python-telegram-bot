@@ -621,9 +621,16 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         self._conversations.update(current_conversations)
         # above might be partly overridden but that's okay since we warn about that in
         # add_handler
-        self._conversations.update_no_track(
-            await application.persistence.get_conversations(self.name)
-        )
+        stored_data = await application.persistence.get_conversations(self.name)
+        self._conversations.update_no_track(stored_data)
+
+        # Since CH.END is stored as normal state, we need to properly parse it here in order to
+        # actually end the conversation, i.e. delete the key from the _conversations dict
+        # This also makes sure that these entries are deleted from the persisted data on the next
+        # run of Application.update_persistence
+        for key, state in stored_data.items():
+            if state == self.END:
+                self._update_state(new_state=self.END, key=key)
 
         out = {self.name: self._conversations}
 
