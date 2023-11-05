@@ -320,5 +320,8 @@ from docs.auxil.tg_const_role import CONSTANTS_ROLE, TGConstXRefRole
 def setup(app: Sphinx):
     app.connect("autodoc-skip-member", autodoc_skip_member)
     app.connect("autodoc-process-bases", autodoc_process_bases)
-    app.connect("autodoc-process-docstring", autodoc_process_docstring)
+    # The default priority is 500. We want our function to run before napoleon doc-conversion
+    # and sphinx-paramlinks do, b/c otherwise the inserted kwargs in the bot methods won't show
+    # up in the objects.inv file that Sphinx generates (i.e. not in the search).
+    app.connect("autodoc-process-docstring", autodoc_process_docstring, priority=100)
     app.add_role_to_domain("py", CONSTANTS_ROLE, TGConstXRefRole())
