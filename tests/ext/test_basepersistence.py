@@ -1442,6 +1442,59 @@ class TestBasePersistence:
             # This is the important part: the persistence is updated with `None` when the conv ends
             assert papp.persistence.conversations == {"conv_1": {(1, 1): None}}
 
+    async def test_non_blocking_conversation_ends(self, bot):
+        papp = build_papp(token=bot.token, update_interval=100)
+        event = asyncio.Event()
+
+        async def callback(_, __):
+            await event.wait()
+            return HandlerStates.END
+
+        conversation = ConversationHandler(
+            entry_points=[
+                TrackingConversationHandler.build_handler(HandlerStates.END, callback=callback)
+            ],
+            states={},
+            fallbacks=[],
+            persistent=True,
+            name="conv",
+            block=False,
+        )
+        papp.add_handler(conversation)
+
+        async with papp:
+            await papp.start()
+            assert papp.persistence.updated_conversations == {}
+
+            await papp.process_update(
+                TrackingConversationHandler.build_update(HandlerStates.END, 1)
+            )
+            assert papp.persistence.updated_conversations == {}
+
+            papp.persistence.reset_tracking()
+            event.set()
+            await asyncio.sleep(0.01)
+            await papp.update_persistence()
+
+            # On shutdown, persisted data should include the END state b/c that's what the
+            # pending state is being resolved to
+            assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
+            assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.END}}
+
+            await papp.stop()
+
+        async with papp:
+            # On the next restart/persistence loading the ConversationHandler should resolve
+            # the stored END state to None …
+            assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.END}}
+            # … and the update should be accepted by the entry point again
+            assert conversation.check_update(
+                TrackingConversationHandler.build_update(HandlerStates.END, 1)
+            )
+
+            await papp.update_persistence()
+            assert papp.persistence.conversations == {"conv": {(1, 1): None}}
+
     async def test_conversation_timeout(self, bot):
         # high update_interval so that we can instead manually call it
         papp = build_papp(token=bot.token, update_interval=150)
