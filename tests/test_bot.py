@@ -26,6 +26,7 @@ import re
 import socket
 import time
 from collections import defaultdict
+from http import HTTPStatus
 
 import pytest
 
@@ -78,7 +79,7 @@ from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
-from telegram.warnings import PTBUserWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
@@ -2445,6 +2446,61 @@ class TestBotWithRequest:
         assert isinstance(updates, tuple)
         if updates:
             assert isinstance(updates[0], Update)
+
+    @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
+    async def test_get_updates_read_timeout_deprecation_warning(
+        self, bot, recwarn, monkeypatch, bot_class
+    ):
+        # Using the normal HTTPXRequest should not issue any warnings
+        await bot.get_updates()
+        assert len(recwarn) == 0
+
+        read_timeout = None
+
+        async def catch_timeouts(*args, **kwargs):
+            nonlocal read_timeout
+            read_timeout = kwargs.get("read_timeout")
+            return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
+
+        monkeypatch.setattr(HTTPXRequest, "read_timeout", BaseRequest.read_timeout)
+        monkeypatch.setattr(HTTPXRequest, "do_request", catch_timeouts)
+
+        bot = bot_class(get_updates_request=HTTPXRequest(), token=bot.token)
+        await bot.get_updates()
+
+        assert len(recwarn) == 1
+        assert "does not override the property `read_timeout`" in str(recwarn[0].message)
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
+
+        assert read_timeout == 2
+
+    @pytest.mark.parametrize(
+        ("read_timeout", "timeout", "expected"),
+        [
+            (None, None, 0),
+            (1, None, 1),
+            (None, 1, 1),
+            (DEFAULT_NONE, None, 10),
+            (DEFAULT_NONE, 1, 11),
+            (1, 2, 3),
+        ],
+    )
+    async def test_get_updates_read_timeout_value_passing(
+        self, bot, read_timeout, timeout, expected, monkeypatch
+    ):
+        caught_read_timeout = None
+
+        async def catch_timeouts(*args, **kwargs):
+            nonlocal caught_read_timeout
+            caught_read_timeout = kwargs.get("read_timeout")
+            return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
+
+        monkeypatch.setattr(HTTPXRequest, "do_request", catch_timeouts)
+
+        bot = Bot(get_updates_request=HTTPXRequest(read_timeout=10), token=bot.token)
+        await bot.get_updates(read_timeout=read_timeout, timeout=timeout)
+        assert caught_read_timeout == expected
 
     @pytest.mark.xdist_group("getUpdates_and_webhook")
     @pytest.mark.parametrize("use_ip", [True, False])

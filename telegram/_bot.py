@@ -3566,12 +3566,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 arg_read_timeout = self._request[0].read_timeout or 0
             except NotImplementedError:
                 arg_read_timeout = 2
-                warn(
-                    f"The class {self._request[0].__class__.__name__} does not support override "
+                self._warn(
+                    f"The class {self._request[0].__class__.__name__} does not override "
                     "the property `read_timeout`. Overriding this property will be mandatory in "
                     "future versions. Using 2 seconds as fallback.",
                     PTBDeprecationWarning,
-                    stacklevel=2,
+                    stacklevel=3,
                 )
 
         # Ideally we'd use an aggressive read timeout for the polling. However,
