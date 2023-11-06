@@ -376,7 +376,7 @@ class TestUpdater:
 
         expected = {
             "timeout": 10,
-            "read_timeout": 2,
+            "read_timeout": DEFAULT_NONE,
             "write_timeout": DEFAULT_NONE,
             "connect_timeout": DEFAULT_NONE,
             "pool_timeout": DEFAULT_NONE,

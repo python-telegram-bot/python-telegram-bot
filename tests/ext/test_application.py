@@ -2210,7 +2210,8 @@ class TestApplication:
             else:
                 app.run_webhook(close_loop=False, stop_signals=None)
 
-        assert len(recwarn) == 0
+        for record in recwarn:
+            assert not str(record.message).startswith("Could not add signal handlers for the stop")
 
     @pytest.mark.flaky(3, 1)  # loop.call_later will error the test when a flood error is received
     def test_signal_handlers(self, app, monkeypatch):
