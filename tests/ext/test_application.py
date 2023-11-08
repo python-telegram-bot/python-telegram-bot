@@ -1499,7 +1499,8 @@ class TestApplication:
         assert found_log
 
     @pytest.mark.parametrize(
-        "timeout_name", ["read_timeout", "connect_timeout", "write_timeout", "pool_timeout"]
+        "timeout_name",
+        ["read_timeout", "connect_timeout", "write_timeout", "pool_timeout", "poll_interval"],
     )
     @pytest.mark.skipif(
         platform.system() == "Windows",
@@ -1533,6 +1534,10 @@ class TestApplication:
         kwargs = {timeout_name: 42}
         app.run_polling(drop_pending_updates=True, close_loop=False, **kwargs)
         thread.join()
+
+        if timeout_name == "poll_interval":
+            assert len(recwarn) == 0
+            return
 
         assert len(recwarn) == 1
         assert "Setting timeouts via `Application.run_polling` is deprecated." in str(
