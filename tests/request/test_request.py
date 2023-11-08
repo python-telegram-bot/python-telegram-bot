@@ -42,6 +42,7 @@ from telegram.error import (
     TelegramError,
     TimedOut,
 )
+from telegram.request import BaseRequest
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
@@ -351,6 +352,20 @@ class TestRequestWithoutRequest:
         )
         assert self.test_flag == (1, 2, 3, 4)
 
+    def test_read_timeout_not_implemented(self):
+        class SimpleRequest(BaseRequest):
+            async def do_request(self, *args, **kwargs):
+                raise httpx.ReadTimeout("read timeout")
+
+            async def initialize(self) -> None:
+                pass
+
+            async def shutdown(self) -> None:
+                pass
+
+        with pytest.raises(NotImplementedError):
+            SimpleRequest().read_timeout
+
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
 class TestHTTPXRequestWithoutRequest:
@@ -652,6 +667,10 @@ class TestHTTPXRequestWithoutRequest:
         transport_kwargs = {}
         HTTPXRequest(socket_options=((1, 2, 3),))
         assert transport_kwargs["socket_options"] == ((1, 2, 3),)
+
+    @pytest.mark.parametrize("read_timeout", [None, 1, 2, 3])
+    async def test_read_timeout_property(self, read_timeout):
+        assert HTTPXRequest(read_timeout=read_timeout).read_timeout == read_timeout
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
