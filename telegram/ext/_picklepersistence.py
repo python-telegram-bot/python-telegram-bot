@@ -492,7 +492,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """
         if self.chat_data is None:
             return
-        self.chat_data.pop(chat_id, None)  # type: ignore[arg-type]
+        self.chat_data.pop(chat_id, None)
 
         if not self.on_flush:
             if not self.single_file:
@@ -511,7 +511,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """
         if self.user_data is None:
             return
-        self.user_data.pop(user_id, None)  # type: ignore[arg-type]
+        self.user_data.pop(user_id, None)
 
         if not self.on_flush:
             if not self.single_file:
