@@ -472,10 +472,10 @@ class _CredentialsBase(TelegramObject):
 
     def __init__(
         self,
-        hash: str,
+        hash: str,  # skipcq: PYL-W0622
         secret: str,
         *,
-        api_kwargs: Optional[JSONDict] = None,  # skipcq: PYL-W0622
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         with self._unfrozen():
