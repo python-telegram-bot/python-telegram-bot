@@ -779,8 +779,9 @@ class Job(Generic[CCT]):
         self._job = cast("APSJob", None)  # skipcq: PTC-W0052
 
     def __getattr__(self, item: str) -> object:
-        """Overrides :py:meth:`object.__getattr__` to get specific attribute of
-        object :class:`telegram.ext.Job` object if exists.
+        """Overrides :py:meth:`object.__getattr__` to get specific attribute of the
+        :class:`telegram.ext.Job` object or of its attribute :class:`apscheduler.job.Job`,
+        if exists.
 
         Args:
            item (:obj:`str`): The name of the attribute.
@@ -801,12 +802,12 @@ class Job(Generic[CCT]):
 
     def __eq__(self, other: object) -> bool:
         """Defines equality condition for the :class:`telegram.ext.Job` object.
-        Two objects of this class are considered to be equal if their :paramref:`id`
-        are equal.
+        Two objects of this class are considered to be equal if their
+        :class:`id <apscheduler.job.Job>` are equal.
 
         Returns:
             :obj:`True` if both objects have :paramref:`id` parameters identical.
-                :obj:`False` otherwise.
+            :obj:`False` otherwise.
         """
         if isinstance(other, self.__class__):
             return self.id == other.id

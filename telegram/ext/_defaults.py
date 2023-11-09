@@ -126,7 +126,7 @@ class Defaults:
 
     def __eq__(self, other: object) -> bool:
         """Defines equality condition for the :class:`Defaults` object.
-        Two objects of this class are considered to be equal if their all parameters
+        Two objects of this class are considered to be equal if all their parameters
         are identical.
 
         Returns:
