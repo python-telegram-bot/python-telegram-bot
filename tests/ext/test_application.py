@@ -1535,6 +1535,8 @@ class TestApplication:
         app.run_polling(drop_pending_updates=True, close_loop=False, **kwargs)
         thread.join()
 
+        raise RuntimeError(" | ".join([str(entry.message) for entry in recwarn]))
+
         if timeout_name == "poll_interval":
             assert len(recwarn) == 0
             return
