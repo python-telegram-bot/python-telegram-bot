@@ -804,9 +804,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 "Application.run_polling is only available if the application has an Updater."
             )
 
-        if (read_timeout, write_timeout, connect_timeout, pool_timeout) != (
-            (2,) + (DEFAULT_NONE,) * 3
-        ):
+        if (read_timeout, write_timeout, connect_timeout, pool_timeout) != ((DEFAULT_NONE,) * 4):
             warn(
                 "Setting timeouts via `Application.run_polling` is deprecated. "
                 "Please use `ApplicationBuilder.get_updates_*_timeout` instead.",
