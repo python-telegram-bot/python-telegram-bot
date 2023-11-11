@@ -94,6 +94,7 @@ _BOT_CHECKS = [
     ("private_key", "private_key"),
     ("rate_limiter", "rate_limiter instance"),
     ("local_mode", "local_mode setting"),
+    ("test_env", "test_env setting"),
 ]
 
 _TWO_ARGS_REQ = "The parameter `{}` may only be set, if no {} was set."
@@ -167,6 +168,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_updater",
         "_write_timeout",
         "_local_mode",
+        "_test_env",
         "_http_version",
     )
 
@@ -196,6 +198,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._defaults: ODVInput[Defaults] = DEFAULT_NONE
         self._arbitrary_callback_data: Union[DefaultValue[bool], int] = DEFAULT_FALSE
         self._local_mode: DVType[bool] = DEFAULT_FALSE
+        self._test_env: DVType[bool] = DEFAULT_FALSE
         self._bot: DVInput[Bot] = DEFAULT_NONE
         self._update_queue: DVType[Queue] = DefaultValue(Queue())
 
@@ -273,6 +276,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             get_updates_request=self._build_request(get_updates=True),
             rate_limiter=DefaultValue.get_value(self._rate_limiter),
             local_mode=DefaultValue.get_value(self._local_mode),
+            test_env=DefaultValue.get_value(self._test_env),
         )
 
     def _bot_check(self, name: str) -> None:
@@ -1004,6 +1008,24 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._bot_check("local_mode")
         self._updater_check("local_mode")
         self._local_mode = local_mode
+        return self
+
+    def test_env(self: BuilderType, test_env: bool) -> BuilderType:
+        """Specifies the value for :paramref:`~telegram.Bot.test_env` for the
+        :attr:`telegram.ext.Application.bot`.
+        If not called, will default to :obj:`False`.
+
+        .. seealso:: See `Testing Mini Apps <https://core.telegram.org/bots/webapps#testing-mini-apps>`_.
+
+        Args:
+            test_env (:obj:`bool`): Whether the bot should use the test routes for test environment
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        self._bot_check("test_env")
+        self._updater_check("test_env")
+        self._test_env = test_env
         return self
 
     def bot(

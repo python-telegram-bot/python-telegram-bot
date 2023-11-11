@@ -207,7 +207,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             this is that files are uploaded using their local path in the
             `file URI scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
             Defaults to :obj:`False`.
-
+        test_env (:obj:`bool`, optional): If set to :obj:`True` appends /test to api route for method
+            calling. This should be set if you want to test your Mini Apps in the test environment.
+            See `Testing Mini Apps <https://core.telegram.org/bots/webapps#testing-mini-apps>`_.
             .. versionadded:: 20.0.
 
     .. include:: inclusions/bot_methods.rst
@@ -230,6 +232,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         "_request",
         "_initialized",
         "_local_mode",
+        "_test_env",
     )
 
     def __init__(
@@ -242,6 +245,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         private_key: Optional[bytes] = None,
         private_key_password: Optional[bytes] = None,
         local_mode: bool = False,
+        test_env: bool = False,
     ):
         super().__init__(api_kwargs=None)
         if not token:
@@ -251,6 +255,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self._base_url: str = base_url + self._token
         self._base_file_url: str = base_file_url + self._token
         self._local_mode: bool = local_mode
+        self._test_env: bool = test_env
         self._bot_user: Optional[User] = None
         self._private_key: Optional[bytes] = None
         self._initialized: bool = False
@@ -407,6 +412,14 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         .. versionadded:: 20.0
         """
         return self._local_mode
+
+    @property
+    def test_env(self) -> bool:
+        """:obj:`bool`: Whether this bot is using the test endpoint.
+
+        .. versionadded:: ??
+        """
+        return self._test_env
 
     # Proper type hints are difficult because:
     # 1. cryptography doesn't have a nice base class, so it would get lengthy
@@ -639,7 +652,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         request = self._request[0] if endpoint == "getUpdates" else self._request[1]
 
         return await request.post(
-            url=f"{self._base_url}/{endpoint}",
+            url=f"{self._base_url}" +("/test" if self._test_env else "") + f"/{endpoint}",
             request_data=request_data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
