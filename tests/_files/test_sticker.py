@@ -399,7 +399,7 @@ class TestStickerWithRequest(TestStickerBase):
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="message not found"):
+            with pytest.raises(BadRequest, match="Message to reply not found"):
                 await default_bot.send_sticker(
                     chat_id, sticker, reply_to_message_id=reply_to_message.message_id
                 )
