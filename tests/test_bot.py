@@ -2180,7 +2180,7 @@ class TestBotWithRequest:
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="message not found"):
+            with pytest.raises(BadRequest, match="Message to reply not found"):
                 await default_bot.send_poll(
                     chat_id,
                     question=question,
@@ -2237,7 +2237,7 @@ class TestBotWithRequest:
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="message not found"):
+            with pytest.raises(BadRequest, match="Message to reply not found"):
                 await default_bot.send_dice(
                     chat_id, reply_to_message_id=reply_to_message.message_id
                 )
@@ -2570,7 +2570,7 @@ class TestBotWithRequest:
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="message not found"):
+            with pytest.raises(BadRequest, match="Message to reply not found"):
                 await default_bot.send_game(
                     chat_id, game_short_name, reply_to_message_id=reply_to_message.message_id
                 )
@@ -3053,7 +3053,7 @@ class TestBotWithRequest:
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="message not found"):
+            with pytest.raises(BadRequest, match="Message to reply not found"):
                 await default_bot.send_message(
                     chat_id, "test", reply_to_message_id=reply_to_message.message_id
                 )
