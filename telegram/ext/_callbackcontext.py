@@ -236,11 +236,13 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 await self.application.persistence.refresh_bot_data(self.bot_data)
             if self.application.persistence.store_data.chat_data and self._chat_id is not None:
                 await self.application.persistence.refresh_chat_data(
-                    chat_id=self._chat_id, chat_data=self.chat_data  # type: ignore[arg-type]
+                    chat_id=self._chat_id,
+                    chat_data=self.chat_data,  # type: ignore[arg-type]
                 )
             if self.application.persistence.store_data.user_data and self._user_id is not None:
                 await self.application.persistence.refresh_user_data(
-                    user_id=self._user_id, user_data=self.user_data  # type: ignore[arg-type]
+                    user_id=self._user_id,
+                    user_data=self.user_data,  # type: ignore[arg-type]
                 )
 
     def drop_callback_data(self, callback_query: CallbackQuery) -> None:
