@@ -99,7 +99,9 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
     # Mypy seems a bit inconsistent about what it wants as types for `default` and return value
     # so we just ignore a bit
     def pop(  # type: ignore[override]
-        self, key: _KT, default: _VT = DEFAULT_NONE  # type: ignore[assignment]
+        self,
+        key: _KT,
+        default: _VT = DEFAULT_NONE,  # type: ignore[assignment]
     ) -> _VT:
         if key in self:
             self.__track_write(key)

@@ -95,3 +95,9 @@ HTTPVersion = Literal["1.1", "2.0", "2"]
 CorrectOptionID = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 MarkdownVersion = Literal[1, 2]
+
+SocketOpt = Union[
+    Tuple[int, int, int],
+    Tuple[int, int, Union[bytes, bytearray]],
+    Tuple[int, int, None, int],
+]

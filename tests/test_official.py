@@ -28,7 +28,7 @@ from bs4 import BeautifulSoup, PageElement, Tag
 
 import telegram
 from telegram._utils.defaultvalue import DefaultValue
-from telegram._utils.types import DVInput, FileInput, ODVInput
+from telegram._utils.types import FileInput, ODVInput
 from telegram.ext import Defaults
 from tests.auxil.envvars import RUN_TEST_OFFICIAL
 
@@ -433,11 +433,10 @@ def check_param_type(
     # Special case for when the parameter is a default value parameter
     for name, _ in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
         if name in ptb_param.name:  # no strict == since we have a param: `explanation_parse_mode`
-            # Check if it's DVInput or ODVInput
-            for param_type in [DVInput, ODVInput]:
-                parsed = param_type[mapped_type]
-                if ptb_annotation == parsed:
-                    return True
+            # Check if it's ODVInput
+            parsed = ODVInput[mapped_type]
+            if (ptb_annotation | None) == parsed:  # We have to add back None in our annotation
+                return True
             return False
 
     # Special case for send_* methods where we accept more types than the official API:

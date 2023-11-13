@@ -1086,7 +1086,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 return await asyncio.create_task(coroutine)
             # If user uses generator in python 3.12+, Exception will happen and we cannot do
             # anything about it. (hence the type ignore if mypy is run on python 3.12-)
-            return await coroutine  # type: ignore
+            return await coroutine  # type: ignore[misc]
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(
@@ -1367,7 +1367,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             chat_id (:obj:`int`): The chat id to delete. The entry will be deleted even if it is
                 not empty.
         """
-        self._chat_data.pop(chat_id, None)  # type: ignore[arg-type]
+        self._chat_data.pop(chat_id, None)
         self._chat_ids_to_be_deleted_in_persistence.add(chat_id)
 
     def drop_user_data(self, user_id: int) -> None:
@@ -1386,7 +1386,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             user_id (:obj:`int`): The user id to delete. The entry will be deleted even if it is
                 not empty.
         """
-        self._user_data.pop(user_id, None)  # type: ignore[arg-type]
+        self._user_data.pop(user_id, None)
         self._user_ids_to_be_deleted_in_persistence.add(user_id)
 
     def migrate_chat_data(

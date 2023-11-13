@@ -28,6 +28,7 @@ from typing import Any, Callable, Coroutine, Tuple
 
 import httpx
 import pytest
+from httpx import AsyncHTTPTransport
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import (
@@ -42,6 +43,7 @@ from telegram.error import (
     TimedOut,
 )
 from telegram.request._httpxrequest import HTTPXRequest
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
 
@@ -78,7 +80,7 @@ async def httpx_request():
 class TestNoSocksHTTP2WithoutRequest:
     async def test_init(self, bot):
         with pytest.raises(RuntimeError, match=r"python-telegram-bot\[socks\]"):
-            HTTPXRequest(proxy_url="socks5://foo")
+            HTTPXRequest(proxy="socks5://foo")
         with pytest.raises(RuntimeError, match=r"python-telegram-bot\[http2\]"):
             HTTPXRequest(http_version="2")
 
@@ -117,7 +119,7 @@ class TestRequestWithoutRequest:
 
         # Make sure that other exceptions are forwarded
         with pytest.raises(ImportError, match=r"Other Error Message"):
-            HTTPXRequest(proxy_url="socks5://foo")
+            HTTPXRequest(proxy="socks5://foo")
 
     def test_slot_behaviour(self):
         inst = HTTPXRequest()
@@ -358,7 +360,9 @@ class TestHTTPXRequestWithoutRequest:
     def _reset(self):
         self.test_flag = None
 
-    def test_init(self, monkeypatch):
+    # We parametrize this to make sure that the legacy `proxy_url` argument is still supported
+    @pytest.mark.parametrize("proxy_argument", ["proxy", "proxy_url"])
+    def test_init(self, monkeypatch, proxy_argument):
         @dataclass
         class Client:
             timeout: object
@@ -366,6 +370,7 @@ class TestHTTPXRequestWithoutRequest:
             limits: object
             http1: object
             http2: object
+            transport: object = None
 
         monkeypatch.setattr(httpx, "AsyncClient", Client)
 
@@ -378,19 +383,31 @@ class TestHTTPXRequestWithoutRequest:
         assert request._client.http1 is True
         assert not request._client.http2
 
-        request = HTTPXRequest(
-            connection_pool_size=42,
-            proxy_url="proxy_url",
-            connect_timeout=43,
-            read_timeout=44,
-            write_timeout=45,
-            pool_timeout=46,
-        )
-        assert request._client.proxies == "proxy_url"
+        kwargs = {
+            "connection_pool_size": 42,
+            proxy_argument: "proxy",
+            "connect_timeout": 43,
+            "read_timeout": 44,
+            "write_timeout": 45,
+            "pool_timeout": 46,
+        }
+        request = HTTPXRequest(**kwargs)
+        assert request._client.proxies == "proxy"
         assert request._client.limits == httpx.Limits(
             max_connections=42, max_keepalive_connections=42
         )
         assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
+
+    def test_proxy_mutually_exclusive(self):
+        with pytest.raises(ValueError, match="mutually exclusive"):
+            HTTPXRequest(proxy="proxy", proxy_url="proxy_url")
+
+    def test_proxy_url_deprecation_warning(self, recwarn):
+        HTTPXRequest(proxy_url="http://127.0.0.1:3128")
+        assert len(recwarn) == 1
+        assert recwarn[0].category is PTBDeprecationWarning
+        assert "`proxy_url` is deprecated" in str(recwarn[0].message)
+        assert recwarn[0].filename == __file__, "incorrect stacklevel"
 
     async def test_multiple_inits_and_shutdowns(self, monkeypatch):
         self.test_flag = defaultdict(int)
@@ -617,6 +634,24 @@ class TestHTTPXRequestWithoutRequest:
                 )
 
             assert exc_info.value.__cause__ is pool_timeout
+
+    async def test_socket_opts(self, monkeypatch):
+        transport_kwargs = {}
+        transport_init = AsyncHTTPTransport.__init__
+
+        def init_transport(*args, **kwargs):
+            nonlocal transport_kwargs
+            transport_kwargs = kwargs.copy()
+            transport_init(*args, **kwargs)
+
+        monkeypatch.setattr(AsyncHTTPTransport, "__init__", init_transport)
+
+        HTTPXRequest()
+        assert "socket_options" not in transport_kwargs
+
+        transport_kwargs = {}
+        HTTPXRequest(socket_options=((1, 2, 3),))
+        assert transport_kwargs["socket_options"] == ((1, 2, 3),)
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
