@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Application."""
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Coroutine, Generic, Optional, Tuple, TypeVar, Union, cast
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.repr import build_repr_with_selected_attrs
@@ -172,3 +172,39 @@ class BaseHandler(Generic[UT, CCT], ABC):
             check_result: The result (return value) from :meth:`check_update`.
 
         """
+
+    async def do_process(
+        self,
+        context: Optional[CCT],
+        update: object,
+        app: "Application[Any, CCT, Any, Any, Any, Any]",
+    ) -> Tuple[bool, Optional[CCT], bool]:
+        """Check if the handler should handle the update, and handle it if yes.
+        Override if needed.
+
+        Args:
+            context (:class:`telegram.ext.CallbackContext`, optional): The context
+                object, may be `None` if not already built.
+            update (:obj:`object` | :class:`telegram.Update`): The update to be checked
+                (and handled).
+            application (:class:`telegram.ext.Application`): The calling application.
+
+        Returns:
+            :obj:`Tuple[bool, Optional[telegram.ext.CallbackContext], bool]`.
+            The first boolean is whether the handler handled the update. the second
+            is the returned context. The third boolean is whether the handler is
+            blocking when handled (should always be `False` if not handled).
+
+        """
+        check = self.check_update(update)  # Should the handler handle this update?
+        if check is None or check is False:
+            return False, context, False
+        # if yes,
+        if not context:  # build a context if not already built
+            context = app.context_types.context.from_update(update, app)
+            await context.refresh_data()
+        update = cast(UT, update)
+        coroutine: Coroutine = self.handle_update(update, app, check, context)
+        is_blocking = await app.do_process_update(self, update, coroutine)
+        # Only a max of 1 handler per group is handled
+        return True, context, is_blocking
