@@ -243,7 +243,7 @@ class Updater(AsyncContextManager["Updater"]):
                     Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE` instead of
                     ``2``.
                 .. deprecated:: NEXT.VERSION
-                    Deprecated in favor of setting the timout via
+                    Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_read_timeout` or
                     :paramref:`telegram.Bot.get_updates_request`.
             write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -251,7 +251,7 @@ class Updater(AsyncContextManager["Updater"]):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
                 .. deprecated:: NEXT.VERSION
-                    Deprecated in favor of setting the timout via
+                    Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_write_timeout` or
                     :paramref:`telegram.Bot.get_updates_request`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -259,7 +259,7 @@ class Updater(AsyncContextManager["Updater"]):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
                 .. deprecated:: NEXT.VERSION
-                    Deprecated in favor of setting the timout via
+                    Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_connect_timeout` or
                     :paramref:`telegram.Bot.get_updates_request`.
             pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -267,7 +267,7 @@ class Updater(AsyncContextManager["Updater"]):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
                 .. deprecated:: NEXT.VERSION
-                    Deprecated in favor of setting the timout via
+                    Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_pool_timeout` or
                     :paramref:`telegram.Bot.get_updates_request`.
             allowed_updates (List[:obj:`str`], optional): Passed to

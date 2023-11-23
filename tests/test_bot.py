@@ -2455,6 +2455,8 @@ class TestBotWithRequest:
         await bot.get_updates()
         assert len(recwarn) == 0
 
+        # Now let's test deprecation warning when using get_updates for other BaseRequest
+        # subclasses (we just monkeypatch the existing HTTPXRequest for this)
         read_timeout = None
 
         async def catch_timeouts(*args, **kwargs):

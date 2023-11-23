@@ -132,10 +132,11 @@ class BaseRequest(
     def read_timeout(self) -> Optional[float]:
         """This property must return the default read timeout in seconds used by this class.
         More precisely, the returned value should be the one used when
-        :paramref:`post.read_timeout` is not passed/equal to :attr:`DEFAULT_NONE`.
+        :paramref:`post.read_timeout` of :meth:post` is not passed/equal to :attr:`DEFAULT_NONE`.
 
         .. versionadded:: NEXT.VERSION
-        .. deprecated:: NEXT.VERSION
+
+        Warning:
             For now this property does not need to be implemented by subclasses and will raise
             :exc:`NotImplementedError` if accessed without being overridden. However, in future
             versions, this property will be abstract and must be implemented by subclasses.

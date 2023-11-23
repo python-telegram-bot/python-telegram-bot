@@ -753,28 +753,28 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     ``2``.
 
                 .. deprecated:: NEXT.VERSION
-                    Deprecated in favor of setting the timout via
+                    Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_read_timeout`.
             write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
                 .. deprecated:: NEXT.VERSION
-                    Deprecated in favor of setting the timout via
+                    Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_write_timeout`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
                 .. deprecated:: NEXT.VERSION
-                    Deprecated in favor of setting the timout via
+                    Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_connect_timeout`.
             pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
                 .. deprecated:: NEXT.VERSION
-                    Deprecated in favor of setting the timout via
+                    Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_pool_timeout`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
