@@ -63,7 +63,8 @@ media_write_timeout_deprecation_methods = [
 ]
 media_write_timeout_deprecation = [
     "    write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
-    "        :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``."
+    "        :paramref:`telegram.request.BaseRequest.post.write_timeout`. By default, ``20`` "
+    "        seconds are used as write timeout."
     "",
     "",
     "       .. deprecated:: NEXT.VERSION",

@@ -117,9 +117,9 @@ def autodoc_process_docstring(
                 "post.write_timeout`. Defaults to" in to_insert
                 and method_name in media_write_timeout_deprecation_methods
             ):
-                effective_insert = media_write_timeout_deprecation
+                effective_insert: list[str] = media_write_timeout_deprecation
             else:
-                effective_insert = (to_insert,)
+                effective_insert = [to_insert]
 
             effective_insert = [
                 entry.format(
