@@ -7,3 +7,9 @@
 
 # httpx has no stable release yet, so let's be cautious for now
 httpx ~= 0.25.1
+# https://github.com/encode/httpx/commit/280a89a4d13b65852b065b3e1aaa53d388946a88 removed version
+# pinning for httpcore in the httpx library, leading to problems with the new `socket_options`
+# parameter in httpx 0.25.1 if an old version of httpcore is installed.
+# Hence, we pin this here to avoid problems for PTB users. Can be removed once we bump httpx as
+# the issue was addressed in https://github.com/encode/httpx/pull/2937.
+httpcore >= 0.17.2
