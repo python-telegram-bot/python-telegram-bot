@@ -19,7 +19,7 @@
 from typing import Optional
 
 import pytest
-from httpx import AsyncClient, Response
+from httpx import AsyncClient, AsyncHTTPTransport, Response
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -90,6 +90,7 @@ async def send_webhook_message(
     content_type: str = "application/json",
     get_method: Optional[str] = None,
     secret_token: Optional[str] = None,
+    unix: Optional[str] = None,
 ) -> Response:
     headers = {
         "content-type": content_type,
@@ -111,7 +112,11 @@ async def send_webhook_message(
 
     url = f"http://{ip}:{port}/{url_path}"
 
-    async with AsyncClient() as client:
+    transport = None
+    if unix:
+        transport = AsyncHTTPTransport(uds=unix)
+
+    async with AsyncClient(transport=transport) as client:
         return await client.request(
             url=url, method=get_method or "POST", data=payload, headers=headers
         )

@@ -32,7 +32,7 @@ from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from telegram.request import HTTPXRequest
 from tests.auxil.build_messages import make_message, make_message_update
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
-from tests.auxil.files import data_file
+from tests.auxil.files import TEST_DATA_PATH, data_file
 from tests.auxil.networking import send_webhook_message
 from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.slots import mro_slots
@@ -72,6 +72,12 @@ class TestUpdater:
         self.err_handler_called = None
         self.cb_handler_called = None
         self.test_flag = False
+
+    @pytest.fixture()
+    def file_path(self) -> str:
+        path = TEST_DATA_PATH / "test.sock"
+        yield str(path)
+        path.unlink(missing_ok=True)
 
     def error_callback(self, error):
         self.received = error
@@ -646,8 +652,9 @@ class TestUpdater:
     @pytest.mark.parametrize("ext_bot", [True, False])
     @pytest.mark.parametrize("drop_pending_updates", [True, False])
     @pytest.mark.parametrize("secret_token", ["SecretToken", None])
+    @pytest.mark.parametrize("unix", [None, True])
     async def test_webhook_basic(
-        self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token
+        self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token, unix, file_path
     ):
         # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
         # that depends on this distinction works
@@ -678,6 +685,8 @@ class TestUpdater:
                 port=port,
                 url_path="TOKEN",
                 secret_token=secret_token,
+                unix=file_path if unix else None,
+                webhook_url="string",
             )
             assert return_value is updater.update_queue
             assert updater.running
@@ -685,22 +694,33 @@ class TestUpdater:
             # Now, we send an update to the server
             update = make_message_update("Webhook")
             await send_webhook_message(
-                ip, port, update.to_json(), "TOKEN", secret_token=secret_token
+                ip,
+                port,
+                update.to_json(),
+                "TOKEN",
+                secret_token=secret_token,
+                unix=file_path if unix else None,
             )
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
 
             # Returns Not Found if path is incorrect
-            response = await send_webhook_message(ip, port, "123456", "webhook_handler.py")
+            response = await send_webhook_message(
+                ip, port, "123456", "webhook_handler.py", unix=file_path if unix else None
+            )
             assert response.status_code == HTTPStatus.NOT_FOUND
 
             # Returns METHOD_NOT_ALLOWED if method is not allowed
-            response = await send_webhook_message(ip, port, None, "TOKEN", get_method="HEAD")
+            response = await send_webhook_message(
+                ip, port, None, "TOKEN", get_method="HEAD", unix=file_path if unix else None
+            )
             assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
             if secret_token:
                 # Returns Forbidden if no secret token is set
                 response_text = "<html><title>403: {0}</title><body>403: {0}</body></html>"
-                response = await send_webhook_message(ip, port, update.to_json(), "TOKEN")
+                response = await send_webhook_message(
+                    ip, port, update.to_json(), "TOKEN", unix=file_path if unix else None
+                )
                 assert response.status_code == HTTPStatus.FORBIDDEN
                 assert response.text == response_text.format(
                     "Request did not include the secret token"
@@ -708,7 +728,12 @@ class TestUpdater:
 
                 # Returns Forbidden if the secret token is wrong
                 response = await send_webhook_message(
-                    ip, port, update.to_json(), "TOKEN", secret_token="NotTheSecretToken"
+                    ip,
+                    port,
+                    update.to_json(),
+                    "TOKEN",
+                    secret_token="NotTheSecretToken",
+                    unix=file_path if unix else None,
                 )
                 assert response.status_code == HTTPStatus.FORBIDDEN
                 assert response.text == response_text.format("Request had the wrong secret token")
@@ -727,13 +752,39 @@ class TestUpdater:
                 ip_address=ip,
                 port=port,
                 url_path="TOKEN",
+                unix=file_path if unix else None,
+                webhook_url="string",
             )
             assert updater.running
             update = make_message_update("Webhook")
-            await send_webhook_message(ip, port, update.to_json(), "TOKEN")
+            await send_webhook_message(
+                ip, port, update.to_json(), "TOKEN", unix=file_path if unix else None
+            )
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
             await updater.stop()
             assert not updater.running
+
+    async def test_unix_webhook_raises(self, updater):
+        async with updater:
+            with pytest.raises(RuntimeError, match="URL"):
+                await updater.start_webhook(listen="127.0.0.1", unix="DoesntMatter")
+            with pytest.raises(RuntimeError, match="unix"):
+                await updater.start_webhook(
+                    listen="127.0.0.1", unix="DoesntMatter", webhook_url="string"
+                )
+
+    async def test_unix_webhook_path(self, updater, monkeypatch, file_path):
+        async def set_webhook(*args, **kwargs):
+            return True
+
+        monkeypatch.setattr(updater.bot, "set_webhook", set_webhook)
+
+        async with updater:
+            await updater.start_webhook(unix=file_path, url_path="TOKEN", webhook_url="string")
+
+            update = make_message_update("Webhook")
+            await send_webhook_message("ip", 123, update.to_json(), "TOKEN", unix=file_path)
+            await updater.stop()
 
     async def test_start_webhook_already_running(self, updater, monkeypatch):
         async def return_true(*args, **kwargs):

@@ -35,10 +35,10 @@ from typing import (
     Union,
 )
 
-from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
-from telegram._utils.types import ODVInput
+from telegram._utils.types import DVType, ODVInput
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 
 try:
@@ -53,6 +53,7 @@ if TYPE_CHECKING:
 
 
 _UpdaterType = TypeVar("_UpdaterType", bound="Updater")  # pylint: disable=invalid-name
+_DefaultIP = DefaultValue("127.0.0.1")
 _LOGGER = get_logger(__name__)
 
 
@@ -419,7 +420,7 @@ class Updater(AsyncContextManager["Updater"]):
 
     async def start_webhook(
         self,
-        listen: str = "127.0.0.1",
+        listen: DVType[str] = _DefaultIP,
         port: int = 80,
         url_path: str = "",
         cert: Optional[Union[str, Path]] = None,
@@ -431,6 +432,7 @@ class Updater(AsyncContextManager["Updater"]):
         ip_address: Optional[str] = None,
         max_connections: int = 40,
         secret_token: Optional[str] = None,
+        unix: Optional[Union[str, Path]] = None,
     ) -> "asyncio.Queue[object]":
         """
         Starts a small http server to listen for updates via webhook. If :paramref:`cert`
@@ -499,6 +501,11 @@ class Updater(AsyncContextManager["Updater"]):
                 header isn't set or it is set to a wrong token.
 
                 .. versionadded:: 20.0
+            unix (:class:`pathlib.Path` | :obj:`str`, optional): Path to the unix socket file. Path
+                can be empty in which case the file will be created. When using this param, you
+                need to set the :paramref:`webhook_url`!
+
+                .. versionadded:: NEXT.VERSION
         Returns:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.
 
@@ -537,6 +544,7 @@ class Updater(AsyncContextManager["Updater"]):
                     ip_address=ip_address,
                     max_connections=max_connections,
                     secret_token=secret_token,
+                    unix=unix,
                 )
 
                 _LOGGER.debug("Waiting for webhook server to start")
@@ -551,7 +559,7 @@ class Updater(AsyncContextManager["Updater"]):
 
     async def _start_webhook(
         self,
-        listen: str,
+        listen: DVType[str],
         port: int,
         url_path: str,
         bootstrap_retries: int,
@@ -564,6 +572,7 @@ class Updater(AsyncContextManager["Updater"]):
         ip_address: Optional[str] = None,
         max_connections: int = 40,
         secret_token: Optional[str] = None,
+        unix: Optional[Union[str, Path]] = None,
     ) -> None:
         _LOGGER.debug("Updater thread started (webhook)")
 
@@ -588,14 +597,19 @@ class Updater(AsyncContextManager["Updater"]):
                 raise TelegramError("Invalid SSL Certificate") from exc
         else:
             ssl_ctx = None
-
+        # If unix is used, the webhook_url can't be generated and thus must be set by the user
+        if unix and not webhook_url:
+            raise RuntimeError(
+                "Since you set unix, you also need to set the URL to the webhook "
+                "of the proxy you run in front of the unix socket."
+            )
         # Create and start server
-        self._httpd = WebhookServer(listen, port, app, ssl_ctx)
+        self._httpd = WebhookServer(listen, port, app, ssl_ctx, unix)
 
         if not webhook_url:
             webhook_url = self._gen_webhook_url(
                 protocol="https" if ssl_ctx else "http",
-                listen=listen,
+                listen=DefaultValue.get_value(listen),
                 port=port,
                 url_path=url_path,
             )

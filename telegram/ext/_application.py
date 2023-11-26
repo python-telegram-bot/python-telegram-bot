@@ -62,7 +62,7 @@ from telegram.ext._basehandler import BaseHandler
 from telegram.ext._basepersistence import BasePersistence
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
-from telegram.ext._updater import Updater
+from telegram.ext._updater import Updater, _DefaultIP
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
 from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, RT, UD, ConversationKey, HandlerCallback
@@ -805,7 +805,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     def run_webhook(
         self,
-        listen: str = "127.0.0.1",
+        listen: DVType[str] = _DefaultIP,
         port: int = 80,
         url_path: str = "",
         cert: Optional[Union[str, Path]] = None,
@@ -819,6 +819,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         close_loop: bool = True,
         stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
         secret_token: Optional[str] = None,
+        unix: Optional[Union[str, Path]] = None,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         listening for updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
@@ -911,6 +912,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 header isn't set or it is set to a wrong token.
 
                 .. versionadded:: 20.0
+            unix (:class:`pathlib.Path` | :obj:`str`, optional): Path to the unix socket file. Path
+                can be empty in which case the file will be created. When using this param, you
+                need to set the :paramref:`webhook_url`!
+
+                .. versionadded:: NEXT.VERSION
         """
         if not self.updater:
             raise RuntimeError(
@@ -931,6 +937,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 ip_address=ip_address,
                 max_connections=max_connections,
                 secret_token=secret_token,
+                unix=unix,
             ),
             close_loop=close_loop,
             stop_signals=stop_signals,
