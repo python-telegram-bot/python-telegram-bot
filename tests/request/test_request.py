@@ -42,7 +42,9 @@ from telegram.error import (
     TelegramError,
     TimedOut,
 )
+from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
+from telegram.request._requestparameter import RequestParameter
 from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
@@ -331,7 +333,7 @@ class TestRequestWithoutRequest:
 
         assert await httpx_request.retrieve(None, None) == server_response
 
-    async def test_timeout_propagation(self, monkeypatch, httpx_request):
+    async def test_timeout_propagation_to_do_request(self, monkeypatch, httpx_request):
         async def make_assertion(*args, **kwargs):
             self.test_flag = (
                 kwargs.get("read_timeout"),
@@ -343,13 +345,66 @@ class TestRequestWithoutRequest:
 
         monkeypatch.setattr(httpx_request, "do_request", make_assertion)
 
-        await httpx_request.post("url", "method")
+        await httpx_request.post("url", None)
         assert self.test_flag == (DEFAULT_NONE, DEFAULT_NONE, DEFAULT_NONE, DEFAULT_NONE)
 
         await httpx_request.post(
             "url", None, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
         )
         assert self.test_flag == (1, 2, 3, 4)
+
+    @pytest.mark.parametrize("media", [True, False])
+    async def test_timeout_propagation_write_timeout(
+        self, monkeypatch, media, input_media_photo, recwarn  # noqa: F811
+    ):
+        class CustomRequest(BaseRequest):
+            async def initialize(self_) -> None:
+                pass
+
+            async def shutdown(self_) -> None:
+                pass
+
+            async def do_request(self_, *args, **kwargs) -> Tuple[int, bytes]:
+                self.test_flag = (
+                    kwargs.get("read_timeout"),
+                    kwargs.get("connect_timeout"),
+                    kwargs.get("write_timeout"),
+                    kwargs.get("pool_timeout"),
+                )
+                return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
+
+        custom_request = CustomRequest()
+        data = {"string": "string", "int": 1, "float": 1.0}
+        if media:
+            data["media"] = input_media_photo
+        request_data = RequestData(
+            parameters=[RequestParameter.from_input(key, value) for key, value in data.items()],
+        )
+
+        # First make sure that custom timeouts are always respected
+        await custom_request.post(
+            "url", request_data, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
+        )
+        assert self.test_flag == (1, 2, 3, 4)
+
+        # Now also ensure that the default timeout for media requests is 20 seconds
+        await custom_request.post("url", request_data)
+        assert self.test_flag == (
+            DEFAULT_NONE,
+            DEFAULT_NONE,
+            20 if media else DEFAULT_NONE,
+            DEFAULT_NONE,
+        )
+
+        if media:
+            assert len(recwarn) == 1
+            assert "will default to `BaseRequest.DEFAULT_NONE` instead of 20" in str(
+                recwarn[0].message
+            )
+            assert recwarn[0].category is PTBDeprecationWarning
+            assert recwarn[0].filename == __file__
+        else:
+            assert len(recwarn) == 0
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="No need to run this twice")
@@ -634,6 +689,37 @@ class TestHTTPXRequestWithoutRequest:
                 )
 
             assert exc_info.value.__cause__ is pool_timeout
+
+    @pytest.mark.parametrize("media", [True, False])
+    async def test_do_request_write_timeout(
+        self, monkeypatch, media, httpx_request, input_media_photo, recwarn  # noqa: F811
+    ):
+        async def request(_, **kwargs):
+            self.test_flag = kwargs.get("timeout")
+            return httpx.Response(HTTPStatus.OK, content=b'{"ok": "True", "result": {}}')
+
+        monkeypatch.setattr(httpx.AsyncClient, "request", request)
+
+        data = {"string": "string", "int": 1, "float": 1.0}
+        if media:
+            data["media"] = input_media_photo
+        request_data = RequestData(
+            parameters=[RequestParameter.from_input(key, value) for key, value in data.items()],
+        )
+
+        # First make sure that custom timeouts are always respected
+        await httpx_request.post(
+            "url", request_data, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
+        )
+        assert self.test_flag == httpx.Timeout(read=1, connect=2, write=3, pool=4)
+
+        # Now also ensure that the default timeout for media requests is 20 seconds
+        await httpx_request.post("url", request_data)
+        assert self.test_flag == httpx.Timeout(read=5, connect=5, write=20 if media else 5, pool=1)
+
+        # Just for double-checking, since warnings are issued for implementations of BaseRequest
+        # other than HTTPXRequest
+        assert len(recwarn) == 0
 
     async def test_socket_opts(self, monkeypatch):
         transport_kwargs = {}
