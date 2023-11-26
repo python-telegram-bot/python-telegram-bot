@@ -29,11 +29,11 @@ from docs.auxil.admonition_inserter import AdmonitionInserter
 from docs.auxil.kwargs_insertion import (
     check_timeout_and_api_kwargs_presence,
     find_insert_pos_for_kwargs,
-    is_write_timeout_20,
     keyword_args,
+    media_write_timeout_deprecation,
+    media_write_timeout_deprecation_methods,
     read_timeout_sub,
     read_timeout_type,
-    write_timeout_sub,
 )
 from docs.auxil.link_code import LINE_NUMBERS
 
@@ -107,19 +107,31 @@ def autodoc_process_docstring(
                 f"Couldn't find the correct position to insert the keyword args for {obj}."
             )
 
-        long_write_timeout = is_write_timeout_20(obj)
         get_updates_sub = 1 if (method_name == "get_updates") else 0
         # The below can be done in 1 line with itertools.chain, but this must be modified in-place
+        insert_idx = insert_index
         for i in range(insert_index, insert_index + len(keyword_args)):
-            lines.insert(
-                i,
-                keyword_args[i - insert_index].format(
+            to_insert = keyword_args[i - insert_index]
+
+            if (
+                "post.write_timeout`. Defaults to" in to_insert
+                and method_name in media_write_timeout_deprecation_methods
+            ):
+                effective_insert: list[str] = media_write_timeout_deprecation
+            else:
+                effective_insert = [to_insert]
+
+            effective_insert = [
+                entry.format(
                     method=method_name,
-                    write_timeout=write_timeout_sub[long_write_timeout],
                     read_timeout=read_timeout_sub[get_updates_sub],
                     read_timeout_type=read_timeout_type[get_updates_sub],
-                ),
-            )
+                )
+                for entry in effective_insert
+            ]
+
+            lines[insert_idx:insert_idx] = effective_insert
+            insert_idx += len(effective_insert)
 
         ADMONITION_INSERTER.insert_admonitions(
             obj=typing.cast(collections.abc.Callable, obj),

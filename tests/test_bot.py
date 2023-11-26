@@ -28,6 +28,7 @@ import time
 from collections import defaultdict
 from http import HTTPStatus
 
+import httpx
 import pytest
 
 from telegram import (
@@ -1363,14 +1364,14 @@ class TestBotWithoutRequest:
         class OkException(BaseException):
             pass
 
-        async def do_request(*args, **kwargs):
-            obj = kwargs.get("write_timeout")
-            if obj == 20:
+        async def request(*args, **kwargs):
+            timeout = kwargs.get("timeout")
+            if timeout.write == 20:
                 raise OkException
 
             return 200, b'{"ok": true, "result": []}'
 
-        monkeypatch.setattr(bot.request, "do_request", do_request)
+        monkeypatch.setattr(httpx.AsyncClient, "request", request)
 
         # Test file uploading
         with pytest.raises(OkException):
