@@ -228,16 +228,24 @@ class HTTPXRequest(BaseRequest):
         if self._client.is_closed:
             raise RuntimeError("This HTTPXRequest is not initialized!")
 
+        files = request_data.multipart_data if request_data else None
+        data = request_data.json_parameters if request_data else None
+
         # If user did not specify timeouts (for e.g. in a bot method), use the default ones when we
         # created this instance.
         if isinstance(read_timeout, DefaultValue):
             read_timeout = self._client.timeout.read
-        if isinstance(write_timeout, DefaultValue):
-            write_timeout = self._client.timeout.write
         if isinstance(connect_timeout, DefaultValue):
             connect_timeout = self._client.timeout.connect
         if isinstance(pool_timeout, DefaultValue):
             pool_timeout = self._client.timeout.pool
+
+        if isinstance(write_timeout, DefaultValue):
+            # Making the networking backend decide on the proper timeout values instead of doing
+            # it via the default values of the Bot methods was introduced in version NEXT.VERSION.
+            # We hard-code the value here for now until we add additional parameters to this
+            # class to control the media_write_timeout separately.
+            write_timeout = self._client.timeout.write if not files else 20
 
         timeout = httpx.Timeout(
             connect=connect_timeout,
@@ -245,9 +253,6 @@ class HTTPXRequest(BaseRequest):
             write=write_timeout,
             pool=pool_timeout,
         )
-
-        files = request_data.multipart_data if request_data else None
-        data = request_data.json_parameters if request_data else None
 
         try:
             res = await self._client.request(
