@@ -67,7 +67,7 @@ media_write_timeout_deprecation = [
     "        seconds are used as write timeout."
     "",
     "",
-    "       .. deprecated:: NEXT.VERSION",
+    "       .. deprecated:: 20.7",
     "           In future versions, the default value will be changed to "
     "           :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
     "",
@@ -77,7 +77,7 @@ get_updates_read_timeout_addition = [
     "        :paramref:`timeout` will be added to this value.",
     "",
     "",
-    "        .. versionchanged:: NEXT.VERSION",
+    "        .. versionchanged:: 20.7",
     "           Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE` instead of ",
     "           ``2``.",
 ]

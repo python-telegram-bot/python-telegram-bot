@@ -239,10 +239,10 @@ class Updater(AsyncContextManager["Updater"]):
                 :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.7
                     Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE` instead of
                     ``2``.
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.7
                     Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_read_timeout` or
                     :paramref:`telegram.Bot.get_updates_request`.
@@ -250,7 +250,7 @@ class Updater(AsyncContextManager["Updater"]):
                 :paramref:`telegram.Bot.get_updates.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.7
                     Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_write_timeout` or
                     :paramref:`telegram.Bot.get_updates_request`.
@@ -258,7 +258,7 @@ class Updater(AsyncContextManager["Updater"]):
                 :paramref:`telegram.Bot.get_updates.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.7
                     Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_connect_timeout` or
                     :paramref:`telegram.Bot.get_updates_request`.
@@ -266,7 +266,7 @@ class Updater(AsyncContextManager["Updater"]):
                 :paramref:`telegram.Bot.get_updates.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.7
                     Deprecated in favor of setting the timeout via
                     :meth:`telegram.ext.ApplicationBuilder.get_updates_pool_timeout` or
                     :paramref:`telegram.Bot.get_updates_request`.
