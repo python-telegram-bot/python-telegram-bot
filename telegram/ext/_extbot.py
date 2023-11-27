@@ -549,7 +549,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         timeout: Optional[int] = None,
         allowed_updates: Optional[Sequence[str]] = None,
         *,
-        read_timeout: float = 2,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,

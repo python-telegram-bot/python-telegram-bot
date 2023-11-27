@@ -331,6 +331,39 @@ class TestUpdater:
 
         assert log_found
 
+    async def test_polling_mark_updates_as_read_timeout(self, monkeypatch, updater, caplog):
+        timeout_event = asyncio.Event()
+
+        async def get_updates(*args, **kwargs):
+            await asyncio.sleep(0)
+            if timeout_event.is_set():
+                raise TimedOut("TestMessage")
+            return []
+
+        monkeypatch.setattr(updater.bot, "get_updates", get_updates)
+
+        async with updater:
+            await updater.start_polling()
+            with caplog.at_level(logging.ERROR):
+                timeout_event.set()
+                await updater.stop()
+
+        assert len(caplog.records) >= 1
+        log_found = False
+        for record in caplog.records:
+            if not record.getMessage().startswith(
+                "Error while calling `get_updates` one more time"
+            ):
+                continue
+
+            assert record.name == "telegram.ext.Updater"
+            assert record.exc_info[0] is TimedOut
+            assert str(record.exc_info[1]) == "TestMessage"
+            log_found = True
+            break
+
+        assert log_found
+
     async def test_polling_mark_updates_as_read_failure(self, monkeypatch, updater, caplog):
         async def get_updates(*args, **kwargs):
             await asyncio.sleep(0)
@@ -376,7 +409,7 @@ class TestUpdater:
 
         expected = {
             "timeout": 10,
-            "read_timeout": 2,
+            "read_timeout": DEFAULT_NONE,
             "write_timeout": DEFAULT_NONE,
             "connect_timeout": DEFAULT_NONE,
             "pool_timeout": DEFAULT_NONE,

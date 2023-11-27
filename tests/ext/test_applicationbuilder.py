@@ -19,11 +19,13 @@
 import asyncio
 import inspect
 from dataclasses import dataclass
+from http import HTTPStatus
 
 import httpx
 import pytest
 
 from telegram import Bot
+from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.ext import (
     AIORateLimiter,
     Application,
@@ -581,3 +583,32 @@ class TestApplicationBuilder:
         )
         assert recwarn[0].category is PTBDeprecationWarning
         assert recwarn[0].filename == __file__, "wrong stacklevel"
+
+    @pytest.mark.parametrize(
+        ("read_timeout", "timeout", "expected"),
+        [
+            (None, None, 0),
+            (1, None, 1),
+            (None, 1, 1),
+            (DEFAULT_NONE, None, 10),
+            (DEFAULT_NONE, 1, 11),
+            (1, 2, 3),
+        ],
+    )
+    async def test_get_updates_read_timeout_value_passing(
+        self, bot, read_timeout, timeout, expected, monkeypatch, builder
+    ):
+        # This test is a double check that ApplicationBuilder respects the changes of #3963 just
+        # like `Bot` does - see also the corresponding test in test_bot.py (same name)
+        caught_read_timeout = None
+
+        async def catch_timeouts(*args, **kwargs):
+            nonlocal caught_read_timeout
+            caught_read_timeout = kwargs.get("read_timeout")
+            return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
+
+        monkeypatch.setattr(HTTPXRequest, "do_request", catch_timeouts)
+
+        bot = builder.get_updates_read_timeout(10).token(bot.token).build().bot
+        await bot.get_updates(read_timeout=read_timeout, timeout=timeout)
+        assert caught_read_timeout == expected

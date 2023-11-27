@@ -700,7 +700,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         poll_interval: float = 0.0,
         timeout: int = 10,
         bootstrap_retries: int = -1,
-        read_timeout: float = 2,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -745,16 +745,37 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 * > 0 - retry up to X times
 
             read_timeout (:obj:`float`, optional): Value to pass to
-                :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to ``2``.
+                :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
+                .. versionchanged:: NEXT.VERSION
+                    Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE` instead of
+                    ``2``.
+
+                .. deprecated:: NEXT.VERSION
+                    Deprecated in favor of setting the timeout via
+                    :meth:`telegram.ext.ApplicationBuilder.get_updates_read_timeout`.
             write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
+                .. deprecated:: NEXT.VERSION
+                    Deprecated in favor of setting the timeout via
+                    :meth:`telegram.ext.ApplicationBuilder.get_updates_write_timeout`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
+                .. deprecated:: NEXT.VERSION
+                    Deprecated in favor of setting the timeout via
+                    :meth:`telegram.ext.ApplicationBuilder.get_updates_connect_timeout`.
             pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
+                .. deprecated:: NEXT.VERSION
+                    Deprecated in favor of setting the timeout via
+                    :meth:`telegram.ext.ApplicationBuilder.get_updates_pool_timeout`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
             allowed_updates (List[:obj:`str`], optional): Passed to
@@ -781,6 +802,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         if not self.updater:
             raise RuntimeError(
                 "Application.run_polling is only available if the application has an Updater."
+            )
+
+        if (read_timeout, write_timeout, connect_timeout, pool_timeout) != ((DEFAULT_NONE,) * 4):
+            warn(
+                "Setting timeouts via `Application.run_polling` is deprecated. "
+                "Please use `ApplicationBuilder.get_updates_*_timeout` instead.",
+                PTBDeprecationWarning,
+                stacklevel=2,
             )
 
         def error_callback(exc: TelegramError) -> None:
