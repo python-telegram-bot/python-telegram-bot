@@ -97,4 +97,4 @@ group`_.
 .. _pytest: https://docs.pytest.org/en/stable/
 .. _pytest-xdist: https://pypi.org/project/pytest-xdist/
 .. _PTB dev group: https://t.me/pythontelegrambotgroup
-.. _corresponding workflow: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.github/workflows/test.yml
+.. _corresponding workflow: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.github/workflows/unit_tests.yml
