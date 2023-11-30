@@ -20,14 +20,14 @@ import inspect
 keyword_args = [
     "Keyword Arguments:",
     (
-        "    read_timeout ({read_timeout_type}, optional): Value to pass to "
+        "    read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
         "        :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to "
-        "        {read_timeout}."
+        "        :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`. "
     ),
     (
         "    write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
         "        :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to "
-        "        {write_timeout}."
+        "        :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`."
     ),
     (
         "    connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
@@ -45,12 +45,42 @@ keyword_args = [
     ),
     "",
 ]
-write_timeout_sub = [":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`", "``20``"]
-read_timeout_sub = [
-    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`",
-    "``2``. :paramref:`timeout` will be added to this value",
+
+media_write_timeout_deprecation_methods = [
+    "send_photo",
+    "send_audio",
+    "send_document",
+    "send_sticker",
+    "send_video",
+    "send_video_note",
+    "send_animation",
+    "send_voice",
+    "send_media_group",
+    "set_chat_photo",
+    "upload_sticker_file",
+    "add_sticker_to_set",
+    "create_new_sticker_set",
 ]
-read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
+media_write_timeout_deprecation = [
+    "    write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
+    "        :paramref:`telegram.request.BaseRequest.post.write_timeout`. By default, ``20`` "
+    "        seconds are used as write timeout."
+    "",
+    "",
+    "       .. deprecated:: 20.7",
+    "           In future versions, the default value will be changed to "
+    "           :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
+    "",
+    "",
+]
+get_updates_read_timeout_addition = [
+    "        :paramref:`timeout` will be added to this value.",
+    "",
+    "",
+    "        .. versionchanged:: 20.7",
+    "           Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE` instead of ",
+    "           ``2``.",
+]
 
 
 def find_insert_pos_for_kwargs(lines: list[str]) -> int:
@@ -60,12 +90,6 @@ def find_insert_pos_for_kwargs(lines: list[str]) -> int:
             return idx
     else:
         return False
-
-
-def is_write_timeout_20(obj: object) -> int:
-    """inspects the default value of write_timeout parameter of the bot method."""
-    sig = inspect.signature(obj)
-    return 1 if (sig.parameters["write_timeout"].default == 20) else 0
 
 
 def check_timeout_and_api_kwargs_presence(obj: object) -> int:

@@ -7,6 +7,55 @@ Changelog
 Version 20.6
 ============
 
+*Released 2023-11-27*
+
+This is the technical changelog for version 20.6. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
+
+New Features
+------------
+
+-  Add ``JobQueue.scheduler_configuration`` and Corresponding Warnings (:pr:`3913` closes :issue:`3837`)
+-  Add Parameter ``socket_options`` to ``HTTPXRequest`` (:pr:`3935` closes :issue:`2965`)
+-  Add ``ApplicationBuilder.(get_updates_)socket_options`` (:pr:`3943`)
+-  Improve ``write_timeout`` Handling for Media Methods (:pr:`3952`)
+-  Add ``filters.Mention`` (:pr:`3941` closes :issue:`3799`)
+-  Rename ``proxy_url`` to ``proxy`` and Allow ``httpx.{Proxy, URL}`` as Input (:pr:`3939` closes :issue:`3844`)
+
+Bug Fixes & Changes
+-------------------
+
+-  Adjust ``read_timeout`` Behavior for ``Bot.get_updates`` (:pr:`3963` closes :issue:`3893`)
+-  Improve ``BaseHandler.__repr__`` for Callbacks without ``__qualname__`` (:pr:`3934`)
+-  Fix Persistency Issue with Ended Non-Blocking Conversations (:pr:`3962`)
+-  Improve Type Hinting for Arguments with Default Values in ``Bot`` (:pr:`3942`)
+
+Documentation Improvements
+--------------------------
+
+-  Add Documentation for ``__aenter__`` and ``__aexit__`` Methods (:pr:`3907` closes :issue:`3886`)
+-  Improve Insertion of Kwargs into ``Bot`` Methods (:pr:`3965`)
+
+Internal Changes
+----------------
+
+-  Adjust Tests to New Error Messages (:pr:`3970`)
+
+Dependency Updates
+------------------
+
+-  Bump ``pytest-xdist`` from 3.3.1 to 3.4.0 (:pr:`3975`)
+-  ``pre-commit`` autoupdate (:pr:`3967`)
+-  Update ``httpx`` requirement from ~=0.25.1 to ~=0.25.2 (:pr:`3983`)
+-  Bump ``pytest-xdist`` from 3.4.0 to 3.5.0 (:pr:`3982`)
+-  Update ``httpx`` requirement from ~=0.25.0 to ~=0.25.1 (:pr:`3961`)
+-  Bump ``srvaroa/labeler`` from 1.6.1 to 1.7.0 (:pr:`3958`)
+-  Update ``cachetools`` requirement from ~=5.3.1 to ~=5.3.2 (:pr:`3954`)
+-  Bump ``pytest`` from 7.4.2 to 7.4.3 (:pr:`3953`)
+
+
+Version 20.6
+============
+
 *Released 2023-10-03*
 
 This is the technical changelog for version 20.6. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.

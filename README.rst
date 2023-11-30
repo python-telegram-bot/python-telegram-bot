@@ -30,7 +30,7 @@
    :target: https://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
 
-.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/Unit%20Tests/badge.svg
+.. image:: https://github.com/python-telegram-bot/python-telegram-bot/actions/workflows/unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/python-telegram-bot/python-telegram-bot/
    :alt: Github Actions workflow
 
@@ -135,7 +135,7 @@ As these features are *optional*, the corresponding 3rd party dependencies are n
 Instead, they are listed as optional dependencies.
 This allows to avoid unnecessary dependency conflicts for users who don't need the optional features.
 
-The only required dependency is `httpx ~= 0.24.1 <https://www.python-httpx.org>`_ for
+The only required dependency is `httpx ~= 0.25.2 <https://www.python-httpx.org>`_ for
 ``telegram.request.HTTPXRequest``, the default networking backend.
 
 ``python-telegram-bot`` is most useful when used along with additional libraries.

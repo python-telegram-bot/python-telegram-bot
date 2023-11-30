@@ -54,7 +54,7 @@ class HTTPXRequest(BaseRequest):
         proxy_url (:obj:`str`, optional): Legacy name for :paramref:`proxy`, kept for backward
             compatibility. Defaults to :obj:`None`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.7
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a response from Telegram's server.
             This value is used unless a different value is passed to :meth:`do_request`.
@@ -95,7 +95,7 @@ class HTTPXRequest(BaseRequest):
                 This is a low-level parameter and should only be used if you are familiar with
                 these concepts.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.7
         proxy (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``, optional): The URL to a proxy server,
             a ``httpx.Proxy`` object or a ``httpx.URL`` object. For example
             ``'http://127.0.0.1:3128'`` or ``'socks5://127.0.0.1:3128'``. Defaults to :obj:`None`.
@@ -111,7 +111,7 @@ class HTTPXRequest(BaseRequest):
 
             .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.7
 
     """
 
@@ -135,7 +135,7 @@ class HTTPXRequest(BaseRequest):
         if proxy_url is not None:
             proxy = proxy_url
             warn(
-                "The parameter `proxy_url` is deprecated since version NEXT.VERSION. Use `proxy` "
+                "The parameter `proxy_url` is deprecated since version 20.7. Use `proxy` "
                 "instead.",
                 PTBDeprecationWarning,
                 stacklevel=2,
@@ -198,6 +198,16 @@ class HTTPXRequest(BaseRequest):
         """
         return self._http_version
 
+    @property
+    def read_timeout(self) -> Optional[float]:
+        """See :attr:`BaseRequest.read_timeout`.
+
+        Returns:
+            :obj:`float` | :obj:`None`: The default read timeout in seconds as passed to
+                :paramref:`HTTPXRequest.read_timeout`.
+        """
+        return self._client.timeout.read
+
     def _build_client(self) -> httpx.AsyncClient:
         return httpx.AsyncClient(**self._client_kwargs)  # type: ignore[arg-type]
 
@@ -228,16 +238,24 @@ class HTTPXRequest(BaseRequest):
         if self._client.is_closed:
             raise RuntimeError("This HTTPXRequest is not initialized!")
 
+        files = request_data.multipart_data if request_data else None
+        data = request_data.json_parameters if request_data else None
+
         # If user did not specify timeouts (for e.g. in a bot method), use the default ones when we
         # created this instance.
         if isinstance(read_timeout, DefaultValue):
             read_timeout = self._client.timeout.read
-        if isinstance(write_timeout, DefaultValue):
-            write_timeout = self._client.timeout.write
         if isinstance(connect_timeout, DefaultValue):
             connect_timeout = self._client.timeout.connect
         if isinstance(pool_timeout, DefaultValue):
             pool_timeout = self._client.timeout.pool
+
+        if isinstance(write_timeout, DefaultValue):
+            # Making the networking backend decide on the proper timeout values instead of doing
+            # it via the default values of the Bot methods was introduced in version 20.7.
+            # We hard-code the value here for now until we add additional parameters to this
+            # class to control the media_write_timeout separately.
+            write_timeout = self._client.timeout.write if not files else 20
 
         timeout = httpx.Timeout(
             connect=connect_timeout,
@@ -245,9 +263,6 @@ class HTTPXRequest(BaseRequest):
             write=write_timeout,
             pool=pool_timeout,
         )
-
-        files = request_data.multipart_data if request_data else None
-        data = request_data.json_parameters if request_data else None
 
         try:
             res = await self._client.request(

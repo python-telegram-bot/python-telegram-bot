@@ -101,7 +101,7 @@ from telegram.error import InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
-from telegram.warnings import PTBUserWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -1012,7 +1012,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -1126,7 +1126,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -1251,7 +1251,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -1366,7 +1366,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         emoji: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -1461,7 +1461,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -1594,7 +1594,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -1711,7 +1711,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -1838,7 +1838,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -1950,7 +1950,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -3504,7 +3504,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         timeout: Optional[int] = None,
         allowed_updates: Optional[Sequence[str]] = None,
         *,
-        read_timeout: float = 2,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3566,6 +3566,22 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "allowed_updates": allowed_updates,
         }
 
+        # The "or 0" is needed for the case where read_timeout is None.
+        if not isinstance(read_timeout, DefaultValue):
+            arg_read_timeout: float = read_timeout or 0
+        else:
+            try:
+                arg_read_timeout = self._request[0].read_timeout or 0
+            except NotImplementedError:
+                arg_read_timeout = 2
+                self._warn(
+                    f"The class {self._request[0].__class__.__name__} does not override "
+                    "the property `read_timeout`. Overriding this property will be mandatory in "
+                    "future versions. Using 2 seconds as fallback.",
+                    PTBDeprecationWarning,
+                    stacklevel=3,
+                )
+
         # Ideally we'd use an aggressive read timeout for the polling. However,
         # * Short polling should return within 2 seconds.
         # * Long polling poses a different problem: the connection might have been dropped while
@@ -3576,7 +3592,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             await self._post(
                 "getUpdates",
                 data,
-                read_timeout=read_timeout + timeout if timeout else read_timeout,
+                read_timeout=arg_read_timeout + timeout if timeout else arg_read_timeout,
                 write_timeout=write_timeout,
                 connect_timeout=connect_timeout,
                 pool_timeout=pool_timeout,
@@ -5155,7 +5171,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         photo: FileInput,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -5535,7 +5551,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         sticker_format: Optional[str],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -5595,7 +5611,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         sticker: Optional["InputSticker"],
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
@@ -5697,7 +5713,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         needs_repainting: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,

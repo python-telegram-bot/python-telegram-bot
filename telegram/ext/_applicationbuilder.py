@@ -507,7 +507,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: :meth:`get_updates_proxy`
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.7
 
         Args:
             proxy_url (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``): See
@@ -518,7 +518,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         warn(
             "`ApplicationBuilder.proxy_url` is deprecated since version "
-            "NEXT.VERSION. Use `ApplicationBuilder.proxy` instead.",
+            "20.7. Use `ApplicationBuilder.proxy` instead.",
             PTBDeprecationWarning,
             stacklevel=2,
         )
@@ -530,7 +530,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: :meth:`get_updates_proxy`
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.7
 
         Args:
             proxy (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``): The URL to a proxy
@@ -550,7 +550,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: :meth:`get_updates_socket_options`
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.7
 
         Args:
             socket_options (Collection[:obj:`tuple`], optional): Socket options. See
@@ -719,7 +719,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: :meth:`proxy`
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.7
 
         Args:
             get_updates_proxy_url (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``): See
@@ -730,7 +730,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         warn(
             "`ApplicationBuilder.get_updates_proxy_url` is deprecated since version "
-            "NEXT.VERSION. Use `ApplicationBuilder.get_updates_proxy` instead.",
+            "20.7. Use `ApplicationBuilder.get_updates_proxy` instead.",
             PTBDeprecationWarning,
             stacklevel=2,
         )
@@ -744,7 +744,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: :meth:`proxy`
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.7
 
         Args:
             proxy (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``): The URL to a proxy server,
@@ -766,7 +766,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: :meth:`socket_options`
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.7
 
         Args:
             get_updates_socket_options (Collection[:obj:`tuple`], optional): Socket options. See
