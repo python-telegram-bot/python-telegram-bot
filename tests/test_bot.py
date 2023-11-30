@@ -332,6 +332,9 @@ class TestBotWithoutRequest:
             assert a != e
             assert hash(a) != hash(e)
 
+            a._bot_user = None
+            assert hash(a) != hash(b)
+
     @pytest.mark.parametrize(
         "attribute",
         [

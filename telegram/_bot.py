@@ -370,7 +370,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     def __hash__(self) -> int:
         """See :meth:`telegram.TelegramObject.__hash__`"""
         if self._bot_user is None:
-            return super().__hash__(Bot)
+            return super().__hash__()
         return hash((self.bot, Bot))
 
     def __repr__(self) -> str:
