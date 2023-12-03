@@ -148,7 +148,7 @@ class TelegramHandler(tornado.web.RequestHandler):
             )
             raise tornado.web.HTTPError(
                 HTTPStatus.BAD_REQUEST, reason="Update could not be processed"
-            ) from None
+            ) from exc
 
         if update:
             _LOGGER.debug(
