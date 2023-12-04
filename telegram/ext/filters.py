@@ -1531,7 +1531,7 @@ class Mention(MessageFilter):
             MessageHandler(filters.Mention("username"), callback)
             MessageHandler(filters.Mention(["@username", 123456]), callback)
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.7
 
     Args:
         mentions (:obj:`int` | :obj:`str` | :class:`telegram.User` | Collection[:obj:`int` | \
