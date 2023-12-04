@@ -859,7 +859,7 @@ class TestUpdater:
     async def test_no_unix(self, updater):
         async with updater:
             with pytest.raises(RuntimeError, match="binding unix sockets."):
-                await updater.start_webhook(unix="DoesntMatter", url_path="TOKEN")
+                await updater.start_webhook(unix="DoesntMatter", webhook_url="TOKEN")
 
     async def test_start_webhook_already_running(self, updater, monkeypatch):
         async def return_true(*args, **kwargs):
