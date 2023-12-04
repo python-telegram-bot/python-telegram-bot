@@ -913,7 +913,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
                 .. versionadded:: 20.0
             unix (:class:`pathlib.Path` | :obj:`str`, optional): Path to the unix socket file. Path
-                can be empty in which case the file will be created. When using this param, you
+                does not need to exist, in which case the file will be created. When using this param, you
                 need to set the :paramref:`webhook_url`!
 
                 .. versionadded:: NEXT.VERSION
