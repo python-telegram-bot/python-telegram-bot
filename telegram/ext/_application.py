@@ -52,7 +52,13 @@ from typing import (
 )
 
 from telegram._update import Update
-from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
+from telegram._utils.defaultvalue import (
+    DEFAULT_80,
+    DEFAULT_IP,
+    DEFAULT_NONE,
+    DEFAULT_TRUE,
+    DefaultValue,
+)
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import SCT, DVType, ODVInput
@@ -62,7 +68,7 @@ from telegram.ext._basehandler import BaseHandler
 from telegram.ext._basepersistence import BasePersistence
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
-from telegram.ext._updater import Updater, _DefaultIP
+from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
 from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, RT, UD, ConversationKey, HandlerCallback
@@ -805,8 +811,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     def run_webhook(
         self,
-        listen: DVType[str] = _DefaultIP,
-        port: int = 80,
+        listen: DVType[str] = DEFAULT_IP,
+        port: DVType[int] = DEFAULT_80,
         url_path: str = "",
         cert: Optional[Union[str, Path]] = None,
         key: Optional[Union[str, Path]] = None,
@@ -913,8 +919,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
                 .. versionadded:: 20.0
             unix (:class:`pathlib.Path` | :obj:`str`, optional): Path to the unix socket file. Path
-                does not need to exist, in which case the file will be created. When using this param, you
-                need to set the :paramref:`webhook_url`!
+                does not need to exist, in which case the file will be created.
+
+                Caution:
+                    This parameter is a replacement for the default TCP bind. Therefore, it is
+                    mutually exclusive with :paramref:`listen` and :paramref:`port`. When using
+                    this param, you must also run a reverse proxy to the unix socket and set the
+                    appropriate :paramref:`webhook_url`.
 
                 .. versionadded:: NEXT.VERSION
         """

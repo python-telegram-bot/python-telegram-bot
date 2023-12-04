@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import logging
+import platform
 from collections import defaultdict
 from http import HTTPStatus
 from pathlib import Path
@@ -656,6 +657,9 @@ class TestUpdater:
     async def test_webhook_basic(
         self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token, unix, file_path
     ):
+        # Skipping unix test on windows since they fail
+        if unix and platform.system() == "Windows":
+            pytest.skip("Windows doesn't support unix bind")
         # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
         # that depends on this distinction works
         if ext_bot and not isinstance(updater.bot, ExtBot):
@@ -679,15 +683,23 @@ class TestUpdater:
         port = randrange(1024, 49152)  # Select random port
 
         async with updater:
-            return_value = await updater.start_webhook(
-                drop_pending_updates=drop_pending_updates,
-                ip_address=ip,
-                port=port,
-                url_path="TOKEN",
-                secret_token=secret_token,
-                unix=file_path if unix else None,
-                webhook_url="string",
-            )
+            if unix:
+                return_value = await updater.start_webhook(
+                    drop_pending_updates=drop_pending_updates,
+                    secret_token=secret_token,
+                    url_path="TOKEN",
+                    unix=file_path,
+                    webhook_url="string",
+                )
+            else:
+                return_value = await updater.start_webhook(
+                    drop_pending_updates=drop_pending_updates,
+                    ip_address=ip,
+                    port=port,
+                    url_path="TOKEN",
+                    secret_token=secret_token,
+                    webhook_url="string",
+                )
             assert return_value is updater.update_queue
             assert updater.running
 
@@ -747,32 +759,53 @@ class TestUpdater:
                 assert self.message_count == 0
 
             # We call the same logic twice to make sure that restarting the updater works as well
-            await updater.start_webhook(
-                drop_pending_updates=drop_pending_updates,
-                ip_address=ip,
-                port=port,
-                url_path="TOKEN",
-                unix=file_path if unix else None,
-                webhook_url="string",
-            )
+            if unix:
+                await updater.start_webhook(
+                    drop_pending_updates=drop_pending_updates,
+                    secret_token=secret_token,
+                    unix=file_path,
+                    webhook_url="string",
+                )
+            else:
+                await updater.start_webhook(
+                    drop_pending_updates=drop_pending_updates,
+                    ip_address=ip,
+                    port=port,
+                    url_path="TOKEN",
+                    secret_token=secret_token,
+                    webhook_url="string",
+                )
             assert updater.running
             update = make_message_update("Webhook")
             await send_webhook_message(
-                ip, port, update.to_json(), "TOKEN", unix=file_path if unix else None
+                ip,
+                port,
+                update.to_json(),
+                "" if unix else "TOKEN",
+                secret_token=secret_token,
+                unix=file_path if unix else None,
             )
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
             await updater.stop()
             assert not updater.running
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Windows doesn't support unix bind",
+    )
     async def test_unix_webhook_raises(self, updater):
         async with updater:
-            with pytest.raises(RuntimeError, match="URL"):
+            with pytest.raises(RuntimeError, match="You can not pass unix and listen"):
                 await updater.start_webhook(listen="127.0.0.1", unix="DoesntMatter")
-            with pytest.raises(RuntimeError, match="unix"):
-                await updater.start_webhook(
-                    listen="127.0.0.1", unix="DoesntMatter", webhook_url="string"
-                )
+            with pytest.raises(RuntimeError, match="You can not pass unix and port"):
+                await updater.start_webhook(port=20, unix="DoesntMatter")
+            with pytest.raises(RuntimeError, match="you set unix, you also need to set the URL"):
+                await updater.start_webhook(unix="DoesntMatter")
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Windows doesn't support unix bind",
+    )
     async def test_unix_webhook_path(self, updater, monkeypatch, file_path):
         async def set_webhook(*args, **kwargs):
             return True
@@ -780,11 +813,20 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, "set_webhook", set_webhook)
 
         async with updater:
-            await updater.start_webhook(unix=file_path, url_path="TOKEN", webhook_url="string")
+            await updater.start_webhook(unix=file_path, webhook_url="string")
 
             update = make_message_update("Webhook")
-            await send_webhook_message("ip", 123, update.to_json(), "TOKEN", unix=file_path)
+            await send_webhook_message("ip", 123, update.to_json(), unix=file_path)
             await updater.stop()
+
+    @pytest.mark.skipif(
+        platform.system() != "Windows",
+        reason="Windows is the only platform without unix",
+    )
+    async def test_no_unix(self, updater):
+        async with updater:
+            with pytest.raises(RuntimeError, match="binding unix sockets."):
+                await updater.start_webhook(listen="127.0.0.1", unix="DoesntMatter")
 
     async def test_start_webhook_already_running(self, updater, monkeypatch):
         async def return_true(*args, **kwargs):

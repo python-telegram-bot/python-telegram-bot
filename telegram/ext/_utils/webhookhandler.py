@@ -29,12 +29,16 @@ from typing import TYPE_CHECKING, Optional, Type, Union
 # this module. Doing it here would be tricky, as the classes below subclass tornado classes
 import tornado.web
 from tornado.httpserver import HTTPServer
-from tornado.netutil import bind_unix_socket
+
+try:
+    from tornado.netutil import bind_unix_socket
+
+    UNIX_AVAILABLE = True
+except ImportError:
+    UNIX_AVAILABLE = False
 
 from telegram import Update
-from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.logging import get_logger
-from telegram._utils.types import DVType
 from telegram.ext._extbot import ExtBot
 
 if TYPE_CHECKING:
@@ -59,17 +63,14 @@ class WebhookServer:
 
     def __init__(
         self,
-        listen: DVType[str],
+        listen: str,
         port: int,
         webhook_app: "WebhookAppClass",
         ssl_ctx: Optional[SSLContext],
         unix: Optional[Union[str, Path]] = None,
     ):
-        if not isinstance(listen, DefaultValue) and unix:
-            raise RuntimeError(
-                "You can not pass unix and listen, only use one. Unix if you want to initialize a"
-                " unix socket, or listen for a standard TCP server"
-            )
+        if unix and not UNIX_AVAILABLE:
+            raise RuntimeError("This OS does not support binding unix sockets.")
         self._http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.listen = listen
         self.port = port
@@ -84,7 +85,7 @@ class WebhookServer:
                 socket = bind_unix_socket(str(self.unix))
                 self._http_server.add_socket(socket)
             else:
-                self._http_server.listen(self.port, address=DefaultValue.get_value(self.listen))
+                self._http_server.listen(self.port, address=self.listen)
 
             self.is_running = True
             if ready is not None:
