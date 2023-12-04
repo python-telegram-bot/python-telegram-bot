@@ -146,7 +146,7 @@ class JobQueue(Generic[CCT]):
             :meth:`~apscheduler.schedulers.base.BaseScheduler.add_jobstore` to avoid using
             :meth:`~apscheduler.schedulers.base.BaseScheduler.configure` altogether.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.7
 
         Returns:
             Dict[:obj:`str`, :obj:`object`]: The configuration values as dictionary.

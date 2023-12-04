@@ -20,9 +20,9 @@ import inspect
 keyword_args = [
     "Keyword Arguments:",
     (
-        "    read_timeout ({read_timeout_type}, optional): Value to pass to "
+        "    read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
         "        :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to "
-        "        {read_timeout}."
+        "        :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`. "
     ),
     (
         "    write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to "
@@ -67,17 +67,20 @@ media_write_timeout_deprecation = [
     "        seconds are used as write timeout."
     "",
     "",
-    "       .. deprecated:: NEXT.VERSION",
+    "       .. deprecated:: 20.7",
     "           In future versions, the default value will be changed to "
     "           :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
     "",
     "",
 ]
-read_timeout_sub = [
-    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`",
-    "``2``. :paramref:`timeout` will be added to this value",
+get_updates_read_timeout_addition = [
+    "        :paramref:`timeout` will be added to this value.",
+    "",
+    "",
+    "        .. versionchanged:: 20.7",
+    "           Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE` instead of ",
+    "           ``2``.",
 ]
-read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
 
 
 def find_insert_pos_for_kwargs(lines: list[str]) -> int:

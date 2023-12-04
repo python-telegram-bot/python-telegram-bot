@@ -30,7 +30,7 @@
    :target: https://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
 
-.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/Unit%20Tests/badge.svg
+.. image:: https://github.com/python-telegram-bot/python-telegram-bot/actions/workflows/unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/python-telegram-bot/python-telegram-bot/
    :alt: Github Actions workflow
 
