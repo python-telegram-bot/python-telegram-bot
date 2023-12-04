@@ -15,3 +15,5 @@ jobs:
           issue-lock-reason: ''
           pr-inactive-days: '7'
           pr-lock-reason: ''
+          # Don't lock Discussions
+          process-only: 'issues, prs'
