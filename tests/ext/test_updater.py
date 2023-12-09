@@ -63,6 +63,7 @@ class TestUpdater:
     cb_handler_called = None
     offset = 0
     test_flag = False
+    response_text = "<html><title>{1}: {0}</title><body>{1}: {0}</body></html>"
 
     @pytest.fixture(autouse=True)
     def _reset(self):
@@ -732,11 +733,10 @@ class TestUpdater:
 
             if secret_token:
                 # Returns Forbidden if no secret token is set
-                response_text = "<html><title>403: {0}</title><body>403: {0}</body></html>"
                 response = await send_webhook_message(ip, port, update.to_json(), "TOKEN")
                 assert response.status_code == HTTPStatus.FORBIDDEN
-                assert response.text == response_text.format(
-                    "Request did not include the secret token"
+                assert response.text == self.response_text.format(
+                    "Request did not include the secret token", HTTPStatus.FORBIDDEN
                 )
 
                 # Returns Forbidden if the secret token is wrong
@@ -744,7 +744,9 @@ class TestUpdater:
                     ip, port, update.to_json(), "TOKEN", secret_token="NotTheSecretToken"
                 )
                 assert response.status_code == HTTPStatus.FORBIDDEN
-                assert response.text == response_text.format("Request had the wrong secret token")
+                assert response.text == self.response_text.format(
+                    "Request had the wrong secret token", HTTPStatus.FORBIDDEN
+                )
 
             await updater.stop()
             assert not updater.running
@@ -1071,11 +1073,15 @@ class TestUpdater:
             # Now, we send an update to the server
             update = make_message_update("Webhook")
             with caplog.at_level(logging.CRITICAL):
-                await send_webhook_message(ip, port, update.to_json(), "TOKEN")
+                response = await send_webhook_message(ip, port, update.to_json(), "TOKEN")
 
             assert len(caplog.records) == 1
             assert caplog.records[-1].getMessage().startswith("Something went wrong processing")
             assert caplog.records[-1].name == "telegram.ext.Updater"
+            assert response.status_code == 400
+            assert response.text == self.response_text.format(
+                "Update could not be processed", HTTPStatus.BAD_REQUEST
+            )
 
             # Make sure that everything works fine again when receiving proper updates
             caplog.clear()

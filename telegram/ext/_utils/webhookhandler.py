@@ -146,6 +146,9 @@ class TelegramHandler(tornado.web.RequestHandler):
                 "Received data was *not* processed!",
                 exc_info=exc,
             )
+            raise tornado.web.HTTPError(
+                HTTPStatus.BAD_REQUEST, reason="Update could not be processed"
+            ) from exc
 
         if update:
             _LOGGER.debug(
