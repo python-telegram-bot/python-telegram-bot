@@ -6,7 +6,7 @@ ci:
 
 repos:
 -   repo: https://github.com/psf/black
-    rev: 23.10.1
+    rev: 23.11.0
     hooks:
     -   id: black
         args:
@@ -29,13 +29,13 @@ repos:
 
         additional_dependencies:
           - httpx~=0.25.2
-          - tornado~=6.3.3
+          - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.2
           - aiolimiter~=1.1.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.6.1
+    rev: v1.7.1
     hooks:
     -   id: mypy
         name: mypy-ptb
@@ -45,7 +45,7 @@ repos:
           - types-cryptography
           - types-cachetools
           - httpx~=0.25.2
-          - tornado~=6.3.3
+          - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.2
           - aiolimiter~=1.1.0
@@ -57,7 +57,7 @@ repos:
         - --no-strict-optional
         - --follow-imports=silent
       additional_dependencies:
-        - tornado~=6.3.3
+        - tornado~=6.4
         - APScheduler~=3.10.4
         - cachetools~=5.3.2
         - . # this basically does `pip install -e .`
@@ -77,14 +77,14 @@ repos:
         - --diff
         - --check
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.1.5'
+    rev: 'v0.1.6'
     hooks:
     -   id: ruff
         name: ruff
         files: ^(telegram|examples|tests)/.*\.py$
         additional_dependencies:
           - httpx~=0.25.2
-          - tornado~=6.3.3
+          - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.2
           - aiolimiter~=1.1.0
