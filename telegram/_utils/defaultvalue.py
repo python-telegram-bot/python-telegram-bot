@@ -133,12 +133,6 @@ DEFAULT_TRUE: DefaultValue[bool] = DefaultValue(True)
 .. versionadded:: 20.0
 """
 
-DEFAULT_EMPTY_STRING: DefaultValue[str] = DefaultValue("")
-""":class:`DefaultValue`: Default :obj:`""`
-
-.. versionadded:: NEXT.VERSION
-"""
-
 DEFAULT_20: DefaultValue[int] = DefaultValue(20)
 """:class:`DefaultValue`: Default :obj:`20`"""
 

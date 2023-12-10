@@ -16,6 +16,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+from pathlib import Path
 from typing import Optional
 
 import pytest
@@ -90,7 +91,7 @@ async def send_webhook_message(
     content_type: str = "application/json",
     get_method: Optional[str] = None,
     secret_token: Optional[str] = None,
-    unix: Optional[str] = None,
+    unix: Optional[Path] = None,
 ) -> Response:
     headers = {
         "content-type": content_type,
