@@ -184,18 +184,57 @@ class BaseFilter:
         self._data_filter = data_filter
 
     def __and__(self, other: "BaseFilter") -> "BaseFilter":
+        """Defines `AND` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by both filters.
+        For example, ``filters.PHOTO & filters.CAPTION`` will only accept messages that contain
+        both a photo and a caption.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _MergedFilter(self, and_filter=other)
 
     def __or__(self, other: "BaseFilter") -> "BaseFilter":
+        """Defines `OR` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by any of the filters.
+        For example, ``filters.PHOTO | filters.CAPTION`` will only accept messages that contain
+        photo or caption or both.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _MergedFilter(self, or_filter=other)
 
     def __xor__(self, other: "BaseFilter") -> "BaseFilter":
+        """Defines `XOR` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by any of the filters and
+        not both of them. For example, ``filters.PHOTO ^ filters.CAPTION`` will only accept
+        messages that contain photo or caption, not both of them.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _XORFilter(self, other)
 
     def __invert__(self) -> "BaseFilter":
+        """Defines `NOT` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by any of the filters.
+        For example, ``~ filters.PHOTO`` will only accept messages that do not contain photo.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _InvertedFilter(self)
 
     def __repr__(self) -> str:
+        """Gives name for this filter.
+
+        .. seealso::
+               :meth:`name`
+
+        Returns:
+            :obj:`str`:
+        """
         return self.name
 
     @property

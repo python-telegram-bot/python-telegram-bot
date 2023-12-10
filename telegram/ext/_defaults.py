@@ -105,6 +105,12 @@ class Defaults:
                 self._api_defaults[kwarg] = value
 
     def __hash__(self) -> int:
+        """Builds a hash value for this object such that the hash of two objects is equal if and
+        only if the objects are equal in terms of :meth:`__eq__`.
+
+        Returns:
+            :obj:`int` The hash value of the object.
+        """
         return hash(
             (
                 self._parse_mode,
@@ -119,6 +125,13 @@ class Defaults:
         )
 
     def __eq__(self, other: object) -> bool:
+        """Defines equality condition for the :class:`Defaults` object.
+        Two objects of this class are considered to be equal if all their parameters
+        are identical.
+
+        Returns:
+            :obj:`True` if both objects have all parameters identical. :obj:`False` otherwise.
+        """
         if isinstance(other, Defaults):
             return all(getattr(self, attr) == getattr(other, attr) for attr in self.__slots__)
         return False
