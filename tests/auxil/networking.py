@@ -112,9 +112,7 @@ async def send_webhook_message(
 
     url = f"http://{ip}:{port}/{url_path}"
 
-    transport = None
-    if unix:
-        transport = AsyncHTTPTransport(uds=unix)
+    transport = AsyncHTTPTransport(uds=unix) if unix else None
 
     async with AsyncClient(transport=transport) as client:
         return await client.request(

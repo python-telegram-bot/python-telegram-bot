@@ -826,7 +826,7 @@ class TestUpdater:
         platform.system() == "Windows",
         reason="Windows doesn't support unix bind",
     )
-    async def test_unix_webhook_raises(self, updater):
+    async def test_unix_webhook_mutually_exclusive_params(self, updater):
         async with updater:
             with pytest.raises(RuntimeError, match="You can not pass unix and listen"):
                 await updater.start_webhook(listen="127.0.0.1", unix="DoesntMatter")
