@@ -272,7 +272,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             arbitrary_callback_data=DefaultValue.get_value(self._arbitrary_callback_data),
             request=self._build_request(get_updates=False),
             get_updates_request=self._build_request(get_updates=True),
-            rate_limiter=DefaultValue.get_value(self._rate_limiter),  # type: ignore[arg-type]
+            rate_limiter=DefaultValue.get_value(self._rate_limiter),
             local_mode=DefaultValue.get_value(self._local_mode),
         )
 
@@ -317,7 +317,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         application: Application[
             BT, CCT, UD, CD, BD, JQ
-        ] = DefaultValue.get_value(  # type: ignore[operator] # pylint: disable=not-callable
+        ] = DefaultValue.get_value(  # pylint: disable=not-callable
             self._application_class
         )(
             bot=bot,
@@ -325,7 +325,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             updater=updater,
             update_processor=self._update_processor,
             job_queue=job_queue,
-            persistence=persistence,  # type: ignore[arg-type]
+            persistence=persistence,
             context_types=DefaultValue.get_value(self._context_types),
             post_init=self._post_init,
             post_shutdown=self._post_shutdown,
@@ -334,12 +334,12 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         )
 
         if job_queue is not None:
-            job_queue.set_application(application)  # type: ignore[arg-type, union-attr]
+            job_queue.set_application(application)  # type: ignore[arg-type]
 
         if persistence is not None:
             # This raises an exception if persistence.store_data.callback_data is True
             # but self.bot is not an instance of ExtBot - so no need to check that later on
-            persistence.set_bot(bot)  # type: ignore[union-attr]
+            persistence.set_bot(bot)
 
         return application
 

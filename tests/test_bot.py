@@ -316,21 +316,25 @@ class TestBotWithoutRequest:
     async def test_equality(self):
         async with make_bot(token=FALLBACKS[0]["token"]) as a, make_bot(
             token=FALLBACKS[0]["token"]
-        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c, Bot(token=FALLBACKS[0]["token"]) as d:
+        ) as b, Bot(token=FALLBACKS[0]["token"]) as c, make_bot(token=FALLBACKS[1]["token"]) as d:
             e = Update(123456789)
+            f = Bot(token=FALLBACKS[0]["token"])
 
             assert a == b
             assert hash(a) == hash(b)
             assert a is not b
 
-            assert a != c
-            assert hash(a) != hash(c)
+            assert a == c
+            assert hash(a) == hash(c)
 
             assert a != d
             assert hash(a) != hash(d)
 
             assert a != e
             assert hash(a) != hash(e)
+
+            # We cant check equality for unintialized Bot object
+            assert hash(a) != hash(f)
 
     @pytest.mark.parametrize(
         "attribute",

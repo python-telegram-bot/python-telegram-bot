@@ -69,6 +69,12 @@ class InvalidCallbackData(TelegramError):
         self.callback_data: Optional[str] = callback_data
 
     def __reduce__(self) -> Tuple[type, Tuple[Optional[str]]]:  # type: ignore[override]
+        """Defines how to serialize the exception for pickle. See
+        :py:meth:`object.__reduce__` for more info.
+
+        Returns:
+            :obj:`tuple`
+        """
         return self.__class__, (self.callback_data,)
 
 
