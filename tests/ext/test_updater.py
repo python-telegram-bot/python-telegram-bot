@@ -33,7 +33,7 @@ from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from telegram.request import HTTPXRequest
 from tests.auxil.build_messages import make_message, make_message_update
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
-from tests.auxil.files import data_file
+from tests.auxil.files import TEST_DATA_PATH, data_file
 from tests.auxil.networking import send_webhook_message
 from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.slots import mro_slots
@@ -74,6 +74,14 @@ class TestUpdater:
         self.err_handler_called = None
         self.cb_handler_called = None
         self.test_flag = False
+
+    # This is needed instead of pytest's temp_path because the file path gets too long on macOS
+    # otherwise
+    @pytest.fixture()
+    def file_path(self) -> str:
+        path = TEST_DATA_PATH / "test.sock"
+        yield str(path)
+        path.unlink(missing_ok=True)
 
     def error_callback(self, error):
         self.received = error
@@ -683,7 +691,7 @@ class TestUpdater:
     @pytest.mark.parametrize("secret_token", ["SecretToken", None])
     @pytest.mark.parametrize("unix", [None, True])
     async def test_webhook_basic(
-        self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token, unix, tmp_path
+        self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token, unix, file_path
     ):
         # Skipping unix test on windows since they fail
         if unix and platform.system() == "Windows":
@@ -716,7 +724,7 @@ class TestUpdater:
                     drop_pending_updates=drop_pending_updates,
                     secret_token=secret_token,
                     url_path="TOKEN",
-                    unix=tmp_path / "test.sock",
+                    unix=file_path,
                     webhook_url="string",
                 )
             else:
@@ -739,7 +747,7 @@ class TestUpdater:
                 update.to_json(),
                 "TOKEN",
                 secret_token=secret_token,
-                unix=tmp_path / "test.sock" if unix else None,
+                unix=file_path if unix else None,
             )
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
 
@@ -749,7 +757,7 @@ class TestUpdater:
                 port,
                 "123456",
                 "webhook_handler.py",
-                unix=tmp_path / "test.sock" if unix else None,
+                unix=file_path if unix else None,
             )
             assert response.status_code == HTTPStatus.NOT_FOUND
 
@@ -760,20 +768,19 @@ class TestUpdater:
                 None,
                 "TOKEN",
                 get_method="HEAD",
-                unix=tmp_path / "test.sock" if unix else None,
+                unix=file_path if unix else None,
             )
             assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
             if secret_token:
                 # Returns Forbidden if no secret token is set
 
-                response_text = "<html><title>403: {0}</title><body>403: {0}</body></html>"
                 response = await send_webhook_message(
                     ip,
                     port,
                     update.to_json(),
                     "TOKEN",
-                    unix=tmp_path / "test.sock" if unix else None,
+                    unix=file_path if unix else None,
                 )
 
                 assert response.status_code == HTTPStatus.FORBIDDEN
@@ -788,7 +795,7 @@ class TestUpdater:
                     update.to_json(),
                     "TOKEN",
                     secret_token="NotTheSecretToken",
-                    unix=tmp_path / "test.sock" if unix else None,
+                    unix=file_path if unix else None,
                 )
                 assert response.status_code == HTTPStatus.FORBIDDEN
                 assert response.text == self.response_text.format(
@@ -808,7 +815,7 @@ class TestUpdater:
                 await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
                     secret_token=secret_token,
-                    unix=tmp_path / "test.sock",
+                    unix=file_path,
                     webhook_url="string",
                 )
             else:
@@ -828,7 +835,7 @@ class TestUpdater:
                 update.to_json(),
                 "" if unix else "TOKEN",
                 secret_token=secret_token,
-                unix=tmp_path / "test.sock" if unix else None,
+                unix=file_path if unix else None,
             )
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
             await updater.stop()
