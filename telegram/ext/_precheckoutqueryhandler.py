@@ -19,9 +19,8 @@
 """This module contains the PreCheckoutQueryHandler class."""
 
 
-import asyncio
 import re
-from typing import Callable, Optional, TypeVar, Union
+from typing import Optional, TypeVar, Union
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -78,26 +77,17 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        pattern: Optional[
-            Union[str, re.Pattern[str], type, Callable[[object], Optional[bool]]]
-        ] = None,
+        pattern: Optional[Union[str, re.Pattern[str]]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
 
-        if callable(pattern) and asyncio.iscoroutinefunction(pattern):
-            raise TypeError(
-                "The `pattern` must not be a coroutine function! Use an ordinary function instead."
-            )
-
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
 
-        self.pattern: Optional[
-            Union[str, re.Pattern[str], type, Callable[[object], Optional[bool]]]
-        ] = pattern
+        self.pattern: Optional[Union[str, re.Pattern[str]]] = pattern
 
-    def check_update(self, update: object) -> Optional[bool]:
+    def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -107,17 +97,10 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
-        # pylint: disable=too-many-return-statements
         if isinstance(update, Update) and update.pre_checkout_query:
             invoice_payload = update.pre_checkout_query.invoice_payload
             if self.pattern:
                 if invoice_payload is None:
-                    return False
-                if isinstance(self.pattern, type):
-                    return isinstance(invoice_payload, self.pattern)
-                if callable(self.pattern):
-                    return self.pattern(invoice_payload)
-                if not isinstance(invoice_payload, str):
                     return False
                 if re.match(self.pattern, invoice_payload):
                     return True
