@@ -75,6 +75,7 @@ __all__ = (
     "Sticker",
     "STORY",
     "SUCCESSFUL_PAYMENT",
+    "SuccessfulPayment",
     "SenderChat",
     "StatusUpdate",
     "TEXT",
