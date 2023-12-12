@@ -31,6 +31,7 @@ from telegram import (
     Message,
     MessageEntity,
     Sticker,
+    SuccessfulPayment,
     Update,
     User,
 )
@@ -1876,6 +1877,13 @@ class TestFilters:
         assert not filters.SUCCESSFUL_PAYMENT.check_update(update)
         update.message.successful_payment = "test"
         assert filters.SUCCESSFUL_PAYMENT.check_update(update)
+
+    def test_filters_successful_payment_payloads(self, update):
+        update.message.successful_payment = SuccessfulPayment(
+            "USD", 100, "custom-payload", "123", "123"
+        )
+        assert filters.SuccessfulPayment(("custom-payload",)).check_update(update)
+        assert not filters.SuccessfulPayment(["test1"]).check_update(update)
 
     def test_filters_passport_data(self, update):
         assert not filters.PASSPORT_DATA.check_update(update)
