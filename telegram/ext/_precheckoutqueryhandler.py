@@ -19,9 +19,17 @@
 """This module contains the PreCheckoutQueryHandler class."""
 
 
+import asyncio
+import re
+from typing import Callable, Optional, TypeVar, Union
+
 from telegram import Update
+from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.types import DVType
 from telegram.ext._basehandler import BaseHandler
-from telegram.ext._utils.types import CCT
+from telegram.ext._utils.types import CCT, HandlerCallback
+
+RT = TypeVar("RT")
 
 
 class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
@@ -43,6 +51,11 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
+        pattern (:func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`): Optional.
+            Regex pattern, callback or type to test
+            :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
+
+            .. versionadded:: NEXT.VERSION
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
@@ -51,13 +64,40 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
+        pattern (:func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`): Optional.
+            Regex pattern, callback or type to test
+            :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
+
+            .. versionadded:: NEXT.VERSION
         block (:obj:`bool`): Determines whether the callback will run in a blocking way..
 
     """
 
-    __slots__ = ()
+    __slots__ = ("pattern",)
 
-    def check_update(self, update: object) -> bool:
+    def __init__(
+        self,
+        callback: HandlerCallback[Update, CCT, RT],
+        pattern: Optional[
+            Union[str, re.Pattern[str], type, Callable[[object], Optional[bool]]]
+        ] = None,
+        block: DVType[bool] = DEFAULT_TRUE,
+    ):
+        super().__init__(callback, block=block)
+
+        if callable(pattern) and asyncio.iscoroutinefunction(pattern):
+            raise TypeError(
+                "The `pattern` must not be a coroutine function! Use an ordinary function instead."
+            )
+
+        if isinstance(pattern, str):
+            pattern = re.compile(pattern)
+
+        self.pattern: Optional[
+            Union[str, re.Pattern[str], type, Callable[[object], Optional[bool]]]
+        ] = pattern
+
+    def check_update(self, update: object) -> Optional[bool]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
@@ -67,4 +107,20 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
-        return isinstance(update, Update) and bool(update.pre_checkout_query)
+        # pylint: disable=too-many-return-statements
+        if isinstance(update, Update) and update.pre_checkout_query:
+            invoice_payload = update.pre_checkout_query.invoice_payload
+            if self.pattern:
+                if invoice_payload is None:
+                    return False
+                if isinstance(self.pattern, type):
+                    return isinstance(invoice_payload, self.pattern)
+                if callable(self.pattern):
+                    return self.pattern(invoice_payload)
+                if not isinstance(invoice_payload, str):
+                    return False
+                if re.match(self.pattern, invoice_payload):
+                    return True
+            else:
+                return True
+        return False
