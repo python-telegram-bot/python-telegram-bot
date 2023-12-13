@@ -100,8 +100,6 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
         if isinstance(update, Update) and update.pre_checkout_query:
             invoice_payload = update.pre_checkout_query.invoice_payload
             if self.pattern:
-                if invoice_payload is None:
-                    return False
                 if re.match(self.pattern, invoice_payload):
                     return True
             else:
