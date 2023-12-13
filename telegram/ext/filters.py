@@ -2277,8 +2277,9 @@ class SuccessfulPayment(MessageFilter):
         :attr:`telegram.ext.filters.SUCCESSFUL_PAYMENT`
 
     Args:
-        invoice_payloads (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which invoice payloads
-        to allow. Only exact matches are allowed. If not specified, will allow any invoice payload.
+        invoice_payloads (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which
+            invoice payloads to allow. Only exact matches are allowed. If not
+            specified, will allow any invoice payload.
 
     .. versionadded:: NEXT.VERSION
     """
