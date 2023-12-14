@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import re
 
 import pytest
 
@@ -109,6 +110,15 @@ class TestPreCheckoutQueryHandler:
     def test_with_pattern(self, pre_checkout_query):
         handler = PreCheckoutQueryHandler(self.callback, pattern=".*voice.*")
 
+        assert handler.check_update(pre_checkout_query)
+
+        pre_checkout_query.pre_checkout_query.invoice_payload = "nothing here"
+        assert not handler.check_update(pre_checkout_query)
+
+    def test_with_compiled_pattern(self, pre_checkout_query):
+        handler = PreCheckoutQueryHandler(self.callback, pattern=re.compile(r".*payload"))
+
+        pre_checkout_query.pre_checkout_query.invoice_payload = "invoice_payload"
         assert handler.check_update(pre_checkout_query)
 
         pre_checkout_query.pre_checkout_query.invoice_payload = "nothing here"
