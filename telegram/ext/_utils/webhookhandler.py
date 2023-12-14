@@ -20,14 +20,22 @@
 import asyncio
 import json
 from http import HTTPStatus
+from pathlib import Path
 from ssl import SSLContext
 from types import TracebackType
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Union
 
 # Instead of checking for ImportError here, we do that in `updater.py`, where we import from
 # this module. Doing it here would be tricky, as the classes below subclass tornado classes
 import tornado.web
 from tornado.httpserver import HTTPServer
+
+try:
+    from tornado.netutil import bind_unix_socket
+
+    UNIX_AVAILABLE = True
+except ImportError:
+    UNIX_AVAILABLE = False
 
 from telegram import Update
 from telegram._utils.logging import get_logger
@@ -50,21 +58,34 @@ class WebhookServer:
         "is_running",
         "_server_lock",
         "_shutdown_lock",
+        "unix",
     )
 
     def __init__(
-        self, listen: str, port: int, webhook_app: "WebhookAppClass", ssl_ctx: Optional[SSLContext]
+        self,
+        listen: str,
+        port: int,
+        webhook_app: "WebhookAppClass",
+        ssl_ctx: Optional[SSLContext],
+        unix: Optional[Union[str, Path]] = None,
     ):
+        if unix and not UNIX_AVAILABLE:
+            raise RuntimeError("This OS does not support binding unix sockets.")
         self._http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.listen = listen
         self.port = port
         self.is_running = False
+        self.unix = unix
         self._server_lock = asyncio.Lock()
         self._shutdown_lock = asyncio.Lock()
 
     async def serve_forever(self, ready: Optional[asyncio.Event] = None) -> None:
         async with self._server_lock:
-            self._http_server.listen(self.port, address=self.listen)
+            if self.unix:
+                socket = bind_unix_socket(str(self.unix))
+                self._http_server.add_socket(socket)
+            else:
+                self._http_server.listen(self.port, address=self.listen)
 
             self.is_running = True
             if ready is not None:
