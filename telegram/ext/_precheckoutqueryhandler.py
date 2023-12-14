@@ -50,9 +50,8 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        pattern (:func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`): Optional.
-            Regex pattern, callback or type to test
-            :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Optional. Regex pattern
+            to test :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
 
             .. versionadded:: NEXT.VERSION
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
@@ -63,9 +62,8 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
-        pattern (:func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`): Optional.
-            Regex pattern, callback or type to test
-            :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Optional. Regex pattern
+            to test :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
 
             .. versionadded:: NEXT.VERSION
         block (:obj:`bool`): Determines whether the callback will run in a blocking way..
