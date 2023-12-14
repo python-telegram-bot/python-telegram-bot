@@ -132,3 +132,19 @@ DEFAULT_TRUE: DefaultValue[bool] = DefaultValue(True)
 
 .. versionadded:: 20.0
 """
+
+
+DEFAULT_20: DefaultValue[int] = DefaultValue(20)
+""":class:`DefaultValue`: Default :obj:`20`"""
+
+DEFAULT_IP: DefaultValue[str] = DefaultValue("127.0.0.1")
+""":class:`DefaultValue`: Default :obj:`127.0.0.1`
+
+.. versionadded:: NEXT.VERSION
+"""
+
+DEFAULT_80: DefaultValue[int] = DefaultValue(80)
+""":class:`DefaultValue`: Default :obj:`80`
+
+.. versionadded:: NEXT.VERSION
+"""

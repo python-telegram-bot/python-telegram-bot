@@ -52,7 +52,13 @@ from typing import (
 )
 
 from telegram._update import Update
-from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
+from telegram._utils.defaultvalue import (
+    DEFAULT_80,
+    DEFAULT_IP,
+    DEFAULT_NONE,
+    DEFAULT_TRUE,
+    DefaultValue,
+)
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import SCT, DVType, ODVInput
@@ -834,8 +840,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     def run_webhook(
         self,
-        listen: str = "127.0.0.1",
-        port: int = 80,
+        listen: DVType[str] = DEFAULT_IP,
+        port: DVType[int] = DEFAULT_80,
         url_path: str = "",
         cert: Optional[Union[str, Path]] = None,
         key: Optional[Union[str, Path]] = None,
@@ -848,6 +854,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         close_loop: bool = True,
         stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
         secret_token: Optional[str] = None,
+        unix: Optional[Union[str, Path]] = None,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         listening for updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
@@ -940,6 +947,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 header isn't set or it is set to a wrong token.
 
                 .. versionadded:: 20.0
+            unix (:class:`pathlib.Path` | :obj:`str`, optional): Path to the unix socket file. Path
+                does not need to exist, in which case the file will be created.
+
+                Caution:
+                    This parameter is a replacement for the default TCP bind. Therefore, it is
+                    mutually exclusive with :paramref:`listen` and :paramref:`port`. When using
+                    this param, you must also run a reverse proxy to the unix socket and set the
+                    appropriate :paramref:`webhook_url`.
+
+                .. versionadded:: NEXT.VERSION
         """
         if not self.updater:
             raise RuntimeError(
@@ -960,6 +977,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 ip_address=ip_address,
                 max_connections=max_connections,
                 secret_token=secret_token,
+                unix=unix,
             ),
             close_loop=close_loop,
             stop_signals=stop_signals,

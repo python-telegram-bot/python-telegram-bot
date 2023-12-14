@@ -16,10 +16,11 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+from pathlib import Path
 from typing import Optional
 
 import pytest
-from httpx import AsyncClient, Response
+from httpx import AsyncClient, AsyncHTTPTransport, Response
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
@@ -90,6 +91,7 @@ async def send_webhook_message(
     content_type: str = "application/json",
     get_method: Optional[str] = None,
     secret_token: Optional[str] = None,
+    unix: Optional[Path] = None,
 ) -> Response:
     headers = {
         "content-type": content_type,
@@ -111,7 +113,9 @@ async def send_webhook_message(
 
     url = f"http://{ip}:{port}/{url_path}"
 
-    async with AsyncClient() as client:
+    transport = AsyncHTTPTransport(uds=unix) if unix else None
+
+    async with AsyncClient(transport=transport) as client:
         return await client.request(
             url=url, method=get_method or "POST", data=payload, headers=headers
         )
