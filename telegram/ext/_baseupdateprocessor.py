@@ -20,10 +20,12 @@
 from abc import ABC, abstractmethod
 from asyncio import BoundedSemaphore
 from types import TracebackType
-from typing import Any, Awaitable, Optional, Type, final
+from typing import Any, AsyncContextManager, Awaitable, Optional, Type, TypeVar, final
+
+_BUPT = TypeVar("_BUPT", bound="BaseUpdateProcessor")
 
 
-class BaseUpdateProcessor(ABC):
+class BaseUpdateProcessor(AsyncContextManager["BaseUpdateProcessor"], ABC):
     """An abstract base class for update processors. You can use this class to implement
     your own update processor.
 
@@ -67,7 +69,7 @@ class BaseUpdateProcessor(ABC):
             raise ValueError("`max_concurrent_updates` must be a positive integer!")
         self._semaphore = BoundedSemaphore(self.max_concurrent_updates)
 
-    async def __aenter__(self) -> "BaseUpdateProcessor":
+    async def __aenter__(self: _BUPT) -> _BUPT:  # noqa: PYI019
         """|async_context_manager| :meth:`initializes <initialize>` the Processor.
 
         Returns:
