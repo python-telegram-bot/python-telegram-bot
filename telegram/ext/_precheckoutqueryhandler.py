@@ -20,7 +20,7 @@
 
 
 import re
-from typing import Optional, Pattern, TypeVar
+from typing import Optional, Pattern, TypeVar, Union
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -76,7 +76,7 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
         self,
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
-        pattern: Optional[Pattern[str]] = None,
+        pattern: Optional[Union[str, Pattern[str]]] = None,
     ):
         super().__init__(callback, block=block)
 
