@@ -82,6 +82,7 @@ __all__ = (  # Keep this alphabetically ordered
     "GeneralForumTopicUnhidden",
     "helpers",
     "IdDocumentData",
+    "InaccessibleMessage",
     "InlineKeyboardButton",
     "InlineKeyboardMarkup",
     "InlineQuery",
@@ -130,6 +131,7 @@ __all__ = (  # Keep this alphabetically ordered
     "Location",
     "LoginUrl",
     "MaskPosition",
+    "MaybeInaccessibleMessage",
     "MenuButton",
     "MenuButtonCommands",
     "MenuButtonDefault",
@@ -300,7 +302,7 @@ from ._keyboardbuttonpolltype import KeyboardButtonPollType
 from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUser
 from ._loginurl import LoginUrl
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
-from ._message import Message
+from ._message import InaccessibleMessage, MaybeInaccessibleMessage, Message
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from ._messageentity import MessageEntity
 from ._messageid import MessageId

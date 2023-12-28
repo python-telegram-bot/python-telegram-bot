@@ -85,7 +85,9 @@ __all__ = [
     "UserProfilePhotosLimit",
 ]
 
+import datetime
 import sys
+from enum import Enum
 from typing import Final, List, NamedTuple
 
 from telegram._utils.enum import IntEnum, StringEnum
@@ -116,7 +118,7 @@ class _BotAPIVersion(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=6, minor=9)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=0)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1754,3 +1756,16 @@ class ForumTopicLimit(IntEnum):
     * :paramref:`~telegram.Bot.edit_general_forum_topic.name` parameter of
       :meth:`telegram.Bot.edit_general_forum_topic`
     """
+
+
+class Date(Enum):
+    # TODO sphinx doesn't build this, I don't know why
+    """This enum contains the date literal for :class:`telegram.InaccessibleMessage`
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    ZERO_DATE = datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC)
+    """:obj:`datetime.datetime`, value of unix 0."""

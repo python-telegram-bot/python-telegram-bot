@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Message."""
 import datetime
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -75,7 +75,7 @@ from telegram._videochat import (
 )
 from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
-from telegram.constants import MessageAttachmentType, ParseMode
+from telegram.constants import Date, MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
 
 if TYPE_CHECKING:
@@ -92,7 +92,108 @@ if TYPE_CHECKING:
     )
 
 
-class Message(TelegramObject):
+class MaybeInaccessibleMessage(TelegramObject):
+    """Base class for Telegram Message Objects.
+
+    Currently, that includes :class:`telegram.Message` and :class:`telegram.InaccessibleMessage`.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`message_id` and :attr:`chat` are equal
+
+    Args:
+        message_id (:obj:`int`): Unique message identifier.
+        date (:class:`datetime.datetime`): Date the message was sent in Unix time or 0 in Unix
+            time. Converted to :class:`datetime.datetime`
+
+            |datetime_localization| (Does not apply to the 0, which will always be in UTC).
+        chat (:class:`telegram.Chat`): Conversation the message belongs to.
+
+    Attributes:
+        message_id (:obj:`int`): Unique message identifier.
+        date (:class:`datetime.datetime`): Date the message was sent in Unix time or 0 in Unix
+            time. Converted to :class:`datetime.datetime`
+
+            |datetime_localization| (Does not apply to the 0, which will always be in UTC).
+        chat (:class:`telegram.Chat`): Conversation the message belongs to.
+    """
+
+    __slots__ = ("chat", "message_id", "date")
+
+    def __init__(
+        self,
+        chat: Chat,
+        message_id: int,
+        # TODO Should this also accept the literal
+        date: datetime.datetime,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.chat: Chat = chat
+        self.message_id: int = message_id
+        self.date: datetime.datetime = date
+
+        self._id_attrs = (self.message_id, self.chat)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaybeInaccessibleMessage"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        if cls is MaybeInaccessibleMessage:
+            if data["date"] == 0:
+                return InaccessibleMessage.de_json(data=data, bot=bot)
+            return Message.de_json(data=data, bot=bot)
+
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
+        # this is to include the Literal from InaccessibleMessage
+        if data["date"] == 0:
+            data["date"] = Date.ZERO_DATE
+        else:
+            data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
+
+        data["chat"] = Chat.de_json(data.get("chat"), bot)
+        return super().de_json(data=data, bot=bot)
+
+
+class InaccessibleMessage(MaybeInaccessibleMessage):
+    """This object represents an inaccessible message.
+
+    These are messages that are e.g. deleted.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`message_id` and :attr:`chat` are equal
+
+    Args:
+        message_id (:obj:`int`): Unique message identifier.
+        date (:class:`constants.Date.ZERO_DATE`): Always 0, which the literal value is.
+        chat (:class:`telegram.Chat`): Chat the message belongs to.
+
+    Attributes:
+        message_id (:obj:`int`): Unique message identifier.
+        date (:class:`constants.Date.ZERO_DATE`): Always 0, which the literal value is.
+        chat (:class:`telegram.Chat`): Chat the message belongs to.
+    """
+
+    def __init__(
+        self,
+        chat: Chat,
+        message_id: int,
+        date: Literal[Date.ZERO_DATE],
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(chat=chat, message_id=message_id, date=date.value, api_kwargs=api_kwargs)
+
+
+class Message(MaybeInaccessibleMessage):
     # fmt: off
     """This object represents a message.
 
@@ -101,6 +202,11 @@ class Message(TelegramObject):
 
     Note:
         In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
+
+    .. versionchanged:: NEXT.VERSION
+        * This class now subclasses :class:`telegram.MaybeInaccessibleMessage`.
+        * The :paramref:`pinned_message` now can be either class:`telegram.Message` or
+          class:`telegram.InaccessibleMessage`.
 
     .. versionchanged:: 20.0
 
@@ -252,9 +358,13 @@ class Message(TelegramObject):
             with the specified identifier.
         migrate_from_chat_id (:obj:`int`, optional): The supergroup has been migrated from a group
             with the specified identifier.
-        pinned_message (:class:`telegram.Message`, optional): Specified message was pinned. Note
-            that the Message object in this field will not contain further
+        pinned_message (:class:`telegram.MaybeInaccessibleMessage`, optional): Specified message
+            was pinned. Note that the Message object in this field will not contain further
             :attr:`reply_to_message` fields even if it is itself a reply.
+
+            .. versionchanged:: NEXT.VERSION
+                This attribute now is either class:`telegram.Message` or
+                class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
@@ -497,9 +607,13 @@ class Message(TelegramObject):
             with the specified identifier.
         migrate_from_chat_id (:obj:`int`): Optional. The supergroup has been migrated from a group
             with the specified identifier.
-        pinned_message (:class:`telegram.Message`): Optional. Specified message was pinned. Note
-            that the Message object in this field will not contain further
+        pinned_message (:class:`telegram.MaybeInaccessibleMessage`): Optional. Specified message
+            was pinned. Note that the Message object in this field will not contain further
             :attr:`reply_to_message` fields even if it is itself a reply.
+
+            .. versionchanged:: NEXT.VERSION
+                This attribute now is either class:`telegram.Message` or
+                class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
             information about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service
@@ -610,7 +724,6 @@ class Message(TelegramObject):
         "contact",
         "migrate_to_chat_id",
         "forward_signature",
-        "chat",
         "successful_payment",
         "game",
         "text",
@@ -638,7 +751,6 @@ class Message(TelegramObject):
         "pinned_message",
         "forward_from_chat",
         "new_chat_photo",
-        "message_id",
         "delete_chat_photo",
         "from_user",
         "author_signature",
@@ -648,7 +760,6 @@ class Message(TelegramObject):
         "forward_from_message_id",
         "caption_entities",
         "voice",
-        "date",
         "supergroup_chat_created",
         "poll",
         "left_chat_member",
@@ -717,7 +828,9 @@ class Message(TelegramObject):
         channel_chat_created: Optional[bool] = None,
         migrate_to_chat_id: Optional[int] = None,
         migrate_from_chat_id: Optional[int] = None,
-        pinned_message: Optional["Message"] = None,
+        # TODO changing this results in a couple mypy errors. Not touching them till we decide
+        # on how to continue with this
+        pinned_message: Optional[MaybeInaccessibleMessage] = None,
         invoice: Optional[Invoice] = None,
         successful_payment: Optional[SuccessfulPayment] = None,
         forward_signature: Optional[str] = None,
@@ -757,98 +870,100 @@ class Message(TelegramObject):
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
-        super().__init__(api_kwargs=api_kwargs)
+        super().__init__(chat=chat, message_id=message_id, date=date, api_kwargs=api_kwargs)
 
-        # Required
-        self.message_id: int = message_id
-        # Optionals
-        self.from_user: Optional[User] = from_user
-        self.sender_chat: Optional[Chat] = sender_chat
-        self.date: datetime.datetime = date
-        self.chat: Chat = chat
-        self.forward_from: Optional[User] = forward_from
-        self.forward_from_chat: Optional[Chat] = forward_from_chat
-        self.forward_date: Optional[datetime.datetime] = forward_date
-        self.is_automatic_forward: Optional[bool] = is_automatic_forward
-        self.reply_to_message: Optional[Message] = reply_to_message
-        self.edit_date: Optional[datetime.datetime] = edit_date
-        self.has_protected_content: Optional[bool] = has_protected_content
-        self.text: Optional[str] = text
-        self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-        self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-        self.audio: Optional[Audio] = audio
-        self.game: Optional[Game] = game
-        self.document: Optional[Document] = document
-        self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
-        self.sticker: Optional[Sticker] = sticker
-        self.video: Optional[Video] = video
-        self.voice: Optional[Voice] = voice
-        self.video_note: Optional[VideoNote] = video_note
-        self.caption: Optional[str] = caption
-        self.contact: Optional[Contact] = contact
-        self.location: Optional[Location] = location
-        self.venue: Optional[Venue] = venue
-        self.new_chat_members: Tuple[User, ...] = parse_sequence_arg(new_chat_members)
-        self.left_chat_member: Optional[User] = left_chat_member
-        self.new_chat_title: Optional[str] = new_chat_title
-        self.new_chat_photo: Tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
-        self.delete_chat_photo: Optional[bool] = bool(delete_chat_photo)
-        self.group_chat_created: Optional[bool] = bool(group_chat_created)
-        self.supergroup_chat_created: Optional[bool] = bool(supergroup_chat_created)
-        self.migrate_to_chat_id: Optional[int] = migrate_to_chat_id
-        self.migrate_from_chat_id: Optional[int] = migrate_from_chat_id
-        self.channel_chat_created: Optional[bool] = bool(channel_chat_created)
-        self.message_auto_delete_timer_changed: Optional[
-            MessageAutoDeleteTimerChanged
-        ] = message_auto_delete_timer_changed
-        self.pinned_message: Optional[Message] = pinned_message
-        self.forward_from_message_id: Optional[int] = forward_from_message_id
-        self.invoice: Optional[Invoice] = invoice
-        self.successful_payment: Optional[SuccessfulPayment] = successful_payment
-        self.connected_website: Optional[str] = connected_website
-        self.forward_signature: Optional[str] = forward_signature
-        self.forward_sender_name: Optional[str] = forward_sender_name
-        self.author_signature: Optional[str] = author_signature
-        self.media_group_id: Optional[str] = media_group_id
-        self.animation: Optional[Animation] = animation
-        self.passport_data: Optional[PassportData] = passport_data
-        self.poll: Optional[Poll] = poll
-        self.dice: Optional[Dice] = dice
-        self.via_bot: Optional[User] = via_bot
-        self.proximity_alert_triggered: Optional[
-            ProximityAlertTriggered
-        ] = proximity_alert_triggered
-        self.video_chat_scheduled: Optional[VideoChatScheduled] = video_chat_scheduled
-        self.video_chat_started: Optional[VideoChatStarted] = video_chat_started
-        self.video_chat_ended: Optional[VideoChatEnded] = video_chat_ended
-        self.video_chat_participants_invited: Optional[
-            VideoChatParticipantsInvited
-        ] = video_chat_participants_invited
-        self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-        self.web_app_data: Optional[WebAppData] = web_app_data
-        self.is_topic_message: Optional[bool] = is_topic_message
-        self.message_thread_id: Optional[int] = message_thread_id
-        self.forum_topic_created: Optional[ForumTopicCreated] = forum_topic_created
-        self.forum_topic_closed: Optional[ForumTopicClosed] = forum_topic_closed
-        self.forum_topic_reopened: Optional[ForumTopicReopened] = forum_topic_reopened
-        self.forum_topic_edited: Optional[ForumTopicEdited] = forum_topic_edited
-        self.general_forum_topic_hidden: Optional[
-            GeneralForumTopicHidden
-        ] = general_forum_topic_hidden
-        self.general_forum_topic_unhidden: Optional[
-            GeneralForumTopicUnhidden
-        ] = general_forum_topic_unhidden
-        self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
-        self.has_media_spoiler: Optional[bool] = has_media_spoiler
-        self.user_shared: Optional[UserShared] = user_shared
-        self.chat_shared: Optional[ChatShared] = chat_shared
-        self.story: Optional[Story] = story
+        # TODO I copied this from Chatmember, not sure if there is a better way
+        with self._unfrozen():
+            # Required
+            self.message_id: int = message_id
+            # Optionals
+            self.from_user: Optional[User] = from_user
+            self.sender_chat: Optional[Chat] = sender_chat
+            self.date: datetime.datetime = date
+            self.chat: Chat = chat
+            self.forward_from: Optional[User] = forward_from
+            self.forward_from_chat: Optional[Chat] = forward_from_chat
+            self.forward_date: Optional[datetime.datetime] = forward_date
+            self.is_automatic_forward: Optional[bool] = is_automatic_forward
+            self.reply_to_message: Optional[Message] = reply_to_message
+            self.edit_date: Optional[datetime.datetime] = edit_date
+            self.has_protected_content: Optional[bool] = has_protected_content
+            self.text: Optional[str] = text
+            self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
+            self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+            self.audio: Optional[Audio] = audio
+            self.game: Optional[Game] = game
+            self.document: Optional[Document] = document
+            self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
+            self.sticker: Optional[Sticker] = sticker
+            self.video: Optional[Video] = video
+            self.voice: Optional[Voice] = voice
+            self.video_note: Optional[VideoNote] = video_note
+            self.caption: Optional[str] = caption
+            self.contact: Optional[Contact] = contact
+            self.location: Optional[Location] = location
+            self.venue: Optional[Venue] = venue
+            self.new_chat_members: Tuple[User, ...] = parse_sequence_arg(new_chat_members)
+            self.left_chat_member: Optional[User] = left_chat_member
+            self.new_chat_title: Optional[str] = new_chat_title
+            self.new_chat_photo: Tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
+            self.delete_chat_photo: Optional[bool] = bool(delete_chat_photo)
+            self.group_chat_created: Optional[bool] = bool(group_chat_created)
+            self.supergroup_chat_created: Optional[bool] = bool(supergroup_chat_created)
+            self.migrate_to_chat_id: Optional[int] = migrate_to_chat_id
+            self.migrate_from_chat_id: Optional[int] = migrate_from_chat_id
+            self.channel_chat_created: Optional[bool] = bool(channel_chat_created)
+            self.message_auto_delete_timer_changed: Optional[
+                MessageAutoDeleteTimerChanged
+            ] = message_auto_delete_timer_changed
+            self.pinned_message: Optional[MaybeInaccessibleMessage] = pinned_message
+            self.forward_from_message_id: Optional[int] = forward_from_message_id
+            self.invoice: Optional[Invoice] = invoice
+            self.successful_payment: Optional[SuccessfulPayment] = successful_payment
+            self.connected_website: Optional[str] = connected_website
+            self.forward_signature: Optional[str] = forward_signature
+            self.forward_sender_name: Optional[str] = forward_sender_name
+            self.author_signature: Optional[str] = author_signature
+            self.media_group_id: Optional[str] = media_group_id
+            self.animation: Optional[Animation] = animation
+            self.passport_data: Optional[PassportData] = passport_data
+            self.poll: Optional[Poll] = poll
+            self.dice: Optional[Dice] = dice
+            self.via_bot: Optional[User] = via_bot
+            self.proximity_alert_triggered: Optional[
+                ProximityAlertTriggered
+            ] = proximity_alert_triggered
+            self.video_chat_scheduled: Optional[VideoChatScheduled] = video_chat_scheduled
+            self.video_chat_started: Optional[VideoChatStarted] = video_chat_started
+            self.video_chat_ended: Optional[VideoChatEnded] = video_chat_ended
+            self.video_chat_participants_invited: Optional[
+                VideoChatParticipantsInvited
+            ] = video_chat_participants_invited
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.web_app_data: Optional[WebAppData] = web_app_data
+            self.is_topic_message: Optional[bool] = is_topic_message
+            self.message_thread_id: Optional[int] = message_thread_id
+            self.forum_topic_created: Optional[ForumTopicCreated] = forum_topic_created
+            self.forum_topic_closed: Optional[ForumTopicClosed] = forum_topic_closed
+            self.forum_topic_reopened: Optional[ForumTopicReopened] = forum_topic_reopened
+            self.forum_topic_edited: Optional[ForumTopicEdited] = forum_topic_edited
+            self.general_forum_topic_hidden: Optional[
+                GeneralForumTopicHidden
+            ] = general_forum_topic_hidden
+            self.general_forum_topic_unhidden: Optional[
+                GeneralForumTopicUnhidden
+            ] = general_forum_topic_unhidden
+            self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
+            self.has_media_spoiler: Optional[bool] = has_media_spoiler
+            self.user_shared: Optional[UserShared] = user_shared
+            self.chat_shared: Optional[ChatShared] = chat_shared
+            self.story: Optional[Story] = story
 
-        self._effective_attachment = DEFAULT_NONE
+            self._effective_attachment = DEFAULT_NONE
 
-        self._id_attrs = (self.message_id, self.chat)
+            self._id_attrs = (self.message_id, self.chat)
 
-        self._freeze()
+            self._freeze()
 
     @property
     def chat_id(self) -> int:
@@ -897,8 +1012,6 @@ class Message(TelegramObject):
 
         data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
-        data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
         data["entities"] = MessageEntity.de_list(data.get("entities"), bot)
         data["caption_entities"] = MessageEntity.de_list(data.get("caption_entities"), bot)
         data["forward_from"] = User.de_json(data.get("forward_from"), bot)
@@ -925,7 +1038,7 @@ class Message(TelegramObject):
         data["message_auto_delete_timer_changed"] = MessageAutoDeleteTimerChanged.de_json(
             data.get("message_auto_delete_timer_changed"), bot
         )
-        data["pinned_message"] = Message.de_json(data.get("pinned_message"), bot)
+        data["pinned_message"] = MaybeInaccessibleMessage.de_json(data.get("pinned_message"), bot)
         data["invoice"] = Invoice.de_json(data.get("invoice"), bot)
         data["successful_payment"] = SuccessfulPayment.de_json(data.get("successful_payment"), bot)
         data["passport_data"] = PassportData.de_json(data.get("passport_data"), bot)

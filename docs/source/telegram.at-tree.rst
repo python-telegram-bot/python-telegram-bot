@@ -47,6 +47,7 @@ Available Types
     telegram.forumtopicreopened
     telegram.generalforumtopichidden
     telegram.generalforumtopicunhidden
+    telegram.inaccessiblemessage
     telegram.inlinekeyboardbutton
     telegram.inlinekeyboardmarkup
     telegram.inputfile
@@ -63,6 +64,7 @@ Available Types
     telegram.keyboardbuttonrequestuser
     telegram.location
     telegram.loginurl
+    telegram.maybeinaccessiblemessage
     telegram.menubutton
     telegram.menubuttoncommands
     telegram.menubuttondefault
