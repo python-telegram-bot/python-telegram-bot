@@ -129,6 +129,7 @@ __all__ = (  # Keep this alphabetically ordered
     "KeyboardButtonPollType",
     "KeyboardButtonRequestChat",
     "KeyboardButtonRequestUser",
+    "KeyboardButtonRequestUsers",
     "LabeledPrice",
     "Location",
     "LoginUrl",
@@ -301,7 +302,11 @@ from ._inline.inputtextmessagecontent import InputTextMessageContent
 from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
-from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUser
+from ._keyboardbuttonrequest import (
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestUser,
+    KeyboardButtonRequestUsers,
+)
 from ._loginurl import LoginUrl
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._message import Message

@@ -22,12 +22,14 @@ from typing import TYPE_CHECKING, Optional
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 
-class KeyboardButtonRequestUser(TelegramObject):
+class KeyboardButtonRequestUsers(TelegramObject):
     """This object defines the criteria used to request a suitable user. The identifier of the
     selected user will be shared with the bot when the corresponding button is pressed.
 
@@ -38,7 +40,8 @@ class KeyboardButtonRequestUser(TelegramObject):
         `Telegram Docs on requesting users \
         <https://core.telegram.org/bots/features#chat-and-user-selection>`_
 
-    .. versionadded:: 20.1
+    .. versionadded:: NEXT.VERSION
+        This class was previously named :class:`KeyboardButtonRequestUser`.
 
     Args:
         request_id (:obj:`int`): Signed 32-bit identifier of the request, which will be received
@@ -48,6 +51,11 @@ class KeyboardButtonRequestUser(TelegramObject):
         user_is_premium (:obj:`bool`, optional): Pass :obj:`True` to request a premium user, pass
             :obj:`False` to request a non-premium user. If not specified, no additional
             restrictions are applied.
+        max_quantity (:obj:`int`, optional): The maximum number of users to be selected; 1-10.
+            Defaults to 1.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
         user_is_bot (:obj:`bool`): Optional. Pass :obj:`True` to request a bot, pass :obj:`False`
@@ -55,12 +63,17 @@ class KeyboardButtonRequestUser(TelegramObject):
         user_is_premium (:obj:`bool`): Optional. Pass :obj:`True` to request a premium user, pass
             :obj:`False` to request a non-premium user. If not specified, no additional
             restrictions are applied.
+        max_quantity (:obj:`int`): Optional. The maximum number of users to be selected; 1-10.
+            Defaults to 1.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
         "request_id",
         "user_is_bot",
         "user_is_premium",
+        "max_quantity",
     )
 
     def __init__(
@@ -68,6 +81,7 @@ class KeyboardButtonRequestUser(TelegramObject):
         request_id: int,
         user_is_bot: Optional[bool] = None,
         user_is_premium: Optional[bool] = None,
+        max_quantity: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,  # skipcq: PYL-W0622
     ):
@@ -78,10 +92,45 @@ class KeyboardButtonRequestUser(TelegramObject):
         # Optionals
         self.user_is_bot: Optional[bool] = user_is_bot
         self.user_is_premium: Optional[bool] = user_is_premium
+        self.max_quantity: Optional[int] = max_quantity
 
         self._id_attrs = (self.request_id,)
 
         self._freeze()
+
+
+class KeyboardButtonRequestUser(KeyboardButtonRequestUsers):
+    """Same as :class:`KeyboardButtonRequestUsers`, kept for backward compatibility.
+
+    .. versionadded:: 20.1
+
+    .. deprecated:: NEXT.VERSION
+        Use :class:`KeyboardButtonRequestUsers` instead.
+
+    """
+
+    def __init__(
+        self,
+        request_id: int,
+        user_is_bot: Optional[bool] = None,
+        user_is_premium: Optional[bool] = None,
+        max_quantity: Optional[int] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,  # skipcq: PYL-W0622
+    ):
+        super().__init__(
+            request_id=request_id,
+            user_is_bot=user_is_bot,
+            user_is_premium=user_is_premium,
+            max_quantity=max_quantity,
+            api_kwargs=api_kwargs,
+        )
+
+        warn(
+            "`KeyboardButtonRequestUser` is deprecated, use `KeyboardButtonRequestUsers` instead.",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
 
 
 class KeyboardButtonRequestChat(TelegramObject):

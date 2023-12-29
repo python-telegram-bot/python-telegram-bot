@@ -26,7 +26,7 @@ from telegram._utils.types import JSONDict
 class UserShared(TelegramObject):
     """
     This object contains information about the user whose identifier was shared with the bot
-    using a :class:`telegram.KeyboardButtonRequestUser` button.
+    using a :class:`telegram.KeyboardButtonRequestUsers` button.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`request_id` and :attr:`user_id` are equal.

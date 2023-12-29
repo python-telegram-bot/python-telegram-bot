@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Optional
 
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
-from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUser
+from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
@@ -74,7 +74,7 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.0
-        request_user (:class:`KeyboardButtonRequestUser`, optional): If specified, pressing the
+        request_user (:class:`KeyboardButtonRequestUsers`, optional): If specified, pressing the
             button will open a list of suitable users. Tapping on any user will send its
             identifier to the bot in a :attr:`telegram.Message.user_shared` service message.
             Available in private chats only.
@@ -102,7 +102,7 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.0
-        request_user (:class:`KeyboardButtonRequestUser`): Optional. If specified, pressing the
+        request_user (:class:`KeyboardButtonRequestUsers`): Optional. If specified, pressing the
             button will open a list of suitable users. Tapping on any user will send its
             identifier to the bot in a :attr:`telegram.Message.user_shared` service message.
             Available in private chats only.
@@ -133,7 +133,7 @@ class KeyboardButton(TelegramObject):
         request_location: Optional[bool] = None,
         request_poll: Optional[KeyboardButtonPollType] = None,
         web_app: Optional[WebAppInfo] = None,
-        request_user: Optional[KeyboardButtonRequestUser] = None,
+        request_user: Optional[KeyboardButtonRequestUsers] = None,
         request_chat: Optional[KeyboardButtonRequestChat] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -146,7 +146,7 @@ class KeyboardButton(TelegramObject):
         self.request_location: Optional[bool] = request_location
         self.request_poll: Optional[KeyboardButtonPollType] = request_poll
         self.web_app: Optional[WebAppInfo] = web_app
-        self.request_user: Optional[KeyboardButtonRequestUser] = request_user
+        self.request_user: Optional[KeyboardButtonRequestUsers] = request_user
         self.request_chat: Optional[KeyboardButtonRequestChat] = request_chat
 
         self._id_attrs = (
@@ -170,7 +170,7 @@ class KeyboardButton(TelegramObject):
             return None
 
         data["request_poll"] = KeyboardButtonPollType.de_json(data.get("request_poll"), bot)
-        data["request_user"] = KeyboardButtonRequestUser.de_json(data.get("request_user"), bot)
+        data["request_user"] = KeyboardButtonRequestUsers.de_json(data.get("request_user"), bot)
         data["request_chat"] = KeyboardButtonRequestChat.de_json(data.get("request_chat"), bot)
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 

@@ -23,7 +23,7 @@ from telegram import (
     KeyboardButton,
     KeyboardButtonPollType,
     KeyboardButtonRequestChat,
-    KeyboardButtonRequestUser,
+    KeyboardButtonRequestUsers,
     WebAppInfo,
 )
 from tests.auxil.slots import mro_slots
@@ -49,7 +49,7 @@ class TestKeyboardButtonBase:
     request_poll = KeyboardButtonPollType("quiz")
     web_app = WebAppInfo(url="https://example.com")
     request_chat = KeyboardButtonRequestChat(1, True)
-    request_user = KeyboardButtonRequestUser(2)
+    request_user = KeyboardButtonRequestUsers(2)
 
 
 class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
@@ -114,13 +114,13 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
             "test",
             request_contact=True,
             request_chat=KeyboardButtonRequestChat(1, False),
-            request_user=KeyboardButtonRequestUser(2),
+            request_user=KeyboardButtonRequestUsers(2),
         )
         g = KeyboardButton(
             "test",
             request_contact=True,
             request_chat=KeyboardButtonRequestChat(1, False),
-            request_user=KeyboardButtonRequestUser(2),
+            request_user=KeyboardButtonRequestUsers(2),
         )
 
         assert a == b
