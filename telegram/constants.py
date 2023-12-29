@@ -55,6 +55,7 @@ __all__ = [
     "ForumIconColor",
     "ForumTopicLimit",
     "GiveawayLimit",
+    "KeyboardButtonRequestUsersLimit",
     "InlineKeyboardButtonLimit",
     "InlineKeyboardMarkupLimit",
     "InlineQueryLimit",
@@ -678,6 +679,27 @@ class GiveawayLimit(IntEnum):
 
     MAX_WINNERS = 100
     """:obj:`int`: Maximum number of winners allowed for :class:`telegram.GiveawayWinners.winners`.
+    """
+
+
+class KeyboardButtonRequestUsersLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.KeyboardButtonRequestUsers`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_QUANTITY = 1
+    """:obj:`int`: Minimum value allowed for
+    :paramref:`~telegram.KeyboardButtonRequestUsers.max_quantity` parameter of
+    :class:`telegram.KeyboardButtonRequestUsers`.
+    """
+    MAX_QUANTITY = 10
+    """:obj:`int`: Maximum value allowed for
+    :paramref:`~telegram.KeyboardButtonRequestUsers.max_quantity` parameter of
+    :class:`telegram.KeyboardButtonRequestUsers`.
     """
 
 

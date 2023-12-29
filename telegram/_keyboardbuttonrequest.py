@@ -51,8 +51,11 @@ class KeyboardButtonRequestUsers(TelegramObject):
         user_is_premium (:obj:`bool`, optional): Pass :obj:`True` to request a premium user, pass
             :obj:`False` to request a non-premium user. If not specified, no additional
             restrictions are applied.
-        max_quantity (:obj:`int`, optional): The maximum number of users to be selected; 1-10.
-            Defaults to 1.
+        max_quantity (:obj:`int`, optional): The maximum number of users to be selected;
+            :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY` -
+            :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MAX_QUANTITY`.
+            Defaults to :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY`
+            .
 
             .. versionadded:: NEXT.VERSION
 
@@ -63,8 +66,11 @@ class KeyboardButtonRequestUsers(TelegramObject):
         user_is_premium (:obj:`bool`): Optional. Pass :obj:`True` to request a premium user, pass
             :obj:`False` to request a non-premium user. If not specified, no additional
             restrictions are applied.
-        max_quantity (:obj:`int`): Optional. The maximum number of users to be selected; 1-10.
-            Defaults to 1.
+        max_quantity (:obj:`int`): Optional. The maximum number of users to be selected;
+            :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY` -
+            :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MAX_QUANTITY`.
+            Defaults to :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY`
+            .
 
             .. versionadded:: NEXT.VERSION
     """
@@ -100,7 +106,7 @@ class KeyboardButtonRequestUsers(TelegramObject):
 
 
 class KeyboardButtonRequestUser(KeyboardButtonRequestUsers):
-    """Same as :class:`KeyboardButtonRequestUsers`, kept for backward compatibility.
+    """Alias for :class:`KeyboardButtonRequestUsers`, kept for backward compatibility.
 
     .. versionadded:: 20.1
 

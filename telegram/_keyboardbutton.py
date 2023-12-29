@@ -82,7 +82,7 @@ class KeyboardButton(TelegramObject):
 
             .. versionadded:: 20.1
             .. deprecated:: NEXT.VERSION
-               Bot API 7.0 deprecates this argument in favor of :param:`request_users`.
+               Bot API 7.0 deprecates this argument in favor of ref`request_users`.
 
         request_users (:class:`KeyboardButtonRequestUsers`, optional): If specified, pressing the
             button will open a list of suitable users. Tapping on any user will send its
