@@ -47,6 +47,10 @@ Available Types
     telegram.forumtopicreopened
     telegram.generalforumtopichidden
     telegram.generalforumtopicunhidden
+    telegram.giveaway
+    telegram.giveawaycompleted
+    telegram.giveawaycreated
+    telegram.giveawaywinners
     telegram.inlinekeyboardbutton
     telegram.inlinekeyboardmarkup
     telegram.inputfile

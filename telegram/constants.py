@@ -666,6 +666,20 @@ class ForumIconColor(IntEnum):
     """
 
 
+class GiveawayLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.Giveaway` and related classes.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_WINNERS = 100
+    """:obj:`int`: Maximum number of winners allowed for :class:`telegram.GiveawayWinners.winners`.
+    """
+
+
 class InlineKeyboardButtonLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.InlineKeyboardButton`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.

@@ -19,7 +19,6 @@
 """A library that provides a Python interface to the Telegram Bot API"""
 
 __author__ = "devs@python-telegram-bot.org"
-
 __all__ = (  # Keep this alphabetically ordered
     "__bot_api_version__",
     "__bot_api_version_info__",
@@ -80,6 +79,10 @@ __all__ = (  # Keep this alphabetically ordered
     "GameHighScore",
     "GeneralForumTopicHidden",
     "GeneralForumTopicUnhidden",
+    "Giveaway",
+    "GiveawayCreated",
+    "GiveawayCompleted",
+    "GiveawayWinners",
     "helpers",
     "IdDocumentData",
     "InlineKeyboardButton",
@@ -264,6 +267,7 @@ from ._forumtopic import (
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore
+from ._giveaway import Giveaway, GiveawayCompleted, GiveawayCreated, GiveawayWinners
 from ._inline.inlinekeyboardbutton import InlineKeyboardButton
 from ._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from ._inline.inlinequery import InlineQuery
