@@ -410,6 +410,9 @@ class TestRequestWithoutRequest:
             DEFAULT_NONE,
         )
 
+        print("warnings")
+        for entry in recwarn:
+            print(entry.message)
         if media:
             assert len(recwarn) == 1
             assert "will default to `BaseRequest.DEFAULT_NONE` instead of 20" in str(
@@ -435,7 +438,7 @@ class TestHTTPXRequestWithoutRequest:
         @dataclass
         class Client:
             timeout: object
-            proxies: object
+            proxy: object
             limits: object
             http1: object
             http2: object
@@ -445,7 +448,7 @@ class TestHTTPXRequestWithoutRequest:
 
         request = HTTPXRequest()
         assert request._client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
-        assert request._client.proxies is None
+        assert request._client.proxy is None
         assert request._client.limits == httpx.Limits(
             max_connections=1, max_keepalive_connections=1
         )
@@ -461,7 +464,7 @@ class TestHTTPXRequestWithoutRequest:
             "pool_timeout": 46,
         }
         request = HTTPXRequest(**kwargs)
-        assert request._client.proxies == "proxy"
+        assert request._client.proxy == "proxy"
         assert request._client.limits == httpx.Limits(
             max_connections=42, max_keepalive_connections=42
         )

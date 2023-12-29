@@ -167,7 +167,7 @@ class HTTPXRequest(BaseRequest):
         )
         self._client_kwargs = {
             "timeout": timeout,
-            "proxies": proxy,
+            "proxy": proxy,
             "limits": limits,
             "transport": transport,
             **http_kwargs,

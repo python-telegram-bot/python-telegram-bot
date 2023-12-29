@@ -120,7 +120,7 @@ class TestApplicationBuilder:
         @dataclass
         class Client:
             timeout: object
-            proxies: object
+            proxy: object
             limits: object
             http1: object
             http2: object
@@ -150,7 +150,7 @@ class TestApplicationBuilder:
         assert get_updates_client.limits == httpx.Limits(
             max_connections=1, max_keepalive_connections=1
         )
-        assert get_updates_client.proxies is None
+        assert get_updates_client.proxy is None
         assert get_updates_client.timeout == httpx.Timeout(
             connect=5.0, read=5.0, write=5.0, pool=1.0
         )
@@ -159,7 +159,7 @@ class TestApplicationBuilder:
 
         client = app.bot.request._client
         assert client.limits == httpx.Limits(max_connections=256, max_keepalive_connections=256)
-        assert client.proxies is None
+        assert client.proxy is None
         assert client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
         assert client.http1 is True
         assert not client.http2
@@ -378,7 +378,7 @@ class TestApplicationBuilder:
         @dataclass
         class Client:
             timeout: object
-            proxies: object
+            proxy: object
             limits: object
             http1: object
             http2: object
@@ -396,7 +396,7 @@ class TestApplicationBuilder:
 
         assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
         assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
-        assert client.proxies == "proxy"
+        assert client.proxy == "proxy"
         assert client.http1 is True
         assert client.http2 is False
 
@@ -414,7 +414,7 @@ class TestApplicationBuilder:
 
         assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
         assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
-        assert client.proxies == "get_updates_proxy"
+        assert client.proxy == "get_updates_proxy"
         assert client.http1 is True
         assert client.http2 is False
 
