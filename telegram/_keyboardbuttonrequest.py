@@ -115,6 +115,8 @@ class KeyboardButtonRequestUser(KeyboardButtonRequestUsers):
 
     """
 
+    __slots__ = ()
+
     def __init__(
         self,
         request_id: int,

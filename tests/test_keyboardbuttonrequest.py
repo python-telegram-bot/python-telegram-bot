@@ -93,6 +93,12 @@ class TestKeyboardButtonRequestUsersWithoutRequest(TestKeyboardButtonRequestUser
 
 
 class TestKeyboardButtonRequestUserWithoutRequest:
+    def test_slot_behaviour(self):
+        inst = KeyboardButtonRequestUser(1)
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
     def test_signature(self):
         assert inspect.signature(KeyboardButtonRequestUser) == inspect.signature(
             KeyboardButtonRequestUsers
