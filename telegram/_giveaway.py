@@ -36,7 +36,7 @@ class Giveaway(TelegramObject):
     """This object represents a message about a scheduled giveaway.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`chats`, :attr:`winner_selection_date` and
+    considered equal, if their :attr:`chats`, :attr:`winners_selection_date` and
     :attr:`winner_count` are equal.
 
     .. versionadded:: NEXT.VERSION

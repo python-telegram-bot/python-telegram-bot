@@ -351,19 +351,19 @@ class Message(TelegramObject):
             with the bot.
 
             .. versionadded:: 20.1
-        giveaway_created (:class:`telegram.GiveAwayCreated`, optional): Service message: a
+        giveaway_created (:class:`telegram.GiveawayCreated`, optional): Service message: a
             scheduled giveaway was created
 
             .. versionadded:: NEXT.VERSION
-        giveaway (:class:`telegram.GiveAway`, optional): The message is a scheduled giveaway
+        giveaway (:class:`telegram.Giveaway`, optional): The message is a scheduled giveaway
             message
 
             .. versionadded:: NEXT.VERSION
-        giveaway_winners (:class:`telegram.GiveAwayWinners`, optional): A giveaway with public
+        giveaway_winners (:class:`telegram.GiveawayWinners`, optional): A giveaway with public
             winners was completed
 
             .. versionadded:: NEXT.VERSION
-        giveaway_completed (:class:`telegram.GiveAwayCompleted`, optional): Service message: a
+        giveaway_completed (:class:`telegram.GiveawayCompleted`, optional): Service message: a
             giveaway without public winners was completed
 
             .. versionadded:: NEXT.VERSION
@@ -615,19 +615,19 @@ class Message(TelegramObject):
             with the bot.
 
             .. versionadded:: 20.1
-        giveaway_created (:class:`telegram.GiveAwayCreated`): Optional. Service message: a
+        giveaway_created (:class:`telegram.GiveawayCreated`): Optional. Service message: a
             scheduled giveaway was created
 
             .. versionadded:: NEXT.VERSION
-        giveaway (:class:`telegram.GiveAway`): Optional. The message is a scheduled giveaway
+        giveaway (:class:`telegram.Giveaway`): Optional. The message is a scheduled giveaway
             message
 
             .. versionadded:: NEXT.VERSION
-        giveaway_winners (:class:`telegram.GiveAwayWinners`): Optional. A giveaway with public
+        giveaway_winners (:class:`telegram.GiveawayWinners`): Optional. A giveaway with public
             winners was completed
 
             .. versionadded:: NEXT.VERSION
-        giveaway_completed (:class:`telegram.GiveAwayCompleted`): Optional. Service message: a
+        giveaway_completed (:class:`telegram.GiveawayCompleted`): Optional. Service message: a
             giveaway without public winners was completed
 
             .. versionadded:: NEXT.VERSION
