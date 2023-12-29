@@ -931,6 +931,46 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
 
     @_log
+    async def delete_messages(
+        self,
+        chat_id: Union[int, str],
+        message_ids: Sequence[int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Use this method to delete multiple messages simultaneously. If some of the specified
+        messages can't be found, they are skipped.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            message_ids (Sequence[:obj:`int`]): Identifiers of 1-100 messages to delete.
+                See :meth:`delete_message` for limitations on which messages can be deleted.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {"chat_id": chat_id, "message_ids": message_ids}
+        return await self._post(
+            "deleteMessages",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
     async def forward_message(
         self,
         chat_id: Union[int, str],
@@ -995,6 +1035,67 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
+
+    @_log
+    async def forward_messages(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple[MessageId, ...]:
+        """
+        Use this method to forward messages of any kind. If some of the specified messages can't be
+        found or forwarded, they are skipped. Service messages and messages with protected content
+        can't be forwarded. Album grouping is kept for forwarded messages.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
+                original message was sent (or channel username in the format ``@channelusername``).
+            message_ids (Sequence[:obj:`int`]): Identifiers of 1-100 messages in the chat
+                :paramref:`from_chat_id` to forward. The identifiers must be specified in a
+                strictly increasing order.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+        Returns:
+            Tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
+            is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "from_chat_id": from_chat_id,
+            "message_ids": message_ids,
+            "disable_notification": disable_notification,
+            "protect_content": protect_content,
+            "message_thread_id": message_thread_id,
+        }
+
+        result = await self._post(
+            "forwardMessages",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return MessageId.de_list(result, self)
 
     @_log
     async def send_photo(
@@ -6859,6 +6960,75 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
         return MessageId.de_json(result, self)  # type: ignore[return-value]
+
+    @_log
+    async def copy_messages(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        remove_caption: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple[MessageId, ...]:
+        """
+        Use this method to copy messages of any kind. If some of the specified messages can't be
+        found or copied, they are skipped. Service messages, giveaway messages, giveaway winners
+        messages, and invoice messages can't be copied. A quiz poll can be copied only if the value
+        of the field correct_option_id is known to the bot. The method is analogous to the method
+        :meth:`forward_messages`, but the copied messages don't have a link to the original
+        message. Album grouping is kept for copied messages.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
+                original message was sent (or channel username in the format ``@channelusername``).
+            message_ids (Sequence[:obj:`int`]): Identifiers of 1-100 messages in the chat
+                :paramref:`from_chat_id` to copy. The identifiers must be specified in a strictly
+                increasing order.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+            remove_caption (:obj:`bool`, optional): Pass :obj:`True` to copy the messages without
+                their captions.
+
+        Returns:
+            Tuple[:class:`telegram.MessageId`]: On success, returns a tuple of `MessageId` of the
+            sent messages.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "from_chat_id": from_chat_id,
+            "message_ids": message_ids,
+            "disable_notification": disable_notification,
+            "protect_content": protect_content,
+            "message_thread_id": message_thread_id,
+            "remove_caption": remove_caption,
+        }
+
+        result = await self._post(
+            "copyMessages",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return MessageId.de_list(result, self)
 
     @_log
     async def set_chat_menu_button(
