@@ -1,4 +1,4 @@
-# Make sure that the additional_dependencies here match requirements.txt
+# Make sure that the additional_dependencies here match requirements(-opts).txt
 
 ci:
     autofix_prs: false
