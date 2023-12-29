@@ -140,6 +140,8 @@ class KeyboardButtonRequestUser(KeyboardButtonRequestUsers):
             stacklevel=2,
         )
 
+        self._freeze()
+
 
 class KeyboardButtonRequestChat(TelegramObject):
     """This object defines the criteria used to request a suitable chat. The identifier of the
