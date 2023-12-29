@@ -8090,8 +8090,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`send_message`"""
     deleteMessage = delete_message
     """Alias for :meth:`delete_message`"""
+    deleteMessages = delete_messages
+    """Alias for :meth:`delete_messages`"""
     forwardMessage = forward_message
     """Alias for :meth:`forward_message`"""
+    forwardMessages = forward_messages
+    """Alias for :meth:`forward_messages`"""
     sendPhoto = send_photo
     """Alias for :meth:`send_photo`"""
     sendAudio = send_audio
@@ -8250,6 +8254,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`log_out`"""
     copyMessage = copy_message
     """Alias for :meth:`copy_message`"""
+    copyMessages = copy_messages
+    """Alias for :meth:`copy_messages`"""
     getChatMenuButton = get_chat_menu_button
     """Alias for :meth:`get_chat_menu_button`"""
     setChatMenuButton = set_chat_menu_button

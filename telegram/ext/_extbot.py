@@ -714,6 +714,39 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def copy_messages(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        remove_caption: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> MessageId:
+        # We override this method to call self._replace_keyboard
+        return await super().copy_messages(
+            chat_id=chat_id,
+            from_chat_id=from_chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            remove_caption=remove_caption,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def get_chat(
         self,
         chat_id: Union[str, int],
@@ -1188,6 +1221,28 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def delete_messages(
+        self,
+        chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().delete_messages(
+            chat_id=chat_id,
+            message_ids=message_ids,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def delete_my_commands(
         self,
         scope: Optional[BotCommandScope] = None,
@@ -1526,6 +1581,36 @@ class ExtBot(Bot, Generic[RLARGS]):
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_id=message_id,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def forward_messages(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Tuple[MessageId, ...]:
+        return await super().forward_messages(
+            chat_id=chat_id,
+            from_chat_id=from_chat_id,
+            message_ids=message_ids,
             disable_notification=disable_notification,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -3742,7 +3827,9 @@ class ExtBot(Bot, Generic[RLARGS]):
     getMe = get_me
     sendMessage = send_message
     deleteMessage = delete_message
+    deleteMessages = delete_messages
     forwardMessage = forward_message
+    forwardMessages = forward_messages
     sendPhoto = send_photo
     sendAudio = send_audio
     sendDocument = send_document
@@ -3822,6 +3909,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     deleteMyCommands = delete_my_commands
     logOut = log_out
     copyMessage = copy_message
+    copyMessages = copy_messages
     getChatMenuButton = get_chat_menu_button
     setChatMenuButton = set_chat_menu_button
     getMyDefaultAdministratorRights = get_my_default_administrator_rights

@@ -1362,6 +1362,70 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    async def delete_message(
+        self,
+        message_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.delete_message(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.delete_message`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return await self.get_bot().delete_message(
+            chat_id=self.id,
+            message_id=message_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_messages(
+        self,
+        message_ids: Sequence[int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.delete_messages(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.delete_messages`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return await self.get_bot().delete_messages(
+            chat_id=self.id,
+            message_ids=message_ids,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def send_media_group(
         self,
         media: Sequence[
@@ -2306,6 +2370,8 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
+        .. seealso:: :meth:`copy_message`, :meth:`send_copies`, :meth:`copy_messages`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -2356,6 +2422,8 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
+        .. seealso:: :meth:`send_copy`, :meth:`send_copies`, :meth:`copy_messages`.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -2380,6 +2448,92 @@ class Chat(TelegramObject):
             message_thread_id=message_thread_id,
         )
 
+    async def send_copies(
+        self,
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        remove_caption: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple["MessageId", ...]:
+        """Shortcut for::
+
+             await bot.copy_messages(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.copy_messages`.
+
+        .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`copy_messages`.
+
+        Returns:
+            Tuple[:class:`telegram.MessageId`]: On success, returns a tuple of `MessageId` of the
+            sent messages.
+
+        """
+        return await self.get_bot().copy_messages(
+            chat_id=self.id,
+            from_chat_id=from_chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            remove_caption=remove_caption,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def copy_messages(
+        self,
+        chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        remove_caption: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple["MessageId", ...]:
+        """Shortcut for::
+
+             await bot.copy_messages(from_chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.copy_messages`.
+
+        .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`send_copies`.
+
+        Returns:
+            Tuple[:class:`telegram.MessageId`]: On success, returns a tuple of `MessageId` of the
+            sent messages.
+
+        """
+        return await self.get_bot().copy_messages(
+            from_chat_id=self.id,
+            chat_id=chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            remove_caption=remove_caption,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def forward_from(
         self,
         from_chat_id: Union[str, int],
@@ -2400,7 +2554,7 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
-        .. seealso:: :meth:`forward_to`
+        .. seealso:: :meth:`forward_to`, :meth:`forwards_from`, :meth:`forwards_to`
 
         .. versionadded:: 20.0
 
@@ -2442,7 +2596,7 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
-        .. seealso:: :meth:`forward_from`
+        .. seealso:: :meth:`forward_from`, :meth:`forwards_from`, :meth:`forwards_to`
 
         .. versionadded:: 20.0
 
@@ -2462,6 +2616,92 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+        )
+
+    async def forwards_from(
+        self,
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple["MessageId", ...]:
+        """Shortcut for::
+
+             await bot.forward_messages(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.forward_messages`.
+
+        .. seealso:: :meth:`forward_to`, :meth:`forward_from`, :meth:`forwards_to`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            Tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
+            is returned.
+
+        """
+        return await self.get_bot().forward_messages(
+            chat_id=self.id,
+            from_chat_id=from_chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def forwards_to(
+        self,
+        chat_id: Union[int, str],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple["MessageId", ...]:
+        """Shortcut for::
+
+             await bot.forward_messages(from_chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.forward_messages`.
+
+        .. seealso:: :meth:`forward_from`, :meth:`forward_to`, :meth:`forwards_from`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            Tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
+            is returned.
+
+        """
+        return await self.get_bot().forward_messages(
+            from_chat_id=self.id,
+            chat_id=chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def export_invite_link(
