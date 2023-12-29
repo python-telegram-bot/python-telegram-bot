@@ -31,6 +31,10 @@ from telegram import (
     Dice,
     Document,
     Game,
+    Giveaway,
+    GiveawayCompleted,
+    GiveawayCreated,
+    GiveawayWinners,
     Invoice,
     Location,
     Message,
@@ -66,6 +70,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.build_messages import make_message
 from tests.auxil.slots import mro_slots
 
 
@@ -214,6 +219,30 @@ def message(bot):
         {"message_thread_id": 123},
         {"user_shared": UserShared(1, 2)},
         {"chat_shared": ChatShared(3, 4)},
+        {
+            "giveaway": Giveaway(
+                chats=[Chat(1, Chat.SUPERGROUP)],
+                winners_selection_date=datetime.utcnow().replace(microsecond=0),
+                winner_count=5,
+            )
+        },
+        {"giveaway_created": GiveawayCreated()},
+        {
+            "giveaway_winners": GiveawayWinners(
+                chat=Chat(1, Chat.CHANNEL),
+                giveaway_message_id=123456789,
+                winners_selection_date=datetime.utcnow().replace(microsecond=0),
+                winner_count=42,
+                winners=[User(1, "user1", False), User(2, "user2", False)],
+            )
+        },
+        {
+            "giveaway_completed": GiveawayCompleted(
+                winner_count=42,
+                unclaimed_prize_count=4,
+                giveaway_message=make_message(text="giveaway_message"),
+            )
+        },
     ],
     ids=[
         "forwarded_user",
@@ -271,6 +300,10 @@ def message(bot):
         "message_thread_id",
         "user_shared",
         "chat_shared",
+        "giveaway",
+        "giveaway_created",
+        "giveaway_winners",
+        "giveaway_completed",
     ],
 )
 def message_params(bot, request):

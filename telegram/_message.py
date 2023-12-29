@@ -82,6 +82,10 @@ if TYPE_CHECKING:
     from telegram import (
         Bot,
         GameHighScore,
+        Giveaway,
+        GiveawayCompleted,
+        GiveawayCreated,
+        GiveawayWinners,
         InputMedia,
         InputMediaAudio,
         InputMediaDocument,
@@ -347,6 +351,23 @@ class Message(TelegramObject):
             with the bot.
 
             .. versionadded:: 20.1
+        giveaway_created (:class:`telegram.GiveAwayCreated`, optional): Service message: a
+            scheduled giveaway was created
+
+            .. versionadded:: NEXT.VERSION
+        giveaway (:class:`telegram.GiveAway`, optional): The message is a scheduled giveaway
+            message
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_winners (:class:`telegram.GiveAwayWinners`, optional): A giveaway with public
+            winners was completed
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_completed (:class:`telegram.GiveAwayCompleted`, optional): Service message: a
+            giveaway without public winners was completed
+
+            .. versionadded:: NEXT.VERSION
+
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -594,6 +615,22 @@ class Message(TelegramObject):
             with the bot.
 
             .. versionadded:: 20.1
+        giveaway_created (:class:`telegram.GiveAwayCreated`): Optional. Service message: a
+            scheduled giveaway was created
+
+            .. versionadded:: NEXT.VERSION
+        giveaway (:class:`telegram.GiveAway`): Optional. The message is a scheduled giveaway
+            message
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_winners (:class:`telegram.GiveAwayWinners`): Optional. A giveaway with public
+            winners was completed
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_completed (:class:`telegram.GiveAwayCompleted`): Optional. Service message: a
+            giveaway without public winners was completed
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
         function. Instead, the supplied replacement for the emoji will be used.
@@ -605,79 +642,83 @@ class Message(TelegramObject):
 
     # fmt: on
     __slots__ = (
-        "reply_markup",
-        "audio",
-        "contact",
-        "migrate_to_chat_id",
-        "forward_signature",
-        "chat",
-        "successful_payment",
-        "game",
-        "text",
-        "forward_sender_name",
-        "document",
-        "new_chat_title",
-        "forward_date",
-        "group_chat_created",
-        "media_group_id",
-        "caption",
-        "video",
-        "entities",
-        "via_bot",
-        "new_chat_members",
-        "connected_website",
-        "animation",
-        "migrate_from_chat_id",
-        "forward_from",
-        "sticker",
-        "location",
-        "venue",
-        "edit_date",
-        "reply_to_message",
-        "passport_data",
-        "pinned_message",
-        "forward_from_chat",
-        "new_chat_photo",
-        "message_id",
-        "delete_chat_photo",
-        "from_user",
-        "author_signature",
-        "proximity_alert_triggered",
-        "sender_chat",
-        "dice",
-        "forward_from_message_id",
-        "caption_entities",
-        "voice",
-        "date",
-        "supergroup_chat_created",
-        "poll",
-        "left_chat_member",
-        "photo",
-        "channel_chat_created",
-        "invoice",
-        "video_note",
         "_effective_attachment",
-        "message_auto_delete_timer_changed",
-        "video_chat_ended",
-        "video_chat_participants_invited",
-        "video_chat_started",
-        "video_chat_scheduled",
-        "is_automatic_forward",
-        "has_protected_content",
-        "web_app_data",
-        "is_topic_message",
-        "message_thread_id",
-        "forum_topic_created",
+        "animation",
+        "audio",
+        "author_signature",
+        "caption",
+        "caption_entities",
+        "channel_chat_created",
+        "chat",
+        "chat_shared",
+        "connected_website",
+        "contact",
+        "date",
+        "delete_chat_photo",
+        "dice",
+        "document",
+        "edit_date",
+        "entities",
         "forum_topic_closed",
-        "forum_topic_reopened",
+        "forum_topic_created",
         "forum_topic_edited",
+        "forum_topic_reopened",
+        "forward_date",
+        "forward_from",
+        "forward_from_chat",
+        "forward_from_message_id",
+        "forward_sender_name",
+        "forward_signature",
+        "from_user",
+        "game",
         "general_forum_topic_hidden",
         "general_forum_topic_unhidden",
-        "write_access_allowed",
+        "giveaway",
+        "giveaway_completed",
+        "giveaway_created",
+        "giveaway_winners",
+        "group_chat_created",
         "has_media_spoiler",
-        "user_shared",
-        "chat_shared",
+        "has_protected_content",
+        "invoice",
+        "is_automatic_forward",
+        "is_topic_message",
+        "left_chat_member",
+        "location",
+        "media_group_id",
+        "message_auto_delete_timer_changed",
+        "message_id",
+        "message_thread_id",
+        "migrate_from_chat_id",
+        "migrate_to_chat_id",
+        "new_chat_members",
+        "new_chat_photo",
+        "new_chat_title",
+        "passport_data",
+        "photo",
+        "pinned_message",
+        "poll",
+        "proximity_alert_triggered",
+        "reply_markup",
+        "reply_to_message",
+        "sender_chat",
+        "sticker",
         "story",
+        "successful_payment",
+        "supergroup_chat_created",
+        "text",
+        "user_shared",
+        "venue",
+        "via_bot",
+        "video",
+        "video_chat_ended",
+        "video_chat_participants_invited",
+        "video_chat_scheduled",
+        "video_chat_started",
+        "video_note",
+        "voice",
+        "web_app_data",
+        "write_access_allowed",
     )
 
     def __init__(
@@ -754,6 +795,10 @@ class Message(TelegramObject):
         user_shared: Optional[UserShared] = None,
         chat_shared: Optional[ChatShared] = None,
         story: Optional[Story] = None,
+        giveaway: Optional["Giveaway"] = None,
+        giveaway_completed: Optional["GiveawayCompleted"] = None,
+        giveaway_created: Optional["GiveawayCreated"] = None,
+        giveaway_winners: Optional["GiveawayWinners"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -843,6 +888,10 @@ class Message(TelegramObject):
         self.user_shared: Optional[UserShared] = user_shared
         self.chat_shared: Optional[ChatShared] = chat_shared
         self.story: Optional[Story] = story
+        self.giveaway: Optional[Giveaway] = giveaway
+        self.giveaway_completed: Optional[GiveawayCompleted] = giveaway_completed
+        self.giveaway_created: Optional[GiveawayCreated] = giveaway_created
+        self.giveaway_winners: Optional[GiveawayWinners] = giveaway_winners
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -964,6 +1013,19 @@ class Message(TelegramObject):
         )
         data["user_shared"] = UserShared.de_json(data.get("user_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
+
+        # Unfortunately, this needs to be here due to cyclic imports
+        from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
+            Giveaway,
+            GiveawayCompleted,
+            GiveawayCreated,
+            GiveawayWinners,
+        )
+
+        data["giveaway"] = Giveaway.de_json(data.get("giveaway"), bot)
+        data["giveaway_completed"] = GiveawayCompleted.de_json(data.get("giveaway_completed"), bot)
+        data["giveaway_created"] = GiveawayCreated.de_json(data.get("giveaway_created"), bot)
+        data["giveaway_winners"] = GiveawayWinners.de_json(data.get("giveaway_winners"), bot)
 
         return super().de_json(data=data, bot=bot)
 

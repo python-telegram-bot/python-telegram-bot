@@ -1201,8 +1201,7 @@ class MessageLimit(IntEnum):
 
 
 class MessageType(StringEnum):
-    """This enum contains the available types of :class:`telegram.Message` that can be seen
-    as attachment. The enum
+    """This enum contains the available types of :class:`telegram.Message`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
     .. versionadded:: 20.0
@@ -1287,6 +1286,14 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_ended`."""
     VIDEO_CHAT_PARTICIPANTS_INVITED = "video_chat_participants_invited"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_participants_invited`."""
+    GIVEAWAY = "giveaway"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`."""
+    GIVEAWAY_CREATED = "giveaway_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_created`."""
+    GIVEAWAY_WINNERS = "giveaway_winners"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_winners`."""
+    GIVEAWAY_COMPLETED = "giveaway_completed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_completed`."""
 
 
 class PollingLimit(IntEnum):
