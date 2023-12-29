@@ -54,6 +54,7 @@ __all__ = [
     "FloodLimit",
     "ForumIconColor",
     "ForumTopicLimit",
+    "GiveawayLimit",
     "InlineKeyboardButtonLimit",
     "InlineKeyboardMarkupLimit",
     "InlineQueryLimit",
