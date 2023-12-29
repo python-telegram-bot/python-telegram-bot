@@ -58,6 +58,8 @@ __all__ = (
     "FORWARDED",
     "ForwardedFrom",
     "GAME",
+    "GIVEAWAY",
+    "GIVEAWAY_WINNERS",
     "HAS_MEDIA_SPOILER",
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
@@ -1446,6 +1448,28 @@ GAME = _Game(name="filters.GAME")
 """Messages that contain :attr:`telegram.Message.game`."""
 
 
+class _Giveaway(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.giveaway)
+
+
+GIVEAWAY = _Giveaway(name="filters.GIVEAWAY")
+"""Messages that contain :attr:`telegram.Message.giveaway`."""
+
+
+class _GiveawayWinners(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.giveaway_winners)
+
+
+GIVEAWAY_WINNERS = _GiveawayWinners(name="filters.GIVEAWAY_WINNERS")
+"""Messages that contain :attr:`telegram.Message.giveaway_winners`."""
+
+
 class _HasMediaSpoiler(MessageFilter):
     __slots__ = ()
 
@@ -1869,6 +1893,8 @@ class StatusUpdate:
                 or StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
                 or StatusUpdate.USER_SHARED.check_update(update)
                 or StatusUpdate.CHAT_SHARED.check_update(update)
+                or StatusUpdate.GIVEAWAY_CREATED.check_update(update)
+                or StatusUpdate.GIVEAWAY_COMPLETED.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -1993,6 +2019,29 @@ class StatusUpdate:
     """Messages that contain :attr:`telegram.Message.general_forum_topic_unhidden`.
 
     .. versionadded:: 20.0
+    """
+
+    class _GiveawayCreated(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.giveaway_created)
+
+    GIVEAWAY_CREATED = _GiveawayCreated(name="filters.StatusUpdate.GIVEAWAY_CREATED")
+    """Messages that contain :attr:`telegram.Message.giveaway_created`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _GiveawayCompleted(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.giveaway_completed)
+
+    GIVEAWAY_COMPLETED = _GiveawayCompleted(name="filters.StatusUpdate.GIVEAWAY_COMPLETED")
+    """Messages that contain :attr:`telegram.Message.giveaway_completed`.
+    .. versionadded:: NEXT.VERSION
     """
 
     class _LeftChatMember(MessageFilter):

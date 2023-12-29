@@ -1064,6 +1064,16 @@ class TestFilters:
         assert filters.StatusUpdate.CHAT_SHARED.check_update(update)
         update.message.chat_shared = None
 
+        update.message.giveaway_created = "giveaway_created"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GIVEAWAY_CREATED.check_update(update)
+        update.message.giveaway_created = None
+
+        update.message.giveaway_completed = "giveaway_completed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GIVEAWAY_COMPLETED.check_update(update)
+        update.message.giveaway_completed = None
+
     def test_filters_forwarded(self, update):
         assert not filters.FORWARDED.check_update(update)
         update.message.forward_date = datetime.datetime.utcnow()
@@ -2485,3 +2495,17 @@ class TestFilters:
         assert not filters.Mention(
             ["@test3", 123, user_no_username, user_wrong_username]
         ).check_update(update)
+
+    def test_filters_giveaway(self, update):
+        assert not filters.GIVEAWAY.check_update(update)
+
+        update.message.giveaway = "test"
+        assert filters.GIVEAWAY.check_update(update)
+        assert str(filters.GIVEAWAY) == "filters.GIVEAWAY"
+
+    def test_filters_giveaway_winners(self, update):
+        assert not filters.GIVEAWAY_WINNERS.check_update(update)
+
+        update.message.giveaway_winners = "test"
+        assert filters.GIVEAWAY_WINNERS.check_update(update)
+        assert str(filters.GIVEAWAY_WINNERS) == "filters.GIVEAWAY_WINNERS"
