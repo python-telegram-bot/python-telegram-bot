@@ -131,6 +131,7 @@ __all__ = (  # Keep this alphabetically ordered
     "KeyboardButtonRequestUser",
     "KeyboardButtonRequestUsers",
     "LabeledPrice",
+    "LinkPreviewOptions",
     "Location",
     "LoginUrl",
     "MaskPosition",
@@ -307,6 +308,7 @@ from ._keyboardbuttonrequest import (
     KeyboardButtonRequestUser,
     KeyboardButtonRequestUsers,
 )
+from ._linkpreviewoptions import LinkPreviewOptions
 from ._loginurl import LoginUrl
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._message import Message
