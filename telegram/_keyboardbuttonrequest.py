@@ -45,7 +45,7 @@ class KeyboardButtonRequestUsers(TelegramObject):
 
     Args:
         request_id (:obj:`int`): Signed 32-bit identifier of the request, which will be received
-            back in the :class:`telegram.UserShared` object. Must be unique within the message.
+            back in the :class:`telegram.UsersShared` object. Must be unique within the message.
         user_is_bot (:obj:`bool`, optional): Pass :obj:`True` to request a bot, pass :obj:`False`
             to request a regular user. If not specified, no additional restrictions are applied.
         user_is_premium (:obj:`bool`, optional): Pass :obj:`True` to request a premium user, pass

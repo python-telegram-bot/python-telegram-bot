@@ -91,6 +91,7 @@ Available Types
     telegram.user
     telegram.userprofilephotos
     telegram.usershared
+    telegram.usersshared
     telegram.venue
     telegram.video
     telegram.videochatended

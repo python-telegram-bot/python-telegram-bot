@@ -53,7 +53,7 @@ from telegram._payment.invoice import Invoice
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
-from telegram._shared import ChatShared, UserShared
+from telegram._shared import ChatShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -350,7 +350,7 @@ class Message(TelegramObject):
             by a spoiler animation.
 
             .. versionadded:: 20.0
-        user_shared (:class:`telegram.UserShared`, optional): Service message: a user was shared
+        user_shared (:class:`telegram.UsersShared`, optional): Service message: a user was shared
             with the bot.
 
             .. versionadded:: 20.1
@@ -620,7 +620,7 @@ class Message(TelegramObject):
             by a spoiler animation.
 
             .. versionadded:: 20.0
-        user_shared (:class:`telegram.UserShared`): Optional. Service message: a user was shared
+        user_shared (:class:`telegram.UsersShared`): Optional. Service message: a user was shared
             with the bot.
 
             .. versionadded:: 20.1
@@ -806,7 +806,7 @@ class Message(TelegramObject):
         general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = None,
         write_access_allowed: Optional[WriteAccessAllowed] = None,
         has_media_spoiler: Optional[bool] = None,
-        user_shared: Optional[UserShared] = None,
+        user_shared: Optional[UsersShared] = None,
         chat_shared: Optional[ChatShared] = None,
         story: Optional[Story] = None,
         giveaway: Optional["Giveaway"] = None,
@@ -900,7 +900,7 @@ class Message(TelegramObject):
         ] = general_forum_topic_unhidden
         self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
         self.has_media_spoiler: Optional[bool] = has_media_spoiler
-        self.user_shared: Optional[UserShared] = user_shared
+        self.user_shared: Optional[UsersShared] = user_shared
         self.chat_shared: Optional[ChatShared] = chat_shared
         self.story: Optional[Story] = story
         self.giveaway: Optional[Giveaway] = giveaway
@@ -1027,7 +1027,7 @@ class Message(TelegramObject):
         data["write_access_allowed"] = WriteAccessAllowed.de_json(
             data.get("write_access_allowed"), bot
         )
-        data["user_shared"] = UserShared.de_json(data.get("user_shared"), bot)
+        data["user_shared"] = UsersShared.de_json(data.get("user_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
 
         # Unfortunately, this needs to be here due to cyclic imports
