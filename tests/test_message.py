@@ -36,6 +36,7 @@ from telegram import (
     GiveawayCreated,
     GiveawayWinners,
     Invoice,
+    LinkPreviewOptions,
     Location,
     Message,
     MessageAutoDeleteTimerChanged,
@@ -243,6 +244,15 @@ def message(bot):
                 giveaway_message=make_message(text="giveaway_message"),
             )
         },
+        {
+            "link_preview_options": LinkPreviewOptions(
+                is_disabled=True,
+                url="https://python-telegram-bot.org",
+                prefer_small_media=True,
+                prefer_large_media=True,
+                show_above_text=True,
+            )
+        },
     ],
     ids=[
         "forwarded_user",
@@ -304,6 +314,7 @@ def message(bot):
         "giveaway_created",
         "giveaway_winners",
         "giveaway_completed",
+        "link_preview_options",
     ],
 )
 def message_params(bot, request):

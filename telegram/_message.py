@@ -45,6 +45,7 @@ from telegram._forumtopic import (
 )
 from telegram._games.game import Game
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._passport.passportdata import PassportData
@@ -177,6 +178,12 @@ class Message(TelegramObject):
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|
+
+        link_preview_options (:obj:`telegram.LinkPreviewOptions`, optional): Options used for link
+            preview generation for the message, if it is a text message and link preview options
+            were changed.
+
+            .. versionadded:: NEXT.VERSION
 
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -424,6 +431,12 @@ class Message(TelegramObject):
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
+
+        link_preview_options (:obj:`telegram.LinkPreviewOptions`): Optional. Options used for link
+            preview generation for the message, if it is a text message and link preview options
+            were changed.
+
+            .. versionadded:: NEXT.VERSION
 
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -684,6 +697,7 @@ class Message(TelegramObject):
         "is_automatic_forward",
         "is_topic_message",
         "left_chat_member",
+        "link_preview_options",
         "location",
         "media_group_id",
         "message_auto_delete_timer_changed",
@@ -799,6 +813,7 @@ class Message(TelegramObject):
         giveaway_completed: Optional["GiveawayCompleted"] = None,
         giveaway_created: Optional["GiveawayCreated"] = None,
         giveaway_winners: Optional["GiveawayWinners"] = None,
+        link_preview_options: Optional[LinkPreviewOptions] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -892,6 +907,7 @@ class Message(TelegramObject):
         self.giveaway_completed: Optional[GiveawayCompleted] = giveaway_completed
         self.giveaway_created: Optional[GiveawayCreated] = giveaway_created
         self.giveaway_winners: Optional[GiveawayWinners] = giveaway_winners
+        self.link_preview_options: Optional[LinkPreviewOptions] = link_preview_options
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -1026,6 +1042,9 @@ class Message(TelegramObject):
         data["giveaway_completed"] = GiveawayCompleted.de_json(data.get("giveaway_completed"), bot)
         data["giveaway_created"] = GiveawayCreated.de_json(data.get("giveaway_created"), bot)
         data["giveaway_winners"] = GiveawayWinners.de_json(data.get("giveaway_winners"), bot)
+        data["link_preview_options"] = LinkPreviewOptions.de_json(
+            data.get("link_preview_options"), bot
+        )
 
         return super().de_json(data=data, bot=bot)
 
