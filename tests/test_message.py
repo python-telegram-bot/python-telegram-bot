@@ -52,6 +52,7 @@ from telegram import (
     Update,
     User,
     UserShared,
+    UsersShared,
     Venue,
     Video,
     VideoChatEnded,
@@ -65,6 +66,7 @@ from telegram import (
 from telegram._utils.datetime import UTC
 from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
+from telegram.warnings import PTBDeprecationWarning
 from tests._passport.test_passport import RAW_PASSPORT_DATA
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
@@ -219,6 +221,7 @@ def message(bot):
         {"web_app_data": WebAppData("some_data", "some_button_text")},
         {"message_thread_id": 123},
         {"user_shared": UserShared(1, 2)},
+        {"users_shared": UsersShared(1, [2, 3])},
         {"chat_shared": ChatShared(3, 4)},
         {
             "giveaway": Giveaway(
@@ -309,6 +312,7 @@ def message(bot):
         "web_app_data",
         "message_thread_id",
         "user_shared",
+        "users_shared",
         "chat_shared",
         "giveaway",
         "giveaway_created",
@@ -474,6 +478,18 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         assert a != e
         assert hash(a) != hash(e)
+
+    def test_user_shared_init_deprecation(self, message):
+        with pytest.warns(PTBDeprecationWarning, match="`user_shared` is deprecated") as record:
+            Message(message_id=1, date=self.date, chat=self.chat, user_shared=1)
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_user_shared_property_deprecation(self, message):
+        with pytest.warns(PTBDeprecationWarning, match="`user_shared` is deprecated") as record:
+            message.user_shared
+
+        assert record[0].filename == __file__, "wrong stacklevel"
 
     async def test_parse_entity(self):
         text = (

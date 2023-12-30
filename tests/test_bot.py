@@ -88,14 +88,7 @@ from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
-
-
-def to_camel_case(snake_str):
-    """https://stackoverflow.com/a/19053800"""
-    components = snake_str.split("_")
-    # We capitalize the first letter of each component except the first one
-    # with the 'title' method and join them together.
-    return components[0] + "".join(x.title() for x in components[1:])
+from tests.auxil.string_manipulation import to_camel_case
 
 
 @pytest.fixture()

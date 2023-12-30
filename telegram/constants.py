@@ -1235,72 +1235,126 @@ class MessageType(StringEnum):
     # Make sure that all attachment type constants are also listed in the
     # MessageAttachmentType Enum! (Enums are not extendable)
 
-    # -------------------------------------------------- Attachment types
     ANIMATION = "animation"
     """:obj:`str`: Messages with :attr:`telegram.Message.animation`."""
     AUDIO = "audio"
     """:obj:`str`: Messages with :attr:`telegram.Message.audio`."""
+    CHANNEL_CHAT_CREATED = "channel_chat_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
+    CHAT_SHARED = "chat_shared"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    CONNECTED_WEBSITE = "connected_website"
+    """:obj:`str`: Messages with :attr:`telegram.Message.connected_website`."""
     CONTACT = "contact"
     """:obj:`str`: Messages with :attr:`telegram.Message.contact`."""
+    DELETE_CHAT_PHOTO = "delete_chat_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.delete_chat_photo`."""
     DICE = "dice"
     """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
     DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
+    FORUM_TOPIC_CREATED = "forum_topic_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_created`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    FORUM_TOPIC_CLOSED = "forum_topic_closed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_closed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    FORUM_TOPIC_EDITED = "forum_topic_edited"
+    """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_edited`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    FORUM_TOPIC_REOPENED = "forum_topic_reopened"
+    """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_reopened`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     GAME = "game"
     """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
-    INVOICE = "invoice"
-    """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
-    LOCATION = "location"
-    """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
-    PASSPORT_DATA = "passport_data"
-    """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
-    PHOTO = "photo"
-    """:obj:`str`: Messages with :attr:`telegram.Message.photo`."""
-    POLL = "poll"
-    """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
-    STICKER = "sticker"
-    """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
-    STORY = "story"
-    """:obj:`str`: Messages with :attr:`telegram.Message.story`."""
-    SUCCESSFUL_PAYMENT = "successful_payment"
-    """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
-    VIDEO = "video"
-    """:obj:`str`: Messages with :attr:`telegram.Message.video`."""
-    VIDEO_NOTE = "video_note"
-    """:obj:`str`: Messages with :attr:`telegram.Message.video_note`."""
-    VOICE = "voice"
-    """:obj:`str`: Messages with :attr:`telegram.Message.voice`."""
-    VENUE = "venue"
-    """:obj:`str`: Messages with :attr:`telegram.Message.venue`."""
-    # -------------------------------------------------- Other types
-    TEXT = "text"
-    """:obj:`str`: Messages with :attr:`telegram.Message.text`."""
-    NEW_CHAT_MEMBERS = "new_chat_members"
-    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_members`."""
-    LEFT_CHAT_MEMBER = "left_chat_member"
-    """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
-    NEW_CHAT_TITLE = "new_chat_title"
-    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_title`."""
-    NEW_CHAT_PHOTO = "new_chat_photo"
-    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_photo`."""
-    DELETE_CHAT_PHOTO = "delete_chat_photo"
-    """:obj:`str`: Messages with :attr:`telegram.Message.delete_chat_photo`."""
+    GENERAL_FORUM_TOPIC_HIDDEN = "general_forum_topic_hidden"
+    """:obj:`str`: Messages with :attr:`telegram.Message.general_forum_topic_hidden`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    GENERAL_FORUM_TOPIC_UNHIDDEN = "general_forum_topic_unhidden"
+    """:obj:`str`: Messages with :attr:`telegram.Message.general_forum_topic_unhidden`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    GIVEAWAY = "giveaway"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    GIVEAWAY_CREATED = "giveaway_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_created`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    GIVEAWAY_WINNERS = "giveaway_winners"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_winners`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    GIVEAWAY_COMPLETED = "giveaway_completed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_completed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     GROUP_CHAT_CREATED = "group_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.group_chat_created`."""
-    SUPERGROUP_CHAT_CREATED = "supergroup_chat_created"
-    """:obj:`str`: Messages with :attr:`telegram.Message.supergroup_chat_created`."""
-    CHANNEL_CHAT_CREATED = "channel_chat_created"
-    """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
+    INVOICE = "invoice"
+    """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
+    LEFT_CHAT_MEMBER = "left_chat_member"
+    """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
+    LOCATION = "location"
+    """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     MESSAGE_AUTO_DELETE_TIMER_CHANGED = "message_auto_delete_timer_changed"
     """:obj:`str`: Messages with :attr:`telegram.Message.message_auto_delete_timer_changed`."""
     MIGRATE_TO_CHAT_ID = "migrate_to_chat_id"
     """:obj:`str`: Messages with :attr:`telegram.Message.migrate_to_chat_id`."""
-    MIGRATE_FROM_CHAT_ID = "migrate_from_chat_id"
-    """:obj:`str`: Messages with :attr:`telegram.Message.migrate_from_chat_id`."""
+    NEW_CHAT_MEMBERS = "new_chat_members"
+    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_members`."""
+    NEW_CHAT_TITLE = "new_chat_title"
+    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_title`."""
+    NEW_CHAT_PHOTO = "new_chat_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_photo`."""
+    PASSPORT_DATA = "passport_data"
+    """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
+    PHOTO = "photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.photo`."""
     PINNED_MESSAGE = "pinned_message"
     """:obj:`str`: Messages with :attr:`telegram.Message.pinned_message`."""
+    POLL = "poll"
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
     PROXIMITY_ALERT_TRIGGERED = "proximity_alert_triggered"
     """:obj:`str`: Messages with :attr:`telegram.Message.proximity_alert_triggered`."""
+    STICKER = "sticker"
+    """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
+    STORY = "story"
+    """:obj:`str`: Messages with :attr:`telegram.Message.story`."""
+    SUPERGROUP_CHAT_CREATED = "supergroup_chat_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.supergroup_chat_created`."""
+    SUCCESSFUL_PAYMENT = "successful_payment"
+    """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
+    TEXT = "text"
+    """:obj:`str`: Messages with :attr:`telegram.Message.text`."""
+    USERS_SHARED = "users_shared"
+    """:obj:`str`: Messages with :attr:`telegram.Message.users_shared`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    VENUE = "venue"
+    """:obj:`str`: Messages with :attr:`telegram.Message.venue`."""
+    VIDEO = "video"
+    """:obj:`str`: Messages with :attr:`telegram.Message.video`."""
     VIDEO_CHAT_SCHEDULED = "video_chat_scheduled"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_scheduled`."""
     VIDEO_CHAT_STARTED = "video_chat_started"
@@ -1309,14 +1363,20 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_ended`."""
     VIDEO_CHAT_PARTICIPANTS_INVITED = "video_chat_participants_invited"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_participants_invited`."""
-    GIVEAWAY = "giveaway"
-    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`."""
-    GIVEAWAY_CREATED = "giveaway_created"
-    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_created`."""
-    GIVEAWAY_WINNERS = "giveaway_winners"
-    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_winners`."""
-    GIVEAWAY_COMPLETED = "giveaway_completed"
-    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_completed`."""
+    VIDEO_NOTE = "video_note"
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_note`."""
+    VOICE = "voice"
+    """:obj:`str`: Messages with :attr:`telegram.Message.voice`."""
+    WEB_APP_DATA = "web_app_data"
+    """:obj:`str`: Messages with :attr:`telegram.Message.web_app_data`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    WRITE_ACCESS_ALLOWED = "write_access_allowed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.write_access_allowed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class PollingLimit(IntEnum):

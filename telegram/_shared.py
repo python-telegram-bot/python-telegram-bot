@@ -31,7 +31,7 @@ class UsersShared(TelegramObject):
     using a :class:`telegram.KeyboardButtonRequestUsers` button.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`request_id` and :attr:`user_id` are equal.
+    considered equal, if their :attr:`request_id` and :attr:`user_ids` are equal.
 
     .. versionadded:: NEXT.VERSION
        Bot API 7.0 replaces :class:`UserShared` with this class. The only difference is that now
@@ -105,10 +105,10 @@ class UserShared(UsersShared):
 
     @property
     def user_id(self) -> int:
-        """Alias for the first entry of :attr:`user_ids`.
+        """Alias for the first entry of :attr:`UsersShared.user_ids`.
 
         .. deprecated:: NEXT.VERSION
-           Bot API 7.0 deprecates this attribute in favor of :attr:`user_ids`.
+           Bot API 7.0 deprecates this attribute in favor of :attr:`UsersShared.user_ids`.
         """
 
         warn(
