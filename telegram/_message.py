@@ -181,9 +181,9 @@ class Message(TelegramObject):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        link_preview_options (:obj:`telegram.LinkPreviewOptions`, optional): Options used for link
-            preview generation for the message, if it is a text message and link preview options
-            were changed.
+        link_preview_options (:class:`telegram.LinkPreviewOptions`, optional): Options used for
+            link preview generation for the message, if it is a text message and link preview
+            options were changed.
 
             .. versionadded:: NEXT.VERSION
 
@@ -440,9 +440,9 @@ class Message(TelegramObject):
             .. versionchanged:: 20.0
                 |tupleclassattrs|
 
-        link_preview_options (:obj:`telegram.LinkPreviewOptions`): Optional. Options used for link
-            preview generation for the message, if it is a text message and link preview options
-            were changed.
+        link_preview_options (:class:`telegram.LinkPreviewOptions`): Optional. Options used for
+            link preview generation for the message, if it is a text message and link preview
+            options were changed.
 
             .. versionadded:: NEXT.VERSION
 
@@ -936,7 +936,7 @@ class Message(TelegramObject):
 
     @property
     def user_shared(self) -> Optional[UsersShared]:
-        """:class:`telegram.UsersShared`: Optional. Service message: a user was shared with the
+        """:class:`telegram.UsersShared`: Optional. Service message. A user was shared with the
         bot.
 
         Hint:

@@ -66,6 +66,7 @@ Available Types
     telegram.keyboardbuttonrequestchat
     telegram.keyboardbuttonrequestuser
     telegram.keyboardbuttonrequestusers
+    telegram.linkpreviewoptions
     telegram.location
     telegram.loginurl
     telegram.menubutton
