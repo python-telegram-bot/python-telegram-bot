@@ -730,7 +730,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
         rate_limit_args: Optional[RLARGS] = None,
-    ) -> MessageId:
+    ) -> Tuple["MessageId", ...]:
         # We override this method to call self._replace_keyboard
         return await super().copy_messages(
             chat_id=chat_id,
