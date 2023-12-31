@@ -86,11 +86,11 @@ class LinkPreviewOptions(TelegramObject):
 
         # Optionals
 
-        self.is_disabled = is_disabled
-        self.url = url
-        self.prefer_small_media = prefer_small_media
-        self.prefer_large_media = prefer_large_media
-        self.show_above_text = show_above_text
+        self.is_disabled: Optional[bool] = is_disabled
+        self.url: Optional[str] = url
+        self.prefer_small_media: Optional[bool] = prefer_small_media
+        self.prefer_large_media: Optional[bool] = prefer_large_media
+        self.show_above_text: Optional[bool] = show_above_text
 
         self._id_attrs = (
             self.is_disabled,
