@@ -161,6 +161,29 @@ class Chat(TelegramObject):
             only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        accent_color_id (:obj:`int`, optional): Identifier of the
+            :class:`accent color <telegram.constants.AccentColor>` for the chat name and
+            backgrounds of the chat photo, reply header, and link preview. See `accent colors`_
+            for more details. Returned only in :meth:`telegram.Bot.get_chat`. Always returned in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        background_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of emoji chosen
+            by the chat for the reply header and link preview background. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        profile_accent_color_id (:obj:`int`, optional): Identifier of the
+            :class:`accent color <telegram.constants.ProfileAccentColor>` for the chat's profile
+            background. See profile `accent colors`_ for more details. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        profile_background_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of
+            the emoji chosen by the chat for its profile background. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         emoji_status_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of emoji
             status of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
@@ -260,6 +283,29 @@ class Chat(TelegramObject):
             obtained via :meth:`~telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        accent_color_id (:obj:`int`): Optional. Identifier of the
+            :class:`accent color <telegram.constants.AccentColor>` for the chat name and
+            backgrounds of the chat photo, reply header, and link preview. See `accent colors`_
+            for more details. Returned only in :meth:`telegram.Bot.get_chat`. Always returned in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        background_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji chosen
+            by the chat for the reply header and link preview background. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        profile_accent_color_id (:obj:`int`): Optional. Identifier of the
+            :class:`accent color <telegram.constants.ProfileAccentColor>` for the chat's profile
+            background. See profile `accent colors`_ for more details. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        profile_background_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of
+            the emoji chosen by the chat for its profile background. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         emoji_status_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji
             status of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
@@ -283,38 +329,43 @@ class Chat(TelegramObject):
             .. versionadded:: 20.0
 
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
+    .. _accent colors: https://core.telegram.org/bots/api#accent-colors
     """
 
     __slots__ = (
-        "bio",
-        "id",
-        "type",
-        "last_name",
-        "sticker_set_name",
-        "slow_mode_delay",
-        "location",
-        "first_name",
-        "permissions",
-        "invite_link",
-        "pinned_message",
-        "description",
-        "can_set_sticker_set",
-        "username",
-        "title",
-        "photo",
-        "linked_chat_id",
-        "message_auto_delete_time",
-        "has_protected_content",
-        "has_private_forwards",
-        "join_to_send_messages",
-        "join_by_request",
-        "has_restricted_voice_and_video_messages",
-        "is_forum",
+        "accent_color_id",
         "active_usernames",
+        "background_custom_emoji_id",
+        "bio",
+        "can_set_sticker_set",
+        "description",
         "emoji_status_custom_emoji_id",
         "emoji_status_expiration_date",
-        "has_hidden_members",
+        "first_name",
         "has_aggressive_anti_spam_enabled",
+        "has_hidden_members",
+        "has_private_forwards",
+        "has_protected_content",
+        "has_restricted_voice_and_video_messages",
+        "id",
+        "invite_link",
+        "is_forum",
+        "join_by_request",
+        "join_to_send_messages",
+        "last_name",
+        "linked_chat_id",
+        "location",
+        "message_auto_delete_time",
+        "permissions",
+        "photo",
+        "pinned_message",
+        "profile_accent_color_id",
+        "profile_background_custom_emoji_id",
+        "slow_mode_delay",
+        "sticker_set_name",
+        "title",
+        "type",
+        "username",
     )
 
     SENDER: Final[str] = constants.ChatType.SENDER
@@ -362,6 +413,10 @@ class Chat(TelegramObject):
         emoji_status_expiration_date: Optional[datetime] = None,
         has_aggressive_anti_spam_enabled: Optional[bool] = None,
         has_hidden_members: Optional[bool] = None,
+        accent_color_id: Optional[int] = None,
+        background_custom_emoji_id: Optional[str] = None,
+        profile_accent_color_id: Optional[int] = None,
+        profile_background_custom_emoji_id: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -401,6 +456,10 @@ class Chat(TelegramObject):
         self.emoji_status_expiration_date: Optional[datetime] = emoji_status_expiration_date
         self.has_aggressive_anti_spam_enabled: Optional[bool] = has_aggressive_anti_spam_enabled
         self.has_hidden_members: Optional[bool] = has_hidden_members
+        self.accent_color_id: Optional[int] = accent_color_id
+        self.background_custom_emoji_id: Optional[str] = background_custom_emoji_id
+        self.profile_accent_color_id: Optional[int] = profile_accent_color_id
+        self.profile_background_custom_emoji_id: Optional[str] = profile_background_custom_emoji_id
 
         self._id_attrs = (self.id,)
 

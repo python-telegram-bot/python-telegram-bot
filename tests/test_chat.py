@@ -16,12 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import time
+import datetime
 
 import pytest
 
 from telegram import Bot, Chat, ChatLocation, ChatPermissions, Location, User
-from telegram._utils.datetime import UTC, from_timestamp
+from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ChatAction, ChatType
 from telegram.helpers import escape_markdown
 from tests.auxil.bot_method_checks import (
@@ -57,6 +57,10 @@ def chat(bot):
         emoji_status_expiration_date=TestChatBase.emoji_status_expiration_date,
         has_aggressive_anti_spam_enabled=TestChatBase.has_aggressive_anti_spam_enabled,
         has_hidden_members=TestChatBase.has_hidden_members,
+        accent_color_id=TestChatBase.accent_color_id,
+        background_custom_emoji_id=TestChatBase.background_custom_emoji_id,
+        profile_accent_color_id=TestChatBase.profile_accent_color_id,
+        profile_background_custom_emoji_id=TestChatBase.profile_background_custom_emoji_id,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -88,9 +92,13 @@ class TestChatBase:
     is_forum = True
     active_usernames = ["These", "Are", "Usernames!"]
     emoji_status_custom_emoji_id = "VeryUniqueCustomEmojiID"
-    emoji_status_expiration_date = time.time()
+    emoji_status_expiration_date = datetime.datetime.now(tz=UTC).replace(microsecond=0)
     has_aggressive_anti_spam_enabled = True
     has_hidden_members = True
+    accent_color_id = 1
+    background_custom_emoji_id = "background_custom_emoji_id"
+    profile_accent_color_id = 2
+    profile_background_custom_emoji_id = "profile_background_custom_emoji_id"
 
 
 class TestChatWithoutRequest(TestChatBase):
@@ -123,9 +131,13 @@ class TestChatWithoutRequest(TestChatBase):
             "is_forum": self.is_forum,
             "active_usernames": self.active_usernames,
             "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id,
-            "emoji_status_expiration_date": self.emoji_status_expiration_date,
+            "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
             "has_aggressive_anti_spam_enabled": self.has_aggressive_anti_spam_enabled,
             "has_hidden_members": self.has_hidden_members,
+            "accent_color_id": self.accent_color_id,
+            "background_custom_emoji_id": self.background_custom_emoji_id,
+            "profile_accent_color_id": self.profile_accent_color_id,
+            "profile_background_custom_emoji_id": self.profile_background_custom_emoji_id,
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -155,17 +167,19 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.is_forum == self.is_forum
         assert chat.active_usernames == tuple(self.active_usernames)
         assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
-        assert chat.emoji_status_expiration_date == from_timestamp(
-            self.emoji_status_expiration_date
-        )
+        assert chat.emoji_status_expiration_date == (self.emoji_status_expiration_date)
         assert chat.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
         assert chat.has_hidden_members == self.has_hidden_members
+        assert chat.accent_color_id == self.accent_color_id
+        assert chat.background_custom_emoji_id == self.background_custom_emoji_id
+        assert chat.profile_accent_color_id == self.profile_accent_color_id
+        assert chat.profile_background_custom_emoji_id == self.profile_background_custom_emoji_id
 
     def test_de_json_localization(self, bot, raw_bot, tz_bot):
         json_dict = {
             "id": self.id_,
             "type": self.type_,
-            "emoji_status_expiration_date": self.emoji_status_expiration_date,
+            "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
         }
         chat_bot = Chat.de_json(json_dict, bot)
         chat_bot_raw = Chat.de_json(json_dict, raw_bot)
@@ -205,11 +219,20 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_dict["is_forum"] == chat.is_forum
         assert chat_dict["active_usernames"] == list(chat.active_usernames)
         assert chat_dict["emoji_status_custom_emoji_id"] == chat.emoji_status_custom_emoji_id
-        assert chat_dict["emoji_status_expiration_date"] == chat.emoji_status_expiration_date
+        assert chat_dict["emoji_status_expiration_date"] == to_timestamp(
+            chat.emoji_status_expiration_date
+        )
         assert (
             chat_dict["has_aggressive_anti_spam_enabled"] == chat.has_aggressive_anti_spam_enabled
         )
         assert chat_dict["has_hidden_members"] == chat.has_hidden_members
+        assert chat_dict["accent_color_id"] == chat.accent_color_id
+        assert chat_dict["background_custom_emoji_id"] == chat.background_custom_emoji_id
+        assert chat_dict["profile_accent_color_id"] == chat.profile_accent_color_id
+        assert (
+            chat_dict["profile_background_custom_emoji_id"]
+            == chat.profile_background_custom_emoji_id
+        )
 
     def test_always_tuples_attributes(self):
         chat = Chat(
