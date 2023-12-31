@@ -315,6 +315,7 @@ async def check_defaults_handling(
     defaults_no_custom_defaults = Defaults()
     kwargs = {kwarg: "custom_default" for kwarg in inspect.signature(Defaults).parameters}
     kwargs["tzinfo"] = pytz.timezone("America/New_York")
+    kwargs.pop("disable_web_page_preview")  # mutually exclusive with link_preview_options
     defaults_custom_defaults = Defaults(**kwargs)
 
     expected_return_values = [None, ()] if return_value is None else [return_value]
