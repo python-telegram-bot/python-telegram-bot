@@ -663,6 +663,10 @@ class Message(TelegramObject):
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
        :exc:`ValueError` when encountering a custom emoji.
+
+    .. |blockquote_no_md1_support| replace:: Since block quotation entities are not supported
+       by :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
+       :exc:`ValueError` when encountering a block quotation.
     """
 
     # fmt: on
@@ -3447,6 +3451,8 @@ class Message(TelegramObject):
                     insert = f'<a href="tg://user?id={entity.user.id}">{escaped_text}</a>'
                 elif entity.type == MessageEntity.URL and urled:
                     insert = f'<a href="{escaped_text}">{escaped_text}</a>'
+                elif entity.type == MessageEntity.BLOCKQUOTE:
+                    insert = f"<blockquote>{escaped_text}</blockquote>"
                 elif entity.type == MessageEntity.BOLD:
                     insert = f"<b>{escaped_text}</b>"
                 elif entity.type == MessageEntity.ITALIC:
@@ -3514,6 +3520,9 @@ class Message(TelegramObject):
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
+
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
 
@@ -3532,6 +3541,9 @@ class Message(TelegramObject):
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
@@ -3553,6 +3565,9 @@ class Message(TelegramObject):
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
         """
@@ -3571,6 +3586,9 @@ class Message(TelegramObject):
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
@@ -3675,6 +3693,12 @@ class Message(TelegramObject):
                             "Spoiler entities are not supported for Markdown version 1"
                         )
                     insert = f"||{escaped_text}||"
+                elif entity.type == MessageEntity.BLOCKQUOTE:
+                    if version == 1:
+                        raise ValueError(
+                            "Blockquote entities are not supported for Markdown version 1"
+                        )
+                    insert = f">{escaped_text}"
                 elif entity.type == MessageEntity.CUSTOM_EMOJI:
                     if version == 1:
                         raise ValueError(
@@ -3739,12 +3763,15 @@ class Message(TelegramObject):
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=False)
@@ -3762,6 +3789,9 @@ class Message(TelegramObject):
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3786,12 +3816,15 @@ class Message(TelegramObject):
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=True)
@@ -3809,6 +3842,9 @@ class Message(TelegramObject):
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3833,12 +3869,15 @@ class Message(TelegramObject):
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=False)
@@ -3856,6 +3895,9 @@ class Message(TelegramObject):
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -3882,12 +3924,15 @@ class Message(TelegramObject):
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)
@@ -3905,6 +3950,9 @@ class Message(TelegramObject):
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
