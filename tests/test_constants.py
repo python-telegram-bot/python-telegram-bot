@@ -162,6 +162,7 @@ class TestConstantsWithoutRequest:
             "is_automatic_forward",
             "is_topic_message",
             "link",
+            "link_preview_options",
             "media_group_id",
             "message_id",
             "message_thread_id",
