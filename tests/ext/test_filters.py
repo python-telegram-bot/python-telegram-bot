@@ -1054,10 +1054,15 @@ class TestFilters:
         assert filters.StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
         update.message.write_access_allowed = None
 
-        update.message.user_shared = "user_shared"
+        update.message._user_shared = "user_shared"
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.USER_SHARED.check_update(update)
-        update.message.user_shared = None
+        update.message._user_shared = None
+
+        update.message.users_shared = "users_shared"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.USERS_SHARED.check_update(update)
+        update.message.users_shared = None
 
         update.message.chat_shared = "user_shared"
         assert filters.StatusUpdate.ALL.check_update(update)

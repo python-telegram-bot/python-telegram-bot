@@ -1868,33 +1868,35 @@ class StatusUpdate:
 
         def filter(self, update: Update) -> bool:
             return bool(
-                StatusUpdate.NEW_CHAT_MEMBERS.check_update(update)
-                or StatusUpdate.LEFT_CHAT_MEMBER.check_update(update)
-                or StatusUpdate.NEW_CHAT_TITLE.check_update(update)
-                or StatusUpdate.NEW_CHAT_PHOTO.check_update(update)
-                or StatusUpdate.DELETE_CHAT_PHOTO.check_update(update)
-                or StatusUpdate.CHAT_CREATED.check_update(update)
-                or StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED.check_update(update)
-                or StatusUpdate.MIGRATE.check_update(update)
-                or StatusUpdate.PINNED_MESSAGE.check_update(update)
+                # keep this alphabetically sorted for easier maintenance
+                StatusUpdate.CHAT_CREATED.check_update(update)
+                or StatusUpdate.CHAT_SHARED.check_update(update)
                 or StatusUpdate.CONNECTED_WEBSITE.check_update(update)
-                or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
-                or StatusUpdate.VIDEO_CHAT_SCHEDULED.check_update(update)
-                or StatusUpdate.VIDEO_CHAT_STARTED.check_update(update)
-                or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
-                or StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
-                or StatusUpdate.WEB_APP_DATA.check_update(update)
-                or StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
+                or StatusUpdate.DELETE_CHAT_PHOTO.check_update(update)
                 or StatusUpdate.FORUM_TOPIC_CLOSED.check_update(update)
-                or StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
+                or StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
                 or StatusUpdate.FORUM_TOPIC_EDITED.check_update(update)
+                or StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
                 or StatusUpdate.GENERAL_FORUM_TOPIC_HIDDEN.check_update(update)
                 or StatusUpdate.GENERAL_FORUM_TOPIC_UNHIDDEN.check_update(update)
-                or StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
-                or StatusUpdate.USER_SHARED.check_update(update)
-                or StatusUpdate.CHAT_SHARED.check_update(update)
-                or StatusUpdate.GIVEAWAY_CREATED.check_update(update)
                 or StatusUpdate.GIVEAWAY_COMPLETED.check_update(update)
+                or StatusUpdate.GIVEAWAY_CREATED.check_update(update)
+                or StatusUpdate.LEFT_CHAT_MEMBER.check_update(update)
+                or StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED.check_update(update)
+                or StatusUpdate.MIGRATE.check_update(update)
+                or StatusUpdate.NEW_CHAT_MEMBERS.check_update(update)
+                or StatusUpdate.NEW_CHAT_PHOTO.check_update(update)
+                or StatusUpdate.NEW_CHAT_TITLE.check_update(update)
+                or StatusUpdate.PINNED_MESSAGE.check_update(update)
+                or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
+                or StatusUpdate.USERS_SHARED.check_update(update)
+                or StatusUpdate.USER_SHARED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_SCHEDULED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_STARTED.check_update(update)
+                or StatusUpdate.WEB_APP_DATA.check_update(update)
+                or StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -2133,7 +2135,25 @@ class StatusUpdate:
     USER_SHARED = _UserShared(name="filters.StatusUpdate.USER_SHARED")
     """Messages that contain :attr:`telegram.Message.user_shared`.
 
+    Warning:
+        This will only catch the legacy :attr:`telegram.Message.user_shared` attribute, not the
+        new :attr:`telegram.Message.users_shared` attribute!
+
     .. versionadded:: 20.1
+    .. deprecated:: NEXT.VERSION
+       User :attr:`USERS_SHARED` instead.
+    """
+
+    class _UsersShared(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.users_shared)
+
+    USERS_SHARED = _UsersShared(name="filters.StatusUpdate.USERS_SHARED")
+    """Messages that contain :attr:`telegram.Message.users_shared`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
     class _VideoChatEnded(MessageFilter):
