@@ -23,6 +23,7 @@ from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import build_deprecation_warning_message
 from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
@@ -135,7 +136,12 @@ class KeyboardButtonRequestUser(KeyboardButtonRequestUsers):
         )
 
         warn(
-            "`KeyboardButtonRequestUser` is deprecated, use `KeyboardButtonRequestUsers` instead.",
+            build_deprecation_warning_message(
+                deprecated_name="KeyboardButtonRequestUser",
+                new_name="KeyboardButtonRequestUsers",
+                object_type="class",
+                bot_api_version="7.0",
+            ),
             PTBDeprecationWarning,
             stacklevel=2,
         )

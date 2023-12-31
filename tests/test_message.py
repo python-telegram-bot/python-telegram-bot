@@ -480,13 +480,17 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert hash(a) != hash(e)
 
     def test_user_shared_init_deprecation(self, message):
-        with pytest.warns(PTBDeprecationWarning, match="`user_shared` is deprecated") as record:
+        with pytest.warns(
+            PTBDeprecationWarning, match="'user_shared' was renamed to 'users_shared'"
+        ) as record:
             Message(message_id=1, date=self.date, chat=self.chat, user_shared=1)
 
         assert record[0].filename == __file__, "wrong stacklevel"
 
     def test_user_shared_property_deprecation(self, message):
-        with pytest.warns(PTBDeprecationWarning, match="`user_shared` is deprecated") as record:
+        with pytest.warns(
+            PTBDeprecationWarning, match="'user_shared' to 'users_shared'"
+        ) as record:
             message.user_shared
 
         assert record[0].filename == __file__, "wrong stacklevel"

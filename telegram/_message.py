@@ -69,6 +69,10 @@ from telegram._utils.types import (
     ReplyMarkup,
 )
 from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import (
+    build_deprecation_warning_message,
+    warn_about_deprecated_attr_in_property,
+)
 from telegram._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -831,8 +835,12 @@ class Message(TelegramObject):
 
         if user_shared:
             warn(
-                "`user_shared` is deprecated in favor of `users_shared and will be removed in "
-                "future versions.",
+                build_deprecation_warning_message(
+                    deprecated_name="user_shared",
+                    new_name="users_shared",
+                    object_type="parameter",
+                    bot_api_version="7.0",
+                ),
                 PTBDeprecationWarning,
                 stacklevel=2,
             )
@@ -948,11 +956,10 @@ class Message(TelegramObject):
         .. deprecated:: NEXT.VERSION
            Bot API 7.0 deprecates :attr:`user_shared` in favor of :attr:`users_shared`.
         """
-        warn(
-            "`user_shared` is deprecated in favor of users_shared and will be removed in future "
-            "versions.",
-            PTBDeprecationWarning,
-            stacklevel=2,
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="user_shared",
+            new_attr_name="users_shared",
+            bot_api_version="7.0",
         )
         return self._user_shared
 

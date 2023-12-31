@@ -105,7 +105,10 @@ class TestKeyboardButtonRequestUserWithoutRequest:
         )
 
     def test_deprecation_warning(self):
-        with pytest.warns(PTBDeprecationWarning, match="User` is deprecated") as record:
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="'KeyboardButtonRequestUser' was renamed to 'KeyboardButtonRequestUsers'",
+        ) as record:
             KeyboardButtonRequestUser(request_id=1)
 
         assert record[0].filename == __file__, "wrong stacklevel"

@@ -122,12 +122,14 @@ class TestUserSharedWithoutRequest(TestUsersSharedBase):
         assert set(users_signature.parameters) - set(user_signature.parameters) == {"user_ids"}
 
     def test_deprecation_warnings(self):
-        with pytest.warns(PTBDeprecationWarning, match="UserShared` is deprecated") as record:
+        with pytest.warns(
+            PTBDeprecationWarning, match="'UserShared' was renamed to 'UsersShared'"
+        ) as record:
             user_shared = UserShared(request_id=1, user_id=1)
 
         assert record[0].filename == __file__, "wrong stacklevel"
 
-        with pytest.warns(PTBDeprecationWarning, match="`user_id` is deprecated") as record:
+        with pytest.warns(PTBDeprecationWarning, match="'user_id' to 'user_ids'") as record:
             user_shared.user_id
 
         assert record[0].filename == __file__, "wrong stacklevel"

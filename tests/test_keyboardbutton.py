@@ -106,21 +106,25 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert none is None
 
     def test_request_user_deprecation_mutually_exclusive(self):
-        with pytest.raises(ValueError, match="Only one of request_user and request_users"):
+        with pytest.raises(ValueError, match="'request_user' was renamed to 'request_users'"):
             KeyboardButton(
                 "test",
-                request_users=KeyboardButtonRequestUsers(2),
+                request_users=KeyboardButtonRequestUsers(1),
                 request_user=KeyboardButtonRequestUsers(2),
             )
 
     def test_request_user_argument_deprecation_warning(self):
-        with pytest.warns(PTBDeprecationWarning, match="request_user is deprecated") as record:
+        with pytest.warns(
+            PTBDeprecationWarning, match="'request_user' to 'request_users'"
+        ) as record:
             KeyboardButton("test", request_user=KeyboardButtonRequestUsers(2))
 
         assert record[0].filename == __file__, "wrong stacklevel"
 
     def test_request_user_property_deprecation_warning(self, keyboard_button):
-        with pytest.warns(PTBDeprecationWarning, match="request_user is deprecated") as record:
+        with pytest.warns(
+            PTBDeprecationWarning, match="'request_user' to 'request_users'"
+        ) as record:
             assert keyboard_button.request_user is keyboard_button.request_users
 
         assert record[0].filename == __file__, "wrong stacklevel"

@@ -22,6 +22,10 @@ from typing import Optional, Sequence, Tuple
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import (
+    build_deprecation_warning_message,
+    warn_about_deprecated_attr_in_property,
+)
 from telegram.warnings import PTBDeprecationWarning
 
 
@@ -96,7 +100,12 @@ class UserShared(UsersShared):
         super().__init__(request_id, (user_id,), api_kwargs=api_kwargs)
 
         warn(
-            "`UserShared` is deprecated, use `UsersShared` instead.",
+            build_deprecation_warning_message(
+                deprecated_name="UserShared",
+                new_name="UsersShared",
+                object_type="class",
+                bot_api_version="7.0",
+            ),
             PTBDeprecationWarning,
             stacklevel=2,
         )
@@ -110,12 +119,10 @@ class UserShared(UsersShared):
         .. deprecated:: NEXT.VERSION
            Bot API 7.0 deprecates this attribute in favor of :attr:`UsersShared.user_ids`.
         """
-
-        warn(
-            "`user_id` is deprecated in favor of `user_ids` and will be removed in future "
-            "versions.",
-            PTBDeprecationWarning,
-            stacklevel=2,
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="user_id",
+            new_attr_name="user_ids",
+            bot_api_version="7.0",
         )
         return self.user_ids[0]
 
