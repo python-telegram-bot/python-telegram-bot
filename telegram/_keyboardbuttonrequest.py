@@ -23,6 +23,7 @@ from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import build_deprecation_warning_message
 from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
@@ -45,7 +46,7 @@ class KeyboardButtonRequestUsers(TelegramObject):
 
     Args:
         request_id (:obj:`int`): Signed 32-bit identifier of the request, which will be received
-            back in the :class:`telegram.UserShared` object. Must be unique within the message.
+            back in the :class:`telegram.UsersShared` object. Must be unique within the message.
         user_is_bot (:obj:`bool`, optional): Pass :obj:`True` to request a bot, pass :obj:`False`
             to request a regular user. If not specified, no additional restrictions are applied.
         user_is_premium (:obj:`bool`, optional): Pass :obj:`True` to request a premium user, pass
@@ -135,7 +136,12 @@ class KeyboardButtonRequestUser(KeyboardButtonRequestUsers):
         )
 
         warn(
-            "`KeyboardButtonRequestUser` is deprecated, use `KeyboardButtonRequestUsers` instead.",
+            build_deprecation_warning_message(
+                deprecated_name="KeyboardButtonRequestUser",
+                new_name="KeyboardButtonRequestUsers",
+                object_type="class",
+                bot_api_version="7.0",
+            ),
             PTBDeprecationWarning,
             stacklevel=2,
         )

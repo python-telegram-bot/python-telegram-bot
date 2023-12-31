@@ -53,7 +53,7 @@ from telegram._payment.invoice import Invoice
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
-from telegram._shared import ChatShared, UserShared
+from telegram._shared import ChatShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -68,6 +68,11 @@ from telegram._utils.types import (
     ODVInput,
     ReplyMarkup,
 )
+from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import (
+    build_deprecation_warning_message,
+    warn_about_deprecated_attr_in_property,
+)
 from telegram._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -78,6 +83,7 @@ from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
 from telegram.constants import MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import (
@@ -179,9 +185,9 @@ class Message(TelegramObject):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
-        link_preview_options (:obj:`telegram.LinkPreviewOptions`, optional): Options used for link
-            preview generation for the message, if it is a text message and link preview options
-            were changed.
+        link_preview_options (:class:`telegram.LinkPreviewOptions`, optional): Options used for
+            link preview generation for the message, if it is a text message and link preview
+            options were changed.
 
             .. versionadded:: NEXT.VERSION
 
@@ -350,10 +356,16 @@ class Message(TelegramObject):
             by a spoiler animation.
 
             .. versionadded:: 20.0
-        user_shared (:class:`telegram.UserShared`, optional): Service message: a user was shared
+        user_shared (:class:`telegram.UsersShared`, optional): Service message: a user was shared
             with the bot.
 
             .. versionadded:: 20.1
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`user_shared` in favor of :paramref:`users_shared`.
+        users_shared (:class:`telegram.UsersShared`, optional): Service message: users were shared
+            with the bot
+
+            .. versionadded:: NEXT.VERSION
         chat_shared (:class:`telegram.ChatShared`, optional):Service message: a chat was shared
             with the bot.
 
@@ -432,9 +444,9 @@ class Message(TelegramObject):
             .. versionchanged:: 20.0
                 |tupleclassattrs|
 
-        link_preview_options (:obj:`telegram.LinkPreviewOptions`): Optional. Options used for link
-            preview generation for the message, if it is a text message and link preview options
-            were changed.
+        link_preview_options (:class:`telegram.LinkPreviewOptions`): Optional. Options used for
+            link preview generation for the message, if it is a text message and link preview
+            options were changed.
 
             .. versionadded:: NEXT.VERSION
 
@@ -620,10 +632,10 @@ class Message(TelegramObject):
             by a spoiler animation.
 
             .. versionadded:: 20.0
-        user_shared (:class:`telegram.UserShared`): Optional. Service message: a user was shared
-            with the bot.
+        users_shared (:class:`telegram.UsersShared`): Optional. Service message: users were shared
+            with the bot
 
-            .. versionadded:: 20.1
+            .. versionadded:: NEXT.VERSION
         chat_shared (:class:`telegram.ChatShared`): Optional. Service message: a chat was shared
             with the bot.
 
@@ -721,7 +733,8 @@ class Message(TelegramObject):
         "successful_payment",
         "supergroup_chat_created",
         "text",
-        "user_shared",
+        "_user_shared",
+        "users_shared",
         "venue",
         "via_bot",
         "video",
@@ -806,18 +819,31 @@ class Message(TelegramObject):
         general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = None,
         write_access_allowed: Optional[WriteAccessAllowed] = None,
         has_media_spoiler: Optional[bool] = None,
-        user_shared: Optional[UserShared] = None,
+        user_shared: Optional[UsersShared] = None,
         chat_shared: Optional[ChatShared] = None,
         story: Optional[Story] = None,
         giveaway: Optional["Giveaway"] = None,
         giveaway_completed: Optional["GiveawayCompleted"] = None,
         giveaway_created: Optional["GiveawayCreated"] = None,
         giveaway_winners: Optional["GiveawayWinners"] = None,
+        users_shared: Optional[UsersShared] = None,
         link_preview_options: Optional[LinkPreviewOptions] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
+
+        if user_shared:
+            warn(
+                build_deprecation_warning_message(
+                    deprecated_name="user_shared",
+                    new_name="users_shared",
+                    object_type="parameter",
+                    bot_api_version="7.0",
+                ),
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
 
         # Required
         self.message_id: int = message_id
@@ -900,7 +926,8 @@ class Message(TelegramObject):
         ] = general_forum_topic_unhidden
         self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
         self.has_media_spoiler: Optional[bool] = has_media_spoiler
-        self.user_shared: Optional[UserShared] = user_shared
+        self._user_shared: Optional[UsersShared] = user_shared
+        self.users_shared: Optional[UsersShared] = users_shared
         self.chat_shared: Optional[ChatShared] = chat_shared
         self.story: Optional[Story] = story
         self.giveaway: Optional[Giveaway] = giveaway
@@ -914,6 +941,27 @@ class Message(TelegramObject):
         self._id_attrs = (self.message_id, self.chat)
 
         self._freeze()
+
+    @property
+    def user_shared(self) -> Optional[UsersShared]:
+        """:class:`telegram.UsersShared`: Optional. Service message. A user was shared with the
+        bot.
+
+        Hint:
+            In case a single user was shared, :attr:`user_shared` will be present in addition to
+            :attr:`users_shared`. If multiple users where shared, only :attr:`users_shared` will
+            be present. However, this behavior is not documented and may be changed by Telegram.
+
+        .. versionadded:: 20.1
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`user_shared` in favor of :attr:`users_shared`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="user_shared",
+            new_attr_name="users_shared",
+            bot_api_version="7.0",
+        )
+        return self._user_shared
 
     @property
     def chat_id(self) -> int:
@@ -1027,7 +1075,8 @@ class Message(TelegramObject):
         data["write_access_allowed"] = WriteAccessAllowed.de_json(
             data.get("write_access_allowed"), bot
         )
-        data["user_shared"] = UserShared.de_json(data.get("user_shared"), bot)
+        data["user_shared"] = UsersShared.de_json(data.get("user_shared"), bot)
+        data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
 
         # Unfortunately, this needs to be here due to cyclic imports

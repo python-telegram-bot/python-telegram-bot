@@ -16,12 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import time
+import datetime
 
 import pytest
 
 from telegram import Bot, Chat, ChatLocation, ChatPermissions, Location, User
-from telegram._utils.datetime import UTC, from_timestamp
+from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ChatAction, ChatType
 from telegram.helpers import escape_markdown
 from tests.auxil.bot_method_checks import (
@@ -57,6 +57,10 @@ def chat(bot):
         emoji_status_expiration_date=TestChatBase.emoji_status_expiration_date,
         has_aggressive_anti_spam_enabled=TestChatBase.has_aggressive_anti_spam_enabled,
         has_hidden_members=TestChatBase.has_hidden_members,
+        accent_color_id=TestChatBase.accent_color_id,
+        background_custom_emoji_id=TestChatBase.background_custom_emoji_id,
+        profile_accent_color_id=TestChatBase.profile_accent_color_id,
+        profile_background_custom_emoji_id=TestChatBase.profile_background_custom_emoji_id,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -88,9 +92,13 @@ class TestChatBase:
     is_forum = True
     active_usernames = ["These", "Are", "Usernames!"]
     emoji_status_custom_emoji_id = "VeryUniqueCustomEmojiID"
-    emoji_status_expiration_date = time.time()
+    emoji_status_expiration_date = datetime.datetime.now(tz=UTC).replace(microsecond=0)
     has_aggressive_anti_spam_enabled = True
     has_hidden_members = True
+    accent_color_id = 1
+    background_custom_emoji_id = "background_custom_emoji_id"
+    profile_accent_color_id = 2
+    profile_background_custom_emoji_id = "profile_background_custom_emoji_id"
 
 
 class TestChatWithoutRequest(TestChatBase):
@@ -123,9 +131,13 @@ class TestChatWithoutRequest(TestChatBase):
             "is_forum": self.is_forum,
             "active_usernames": self.active_usernames,
             "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id,
-            "emoji_status_expiration_date": self.emoji_status_expiration_date,
+            "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
             "has_aggressive_anti_spam_enabled": self.has_aggressive_anti_spam_enabled,
             "has_hidden_members": self.has_hidden_members,
+            "accent_color_id": self.accent_color_id,
+            "background_custom_emoji_id": self.background_custom_emoji_id,
+            "profile_accent_color_id": self.profile_accent_color_id,
+            "profile_background_custom_emoji_id": self.profile_background_custom_emoji_id,
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -155,17 +167,19 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.is_forum == self.is_forum
         assert chat.active_usernames == tuple(self.active_usernames)
         assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
-        assert chat.emoji_status_expiration_date == from_timestamp(
-            self.emoji_status_expiration_date
-        )
+        assert chat.emoji_status_expiration_date == (self.emoji_status_expiration_date)
         assert chat.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
         assert chat.has_hidden_members == self.has_hidden_members
+        assert chat.accent_color_id == self.accent_color_id
+        assert chat.background_custom_emoji_id == self.background_custom_emoji_id
+        assert chat.profile_accent_color_id == self.profile_accent_color_id
+        assert chat.profile_background_custom_emoji_id == self.profile_background_custom_emoji_id
 
     def test_de_json_localization(self, bot, raw_bot, tz_bot):
         json_dict = {
             "id": self.id_,
             "type": self.type_,
-            "emoji_status_expiration_date": self.emoji_status_expiration_date,
+            "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
         }
         chat_bot = Chat.de_json(json_dict, bot)
         chat_bot_raw = Chat.de_json(json_dict, raw_bot)
@@ -205,11 +219,20 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_dict["is_forum"] == chat.is_forum
         assert chat_dict["active_usernames"] == list(chat.active_usernames)
         assert chat_dict["emoji_status_custom_emoji_id"] == chat.emoji_status_custom_emoji_id
-        assert chat_dict["emoji_status_expiration_date"] == chat.emoji_status_expiration_date
+        assert chat_dict["emoji_status_expiration_date"] == to_timestamp(
+            chat.emoji_status_expiration_date
+        )
         assert (
             chat_dict["has_aggressive_anti_spam_enabled"] == chat.has_aggressive_anti_spam_enabled
         )
         assert chat_dict["has_hidden_members"] == chat.has_hidden_members
+        assert chat_dict["accent_color_id"] == chat.accent_color_id
+        assert chat_dict["background_custom_emoji_id"] == chat.background_custom_emoji_id
+        assert chat_dict["profile_accent_color_id"] == chat.profile_accent_color_id
+        assert (
+            chat_dict["profile_background_custom_emoji_id"]
+            == chat.profile_background_custom_emoji_id
+        )
 
     def test_always_tuples_attributes(self):
         chat = Chat(
@@ -273,6 +296,28 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.effective_name == "group"
         chat = Chat(id=1, type=Chat.GROUP)
         assert chat.effective_name is None
+
+    async def test_delete_message(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["message_id"] == 42
+
+        assert check_shortcut_signature(Chat.delete_message, Bot.delete_message, ["chat_id"], [])
+        assert await check_shortcut_call(chat.delete_message, chat.get_bot(), "delete_message")
+        assert await check_defaults_handling(chat.delete_message, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "delete_message", make_assertion)
+        assert await chat.delete_message(message_id=42)
+
+    async def test_delete_messages(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["message_ids"] == (42, 43)
+
+        assert check_shortcut_signature(Chat.delete_messages, Bot.delete_messages, ["chat_id"], [])
+        assert await check_shortcut_call(chat.delete_messages, chat.get_bot(), "delete_messages")
+        assert await check_defaults_handling(chat.delete_messages, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "delete_messages", make_assertion)
+        assert await chat.delete_messages(message_ids=(42, 43))
 
     async def test_send_action(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
@@ -824,6 +869,36 @@ class TestChatWithoutRequest(TestChatBase):
         monkeypatch.setattr(chat.get_bot(), "copy_message", make_assertion)
         assert await chat.copy_message(chat_id="test_copy", message_id=42)
 
+    async def test_instance_method_send_copies(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            from_chat_id = kwargs["from_chat_id"] == "test_copies"
+            message_ids = kwargs["message_ids"] == (42, 43)
+            chat_id = kwargs["chat_id"] == chat.id
+            return from_chat_id and message_ids and chat_id
+
+        assert check_shortcut_signature(Chat.send_copies, Bot.copy_messages, ["chat_id"], [])
+        assert await check_shortcut_call(chat.send_copies, chat.get_bot(), "copy_messages")
+        assert await check_defaults_handling(chat.send_copies, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "copy_messages", make_assertion)
+        assert await chat.send_copies(from_chat_id="test_copies", message_ids=(42, 43))
+
+    async def test_instance_method_copy_messages(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            from_chat_id = kwargs["from_chat_id"] == chat.id
+            message_ids = kwargs["message_ids"] == (42, 43)
+            chat_id = kwargs["chat_id"] == "test_copies"
+            return from_chat_id and message_ids and chat_id
+
+        assert check_shortcut_signature(
+            Chat.copy_messages, Bot.copy_messages, ["from_chat_id"], []
+        )
+        assert await check_shortcut_call(chat.copy_messages, chat.get_bot(), "copy_messages")
+        assert await check_defaults_handling(chat.copy_messages, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "copy_messages", make_assertion)
+        assert await chat.copy_messages(chat_id="test_copies", message_ids=(42, 43))
+
     async def test_instance_method_forward_from(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs["chat_id"] == chat.id
@@ -851,6 +926,36 @@ class TestChatWithoutRequest(TestChatBase):
 
         monkeypatch.setattr(chat.get_bot(), "forward_message", make_assertion)
         assert await chat.forward_to(chat_id="test_forward", message_id=42)
+
+    async def test_instance_method_forwards_from(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            chat_id = kwargs["chat_id"] == chat.id
+            message_ids = kwargs["message_ids"] == (42, 43)
+            from_chat_id = kwargs["from_chat_id"] == "test_forwards"
+            return from_chat_id and message_ids and chat_id
+
+        assert check_shortcut_signature(Chat.forwards_from, Bot.forward_messages, ["chat_id"], [])
+        assert await check_shortcut_call(chat.forwards_from, chat.get_bot(), "forward_messages")
+        assert await check_defaults_handling(chat.forwards_from, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "forward_messages", make_assertion)
+        assert await chat.forwards_from(from_chat_id="test_forwards", message_ids=(42, 43))
+
+    async def test_instance_method_forwards_to(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            from_chat_id = kwargs["from_chat_id"] == chat.id
+            message_ids = kwargs["message_ids"] == (42, 43)
+            chat_id = kwargs["chat_id"] == "test_forwards"
+            return from_chat_id and message_ids and chat_id
+
+        assert check_shortcut_signature(
+            Chat.forwards_to, Bot.forward_messages, ["from_chat_id"], []
+        )
+        assert await check_shortcut_call(chat.forwards_to, chat.get_bot(), "forward_messages")
+        assert await check_defaults_handling(chat.forwards_to, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "forward_messages", make_assertion)
+        assert await chat.forwards_to(chat_id="test_forwards", message_ids=(42, 43))
 
     async def test_export_invite_link(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):

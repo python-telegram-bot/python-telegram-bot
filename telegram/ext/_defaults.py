@@ -20,7 +20,11 @@
 import datetime
 from typing import Any, Dict, NoReturn, Optional, final
 
+from telegram import LinkPreviewOptions
 from telegram._utils.datetime import UTC
+from telegram._utils.types import ODVInput
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 
 @final
@@ -38,7 +42,12 @@ class Defaults:
         parse_mode (:obj:`str`, optional): |parse_mode|
         disable_notification (:obj:`bool`, optional): |disable_notification|
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in this
-            message.
+            message. Mutually exclusive with :paramref:`link_preview_options`.
+
+            .. deprecated:: NEXT.VERSION
+                Use :paramref:`link_preview_options` instead. This parameter will be removed in
+                future versions.
+
         allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
         quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
             to the message. If ``reply_to_message_id`` is passed, this parameter will
@@ -56,11 +65,15 @@ class Defaults:
         protect_content (:obj:`bool`, optional): |protect_content|
 
             .. versionadded:: 20.0
+        link_preview_options (:class:`telegram.LinkPreviewOptions`, optional):
+            Link preview generation options for all outgoing messages. Mutually exclusive with
+            :paramref:`disable_web_page_preview`.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
         "_tzinfo",
-        "_disable_web_page_preview",
         "_block",
         "_quote",
         "_disable_notification",
@@ -68,6 +81,7 @@ class Defaults:
         "_parse_mode",
         "_api_defaults",
         "_protect_content",
+        "_link_preview_options",
     )
 
     def __init__(
@@ -80,25 +94,42 @@ class Defaults:
         block: bool = True,
         allow_sending_without_reply: Optional[bool] = None,
         protect_content: Optional[bool] = None,
+        link_preview_options: Optional["LinkPreviewOptions"] = None,
     ):
         self._parse_mode: Optional[str] = parse_mode
         self._disable_notification: Optional[bool] = disable_notification
-        self._disable_web_page_preview: Optional[bool] = disable_web_page_preview
         self._allow_sending_without_reply: Optional[bool] = allow_sending_without_reply
         self._quote: Optional[bool] = quote
         self._tzinfo: datetime.tzinfo = tzinfo
         self._block: bool = block
         self._protect_content: Optional[bool] = protect_content
 
+        if disable_web_page_preview is not None and link_preview_options is not None:
+            raise ValueError(
+                "`disable_web_page_preview` and `link_preview_options` are mutually exclusive."
+            )
+
+        if disable_web_page_preview is not None:
+            warn(
+                "`Defaults.disable_web_page_preview` is deprecated. Use "
+                "`Defaults.link_preview_options` instead.",
+                category=PTBDeprecationWarning,
+                stacklevel=2,
+            )
+            self._link_preview_options: Optional[LinkPreviewOptions] = LinkPreviewOptions(
+                is_disabled=disable_web_page_preview
+            )
+        else:
+            self._link_preview_options = link_preview_options
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
         for kwarg in (
             "parse_mode",
             "explanation_parse_mode",
             "disable_notification",
-            "disable_web_page_preview",
             "allow_sending_without_reply",
             "protect_content",
+            "link_preview_options",
         ):
             value = getattr(self, kwarg)
             if value is not None:
@@ -115,7 +146,7 @@ class Defaults:
             (
                 self._parse_mode,
                 self._disable_notification,
-                self._disable_web_page_preview,
+                self.disable_web_page_preview,
                 self._allow_sending_without_reply,
                 self._quote,
                 self._tzinfo,
@@ -178,11 +209,11 @@ class Defaults:
         )
 
     @property
-    def disable_web_page_preview(self) -> Optional[bool]:
-        """:obj:`bool`: Optional. Disables link previews for links in this
-        message.
+    def disable_web_page_preview(self) -> ODVInput[bool]:
+        """:obj:`bool`: Optional. Disables link previews for links in all outgoing
+        messages.
         """
-        return self._disable_web_page_preview
+        return self._link_preview_options.is_disabled if self._link_preview_options else None
 
     @disable_web_page_preview.setter
     def disable_web_page_preview(self, value: object) -> NoReturn:
@@ -252,3 +283,12 @@ class Defaults:
         raise AttributeError(
             "You can't assign a new value to protect_content after initialization."
         )
+
+    @property
+    def link_preview_options(self) -> Optional["LinkPreviewOptions"]:
+        """:class:`telegram.LinkPreviewOptions`: Optional. Link preview generation options for all
+        outgoing messages.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self._link_preview_options

@@ -182,6 +182,7 @@ __all__ = (  # Keep this alphabetically ordered
     "Update",
     "User",
     "UserProfilePhotos",
+    "UsersShared",
     "UserShared",
     "Venue",
     "Video",
@@ -352,7 +353,7 @@ from ._proximityalerttriggered import ProximityAlertTriggered
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage
-from ._shared import ChatShared, UserShared
+from ._shared import ChatShared, UserShared, UsersShared
 from ._story import Story
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject

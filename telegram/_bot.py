@@ -79,6 +79,7 @@ from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
+from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
@@ -670,7 +671,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-        disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -688,12 +689,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         using `Any` instead saves us a lot of `type: ignore` comments
         """
         # We don't check if (DEFAULT_)None here, so that _post is able to insert the defaults
-        # correctly, if necessary
+        # correctly, if necessary:
         data["disable_notification"] = disable_notification
         data["allow_sending_without_reply"] = allow_sending_without_reply
         data["protect_content"] = protect_content
         data["parse_mode"] = parse_mode
-        data["disable_web_page_preview"] = disable_web_page_preview
+        data["link_preview_options"] = link_preview_options
 
         if reply_to_message_id is not None:
             data["reply_to_message_id"] = reply_to_message_id
@@ -800,13 +801,17 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Optional[Sequence["MessageEntity"]] = None,
+        # Deprecated since Bot API 7.0 (to be made keyword arg):
+        # ---
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
+        # ---
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -828,8 +833,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
+            link_preview_options (:obj:`LinkPreviewOptions`, optional): Link preview generation
+                options for the message. Mutually exclusive with
+                :paramref:`disable_web_page_preview`.
+
+                .. versionadded:: NEXT.VERSION
+
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
-                this message.
+                this message. Mutually exclusive with :paramref:`link_preview_options`.
+
+                .. versionchanged:: NEXT.VERSION
+                    Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
+                    argument. PTB will automatically convert this argument to that one, but
+                    you should update your code to use the new argument.
+
+                .. deprecated:: NEXT.VERSION
+                    In future versions, this argument will become keyword only.
+
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -848,10 +868,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.Message`: On success, the sent message is returned.
 
         Raises:
-            :class:`telegram.error.TelegramError`
+            :exc:`ValueError`: If both :paramref:`disable_web_page_preview` and
+                :paramref:`link_preview_options` are passed.
+            :class:`telegram.error.TelegramError`: For other errors.
 
         """
         data: JSONDict = {"chat_id": chat_id, "text": text, "entities": entities}
+
+        if disable_web_page_preview and link_preview_options:
+            raise ValueError(
+                "`disable_web_page_preview` and `link_preview_options` are mutually  exclusive."
+            )
+        # Convert to LinkPreviewOptions:
+        if not isinstance(disable_web_page_preview, DefaultValue):
+            link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
 
         return await self._send_message(
             "sendMessage",
@@ -863,7 +893,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             parse_mode=parse_mode,
-            disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3339,9 +3369,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
+        # Deprecated since Bot API 7.0 (to be keyword only):
+        # ---
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
+        # ---
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3375,8 +3409,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
+
+            link_preview_options (:obj:`LinkPreviewOptions`, optional): Link preview generation
+                options for the message. Mutually exclusive with
+                :paramref:`disable_web_page_preview`.
+
+                .. versionadded:: NEXT.VERSION
+
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
-                this message.
+                this message. Mutually exclusive with :paramref:`link_preview_options`.
+
+                .. versionchanged:: NEXT.VERSION
+                    Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
+                    argument. PTB will automatically convert this argument to that one, but
+                    you should update your code to use the new argument.
+
+                .. deprecated:: NEXT.VERSION
+                    In future versions, this argument will become keyword only.
+
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
 
@@ -3385,7 +3435,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
-            :class:`telegram.error.TelegramError`
+            :exc:`ValueError`: If both :paramref:`disable_web_page_preview` and
+                :paramref:`link_preview_options` are passed.
+            :class:`telegram.error.TelegramError`: For other errors.
 
         """
         data: JSONDict = {
@@ -3396,12 +3448,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "entities": entities,
         }
 
+        if disable_web_page_preview and link_preview_options:
+            raise ValueError(
+                "`disable_web_page_preview` and `link_preview_options` are mutually  exclusive."
+            )
+        # Convert to LinkPreviewOptions:
+        if not isinstance(disable_web_page_preview, DefaultValue):
+            link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
+
         return await self._send_message(
             "editMessageText",
             data,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
-            disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

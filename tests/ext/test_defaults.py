@@ -22,8 +22,9 @@ import inspect
 
 import pytest
 
-from telegram import User
+from telegram import LinkPreviewOptions, User
 from telegram.ext import Defaults
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
 
@@ -55,6 +56,8 @@ class TestDefaults:
         c = Defaults(parse_mode="HTML", quote=True, protect_content=True)
         d = Defaults(parse_mode="HTML", protect_content=True)
         e = User(123, "test_user", False)
+        f = Defaults(parse_mode="HTML", disable_web_page_preview=True)
+        g = Defaults(parse_mode="HTML", disable_web_page_preview=True)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -68,3 +71,17 @@ class TestDefaults:
 
         assert a != e
         assert hash(a) != hash(e)
+
+        assert f == g
+        assert hash(f) == hash(g)
+
+    def test_mutually_exclusive(self):
+        with pytest.raises(ValueError, match="mutually exclusive"):
+            Defaults(disable_web_page_preview=True, link_preview_options=LinkPreviewOptions(False))
+
+    def test_deprecation_warning_for_disable_web_page_preview(self):
+        with pytest.warns(PTBDeprecationWarning, match="`Defaults.disable_web_page_preview` is "):
+            Defaults(disable_web_page_preview=True)
+
+        assert Defaults(disable_web_page_preview=True).link_preview_options.is_disabled is True
+        assert Defaults(disable_web_page_preview=False).disable_web_page_preview is False

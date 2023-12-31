@@ -24,9 +24,11 @@ from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
 from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import (
+    warn_about_deprecated_arg_return_new_arg,
+    warn_about_deprecated_attr_in_property,
+)
 from telegram._webappinfo import WebAppInfo
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -149,19 +151,8 @@ class KeyboardButton(TelegramObject):
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
-        if request_users and request_user:
-            raise ValueError(
-                "Only one of request_user and request_users can be specified, not both."
-            )
-        if request_user:
-            warn(
-                "request_user is deprecated in favor of request_users and will be removed in "
-                "future versions.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-
         super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.text: str = text
         # Optionals
@@ -169,7 +160,15 @@ class KeyboardButton(TelegramObject):
         self.request_location: Optional[bool] = request_location
         self.request_poll: Optional[KeyboardButtonPollType] = request_poll
         self.web_app: Optional[WebAppInfo] = web_app
-        self.request_users: Optional[KeyboardButtonRequestUsers] = request_user or request_users
+        self.request_users: Optional[
+            KeyboardButtonRequestUsers
+        ] = warn_about_deprecated_arg_return_new_arg(
+            deprecated_arg=request_user,
+            new_arg=request_users,
+            deprecated_arg_name="request_user",
+            new_arg_name="request_users",
+            bot_api_version="7.0",
+        )
         self.request_chat: Optional[KeyboardButtonRequestChat] = request_chat
 
         self._id_attrs = (
@@ -192,11 +191,10 @@ class KeyboardButton(TelegramObject):
         .. deprecated:: NEXT.VERSION
            Bot API 7.0 deprecates this attribute in favor of :attr:`request_users`.
         """
-        warn(
-            "request_user is deprecated in favor of request_users and will be removed in future "
-            "versions.",
-            PTBDeprecationWarning,
-            stacklevel=2,
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="request_user",
+            new_attr_name="request_users",
+            bot_api_version="7.0",
         )
         return self.request_users
 

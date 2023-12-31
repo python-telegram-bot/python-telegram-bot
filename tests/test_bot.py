@@ -53,6 +53,7 @@ from telegram import (
     InputMessageContent,
     InputTextMessageContent,
     LabeledPrice,
+    LinkPreviewOptions,
     MenuButton,
     MenuButtonCommands,
     MenuButtonDefault,
@@ -88,14 +89,7 @@ from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
-
-
-def to_camel_case(snake_str):
-    """https://stackoverflow.com/a/19053800"""
-    components = snake_str.split("_")
-    # We capitalize the first letter of each component except the first one
-    # with the 'title' method and join them together.
-    return components[0] + "".join(x.title() for x in components[1:])
+from tests.auxil.string_manipulation import to_camel_case
 
 
 @pytest.fixture()
@@ -1037,6 +1031,18 @@ class TestBotWithoutRequest:
             1234, results=inline_results_callback, current_offset=6
         )
 
+    async def test_send_edit_message_mutually_exclusive_link_preview(self, bot, chat_id):
+        """Test that link_preview is mutually exclusive with disable_web_page_preview."""
+        with pytest.raises(ValueError, match="`disable_web_page_preview` and"):
+            await bot.send_message(
+                chat_id, "text", disable_web_page_preview=True, link_preview_options=True
+            )
+
+        with pytest.raises(ValueError, match="`disable_web_page_preview` and"):
+            await bot.edit_message_text(
+                "text", chat_id, 1, disable_web_page_preview=True, link_preview_options=True
+            )
+
     # get_file is tested multiple times in the test_*media* modules.
     # Here we only test the behaviour for bot apis in local mode
     async def test_get_file_local_mode(self, bot, monkeypatch):
@@ -1849,6 +1855,41 @@ class TestBotWithRequest:
         result = await tasks
         assert all("can't be forwarded" in str(exc) for exc in result)
 
+    async def test_forward_messages(self, bot, chat_id):
+        tasks = asyncio.gather(
+            bot.send_message(chat_id, text="will be forwarded"),
+            bot.send_message(chat_id, text="will be forwarded"),
+        )
+
+        msg1, msg2 = await tasks
+
+        forward_messages = await bot.forward_messages(
+            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
+        )
+
+        assert isinstance(forward_messages, tuple)
+
+        tasks = asyncio.gather(
+            bot.send_message(
+                chat_id, "temp 1", reply_to_message_id=forward_messages[0].message_id
+            ),
+            bot.send_message(
+                chat_id, "temp 2", reply_to_message_id=forward_messages[1].message_id
+            ),
+        )
+
+        temp_msg1, temp_msg2 = await tasks
+        forward_msg1 = temp_msg1.reply_to_message
+        forward_msg2 = temp_msg2.reply_to_message
+
+        assert forward_msg1.text == msg1.text
+        assert forward_msg1.forward_from.username == msg1.from_user.username
+        assert isinstance(forward_msg1.forward_date, dtm.datetime)
+
+        assert forward_msg2.text == msg2.text
+        assert forward_msg2.forward_from.username == msg2.from_user.username
+        assert isinstance(forward_msg2.forward_date, dtm.datetime)
+
     async def test_delete_message(self, bot, chat_id):
         message = await bot.send_message(chat_id, text="will be deleted")
         await asyncio.sleep(2)
@@ -1863,6 +1904,13 @@ class TestBotWithRequest:
     # send_photo, send_audio, send_document, send_sticker, send_video, send_voice, send_video_note,
     # send_media_group and send_animation are tested in their respective test modules. No need to
     # duplicate here.
+
+    async def test_delete_messages(self, bot, chat_id):
+        msg1 = await bot.send_message(chat_id, text="will be deleted")
+        msg2 = await bot.send_message(chat_id, text="will be deleted")
+        await asyncio.sleep(2)
+
+        assert await bot.delete_messages(chat_id=chat_id, message_ids=(msg1.id, msg2.id)) is True
 
     async def test_send_venue(self, bot, chat_id):
         longitude = -46.788279
@@ -3044,6 +3092,70 @@ class TestBotWithRequest:
 
     # get_forum_topic_icon_stickers, edit_forum_topic, general_forum etc...
     # are tested in the test_forum module.
+    async def test_send_message_disable_web_page_preview(self, bot, chat_id):
+        """Test that disable_web_page_preview is substituted for link_preview_options and that
+        it still works as expected for backward compatability."""
+        msg = await bot.send_message(
+            chat_id,
+            "https://github.com/python-telegram-bot/python-telegram-bot",
+            disable_web_page_preview=True,
+        )
+        assert msg.link_preview_options
+        assert msg.link_preview_options.is_disabled
+
+    async def test_send_message_link_preview_options(self, bot, chat_id):
+        """Test whether link_preview_options is correctly passed to the API."""
+        # btw it is possible to have no url in the text, but set a url for the preview.
+        msg = await bot.send_message(
+            chat_id,
+            "https://github.com/python-telegram-bot/python-telegram-bot",
+            link_preview_options=LinkPreviewOptions(prefer_small_media=True, show_above_text=True),
+        )
+        assert msg.link_preview_options
+        assert not msg.link_preview_options.is_disabled
+        # The prefer_* options aren't very consistent on the client side (big pic shown) +
+        # they are not returned by the API.
+        # assert msg.link_preview_options.prefer_small_media
+        assert msg.link_preview_options.show_above_text
+
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"link_preview_options": LinkPreviewOptions(show_above_text=True)}],
+        indirect=True,
+    )
+    async def test_send_message_default_link_preview_options(self, default_bot, chat_id):
+        """Test whether Defaults.link_preview_options is correctly fused with the passed LPO."""
+        github_url = "https://github.com/python-telegram-bot/python-telegram-bot"
+        website = "https://python-telegram-bot.org/"
+
+        # First test just the default passing:
+        coro = default_bot.send_message(chat_id, github_url)
+        # Next test fusion of both LPOs:
+        coro2 = default_bot.send_message(
+            chat_id,
+            github_url,
+            link_preview_options=LinkPreviewOptions(url=website, prefer_large_media=True),
+        )
+        # Now test fusion + overriding of passed LPO:
+        coro3 = default_bot.send_message(
+            chat_id,
+            github_url,
+            link_preview_options=LinkPreviewOptions(show_above_text=False, url=website),
+        )
+
+        msgs = asyncio.gather(coro, coro2, coro3)
+        msg, msg2, msg3 = await msgs
+        assert msg.link_preview_options
+        assert msg.link_preview_options.show_above_text
+
+        assert msg2.link_preview_options
+        assert msg2.link_preview_options.show_above_text
+        assert msg2.link_preview_options.url == website
+        assert msg2.link_preview_options.prefer_large_media  # Now works correctly using new url..
+
+        assert msg3.link_preview_options
+        assert not msg3.link_preview_options.show_above_text
+        assert msg3.link_preview_options.url == website
 
     async def test_send_message_entities(self, bot, chat_id):
         test_string = "Italic Bold Code Spoiler"
@@ -3173,8 +3285,8 @@ class TestBotWithRequest:
         assert await bot.set_my_commands(commands)
 
         for i, bc in enumerate(await bot.get_my_commands()):
-            assert bc.command == f"cmd{i+1}"
-            assert bc.description == f"descr{i+1}"
+            assert bc.command == f"cmd{i + 1}"
+            assert bc.description == f"descr{i + 1}"
 
     async def test_get_set_delete_my_commands_with_scope(self, bot, super_group_id, chat_id):
         group_cmds = [BotCommand("group_cmd", "visible to this supergroup only")]
@@ -3280,6 +3392,30 @@ class TestBotWithRequest:
             assert len(message.caption_entities) == 1
         else:
             assert len(message.caption_entities) == 0
+
+    async def test_copy_messages(self, bot, chat_id):
+        tasks = asyncio.gather(
+            bot.send_message(chat_id, text="will be copied 1"),
+            bot.send_message(chat_id, text="will be copied 2"),
+        )
+        msg1, msg2 = await tasks
+
+        copy_messages = await bot.copy_messages(
+            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
+        )
+        assert isinstance(copy_messages, tuple)
+
+        tasks = asyncio.gather(
+            bot.send_message(chat_id, "temp 1", reply_to_message_id=copy_messages[0].message_id),
+            bot.send_message(chat_id, "temp 2", reply_to_message_id=copy_messages[1].message_id),
+        )
+        temp_msg1, temp_msg2 = await tasks
+
+        forward_msg1 = temp_msg1.reply_to_message
+        forward_msg2 = temp_msg2.reply_to_message
+
+        assert forward_msg1.text == msg1.text
+        assert forward_msg2.text == msg2.text
 
     # Continue testing arbitrary callback data here with actual requests:
     async def test_replace_callback_data_send_message(self, cdc_bot, chat_id):
