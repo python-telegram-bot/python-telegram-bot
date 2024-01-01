@@ -875,7 +875,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         data: JSONDict = {"chat_id": chat_id, "text": text, "entities": entities}
 
-        if disable_web_page_preview and link_preview_options:
+        if not isinstance(disable_web_page_preview, DefaultValue) and not isinstance(
+            link_preview_options, DefaultValue
+        ):
             raise ValueError(
                 "`disable_web_page_preview` and `link_preview_options` are mutually  exclusive."
             )
@@ -3448,7 +3450,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "entities": entities,
         }
 
-        if disable_web_page_preview and link_preview_options:
+        if not isinstance(disable_web_page_preview, DefaultValue) and not isinstance(
+            link_preview_options, DefaultValue
+        ):
             raise ValueError(
                 "`disable_web_page_preview` and `link_preview_options` are mutually  exclusive."
             )
