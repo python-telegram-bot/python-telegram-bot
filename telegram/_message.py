@@ -53,7 +53,7 @@ from telegram._payment.invoice import Invoice
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
-from telegram._shared import ChatShared, UsersShared
+from telegram._shared import ChatShared, UserShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -1099,7 +1099,7 @@ class Message(TelegramObject):
         data["write_access_allowed"] = WriteAccessAllowed.de_json(
             data.get("write_access_allowed"), bot
         )
-        data["user_shared"] = UsersShared.de_json(data.get("user_shared"), bot)
+        data["user_shared"] = UserShared.de_json(data.get("user_shared"), bot)
         data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
 
