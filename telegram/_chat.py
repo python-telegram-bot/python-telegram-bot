@@ -185,13 +185,13 @@ class Chat(TelegramObject):
 
             .. versionadded:: NEXT.VERSION
         emoji_status_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of emoji
-            status of the other party in a private chat. Returned only in
+            status of the chat or the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
         emoji_status_expiration_date (:class:`datetime.datetime`, optional): Expiration date of
-            emoji status of the other party in a private chat, in seconds. Returned only in
-            :meth:`telegram.Bot.get_chat`.
+            emoji status of the chat or the other party in a private chat, in seconds. Returned
+            only in :meth:`telegram.Bot.get_chat`.
             |datetime_localization|
 
             .. versionadded:: 20.5
@@ -307,13 +307,13 @@ class Chat(TelegramObject):
 
             .. versionadded:: NEXT.VERSION
         emoji_status_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji
-            status of the other party in a private chat. Returned only in
+            status of the chat or the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
-        emoji_status_expiration_date (:class:`datetime.datetime`, optional): Expiration date of
-            emoji status of the other party in a private chat, in seconds. Returned only in
-            :meth:`telegram.Bot.get_chat`.
+        emoji_status_expiration_date (:class:`datetime.datetime`): Optional. Expiration date of
+            emoji status of the chat or the other party in a private chat, in seconds. Returned
+            only in :meth:`telegram.Bot.get_chat`.
             |datetime_localization|
 
             .. versionadded:: 20.5
