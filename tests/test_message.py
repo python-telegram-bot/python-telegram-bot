@@ -49,6 +49,7 @@ from telegram import (
     Sticker,
     Story,
     SuccessfulPayment,
+    TextQuote,
     Update,
     User,
     UserShared,
@@ -105,6 +106,7 @@ def message(bot):
                 50, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
             )
         },
+        {"quote": TextQuote("a text quote", 1)},
         {"edit_date": datetime.utcnow()},
         {
             "text": "a text message",
@@ -319,6 +321,7 @@ def message(bot):
         "giveaway_winners",
         "giveaway_completed",
         "link_preview_options",
+        "quote",
     ],
 )
 def message_params(bot, request):

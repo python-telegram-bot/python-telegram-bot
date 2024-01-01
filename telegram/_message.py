@@ -88,6 +88,7 @@ from telegram.warnings import PTBDeprecationWarning
 if TYPE_CHECKING:
     from telegram import (
         Bot,
+        ExternalReplyInfo,
         GameHighScore,
         Giveaway,
         GiveawayCompleted,
@@ -100,6 +101,7 @@ if TYPE_CHECKING:
         InputMediaVideo,
         LabeledPrice,
         MessageId,
+        TextQuote,
     )
 
 
@@ -164,6 +166,14 @@ class Message(TelegramObject):
         reply_to_message (:class:`telegram.Message`, optional): For replies, the original message.
             Note that the Message object in this field will not contain further
             ``reply_to_message`` fields even if it itself is a reply.
+        external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
+            message that is being replied to, which may come from another chat or forum topic.
+
+            .. versionadded:: NEXT.VERSION
+        quote (:class:`telegram.TextQuote`, optional): For replies that quote part of the original
+            message, the quoted part of the message.
+
+            .. versionadded:: NEXT.VERSION
         edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
 
@@ -423,6 +433,14 @@ class Message(TelegramObject):
         reply_to_message (:class:`telegram.Message`): Optional. For replies, the original message.
             Note that the Message object in this field will not contain further
             ``reply_to_message`` fields even if it itself is a reply.
+        external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
+            message that is being replied to, which may come from another chat or forum topic.
+
+            .. versionadded:: NEXT.VERSION
+        quote (:class:`telegram.TextQuote`): Optional. For replies that quote part of the original
+            message, the quoted part of the message.
+
+            .. versionadded:: NEXT.VERSION
         edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
 
@@ -684,6 +702,8 @@ class Message(TelegramObject):
         "document",
         "edit_date",
         "entities",
+        "external_reply",
+        "quote",
         "forum_topic_closed",
         "forum_topic_created",
         "forum_topic_edited",
@@ -759,6 +779,8 @@ class Message(TelegramObject):
         forward_from_message_id: Optional[int] = None,
         forward_date: Optional[datetime.datetime] = None,
         reply_to_message: Optional["Message"] = None,
+        external_reply: Optional["ExternalReplyInfo"] = None,
+        quote: Optional["TextQuote"] = None,
         edit_date: Optional[datetime.datetime] = None,
         text: Optional[str] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
@@ -857,6 +879,8 @@ class Message(TelegramObject):
         self.forward_date: Optional[datetime.datetime] = forward_date
         self.is_automatic_forward: Optional[bool] = is_automatic_forward
         self.reply_to_message: Optional[Message] = reply_to_message
+        self.external_reply: Optional[ExternalReplyInfo] = external_reply
+        self.quote: Optional[TextQuote] = quote
         self.edit_date: Optional[datetime.datetime] = edit_date
         self.has_protected_content: Optional[bool] = has_protected_content
         self.text: Optional[str] = text
@@ -1086,7 +1110,13 @@ class Message(TelegramObject):
             GiveawayCreated,
             GiveawayWinners,
         )
+        from telegram._reply import (  # pylint: disable=import-outside-toplevel
+            ExternalReplyInfo,
+            TextQuote,
+        )
 
+        data["external_reply"] = ExternalReplyInfo.de_json(data.get("external_reply"), bot)
+        data["quote"] = TextQuote.de_json(data.get("quote"), bot)
         data["giveaway"] = Giveaway.de_json(data.get("giveaway"), bot)
         data["giveaway_completed"] = GiveawayCompleted.de_json(data.get("giveaway_completed"), bot)
         data["giveaway_created"] = GiveawayCreated.de_json(data.get("giveaway_created"), bot)

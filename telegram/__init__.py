@@ -66,6 +66,7 @@ __all__ = (  # Keep this alphabetically ordered
     "Document",
     "EncryptedCredentials",
     "EncryptedPassportElement",
+    "ExternalReplyInfo",
     "error",
     "File",
     "FileCredentials",
@@ -165,6 +166,7 @@ __all__ = (  # Keep this alphabetically ordered
     "ProximityAlertTriggered",
     "ReplyKeyboardMarkup",
     "ReplyKeyboardRemove",
+    "ReplyParameters",
     "request",
     "ResidentialAddress",
     "SecureData",
@@ -179,6 +181,7 @@ __all__ = (  # Keep this alphabetically ordered
     "SuccessfulPayment",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
+    "TextQuote",
     "Update",
     "User",
     "UserProfilePhotos",
@@ -350,6 +353,7 @@ from ._payment.shippingquery import ShippingQuery
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import Poll, PollAnswer, PollOption
 from ._proximityalerttriggered import ProximityAlertTriggered
+from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage

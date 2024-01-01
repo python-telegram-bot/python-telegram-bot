@@ -271,38 +271,38 @@ class TextQuote(TelegramObject):
     Args:
         text (:obj:`str`): Text of the quoted part of a message that is replied to by the given
             message.
+        position (:obj:`int`): Approximate quote position in the original message in UTF-16 code
+            units as specified by the sender.
         entities (Sequence[:obj:`telegram.MessageEntity`], optional): Special entities that appear
             in the quote. Currently, only bold, italic, underline, strikethrough, spoiler, and
             custom_emoji entities are kept in quotes.
-        position (:obj:`int`, optional): Approximate quote position in the original message in
-            UTF-16 code units as specified by the sender.
         is_manual (:obj:`bool`, optional): :obj:`True`, if the quote was chosen manually by the
             message sender. Otherwise, the quote was added automatically by the server.
 
     Attributes:
         text (:obj:`str`): Text of the quoted part of a message that is replied to by the given
             message.
+        position (:obj:`int`): Approximate quote position in the original message in UTF-16 code
+            units as specified by the sender.
         entities (Tuple[:obj:`telegram.MessageEntity`]): Optional. Special entities that appear
             in the quote. Currently, only bold, italic, underline, strikethrough, spoiler, and
             custom_emoji entities are kept in quotes.
-        position (:obj:`int`): Optional. Approximate quote position in the original message in
-            UTF-16 code units as specified by the sender.
         is_manual (:obj:`bool`): Optional. :obj:`True`, if the quote was chosen manually by the
             message sender. Otherwise, the quote was added automatically by the server.
     """
 
     __slots__ = (
         "text",
-        "entities",
         "position",
+        "entities",
         "is_manual",
     )
 
     def __init__(
         self,
         text: str,
+        position: int,
         entities: Optional[Sequence[MessageEntity]] = None,
-        position: Optional[int] = None,
         is_manual: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -310,8 +310,8 @@ class TextQuote(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         self.text: str = text
+        self.position: int = position
         self.entities: Optional[Tuple[MessageEntity, ...]] = parse_sequence_arg(entities)
-        self.position: Optional[int] = position
         self.is_manual: Optional[bool] = is_manual
 
         self._id_attrs = (self.text,)
@@ -339,7 +339,7 @@ class ReplyParameters(TelegramObject):
 
     Args:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
-            chat, or in the chat chat_id if it is specified.
+            chat, or in the chat :paramref:`chat_id` if it is specified.
         chat_id (:obj:`int` | :obj:`str`, optional): If the message to be replied to is from a
             different chat, |channel_id_channel|
         allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply| Can be
@@ -360,7 +360,7 @@ class ReplyParameters(TelegramObject):
 
     Attributes:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
-            chat, or in the chat chat_id if it is specified.
+            chat, or in the chat :paramref:`chat_id` if it is specified.
         chat_id (:obj:`int` | :obj:`str`): Optional. If the message to be replied to is from a
             different chat, |channel_id_channel|
         allow_sending_without_reply (:obj:`bool`): Optional. |allow_sending_without_reply| Can be

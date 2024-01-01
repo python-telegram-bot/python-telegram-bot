@@ -38,6 +38,7 @@ Available Types
     telegram.contact
     telegram.dice
     telegram.document
+    telegram.externalreplyinfo
     telegram.file
     telegram.forcereply
     telegram.forumtopic
@@ -84,10 +85,12 @@ Available Types
     telegram.proximityalerttriggered
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
+    telegram.replyparameters
     telegram.sentwebappmessage
     telegram.story
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
+    telegram.textquote
     telegram.update
     telegram.user
     telegram.userprofilephotos
