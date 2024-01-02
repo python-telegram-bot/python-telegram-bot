@@ -1,4 +1,4 @@
-# Make sure that the additional_dependencies here match requirements.txt
+# Make sure that the additional_dependencies here match requirements(-opts).txt
 
 ci:
     autofix_prs: false
@@ -28,7 +28,7 @@ repos:
           - --jobs=0
 
         additional_dependencies:
-          - httpx~=0.25.2
+          - httpx~=0.26.0
           - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.2
@@ -44,7 +44,7 @@ repos:
           - types-pytz
           - types-cryptography
           - types-cachetools
-          - httpx~=0.25.2
+          - httpx~=0.26.0
           - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.2
@@ -83,7 +83,7 @@ repos:
         name: ruff
         files: ^(telegram|examples|tests)/.*\.py$
         additional_dependencies:
-          - httpx~=0.25.2
+          - httpx~=0.26.0
           - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.2

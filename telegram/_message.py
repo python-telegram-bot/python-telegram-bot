@@ -45,6 +45,7 @@ from telegram._forumtopic import (
 )
 from telegram._games.game import Game
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._passport.passportdata import PassportData
@@ -52,7 +53,7 @@ from telegram._payment.invoice import Invoice
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
-from telegram._shared import ChatShared, UserShared
+from telegram._shared import ChatShared, UserShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -67,6 +68,11 @@ from telegram._utils.types import (
     ODVInput,
     ReplyMarkup,
 )
+from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import (
+    build_deprecation_warning_message,
+    warn_about_deprecated_attr_in_property,
+)
 from telegram._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -77,11 +83,17 @@ from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
 from telegram.constants import Date, MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import (
         Bot,
+        ExternalReplyInfo,
         GameHighScore,
+        Giveaway,
+        GiveawayCompleted,
+        GiveawayCreated,
+        GiveawayWinners,
         InputMedia,
         InputMediaAudio,
         InputMediaDocument,
@@ -89,6 +101,7 @@ if TYPE_CHECKING:
         InputMediaVideo,
         LabeledPrice,
         MessageId,
+        TextQuote,
     )
 
 
@@ -259,6 +272,14 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message (:class:`telegram.Message`, optional): For replies, the original message.
             Note that the Message object in this field will not contain further
             ``reply_to_message`` fields even if it itself is a reply.
+        external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
+            message that is being replied to, which may come from another chat or forum topic.
+
+            .. versionadded:: NEXT.VERSION
+        quote (:class:`telegram.TextQuote`, optional): For replies that quote part of the original
+            message, the quoted part of the message.
+
+            .. versionadded:: NEXT.VERSION
         edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
 
@@ -279,6 +300,12 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|
+
+        link_preview_options (:class:`telegram.LinkPreviewOptions`, optional): Options used for
+            link preview generation for the message, if it is a text message and link preview
+            options were changed.
+
+            .. versionadded:: NEXT.VERSION
 
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -449,14 +476,37 @@ class Message(MaybeInaccessibleMessage):
             by a spoiler animation.
 
             .. versionadded:: 20.0
-        user_shared (:class:`telegram.UserShared`, optional): Service message: a user was shared
+        user_shared (:class:`telegram.UsersShared`, optional): Service message: a user was shared
             with the bot.
 
             .. versionadded:: 20.1
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`user_shared` in favor of :paramref:`users_shared`.
+        users_shared (:class:`telegram.UsersShared`, optional): Service message: users were shared
+            with the bot
+
+            .. versionadded:: NEXT.VERSION
         chat_shared (:class:`telegram.ChatShared`, optional):Service message: a chat was shared
             with the bot.
 
             .. versionadded:: 20.1
+        giveaway_created (:class:`telegram.GiveawayCreated`, optional): Service message: a
+            scheduled giveaway was created
+
+            .. versionadded:: NEXT.VERSION
+        giveaway (:class:`telegram.Giveaway`, optional): The message is a scheduled giveaway
+            message
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_winners (:class:`telegram.GiveawayWinners`, optional): A giveaway with public
+            winners was completed
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_completed (:class:`telegram.GiveawayCompleted`, optional): Service message: a
+            giveaway without public winners was completed
+
+            .. versionadded:: NEXT.VERSION
+
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -493,6 +543,14 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message (:class:`telegram.Message`): Optional. For replies, the original message.
             Note that the Message object in this field will not contain further
             ``reply_to_message`` fields even if it itself is a reply.
+        external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
+            message that is being replied to, which may come from another chat or forum topic.
+
+            .. versionadded:: NEXT.VERSION
+        quote (:class:`telegram.TextQuote`): Optional. For replies that quote part of the original
+            message, the quoted part of the message.
+
+            .. versionadded:: NEXT.VERSION
         edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
 
@@ -513,6 +571,12 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
+
+        link_preview_options (:class:`telegram.LinkPreviewOptions`): Optional. Options used for
+            link preview generation for the message, if it is a text message and link preview
+            options were changed.
+
+            .. versionadded:: NEXT.VERSION
 
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -700,14 +764,30 @@ class Message(MaybeInaccessibleMessage):
             by a spoiler animation.
 
             .. versionadded:: 20.0
-        user_shared (:class:`telegram.UserShared`): Optional. Service message: a user was shared
-            with the bot.
+        users_shared (:class:`telegram.UsersShared`): Optional. Service message: users were shared
+            with the bot
 
-            .. versionadded:: 20.1
+            .. versionadded:: NEXT.VERSION
         chat_shared (:class:`telegram.ChatShared`): Optional. Service message: a chat was shared
             with the bot.
 
             .. versionadded:: 20.1
+        giveaway_created (:class:`telegram.GiveawayCreated`): Optional. Service message: a
+            scheduled giveaway was created
+
+            .. versionadded:: NEXT.VERSION
+        giveaway (:class:`telegram.Giveaway`): Optional. The message is a scheduled giveaway
+            message
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_winners (:class:`telegram.GiveawayWinners`): Optional. A giveaway with public
+            winners was completed
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_completed (:class:`telegram.GiveawayCompleted`): Optional. Service message: a
+            giveaway without public winners was completed
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
         function. Instead, the supplied replacement for the emoji will be used.
@@ -719,76 +799,97 @@ class Message(MaybeInaccessibleMessage):
 
     # fmt: on
     __slots__ = (
-        "reply_markup",
+        "_effective_attachment",
+        "animation",
         "audio",
+        "author_signature",
+        "caption",
+        "caption_entities",
+        "channel_chat_created",
+        "chat",
+        "chat_shared",
+        "connected_website",
         "contact",
-        "migrate_to_chat_id",
+        "date",
+        "delete_chat_photo",
+        "dice",
+        "document",
+        "edit_date",
+        "entities",
+        "external_reply",
+        "quote",
+        "forum_topic_closed",
+        "forum_topic_created",
+        "forum_topic_edited",
+        "forum_topic_reopened",
+        "forward_date",
+        "forward_from",
+        "forward_from_chat",
+        "forward_from_message_id",
+        "forward_sender_name",
         "forward_signature",
+        "from_user",
         "successful_payment",
         "game",
-        "text",
-        "forward_sender_name",
-        "document",
-        "new_chat_title",
-        "forward_date",
+        "general_forum_topic_hidden",
+        "general_forum_topic_unhidden",
+        "giveaway",
+        "giveaway_completed",
+        "giveaway_created",
+        "giveaway_winners",
         "group_chat_created",
-        "media_group_id",
-        "caption",
-        "video",
-        "entities",
-        "via_bot",
-        "new_chat_members",
-        "connected_website",
-        "animation",
-        "migrate_from_chat_id",
-        "forward_from",
-        "sticker",
+        "has_media_spoiler",
+        "has_protected_content",
+        "invoice",
+        "is_automatic_forward",
+        "is_topic_message",
+        "left_chat_member",
+        "link_preview_options",
         "location",
-        "venue",
-        "edit_date",
-        "reply_to_message",
+        "media_group_id",
+        "message_auto_delete_timer_changed",
+        "message_id",
+        "message_thread_id",
+        "migrate_from_chat_id",
+        "migrate_to_chat_id",
+        "new_chat_members",
+        "new_chat_photo",
+        "new_chat_title",
         "passport_data",
+        "photo",
         "pinned_message",
         "forward_from_chat",
         "new_chat_photo",
         "delete_chat_photo",
         "from_user",
         "author_signature",
+        "poll",
         "proximity_alert_triggered",
+        "reply_markup",
+        "reply_to_message",
         "sender_chat",
+        "sticker",
+        "story",
+        "successful_payment",
         "dice",
         "forward_from_message_id",
         "caption_entities",
         "voice",
         "supergroup_chat_created",
-        "poll",
-        "left_chat_member",
-        "photo",
-        "channel_chat_created",
-        "invoice",
-        "video_note",
-        "_effective_attachment",
-        "message_auto_delete_timer_changed",
+        "text",
+        "_user_shared",
+        "users_shared",
+        "venue",
+        "via_bot",
+        "video",
         "video_chat_ended",
         "video_chat_participants_invited",
-        "video_chat_started",
         "video_chat_scheduled",
-        "is_automatic_forward",
-        "has_protected_content",
+        "video_chat_started",
+        "video_note",
+        "voice",
         "web_app_data",
-        "is_topic_message",
-        "message_thread_id",
-        "forum_topic_created",
-        "forum_topic_closed",
-        "forum_topic_reopened",
-        "forum_topic_edited",
-        "general_forum_topic_hidden",
-        "general_forum_topic_unhidden",
         "write_access_allowed",
-        "has_media_spoiler",
-        "user_shared",
-        "chat_shared",
-        "story",
     )
 
     def __init__(
@@ -802,6 +903,8 @@ class Message(MaybeInaccessibleMessage):
         forward_from_message_id: Optional[int] = None,
         forward_date: Optional[datetime.datetime] = None,
         reply_to_message: Optional["Message"] = None,
+        external_reply: Optional["ExternalReplyInfo"] = None,
+        quote: Optional["TextQuote"] = None,
         edit_date: Optional[datetime.datetime] = None,
         text: Optional[str] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
@@ -864,14 +967,31 @@ class Message(MaybeInaccessibleMessage):
         general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = None,
         write_access_allowed: Optional[WriteAccessAllowed] = None,
         has_media_spoiler: Optional[bool] = None,
-        user_shared: Optional[UserShared] = None,
+        user_shared: Optional[UsersShared] = None,
         chat_shared: Optional[ChatShared] = None,
         story: Optional[Story] = None,
+        giveaway: Optional["Giveaway"] = None,
+        giveaway_completed: Optional["GiveawayCompleted"] = None,
+        giveaway_created: Optional["GiveawayCreated"] = None,
+        giveaway_winners: Optional["GiveawayWinners"] = None,
+        users_shared: Optional[UsersShared] = None,
+        link_preview_options: Optional[LinkPreviewOptions] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(chat=chat, message_id=message_id, date=date, api_kwargs=api_kwargs)
 
+        if user_shared:
+            warn(
+                build_deprecation_warning_message(
+                    deprecated_name="user_shared",
+                    new_name="users_shared",
+                    object_type="parameter",
+                    bot_api_version="7.0",
+                ),
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
         # TODO I copied this from Chatmember, not sure if there is a better way
         with self._unfrozen():
             # Required
@@ -964,6 +1084,27 @@ class Message(MaybeInaccessibleMessage):
             self._id_attrs = (self.message_id, self.chat)
 
             self._freeze()
+
+    @property
+    def user_shared(self) -> Optional[UsersShared]:
+        """:class:`telegram.UsersShared`: Optional. Service message. A user was shared with the
+        bot.
+
+        Hint:
+            In case a single user was shared, :attr:`user_shared` will be present in addition to
+            :attr:`users_shared`. If multiple users where shared, only :attr:`users_shared` will
+            be present. However, this behavior is not documented and may be changed by Telegram.
+
+        .. versionadded:: 20.1
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`user_shared` in favor of :attr:`users_shared`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="user_shared",
+            new_attr_name="users_shared",
+            bot_api_version="7.0",
+        )
+        return self._user_shared
 
     @property
     def chat_id(self) -> int:
@@ -1076,7 +1217,30 @@ class Message(MaybeInaccessibleMessage):
             data.get("write_access_allowed"), bot
         )
         data["user_shared"] = UserShared.de_json(data.get("user_shared"), bot)
+        data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
+
+        # Unfortunately, this needs to be here due to cyclic imports
+        from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
+            Giveaway,
+            GiveawayCompleted,
+            GiveawayCreated,
+            GiveawayWinners,
+        )
+        from telegram._reply import (  # pylint: disable=import-outside-toplevel
+            ExternalReplyInfo,
+            TextQuote,
+        )
+
+        data["external_reply"] = ExternalReplyInfo.de_json(data.get("external_reply"), bot)
+        data["quote"] = TextQuote.de_json(data.get("quote"), bot)
+        data["giveaway"] = Giveaway.de_json(data.get("giveaway"), bot)
+        data["giveaway_completed"] = GiveawayCompleted.de_json(data.get("giveaway_completed"), bot)
+        data["giveaway_created"] = GiveawayCreated.de_json(data.get("giveaway_created"), bot)
+        data["giveaway_winners"] = GiveawayWinners.de_json(data.get("giveaway_winners"), bot)
+        data["link_preview_options"] = LinkPreviewOptions.de_json(
+            data.get("link_preview_options"), bot
+        )
 
         return super().de_json(data=data, bot=bot)
 

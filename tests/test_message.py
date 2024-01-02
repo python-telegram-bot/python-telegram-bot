@@ -31,7 +31,12 @@ from telegram import (
     Dice,
     Document,
     Game,
+    Giveaway,
+    GiveawayCompleted,
+    GiveawayCreated,
+    GiveawayWinners,
     Invoice,
+    LinkPreviewOptions,
     Location,
     Message,
     MessageAutoDeleteTimerChanged,
@@ -44,9 +49,10 @@ from telegram import (
     Sticker,
     Story,
     SuccessfulPayment,
+    TextQuote,
     Update,
     User,
-    UserShared,
+    UsersShared,
     Venue,
     Video,
     VideoChatEnded,
@@ -60,12 +66,14 @@ from telegram import (
 from telegram._utils.datetime import UTC
 from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
+from telegram.warnings import PTBDeprecationWarning
 from tests._passport.test_passport import RAW_PASSPORT_DATA
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.build_messages import make_message
 from tests.auxil.slots import mro_slots
 
 
@@ -97,6 +105,7 @@ def message(bot):
                 50, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
             )
         },
+        {"quote": TextQuote("a text quote", 1)},
         {"edit_date": datetime.utcnow()},
         {
             "text": "a text message",
@@ -212,8 +221,44 @@ def message(bot):
         },
         {"web_app_data": WebAppData("some_data", "some_button_text")},
         {"message_thread_id": 123},
-        {"user_shared": UserShared(1, 2)},
+        # Using a `UserShared` object here doesn't work, because `to_dict` produces `user_ids`
+        # instead of `user_id` - but that's what we want to test here.
+        {"user_shared": {"request_id": 1, "user_id": 2}},
+        {"users_shared": UsersShared(1, [2, 3])},
         {"chat_shared": ChatShared(3, 4)},
+        {
+            "giveaway": Giveaway(
+                chats=[Chat(1, Chat.SUPERGROUP)],
+                winners_selection_date=datetime.utcnow().replace(microsecond=0),
+                winner_count=5,
+            )
+        },
+        {"giveaway_created": GiveawayCreated()},
+        {
+            "giveaway_winners": GiveawayWinners(
+                chat=Chat(1, Chat.CHANNEL),
+                giveaway_message_id=123456789,
+                winners_selection_date=datetime.utcnow().replace(microsecond=0),
+                winner_count=42,
+                winners=[User(1, "user1", False), User(2, "user2", False)],
+            )
+        },
+        {
+            "giveaway_completed": GiveawayCompleted(
+                winner_count=42,
+                unclaimed_prize_count=4,
+                giveaway_message=make_message(text="giveaway_message"),
+            )
+        },
+        {
+            "link_preview_options": LinkPreviewOptions(
+                is_disabled=True,
+                url="https://python-telegram-bot.org",
+                prefer_small_media=True,
+                prefer_large_media=True,
+                show_above_text=True,
+            )
+        },
     ],
     ids=[
         "forwarded_user",
@@ -270,7 +315,14 @@ def message(bot):
         "web_app_data",
         "message_thread_id",
         "user_shared",
+        "users_shared",
         "chat_shared",
+        "giveaway",
+        "giveaway_created",
+        "giveaway_winners",
+        "giveaway_completed",
+        "link_preview_options",
+        "quote",
     ],
 )
 def message_params(bot, request):
@@ -430,6 +482,22 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         assert a != e
         assert hash(a) != hash(e)
+
+    def test_user_shared_init_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'user_shared' was renamed to 'users_shared'"
+        ) as record:
+            Message(message_id=1, date=self.date, chat=self.chat, user_shared=1)
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_user_shared_property_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'user_shared' to 'users_shared'"
+        ) as record:
+            message.user_shared
+
+        assert record[0].filename == __file__, "wrong stacklevel"
 
     async def test_parse_entity(self):
         text = (

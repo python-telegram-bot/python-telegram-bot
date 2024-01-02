@@ -38,6 +38,7 @@ Available Types
     telegram.contact
     telegram.dice
     telegram.document
+    telegram.externalreplyinfo
     telegram.file
     telegram.forcereply
     telegram.forumtopic
@@ -47,6 +48,10 @@ Available Types
     telegram.forumtopicreopened
     telegram.generalforumtopichidden
     telegram.generalforumtopicunhidden
+    telegram.giveaway
+    telegram.giveawaycompleted
+    telegram.giveawaycreated
+    telegram.giveawaywinners
     telegram.inaccessiblemessage
     telegram.inlinekeyboardbutton
     telegram.inlinekeyboardmarkup
@@ -62,6 +67,8 @@ Available Types
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat
     telegram.keyboardbuttonrequestuser
+    telegram.keyboardbuttonrequestusers
+    telegram.linkpreviewoptions
     telegram.location
     telegram.loginurl
     telegram.maybeinaccessiblemessage
@@ -83,14 +90,17 @@ Available Types
     telegram.reactiontypeemoji
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
+    telegram.replyparameters
     telegram.sentwebappmessage
     telegram.story
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
+    telegram.textquote
     telegram.update
     telegram.user
     telegram.userprofilephotos
     telegram.usershared
+    telegram.usersshared
     telegram.venue
     telegram.video
     telegram.videochatended

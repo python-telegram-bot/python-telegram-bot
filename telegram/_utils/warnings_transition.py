@@ -29,6 +29,23 @@ from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
 
 
+def build_deprecation_warning_message(
+    deprecated_name: str,
+    new_name: str,
+    object_type: str,
+    bot_api_version: str,
+) -> str:
+    """Builds a warning message for the transition in API when an object is renamed.
+
+    Returns a warning message that can be used in `warn` function.
+    """
+    return (
+        f"The {object_type} '{deprecated_name}' was renamed to '{new_name}' in Bot API "
+        f"{bot_api_version}. We recommend using '{new_name}' instead of "
+        f"'{deprecated_name}'."
+    )
+
+
 # Narrower type hints will cause linting errors and/or circular imports.
 # We'll use `Any` here and put type hints in the calling code.
 def warn_about_deprecated_arg_return_new_arg(
@@ -50,11 +67,15 @@ def warn_about_deprecated_arg_return_new_arg(
     different.
     """
     if deprecated_arg and new_arg and deprecated_arg != new_arg:
+        base_message = build_deprecation_warning_message(
+            deprecated_name=deprecated_arg_name,
+            new_name=new_arg_name,
+            object_type="parameter",
+            bot_api_version=bot_api_version,
+        )
         raise ValueError(
             f"You passed different entities as '{deprecated_arg_name}' and '{new_arg_name}'. "
-            f"The parameter '{deprecated_arg_name}' was renamed to '{new_arg_name}' in Bot API "
-            f"{bot_api_version}. We recommend using '{new_arg_name}' instead of "
-            f"'{deprecated_arg_name}'."
+            f"{base_message}"
         )
 
     if deprecated_arg:

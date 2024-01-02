@@ -79,6 +79,7 @@ from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
+from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
@@ -670,7 +671,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-        disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -688,12 +689,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         using `Any` instead saves us a lot of `type: ignore` comments
         """
         # We don't check if (DEFAULT_)None here, so that _post is able to insert the defaults
-        # correctly, if necessary
+        # correctly, if necessary:
         data["disable_notification"] = disable_notification
         data["allow_sending_without_reply"] = allow_sending_without_reply
         data["protect_content"] = protect_content
         data["parse_mode"] = parse_mode
-        data["disable_web_page_preview"] = disable_web_page_preview
+        data["link_preview_options"] = link_preview_options
 
         if reply_to_message_id is not None:
             data["reply_to_message_id"] = reply_to_message_id
@@ -800,13 +801,17 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Optional[Sequence["MessageEntity"]] = None,
+        # Deprecated since Bot API 7.0 (to be made keyword arg):
+        # ---
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
+        # ---
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -828,8 +833,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
+            link_preview_options (:obj:`LinkPreviewOptions`, optional): Link preview generation
+                options for the message. Mutually exclusive with
+                :paramref:`disable_web_page_preview`.
+
+                .. versionadded:: NEXT.VERSION
+
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
-                this message.
+                this message. Mutually exclusive with :paramref:`link_preview_options`.
+
+                .. versionchanged:: NEXT.VERSION
+                    Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
+                    argument. PTB will automatically convert this argument to that one, but
+                    you should update your code to use the new argument.
+
+                .. deprecated:: NEXT.VERSION
+                    In future versions, this argument will become keyword only.
+
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -848,10 +868,22 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             :class:`telegram.Message`: On success, the sent message is returned.
 
         Raises:
-            :class:`telegram.error.TelegramError`
+            :exc:`ValueError`: If both :paramref:`disable_web_page_preview` and
+                :paramref:`link_preview_options` are passed.
+            :class:`telegram.error.TelegramError`: For other errors.
 
         """
         data: JSONDict = {"chat_id": chat_id, "text": text, "entities": entities}
+
+        if not isinstance(disable_web_page_preview, DefaultValue) and not isinstance(
+            link_preview_options, DefaultValue
+        ):
+            raise ValueError(
+                "`disable_web_page_preview` and `link_preview_options` are mutually  exclusive."
+            )
+        # Convert to LinkPreviewOptions:
+        if not isinstance(disable_web_page_preview, DefaultValue):
+            link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
 
         return await self._send_message(
             "sendMessage",
@@ -863,7 +895,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             parse_mode=parse_mode,
-            disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -922,6 +954,46 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         data: JSONDict = {"chat_id": chat_id, "message_id": message_id}
         return await self._post(
             "deleteMessage",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def delete_messages(
+        self,
+        chat_id: Union[int, str],
+        message_ids: Sequence[int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Use this method to delete multiple messages simultaneously. If some of the specified
+        messages can't be found, they are skipped.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            message_ids (Sequence[:obj:`int`]): Identifiers of 1-100 messages to delete.
+                See :meth:`delete_message` for limitations on which messages can be deleted.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {"chat_id": chat_id, "message_ids": message_ids}
+        return await self._post(
+            "deleteMessages",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -995,6 +1067,67 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
+
+    @_log
+    async def forward_messages(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple[MessageId, ...]:
+        """
+        Use this method to forward messages of any kind. If some of the specified messages can't be
+        found or forwarded, they are skipped. Service messages and messages with protected content
+        can't be forwarded. Album grouping is kept for forwarded messages.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
+                original message was sent (or channel username in the format ``@channelusername``).
+            message_ids (Sequence[:obj:`int`]): Identifiers of 1-100 messages in the chat
+                :paramref:`from_chat_id` to forward. The identifiers must be specified in a
+                strictly increasing order.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+        Returns:
+            Tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
+            is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "from_chat_id": from_chat_id,
+            "message_ids": message_ids,
+            "disable_notification": disable_notification,
+            "protect_content": protect_content,
+            "message_thread_id": message_thread_id,
+        }
+
+        result = await self._post(
+            "forwardMessages",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return MessageId.de_list(result, self)
 
     @_log
     async def send_photo(
@@ -3238,9 +3371,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
+        # Deprecated since Bot API 7.0 (to be keyword only):
+        # ---
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
+        # ---
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3274,8 +3411,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
+
+            link_preview_options (:obj:`LinkPreviewOptions`, optional): Link preview generation
+                options for the message. Mutually exclusive with
+                :paramref:`disable_web_page_preview`.
+
+                .. versionadded:: NEXT.VERSION
+
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
-                this message.
+                this message. Mutually exclusive with :paramref:`link_preview_options`.
+
+                .. versionchanged:: NEXT.VERSION
+                    Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
+                    argument. PTB will automatically convert this argument to that one, but
+                    you should update your code to use the new argument.
+
+                .. deprecated:: NEXT.VERSION
+                    In future versions, this argument will become keyword only.
+
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
 
@@ -3284,7 +3437,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             edited message is returned, otherwise :obj:`True` is returned.
 
         Raises:
-            :class:`telegram.error.TelegramError`
+            :exc:`ValueError`: If both :paramref:`disable_web_page_preview` and
+                :paramref:`link_preview_options` are passed.
+            :class:`telegram.error.TelegramError`: For other errors.
 
         """
         data: JSONDict = {
@@ -3295,12 +3450,22 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "entities": entities,
         }
 
+        if not isinstance(disable_web_page_preview, DefaultValue) and not isinstance(
+            link_preview_options, DefaultValue
+        ):
+            raise ValueError(
+                "`disable_web_page_preview` and `link_preview_options` are mutually  exclusive."
+            )
+        # Convert to LinkPreviewOptions:
+        if not isinstance(disable_web_page_preview, DefaultValue):
+            link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
+
         return await self._send_message(
             "editMessageText",
             data,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
-            disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -6861,6 +7026,75 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         return MessageId.de_json(result, self)  # type: ignore[return-value]
 
     @_log
+    async def copy_messages(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        remove_caption: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple[MessageId, ...]:
+        """
+        Use this method to copy messages of any kind. If some of the specified messages can't be
+        found or copied, they are skipped. Service messages, giveaway messages, giveaway winners
+        messages, and invoice messages can't be copied. A quiz poll can be copied only if the value
+        of the field correct_option_id is known to the bot. The method is analogous to the method
+        :meth:`forward_messages`, but the copied messages don't have a link to the original
+        message. Album grouping is kept for copied messages.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
+                original message was sent (or channel username in the format ``@channelusername``).
+            message_ids (Sequence[:obj:`int`]): Identifiers of 1-100 messages in the chat
+                :paramref:`from_chat_id` to copy. The identifiers must be specified in a strictly
+                increasing order.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+            remove_caption (:obj:`bool`, optional): Pass :obj:`True` to copy the messages without
+                their captions.
+
+        Returns:
+            Tuple[:class:`telegram.MessageId`]: On success, returns a tuple of `MessageId` of the
+            sent messages.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "from_chat_id": from_chat_id,
+            "message_ids": message_ids,
+            "disable_notification": disable_notification,
+            "protect_content": protect_content,
+            "message_thread_id": message_thread_id,
+            "remove_caption": remove_caption,
+        }
+
+        result = await self._post(
+            "copyMessages",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return MessageId.de_list(result, self)
+
+    @_log
     async def set_chat_menu_button(
         self,
         chat_id: Optional[int] = None,
@@ -7920,8 +8154,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`send_message`"""
     deleteMessage = delete_message
     """Alias for :meth:`delete_message`"""
+    deleteMessages = delete_messages
+    """Alias for :meth:`delete_messages`"""
     forwardMessage = forward_message
     """Alias for :meth:`forward_message`"""
+    forwardMessages = forward_messages
+    """Alias for :meth:`forward_messages`"""
     sendPhoto = send_photo
     """Alias for :meth:`send_photo`"""
     sendAudio = send_audio
@@ -8080,6 +8318,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`log_out`"""
     copyMessage = copy_message
     """Alias for :meth:`copy_message`"""
+    copyMessages = copy_messages
+    """Alias for :meth:`copy_messages`"""
     getChatMenuButton = get_chat_menu_button
     """Alias for :meth:`get_chat_menu_button`"""
     setChatMenuButton = set_chat_menu_button

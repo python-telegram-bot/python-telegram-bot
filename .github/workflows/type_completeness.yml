@@ -50,6 +50,14 @@ jobs:
               json.load(open("pr.json", "rb"))["typeCompleteness"]["completenessScore"]
             )
             base_text = f"This PR changes type completeness from {round(base, 3)} to {round(pr, 3)}."
+            
+            if base == 0:
+                text = f"Something is broken in the workflow. Reported type completeness is 0. 💥"
+                set_summary(text)
+                print(Path("pr.readable").read_text(encoding="utf-8"))
+                error(text)
+                exit(1)
+            
             if pr < (base - 0.001):
                 text = f"{base_text} ❌"
                 set_summary(text)

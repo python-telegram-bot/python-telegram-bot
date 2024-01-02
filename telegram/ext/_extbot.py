@@ -63,6 +63,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
     InputMedia,
+    LinkPreviewOptions,
     Location,
     MaskPosition,
     MenuButton,
@@ -395,6 +396,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         #    we fall back to the default value of the bot method
         # 2) convert all datetime.datetime objects to timestamps wrt the correct default timezone
         # 3) set the correct parse_mode for all InputMedia objects
+        # 4) handle the LinkPreviewOptions case (see below)
         for key, val in data.items():
             # 1)
             if isinstance(val, DefaultValue):
@@ -426,6 +428,29 @@ class ExtBot(Bot, Generic[RLARGS]):
                             media.parse_mode = self.defaults.parse_mode if self.defaults else None
 
                 data[key] = copy_list
+
+            # 4)
+            # We need handle the LinkPreviewOptions case:
+            # If Defaults.LPO is set, and LPO is passed in the bot method we should fuse
+            # them, giving precedence to passed values.
+            # Defaults.LPO(True, "google.com", True) & # LPO=LPO(True, ..., False) ->
+            # LPO(True, "google.com", False)
+            elif (
+                isinstance(val, LinkPreviewOptions)
+                and self.defaults
+                and (passed_lpo := data.get(key, False)) is not DEFAULT_NONE
+                and (defaults_lpo := self.defaults.api_defaults.get(key, None)) is not None
+            ):
+                defaults_lpo_dict = defaults_lpo.to_dict()
+                passed_lpo_dict = passed_lpo.to_dict()  # type: ignore[attr-defined]
+
+                passed_lpo_dict.update(
+                    (k, DefaultValue.get_value(defaults_lpo_dict[k]))
+                    for k in defaults_lpo_dict
+                    if k not in passed_lpo_dict
+                )
+                fused_lpo = LinkPreviewOptions.de_json(passed_lpo_dict, self)
+                data[key] = fused_lpo
 
     def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
@@ -509,7 +534,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-        disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
+        link_preview_options: ODVInput[LinkPreviewOptions] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -531,7 +556,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
-            disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -707,6 +732,39 @@ class ExtBot(Bot, Generic[RLARGS]):
             reply_markup=self._replace_keyboard(reply_markup),
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def copy_messages(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        remove_caption: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Tuple["MessageId", ...]:
+        # We override this method to call self._replace_keyboard
+        return await super().copy_messages(
+            chat_id=chat_id,
+            from_chat_id=from_chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            remove_caption=remove_caption,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1188,6 +1246,28 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def delete_messages(
+        self,
+        chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> bool:
+        return await super().delete_messages(
+            chat_id=chat_id,
+            message_ids=message_ids,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     async def delete_my_commands(
         self,
         scope: Optional[BotCommandScope] = None,
@@ -1462,6 +1542,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1484,6 +1565,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            link_preview_options=link_preview_options,
         )
 
     async def export_chat_invite_link(
@@ -1526,6 +1608,36 @@ class ExtBot(Bot, Generic[RLARGS]):
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_id=message_id,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def forward_messages(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Tuple[MessageId, ...]:
+        return await super().forward_messages(
+            chat_id=chat_id,
+            from_chat_id=from_chat_id,
+            message_ids=message_ids,
             disable_notification=disable_notification,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
@@ -2613,6 +2725,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2638,6 +2751,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            link_preview_options=link_preview_options,
         )
 
     async def send_photo(
@@ -3742,7 +3856,9 @@ class ExtBot(Bot, Generic[RLARGS]):
     getMe = get_me
     sendMessage = send_message
     deleteMessage = delete_message
+    deleteMessages = delete_messages
     forwardMessage = forward_message
+    forwardMessages = forward_messages
     sendPhoto = send_photo
     sendAudio = send_audio
     sendDocument = send_document
@@ -3822,6 +3938,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     deleteMyCommands = delete_my_commands
     logOut = log_out
     copyMessage = copy_message
+    copyMessages = copy_messages
     getChatMenuButton = get_chat_menu_button
     setChatMenuButton = set_chat_menu_button
     getMyDefaultAdministratorRights = get_my_default_administrator_rights

@@ -19,7 +19,6 @@
 """A library that provides a Python interface to the Telegram Bot API"""
 
 __author__ = "devs@python-telegram-bot.org"
-
 __all__ = (  # Keep this alphabetically ordered
     "__bot_api_version__",
     "__bot_api_version_info__",
@@ -67,6 +66,7 @@ __all__ = (  # Keep this alphabetically ordered
     "Document",
     "EncryptedCredentials",
     "EncryptedPassportElement",
+    "ExternalReplyInfo",
     "error",
     "File",
     "FileCredentials",
@@ -80,6 +80,10 @@ __all__ = (  # Keep this alphabetically ordered
     "GameHighScore",
     "GeneralForumTopicHidden",
     "GeneralForumTopicUnhidden",
+    "Giveaway",
+    "GiveawayCreated",
+    "GiveawayCompleted",
+    "GiveawayWinners",
     "helpers",
     "IdDocumentData",
     "InaccessibleMessage",
@@ -127,7 +131,9 @@ __all__ = (  # Keep this alphabetically ordered
     "KeyboardButtonPollType",
     "KeyboardButtonRequestChat",
     "KeyboardButtonRequestUser",
+    "KeyboardButtonRequestUsers",
     "LabeledPrice",
+    "LinkPreviewOptions",
     "Location",
     "LoginUrl",
     "MaskPosition",
@@ -165,6 +171,7 @@ __all__ = (  # Keep this alphabetically ordered
     "ReactionTypeEmoji",
     "ReplyKeyboardMarkup",
     "ReplyKeyboardRemove",
+    "ReplyParameters",
     "request",
     "ResidentialAddress",
     "SecureData",
@@ -179,9 +186,11 @@ __all__ = (  # Keep this alphabetically ordered
     "SuccessfulPayment",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
+    "TextQuote",
     "Update",
     "User",
     "UserProfilePhotos",
+    "UsersShared",
     "UserShared",
     "Venue",
     "Video",
@@ -269,6 +278,7 @@ from ._forumtopic import (
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore
+from ._giveaway import Giveaway, GiveawayCompleted, GiveawayCreated, GiveawayWinners
 from ._inline.inlinekeyboardbutton import InlineKeyboardButton
 from ._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from ._inline.inlinequery import InlineQuery
@@ -302,7 +312,12 @@ from ._inline.inputtextmessagecontent import InputTextMessageContent
 from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
-from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUser
+from ._keyboardbuttonrequest import (
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestUser,
+    KeyboardButtonRequestUsers,
+)
+from ._linkpreviewoptions import LinkPreviewOptions
 from ._loginurl import LoginUrl
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._message import InaccessibleMessage, MaybeInaccessibleMessage, Message
@@ -344,10 +359,11 @@ from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import Poll, PollAnswer, PollOption
 from ._proximityalerttriggered import ProximityAlertTriggered
 from ._reactiontype import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
+from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage
-from ._shared import ChatShared, UserShared
+from ._shared import ChatShared, UserShared, UsersShared
 from ._story import Story
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject
