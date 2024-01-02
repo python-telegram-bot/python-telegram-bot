@@ -97,6 +97,7 @@ import sys
 from enum import Enum
 from typing import Final, List, NamedTuple, Optional, Tuple
 
+from telegram._utils.datetime import UTC
 from telegram._utils.enum import IntEnum, StringEnum
 
 
@@ -2576,7 +2577,7 @@ class Date(Enum):
 
     __slots__ = ()
 
-    ZERO_DATE = datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC)
+    ZERO_DATE = datetime.datetime(1970, 1, 1, tzinfo=UTC)
     """:obj:`datetime.datetime`, value of unix 0."""
 
 

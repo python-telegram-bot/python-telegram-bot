@@ -126,7 +126,11 @@ class Chat(TelegramObject):
             be forwarded to other chats. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.9
+        has_visible_history (:obj:`bool`, optional): :obj:`True`, if new chat members will have
+            access to old messages; available only to chat administrators. Returned only in
+            :meth:`telegram.Bot.get_chat`.
 
+            .. versionadded:: NEXT.VERSION
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the
@@ -247,6 +251,11 @@ class Chat(TelegramObject):
             be forwarded to other chats. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.9
+        has_visible_history (:obj:`bool`): Optional. :obj:`True`, if new chat members will have
+            access to old messages; available only to chat administrators. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
@@ -347,6 +356,7 @@ class Chat(TelegramObject):
         "has_private_forwards",
         "has_protected_content",
         "has_restricted_voice_and_video_messages",
+        "has_visible_history",
         "id",
         "invite_link",
         "is_forum",
@@ -417,6 +427,7 @@ class Chat(TelegramObject):
         background_custom_emoji_id: Optional[str] = None,
         profile_accent_color_id: Optional[int] = None,
         profile_background_custom_emoji_id: Optional[str] = None,
+        has_visible_history: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -441,6 +452,7 @@ class Chat(TelegramObject):
             int(message_auto_delete_time) if message_auto_delete_time is not None else None
         )
         self.has_protected_content: Optional[bool] = has_protected_content
+        self.has_visible_history: Optional[bool] = has_visible_history
         self.sticker_set_name: Optional[str] = sticker_set_name
         self.can_set_sticker_set: Optional[bool] = can_set_sticker_set
         self.linked_chat_id: Optional[int] = linked_chat_id

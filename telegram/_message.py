@@ -800,24 +800,22 @@ class Message(MaybeInaccessibleMessage):
     # fmt: on
     __slots__ = (
         "_effective_attachment",
+        "_user_shared",
         "animation",
         "audio",
         "author_signature",
         "caption",
         "caption_entities",
         "channel_chat_created",
-        "chat",
         "chat_shared",
         "connected_website",
         "contact",
-        "date",
         "delete_chat_photo",
         "dice",
         "document",
         "edit_date",
         "entities",
         "external_reply",
-        "quote",
         "forum_topic_closed",
         "forum_topic_created",
         "forum_topic_edited",
@@ -829,7 +827,6 @@ class Message(MaybeInaccessibleMessage):
         "forward_sender_name",
         "forward_signature",
         "from_user",
-        "successful_payment",
         "game",
         "general_forum_topic_hidden",
         "general_forum_topic_unhidden",
@@ -848,36 +845,28 @@ class Message(MaybeInaccessibleMessage):
         "location",
         "media_group_id",
         "message_auto_delete_timer_changed",
-        "message_id",
         "message_thread_id",
         "migrate_from_chat_id",
         "migrate_to_chat_id",
         "new_chat_members",
         "new_chat_photo",
+        "new_chat_photo",
         "new_chat_title",
         "passport_data",
         "photo",
         "pinned_message",
-        "forward_from_chat",
-        "new_chat_photo",
-        "delete_chat_photo",
-        "from_user",
-        "author_signature",
         "poll",
         "proximity_alert_triggered",
+        "quote",
         "reply_markup",
         "reply_to_message",
         "sender_chat",
         "sticker",
         "story",
         "successful_payment",
-        "dice",
-        "forward_from_message_id",
-        "caption_entities",
-        "voice",
+        "successful_payment",
         "supergroup_chat_created",
         "text",
-        "_user_shared",
         "users_shared",
         "venue",
         "via_bot",
@@ -887,6 +876,7 @@ class Message(MaybeInaccessibleMessage):
         "video_chat_scheduled",
         "video_chat_started",
         "video_note",
+        "voice",
         "voice",
         "web_app_data",
         "write_access_allowed",
@@ -967,7 +957,7 @@ class Message(MaybeInaccessibleMessage):
         general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = None,
         write_access_allowed: Optional[WriteAccessAllowed] = None,
         has_media_spoiler: Optional[bool] = None,
-        user_shared: Optional[UsersShared] = None,
+        user_shared: Optional[UserShared] = None,
         chat_shared: Optional[ChatShared] = None,
         story: Optional[Story] = None,
         giveaway: Optional["Giveaway"] = None,
@@ -1006,6 +996,8 @@ class Message(MaybeInaccessibleMessage):
             self.forward_date: Optional[datetime.datetime] = forward_date
             self.is_automatic_forward: Optional[bool] = is_automatic_forward
             self.reply_to_message: Optional[Message] = reply_to_message
+            self.external_reply: Optional[ExternalReplyInfo] = external_reply
+            self.quote: Optional[TextQuote] = quote
             self.edit_date: Optional[datetime.datetime] = edit_date
             self.has_protected_content: Optional[bool] = has_protected_content
             self.text: Optional[str] = text
@@ -1075,9 +1067,15 @@ class Message(MaybeInaccessibleMessage):
             ] = general_forum_topic_unhidden
             self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
             self.has_media_spoiler: Optional[bool] = has_media_spoiler
-            self.user_shared: Optional[UserShared] = user_shared
+            self._user_shared: Optional[UserShared] = user_shared
+            self.users_shared: Optional[UsersShared] = users_shared
             self.chat_shared: Optional[ChatShared] = chat_shared
             self.story: Optional[Story] = story
+            self.giveaway: Optional[Giveaway] = giveaway
+            self.giveaway_completed: Optional[GiveawayCompleted] = giveaway_completed
+            self.giveaway_created: Optional[GiveawayCreated] = giveaway_created
+            self.giveaway_winners: Optional[GiveawayWinners] = giveaway_winners
+            self.link_preview_options: Optional[LinkPreviewOptions] = link_preview_options
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1242,7 +1240,7 @@ class Message(MaybeInaccessibleMessage):
             data.get("link_preview_options"), bot
         )
 
-        return super().de_json(data=data, bot=bot)
+        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
     @property
     def effective_attachment(
