@@ -75,6 +75,7 @@ __all__ = (
     "Sticker",
     "STORY",
     "SUCCESSFUL_PAYMENT",
+    "SuccessfulPayment",
     "SenderChat",
     "StatusUpdate",
     "TEXT",
@@ -2265,14 +2266,45 @@ STORY = _Story(name="filters.STORY")
 """
 
 
-class _SuccessfulPayment(MessageFilter):
-    __slots__ = ()
+class SuccessfulPayment(MessageFilter):
+    """Successful Payment Messages. If a list of invoice payloads is passed, it filters
+    messages to only allow those whose `invoice_payload` is appearing in the given list.
+
+    Examples:
+        `MessageHandler(filters.SuccessfulPayment(['Custom-Payload']), callback_method)`
+
+    .. seealso::
+        :attr:`telegram.ext.filters.SUCCESSFUL_PAYMENT`
+
+    Args:
+        invoice_payloads (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which
+            invoice payloads to allow. Only exact matches are allowed. If not
+            specified, will allow any invoice payload.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ("invoice_payloads",)
+
+    def __init__(self, invoice_payloads: Optional[Union[List[str], Tuple[str, ...]]] = None):
+        self.invoice_payloads: Optional[Sequence[str]] = invoice_payloads
+        super().__init__(
+            name=f"filters.SuccessfulPayment({invoice_payloads})"
+            if invoice_payloads
+            else "filters.SUCCESSFUL_PAYMENT"
+        )
 
     def filter(self, message: Message) -> bool:
-        return bool(message.successful_payment)
+        if self.invoice_payloads is None:
+            return bool(message.successful_payment)
+        return (
+            payment.invoice_payload in self.invoice_payloads
+            if (payment := message.successful_payment)
+            else False
+        )
 
 
-SUCCESSFUL_PAYMENT = _SuccessfulPayment(name="filters.SUCCESSFUL_PAYMENT")
+SUCCESSFUL_PAYMENT = SuccessfulPayment()
 """Messages that contain :attr:`telegram.Message.successful_payment`."""
 
 
