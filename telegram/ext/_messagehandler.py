@@ -76,7 +76,7 @@ class MessageHandler(BaseHandler[Update, CCT]):
 
     def __init__(
         self,
-        filters: filters_module.BaseFilter,
+        filters: Optional[filters_module.BaseFilter],
         callback: HandlerCallback[Update, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
     ):
