@@ -48,6 +48,7 @@ __all__ = [
     "ChatType",
     "ContactLimit",
     "CustomEmojiStickerLimit",
+    "Date",
     "DiceEmoji",
     "DiceLimit",
     "FileSizeLimit",
@@ -74,6 +75,8 @@ __all__ = [
     "ParseMode",
     "PollLimit",
     "PollType",
+    "ReactionEmojis",
+    "ReactionType",
     "ReplyLimit",
     "SUPPORTED_WEBHOOK_PORTS",
     "StickerFormat",
@@ -1759,7 +1762,6 @@ class ForumTopicLimit(IntEnum):
 
 
 class Date(Enum):
-    # TODO sphinx doesn't build this, I don't know why
     """This enum contains the date literal for :class:`telegram.InaccessibleMessage`
 
     .. versionadded:: NEXT.VERSION
@@ -1769,3 +1771,38 @@ class Date(Enum):
 
     ZERO_DATE = datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC)
     """:obj:`datetime.datetime`, value of unix 0."""
+
+
+class ReactionType(StringEnum):
+    """This enum contains the available types of :class:`telegram.Update`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    EMOJI = "emoji"
+    """:obj:`str`: A :class:`telegram.ReactionType` with a normal emoji."""
+    CUSTOM_EMOJI = "custom_emoji"
+    """:obj:`str`: A :class:`telegram.ReactionType` with a custom emoji."""
+
+
+class ReactionEmojis(StringEnum):
+    """This enum contains the available emojis of :class:`telegram.ReactionTypeEmoji`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+
+    The descriptions were taken from emojipedia.org
+    """
+
+    # TODO if we want to have these descriptions, we should ask for permission from emojipedia
+    __slots__ = ()
+
+    THUMBS_UP = "👍"
+    """:obj:`str`: A thumbs-up gesture indicating approval."""
+    THUMB_DOWN = "👎"
+    """:obj:`str`: A thumbs-down gesture indicating disapproval."""
+    READ_HEART = "❤"
+    """:obj:`str`: A classic red love heart emoji, used for expressions of love and romance."""

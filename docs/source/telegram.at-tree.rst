@@ -78,6 +78,9 @@ Available Types
     telegram.pollanswer
     telegram.polloption
     telegram.proximityalerttriggered
+    telegram.reactiontype
+    telegram.reactiontypecustomemoji
+    telegram.reactiontypeemoji
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
     telegram.sentwebappmessage
