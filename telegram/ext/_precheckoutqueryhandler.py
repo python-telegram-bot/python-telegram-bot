@@ -19,9 +19,16 @@
 """This module contains the PreCheckoutQueryHandler class."""
 
 
+import re
+from typing import Optional, Pattern, TypeVar, Union
+
 from telegram import Update
+from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.types import DVType
 from telegram.ext._basehandler import BaseHandler
-from telegram.ext._utils.types import CCT
+from telegram.ext._utils.types import CCT, HandlerCallback
+
+RT = TypeVar("RT")
 
 
 class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
@@ -48,14 +55,32 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Optional. Regex pattern
+            to test :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the callback will run in a blocking way..
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Optional. Regex pattern
+            to test :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ()
+    __slots__ = ("pattern",)
+
+    def __init__(
+        self,
+        callback: HandlerCallback[Update, CCT, RT],
+        block: DVType[bool] = DEFAULT_TRUE,
+        pattern: Optional[Union[str, Pattern[str]]] = None,
+    ):
+        super().__init__(callback, block=block)
+
+        self.pattern: Optional[Pattern[str]] = re.compile(pattern) if pattern is not None else None
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -67,4 +92,11 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
-        return isinstance(update, Update) and bool(update.pre_checkout_query)
+        if isinstance(update, Update) and update.pre_checkout_query:
+            invoice_payload = update.pre_checkout_query.invoice_payload
+            if self.pattern:
+                if self.pattern.match(invoice_payload):
+                    return True
+            else:
+                return True
+        return False

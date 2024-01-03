@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -41,7 +41,7 @@ jobs:
 
       - name: Test Summary
         id: test_summary
-        uses: test-summary/action@v2.1
+        uses: test-summary/action@v2.2
         if: always()  # always run, even if tests fail
         with:
           paths: .test_report_official.xml
