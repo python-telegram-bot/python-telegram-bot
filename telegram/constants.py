@@ -73,6 +73,7 @@ __all__ = [
     "MessageAttachmentType",
     "MessageEntityType",
     "MessageLimit",
+    "MessageOriginType",
     "MessageType",
     "PollingLimit",
     "ParseMode",
@@ -1620,6 +1621,25 @@ class MessageLimit(IntEnum):
     Note:
         This value is undocumented and might be changed by Telegram.
     """
+
+
+class MessageOriginType(StringEnum):
+    """This enum contains the available types of :class:`telegram.MessageOrigin`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    USER = "user"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by an user."""
+    HIDDEN_USER = "hidden_user"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by a hidden user."""
+    CHAT = "chat"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by a chat."""
+    CHANNEL = "channel"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by a channel."""
 
 
 class MessageType(StringEnum):

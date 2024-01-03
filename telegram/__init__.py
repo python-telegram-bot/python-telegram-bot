@@ -146,6 +146,11 @@ __all__ = (  # Keep this alphabetically ordered
     "MessageAutoDeleteTimerChanged",
     "MessageEntity",
     "MessageId",
+    "MessageOrigin",
+    "MessageOriginUser",
+    "MessageOriginHiddenUser",
+    "MessageOriginChat",
+    "MessageOriginChannel",
     "OrderInfo",
     "PassportData",
     "PassportElementError",
@@ -324,6 +329,13 @@ from ._message import InaccessibleMessage, MaybeInaccessibleMessage, Message
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from ._messageentity import MessageEntity
 from ._messageid import MessageId
+from ._messageorigin import (
+    MessageOrigin,
+    MessageOriginChannel,
+    MessageOriginChat,
+    MessageOriginHiddenUser,
+    MessageOriginUser,
+)
 from ._passport.credentials import (
     Credentials,
     DataCredentials,

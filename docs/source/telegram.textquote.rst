@@ -1,5 +1,5 @@
 TextQuote
-========
+=========
 
 .. autoclass:: telegram.TextQuote
     :members:

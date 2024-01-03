@@ -1,5 +1,5 @@
 ExternalReplyInfo
-========
+=================
 
 .. autoclass:: telegram.ExternalReplyInfo
     :members:

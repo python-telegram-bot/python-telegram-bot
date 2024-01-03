@@ -222,7 +222,7 @@ class ExternalReplyInfo(TelegramObject):
         self.poll: Optional[Poll] = poll
         self.venue: Optional[Venue] = venue
 
-        self._id_attrs = self.origin
+        self._id_attrs = (self.origin,)
 
         self._freeze()
 

@@ -1,5 +1,5 @@
 ReplyParameters
-========
+===============
 
 .. autoclass:: telegram.ReplyParameters
     :members:
