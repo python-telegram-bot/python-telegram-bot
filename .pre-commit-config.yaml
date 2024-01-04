@@ -1,12 +1,12 @@
-# Make sure that the additional_dependencies here match requirements.txt
+# Make sure that the additional_dependencies here match requirements(-opts).txt
 
 ci:
     autofix_prs: false
     autoupdate_schedule: monthly
 
 repos:
--   repo: https://github.com/psf/black
-    rev: 23.10.1
+-   repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 23.12.1
     hooks:
     -   id: black
         args:
@@ -17,7 +17,7 @@ repos:
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.0.1
+    rev: v3.0.3
     hooks:
     -   id: pylint
         files: ^(telegram|examples)/.*\.py$
@@ -28,14 +28,14 @@ repos:
           - --jobs=0
 
         additional_dependencies:
-          - httpx~=0.25.2
-          - tornado~=6.3.3
+          - httpx~=0.26.0
+          - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.2
           - aiolimiter~=1.1.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.6.1
+    rev: v1.8.0
     hooks:
     -   id: mypy
         name: mypy-ptb
@@ -44,8 +44,8 @@ repos:
           - types-pytz
           - types-cryptography
           - types-cachetools
-          - httpx~=0.25.2
-          - tornado~=6.3.3
+          - httpx~=0.26.0
+          - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.2
           - aiolimiter~=1.1.0
@@ -57,7 +57,7 @@ repos:
         - --no-strict-optional
         - --follow-imports=silent
       additional_dependencies:
-        - tornado~=6.3.3
+        - tornado~=6.4
         - APScheduler~=3.10.4
         - cachetools~=5.3.2
         - . # this basically does `pip install -e .`
@@ -69,7 +69,7 @@ repos:
         args:
           - --py38-plus
 -   repo: https://github.com/pycqa/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
     -   id: isort
         name: isort
@@ -77,14 +77,14 @@ repos:
         - --diff
         - --check
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.1.5'
+    rev: 'v0.1.9'
     hooks:
     -   id: ruff
         name: ruff
         files: ^(telegram|examples|tests)/.*\.py$
         additional_dependencies:
-          - httpx~=0.25.2
-          - tornado~=6.3.3
+          - httpx~=0.26.0
+          - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.2
           - aiolimiter~=1.1.0

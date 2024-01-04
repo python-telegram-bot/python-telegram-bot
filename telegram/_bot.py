@@ -356,12 +356,22 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         raise TypeError("Bot objects cannot be deepcopied!")
 
     def __eq__(self, other: object) -> bool:
-        if isinstance(other, self.__class__):
+        """Defines equality condition for the :class:`telegram.Bot` object.
+        Two objects of this class are considered to be equal if their attributes
+        :attr:`bot` are equal.
+
+        Returns:
+            :obj:`True` if both attributes :attr:`bot` are equal. :obj:`False` otherwise.
+        """
+        if isinstance(other, Bot):
             return self.bot == other.bot
-        return False
+        return super().__eq__(other)
 
     def __hash__(self) -> int:
-        return hash((self.__class__, self.bot))
+        """See :meth:`telegram.TelegramObject.__hash__`"""
+        if self._bot_user is None:
+            return super().__hash__()
+        return hash((self.bot, Bot))
 
     def __repr__(self) -> str:
         """Give a string representation of the bot in the form ``Bot[token=...]``.

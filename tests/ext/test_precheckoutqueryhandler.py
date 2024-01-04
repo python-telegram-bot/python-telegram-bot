@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import re
 
 import pytest
 
@@ -69,12 +70,15 @@ def false_update(request):
 
 @pytest.fixture(scope="class")
 def pre_checkout_query():
-    return Update(
+    update = Update(
         1,
         pre_checkout_query=PreCheckoutQuery(
             "id", User(1, "test user", False), "EUR", 223, "invoice_payload"
         ),
     )
+    update._unfreeze()
+    update.pre_checkout_query._unfreeze()
+    return update
 
 
 class TestPreCheckoutQueryHandler:
@@ -102,6 +106,23 @@ class TestPreCheckoutQueryHandler:
             and isinstance(context.bot_data, dict)
             and isinstance(update.pre_checkout_query, PreCheckoutQuery)
         )
+
+    def test_with_pattern(self, pre_checkout_query):
+        handler = PreCheckoutQueryHandler(self.callback, pattern=".*voice.*")
+
+        assert handler.check_update(pre_checkout_query)
+
+        pre_checkout_query.pre_checkout_query.invoice_payload = "nothing here"
+        assert not handler.check_update(pre_checkout_query)
+
+    def test_with_compiled_pattern(self, pre_checkout_query):
+        handler = PreCheckoutQueryHandler(self.callback, pattern=re.compile(r".*payload"))
+
+        pre_checkout_query.pre_checkout_query.invoice_payload = "invoice_payload"
+        assert handler.check_update(pre_checkout_query)
+
+        pre_checkout_query.pre_checkout_query.invoice_payload = "nothing here"
+        assert not handler.check_update(pre_checkout_query)
 
     def test_other_update_types(self, false_update):
         handler = PreCheckoutQueryHandler(self.callback)

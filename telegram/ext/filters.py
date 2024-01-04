@@ -75,6 +75,7 @@ __all__ = (
     "Sticker",
     "STORY",
     "SUCCESSFUL_PAYMENT",
+    "SuccessfulPayment",
     "SenderChat",
     "StatusUpdate",
     "TEXT",
@@ -184,18 +185,57 @@ class BaseFilter:
         self._data_filter = data_filter
 
     def __and__(self, other: "BaseFilter") -> "BaseFilter":
+        """Defines `AND` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by both filters.
+        For example, ``filters.PHOTO & filters.CAPTION`` will only accept messages that contain
+        both a photo and a caption.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _MergedFilter(self, and_filter=other)
 
     def __or__(self, other: "BaseFilter") -> "BaseFilter":
+        """Defines `OR` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by any of the filters.
+        For example, ``filters.PHOTO | filters.CAPTION`` will only accept messages that contain
+        photo or caption or both.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _MergedFilter(self, or_filter=other)
 
     def __xor__(self, other: "BaseFilter") -> "BaseFilter":
+        """Defines `XOR` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by any of the filters and
+        not both of them. For example, ``filters.PHOTO ^ filters.CAPTION`` will only accept
+        messages that contain photo or caption, not both of them.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _XORFilter(self, other)
 
     def __invert__(self) -> "BaseFilter":
+        """Defines `NOT` bitwise operator for :class:`BaseFilter` object.
+        The combined filter accepts an update only if it is accepted by any of the filters.
+        For example, ``~ filters.PHOTO`` will only accept messages that do not contain photo.
+
+        Returns:
+           :obj:`BaseFilter`
+        """
         return _InvertedFilter(self)
 
     def __repr__(self) -> str:
+        """Gives name for this filter.
+
+        .. seealso::
+               :meth:`name`
+
+        Returns:
+            :obj:`str`:
+        """
         return self.name
 
     @property
@@ -2226,14 +2266,45 @@ STORY = _Story(name="filters.STORY")
 """
 
 
-class _SuccessfulPayment(MessageFilter):
-    __slots__ = ()
+class SuccessfulPayment(MessageFilter):
+    """Successful Payment Messages. If a list of invoice payloads is passed, it filters
+    messages to only allow those whose `invoice_payload` is appearing in the given list.
+
+    Examples:
+        `MessageHandler(filters.SuccessfulPayment(['Custom-Payload']), callback_method)`
+
+    .. seealso::
+        :attr:`telegram.ext.filters.SUCCESSFUL_PAYMENT`
+
+    Args:
+        invoice_payloads (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which
+            invoice payloads to allow. Only exact matches are allowed. If not
+            specified, will allow any invoice payload.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ("invoice_payloads",)
+
+    def __init__(self, invoice_payloads: Optional[Union[List[str], Tuple[str, ...]]] = None):
+        self.invoice_payloads: Optional[Sequence[str]] = invoice_payloads
+        super().__init__(
+            name=f"filters.SuccessfulPayment({invoice_payloads})"
+            if invoice_payloads
+            else "filters.SUCCESSFUL_PAYMENT"
+        )
 
     def filter(self, message: Message) -> bool:
-        return bool(message.successful_payment)
+        if self.invoice_payloads is None:
+            return bool(message.successful_payment)
+        return (
+            payment.invoice_payload in self.invoice_payloads
+            if (payment := message.successful_payment)
+            else False
+        )
 
 
-SUCCESSFUL_PAYMENT = _SuccessfulPayment(name="filters.SUCCESSFUL_PAYMENT")
+SUCCESSFUL_PAYMENT = SuccessfulPayment()
 """Messages that contain :attr:`telegram.Message.successful_payment`."""
 
 
