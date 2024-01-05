@@ -49,9 +49,9 @@ from telegram import (
     Sticker,
     Story,
     SuccessfulPayment,
+    TextQuote,
     Update,
     User,
-    UserShared,
     UsersShared,
     Venue,
     Video,
@@ -105,6 +105,7 @@ def message(bot):
                 50, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
             )
         },
+        {"quote": TextQuote("a text quote", 1)},
         {"edit_date": datetime.utcnow()},
         {
             "text": "a text message",
@@ -220,7 +221,9 @@ def message(bot):
         },
         {"web_app_data": WebAppData("some_data", "some_button_text")},
         {"message_thread_id": 123},
-        {"user_shared": UserShared(1, 2)},
+        # Using a `UserShared` object here doesn't work, because `to_dict` produces `user_ids`
+        # instead of `user_id` - but that's what we want to test here.
+        {"user_shared": {"request_id": 1, "user_id": 2}},
         {"users_shared": UsersShared(1, [2, 3])},
         {"chat_shared": ChatShared(3, 4)},
         {
@@ -319,6 +322,7 @@ def message(bot):
         "giveaway_winners",
         "giveaway_completed",
         "link_preview_options",
+        "quote",
     ],
 )
 def message_params(bot, request):

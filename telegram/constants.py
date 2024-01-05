@@ -49,6 +49,7 @@ __all__ = [
     "ChatType",
     "ContactLimit",
     "CustomEmojiStickerLimit",
+    "Date",
     "DiceEmoji",
     "DiceLimit",
     "FileSizeLimit",
@@ -72,12 +73,15 @@ __all__ = [
     "MessageAttachmentType",
     "MessageEntityType",
     "MessageLimit",
+    "MessageOriginType",
     "MessageType",
     "PollingLimit",
     "ParseMode",
     "PollLimit",
     "PollType",
     "ProfileAccentColor",
+    "ReactionEmojis",
+    "ReactionType",
     "ReplyLimit",
     "SUPPORTED_WEBHOOK_PORTS",
     "StickerFormat",
@@ -89,10 +93,12 @@ __all__ = [
     "UserProfilePhotosLimit",
 ]
 
+import datetime
 import sys
 from enum import Enum
 from typing import Final, List, NamedTuple, Optional, Tuple
 
+from telegram._utils.datetime import UTC
 from telegram._utils.enum import IntEnum, StringEnum
 
 
@@ -1622,6 +1628,25 @@ class MessageLimit(IntEnum):
     """
 
 
+class MessageOriginType(StringEnum):
+    """This enum contains the available types of :class:`telegram.MessageOrigin`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    USER = "user"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by an user."""
+    HIDDEN_USER = "hidden_user"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by a hidden user."""
+    CHAT = "chat"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by a chat."""
+    CHANNEL = "channel"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by a channel."""
+
+
 class MessageType(StringEnum):
     """This enum contains the available types of :class:`telegram.Message`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -2567,3 +2592,50 @@ class ForumTopicLimit(IntEnum):
     * :paramref:`~telegram.Bot.edit_general_forum_topic.name` parameter of
       :meth:`telegram.Bot.edit_general_forum_topic`
     """
+
+
+class Date(Enum):
+    """This enum contains the date literal for :class:`telegram.InaccessibleMessage`
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    ZERO_DATE = datetime.datetime(1970, 1, 1, tzinfo=UTC)
+    """:obj:`datetime.datetime`, value of unix 0."""
+
+
+class ReactionType(StringEnum):
+    """This enum contains the available types of :class:`telegram.Update`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    EMOJI = "emoji"
+    """:obj:`str`: A :class:`telegram.ReactionType` with a normal emoji."""
+    CUSTOM_EMOJI = "custom_emoji"
+    """:obj:`str`: A :class:`telegram.ReactionType` with a custom emoji."""
+
+
+class ReactionEmojis(StringEnum):
+    """This enum contains the available emojis of :class:`telegram.ReactionTypeEmoji`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+
+    The descriptions were taken from emojipedia.org
+    """
+
+    # TODO if we want to have these descriptions, we should ask for permission from emojipedia
+    __slots__ = ()
+
+    THUMBS_UP = "👍"
+    """:obj:`str`: A thumbs-up gesture indicating approval."""
+    THUMB_DOWN = "👎"
+    """:obj:`str`: A thumbs-down gesture indicating disapproval."""
+    READ_HEART = "❤"
+    """:obj:`str`: A classic red love heart emoji, used for expressions of love and romance."""

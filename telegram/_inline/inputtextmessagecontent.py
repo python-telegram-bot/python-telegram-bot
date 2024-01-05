@@ -20,10 +20,13 @@
 from typing import Optional, Sequence, Tuple
 
 from telegram._inline.inputmessagecontent import InputMessageContent
+from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.warnings import warn
+from telegram.warnings import PTBDeprecationWarning
 
 
 class InputTextMessageContent(InputMessageContent):
@@ -48,7 +51,21 @@ class InputTextMessageContent(InputMessageContent):
                 |sequenceclassargs|
 
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
-            sent message.
+            sent message. Mutually exclusive with :paramref:`link_preview_options`.
+
+            .. versionchanged:: NEXT.VERSION
+                Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
+                argument. PTB will automatically convert this argument to that one, but
+                you should update your code to use the new argument.
+
+            .. deprecated:: NEXT.VERSION
+                In future versions, this argument will become keyword only.
+
+        link_preview_options (:obj:`LinkPreviewOptions`, optional): Link preview generation
+            options for the message. Mutually exclusive with
+            :paramref:`disable_web_page_preview`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_text (:obj:`str`): Text of the message to be sent,
@@ -62,12 +79,15 @@ class InputTextMessageContent(InputMessageContent):
 
                 * |tupleclassattrs|
                 * |alwaystuple|
-        disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
-            sent message.
+        link_preview_options (:obj:`LinkPreviewOptions`): Optional. Link preview generation
+            options for the message. Mutually exclusive with
+            :attr:`disable_web_page_preview`.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ("disable_web_page_preview", "parse_mode", "entities", "message_text")
+    __slots__ = ("parse_mode", "entities", "message_text", "link_preview_options")
 
     def __init__(
         self,
@@ -75,16 +95,47 @@ class InputTextMessageContent(InputMessageContent):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         entities: Optional[Sequence[MessageEntity]] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
+        if (
+            disable_web_page_preview is not DEFAULT_NONE
+            and link_preview_options is not DEFAULT_NONE
+        ):
+            raise ValueError(
+                "`disable_web_page_preview` and `link_preview_options` are mutually exclusive."
+            )
+
+        # Convert to LinkPreviewOptions:
+        if not isinstance(disable_web_page_preview, DefaultValue):
+            link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
+
         with self._unfrozen():
             # Required
             self.message_text: str = message_text
             # Optionals
             self.parse_mode: ODVInput[str] = parse_mode
             self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.disable_web_page_preview: ODVInput[bool] = disable_web_page_preview
+            self.link_preview_options = link_preview_options
 
             self._id_attrs = (self.message_text,)
+
+    @property
+    def disable_web_page_preview(self) -> Optional[bool]:
+        """Optional[:obj:`bool`]: Disables link previews for links in the sent message.
+
+        .. deprecated:: NEXT.VERSION
+        """
+        warn(
+            "The `disable_web_page_preview` attribute is deprecated. "
+            "Use `link_preview_options` instead.",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
+        return (
+            self.link_preview_options.is_disabled  # type: ignore[union-attr]
+            if self.link_preview_options
+            else None
+        )

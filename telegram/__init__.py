@@ -66,6 +66,7 @@ __all__ = (  # Keep this alphabetically ordered
     "Document",
     "EncryptedCredentials",
     "EncryptedPassportElement",
+    "ExternalReplyInfo",
     "error",
     "File",
     "FileCredentials",
@@ -85,6 +86,7 @@ __all__ = (  # Keep this alphabetically ordered
     "GiveawayWinners",
     "helpers",
     "IdDocumentData",
+    "InaccessibleMessage",
     "InlineKeyboardButton",
     "InlineKeyboardMarkup",
     "InlineQuery",
@@ -135,6 +137,7 @@ __all__ = (  # Keep this alphabetically ordered
     "Location",
     "LoginUrl",
     "MaskPosition",
+    "MaybeInaccessibleMessage",
     "MenuButton",
     "MenuButtonCommands",
     "MenuButtonDefault",
@@ -143,6 +146,11 @@ __all__ = (  # Keep this alphabetically ordered
     "MessageAutoDeleteTimerChanged",
     "MessageEntity",
     "MessageId",
+    "MessageOrigin",
+    "MessageOriginUser",
+    "MessageOriginHiddenUser",
+    "MessageOriginChat",
+    "MessageOriginChannel",
     "OrderInfo",
     "PassportData",
     "PassportElementError",
@@ -163,8 +171,12 @@ __all__ = (  # Keep this alphabetically ordered
     "PollOption",
     "PreCheckoutQuery",
     "ProximityAlertTriggered",
+    "ReactionType",
+    "ReactionTypeCustomEmoji",
+    "ReactionTypeEmoji",
     "ReplyKeyboardMarkup",
     "ReplyKeyboardRemove",
+    "ReplyParameters",
     "request",
     "ResidentialAddress",
     "SecureData",
@@ -179,6 +191,7 @@ __all__ = (  # Keep this alphabetically ordered
     "SuccessfulPayment",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
+    "TextQuote",
     "Update",
     "User",
     "UserProfilePhotos",
@@ -312,10 +325,17 @@ from ._keyboardbuttonrequest import (
 from ._linkpreviewoptions import LinkPreviewOptions
 from ._loginurl import LoginUrl
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
-from ._message import Message
+from ._message import InaccessibleMessage, MaybeInaccessibleMessage, Message
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from ._messageentity import MessageEntity
 from ._messageid import MessageId
+from ._messageorigin import (
+    MessageOrigin,
+    MessageOriginChannel,
+    MessageOriginChat,
+    MessageOriginHiddenUser,
+    MessageOriginUser,
+)
 from ._passport.credentials import (
     Credentials,
     DataCredentials,
@@ -350,6 +370,8 @@ from ._payment.shippingquery import ShippingQuery
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import Poll, PollAnswer, PollOption
 from ._proximityalerttriggered import ProximityAlertTriggered
+from ._reactiontype import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
+from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage

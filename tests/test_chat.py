@@ -48,6 +48,7 @@ def chat(bot):
         location=TestChatBase.location,
         has_private_forwards=True,
         has_protected_content=True,
+        has_visible_history=True,
         join_to_send_messages=True,
         join_by_request=True,
         has_restricted_voice_and_video_messages=True,
@@ -85,6 +86,7 @@ class TestChatBase:
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), "Barbie World")
     has_protected_content = True
+    has_visible_history = True
     has_private_forwards = True
     join_to_send_messages = True
     join_by_request = True
@@ -120,6 +122,7 @@ class TestChatWithoutRequest(TestChatBase):
             "slow_mode_delay": self.slow_mode_delay,
             "bio": self.bio,
             "has_protected_content": self.has_protected_content,
+            "has_visible_history": self.has_visible_history,
             "has_private_forwards": self.has_private_forwards,
             "linked_chat_id": self.linked_chat_id,
             "location": self.location.to_dict(),
@@ -151,6 +154,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.slow_mode_delay == self.slow_mode_delay
         assert chat.bio == self.bio
         assert chat.has_protected_content == self.has_protected_content
+        assert chat.has_visible_history == self.has_visible_history
         assert chat.has_private_forwards == self.has_private_forwards
         assert chat.linked_chat_id == self.linked_chat_id
         assert chat.location.location == self.location.location
@@ -208,6 +212,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_dict["bio"] == chat.bio
         assert chat_dict["has_private_forwards"] == chat.has_private_forwards
         assert chat_dict["has_protected_content"] == chat.has_protected_content
+        assert chat_dict["has_visible_history"] == chat.has_visible_history
         assert chat_dict["linked_chat_id"] == chat.linked_chat_id
         assert chat_dict["location"] == chat.location.to_dict()
         assert chat_dict["join_to_send_messages"] == chat.join_to_send_messages
