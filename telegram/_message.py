@@ -3698,7 +3698,10 @@ class Message(TelegramObject):
                         raise ValueError(
                             "Blockquote entities are not supported for Markdown version 1"
                         )
-                    insert = f">{escaped_text}"
+                    prefix = ">" if entity.offset == 0 else "\n>"
+                    message_length = len(str(message_text, encoding="utf-16-le"))  # type: ignore
+                    suffix = "" if entity.offset + entity.length - 1 == message_length else "\n"
+                    insert = prefix + escaped_text.replace("\n", "\n>") + suffix
                 elif entity.type == MessageEntity.CUSTOM_EMOJI:
                     if version == 1:
                         raise ValueError(
