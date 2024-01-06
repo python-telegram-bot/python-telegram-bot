@@ -848,7 +848,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     you should update your code to use the new argument.
 
                 .. deprecated:: NEXT.VERSION
-                    In future versions, this argument will become keyword only.
+                    In future versions, this argument will become a keyword-only argument.
 
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|

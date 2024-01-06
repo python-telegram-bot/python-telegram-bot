@@ -24,6 +24,10 @@ import pytest
 from telegram import (
     CallbackQuery,
     Chat,
+    ChatBoost,
+    ChatBoostRemoved,
+    ChatBoostSourcePremium,
+    ChatBoostUpdated,
     ChatJoinRequest,
     ChatMemberOwner,
     ChatMemberUpdated,
@@ -59,6 +63,24 @@ chat_join_request = ChatJoinRequest(
     bio="bio",
 )
 
+chat_boost = ChatBoostUpdated(
+    chat=Chat(1, "priv"),
+    boost=ChatBoost(
+        "1",
+        from_timestamp(int(time.time())),
+        from_timestamp(int(time.time())),
+        ChatBoostSourcePremium(User(1, "", False)),
+    ),
+)
+
+removed_chat_boost = ChatBoostRemoved(
+    Chat(1, "private"),
+    "2",
+    from_timestamp(int(time.time())),
+    ChatBoostSourcePremium(User(1, "name", False)),
+)
+
+
 params = [
     {"message": message},
     {"edited_message": message},
@@ -85,6 +107,8 @@ params = [
     {"my_chat_member": chat_member_updated},
     {"chat_member": chat_member_updated},
     {"chat_join_request": chat_join_request},
+    {"chat_boost": chat_boost},
+    {"removed_chat_boost": removed_chat_boost},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -104,6 +128,8 @@ all_types = (
     "my_chat_member",
     "chat_member",
     "chat_join_request",
+    "chat_boost",
+    "removed_chat_boost",
 )
 
 ids = (*all_types, "callback_query_without_message")
@@ -200,6 +226,8 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             update.channel_post is not None
             or update.edited_channel_post is not None
             or update.poll is not None
+            or update.chat_boost is not None
+            or update.removed_chat_boost is not None
         ):
             assert user.id == 1
         else:
@@ -219,6 +247,8 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.my_chat_member is not None
             or update.chat_member is not None
             or update.chat_join_request is not None
+            or update.chat_boost is not None
+            or update.removed_chat_boost is not None
         ):
             assert eff_message.message_id == message.message_id
         else:

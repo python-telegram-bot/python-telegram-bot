@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Final, List, Optional
 
 from telegram import constants
 from telegram._callbackquery import CallbackQuery
+from telegram._chatboost import ChatBoostRemoved, ChatBoostUpdated
 from telegram._chatjoinrequest import ChatJoinRequest
 from telegram._chatmemberupdated import ChatMemberUpdated
 from telegram._choseninlineresult import ChosenInlineResult
@@ -96,6 +97,17 @@ class Update(TelegramObject):
             receive these updates.
 
             .. versionadded:: 13.8
+
+        chat_boost (:class:`telegram.ChatBoostUpdated`, optional): A chat boost was added or
+            changed. The bot must be an administrator in the chat to receive these updates.
+
+            .. versionadded:: NEXT.VERSION
+
+        removed_chat_boost (:class:`telegram.ChatBoostRemoved`, optional): A boost was removed from
+            a chat. The bot must be an administrator in the chat to receive these updates.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
             certain positive number and increase sequentially. This ID becomes especially handy if
@@ -148,6 +160,15 @@ class Update(TelegramObject):
 
             .. versionadded:: 13.8
 
+        chat_boost (:class:`telegram.ChatBoostUpdated`): Optional. A chat boost was added or
+            changed. The bot must be an administrator in the chat to receive these updates.
+
+            .. versionadded:: NEXT.VERSION
+
+        removed_chat_boost (:class:`telegram.ChatBoostRemoved`): Optional. A boost was removed from
+            a chat. The bot must be an administrator in the chat to receive these updates.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -169,6 +190,8 @@ class Update(TelegramObject):
         "my_chat_member",
         "chat_member",
         "chat_join_request",
+        "chat_boost",
+        "removed_chat_boost",
     )
 
     MESSAGE: Final[str] = constants.UpdateType.MESSAGE
@@ -227,6 +250,14 @@ class Update(TelegramObject):
     """:const:`telegram.constants.UpdateType.CHAT_JOIN_REQUEST`
 
     .. versionadded:: 13.8"""
+    CHAT_BOOST: Final[str] = constants.UpdateType.CHAT_BOOST
+    """:const:`telegram.constants.UpdateType.CHAT_BOOST`
+
+    .. versionadded:: NEXT.VERSION"""
+    REMOVED_CHAT_BOOST: Final[str] = constants.UpdateType.REMOVED_CHAT_BOOST
+    """:const:`telegram.constants.UpdateType.REMOVED_CHAT_BOOST`
+
+    .. versionadded:: NEXT.VERSION"""
     ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
     """List[:obj:`str`]: A list of all available update types.
 
@@ -249,6 +280,8 @@ class Update(TelegramObject):
         my_chat_member: Optional[ChatMemberUpdated] = None,
         chat_member: Optional[ChatMemberUpdated] = None,
         chat_join_request: Optional[ChatJoinRequest] = None,
+        chat_boost: Optional[ChatBoostUpdated] = None,
+        removed_chat_boost: Optional[ChatBoostRemoved] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -270,6 +303,8 @@ class Update(TelegramObject):
         self.my_chat_member: Optional[ChatMemberUpdated] = my_chat_member
         self.chat_member: Optional[ChatMemberUpdated] = chat_member
         self.chat_join_request: Optional[ChatJoinRequest] = chat_join_request
+        self.chat_boost: Optional[ChatBoostUpdated] = chat_boost
+        self.removed_chat_boost: Optional[ChatBoostRemoved] = removed_chat_boost
 
         self._effective_user: Optional[User] = None
         self._effective_chat: Optional[Chat] = None
@@ -377,6 +412,12 @@ class Update(TelegramObject):
         elif self.chat_join_request:
             chat = self.chat_join_request.chat
 
+        elif self.chat_boost:
+            chat = self.chat_boost.chat
+
+        elif self.removed_chat_boost:
+            chat = self.removed_chat_boost.chat
+
         self._effective_chat = chat
         return chat
 
@@ -437,5 +478,7 @@ class Update(TelegramObject):
         data["my_chat_member"] = ChatMemberUpdated.de_json(data.get("my_chat_member"), bot)
         data["chat_member"] = ChatMemberUpdated.de_json(data.get("chat_member"), bot)
         data["chat_join_request"] = ChatJoinRequest.de_json(data.get("chat_join_request"), bot)
+        data["chat_boost"] = ChatBoostUpdated.de_json(data.get("chat_boost"), bot)
+        data["removed_chat_boost"] = ChatBoostRemoved.de_json(data.get("removed_chat_boost"), bot)
 
         return super().de_json(data=data, bot=bot)

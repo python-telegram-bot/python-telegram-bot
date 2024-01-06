@@ -21,6 +21,13 @@ Available Types
     telegram.callbackquery
     telegram.chat
     telegram.chatadministratorrights
+    telegram.chatboost
+    telegram.chatboostremoved
+    telegram.chatboostsource
+    telegram.chatboostsourcegiftcode
+    telegram.chatboostsourcegiveaway
+    telegram.chatboostsourcepremium
+    telegram.chatboostupdated
     telegram.chatinvitelink
     telegram.chatjoinrequest
     telegram.chatlocation
@@ -103,6 +110,7 @@ Available Types
     telegram.textquote
     telegram.update
     telegram.user
+    telegram.userchatboosts
     telegram.userprofilephotos
     telegram.usershared
     telegram.usersshared

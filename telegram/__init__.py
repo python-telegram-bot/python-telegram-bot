@@ -43,6 +43,13 @@ __all__ = (  # Keep this alphabetically ordered
     "CallbackQuery",
     "Chat",
     "ChatAdministratorRights",
+    "ChatBoost",
+    "ChatBoostRemoved",
+    "ChatBoostSource",
+    "ChatBoostSourceGiftCode",
+    "ChatBoostSourceGiveaway",
+    "ChatBoostSourcePremium",
+    "ChatBoostUpdated",
     "ChatInviteLink",
     "ChatJoinRequest",
     "ChatLocation",
@@ -194,6 +201,7 @@ __all__ = (  # Keep this alphabetically ordered
     "TextQuote",
     "Update",
     "User",
+    "UserChatBoosts",
     "UserProfilePhotos",
     "UsersShared",
     "UserShared",
@@ -231,6 +239,16 @@ from ._botname import BotName
 from ._callbackquery import CallbackQuery
 from ._chat import Chat
 from ._chatadministratorrights import ChatAdministratorRights
+from ._chatboost import (
+    ChatBoost,
+    ChatBoostRemoved,
+    ChatBoostSource,
+    ChatBoostSourceGiftCode,
+    ChatBoostSourceGiveaway,
+    ChatBoostSourcePremium,
+    ChatBoostUpdated,
+    UserChatBoosts,
+)
 from ._chatinvitelink import ChatInviteLink
 from ._chatjoinrequest import ChatJoinRequest
 from ._chatlocation import ChatLocation

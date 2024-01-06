@@ -41,6 +41,7 @@ __all__ = [
     "BotNameLimit",
     "CallbackQueryLimit",
     "ChatAction",
+    "ChatBoostSources",
     "ChatID",
     "ChatInviteLinkLimit",
     "ChatLimit",
@@ -675,6 +676,24 @@ class ChatAction(StringEnum):
     """:obj:`str`: Chat action indicating that the bot is uploading a video."""
     UPLOAD_VIDEO_NOTE = "upload_video_note"
     """:obj:`str`: Chat action indicating that the bot is uploading a video note."""
+
+
+class ChatBoostSources(StringEnum):
+    """This enum contains the available sources for a
+    :class:`Telegram chat boost <telegram.ChatBoostSource>`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    GIFT_CODE = "gift_code"
+    """:obj:`str`: The source of the chat boost was a Telegram Premium gift code."""
+    GIVEAWAY = "giveaway"
+    """:obj:`str`: The source of the chat boost was a Telegram Premium giveaway."""
+    PREMIUM = "premium"
+    """:obj:`str`: The source of the chat boost was a Telegram Premium subscription/gift."""
 
 
 class ChatID(IntEnum):
@@ -2422,6 +2441,16 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_member`."""
     CHAT_JOIN_REQUEST = "chat_join_request"
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_join_request`."""
+    CHAT_BOOST = "chat_boost"
+    """:obj:`str`: Updates with :attr:`telegram.Update.chat_boost`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    REMOVED_CHAT_BOOST = "removed_chat_boost"
+    """:obj:`str`: Updates with :attr:`telegram.Update.removed_chat_boost`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InvoiceLimit(IntEnum):
