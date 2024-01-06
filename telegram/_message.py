@@ -3563,8 +3563,7 @@ class Message(MaybeInaccessibleMessage):
         if message_text is None:
             return None
 
-        message_text = message_text.encode("utf-16-le")  # type: ignore
-
+        utf_16_text = message_text.encode("utf-16-le")
         html_text = ""
         last_offset = 0
 
@@ -3572,83 +3571,69 @@ class Message(MaybeInaccessibleMessage):
         parsed_entities = []
 
         for entity, text in sorted_entities:
-            if entity not in parsed_entities:
-                nested_entities = {
-                    e: t
-                    for (e, t) in sorted_entities
-                    if e.offset >= entity.offset
-                    and e.offset + e.length <= entity.offset + entity.length
-                    and e != entity
-                }
-                parsed_entities.extend(list(nested_entities.keys()))
+            if entity in parsed_entities:
+                continue
 
-                orig_text = text
+            nested_entities = {
+                e: t
+                for (e, t) in sorted_entities
+                if e.offset >= entity.offset
+                and e.offset + e.length <= entity.offset + entity.length
+                and e != entity
+            }
+            parsed_entities.extend(list(nested_entities.keys()))
+
+            if nested_entities:
+                escaped_text = Message._parse_html(
+                    text, nested_entities, urled=urled, offset=entity.offset
+                )
+            else:
                 escaped_text = escape(text)
 
-                if nested_entities:
-                    escaped_text = Message._parse_html(
-                        orig_text, nested_entities, urled=urled, offset=entity.offset
-                    )
-
-                if entity.type == MessageEntity.TEXT_LINK:
-                    insert = f'<a href="{entity.url}">{escaped_text}</a>'
-                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = f'<a href="tg://user?id={entity.user.id}">{escaped_text}</a>'
-                elif entity.type == MessageEntity.URL and urled:
-                    insert = f'<a href="{escaped_text}">{escaped_text}</a>'
-                elif entity.type == MessageEntity.BLOCKQUOTE:
-                    insert = f"<blockquote>{escaped_text}</blockquote>"
-                elif entity.type == MessageEntity.BOLD:
-                    insert = f"<b>{escaped_text}</b>"
-                elif entity.type == MessageEntity.ITALIC:
-                    insert = f"<i>{escaped_text}</i>"
-                elif entity.type == MessageEntity.CODE:
-                    insert = f"<code>{escaped_text}</code>"
-                elif entity.type == MessageEntity.PRE:
-                    if entity.language:
-                        insert = (
-                            f'<pre><code class="{entity.language}">{escaped_text}</code></pre>'
-                        )
-                    else:
-                        insert = f"<pre>{escaped_text}</pre>"
-                elif entity.type == MessageEntity.UNDERLINE:
-                    insert = f"<u>{escaped_text}</u>"
-                elif entity.type == MessageEntity.STRIKETHROUGH:
-                    insert = f"<s>{escaped_text}</s>"
-                elif entity.type == MessageEntity.SPOILER:
-                    insert = f'<span class="tg-spoiler">{escaped_text}</span>'
-                elif entity.type == MessageEntity.CUSTOM_EMOJI:
-                    insert = (
-                        f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
-                    )
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = f'<a href="{entity.url}">{escaped_text}</a>'
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = f'<a href="tg://user?id={entity.user.id}">{escaped_text}</a>'
+            elif entity.type == MessageEntity.URL and urled:
+                insert = f'<a href="{escaped_text}">{escaped_text}</a>'
+            elif entity.type == MessageEntity.BLOCKQUOTE:
+                insert = f"<blockquote>{escaped_text}</blockquote>"
+            elif entity.type == MessageEntity.BOLD:
+                insert = f"<b>{escaped_text}</b>"
+            elif entity.type == MessageEntity.ITALIC:
+                insert = f"<i>{escaped_text}</i>"
+            elif entity.type == MessageEntity.CODE:
+                insert = f"<code>{escaped_text}</code>"
+            elif entity.type == MessageEntity.PRE:
+                if entity.language:
+                    insert = f'<pre><code class="{entity.language}">{escaped_text}</code></pre>'
                 else:
-                    insert = escaped_text
+                    insert = f"<pre>{escaped_text}</pre>"
+            elif entity.type == MessageEntity.UNDERLINE:
+                insert = f"<u>{escaped_text}</u>"
+            elif entity.type == MessageEntity.STRIKETHROUGH:
+                insert = f"<s>{escaped_text}</s>"
+            elif entity.type == MessageEntity.SPOILER:
+                insert = f'<span class="tg-spoiler">{escaped_text}</span>'
+            elif entity.type == MessageEntity.CUSTOM_EMOJI:
+                insert = f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
+            else:
+                insert = escaped_text
 
-                if offset == 0:
-                    html_text += (
-                        escape(
-                            message_text[  # type: ignore
-                                last_offset * 2 : (entity.offset - offset) * 2
-                            ].decode("utf-16-le")
-                        )
-                        + insert
-                    )
-                else:
-                    html_text += (
-                        message_text[  # type: ignore
-                            last_offset * 2 : (entity.offset - offset) * 2
-                        ].decode("utf-16-le")
-                        + insert
-                    )
-
-                last_offset = entity.offset - offset + entity.length
-
-        if offset == 0:
-            html_text += escape(
-                message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+            # Make sure to escape the text that is not part of the entity
+            # if we're in a nested entity, this is still required, since in that case this
+            # text is part of the parent entity
+            html_text += (
+                escape(
+                    utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode("utf-16-le")
+                )
+                + insert
             )
-        else:
-            html_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+
+            last_offset = entity.offset - offset + entity.length
+
+        # see comment above
+        html_text += escape(utf_16_text[last_offset * 2 :].decode("utf-16-le"))  # type: ignor
 
         return html_text
 
@@ -3748,13 +3733,22 @@ class Message(MaybeInaccessibleMessage):
         version: MarkdownVersion = 1,
         offset: int = 0,
     ) -> Optional[str]:
-        version = int(version)  # type: ignore
+        if version == 1:
+            for entity_type in (
+                MessageEntity.UNDERLINE,
+                MessageEntity.STRIKETHROUGH,
+                MessageEntity.SPOILER,
+                MessageEntity.BLOCKQUOTE,
+                MessageEntity.CUSTOM_EMOJI,
+            ):
+                if any(entity.type == entity_type for entity in entities):
+                    name = entity_type.name.title().replace("_", " ")  # type:ignore[attr-defined]
+                    raise ValueError(f"{name} entities are not supported for Markdown version 1")
 
         if message_text is None:
             return None
 
-        message_text = message_text.encode("utf-16-le")  # type: ignore
-
+        utf_16_text = message_text.encode("utf-16-le")
         markdown_text = ""
         last_offset = 0
 
@@ -3762,134 +3756,103 @@ class Message(MaybeInaccessibleMessage):
         parsed_entities = []
 
         for entity, text in sorted_entities:
-            if entity not in parsed_entities:
-                nested_entities = {
-                    e: t
-                    for (e, t) in sorted_entities
-                    if e.offset >= entity.offset
-                    and e.offset + e.length <= entity.offset + entity.length
-                    and e != entity
-                }
-                parsed_entities.extend(list(nested_entities.keys()))
+            if entity in parsed_entities:
+                continue
 
+            nested_entities = {
+                e: t
+                for (e, t) in sorted_entities
+                if e.offset >= entity.offset
+                and e.offset + e.length <= entity.offset + entity.length
+                and e != entity
+            }
+            parsed_entities.extend(list(nested_entities.keys()))
+
+            if nested_entities:
+                if version < 2:
+                    raise ValueError("Nested entities are not supported for Markdown version 1")
+
+                escaped_text = Message._parse_markdown(
+                    text,
+                    nested_entities,
+                    urled=urled,
+                    offset=entity.offset,
+                    version=version,
+                )
+            else:
                 escaped_text = escape_markdown(text, version=version)
 
-                if nested_entities:
-                    if version < 2:
-                        raise ValueError(
-                            "Nested entities are not supported for Markdown version 1"
-                        )
-
-                    escaped_text = Message._parse_markdown(
-                        text,
-                        nested_entities,
-                        urled=urled,
-                        offset=entity.offset,
-                        version=version,
-                    )
-
-                if entity.type == MessageEntity.TEXT_LINK:
-                    if version == 1:
-                        url = entity.url
-                    else:
-                        # Links need special escaping. Also can't have entities nested within
-                        url = escape_markdown(
-                            entity.url, version=version, entity_type=MessageEntity.TEXT_LINK
-                        )
-                    insert = f"[{escaped_text}]({url})"
-                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = f"[{escaped_text}](tg://user?id={entity.user.id})"
-                elif entity.type == MessageEntity.URL and urled:
-                    link = text if version == 1 else escaped_text
-                    insert = f"[{link}]({text})"
-                elif entity.type == MessageEntity.BOLD:
-                    insert = f"*{escaped_text}*"
-                elif entity.type == MessageEntity.ITALIC:
-                    insert = f"_{escaped_text}_"
-                elif entity.type == MessageEntity.CODE:
-                    # Monospace needs special escaping. Also can't have entities nested within
-                    insert = f"`{escape_markdown(text, version, MessageEntity.CODE)}`"
-
-                elif entity.type == MessageEntity.PRE:
-                    # Monospace needs special escaping. Also can't have entities nested within
-                    code = escape_markdown(text, version=version, entity_type=MessageEntity.PRE)
-                    if entity.language:
-                        prefix = f"```{entity.language}\n"
-                    elif code.startswith("\\"):
-                        prefix = "```"
-                    else:
-                        prefix = "```\n"
-                    insert = f"{prefix}{code}```"
-                elif entity.type == MessageEntity.UNDERLINE:
-                    if version == 1:
-                        raise ValueError(
-                            "Underline entities are not supported for Markdown version 1"
-                        )
-                    insert = f"__{escaped_text}__"
-                elif entity.type == MessageEntity.STRIKETHROUGH:
-                    if version == 1:
-                        raise ValueError(
-                            "Strikethrough entities are not supported for Markdown version 1"
-                        )
-                    insert = f"~{escaped_text}~"
-                elif entity.type == MessageEntity.SPOILER:
-                    if version == 1:
-                        raise ValueError(
-                            "Spoiler entities are not supported for Markdown version 1"
-                        )
-                    insert = f"||{escaped_text}||"
-                elif entity.type == MessageEntity.BLOCKQUOTE:
-                    if version == 1:
-                        raise ValueError(
-                            "Blockquote entities are not supported for Markdown version 1"
-                        )
-                    prefix = ">" if entity.offset == 0 else "\n>"
-                    message_length = len(str(message_text, encoding="utf-16-le"))  # type: ignore
-                    suffix = "" if entity.offset + entity.length - 1 == message_length else "\n"
-                    insert = prefix + escaped_text.replace("\n", "\n>") + suffix
-                elif entity.type == MessageEntity.CUSTOM_EMOJI:
-                    if version == 1:
-                        raise ValueError(
-                            "Custom emoji entities are not supported for Markdown version 1"
-                        )
-                    # This should never be needed because ids are numeric but the documentation
-                    # specifically mentions it so here we are
-                    custom_emoji_id = escape_markdown(
-                        entity.custom_emoji_id,
-                        version=version,
-                        entity_type=MessageEntity.CUSTOM_EMOJI,
-                    )
-                    insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+            if entity.type == MessageEntity.TEXT_LINK:
+                if version == 1:
+                    url = entity.url
                 else:
-                    insert = escaped_text
-
-                if offset == 0:
-                    markdown_text += (
-                        escape_markdown(
-                            message_text[  # type: ignore
-                                last_offset * 2 : (entity.offset - offset) * 2
-                            ].decode("utf-16-le"),
-                            version=version,
-                        )
-                        + insert
+                    # Links need special escaping. Also can't have entities nested within
+                    url = escape_markdown(
+                        entity.url, version=version, entity_type=MessageEntity.TEXT_LINK
                     )
+                insert = f"[{escaped_text}]({url})"
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = f"[{escaped_text}](tg://user?id={entity.user.id})"
+            elif entity.type == MessageEntity.URL and urled:
+                link = text if version == 1 else escaped_text
+                insert = f"[{link}]({text})"
+            elif entity.type == MessageEntity.BOLD:
+                insert = f"*{escaped_text}*"
+            elif entity.type == MessageEntity.ITALIC:
+                insert = f"_{escaped_text}_"
+            elif entity.type == MessageEntity.CODE:
+                # Monospace needs special escaping. Also can't have entities nested within
+                insert = f"`{escape_markdown(text, version, MessageEntity.CODE)}`"
+            elif entity.type == MessageEntity.PRE:
+                # Monospace needs special escaping. Also can't have entities nested within
+                code = escape_markdown(text, version=version, entity_type=MessageEntity.PRE)
+                if entity.language:
+                    prefix = f"```{entity.language}\n"
+                elif code.startswith("\\"):
+                    prefix = "```"
                 else:
-                    markdown_text += (
-                        message_text[  # type: ignore
-                            last_offset * 2 : (entity.offset - offset) * 2
-                        ].decode("utf-16-le")
-                        + insert
-                    )
+                    prefix = "```\n"
+                insert = f"{prefix}{code}```"
+            elif entity.type == MessageEntity.UNDERLINE:
+                insert = f"__{escaped_text}__"
+            elif entity.type == MessageEntity.STRIKETHROUGH:
+                insert = f"~{escaped_text}~"
+            elif entity.type == MessageEntity.SPOILER:
+                insert = f"||{escaped_text}||"
+            elif entity.type == MessageEntity.BLOCKQUOTE:
+                insert = ">" + "\n>".join(escaped_text.splitlines())
+            elif entity.type == MessageEntity.CUSTOM_EMOJI:
+                # This should never be needed because ids are numeric but the documentation
+                # specifically mentions it so here we are
+                custom_emoji_id = escape_markdown(
+                    entity.custom_emoji_id,
+                    version=version,
+                    entity_type=MessageEntity.CUSTOM_EMOJI,
+                )
+                insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+            else:
+                insert = escaped_text
 
-                last_offset = entity.offset - offset + entity.length
-
-        if offset == 0:
-            markdown_text += escape_markdown(
-                message_text[last_offset * 2 :].decode("utf-16-le"),  # type: ignore
-                version=version,
+            # Make sure to escape the text that is not part of the entity
+            # if we're in a nested entity, this is still required, since in that case this
+            # text is part of the parent entity
+            markdown_text += (
+                escape_markdown(
+                    utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode(
+                        "utf-16-le"
+                    ),
+                    version=version,
+                )
+                + insert
             )
-        else:
-            markdown_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+
+            last_offset = entity.offset - offset + entity.length
+
+        # see comment above
+        markdown_text += escape_markdown(
+            utf_16_text[last_offset * 2 :].decode("utf-16-le"),
+            version=version,
+        )
 
         return markdown_text
 
