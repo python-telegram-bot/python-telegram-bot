@@ -88,10 +88,10 @@ Available Types
     telegram.messageentity
     telegram.messageid
     telegram.messageorigin
-    telegram.messageoriginuser
-    telegram.messageoriginhiddenuser
-    telegram.messageoriginchat
     telegram.messageoriginchannel
+    telegram.messageoriginchat
+    telegram.messageoriginhiddenuser
+    telegram.messageoriginuser
     telegram.photosize
     telegram.poll
     telegram.pollanswer

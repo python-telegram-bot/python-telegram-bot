@@ -53,6 +53,9 @@ class ExternalReplyInfo(TelegramObject):
     This object contains information about a message that is being replied to, which may
     come from another chat or forum topic.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`origin` is equal.
+
     .. versionadded:: NEXT.VERSION
 
     Args:
@@ -266,6 +269,9 @@ class TextQuote(TelegramObject):
     This object contains information about the quoted part of a message that is replied to
     by the given message.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`text` and :attr:`position` are equal.
+
     .. versionadded:: NEXT.VERSION
 
     Args:
@@ -337,11 +343,14 @@ class ReplyParameters(TelegramObject):
 
     .. versionadded:: NEXT.VERSION
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`message_id` and :attr:`chat_id` are equal.
+
     Args:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
             chat, or in the chat :paramref:`chat_id` if it is specified.
         chat_id (:obj:`int` | :obj:`str`, optional): If the message to be replied to is from a
-            different chat, |channel_id_channel|
+            different chat, |chat_id_channel|
         allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply| Can be
             used only for replies in the same chat and forum topic.
         quote (:obj:`str`, optional): Quoted part of the message to be replied to; 0-1024
@@ -362,7 +371,7 @@ class ReplyParameters(TelegramObject):
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
             chat, or in the chat :paramref:`chat_id` if it is specified.
         chat_id (:obj:`int` | :obj:`str`): Optional. If the message to be replied to is from a
-            different chat, |channel_id_channel|
+            different chat, |chat_id_channel|
         allow_sending_without_reply (:obj:`bool`): Optional. |allow_sending_without_reply| Can be
             used only for replies in the same chat and forum topic.
         quote (:obj:`str`): Optional. Quoted part of the message to be replied to; 0-1024

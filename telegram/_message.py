@@ -101,6 +101,7 @@ if TYPE_CHECKING:
         InputMediaVideo,
         LabeledPrice,
         MessageId,
+        MessageOrigin,
         TextQuote,
     )
 
@@ -272,14 +273,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message (:class:`telegram.Message`, optional): For replies, the original message.
             Note that the Message object in this field will not contain further
             ``reply_to_message`` fields even if it itself is a reply.
-        external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
-            message that is being replied to, which may come from another chat or forum topic.
-
-            .. versionadded:: NEXT.VERSION
-        quote (:class:`telegram.TextQuote`, optional): For replies that quote part of the original
-            message, the quoted part of the message.
-
-            .. versionadded:: NEXT.VERSION
         edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
 
@@ -506,7 +499,18 @@ class Message(MaybeInaccessibleMessage):
             giveaway without public winners was completed
 
             .. versionadded:: NEXT.VERSION
+        external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
+            message that is being replied to, which may come from another chat or forum topic.
 
+            .. versionadded:: NEXT.VERSION
+        quote (:class:`telegram.TextQuote`, optional): For replies that quote part of the original
+            message, the quoted part of the message.
+
+            .. versionadded:: NEXT.VERSION
+        forward_origin (:class:`telegram.MessageOrigin`, optional): Information about the original
+            message for forwarded messages
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -543,14 +547,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message (:class:`telegram.Message`): Optional. For replies, the original message.
             Note that the Message object in this field will not contain further
             ``reply_to_message`` fields even if it itself is a reply.
-        external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
-            message that is being replied to, which may come from another chat or forum topic.
-
-            .. versionadded:: NEXT.VERSION
-        quote (:class:`telegram.TextQuote`): Optional. For replies that quote part of the original
-            message, the quoted part of the message.
-
-            .. versionadded:: NEXT.VERSION
         edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
 
@@ -788,6 +784,18 @@ class Message(MaybeInaccessibleMessage):
             giveaway without public winners was completed
 
             .. versionadded:: NEXT.VERSION
+        external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
+            message that is being replied to, which may come from another chat or forum topic.
+
+            .. versionadded:: NEXT.VERSION
+        quote (:class:`telegram.TextQuote`): Optional. For replies that quote part of the original
+            message, the quoted part of the message.
+
+            .. versionadded:: NEXT.VERSION
+        forward_origin (:class:`telegram.MessageOrigin`, optional): Information about the original
+            message for forwarded messages
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
         function. Instead, the supplied replacement for the emoji will be used.
@@ -824,6 +832,7 @@ class Message(MaybeInaccessibleMessage):
         "forward_from",
         "forward_from_chat",
         "forward_from_message_id",
+        "forward_origin",
         "forward_sender_name",
         "forward_signature",
         "from_user",
@@ -893,8 +902,6 @@ class Message(MaybeInaccessibleMessage):
         forward_from_message_id: Optional[int] = None,
         forward_date: Optional[datetime.datetime] = None,
         reply_to_message: Optional["Message"] = None,
-        external_reply: Optional["ExternalReplyInfo"] = None,
-        quote: Optional["TextQuote"] = None,
         edit_date: Optional[datetime.datetime] = None,
         text: Optional[str] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
@@ -966,6 +973,9 @@ class Message(MaybeInaccessibleMessage):
         giveaway_winners: Optional["GiveawayWinners"] = None,
         users_shared: Optional[UsersShared] = None,
         link_preview_options: Optional[LinkPreviewOptions] = None,
+        external_reply: Optional["ExternalReplyInfo"] = None,
+        quote: Optional["TextQuote"] = None,
+        forward_origin: Optional["MessageOrigin"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -996,8 +1006,6 @@ class Message(MaybeInaccessibleMessage):
             self.forward_date: Optional[datetime.datetime] = forward_date
             self.is_automatic_forward: Optional[bool] = is_automatic_forward
             self.reply_to_message: Optional[Message] = reply_to_message
-            self.external_reply: Optional[ExternalReplyInfo] = external_reply
-            self.quote: Optional[TextQuote] = quote
             self.edit_date: Optional[datetime.datetime] = edit_date
             self.has_protected_content: Optional[bool] = has_protected_content
             self.text: Optional[str] = text
@@ -1076,6 +1084,9 @@ class Message(MaybeInaccessibleMessage):
             self.giveaway_created: Optional[GiveawayCreated] = giveaway_created
             self.giveaway_winners: Optional[GiveawayWinners] = giveaway_winners
             self.link_preview_options: Optional[LinkPreviewOptions] = link_preview_options
+            self.external_reply: Optional[ExternalReplyInfo] = external_reply
+            self.quote: Optional[TextQuote] = quote
+            self.forward_origin: Optional[MessageOrigin] = forward_origin
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1225,13 +1236,14 @@ class Message(MaybeInaccessibleMessage):
             GiveawayCreated,
             GiveawayWinners,
         )
+        from telegram._messageorigin import (  # pylint: disable=import-outside-toplevel
+            MessageOrigin,
+        )
         from telegram._reply import (  # pylint: disable=import-outside-toplevel
             ExternalReplyInfo,
             TextQuote,
         )
 
-        data["external_reply"] = ExternalReplyInfo.de_json(data.get("external_reply"), bot)
-        data["quote"] = TextQuote.de_json(data.get("quote"), bot)
         data["giveaway"] = Giveaway.de_json(data.get("giveaway"), bot)
         data["giveaway_completed"] = GiveawayCompleted.de_json(data.get("giveaway_completed"), bot)
         data["giveaway_created"] = GiveawayCreated.de_json(data.get("giveaway_created"), bot)
@@ -1239,6 +1251,9 @@ class Message(MaybeInaccessibleMessage):
         data["link_preview_options"] = LinkPreviewOptions.de_json(
             data.get("link_preview_options"), bot
         )
+        data["external_reply"] = ExternalReplyInfo.de_json(data.get("external_reply"), bot)
+        data["quote"] = TextQuote.de_json(data.get("quote"), bot)
+        data["forward_origin"] = MessageOrigin.de_json(data.get("forward_origin"), bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 

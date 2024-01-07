@@ -2543,8 +2543,8 @@ class Chat(TelegramObject):
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`copy_messages`.
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, returns a tuple of `MessageId` of the
-            sent messages.
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of the sent messages is returned.
 
         """
         return await self.get_bot().copy_messages(
@@ -2586,8 +2586,8 @@ class Chat(TelegramObject):
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`send_copies`.
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, returns a tuple of `MessageId` of the
-            sent messages.
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~tleegram.MessageId`
+            of the sent messages is returned.
 
         """
         return await self.get_bot().copy_messages(
@@ -2714,8 +2714,8 @@ class Chat(TelegramObject):
         .. versionadded:: NEXT.VERSION
 
         Returns:
-            Tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
-            is returned.
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of sent messages is returned.
 
         """
         return await self.get_bot().forward_messages(
@@ -2757,8 +2757,8 @@ class Chat(TelegramObject):
         .. versionadded:: NEXT.VERSION
 
         Returns:
-            Tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
-            is returned.
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of sent messages is returned.
 
         """
         return await self.get_bot().forward_messages(

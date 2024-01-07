@@ -30,6 +30,7 @@ from telegram import (
     Contact,
     Dice,
     Document,
+    ExternalReplyInfo,
     Game,
     Giveaway,
     GiveawayCompleted,
@@ -41,6 +42,7 @@ from telegram import (
     Message,
     MessageAutoDeleteTimerChanged,
     MessageEntity,
+    MessageOriginChat,
     PassportData,
     PhotoSize,
     Poll,
@@ -105,7 +107,6 @@ def message(bot):
                 50, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
             )
         },
-        {"quote": TextQuote("a text quote", 1)},
         {"edit_date": datetime.utcnow()},
         {
             "text": "a text message",
@@ -259,6 +260,13 @@ def message(bot):
                 show_above_text=True,
             )
         },
+        {
+            "external_reply": ExternalReplyInfo(
+                MessageOriginChat(datetime.utcnow(), Chat(1, "private"))
+            )
+        },
+        {"quote": TextQuote("a text quote", 1)},
+        {"forward_origin": MessageOriginChat(datetime.utcnow(), Chat(1, "private"))},
     ],
     ids=[
         "forwarded_user",
@@ -322,7 +330,9 @@ def message(bot):
         "giveaway_winners",
         "giveaway_completed",
         "link_preview_options",
+        "external_reply",
         "quote",
+        "forward_origin",
     ],
 )
 def message_params(bot, request):
