@@ -19,8 +19,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 import datetime
+import re
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Sequence, Tuple, TypedDict, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -53,6 +54,7 @@ from telegram._payment.invoice import Invoice
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
+from telegram._reply import ReplyParameters
 from telegram._shared import ChatShared, UserShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
@@ -104,6 +106,12 @@ if TYPE_CHECKING:
         MessageOrigin,
         TextQuote,
     )
+
+
+class _ReplyKwargs(TypedDict, total=False):
+    message_id: int
+    chat_id: Union[str, int]
+    reply_parameters: ReplyParameters
 
 
 class MaybeInaccessibleMessage(TelegramObject):
@@ -1324,14 +1332,16 @@ class Message(MaybeInaccessibleMessage):
 
         return self._effective_attachment  # type: ignore[return-value]
 
-    def _quote(self, quote: Optional[bool], reply_to_message_id: Optional[int]) -> Optional[int]:
+    def _quote(
+        self, quote: Optional[bool], reply_to_message_id: Optional[int] = None
+    ) -> Optional[ReplyParameters]:
         """Modify kwargs for replying with or without quoting."""
         if reply_to_message_id is not None:
-            return reply_to_message_id
+            return ReplyParameters(reply_to_message_id)
 
         if quote is not None:
             if quote:
-                return self.message_id
+                return ReplyParameters(self.message_id)
 
         else:
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
@@ -1341,9 +1351,67 @@ class Message(MaybeInaccessibleMessage):
             else:
                 default_quote = None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
-                return self.message_id
+                return ReplyParameters(self.message_id)
 
         return None
+
+    def compute_quote_position_and_entities(
+        self, quote: str, index: Optional[int] = None
+    ) -> Tuple[int, Tuple[MessageEntity, ...]]:
+        if not (text := (self.text or self.caption)):
+            raise RuntimeError("This message has neither text nor caption.")
+
+        effective_index = 0 or index
+
+        matches = list(re.finditer(re.escape(quote), text))
+        if (length := len(matches)) < effective_index:
+            raise ValueError(
+                f"You requested the {index}-nth occurrence of '{quote}', but this text appears "
+                f"only {length} times."
+            )
+        # apply utf-16 conversion
+        position = matches[index].start()
+        end_position = position + len(quote)
+        entities = tuple(
+            entity
+            for entity in self.entities or self.caption_entities
+            if position <= entity.offset <= end_position
+        )
+        return position, entities
+
+    def build_reply_arguments(
+        self,
+        quote: Optional[str] = None,
+        quote_index: Optional[int] = None,
+        target_chat_id: Optional[Union[int, str]] = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+    ) -> _ReplyKwargs:
+        kwargs: _ReplyKwargs = {"message_id": self.message_id}
+        if target_chat_id:
+            kwargs["chat_id"] = target_chat_id
+
+        if target_chat_id in (None, self.chat_id, f"@{self.username}") and message_thread_id in (
+            None,
+            self.message_thread_id,
+        ):
+            # defaults handling will take place in `Bot._insert_defaults`
+            effective_aswr: ODVInput[bool] = allow_sending_without_reply
+        else:
+            effective_aswr = None
+
+        quote_position, quote_entities = (
+            self.compute_quote_position_and_entities(quote, quote_index) if quote else (None, None)
+        )
+        kwargs["reply_parameters"] = ReplyParameters(
+            chat_id=self.chat_id if not target_chat_id else None,
+            message_id=self.message_id,
+            quote_position=quote_position,
+            quote_entities=quote_entities,
+            allow_sending_without_reply=effective_aswr,
+        )
+
+        return kwargs
 
     async def reply_text(
         self,
@@ -1359,6 +1427,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1380,14 +1449,21 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        if quote and do_quote:
+            raise ValueError("Mutually exclusive")
+
+        effective_do_quote = quote or do_quote
+        reply_parameters = (
+            self._quote(quote, reply_to_message_id)
+            if isinstance(effective_do_quote, bool)
+            else effective_do_quote
+        )
         return await self.get_bot().send_message(
             chat_id=self.chat_id,
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1398,6 +1474,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            reply_parameters=reply_parameters,
         )
 
     async def reply_markdown(
