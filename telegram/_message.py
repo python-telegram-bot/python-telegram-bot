@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Message."""
 import datetime
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -81,7 +81,7 @@ from telegram._videochat import (
 )
 from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
-from telegram.constants import Date, MessageAttachmentType, ParseMode
+from telegram.constants import ZERO_DATE, MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
 from telegram.warnings import PTBDeprecationWarning
 
@@ -129,9 +129,11 @@ class MaybeInaccessibleMessage(TelegramObject):
 
             |datetime_localization| (Does not apply to the 0, which will always be in UTC).
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
+        is_accessible (:obj:`bool`): Convenience attribute. :obj:`True`, if the date is not 0 in
+            Unix time
     """
 
-    __slots__ = ("chat", "message_id", "date")
+    __slots__ = ("chat", "message_id", "date", "is_accessible")
 
     def __init__(
         self,
@@ -146,6 +148,7 @@ class MaybeInaccessibleMessage(TelegramObject):
         self.chat: Chat = chat
         self.message_id: int = message_id
         self.date: datetime.datetime = date
+        self.is_accessible = date != ZERO_DATE
 
         self._id_attrs = (self.message_id, self.chat)
 
@@ -161,7 +164,7 @@ class MaybeInaccessibleMessage(TelegramObject):
 
         if cls is MaybeInaccessibleMessage:
             if data["date"] == 0:
-                return InaccessibleMessage.de_json(data=data, bot=bot)
+                return InaccessibleMessage.de_json(data=data.pop("date"), bot=bot)
             return Message.de_json(data=data, bot=bot)
 
         # Get the local timezone from the bot if it has defaults
@@ -169,7 +172,7 @@ class MaybeInaccessibleMessage(TelegramObject):
 
         # this is to include the Literal from InaccessibleMessage
         if data["date"] == 0:
-            data["date"] = Date.ZERO_DATE
+            data["date"] = ZERO_DATE
         else:
             data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
 
@@ -187,12 +190,12 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
 
     Args:
         message_id (:obj:`int`): Unique message identifier.
-        date (:class:`constants.Date.ZERO_DATE`): Always 0, which the literal value is.
         chat (:class:`telegram.Chat`): Chat the message belongs to.
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier.
-        date (:class:`constants.Date.ZERO_DATE`): Always :tg-const:`constants.Date.ZERO_DATE`. The field can be used to differentiate regular and inaccessible messages.
+        date (:class:`constants.ZERO_DATE`): Always :tg-const:`constants.ZERO_DATE`. The field can
+            be used to differentiate regular and inaccessible messages.
         chat (:class:`telegram.Chat`): Chat the message belongs to.
     """
 
@@ -200,11 +203,22 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
         self,
         chat: Chat,
         message_id: int,
-        date: Literal[Date.ZERO_DATE],
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
-        super().__init__(chat=chat, message_id=message_id, date=date.value, api_kwargs=api_kwargs)
+        super().__init__(chat=chat, message_id=message_id, date=ZERO_DATE, api_kwargs=api_kwargs)
+
+    def __bool__(self) -> bool:
+        warn(
+            "We currently override the bool behaivour of this class. You probably see this error"
+            " because you wrote `if callback_query.message` or `if message.pinned_message` in your"
+            " code. This is not the supported way of checking the existence of a message as of"
+            " API 7.0, please use `if message.is_available` instead or check the type of the"
+            " message.",
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
+        return False
 
 
 class Message(MaybeInaccessibleMessage):
@@ -992,7 +1006,6 @@ class Message(MaybeInaccessibleMessage):
                 PTBDeprecationWarning,
                 stacklevel=2,
             )
-        # TODO I copied this from Chatmember, not sure if there is a better way
         with self._unfrozen():
             # Required
             self.message_id: int = message_id
@@ -1091,8 +1104,6 @@ class Message(MaybeInaccessibleMessage):
             self._effective_attachment = DEFAULT_NONE
 
             self._id_attrs = (self.message_id, self.chat)
-
-            self._freeze()
 
     @property
     def user_shared(self) -> Optional[UsersShared]:

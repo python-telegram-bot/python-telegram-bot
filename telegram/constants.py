@@ -50,7 +50,6 @@ __all__ = [
     "ChatType",
     "ContactLimit",
     "CustomEmojiStickerLimit",
-    "Date",
     "DiceEmoji",
     "DiceLimit",
     "FileSizeLimit",
@@ -81,7 +80,7 @@ __all__ = [
     "PollLimit",
     "PollType",
     "ProfileAccentColor",
-    "ReactionEmojis",
+    "ReactionEmoji",
     "ReactionType",
     "ReplyLimit",
     "SUPPORTED_WEBHOOK_PORTS",
@@ -92,6 +91,7 @@ __all__ = [
     "WebhookLimit",
     "UpdateType",
     "UserProfilePhotosLimit",
+    "ZERO_DATE",
 ]
 
 import datetime
@@ -154,6 +154,11 @@ BOT_API_VERSION: Final[str] = str(BOT_API_VERSION_INFO)
 #: List[:obj:`int`]: Ports supported by
 #:  :paramref:`telegram.Bot.set_webhook.url`.
 SUPPORTED_WEBHOOK_PORTS: Final[List[int]] = [443, 80, 88, 8443]
+
+#: :obj:`datetime.datetime`, value of unix 0."""
+#: This date literal is used in :class:`telegram.InaccessibleMessage`
+#: .. versionadded:: NEXT.VERSION
+ZERO_DATE: Final[datetime.datetime] = datetime.datetime(1970, 1, 1, tzinfo=UTC)
 
 
 class AccentColor(Enum):
@@ -2616,18 +2621,6 @@ class ForumTopicLimit(IntEnum):
     * :paramref:`~telegram.Bot.edit_general_forum_topic.name` parameter of
       :meth:`telegram.Bot.edit_general_forum_topic`
     """
-
-
-class Date(Enum):
-    """This enum contains the date literal for :class:`telegram.InaccessibleMessage`
-
-    .. versionadded:: NEXT.VERSION
-    """
-
-    __slots__ = ()
-
-    ZERO_DATE = datetime.datetime(1970, 1, 1, tzinfo=UTC)
-    """:obj:`datetime.datetime`, value of unix 0."""
 
 
 class ReactionType(StringEnum):
