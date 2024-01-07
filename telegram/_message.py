@@ -218,7 +218,7 @@ class Message(MaybeInaccessibleMessage):
         In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
 
     .. versionchanged:: NEXT.VERSION
-        * This class now subclasses :class:`telegram.MaybeInaccessibleMessage`.
+        * This class is now a subclass of :class:`telegram.MaybeInaccessibleMessage`.
         * The :paramref:`pinned_message` now can be either class:`telegram.Message` or
           class:`telegram.InaccessibleMessage`.
 
