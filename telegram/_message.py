@@ -192,7 +192,7 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier.
-        date (:class:`constants.Date.ZERO_DATE`): Always 0, which the literal value is.
+        date (:class:`constants.Date.ZERO_DATE`): Always :tg-const:`constants.Date.ZERO_DATE`. The field can be used to differentiate regular and inaccessible messages.
         chat (:class:`telegram.Chat`): Chat the message belongs to.
     """
 

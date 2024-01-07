@@ -2645,7 +2645,7 @@ class ReactionType(StringEnum):
     """:obj:`str`: A :class:`telegram.ReactionType` with a custom emoji."""
 
 
-class ReactionEmojis(StringEnum):
+class ReactionEmoji(StringEnum):
     """This enum contains the available emojis of :class:`telegram.ReactionTypeEmoji`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
