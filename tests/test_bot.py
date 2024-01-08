@@ -1902,8 +1902,8 @@ class TestBotWithRequest:
             await bot.delete_message(chat_id=chat_id, message_id=1)
 
     # send_photo, send_audio, send_document, send_sticker, send_video, send_voice, send_video_note,
-    # send_media_group and send_animation are tested in their respective test modules. No need to
-    # duplicate here.
+    # send_media_group, send_animation, get_user_chat_boosts are tested in their respective
+    # test modules. No need to duplicate here.
 
     async def test_delete_messages(self, bot, chat_id):
         msg1 = await bot.send_message(chat_id, text="will be deleted")

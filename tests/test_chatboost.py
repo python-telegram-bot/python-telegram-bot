@@ -36,6 +36,7 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ChatBoostSources
+from telegram.request import RequestData
 from tests.auxil.slots import mro_slots
 
 
@@ -522,3 +523,22 @@ class TestUserChatBoostsWithoutRequest(ChatBoostDefaults):
         assert isinstance(user_chat_boosts_dict, dict)
         assert isinstance(user_chat_boosts_dict["boosts"], list)
         assert user_chat_boosts_dict["boosts"][0] == user_chat_boosts.boosts[0].to_dict()
+
+    async def test_get_user_chat_boosts(self, monkeypatch, bot):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.json_parameters
+            chat_id = data["chat_id"] == "3"
+            user_id = data["user_id"] == "2"
+            if not all((chat_id, user_id)):
+                pytest.fail("I got wrong parameters in post")
+            return data
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        assert await bot.get_user_chat_boosts("3", 2)
+
+
+class TestUserChatBoostsWithRequest(ChatBoostDefaults):
+    async def test_get_user_chat_boosts(self, bot, channel_id, chat_id):
+        chat_boosts = await bot.get_user_chat_boosts(channel_id, chat_id)
+        assert isinstance(chat_boosts, UserChatBoosts)

@@ -454,6 +454,23 @@ class TestUserWithoutRequest(TestUserBase):
         monkeypatch.setattr(user.get_bot(), "copy_message", make_assertion)
         assert await user.copy_message(chat_id="chat_id", message_id="message_id")
 
+    async def test_instance_method_get_user_chat_boosts(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            chat_id = kwargs["chat_id"] == "chat_id"
+            user_id = kwargs["user_id"] == user.id
+            return chat_id and user_id
+
+        assert check_shortcut_signature(
+            User.get_user_chat_boosts, Bot.get_user_chat_boosts, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.get_user_chat_boosts, user.get_bot(), "get_user_chat_boosts"
+        )
+        assert await check_defaults_handling(user.get_user_chat_boosts, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "get_user_chat_boosts", make_assertion)
+        assert await user.get_user_chat_boosts(chat_id="chat_id")
+
     async def test_instance_method_get_menu_button(self, monkeypatch, user):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == user.id
