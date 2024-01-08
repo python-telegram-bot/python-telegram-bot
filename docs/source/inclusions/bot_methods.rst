@@ -157,6 +157,8 @@
       - Used for getting the number of members in a chat
     * - :meth:`~telegram.Bot.get_chat_member`
       - Used for getting a member of a chat
+    * - :meth:`~telegram.Bot.get_user_chat_boosts`
+      - Used for getting the list of boosts added to a chat
     * - :meth:`~telegram.Bot.leave_chat`
       - Used for leaving a chat
 

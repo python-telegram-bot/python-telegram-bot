@@ -59,6 +59,7 @@ from telegram._botdescription import BotDescription, BotShortDescription
 from telegram._botname import BotName
 from telegram._chat import Chat
 from telegram._chatadministratorrights import ChatAdministratorRights
+from telegram._chatboost import UserChatBoosts
 from telegram._chatinvitelink import ChatInviteLink
 from telegram._chatmember import ChatMember
 from telegram._chatpermissions import ChatPermissions
@@ -8138,6 +8139,48 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    async def get_user_chat_boosts(
+        self,
+        chat_id: Union[str, int],
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> UserChatBoosts:
+        """
+        Use this method to get the list of boosts added to a chat by a user. Requires
+        administrator rights in the chat.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            user_id (:obj:`int`): Unique identifier of the target user.
+
+        Returns:
+            :class:`telegram.UserChatBoosts`: On success, the object containing the list of boosts
+                is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
+        return UserChatBoosts.de_json(  # type: ignore[return-value]
+            await self._post(
+                "getUserChatBoosts",
+                data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                api_kwargs=api_kwargs,
+            ),
+            bot=self,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # skipcq: PYL-W0613
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -8380,3 +8423,5 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`get_my_name`"""
     unpinAllGeneralForumTopicMessages = unpin_all_general_forum_topic_messages
     """Alias for :meth:`unpin_all_general_forum_topic_messages`"""
+    getUserChatBoosts = get_user_chat_boosts
+    """Alias for :meth:`get_user_chat_boosts`"""

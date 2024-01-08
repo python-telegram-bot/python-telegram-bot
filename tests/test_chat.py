@@ -1344,6 +1344,23 @@ class TestChatWithoutRequest(TestChatBase):
         monkeypatch.setattr(chat.get_bot(), "unhide_general_forum_topic", make_assertion)
         assert await chat.unhide_general_forum_topic()
 
+    async def test_instance_method_get_user_chat_boosts(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            user_id = kwargs["user_id"] == "user_id"
+            chat_id = kwargs["chat_id"] == chat.id
+            return chat_id and user_id
+
+        assert check_shortcut_signature(
+            Chat.get_user_chat_boosts, Bot.get_user_chat_boosts, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.get_user_chat_boosts, chat.get_bot(), "get_user_chat_boosts"
+        )
+        assert await check_defaults_handling(chat.get_user_chat_boosts, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "get_user_chat_boosts", make_assertion)
+        assert await chat.get_user_chat_boosts(user_id="user_id")
+
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):

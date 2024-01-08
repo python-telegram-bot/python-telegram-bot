@@ -47,6 +47,7 @@ if TYPE_CHECKING:
         MessageId,
         PhotoSize,
         Sticker,
+        UserChatBoosts,
         UserProfilePhotos,
         Venue,
         Video,
@@ -1642,6 +1643,38 @@ class User(TelegramObject):
         """
         return await self.get_bot().get_chat_menu_button(
             chat_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_user_chat_boosts(
+        self,
+        chat_id: Union[int, str],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "UserChatBoosts":
+        """Shortcut for::
+
+             await bot.get_user_chat_boosts(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_user_chat_boosts`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.UserChatBoosts`: On success, returns the boosts applied by the user.
+        """
+        return await self.get_bot().get_user_chat_boosts(
+            chat_id=chat_id,
+            user_id=self.id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
