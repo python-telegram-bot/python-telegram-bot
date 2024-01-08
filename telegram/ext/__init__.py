@@ -39,7 +39,6 @@ __all__ = (
     "Defaults",
     "DictPersistence",
     "ExtBot",
-    "filters",
     "InlineQueryHandler",
     "InvalidCallbackData",
     "Job",
@@ -58,6 +57,7 @@ __all__ = (
     "StringRegexHandler",
     "TypeHandler",
     "Updater",
+    "filters",
 )
 
 from . import filters
