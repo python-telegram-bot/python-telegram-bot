@@ -20,9 +20,18 @@ import datetime
 
 import pytest
 
-from telegram import Bot, Chat, ChatLocation, ChatPermissions, Location, User
+from telegram import (
+    Bot,
+    Chat,
+    ChatLocation,
+    ChatPermissions,
+    Location,
+    ReactionTypeCustomEmoji,
+    ReactionTypeEmoji,
+    User,
+)
 from telegram._utils.datetime import UTC, to_timestamp
-from telegram.constants import ChatAction, ChatType
+from telegram.constants import ChatAction, ChatType, ReactionEmoji
 from telegram.helpers import escape_markdown
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
@@ -58,6 +67,7 @@ def chat(bot):
         emoji_status_expiration_date=TestChatBase.emoji_status_expiration_date,
         has_aggressive_anti_spam_enabled=TestChatBase.has_aggressive_anti_spam_enabled,
         has_hidden_members=TestChatBase.has_hidden_members,
+        available_reactions=TestChatBase.available_reactions,
         accent_color_id=TestChatBase.accent_color_id,
         background_custom_emoji_id=TestChatBase.background_custom_emoji_id,
         profile_accent_color_id=TestChatBase.profile_accent_color_id,
@@ -97,6 +107,10 @@ class TestChatBase:
     emoji_status_expiration_date = datetime.datetime.now(tz=UTC).replace(microsecond=0)
     has_aggressive_anti_spam_enabled = True
     has_hidden_members = True
+    available_reactions = [
+        ReactionTypeEmoji(ReactionEmoji.THUMB_DOWN),
+        ReactionTypeCustomEmoji("custom_emoji_id"),
+    ]
     accent_color_id = 1
     background_custom_emoji_id = "background_custom_emoji_id"
     profile_accent_color_id = 2
@@ -137,6 +151,7 @@ class TestChatWithoutRequest(TestChatBase):
             "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
             "has_aggressive_anti_spam_enabled": self.has_aggressive_anti_spam_enabled,
             "has_hidden_members": self.has_hidden_members,
+            "available_reactions": self.available_reactions,
             "accent_color_id": self.accent_color_id,
             "background_custom_emoji_id": self.background_custom_emoji_id,
             "profile_accent_color_id": self.profile_accent_color_id,
@@ -174,6 +189,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.emoji_status_expiration_date == (self.emoji_status_expiration_date)
         assert chat.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
         assert chat.has_hidden_members == self.has_hidden_members
+        assert chat.available_reactions == self.available_reactions
         assert chat.accent_color_id == self.accent_color_id
         assert chat.background_custom_emoji_id == self.background_custom_emoji_id
         assert chat.profile_accent_color_id == self.profile_accent_color_id
@@ -231,6 +247,7 @@ class TestChatWithoutRequest(TestChatBase):
             chat_dict["has_aggressive_anti_spam_enabled"] == chat.has_aggressive_anti_spam_enabled
         )
         assert chat_dict["has_hidden_members"] == chat.has_hidden_members
+        assert chat_dict["available_reactions"] == chat.available_reactions
         assert chat_dict["accent_color_id"] == chat.accent_color_id
         assert chat_dict["background_custom_emoji_id"] == chat.background_custom_emoji_id
         assert chat_dict["profile_accent_color_id"] == chat.profile_accent_color_id
@@ -1360,6 +1377,26 @@ class TestChatWithoutRequest(TestChatBase):
 
         monkeypatch.setattr(chat.get_bot(), "get_user_chat_boosts", make_assertion)
         assert await chat.get_user_chat_boosts(user_id="user_id")
+
+    async def test_instance_method_set_message_reaction(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            message_id = kwargs["message_id"] == 123
+            chat_id = kwargs["chat_id"] == chat.id
+            reaction = kwargs["reaction"] == [ReactionTypeEmoji(ReactionEmoji.THUMB_DOWN)]
+            return chat_id and message_id and reaction and kwargs["is_big"]
+
+        assert check_shortcut_signature(
+            Chat.set_message_reaction, Bot.set_message_reaction, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.set_message_reaction, chat.get_bot(), "set_message_reaction"
+        )
+        assert await check_defaults_handling(chat.set_message_reaction, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "set_message_reaction", make_assertion)
+        assert await chat.set_message_reaction(
+            123, [ReactionTypeEmoji(ReactionEmoji.THUMB_DOWN)], True
+        )
 
     def test_mention_html(self):
         chat = Chat(id=1, type="foo")

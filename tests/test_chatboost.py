@@ -174,7 +174,6 @@ class TestChatBoostSourceTypesWithoutRequest:
         assert cls.de_json({}, bot) is None
 
         json_dict = make_json_dict(chat_boost_source)
-        print(json_dict)
         const_boost_source = ChatBoostSource.de_json(json_dict, bot)
         assert const_boost_source.api_kwargs == {}
 

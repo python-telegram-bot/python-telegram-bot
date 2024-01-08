@@ -62,6 +62,8 @@ from telegram import (
     MessageEntity,
     Poll,
     PollOption,
+    ReactionTypeCustomEmoji,
+    ReactionTypeEmoji,
     SentWebAppMessage,
     ShippingOption,
     Update,
@@ -76,6 +78,7 @@ from telegram.constants import (
     InlineQueryResultType,
     MenuButtonType,
     ParseMode,
+    ReactionEmoji,
 )
 from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
@@ -1800,6 +1803,50 @@ class TestBotWithoutRequest:
         assert await asyncio.gather(
             bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
         ) == 3 * [BotName(default_name)]
+
+    async def test_set_message_reaction(self, bot, monkeypatch):
+        """This is here so we can test the convenient conversion we do in the function without
+        having to do multiple requests to Telegram"""
+
+        expected_param = [
+            [{"emoji": ReactionEmoji.THUMBS_UP, "type": "emoji"}],
+            [{"emoji": ReactionEmoji.RED_HEART, "type": "emoji"}],
+            [{"custom_emoji_id": "custom_emoji_1", "type": "custom_emoji"}],
+            [{"custom_emoji_id": "custom_emoji_2", "type": "custom_emoji"}],
+            [{"emoji": ReactionEmoji.THUMB_DOWN, "type": "emoji"}],
+            [{"custom_emoji_id": "custom_emoji_3", "type": "custom_emoji"}],
+            [
+                {"emoji": ReactionEmoji.RED_HEART, "type": "emoji"},
+                {"emoji": ReactionEmoji.THUMB_DOWN, "type": "emoji"},
+            ],
+            [
+                {"custom_emoji_id": "custom_emoji_4", "type": "custom_emoji"},
+                {"custom_emoji_id": "custom_emoji_5", "type": "custom_emoji"},
+            ],
+        ]
+
+        amount = 0
+
+        async def post(url, request_data: RequestData, *args, **kwargs):
+            # The mock-post now just fetches the predefined responses from the queues
+            assert request_data.json_parameters["chat_id"] == "1"
+            assert request_data.json_parameters["message_id"] == "2"
+            assert request_data.json_parameters["is_big"]
+            nonlocal amount
+            assert request_data.parameters["reaction"] == expected_param[amount]
+            amount += 1
+
+        monkeypatch.setattr(bot.request, "post", post)
+        await bot.set_message_reaction(1, 2, [ReactionTypeEmoji(ReactionEmoji.THUMBS_UP)], True)
+        await bot.set_message_reaction(1, 2, ReactionTypeEmoji(ReactionEmoji.RED_HEART), True)
+        await bot.set_message_reaction(1, 2, [ReactionTypeCustomEmoji("custom_emoji_1")], True)
+        await bot.set_message_reaction(1, 2, ReactionTypeCustomEmoji("custom_emoji_2"), True)
+        await bot.set_message_reaction(1, 2, ReactionEmoji.THUMB_DOWN, True)
+        await bot.set_message_reaction(1, 2, "custom_emoji_3", True)
+        await bot.set_message_reaction(
+            1, 2, [ReactionEmoji.RED_HEART, ReactionEmoji.THUMB_DOWN], True
+        )
+        await bot.set_message_reaction(1, 2, ["custom_emoji_4", "custom_emoji_5"], True)
 
 
 class TestBotWithRequest:
@@ -3636,3 +3683,8 @@ class TestBotWithRequest:
             bot.get_my_short_description("en"),
             bot.get_my_short_description("de"),
         ) == 3 * [BotShortDescription("")]
+
+    async def test_set_message_reaction(self, bot, chat_id, message):
+        assert await bot.set_message_reaction(
+            chat_id, message.message_id, ReactionEmoji.THUMB_DOWN, True
+        )

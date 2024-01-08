@@ -102,6 +102,7 @@ if TYPE_CHECKING:
         LabeledPrice,
         MessageId,
         MessageOrigin,
+        ReactionType,
         TextQuote,
     )
 
@@ -3452,6 +3453,44 @@ class Message(MaybeInaccessibleMessage):
         return await self.get_bot().unpin_all_forum_topic_messages(
             chat_id=self.chat_id,
             message_thread_id=self.message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_message_reaction(
+        self,
+        reaction: Optional[
+            Union[Sequence["ReactionType"], "ReactionType", Sequence[str], str]
+        ] = None,
+        is_big: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.set_message_reaction(chat_id=message.chat_id, message_id=message.message_id,
+                *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_message_reaction`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().set_message_reaction(
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            reaction=reaction,
+            is_big=is_big,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

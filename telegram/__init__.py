@@ -158,6 +158,8 @@ __all__ = (  # Keep this alphabetically ordered
     "MessageOriginChat",
     "MessageOriginHiddenUser",
     "MessageOriginUser",
+    "MessageReactionUpdated",
+    "MessageReactionCountUpdated",
     "OrderInfo",
     "PassportData",
     "PassportElementError",
@@ -178,6 +180,7 @@ __all__ = (  # Keep this alphabetically ordered
     "PollOption",
     "PreCheckoutQuery",
     "ProximityAlertTriggered",
+    "ReactionCount",
     "ReactionType",
     "ReactionTypeCustomEmoji",
     "ReactionTypeEmoji",
@@ -354,6 +357,7 @@ from ._messageorigin import (
     MessageOriginHiddenUser,
     MessageOriginUser,
 )
+from ._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
 from ._passport.credentials import (
     Credentials,
     DataCredentials,
@@ -388,7 +392,7 @@ from ._payment.shippingquery import ShippingQuery
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import Poll, PollAnswer, PollOption
 from ._proximityalerttriggered import ProximityAlertTriggered
-from ._reactiontype import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
+from ._reaction import ReactionCount, ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove

@@ -105,6 +105,7 @@ if TYPE_CHECKING:
         LabeledPrice,
         MessageEntity,
         PassportElementError,
+        ReactionType,
         ShippingOption,
     )
     from telegram.ext import BaseRateLimiter, Defaults
@@ -3875,6 +3876,33 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def set_message_reaction(
+        self,
+        chat_id: Union[str, int],
+        message_id: int,
+        reaction: Optional[
+            Union[Sequence["ReactionType"], "ReactionType", Sequence[str], str]
+        ] = None,
+        is_big: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        return await super().set_message_reaction(
+            chat_id=chat_id,
+            message_id=message_id,
+            reaction=reaction,
+            is_big=is_big,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -3993,3 +4021,4 @@ class ExtBot(Bot, Generic[RLARGS]):
     getMyName = get_my_name
     unpinAllGeneralForumTopicMessages = unpin_all_general_forum_topic_messages
     getUserChatBoosts = get_user_chat_boosts
+    setMessageReaction = set_message_reaction

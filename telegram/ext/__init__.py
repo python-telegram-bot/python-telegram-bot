@@ -45,6 +45,7 @@ __all__ = (
     "Job",
     "JobQueue",
     "MessageHandler",
+    "MessageReactionHandler",
     "PersistenceInput",
     "PicklePersistence",
     "PollAnswerHandler",
@@ -82,6 +83,7 @@ from ._extbot import ExtBot
 from ._inlinequeryhandler import InlineQueryHandler
 from ._jobqueue import Job, JobQueue
 from ._messagehandler import MessageHandler
+from ._messagereactionhandler import MessageReactionHandler
 from ._picklepersistence import PicklePersistence
 from ._pollanswerhandler import PollAnswerHandler
 from ._pollhandler import PollHandler

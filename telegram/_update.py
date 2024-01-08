@@ -28,6 +28,7 @@ from telegram._chatmemberupdated import ChatMemberUpdated
 from telegram._choseninlineresult import ChosenInlineResult
 from telegram._inline.inlinequery import InlineQuery
 from telegram._message import Message
+from telegram._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
 from telegram._payment.precheckoutquery import PreCheckoutQuery
 from telegram._payment.shippingquery import ShippingQuery
 from telegram._poll import Poll, PollAnswer
@@ -108,6 +109,28 @@ class Update(TelegramObject):
 
             .. versionadded:: NEXT.VERSION
 
+        message_reaction (:class:`telegram.MessageReactionUpdated`, optional): A reaction to a
+            message was changed by a user. The bot must be an administrator in the chat and must
+            explicitly specify :attr:`MESSAGE_REACTION` in the list of
+            :paramref:`telegram.ext.Application.run_polling.allowed_updates` to receive these
+            updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
+            :meth:`telegram.ext.Application.run_polling` and
+            :meth:`telegram.ext.Application.run_webhook`). The update isn't received for reactions
+            set by bots.
+
+            .. versionadded:: NEXT.VERSION
+
+        message_reaction_count (:class:`telegram.MessageReactionCountUpdated`, optional): Reactions
+            to a message with anonymous reactions were changed. The bot must be an administrator in
+            the chat and must explicitly specify :attr:`MESSAGE_REACTION_COUNT` in the list of
+            :paramref:`telegram.ext.Application.run_polling.allowed_updates` to receive these
+            updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
+            :meth:`telegram.ext.Application.run_polling` and
+            :meth:`telegram.ext.Application.run_webhook`). The updates are grouped and can be sent
+            with delay up to a few minutes.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
             certain positive number and increase sequentially. This ID becomes especially handy if
@@ -169,6 +192,28 @@ class Update(TelegramObject):
             a chat. The bot must be an administrator in the chat to receive these updates.
 
             .. versionadded:: NEXT.VERSION
+
+        message_reaction (:class:`telegram.MessageReactionUpdated`): Optional. A reaction to a
+            message was changed by a user. The bot must be an administrator in the chat and must
+            explicitly specify :attr:`MESSAGE_REACTION` in the list of
+            :paramref:`telegram.ext.Application.run_polling.allowed_updates` to receive these
+            updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
+            :meth:`telegram.ext.Application.run_polling` and
+            :meth:`telegram.ext.Application.run_webhook`). The update isn't received for reactions
+            set by bots.
+
+            .. versionadded:: NEXT.VERSION
+
+        message_reaction_count (:class:`telegram.MessageReactionCountUpdated`): Optional. Reactions
+            to a message with anonymous reactions were changed. The bot must be an administrator in
+            the chat and must explicitly specify :attr:`MESSAGE_REACTION_COUNT` in the list of
+            :paramref:`telegram.ext.Application.run_polling.allowed_updates` to receive these
+            updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
+            :meth:`telegram.ext.Application.run_polling` and
+            :meth:`telegram.ext.Application.run_webhook`). The updates are grouped and can be sent
+            with delay up to a few minutes.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -192,6 +237,8 @@ class Update(TelegramObject):
         "chat_join_request",
         "chat_boost",
         "removed_chat_boost",
+        "message_reaction",
+        "message_reaction_count",
     )
 
     MESSAGE: Final[str] = constants.UpdateType.MESSAGE
@@ -258,6 +305,14 @@ class Update(TelegramObject):
     """:const:`telegram.constants.UpdateType.REMOVED_CHAT_BOOST`
 
     .. versionadded:: NEXT.VERSION"""
+    MESSAGE_REACTION: Final[str] = constants.UpdateType.MESSAGE_REACTION
+    """:const:`telegram.constants.UpdateType.MESSAGE_REACTION`
+
+    .. versionadded:: NEXT.VERSION"""
+    MESSAGE_COUNT_REACTION: Final[str] = constants.UpdateType.MESSAGE_COUNT_REACTION
+    """:const:`telegram.constants.UpdateType.MESSAGE_COUNT_REACTION`
+
+    .. versionadded:: NEXT.VERSION"""
     ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
     """List[:obj:`str`]: A list of all available update types.
 
@@ -282,6 +337,8 @@ class Update(TelegramObject):
         chat_join_request: Optional[ChatJoinRequest] = None,
         chat_boost: Optional[ChatBoostUpdated] = None,
         removed_chat_boost: Optional[ChatBoostRemoved] = None,
+        message_reaction: Optional[MessageReactionUpdated] = None,
+        message_reaction_count: Optional[MessageReactionCountUpdated] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -305,6 +362,8 @@ class Update(TelegramObject):
         self.chat_join_request: Optional[ChatJoinRequest] = chat_join_request
         self.chat_boost: Optional[ChatBoostUpdated] = chat_boost
         self.removed_chat_boost: Optional[ChatBoostRemoved] = removed_chat_boost
+        self.message_reaction: Optional[MessageReactionUpdated] = message_reaction
+        self.message_reaction_count: Optional[MessageReactionCountUpdated] = message_reaction_count
 
         self._effective_user: Optional[User] = None
         self._effective_chat: Optional[Chat] = None
@@ -365,6 +424,9 @@ class Update(TelegramObject):
         elif self.chat_join_request:
             user = self.chat_join_request.from_user
 
+        elif self.message_reaction:
+            user = self.message_reaction.user
+
         self._effective_user = user
         return user
 
@@ -417,6 +479,12 @@ class Update(TelegramObject):
 
         elif self.removed_chat_boost:
             chat = self.removed_chat_boost.chat
+
+        elif self.message_reaction:
+            chat = self.message_reaction.chat
+
+        elif self.message_reaction_count:
+            chat = self.message_reaction_count.chat
 
         self._effective_chat = chat
         return chat
@@ -480,5 +548,11 @@ class Update(TelegramObject):
         data["chat_join_request"] = ChatJoinRequest.de_json(data.get("chat_join_request"), bot)
         data["chat_boost"] = ChatBoostUpdated.de_json(data.get("chat_boost"), bot)
         data["removed_chat_boost"] = ChatBoostRemoved.de_json(data.get("removed_chat_boost"), bot)
+        data["message_reaction"] = MessageReactionUpdated.de_json(
+            data.get("message_reaction"), bot
+        )
+        data["message_reaction_count"] = MessageReactionCountUpdated.de_json(
+            data.get("message_reaction_count"), bot
+        )
 
         return super().de_json(data=data, bot=bot)

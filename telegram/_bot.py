@@ -85,6 +85,7 @@ from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
 from telegram._poll import Poll
+from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._sentwebappmessage import SentWebAppMessage
 from telegram._telegramobject import TelegramObject
 from telegram._update import Update
@@ -98,7 +99,7 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import CorrectOptionID, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram._utils.warnings import warn
 from telegram._webhookinfo import WebhookInfo
-from telegram.constants import InlineQueryLimit
+from telegram.constants import InlineQueryLimit, ReactionEmoji
 from telegram.error import InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
@@ -8181,6 +8182,74 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    async def set_message_reaction(
+        self,
+        chat_id: Union[str, int],
+        message_id: int,
+        reaction: Optional[Union[Sequence[ReactionType], ReactionType, Sequence[str], str]] = None,
+        is_big: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """
+        Use this method to change the chosen reactions on a message. Service messages can't be
+        reacted to. Automatically forwarded messages from a channel to its discussion group have
+        the same available reactions as messages in the channel.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            message_id (:obj:`int`): Identifier of the target message. If the message belongs to a
+                media group, the reaction is set to the first non-deleted message in the group
+                instead.
+            reaction (Sequence[:class:`telegram.ReactionType`], optional): New list of reaction
+                types to set on the message. Currently, as non-premium users, bots can set up to
+                one reaction per message. A custom emoji reaction can be used if it is either
+                already present on the message or explicitly allowed by chat administrators.
+            is_big (:obj:`bool`, optional): Pass :obj:`True` to set the reaction with a big
+                animation.
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        # this variable is also only here for mypy... Better solution to cast?
+        mypy_extra = None
+        if isinstance(reaction, (ReactionType, str)):
+            mypy_extra = [reaction]
+        if mypy_extra and all(isinstance(s, str) for s in mypy_extra):
+            # The extra str call is there to make mypy happy. Maybe there is a better way
+            reaction = [
+                ReactionTypeEmoji(emoji=str(emoji))
+                if emoji in list(ReactionEmoji)
+                else ReactionTypeCustomEmoji(custom_emoji_id=str(emoji))
+                for emoji in mypy_extra
+            ]
+
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "reaction": reaction,
+            "is_big": is_big,
+        }
+
+        return await self._post(
+            "setMessageReaction",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # skipcq: PYL-W0613
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -8425,3 +8494,5 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`unpin_all_general_forum_topic_messages`"""
     getUserChatBoosts = get_user_chat_boosts
     """Alias for :meth:`get_user_chat_boosts`"""
+    setMessageReaction = set_message_reaction
+    """Alias for :meth:`set_message_reaction`"""

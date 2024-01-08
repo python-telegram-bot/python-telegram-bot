@@ -28,6 +28,7 @@ from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
 from telegram._forumtopic import ForumTopic
 from telegram._menubutton import MenuButton
+from telegram._reaction import ReactionType
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -166,6 +167,12 @@ class Chat(TelegramObject):
             only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        available_reactions (Sequence[:class:`telegram.ReactionType`], optional): List of available
+            reactions allowed in the chat. If omitted, then all of
+            :const:`telegram.constants.ReactionEmojis` are allowed. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         accent_color_id (:obj:`int`, optional): Identifier of the
             :class:`accent color <telegram.constants.AccentColor>` for the chat name and
             backgrounds of the chat photo, reply header, and link preview. See `accent colors`_
@@ -293,6 +300,12 @@ class Chat(TelegramObject):
             obtained via :meth:`~telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        available_reactions (Sequence[:class:`telegram.ReactionType`]): Optional. List of available
+            reactions allowed in the chat. If omitted, then all of
+            :const:`telegram.constants.ReactionEmojis` are allowed. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         accent_color_id (:obj:`int`): Optional. Identifier of the
             :class:`accent color <telegram.constants.AccentColor>` for the chat name and
             backgrounds of the chat photo, reply header, and link preview. See `accent colors`_
@@ -345,6 +358,7 @@ class Chat(TelegramObject):
     __slots__ = (
         "accent_color_id",
         "active_usernames",
+        "available_reactions",
         "background_custom_emoji_id",
         "bio",
         "can_set_sticker_set",
@@ -424,6 +438,7 @@ class Chat(TelegramObject):
         emoji_status_expiration_date: Optional[datetime] = None,
         has_aggressive_anti_spam_enabled: Optional[bool] = None,
         has_hidden_members: Optional[bool] = None,
+        available_reactions: Optional[Sequence[ReactionType]] = None,
         accent_color_id: Optional[int] = None,
         background_custom_emoji_id: Optional[str] = None,
         profile_accent_color_id: Optional[int] = None,
@@ -469,6 +484,9 @@ class Chat(TelegramObject):
         self.emoji_status_expiration_date: Optional[datetime] = emoji_status_expiration_date
         self.has_aggressive_anti_spam_enabled: Optional[bool] = has_aggressive_anti_spam_enabled
         self.has_hidden_members: Optional[bool] = has_hidden_members
+        self.available_reactions: Optional[Sequence[ReactionType]] = parse_sequence_arg(
+            available_reactions
+        )
         self.accent_color_id: Optional[int] = accent_color_id
         self.background_custom_emoji_id: Optional[str] = background_custom_emoji_id
         self.profile_accent_color_id: Optional[int] = profile_accent_color_id
@@ -540,6 +558,7 @@ class Chat(TelegramObject):
         data["pinned_message"] = Message.de_json(data.get("pinned_message"), bot)
         data["permissions"] = ChatPermissions.de_json(data.get("permissions"), bot)
         data["location"] = ChatLocation.de_json(data.get("location"), bot)
+        data["available_reactions"] = ReactionType.de_list(data.get("available_reactions"), bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -3485,4 +3504,40 @@ class Chat(TelegramObject):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+        )
+
+    async def set_message_reaction(
+        self,
+        message_id: int,
+        reaction: Optional[Union[Sequence[ReactionType], ReactionType, Sequence[str], str]] = None,
+        is_big: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.set_message_reaction(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_message_reaction`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().set_message_reaction(
+            chat_id=self.id,
+            message_id=message_id,
+            reaction=reaction,
+            is_big=is_big,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )

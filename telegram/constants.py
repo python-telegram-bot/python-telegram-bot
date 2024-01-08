@@ -2456,6 +2456,16 @@ class UpdateType(StringEnum):
 
     .. versionadded:: NEXT.VERSION
     """
+    MESSAGE_REACTION = "message_reaction"
+    """:obj:`str`: Updates with :attr:`telegram.Update.message_reaction`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MESSAGE_COUNT_REACTION = "message_count_reaction"
+    """:obj:`str`: Updates with :attr:`telegram.Update.message_count_reaction`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InvoiceLimit(IntEnum):
@@ -2624,7 +2634,7 @@ class ForumTopicLimit(IntEnum):
 
 
 class ReactionType(StringEnum):
-    """This enum contains the available types of :class:`telegram.Update`. The enum
+    """This enum contains the available types of :class:`telegram.ReactionType`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
     .. versionadded:: NEXT.VERSION
@@ -2652,7 +2662,7 @@ class ReactionEmoji(StringEnum):
 
     THUMBS_UP = "👍"
     """:obj:`str`: A thumbs-up gesture indicating approval."""
-    THUMB_DOWN = "👎"
+    THUMBS_DOWN = "👎"
     """:obj:`str`: A thumbs-down gesture indicating disapproval."""
-    READ_HEART = "❤"
+    RED_HEART = "❤"
     """:obj:`str`: A classic red love heart emoji, used for expressions of love and romance."""

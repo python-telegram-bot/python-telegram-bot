@@ -131,6 +131,8 @@ class ReactionTypeCustomEmoji(ReactionType):
         type (:obj:`str`): Type of the reaction,
             always :tg-const:`telegram.ReactionType.CUSTOM_EMOJI`.
         custom_emoji_id (:obj:`str`): Custom emoji identifier.
+
+
     """
 
     __slots__ = ("custom_emoji_id",)
@@ -146,3 +148,45 @@ class ReactionTypeCustomEmoji(ReactionType):
         with self._unfrozen():
             self.custom_emoji_id: str = custom_emoji_id
             self._id_attrs = (self.custom_emoji_id,)
+
+
+class ReactionCount(TelegramObject):
+    """This class represents a reaction added to a message along with the number of times it was
+    added.
+
+    .. versionadded:: NEXT.VERSION
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if the :attr:`type` and :attr:`total_count` is equal.
+
+    Args:
+        type (:class:`telegram.ReactionType`): Type of the reaction.
+        total_count (:obj:`int`): Number of times the reaction was added.
+
+    Attributes:
+        type (:class:`telegram.ReactionType`): Type of the reaction.
+        total_count (:obj:`int`): Number of times the reaction was added.
+    """
+
+    __slots__ = (
+        "type",
+        "total_count",
+    )
+
+    def __init__(
+        self,
+        type: ReactionType,  # pylint: disable=redefined-builtin
+        total_count: int,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        # Required
+        self.type: ReactionType = type
+        self.total_count: int = total_count
+
+        self._id_attrs = (
+            self.type,
+            self.total_count,
+        )
+        self._freeze()
