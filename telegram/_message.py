@@ -108,8 +108,7 @@ if TYPE_CHECKING:
     )
 
 
-class _ReplyKwargs(TypedDict, total=False):
-    message_id: int
+class _ReplyKwargs(TypedDict):
     chat_id: Union[str, int]
     reply_parameters: ReplyParameters
 
@@ -1387,11 +1386,10 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
     ) -> _ReplyKwargs:
-        kwargs: _ReplyKwargs = {"message_id": self.message_id}
-        if target_chat_id:
-            kwargs["chat_id"] = target_chat_id
+        kwargs: _ReplyKwargs = {"chat_id": target_chat_id or self.chat_id}
+        target_chat_is_self = target_chat_id in (None, self.chat_id, f"@{self.username}")
 
-        if target_chat_id in (None, self.chat_id, f"@{self.username}") and message_thread_id in (
+        if target_chat_is_self and message_thread_id in (
             None,
             self.message_thread_id,
         ):
@@ -1404,7 +1402,7 @@ class Message(MaybeInaccessibleMessage):
             self.compute_quote_position_and_entities(quote, quote_index) if quote else (None, None)
         )
         kwargs["reply_parameters"] = ReplyParameters(
-            chat_id=self.chat_id if not target_chat_id else None,
+            chat_id=None if target_chat_is_self else self.chat_id,
             message_id=self.message_id,
             quote_position=quote_position,
             quote_entities=quote_entities,
@@ -1412,6 +1410,24 @@ class Message(MaybeInaccessibleMessage):
         )
 
         return kwargs
+
+    async def _parse_quote_arguments(
+        self,
+        do_quote: Optional[Union[bool, _ReplyKwargs]],
+        quote: Optional[bool],
+        reply_to_message_id: Optional[int],
+    ) -> Tuple[Union[str, int], ReplyParameters]:
+        if quote and do_quote:
+            raise ValueError("Mutually exclusive")
+        effective_do_quote = quote or do_quote
+        bool_do_quote = isinstance(effective_do_quote, bool)
+        reply_parameters = (
+            self._quote(quote, reply_to_message_id)
+            if bool_do_quote
+            else effective_do_quote["reply_parameters"]
+        )
+        chat_id = self.chat_id if bool_do_quote else effective_do_quote["chat_id"]
+        return chat_id, reply_parameters
 
     async def reply_text(
         self,
@@ -1449,17 +1465,11 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        if quote and do_quote:
-            raise ValueError("Mutually exclusive")
-
-        effective_do_quote = quote or do_quote
-        reply_parameters = (
-            self._quote(quote, reply_to_message_id)
-            if isinstance(effective_do_quote, bool)
-            else effective_do_quote
+        chat_id, reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id
         )
         return await self.get_bot().send_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
