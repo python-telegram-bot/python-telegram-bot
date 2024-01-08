@@ -1589,6 +1589,11 @@ class MessageEntityType(StringEnum):
 
     .. versionadded:: 20.0
     """
+    BLOCKQUOTE = "blockquote"
+    """:obj:`str`: Message entities representing a block quotation.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class MessageLimit(IntEnum):
