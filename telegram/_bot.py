@@ -86,6 +86,7 @@ from telegram._message import Message
 from telegram._messageid import MessageId
 from telegram._poll import Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
+from telegram._reply import ReplyParameters
 from telegram._sentwebappmessage import SentWebAppMessage
 from telegram._telegramobject import TelegramObject
 from telegram._update import Update
@@ -674,6 +675,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -692,14 +694,30 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         # We don't check if (DEFAULT_)None here, so that _post is able to insert the defaults
         # correctly, if necessary:
+        if (
+            allow_sending_without_reply is not DEFAULT_NONE
+            and reply_parameters is not DEFAULT_NONE
+        ):
+            raise ValueError(
+                "`allow_sending_without_reply` and `reply_parameters` are mutually exclusive."
+            )
+
+        if reply_to_message_id is not None and reply_parameters is not DEFAULT_NONE:
+            raise ValueError(
+                "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
+            )
+
+        if reply_to_message_id is not None:
+            reply_parameters = ReplyParameters(
+                message_id=reply_to_message_id,
+                allow_sending_without_reply=allow_sending_without_reply,  # type: ignore[arg-type]
+            )
+
         data["disable_notification"] = disable_notification
-        data["allow_sending_without_reply"] = allow_sending_without_reply
         data["protect_content"] = protect_content
         data["parse_mode"] = parse_mode
         data["link_preview_options"] = link_preview_options
-
-        if reply_to_message_id is not None:
-            data["reply_to_message_id"] = reply_to_message_id
+        data["reply_parameters"] = reply_parameters
 
         if reply_markup is not None:
             data["reply_markup"] = reply_markup
@@ -814,6 +832,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         reply_markup: Optional[ReplyMarkup] = None,
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -865,6 +884,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
@@ -898,6 +920,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id=message_thread_id,
             parse_mode=parse_mode,
             link_preview_options=link_preview_options,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -984,7 +1007,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            message_ids (Sequence[:obj:`int`]): Identifiers of 1-100 messages to delete.
+            message_ids (Sequence[:obj:`int`]): Identifiers of
+                :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` messages to delete.
                 See :meth:`delete_message` for limitations on which messages can be deleted.
 
         Returns:
@@ -1097,7 +1122,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
-            message_ids (Sequence[:obj:`int`]): Identifiers of 1-100 messages in the chat
+            message_ids (Sequence[:obj:`int`]): Identifiers of
+                :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` messages in the chat
                 :paramref:`from_chat_id` to forward. The identifiers must be specified in a
                 strictly increasing order.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -1146,6 +1173,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1202,6 +1230,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 with a spoiler animation.
 
                 .. versionadded:: 20.0
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the photo, when uploading a
@@ -1235,6 +1266,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1260,6 +1292,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1326,6 +1359,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 optional): |thumbdocstring|
 
                 .. versionadded:: 20.2
+            reply_parameters (:obj:`ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the audio, when uploading a
@@ -1362,6 +1398,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1385,6 +1422,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1450,6 +1488,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 optional): |thumbdocstring|
 
                 .. versionadded:: 20.2
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the document, when uploading a
@@ -1482,6 +1523,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1501,6 +1543,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1546,6 +1589,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1568,6 +1614,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1595,6 +1642,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1669,6 +1717,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 optional): |thumbdocstring|
 
                 .. versionadded:: 20.2
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video, when uploading a
@@ -1707,6 +1758,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1728,6 +1780,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1787,6 +1840,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 optional): |thumbdocstring|
 
                 .. versionadded:: 20.2
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video note, when uploading a
@@ -1819,6 +1875,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1845,6 +1902,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1913,6 +1971,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 optional): |thumbdocstring|
 
                 .. versionadded:: 20.2
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the animation, when uploading a
@@ -1950,6 +2011,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1972,6 +2034,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2033,6 +2096,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the voice, when uploading a
@@ -2066,6 +2132,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2085,6 +2152,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2129,6 +2197,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             caption (:obj:`str`, optional): Caption that will be added to the
@@ -2180,14 +2251,33 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             media = list(media)
             media[0] = item_to_get_caption
 
+        # TODO Maybe should write helper function, 3 use cases so far.
+        if (
+            allow_sending_without_reply is not DEFAULT_NONE
+            and reply_parameters is not DEFAULT_NONE
+        ):
+            raise ValueError(
+                "`allow_sending_without_reply` and `reply_parameters` are mutually exclusive."
+            )
+
+        if reply_to_message_id is not None and reply_parameters is not DEFAULT_NONE:
+            raise ValueError(
+                "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
+            )
+
+        if reply_to_message_id is not None:
+            reply_parameters = ReplyParameters(
+                message_id=reply_to_message_id,
+                allow_sending_without_reply=allow_sending_without_reply,  # type: ignore[arg-type]
+            )
+
         data: JSONDict = {
             "chat_id": chat_id,
             "media": media,
             "disable_notification": disable_notification,
-            "allow_sending_without_reply": allow_sending_without_reply,
             "protect_content": protect_content,
             "message_thread_id": message_thread_id,
-            "reply_to_message_id": reply_to_message_id,
+            "reply_parameters": reply_parameters,
         }
 
         result = await self._post(
@@ -2218,6 +2308,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2266,6 +2357,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             location (:class:`telegram.Location`, optional): The location to send.
@@ -2310,6 +2404,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2478,6 +2573,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         venue: Optional[Venue] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2524,6 +2620,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             venue (:class:`telegram.Venue`, optional): The venue to send.
@@ -2579,6 +2678,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2600,6 +2700,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         contact: Optional[Contact] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2636,6 +2737,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             contact (:class:`telegram.Contact`, optional): The contact to send.
@@ -2682,6 +2786,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2700,6 +2805,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2726,6 +2832,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard. If empty, one "Play game_title" button will be
                 shown. If not empty, the first button must launch the game.
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -2745,6 +2854,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -4384,6 +4494,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4486,6 +4597,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard. If empty, one 'Pay total price' button will be
                 shown. If not empty, the first button must be a Pay button.
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -4528,6 +4642,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -4736,7 +4851,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 permissions are set independently. Otherwise, the
                 :attr:`~telegram.ChatPermissions.can_send_other_messages` and
                 :attr:`~telegram.ChatPermissions.can_add_web_page_previews` permissions will imply
-                the :attr:`~telegram.ChatPermissions.can_send_messages`,
+                the :attr:`~telegram.ChatPermissions.caforward_messages_tod_messages`,
                 :attr:`~telegram.ChatPermissions.can_send_audios`,
                 :attr:`~telegram.ChatPermissions.can_send_documents`,
                 :attr:`~telegram.ChatPermissions.can_send_photos`,
@@ -6382,6 +6497,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6454,6 +6570,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -6487,6 +6606,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -6551,6 +6671,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6591,6 +6712,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -6610,6 +6734,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -6952,6 +7077,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6993,6 +7119,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.MessageId`: On success
@@ -7001,19 +7130,38 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
+
+        if (
+            allow_sending_without_reply is not DEFAULT_NONE
+            and reply_parameters is not DEFAULT_NONE
+        ):
+            raise ValueError(
+                "`allow_sending_without_reply` and `reply_parameters` are mutually exclusive."
+            )
+
+        if reply_to_message_id is not None and reply_parameters is not DEFAULT_NONE:
+            raise ValueError(
+                "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
+            )
+
+        if reply_to_message_id is not None:
+            reply_parameters = ReplyParameters(
+                message_id=reply_to_message_id,
+                allow_sending_without_reply=allow_sending_without_reply,  # type: ignore[arg-type]
+            )
+
         data: JSONDict = {
             "chat_id": chat_id,
             "from_chat_id": from_chat_id,
             "message_id": message_id,
             "parse_mode": parse_mode,
             "disable_notification": disable_notification,
-            "allow_sending_without_reply": allow_sending_without_reply,
             "protect_content": protect_content,
             "caption": caption,
             "caption_entities": caption_entities,
-            "reply_to_message_id": reply_to_message_id,
             "reply_markup": reply_markup,
             "message_thread_id": message_thread_id,
+            "reply_parameters": reply_parameters,
         }
 
         result = await self._post(
@@ -7058,7 +7206,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
-            message_ids (Sequence[:obj:`int`]): Identifiers of 1-100 messages in the chat
+            message_ids (Sequence[:obj:`int`]): Identifiers of
+                :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` messages in the chat.
                 :paramref:`from_chat_id` to copy. The identifiers must be specified in a strictly
                 increasing order.
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -7068,8 +7218,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 their captions.
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, returns a tuple of `MessageId` of the
-            sent messages.
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of the sent messages is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`

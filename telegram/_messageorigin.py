@@ -112,6 +112,15 @@ class MessageOrigin(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
 
+        if "sender_user" in data:
+            data["sender_user"] = User.de_json(data.get("sender_user"), bot)
+
+        if "sender_chat" in data:
+            data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
+
+        if "chat" in data:
+            data["chat"] = Chat.de_json(data.get("chat"), bot)
+
         return super().de_json(data=data, bot=bot)
 
 

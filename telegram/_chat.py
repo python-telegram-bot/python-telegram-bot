@@ -2645,7 +2645,7 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
-        .. seealso:: :meth:`forward_to`, :meth:`forwards_from`, :meth:`forwards_to`
+        .. seealso:: :meth:`forward_to`, :meth:`forward_messages_from`, :meth:`forward_messages_to`
 
         .. versionadded:: 20.0
 
@@ -2687,7 +2687,8 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
-        .. seealso:: :meth:`forward_from`, :meth:`forwards_from`, :meth:`forwards_to`
+        .. seealso:: :meth:`forward_from`, :meth:`forward_messages_from`,
+            :meth:`forward_messages_to`
 
         .. versionadded:: 20.0
 
@@ -2709,7 +2710,7 @@ class Chat(TelegramObject):
             message_thread_id=message_thread_id,
         )
 
-    async def forwards_from(
+    async def forward_messages_from(
         self,
         from_chat_id: Union[str, int],
         message_ids: Sequence[int],
@@ -2729,7 +2730,7 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_messages`.
 
-        .. seealso:: :meth:`forward_to`, :meth:`forward_from`, :meth:`forwards_to`.
+        .. seealso:: :meth:`forward_to`, :meth:`forward_from`, :meth:`forward_messages_to`.
 
         .. versionadded:: NEXT.VERSION
 
@@ -2752,7 +2753,7 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    async def forwards_to(
+    async def forward_messages_to(
         self,
         chat_id: Union[int, str],
         message_ids: Sequence[int],
@@ -2772,7 +2773,7 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_messages`.
 
-        .. seealso:: :meth:`forward_from`, :meth:`forward_to`, :meth:`forwards_from`.
+        .. seealso:: :meth:`forward_from`, :meth:`forward_to`, :meth:`forward_messages_from`.
 
         .. versionadded:: NEXT.VERSION
 

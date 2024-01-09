@@ -320,7 +320,10 @@ class TextQuote(TelegramObject):
         self.entities: Optional[Tuple[MessageEntity, ...]] = parse_sequence_arg(entities)
         self.is_manual: Optional[bool] = is_manual
 
-        self._id_attrs = (self.text,)
+        self._id_attrs = (
+            self.text,
+            self.position,
+        )
 
         self._freeze()
 
@@ -344,7 +347,7 @@ class ReplyParameters(TelegramObject):
     .. versionadded:: NEXT.VERSION
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`message_id` and :attr:`chat_id` are equal.
+    considered equal, if their :attr:`message_id` is equal.
 
     Args:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
