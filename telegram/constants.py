@@ -634,6 +634,22 @@ class BotNameLimit(IntEnum):
     """
 
 
+class BulkRequestLimit(IntEnum):
+    """This enum contains limitations for :meth:`telegram.Bot.delete_messages`,
+    :meth:`telegram.Bot.forward_messages` and :meth:`telegram.Bot.copy_messages`. The enum members
+    of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum number of messages required for bulk actions."""
+    MAX_LIMIT = 100
+    """:obj:`int`: Maximum number of messages required for bulk actions."""
+
+
 class CallbackQueryLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.CallbackQuery`/
     :meth:`telegram.Bot.answer_callback_query`. The enum members of this enumeration are instances
@@ -2671,19 +2687,3 @@ class ReactionEmoji(StringEnum):
     """:obj:`str`: A thumbs-down gesture indicating disapproval."""
     RED_HEART = "❤"
     """:obj:`str`: A classic red love heart emoji, used for expressions of love and romance."""
-
-
-class BulkRequestLimit(IntEnum):
-    """This enum contains limitations for :meth:`telegram.Bot.delete_messages`,
-    :meth:`telegram.Bot.forward_messages` and :meth:`telegram.Bot.copy_messages`. The enum members
-    of this enumeration are instances of :class:`int` and can be treated as such.
-
-    .. versionadded:: NEXT.VERSION
-    """
-
-    __slots__ = ()
-
-    MIN_LIMIT = 1
-    """:obj:`int`: Minimum number of messages required for bulk actions."""
-    MAX_LIMIT = 100
-    """:obj:`int`: Maximum number of messages required for bulk actions."""

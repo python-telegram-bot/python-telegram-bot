@@ -34,6 +34,7 @@ if TYPE_CHECKING:
 class MessageOrigin(TelegramObject):
     """
     Base class for telegram MessageOrigin object, it can be one of:
+
     * :class:`MessageOriginUser`
     * :class:`MessageOriginHiddenUser`
     * :class:`MessageOriginChat`
