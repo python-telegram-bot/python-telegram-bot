@@ -16,31 +16,35 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the ChosenInlineResultHandler class."""
-import re
-from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union, cast
+"""This module contains the StringCommandHandler class."""
 
-from telegram import Update
+from typing import TYPE_CHECKING, Any, List, Optional
+
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
-from telegram.ext._basehandler import BaseHandler
-from telegram.ext._utils.types import CCT, HandlerCallback
-
-RT = TypeVar("RT")
+from telegram.ext._handlers._basehandler import BaseHandler
+from telegram.ext._utils.types import CCT, RT, HandlerCallback
 
 if TYPE_CHECKING:
     from telegram.ext import Application
 
 
-class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
-    """Handler class to handle Telegram updates that contain
-    :attr:`telegram.Update.chosen_inline_result`.
+class StringCommandHandler(BaseHandler[str, CCT]):
+    """Handler class to handle string commands. Commands are string updates that start with
+    ``/``. The handler will add a :obj:`list` to the
+    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
+    which is the text following the command split on single whitespace characters.
+
+    Note:
+        This handler is not used to handle Telegram :class:`telegram.Update`, but strings manually
+        put in the queue. For example to send messages with the bot using command line or API.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
+        command (:obj:`str`): The command this handler should listen for.
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::
@@ -54,68 +58,51 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
-        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Regex pattern. If not
-            :obj:`None`, :func:`re.match`
-            is used on :attr:`telegram.ChosenInlineResult.result_id` to determine if an update
-            should be handled by this handler. This is accessible in the callback as
-            :attr:`telegram.ext.CallbackContext.matches`.
 
-            .. versionadded:: 13.6
     Attributes:
+        command (:obj:`str`): The command this handler should listen for.
         callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
-        pattern (`Pattern`): Optional. Regex pattern to test
-            :attr:`telegram.ChosenInlineResult.result_id` against.
-
-            .. versionadded:: 13.6
 
     """
 
-    __slots__ = ("pattern",)
+    __slots__ = ("command",)
 
     def __init__(
         self,
-        callback: HandlerCallback[Update, CCT, RT],
+        command: str,
+        callback: HandlerCallback[str, CCT, RT],
         block: DVType[bool] = DEFAULT_TRUE,
-        pattern: Optional[Union[str, Pattern[str]]] = None,
     ):
         super().__init__(callback, block=block)
+        self.command: str = command
 
-        if isinstance(pattern, str):
-            pattern = re.compile(pattern)
-
-        self.pattern: Optional[Union[str, Pattern[str]]] = pattern
-
-    def check_update(self, update: object) -> Optional[Union[bool, object]]:
+    def check_update(self, update: object) -> Optional[List[str]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
-            update (:class:`telegram.Update` | :obj:`object`): Incoming update.
+            update (:obj:`object`): The incoming update.
 
         Returns:
-            :obj:`bool` | :obj:`re.match`
+            List[:obj:`str`]: List containing the text command split on whitespace.
 
         """
-        if isinstance(update, Update) and update.chosen_inline_result:
-            if self.pattern:
-                if match := re.match(self.pattern, update.chosen_inline_result.result_id):
-                    return match
-            else:
-                return True
+        if isinstance(update, str) and update.startswith("/"):
+            args = update[1:].split(" ")
+            if args[0] == self.command:
+                return args[1:]
         return None
 
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,  # skipcq: BAN-B301
+        update: str,  # skipcq: BAN-B301
         application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
-        check_result: Union[bool, Match[str]],
+        check_result: Optional[List[str]],
     ) -> None:
-        """This function adds the matched regex pattern result to
-        :attr:`telegram.ext.CallbackContext.matches`.
+        """Add text after the command to :attr:`CallbackContext.args` as list, split on single
+        whitespaces.
         """
-        if self.pattern:
-            check_result = cast(Match, check_result)
-            context.matches = [check_result]
+        context.args = check_result

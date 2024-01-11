@@ -16,30 +16,29 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the PreCheckoutQueryHandler class."""
-
-
+"""This module contains the ChosenInlineResultHandler class."""
 import re
-from typing import Optional, Pattern, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
-from telegram.ext._basehandler import BaseHandler
+from telegram.ext._handlers._basehandler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar("RT")
 
+if TYPE_CHECKING:
+    from telegram.ext import Application
 
-class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
-    """Handler class to handle Telegram :attr:`telegram.Update.pre_checkout_query`.
+
+class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
+    """Handler class to handle Telegram updates that contain
+    :attr:`telegram.Update.chosen_inline_result`.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
-
-    Examples:
-        :any:`Payment Bot <examples.paymentbot>`
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -55,18 +54,22 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
-        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Optional. Regex pattern
-            to test :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Regex pattern. If not
+            :obj:`None`, :func:`re.match`
+            is used on :attr:`telegram.ChosenInlineResult.result_id` to determine if an update
+            should be handled by this handler. This is accessible in the callback as
+            :attr:`telegram.ext.CallbackContext.matches`.
 
-            .. versionadded:: NEXT.VERSION
-
+            .. versionadded:: 13.6
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
-        block (:obj:`bool`): Determines whether the callback will run in a blocking way..
-        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Optional. Regex pattern
-            to test :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
+        pattern (`Pattern`): Optional. Regex pattern to test
+            :attr:`telegram.ChosenInlineResult.result_id` against.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 13.6
 
     """
 
@@ -80,23 +83,39 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
     ):
         super().__init__(callback, block=block)
 
-        self.pattern: Optional[Pattern[str]] = re.compile(pattern) if pattern is not None else None
+        if isinstance(pattern, str):
+            pattern = re.compile(pattern)
 
-    def check_update(self, update: object) -> bool:
+        self.pattern: Optional[Union[str, Pattern[str]]] = pattern
+
+    def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
-            :obj:`bool`
+            :obj:`bool` | :obj:`re.match`
 
         """
-        if isinstance(update, Update) and update.pre_checkout_query:
-            invoice_payload = update.pre_checkout_query.invoice_payload
+        if isinstance(update, Update) and update.chosen_inline_result:
             if self.pattern:
-                if self.pattern.match(invoice_payload):
-                    return True
+                if match := re.match(self.pattern, update.chosen_inline_result.result_id):
+                    return match
             else:
                 return True
-        return False
+        return None
+
+    def collect_additional_context(
+        self,
+        context: CCT,
+        update: Update,  # skipcq: BAN-B301
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
+        check_result: Union[bool, Match[str]],
+    ) -> None:
+        """This function adds the matched regex pattern result to
+        :attr:`telegram.ext.CallbackContext.matches`.
+        """
+        if self.pattern:
+            check_result = cast(Match, check_result)
+            context.matches = [check_result]

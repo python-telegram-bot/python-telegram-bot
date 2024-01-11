@@ -22,7 +22,7 @@ from typing import Final, Optional, TypeVar
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
-from telegram.ext._basehandler import BaseHandler
+from telegram.ext._handlers._basehandler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar("RT")

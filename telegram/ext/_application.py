@@ -64,7 +64,7 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
-from telegram.ext._basehandler import BaseHandler
+from telegram.ext._handlers._basehandler import BaseHandler
 from telegram.ext._basepersistence import BasePersistence
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot

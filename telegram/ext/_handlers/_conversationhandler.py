@@ -42,14 +42,14 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import DVType
 from telegram._utils.warnings import warn
 from telegram.ext._application import ApplicationHandlerStop
-from telegram.ext._basehandler import BaseHandler
-from telegram.ext._callbackqueryhandler import CallbackQueryHandler
-from telegram.ext._choseninlineresulthandler import ChosenInlineResultHandler
+from telegram.ext._handlers._basehandler import BaseHandler
+from telegram.ext._handlers._callbackqueryhandler import CallbackQueryHandler
+from telegram.ext._handlers._choseninlineresulthandler import ChosenInlineResultHandler
 from telegram.ext._extbot import ExtBot
-from telegram.ext._inlinequeryhandler import InlineQueryHandler
-from telegram.ext._stringcommandhandler import StringCommandHandler
-from telegram.ext._stringregexhandler import StringRegexHandler
-from telegram.ext._typehandler import TypeHandler
+from telegram.ext._handlers._inlinequeryhandler import InlineQueryHandler
+from telegram.ext._handlers._stringcommandhandler import StringCommandHandler
+from telegram.ext._handlers._stringregexhandler import StringRegexHandler
+from telegram.ext._handlers._typehandler import TypeHandler
 from telegram.ext._utils.trackingdict import TrackingDict
 from telegram.ext._utils.types import CCT, ConversationDict, ConversationKey
 
