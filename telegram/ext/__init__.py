@@ -59,24 +59,7 @@ __all__ = (
     "filters",
 )
 
-from ._handlers import filters
-from ._handlers._basehandler import BaseHandler
-from ._handlers._callbackqueryhandler import CallbackQueryHandler
-from ._handlers._chatjoinrequesthandler import ChatJoinRequestHandler
-from ._handlers._chatmemberhandler import ChatMemberHandler
-from ._handlers._choseninlineresulthandler import ChosenInlineResultHandler
-from ._handlers._commandhandler import CommandHandler
-from ._handlers._pollanswerhandler import PollAnswerHandler
-from ._handlers._pollhandler import PollHandler
-from ._handlers._precheckoutqueryhandler import PreCheckoutQueryHandler
-from ._handlers._prefixhandler import PrefixHandler
-from ._handlers._shippingqueryhandler import ShippingQueryHandler
-from ._handlers._stringcommandhandler import StringCommandHandler
-from ._handlers._stringregexhandler import StringRegexHandler
-from ._handlers._typehandler import TypeHandler
-from ._handlers._inlinequeryhandler import InlineQueryHandler
-from ._handlers._conversationhandler import ConversationHandler
-from ._handlers._messagehandler import MessageHandler
+from . import filters
 from ._aioratelimiter import AIORateLimiter
 from ._application import Application, ApplicationHandlerStop
 from ._applicationbuilder import ApplicationBuilder
@@ -89,6 +72,23 @@ from ._contexttypes import ContextTypes
 from ._defaults import Defaults
 from ._dictpersistence import DictPersistence
 from ._extbot import ExtBot
+from ._handlers.basehandler import BaseHandler
+from ._handlers.callbackqueryhandler import CallbackQueryHandler
+from ._handlers.chatjoinrequesthandler import ChatJoinRequestHandler
+from ._handlers.chatmemberhandler import ChatMemberHandler
+from ._handlers.choseninlineresulthandler import ChosenInlineResultHandler
+from ._handlers.commandhandler import CommandHandler
+from ._handlers.conversationhandler import ConversationHandler
+from ._handlers.inlinequeryhandler import InlineQueryHandler
+from ._handlers.messagehandler import MessageHandler
+from ._handlers.pollanswerhandler import PollAnswerHandler
+from ._handlers.pollhandler import PollHandler
+from ._handlers.precheckoutqueryhandler import PreCheckoutQueryHandler
+from ._handlers.prefixhandler import PrefixHandler
+from ._handlers.shippingqueryhandler import ShippingQueryHandler
+from ._handlers.stringcommandhandler import StringCommandHandler
+from ._handlers.stringregexhandler import StringRegexHandler
+from ._handlers.typehandler import TypeHandler
 from ._jobqueue import Job, JobQueue
 from ._picklepersistence import PicklePersistence
 from ._updater import Updater

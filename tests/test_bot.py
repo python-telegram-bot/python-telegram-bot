@@ -3173,8 +3173,8 @@ class TestBotWithRequest:
         assert await bot.set_my_commands(commands)
 
         for i, bc in enumerate(await bot.get_my_commands()):
-            assert bc.command == f"cmd{i+1}"
-            assert bc.description == f"descr{i+1}"
+            assert bc.command == f"cmd{i + 1}"
+            assert bc.description == f"descr{i + 1}"
 
     async def test_get_set_delete_my_commands_with_scope(self, bot, super_group_id, chat_id):
         group_cmds = [BotCommand("group_cmd", "visible to this supergroup only")]
