@@ -42,7 +42,8 @@ from telegram._poll import Poll
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -406,7 +407,7 @@ class ReplyParameters(TelegramObject):
         self,
         message_id: int,
         chat_id: Optional[Union[int, str]] = None,
-        allow_sending_without_reply: Optional[bool] = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: Optional[str] = None,
         quote_parse_mode: Optional[str] = None,
         quote_entities: Optional[Sequence[MessageEntity]] = None,
@@ -418,7 +419,7 @@ class ReplyParameters(TelegramObject):
 
         self.message_id: int = message_id
         self.chat_id: Optional[Union[int, str]] = chat_id
-        self.allow_sending_without_reply: Optional[bool] = allow_sending_without_reply
+        self.allow_sending_without_reply: ODVInput[bool] = allow_sending_without_reply
         self.quote: Optional[str] = quote
         self.quote_parse_mode: Optional[str] = quote_parse_mode
         self.quote_entities: Optional[Tuple[MessageEntity, ...]] = parse_sequence_arg(

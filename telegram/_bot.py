@@ -710,7 +710,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         if reply_to_message_id is not None:
             reply_parameters = ReplyParameters(
                 message_id=reply_to_message_id,
-                allow_sending_without_reply=allow_sending_without_reply,  # type: ignore[arg-type]
+                allow_sending_without_reply=allow_sending_without_reply,
             )
 
         data["disable_notification"] = disable_notification
@@ -2268,7 +2268,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         if reply_to_message_id is not None:
             reply_parameters = ReplyParameters(
                 message_id=reply_to_message_id,
-                allow_sending_without_reply=allow_sending_without_reply,  # type: ignore[arg-type]
+                allow_sending_without_reply=allow_sending_without_reply,
             )
 
         data: JSONDict = {
@@ -7147,7 +7147,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         if reply_to_message_id is not None:
             reply_parameters = ReplyParameters(
                 message_id=reply_to_message_id,
-                allow_sending_without_reply=allow_sending_without_reply,  # type: ignore[arg-type]
+                allow_sending_without_reply=allow_sending_without_reply,
             )
 
         data: JSONDict = {
