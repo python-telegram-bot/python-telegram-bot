@@ -725,10 +725,10 @@ class TestConversationHandler:
             assert recwarn[0].category is PTBUserWarning
             assert (
                 Path(recwarn[0].filename)
-                == PROJECT_ROOT_PATH 
-                / "telegram" 
-                / "ext" 
-                / "_handlers" 
+                == PROJECT_ROOT_PATH
+                / "telegram"
+                / "ext"
+                / "_handlers"
                 / "conversationhandler.py"
             ), "wrong stacklevel!"
             assert (
@@ -1109,10 +1109,10 @@ class TestConversationHandler:
                 assert warning.category is PTBUserWarning
                 assert (
                     Path(warning.filename)
-                    == PROJECT_ROOT_PATH 
-                    / "telegram" 
-                    / "ext" 
-                    / "_handlers" 
+                    == PROJECT_ROOT_PATH
+                    / "telegram"
+                    / "ext"
+                    / "_handlers"
                     / "conversationhandler.py"
                 ), "wrong stacklevel!"
             # now set app.job_queue back to it's original value
