@@ -1046,6 +1046,28 @@ class TestBotWithoutRequest:
                 "text", chat_id, 1, disable_web_page_preview=True, link_preview_options=True
             )
 
+    async def test_rtm_aswr_mutually_exclusive_reply_parameter(self, bot: Bot, chat_id):
+        """Test that reply_to_message_id and allow_sending_without_reply are mutually exclusive
+        with reply_parameters."""
+        with pytest.raises(ValueError, match="`reply_to_message_id` and"):
+            await bot.send_message(chat_id, "text", reply_to_message_id=1, reply_parameters=True)
+
+        with pytest.raises(ValueError, match="`allow_sending_without_reply` and"):
+            await bot.send_message(
+                chat_id, "text", allow_sending_without_reply=True, reply_parameters=True
+            )
+
+        # Test with copy message
+        with pytest.raises(ValueError, match="`reply_to_message_id` and"):
+            await bot.copy_message(
+                chat_id, chat_id, 1, reply_to_message_id=1, reply_parameters=True
+            )
+
+        with pytest.raises(ValueError, match="`allow_sending_without_reply` and"):
+            await bot.copy_message(
+                chat_id, chat_id, 1, allow_sending_without_reply=True, reply_parameters=True
+            )
+
     # get_file is tested multiple times in the test_*media* modules.
     # Here we only test the behaviour for bot apis in local mode
     async def test_get_file_local_mode(self, bot, monkeypatch):
@@ -3203,6 +3225,24 @@ class TestBotWithRequest:
         assert msg3.link_preview_options
         assert not msg3.link_preview_options.show_above_text
         assert msg3.link_preview_options.url == website
+
+    async def test_send_message_rtm_aswr(self, bot, chat_id):
+        """Test that reply_to_message_id and allow_sending_without_reply are substituted for
+        reply_parameters and that it still works as expected for backward compatability."""
+        msg = await bot.send_message(chat_id, "text", reply_to_message_id=1)
+        assert msg.reply_parameters
+        assert msg.reply_parameters.message_id == 1
+
+        msg = await bot.send_message(chat_id, "text", allow_sending_without_reply=True)
+        assert msg.reply_parameters
+        assert msg.reply_parameters.allow_sending_without_reply
+
+        msg = await bot.send_message(
+            chat_id, "text", reply_to_message_id=1, allow_sending_without_reply=True
+        )
+        assert msg.reply_parameters
+        assert msg.reply_parameters.message_id == 1
+        assert msg.reply_parameters.allow_sending_without_reply
 
     async def test_send_message_entities(self, bot, chat_id):
         test_string = "Italic Bold Code Spoiler"

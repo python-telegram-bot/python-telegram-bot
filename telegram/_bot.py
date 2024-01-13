@@ -875,8 +875,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1220,8 +1235,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1348,9 +1378,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1477,9 +1521,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1582,9 +1640,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1703,8 +1775,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.0
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1829,9 +1916,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1957,8 +2058,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.0
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -2089,9 +2205,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -2194,9 +2324,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
                 .. versionadded:: NEXT.VERSION
@@ -2251,7 +2395,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             media = list(media)
             media[0] = item_to_get_caption
 
-        # TODO Maybe should write helper function, 3 use cases so far.
         if (
             allow_sending_without_reply is not DEFAULT_NONE
             and reply_parameters is not DEFAULT_NONE
@@ -2350,9 +2493,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -2613,9 +2770,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -2730,9 +2901,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -2826,9 +3011,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard. If empty, one "Play game_title" button will be
                 shown. If not empty, the first button must launch the game.
@@ -4591,9 +4790,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard. If empty, one 'Pay total price' button will be
                 shown. If not empty, the first button must be a Pay button.
@@ -6563,9 +6776,23 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -6685,7 +6912,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             disable_notification (:obj:`bool`, optional): |disable_notification|
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -6706,6 +6940,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 13.4
                    Added the :tg-const:`telegram.Dice.BOWLING` emoji.
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
@@ -7113,8 +7355,23 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionadded:: 20.0
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                |mutually_exc_rp|
+
+                .. versionchaned:: NEXT.VERSION
+                    |rtm_aswr_deprecated|
+
+                .. deprecated:: NEXT.VERSION
+                    |keyword_only_arg|
+
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply

@@ -509,6 +509,108 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         assert record[0].filename == __file__, "wrong stacklevel"
 
+    def test_forward_from_init_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'forward_from' was transferred to 'forward_origin'"
+        ) as record:
+            Message(
+                message_id=1, date=self.date, chat=self.chat, forward_from=User(1, "user", False)
+            )
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_from_property_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'forward_from' to 'forward_origin'"
+        ) as record:
+            message.forward_from
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_from_chat_init_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'forward_from_chat' was transferred to 'forward_origin'"
+        ) as record:
+            Message(
+                message_id=1, date=self.date, chat=self.chat, forward_from_chat=Chat(1, "private")
+            )
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_from_chat_property_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'forward_from_chat' to 'forward_origin'"
+        ) as record:
+            message.forward_from_chat
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_from_message_id_init_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="'forward_from_message_id' was transferred to 'forward_origin'",
+        ) as record:
+            Message(message_id=1, date=self.date, chat=self.chat, forward_from_message_id=1)
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_from_message_id_property_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'forward_from_message_id' to 'forward_origin'"
+        ) as record:
+            message.forward_from_message_id
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_signature_init_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'forward_signature' was transferred to 'forward_origin'"
+        ) as record:
+            Message(message_id=1, date=self.date, chat=self.chat, forward_signature="signature")
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_signature_property_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'forward_signature' to 'forward_origin'"
+        ) as record:
+            message.forward_signature
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_sender_name_init_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="'forward_sender_name' was transferred to 'forward_origin'",
+        ) as record:
+            Message(message_id=1, date=self.date, chat=self.chat, forward_sender_name="name")
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_sender_name_property_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'forward_sender_name' to 'forward_origin'"
+        ) as record:
+            message.forward_sender_name
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_date_init_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'forward_date' was transferred to 'forward_origin'"
+        ) as record:
+            Message(message_id=1, date=self.date, chat=self.chat, forward_date=datetime.utcnow())
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_forward_date_property_deprecation(self, message):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'forward_date' to 'forward_origin'"
+        ) as record:
+            message.forward_date
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
     async def test_parse_entity(self):
         text = (
             b"\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467"

@@ -270,17 +270,37 @@ class Message(MaybeInaccessibleMessage):
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`, optional): For forwarded messages, sender of
             the original message.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_from` in favor of
+               :paramref:`forward_origin`.
         forward_from_chat (:class:`telegram.Chat`, optional): For messages forwarded from channels
             or from anonymous administrators, information about the original sender chat.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_from_chat` in favor of
+               :paramref:`forward_origin`.
         forward_from_message_id (:obj:`int`, optional): For forwarded channel posts, identifier of
             the original message in the channel.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_from_message_id` in favor of
+               :paramref:`forward_origin`.
         forward_sender_name (:obj:`str`, optional): Sender's name for messages forwarded from
             users who disallow adding a link to their account in forwarded messages.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_sender_name` in favor of
+               :paramref:`forward_origin`.
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
 
             .. versionchanged:: 20.3
                 |datetime_localization|
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_date` in favor of
+               :paramref:`forward_origin`.
         is_automatic_forward (:obj:`bool`, optional): :obj:`True`, if the message is a channel
             post that was automatically forwarded to the connected discussion group.
 
@@ -408,6 +428,10 @@ class Message(MaybeInaccessibleMessage):
             has logged in.
         forward_signature (:obj:`str`, optional): For messages forwarded from channels, signature
             of the post author if present.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_signature` in favor of
+               :paramref:`forward_origin`.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
@@ -544,17 +568,6 @@ class Message(MaybeInaccessibleMessage):
             .. versionchanged:: 20.3
                 |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
-        forward_from (:class:`telegram.User`): Optional. For forwarded messages, sender of the
-            original message.
-        forward_from_chat (:class:`telegram.Chat`): Optional. For messages forwarded from channels
-            or from anonymous administrators, information about the original sender chat.
-        forward_from_message_id (:obj:`int`): Optional. For forwarded channel posts, identifier of
-            the original message in the channel.
-        forward_date (:class:`datetime.datetime`): Optional. For forwarded messages, date the
-            original message was sent in Unix time. Converted to :class:`datetime.datetime`.
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
         is_automatic_forward (:obj:`bool`): Optional. :obj:`True`, if the message is a channel
             post that was automatically forwarded to the connected discussion group.
 
@@ -695,12 +708,8 @@ class Message(MaybeInaccessibleMessage):
             message about a successful payment, information about the payment.
         connected_website (:obj:`str`): Optional. The domain name of the website on which the user
             has logged in.
-        forward_signature (:obj:`str`): Optional. For messages forwarded from channels, signature
-            of the post author if present.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
-        forward_sender_name (:obj:`str`): Optional. Sender's name for messages forwarded from
-            users who disallow adding a link to their account in forwarded messages.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
 
             Examples:
@@ -843,13 +852,13 @@ class Message(MaybeInaccessibleMessage):
         "forum_topic_created",
         "forum_topic_edited",
         "forum_topic_reopened",
-        "forward_date",
-        "forward_from",
-        "forward_from_chat",
-        "forward_from_message_id",
+        "_forward_date",
+        "_forward_from",
+        "_forward_from_chat",
+        "_forward_from_message_id",
         "forward_origin",
-        "forward_sender_name",
-        "forward_signature",
+        "_forward_sender_name",
+        "_forward_signature",
         "from_user",
         "game",
         "general_forum_topic_hidden",
@@ -1007,6 +1016,38 @@ class Message(MaybeInaccessibleMessage):
                 PTBDeprecationWarning,
                 stacklevel=2,
             )
+
+        if any(
+            (
+                forward_from,
+                forward_from_chat,
+                forward_from_message_id,
+                forward_signature,
+                forward_sender_name,
+                forward_date,
+            )
+        ):
+            if forward_from:
+                _warn_param = "forward_from"
+            elif forward_from_chat:
+                _warn_param = "forward_from_chat"
+            elif forward_from_message_id:
+                _warn_param = "forward_from_message_id"
+            elif forward_signature:
+                _warn_param = "forward_signature"
+            elif forward_sender_name:
+                _warn_param = "forward_sender_name"
+            else:
+                _warn_param = "forward_date"
+
+            warn(
+                f"The information about parameter '{_warn_param}' was transferred to "
+                "'forward_origin' in Bot API 7.0. We recommend using 'forward_origin' instead of "
+                f"'{_warn_param}'",
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
+
         with self._unfrozen():
             # Required
             self.message_id: int = message_id
@@ -1015,9 +1056,9 @@ class Message(MaybeInaccessibleMessage):
             self.sender_chat: Optional[Chat] = sender_chat
             self.date: datetime.datetime = date
             self.chat: Chat = chat
-            self.forward_from: Optional[User] = forward_from
-            self.forward_from_chat: Optional[Chat] = forward_from_chat
-            self.forward_date: Optional[datetime.datetime] = forward_date
+            self._forward_from: Optional[User] = forward_from
+            self._forward_from_chat: Optional[Chat] = forward_from_chat
+            self._forward_date: Optional[datetime.datetime] = forward_date
             self.is_automatic_forward: Optional[bool] = is_automatic_forward
             self.reply_to_message: Optional[Message] = reply_to_message
             self.edit_date: Optional[datetime.datetime] = edit_date
@@ -1051,12 +1092,12 @@ class Message(MaybeInaccessibleMessage):
                 MessageAutoDeleteTimerChanged
             ] = message_auto_delete_timer_changed
             self.pinned_message: Optional[MaybeInaccessibleMessage] = pinned_message
-            self.forward_from_message_id: Optional[int] = forward_from_message_id
+            self._forward_from_message_id: Optional[int] = forward_from_message_id
             self.invoice: Optional[Invoice] = invoice
             self.successful_payment: Optional[SuccessfulPayment] = successful_payment
             self.connected_website: Optional[str] = connected_website
-            self.forward_signature: Optional[str] = forward_signature
-            self.forward_sender_name: Optional[str] = forward_sender_name
+            self._forward_signature: Optional[str] = forward_signature
+            self._forward_sender_name: Optional[str] = forward_sender_name
             self.author_signature: Optional[str] = author_signature
             self.media_group_id: Optional[str] = media_group_id
             self.animation: Optional[Animation] = animation
@@ -1126,6 +1167,100 @@ class Message(MaybeInaccessibleMessage):
             bot_api_version="7.0",
         )
         return self._user_shared
+
+    @property
+    def forward_from(self) -> Optional[User]:
+        """:class:`telegram.User`: Optional. For forwarded messages, sender of the original
+        message.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_from` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_from",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_from
+
+    @property
+    def forward_from_chat(self) -> Optional[Chat]:
+        """:class:`telegram.Chat`: Optional. For messages forwarded from channels or from anonymous
+        administrators, information about the original sender chat.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_from_chat` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_from_chat",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_from_chat
+
+    @property
+    def forward_from_message_id(self) -> Optional[int]:
+        """:obj:`int`: Optional. For forwarded channel posts, identifier of the original message
+        in the channel.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_from_message_id` in favor of
+           :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_from_message_id",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_from_message_id
+
+    @property
+    def forward_signature(self) -> Optional[str]:
+        """:obj:`str`: Optional. For messages forwarded from channels, signature
+        of the post author if present.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_signature` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_from",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_signature
+
+    @property
+    def forward_sender_name(self) -> Optional[str]:
+        """:class:`telegram.User`: Optional. Sender's name for messages forwarded from users who
+        disallow adding a link to their account in forwarded messages.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_sender_name` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_sender_name",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_sender_name
+
+    @property
+    def forward_date(self) -> Optional[datetime.datetime]:
+        """:obj:`datetime.datetime`: Optional. For forwarded messages, date the original message
+        was sent in Unix time. Converted to :class:`datetime.datetime`.
+
+            .. versionchanged:: 20.3
+                |datetime_localization|
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_date` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_date",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_date
 
     @property
     def chat_id(self) -> int:
