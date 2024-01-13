@@ -508,8 +508,8 @@ class Message(MaybeInaccessibleMessage):
             by a spoiler animation.
 
             .. versionadded:: 20.0
-        user_shared (:class:`telegram.UsersShared`, optional): Service message: a user was shared
-            with the bot.
+        user_shared (:class:`telegram.UsersShared` | :class:`telegram.UserShared`, optional):
+            Service message: a user was shared with the bot.
 
             .. versionadded:: 20.1
             .. deprecated:: NEXT.VERSION
@@ -988,7 +988,7 @@ class Message(MaybeInaccessibleMessage):
         general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = None,
         write_access_allowed: Optional[WriteAccessAllowed] = None,
         has_media_spoiler: Optional[bool] = None,
-        user_shared: Optional[UserShared] = None,
+        user_shared: Optional[UsersShared] = None,
         chat_shared: Optional[ChatShared] = None,
         story: Optional[Story] = None,
         giveaway: Optional["Giveaway"] = None,
