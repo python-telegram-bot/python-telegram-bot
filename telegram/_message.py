@@ -130,11 +130,9 @@ class MaybeInaccessibleMessage(TelegramObject):
 
             |datetime_localization| (Does not apply to the 0, which will always be in UTC).
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
-        is_accessible (:obj:`bool`): Convenience attribute. :obj:`True`, if the date is not 0 in
-            Unix time
     """
 
-    __slots__ = ("chat", "message_id", "date", "is_accessible")
+    __slots__ = ("chat", "message_id", "date")
 
     def __init__(
         self,
@@ -149,11 +147,53 @@ class MaybeInaccessibleMessage(TelegramObject):
         self.chat: Chat = chat
         self.message_id: int = message_id
         self.date: datetime.datetime = date
-        self.is_accessible = date != ZERO_DATE
 
         self._id_attrs = (self.message_id, self.chat)
 
         self._freeze()
+
+    @property
+    def is_accessible(self) -> bool:
+        """Convenience attribute. :obj:`True`, if the date is not 0 in Unix time.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self.date != ZERO_DATE
+
+    def __bool__(self) -> bool:
+        """Overrides :meth:`object.__bool__` to return the value of :attr:`is_accessible`.
+        This is intended to ease migration to Bot API 7.0, as this allows checks like
+
+        .. code-block:: python
+
+            if message.pinned_message:
+                ...
+
+        to work as before, when ``message.pinned_message`` was :obj:`None`. Note that this does not
+        help with check like
+
+        .. code-block:: python
+
+            if message.pinned_message is None:
+                ...
+
+        for cases where ``message.pinned_message`` is now no longer :obj:`None`.
+
+        .. versionadded:: NEXT.VERSION
+        .. deprecated:: NEXT.VERSION
+           This behavior is introduced only temporarily to ease migration to Bot API 7.0. It will
+           be removed along with other functionality deprecated by Bot API 7.0.
+        """
+        warn(
+            category=PTBDeprecationWarning,
+            message=(
+                f"`{self.__class__.__name__}.__bool__` will be reverted to Pythons default "
+                f"implementation in future versions. Please verify if you need to use `is None` "
+                f"instead."
+            ),
+            stacklevel=2,
+        )
+        return self.is_accessible
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaybeInaccessibleMessage"]:
@@ -165,7 +205,7 @@ class MaybeInaccessibleMessage(TelegramObject):
 
         if cls is MaybeInaccessibleMessage:
             if data["date"] == 0:
-                return InaccessibleMessage.de_json(data=data.pop("date"), bot=bot)
+                return InaccessibleMessage.de_json(data=data, bot=bot)
             return Message.de_json(data=data, bot=bot)
 
         # Get the local timezone from the bot if it has defaults
