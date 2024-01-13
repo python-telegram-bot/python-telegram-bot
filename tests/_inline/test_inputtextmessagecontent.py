@@ -95,11 +95,13 @@ class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase)
         assert hash(a) != hash(d)
 
     def test_mutually_exclusive(self):
-        with pytest.raises(ValueError, match="mutually exclusive"):
+        with pytest.raises(ValueError, match="'link_preview_options' in Bot API 7.0"):
             InputTextMessageContent(
                 "text", disable_web_page_preview=True, link_preview_options=LinkPreviewOptions()
             )
 
     def test_disable_web_page_preview_deprecated(self):
-        with pytest.warns(PTBDeprecationWarning, match="deprecated"):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'disable_web_page_preview' to 'link_preview_options'"
+        ):
             InputTextMessageContent("text", disable_web_page_preview=True).disable_web_page_preview

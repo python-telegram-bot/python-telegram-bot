@@ -26,6 +26,10 @@ from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import JSONDict, ODVInput
 from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import (
+    warn_about_deprecated_attr_in_property,
+    warn_about_deprecated_arg_return_new_arg,
+)
 from telegram.warnings import PTBDeprecationWarning
 
 
@@ -100,13 +104,14 @@ class InputTextMessageContent(InputMessageContent):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        if (
-            disable_web_page_preview is not DEFAULT_NONE
-            and link_preview_options is not DEFAULT_NONE
-        ):
-            raise ValueError(
-                "`disable_web_page_preview` and `link_preview_options` are mutually exclusive."
-            )
+        warn_about_deprecated_arg_return_new_arg(
+            deprecated_arg=disable_web_page_preview,
+            new_arg=link_preview_options,
+            deprecated_arg_name="disable_web_page_preview",
+            new_arg_name="link_preview_options",
+            bot_api_version="7.0",
+            stacklevel=2,
+        )
 
         # Convert to LinkPreviewOptions:
         if not isinstance(disable_web_page_preview, DefaultValue):
@@ -128,10 +133,10 @@ class InputTextMessageContent(InputMessageContent):
 
         .. deprecated:: NEXT.VERSION
         """
-        warn(
-            "The `disable_web_page_preview` attribute is deprecated. "
-            "Use `link_preview_options` instead.",
-            PTBDeprecationWarning,
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="disable_web_page_preview",
+            new_attr_name="link_preview_options",
+            bot_api_version="7.0",
             stacklevel=2,
         )
         return (
