@@ -138,7 +138,6 @@ class MaybeInaccessibleMessage(TelegramObject):
         self,
         chat: Chat,
         message_id: int,
-        # TODO Should this also accept the literal
         date: datetime.datetime,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -181,6 +180,7 @@ class MaybeInaccessibleMessage(TelegramObject):
            This behavior is introduced only temporarily to ease migration to Bot API 7.0. It will
            be removed along with other functionality deprecated by Bot API 7.0.
         """
+        # Once we remove this method, also remove `Message.__bool__`.
         warn(
             category=PTBDeprecationWarning,
             message=(
