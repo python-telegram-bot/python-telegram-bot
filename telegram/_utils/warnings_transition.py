@@ -25,7 +25,7 @@ inside warnings.py.
 """
 from typing import Any, Callable, Type
 
-from telegram import LinkPreviewOptions
+from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import ODVInput
 from telegram._utils.warnings import warn
