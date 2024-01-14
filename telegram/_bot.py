@@ -7386,7 +7386,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-
         if (
             allow_sending_without_reply is not DEFAULT_NONE
             and reply_parameters is not DEFAULT_NONE

@@ -134,7 +134,6 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
         self._user_ids = parse_chat_id(user_id)
         self._user_usernames = parse_username(user_username)
 
-    # pylint: disable=too-many-return-statements
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 

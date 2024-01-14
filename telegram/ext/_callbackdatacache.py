@@ -395,7 +395,7 @@ class CallbackDataCache:
 
         # Get the cached callback data for the inline keyboard attached to the
         # CallbackQuery.
-        if callback_query.message:
+        if isinstance(callback_query.message, Message):
             self.__process_message(callback_query.message)
             for maybe_message in (
                 callback_query.message.pinned_message,
