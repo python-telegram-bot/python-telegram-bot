@@ -24,6 +24,7 @@ from telegram import constants
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils import enum
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -83,7 +84,7 @@ class MessageOrigin(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
-        self.type: str = type
+        self.type: str = enum.get_member(constants.MessageOriginType, type, type)
         self.date: datetime.datetime = date
 
         self._id_attrs = (
