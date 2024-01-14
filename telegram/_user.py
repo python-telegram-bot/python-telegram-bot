@@ -1650,7 +1650,7 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    async def get_user_chat_boosts(
+    async def get_chat_boosts(
         self,
         chat_id: Union[int, str],
         *,
