@@ -23,6 +23,7 @@ from typing import Final, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
 from telegram._utils.types import JSONDict
 
 
@@ -59,7 +60,7 @@ class InlineQueryResult(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
-        self.type: str = type
+        self.type: str = enum.get_member(constants.InlineQueryResultType, type, type)
         self.id: str = str(id)
 
         self._id_attrs = (self.id,)

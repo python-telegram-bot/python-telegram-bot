@@ -31,6 +31,7 @@ from telegram import (
     BotCommandScopeDefault,
     Dice,
 )
+from telegram.constants import BotCommandScopeType
 from tests.auxil.slots import mro_slots
 
 
@@ -166,6 +167,10 @@ class TestBotCommandScopeWithoutRequest:
             assert bot_command_scope["chat_id"] == bot_command_scope.chat_id
         if hasattr(bot_command_scope, "user_id"):
             assert bot_command_scope["user_id"] == bot_command_scope.user_id
+
+    def test_type_enum_conversion(self):
+        assert type(BotCommandScope("default").type) is BotCommandScopeType
+        assert BotCommandScope("unknown").type == "unknown"
 
     def test_equality(self, bot_command_scope, bot):
         a = BotCommandScope("base_type")

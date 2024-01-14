@@ -25,6 +25,7 @@ import pytest
 
 from telegram import (
     InputFile,
+    InputMedia,
     InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
@@ -33,7 +34,7 @@ from telegram import (
     Message,
     MessageEntity,
 )
-from telegram.constants import ParseMode
+from telegram.constants import InputMediaType, ParseMode
 
 # noinspection PyUnresolvedReferences
 from telegram.error import BadRequest
@@ -202,6 +203,26 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
         )
         assert input_media_video.media == data_file("telegram.mp4").as_uri()
         assert input_media_video.thumbnail == data_file("telegram.jpg").as_uri()
+
+    def test_type_enum_conversion(self):
+        # Since we have a lot of different test classes for all the input media types, we test this
+        # conversion only here. It is independent of the specific class
+        assert (
+            type(
+                InputMedia(
+                    media_type="animation",
+                    media="media",
+                ).type
+            )
+            is InputMediaType
+        )
+        assert (
+            InputMedia(
+                media_type="unknown",
+                media="media",
+            ).type
+            == "unknown"
+        )
 
 
 class TestInputMediaPhotoBase:

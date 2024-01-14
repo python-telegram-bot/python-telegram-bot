@@ -22,10 +22,12 @@ import pytest
 from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    InlineQueryResult,
     InlineQueryResultArticle,
     InlineQueryResultAudio,
     InputTextMessageContent,
 )
+from telegram.constants import InlineQueryResultType
 from tests.auxil.slots import mro_slots
 
 
@@ -114,6 +116,26 @@ class TestInlineQueryResultArticleWithoutRequest(TestInlineQueryResultArticleBas
         assert (
             inline_query_result_article_dict["thumbnail_width"]
             == inline_query_result_article.thumbnail_width
+        )
+
+    def test_type_enum_conversion(self):
+        # Since we have a lot of different test files for all the result types, we test this
+        # conversion only here. It is independent of the specific class
+        assert (
+            type(
+                InlineQueryResult(
+                    id="id",
+                    type="article",
+                ).type
+            )
+            is InlineQueryResultType
+        )
+        assert (
+            InlineQueryResult(
+                id="id",
+                type="unknown",
+            ).type
+            == "unknown"
         )
 
     def test_equality(self):
