@@ -32,6 +32,7 @@ from telegram import (
     ChatMemberOwner,
     ChatMemberUpdated,
     ChosenInlineResult,
+    InaccessibleMessage,
     InlineQuery,
     Message,
     Poll,
@@ -43,6 +44,7 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import from_timestamp
+from telegram.warnings import PTBUserWarning
 from tests.auxil.slots import mro_slots
 
 message = Message(1, datetime.utcnow(), Chat(1, ""), from_user=User(1, "", False), text="Text")
@@ -253,3 +255,21 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             assert eff_message.message_id == message.message_id
         else:
             assert eff_message is None
+
+    def test_effective_message_future_warning(self):
+        update = Update(
+            update_id=1,
+            callback_query=CallbackQuery(
+                "id",
+                User(1, "", False),
+                "chat",
+                message=InaccessibleMessage(message_id=1, chat=Chat(1, "")),
+            ),
+        )
+        with pytest.warns(
+            PTBUserWarning,
+            match="`telegram.MaybeInaccessibleMessage` instead of `telegram.Message`",
+        ) as record:
+            assert update.effective_message is None
+
+        assert record[0].filename == __file__

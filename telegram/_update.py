@@ -34,6 +34,7 @@ from telegram._payment.shippingquery import ShippingQuery
 from telegram._poll import Poll, PollAnswer
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
 
 if TYPE_CHECKING:
     from telegram import Bot, Chat, User
@@ -507,11 +508,23 @@ class Update(TelegramObject):
             :attr:`callback_query` (i.e. :attr:`telegram.CallbackQuery.message`) or :obj:`None`, if
             none of those are present.
 
+        Warning:
+            In future versions of python-telegram-bot, this will return
+            :class:`telegram.MaybeInaccessibleMessage` instead of :class:`telegram.Message`.
         """
+        # Stupid comment in hopes of making this easier to find when searching for things that
+        # we should change in the next major version:
+        # .. deprecated:: NEXT.VERSION
+        warn(
+            "In future versions, `Update.effective_message` will return "
+            "`telegram.MaybeInaccessibleMessage` instead of `telegram.Message`.",
+            stacklevel=2,
+        )
+
         if self._effective_message:
             return self._effective_message
 
-        message = None
+        message: Optional[Message] = None
 
         if self.message:
             message = self.message
@@ -519,7 +532,7 @@ class Update(TelegramObject):
         elif self.edited_message:
             message = self.edited_message
 
-        elif self.callback_query:
+        elif self.callback_query and isinstance(self.callback_query.message, Message):
             message = self.callback_query.message
 
         elif self.channel_post:
