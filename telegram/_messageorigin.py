@@ -272,7 +272,7 @@ class MessageOriginChannel(MessageOrigin):
         date: datetime.datetime,
         chat: Chat,
         message_id: int,
-        author_signature: Optional[str],
+        author_signature: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):

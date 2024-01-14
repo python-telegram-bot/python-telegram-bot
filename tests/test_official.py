@@ -62,6 +62,11 @@ PTB_EXTRA_PARAMS = {
     "InputMedia": {"caption", "caption_entities", "media", "media_type", "parse_mode"},
     "InputMedia(Animation|Audio|Document|Photo|Video|VideoNote|Voice)": {"filename"},
     "InputFile": {"attach", "filename", "obj"},
+    "MaybeInaccessibleMessage": {"date", "message_id", "chat"},  # attributes common to all subcls
+    "ChatBoostSource": {"source"},  # attributes common to all subclasses
+    "MessageOrigin": {"type", "date"},  # attributes common to all subclasses
+    "ReactionType": {"type"},  # attributes common to all subclasses
+    "KeyboardButton": {"request_user"},  # deprecated by Bot API 7.0, kept for now for bw compat
 }
 
 # Types for certain parameters accepted by PTB but not in the official API
@@ -121,6 +126,7 @@ def ptb_extra_params(object_name: str) -> set[str]:
 
 
 # Arguments *removed* from the official API
+# Mostly due to the value being fixed anyway
 PTB_IGNORED_PARAMS = {
     r"InlineQueryResult\w+": {"type"},
     r"ChatMember\w+": {"status"},
@@ -130,6 +136,10 @@ PTB_IGNORED_PARAMS = {
     r"BotCommandScope\w+": {"type"},
     r"MenuButton\w+": {"type"},
     r"InputMedia\w+": {"type"},
+    "InaccessibleMessage": {"date"},
+    r"MessageOrigin\w+": {"type"},
+    r"ChatBoostSource\w+": {"source"},
+    r"ReactionType\w+": {"type"},
 }
 
 

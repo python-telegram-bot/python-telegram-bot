@@ -159,8 +159,8 @@ class MessageReactionUpdated(TelegramObject):
         date: datetime,
         old_reaction: Sequence[ReactionType],
         new_reaction: Sequence[ReactionType],
-        user: Optional[User],
-        actor_chat: Optional[Chat],
+        user: Optional[User] = None,
+        actor_chat: Optional[Chat] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):

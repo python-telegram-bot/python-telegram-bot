@@ -1750,7 +1750,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         update: Optional[object],
         error: Exception,
         job: Optional["Job[CCT]"] = None,
-        coroutine: _ErrorCoroType[RT] = None,
+        coroutine: Optional[_ErrorCoroType[RT]] = None,
     ) -> bool:
         """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises

@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple, Union
 
 from telegram import constants
 from telegram._files.location import Location
-from telegram._message import Message
+from telegram._message import MaybeInaccessibleMessage, Message
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -70,9 +70,11 @@ class CallbackQuery(TelegramObject):
         from_user (:class:`telegram.User`): Sender.
         chat_instance (:obj:`str`): Global identifier, uniquely corresponding to the chat to which
             the message with the callback button was sent. Useful for high scores in games.
-        message (:class:`telegram.Message`, optional): Message with the callback button that
-            originated the query. Note that message content and message date will not be available
-            if the message is too old.
+        message (:class:`telegram.MaybeInaccessibleMessage`, optional): Message sent by the bot
+            with the callback button that originated the query.
+
+            .. versionchanged:: NEXT.VERSION
+               Accept objects of type :class:`telegram.MaybeInaccessibleMessage` since Bot API 7.0.
         data (:obj:`str`, optional): Data associated with the callback button. Be aware that the
             message, which originated the query, can contain no callback buttons with this data.
         inline_message_id (:obj:`str`, optional): Identifier of the message sent via the bot in
@@ -85,9 +87,12 @@ class CallbackQuery(TelegramObject):
         from_user (:class:`telegram.User`): Sender.
         chat_instance (:obj:`str`): Global identifier, uniquely corresponding to the chat to which
             the message with the callback button was sent. Useful for high scores in games.
-        message (:class:`telegram.Message`): Optional. Message with the callback button that
-            originated the query. Note that message content and message date will not be available
-            if the message is too old.
+        message (:class:`telegram.MaybeInaccessibleMessage`): Optional. Message sent by the bot
+            with the callback button that originated the query.
+
+            .. versionchanged:: NEXT.VERSION
+               Objects maybe be of type :class:`telegram.MaybeInaccessibleMessage` since Bot API
+               7.0.
         data (:obj:`str` | :obj:`object`): Optional. Data associated with the callback button.
             Be aware that the message, which originated the query, can contain no callback buttons
             with this data.
@@ -118,7 +123,7 @@ class CallbackQuery(TelegramObject):
         id: str,
         from_user: User,
         chat_instance: str,
-        message: Optional[Message] = None,
+        message: Optional[MaybeInaccessibleMessage] = None,
         data: Optional[str] = None,
         inline_message_id: Optional[str] = None,
         game_short_name: Optional[str] = None,
@@ -131,7 +136,7 @@ class CallbackQuery(TelegramObject):
         self.from_user: User = from_user
         self.chat_instance: str = chat_instance
         # Optionals
-        self.message: Optional[Message] = message
+        self.message: Optional[MaybeInaccessibleMessage] = message
         self.data: Optional[str] = data
         self.inline_message_id: Optional[str] = inline_message_id
         self.game_short_name: Optional[str] = game_short_name
@@ -217,9 +222,15 @@ class CallbackQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_text` and :meth:`telegram.Message.edit_text`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
+
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
 
         """
         if self.inline_message_id:
@@ -238,6 +249,8 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.edit_text(
             text=text,
             parse_mode=parse_mode,
@@ -277,9 +290,15 @@ class CallbackQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_caption` and :meth:`telegram.Message.edit_caption`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
+
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
 
         """
         if self.inline_message_id:
@@ -297,6 +316,8 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.edit_caption(
             caption=caption,
             reply_markup=reply_markup,
@@ -333,9 +354,15 @@ class CallbackQuery(TelegramObject):
         :meth:`telegram.Bot.edit_message_reply_markup` and
         :meth:`telegram.Message.edit_reply_markup`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
+
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
 
         """
         if self.inline_message_id:
@@ -350,6 +377,8 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.edit_reply_markup(
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -383,9 +412,15 @@ class CallbackQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_media` and :meth:`telegram.Message.edit_media`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited Message is returned, otherwise :obj:`True` is returned.
+
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
 
         """
         if self.inline_message_id:
@@ -401,6 +436,8 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.edit_media(
             media=media,
             reply_markup=reply_markup,
@@ -441,9 +478,15 @@ class CallbackQuery(TelegramObject):
         :meth:`telegram.Bot.edit_message_live_location` and
         :meth:`telegram.Message.edit_live_location`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
+
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
 
         """
         if self.inline_message_id:
@@ -464,6 +507,8 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.edit_live_location(
             latitude=latitude,
             longitude=longitude,
@@ -503,9 +548,15 @@ class CallbackQuery(TelegramObject):
         :meth:`telegram.Bot.stop_message_live_location` and
         :meth:`telegram.Message.stop_live_location`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
+
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
 
         """
         if self.inline_message_id:
@@ -520,6 +571,8 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.stop_live_location(
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -555,9 +608,15 @@ class CallbackQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_game_score` and :meth:`telegram.Message.set_game_score`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
+
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
 
         """
         if self.inline_message_id:
@@ -575,6 +634,8 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.set_game_score(
             user_id=user_id,
             score=score,
@@ -611,8 +672,14 @@ class CallbackQuery(TelegramObject):
         :meth:`telegram.Bot.get_game_high_scores` and
         :meth:`telegram.Message.get_game_high_scores`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             Tuple[:class:`telegram.GameHighScore`]
+
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
 
         """
         if self.inline_message_id:
@@ -627,6 +694,8 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.get_game_high_scores(
             user_id=user_id,
             read_timeout=read_timeout,
@@ -651,10 +720,18 @@ class CallbackQuery(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Message.delete`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
+
         """
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.delete(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -679,10 +756,17 @@ class CallbackQuery(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Message.pin`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
         """
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.pin(
             disable_notification=disable_notification,
             read_timeout=read_timeout,
@@ -707,10 +791,17 @@ class CallbackQuery(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Message.unpin`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
         """
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.unpin(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -749,10 +840,17 @@ class CallbackQuery(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Message.copy`.
 
+        .. versionchanged:: NEXT.VERSION
+           Raises :exc:`TypeError` if :attr:`message` is not accessible.
+
         Returns:
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
+        Raises:
+            :exc:`TypeError` if :attr:`message` is not accessible.
         """
+        if not isinstance(self.message, Message):
+            raise TypeError("Cannot edit an inaccessible message")
         return await self.message.copy(
             chat_id=chat_id,
             caption=caption,
