@@ -116,7 +116,14 @@ from typing import (
 )
 
 from telegram import Chat as TGChat
-from telegram import Message, MessageEntity, Update
+from telegram import (
+    Message,
+    MessageEntity,
+    MessageOriginChannel,
+    MessageOriginChat,
+    MessageOriginUser,
+    Update,
+)
 from telegram import User as TGUser
 from telegram._utils.types import SCT
 from telegram.constants import DiceEmoji as DiceEmojiEnum
@@ -1348,28 +1355,40 @@ class _Forwarded(MessageFilter):
     __slots__ = ()
 
     def filter(self, message: Message) -> bool:
-        return bool(message.forward_date)
+        return bool(message.forward_origin)
 
 
 FORWARDED = _Forwarded(name="filters.FORWARDED")
-"""Messages that contain :attr:`telegram.Message.forward_date`."""
+"""Messages that contain :attr:`telegram.Message.forward_origin`.
+
+.. versionchanged:: NEXT.VERSION
+   Now based on :attr:`telegram.Message.forward_origin` instead of
+   :attr:`telegram.Message.forward_date`.
+"""
 
 
 class ForwardedFrom(_ChatUserBaseFilter):
     """Filters messages to allow only those which are forwarded from the specified chat ID(s)
-    or username(s) based on :attr:`telegram.Message.forward_from` and
-    :attr:`telegram.Message.forward_from_chat`.
+    or username(s) based on :attr:`telegram.Message.forward_origin` and in particular
+
+    * :attr:`telegram.MessageOriginUser.sender_user`
+    * :attr:`telegram.MessageChat.sender_chat`
+    * :attr:`telegram.MessageOriginChannel.chat`
 
     .. versionadded:: 13.5
+
+    .. versionchanged:: NEXT.VERSION
+       Was previously based on :attr:`telegram.Message.forward_from` and
+         :attr:`telegram.Message.forward_from_chat`.
 
     Examples:
         ``MessageHandler(filters.ForwardedFrom(chat_id=1234), callback_method)``
 
     Note:
         When a user has disallowed adding a link to their account while forwarding their
-        messages, this filter will *not* work since both
-        :attr:`telegram.Message.forward_from` and
-        :attr:`telegram.Message.forward_from_chat` are :obj:`None`. However, this behaviour
+        messages, this filter will *not* work since
+        :attr:`telegram.Message.forward_origin` will be of type
+        :class:`telegram.MessageOriginHiddenUser`. However, this behaviour
         is undocumented and might be changed by Telegram.
 
     Warning:
@@ -1400,7 +1419,17 @@ class ForwardedFrom(_ChatUserBaseFilter):
     __slots__ = ()
 
     def _get_chat_or_user(self, message: Message) -> Union[TGUser, TGChat, None]:
-        return message.forward_from or message.forward_from_chat
+        if (forward_origin := message.forward_origin) is None:
+            return None
+
+        if isinstance(forward_origin, MessageOriginUser):
+            return forward_origin.sender_user
+        if isinstance(forward_origin, MessageOriginChat):
+            return forward_origin.sender_chat
+        if isinstance(forward_origin, MessageOriginChannel):
+            return forward_origin.chat
+
+        return None
 
     def add_chat_ids(self, chat_id: SCT[int]) -> None:
         """

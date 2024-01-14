@@ -71,6 +71,7 @@ from telegram import (
     MessageId,
     PhotoSize,
     Poll,
+    ReactionType,
     ReplyParameters,
     SentWebAppMessage,
     Sticker,
@@ -106,7 +107,6 @@ if TYPE_CHECKING:
         LabeledPrice,
         MessageEntity,
         PassportElementError,
-        ReactionType,
         ShippingOption,
     )
     from telegram.ext import BaseRateLimiter, Defaults
@@ -3919,9 +3919,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[str, int],
         message_id: int,
-        reaction: Optional[
-            Union[Sequence["ReactionType"], "ReactionType", Sequence[str], str]
-        ] = None,
+        reaction: Optional[Union[Sequence[Union[ReactionType, str]], ReactionType, str]] = None,
         is_big: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
