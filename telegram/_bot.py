@@ -867,7 +867,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionchanged:: NEXT.VERSION
                     Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
                     argument. PTB will automatically convert this argument to that one, but
-                    you should update your code to use the new argument.
+                    for advanced options, please use :paramref:`link_preview_options` directly.
 
                 .. deprecated:: NEXT.VERSION
                     In future versions, this argument will become a keyword-only argument.
@@ -3736,7 +3736,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionchanged:: NEXT.VERSION
                     Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
                     argument. PTB will automatically convert this argument to that one, but
-                    you should update your code to use the new argument.
+                    for advanced options, please use :paramref:`link_preview_options` directly.
 
                 .. deprecated:: NEXT.VERSION
                     In future versions, this argument will become keyword only.
