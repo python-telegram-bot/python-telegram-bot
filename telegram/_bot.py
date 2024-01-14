@@ -81,7 +81,6 @@ from telegram._files.voice import Voice
 from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
-from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
@@ -100,6 +99,7 @@ from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import CorrectOptionID, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import warn_for_link_preview_options
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit, ReactionEmoji
 from telegram.error import InvalidToken
@@ -119,6 +119,7 @@ if TYPE_CHECKING:
         InputMediaVideo,
         InputSticker,
         LabeledPrice,
+        LinkPreviewOptions,
         MessageEntity,
         PassportElementError,
         ShippingOption,
@@ -914,16 +915,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         data: JSONDict = {"chat_id": chat_id, "text": text, "entities": entities}
-
-        if not isinstance(disable_web_page_preview, DefaultValue) and not isinstance(
-            link_preview_options, DefaultValue
-        ):
-            raise ValueError(
-                "`disable_web_page_preview` and `link_preview_options` are mutually  exclusive."
-            )
-        # Convert to LinkPreviewOptions:
-        if not isinstance(disable_web_page_preview, DefaultValue):
-            link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
+        link_preview_options = warn_for_link_preview_options(
+            disable_web_page_preview, link_preview_options
+        )
 
         return await self._send_message(
             "sendMessage",
@@ -3762,15 +3756,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "entities": entities,
         }
 
-        if not isinstance(disable_web_page_preview, DefaultValue) and not isinstance(
-            link_preview_options, DefaultValue
-        ):
-            raise ValueError(
-                "`disable_web_page_preview` and `link_preview_options` are mutually  exclusive."
-            )
-        # Convert to LinkPreviewOptions:
-        if not isinstance(disable_web_page_preview, DefaultValue):
-            link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
+        link_preview_options = warn_for_link_preview_options(
+            disable_web_page_preview, link_preview_options
+        )
 
         return await self._send_message(
             "editMessageText",
