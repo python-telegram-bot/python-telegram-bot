@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represents a Telegram ReactionType."""
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final, Literal, Optional, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -44,21 +45,22 @@ class ReactionType(TelegramObject):
 
     __slots__ = ("type",)
 
-    EMOJI: Final[str] = constants.ReactionType.EMOJI
+    EMOJI: Final[constants.ReactionType] = constants.ReactionType.EMOJI
     """:const:`telegram.constants.ReactionType.EMOJI`"""
-    CUSTOM_EMOJI: Final[str] = constants.ReactionType.CUSTOM_EMOJI
+    CUSTOM_EMOJI: Final[constants.ReactionType] = constants.ReactionType.CUSTOM_EMOJI
     """:const:`telegram.constants.ReactionType.CUSTOM_EMOJI`"""
 
     def __init__(
         self,
-        # TODO we can use Literals here as well tbh...
-        type: str,  # pylint: disable=redefined-builtin
+        type: Union[  # pylint: disable=redefined-builtin
+            Literal["emoji", "custom_emoji"], constants.ReactionType
+        ],
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
-        self.type: str = type
+        self.type: str = enum.get_member(constants.ReactionType, type, type)
 
         self._freeze()
 
@@ -83,11 +85,10 @@ class ReactionTypeEmoji(ReactionType):
     """
     Represents a reaction with a normal emoji.
 
-    .. versionadded:: NEXT.VERSION
-
-
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if the :attr:`emoji` is equal.
+
+    .. versionadded:: NEXT.VERSION
 
     Args:
         emoji (:obj:`str`): Reaction emoji. It can be one of
@@ -119,10 +120,10 @@ class ReactionTypeCustomEmoji(ReactionType):
     """
     Represents a reaction with a custom emoji.
 
-    .. versionadded:: NEXT.VERSION
-
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if the :attr:`custom_emoji_id` is equal.
+
+    .. versionadded:: NEXT.VERSION
 
     Args:
         custom_emoji_id (:obj:`str`): Custom emoji identifier.
@@ -154,10 +155,10 @@ class ReactionCount(TelegramObject):
     """This class represents a reaction added to a message along with the number of times it was
     added.
 
-    .. versionadded:: NEXT.VERSION
-
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if the :attr:`type` and :attr:`total_count` is equal.
+
+    .. versionadded:: NEXT.VERSION
 
     Args:
         type (:class:`telegram.ReactionType`): Type of the reaction.
