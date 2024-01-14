@@ -378,7 +378,16 @@ class Update(TelegramObject):
         """
         :class:`telegram.User`: The user that sent this update, no matter what kind of update this
         is. If no user is associated with this update, this gives :obj:`None`. This is the case
-        if :attr:`channel_post`, :attr:`edited_channel_post` or :attr:`poll` is present.
+        if any of
+
+        * :attr:`channel_post`
+        * :attr:`edited_channel_post`
+        * :attr:`poll`
+        * :attr:`chat_boost`
+        * :attr:`removed_chat_boost`
+        * :attr:`message_reaction_count`
+
+        is present.
 
         Example:
             * If :attr:`message` is present, this will give
