@@ -442,6 +442,15 @@ def check_param_type(
 
     # Special case for when the parameter is a default value parameter
     for name, _ in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
+        if (
+            is_class
+            and obj.__name__ in ("ReplyParameters", "Message")
+            and ptb_param.name.startswith("quote")
+        ):
+            # Special case for ReplyParameters.quote(_\w+)?, which overlaps with the currently
+            # available `Defaults.quote`
+            continue
+
         if name in ptb_param.name:  # no strict == since we have a param: `explanation_parse_mode`
             # Check if it's ODVInput
             parsed = ODVInput[mapped_type]
