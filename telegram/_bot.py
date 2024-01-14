@@ -8618,6 +8618,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 types to set on the message. Currently, as non-premium users, bots can set up to
                 one reaction per message. A custom emoji reaction can be used if it is either
                 already present on the message or explicitly allowed by chat administrators.
+
+                Tip:
+                    Passed :obj:`str` values will be converted to either
+                    :class:`telegram.ReactionTypeEmoji` or
+                    :class:`telegram.ReactionTypeCustomEmoji`
+                    depending on whether they are listed in
+                    :enum:`~telegram.constants.ReactionEmoji`.
+
             is_big (:obj:`bool`, optional): Pass :obj:`True` to set the reaction with a big
                 animation.
 

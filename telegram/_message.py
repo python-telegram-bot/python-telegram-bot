@@ -120,7 +120,7 @@ class MaybeInaccessibleMessage(TelegramObject):
         date (:class:`datetime.datetime`): Date the message was sent in Unix time or 0 in Unix
             time. Converted to :class:`datetime.datetime`
 
-            |datetime_localization| (Does not apply to the 0, which will always be in UTC).
+            |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
 
     Attributes:
@@ -128,7 +128,7 @@ class MaybeInaccessibleMessage(TelegramObject):
         date (:class:`datetime.datetime`): Date the message was sent in Unix time or 0 in Unix
             time. Converted to :class:`datetime.datetime`
 
-            |datetime_localization| (Does not apply to the 0, which will always be in UTC).
+            |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
     """
 
