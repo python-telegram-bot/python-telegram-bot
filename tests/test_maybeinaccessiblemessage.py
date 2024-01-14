@@ -16,18 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
-import inspect
 import datetime as dtm
+
 import pytest
 
-from telegram import (
-    ChatAdministratorRights,
-    KeyboardButtonRequestChat,
-    KeyboardButtonRequestUser,
-    MaybeInaccessibleMessage,
-    Chat,
-)
-from telegram._utils.datetime import to_timestamp, UTC
+from telegram import Chat, MaybeInaccessibleMessage
+from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ZERO_DATE
 from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
@@ -126,7 +120,10 @@ class TestMaybeInaccessibleMessageWithoutRequest(TestMaybeInaccessibleMessageBas
     def test_bool_deprecation_warning(self):
         with pytest.warns(
             PTBDeprecationWarning,
-            match="`MaybeInaccessibleMessage.__bool__` will be reverted to Pythons default implementation",
+            match=(
+                "`MaybeInaccessibleMessage.__bool__` will be reverted to Pythons default "
+                "implementation"
+            ),
         ) as record:
             bool(MaybeInaccessibleMessage(self.chat, self.message_id, self.date))
 

@@ -31,7 +31,9 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a message reaction.
 
     Note:
-        The following rules apply to both `username` and the `chat_id` param groups, respectively:
+        The following rules apply to both ``username`` and the ``chat_id`` param groups,
+        respectively:
+
          * If none of them are passed, the handler does not filter the update for that specific
             attribute.
          * If a chat ID **or** a username is passed, the updates will be filtered with that
@@ -163,42 +165,38 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
 
         if not (update.message_reaction or update.message_reaction_count):
             return False
+
         if (
             self.message_reaction_types == self.MESSAGE_REACTION_UPDATED
             and update.message_reaction_count
         ):
             return False
+
         if (
             self.message_reaction_types == self.MESSAGE_REACTION_COUNT_UPDATED
             and update.message_reaction
         ):
             return False
-        if (
-            not self._chat_ids
-            and not self._chat_usernames
-            and not self._user_ids
-            and not self._user_usernames
-        ):
+
+        if not any((self._chat_ids, self._chat_usernames, self._user_ids, self._user_usernames)):
             return True
-        # this filter must chain False, because it filters both chat and users, which wouldn't
-        # work if we return True
-        # TODO this breaks mypy and I need help with the best solution to not make it break
-        if self._chat_ids and update.effective_chat.id not in self._chat_ids:
-            return False
-        if self._chat_usernames and update.effective_chat.username not in self._chat_usernames:
-            return False
-        user_id = (
-            update.effective_user.id
-            if update.effective_user
-            else update.message_reaction.actor_chat.id
+
+        # Extract chat and user IDs and usernames from the update for comparison
+        chat_id = chat.id if (chat := update.effective_chat) else None
+        chat_username = chat.username if chat else None
+        user_id = user.id if (user := update.effective_user) else None
+        user_username = user.username if user else None
+
+        # Special casing for anonymous reactions
+        if (message_reaction := update.message_reaction) and message_reaction.actor_chat:
+            if user_id is None:
+                user_id = message_reaction.actor_chat.id
+            if user_username is None:
+                user_username = message_reaction.actor_chat.username
+
+        return (
+            bool(self._chat_ids and (chat_id in self._chat_ids))
+            or bool(self._chat_usernames and (chat_username in self._chat_usernames))
+            or bool(self._user_ids and (user_id in self._user_ids))
+            or bool(self._user_usernames and (user_username in self._user_usernames))
         )
-        if self._user_ids and user_id not in self._user_ids:
-            return False
-        username = (
-            update.effective_user.username
-            if update.effective_user
-            else update.message_reaction.actor_chat.username
-        )
-        if self._user_usernames and username not in self._user_usernames:
-            return False
-        return True

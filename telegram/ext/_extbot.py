@@ -508,10 +508,10 @@ class ExtBot(Bot, Generic[RLARGS]):
             if obj.reply_to_message:
                 # reply_to_message can't contain further reply_to_messages, so no need to check
                 self.callback_data_cache.process_message(obj.reply_to_message)
-                if obj.reply_to_message.pinned_message:
+                if isinstance(obj.reply_to_message.pinned_message, Message):
                     # pinned messages can't contain reply_to_message, no need to check
                     self.callback_data_cache.process_message(obj.reply_to_message.pinned_message)
-            if obj.pinned_message:
+            if isinstance(obj.pinned_message, Message):
                 # pinned messages can't contain reply_to_message, no need to check
                 self.callback_data_cache.process_message(obj.pinned_message)
 

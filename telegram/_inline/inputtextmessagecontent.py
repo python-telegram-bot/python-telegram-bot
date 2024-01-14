@@ -25,12 +25,10 @@ from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import JSONDict, ODVInput
-from telegram._utils.warnings import warn
 from telegram._utils.warnings_transition import (
-    warn_about_deprecated_attr_in_property,
     warn_about_deprecated_arg_return_new_arg,
+    warn_about_deprecated_attr_in_property,
 )
-from telegram.warnings import PTBDeprecationWarning
 
 
 class InputTextMessageContent(InputMessageContent):

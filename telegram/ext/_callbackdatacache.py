@@ -397,12 +397,12 @@ class CallbackDataCache:
         # CallbackQuery.
         if callback_query.message:
             self.__process_message(callback_query.message)
-            for message in (
+            for maybe_message in (
                 callback_query.message.pinned_message,
                 callback_query.message.reply_to_message,
             ):
-                if message:
-                    self.__process_message(message)
+                if isinstance(maybe_message, Message):
+                    self.__process_message(maybe_message)
 
     def drop_data(self, callback_query: CallbackQuery) -> None:
         """Deletes the data for the specified callback query.
