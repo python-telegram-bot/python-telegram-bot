@@ -3635,7 +3635,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
         )
 
-    async def set_message_reaction(
+    async def set_reaction(
         self,
         reaction: Optional[
             Union[Sequence["ReactionType"], "ReactionType", Sequence[str], str]
