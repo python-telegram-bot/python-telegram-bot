@@ -96,7 +96,8 @@ class MessageOrigin(TelegramObject):
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MessageOrigin"]:
         """Converts JSON data to the appropriate :class:`MessageOrigin` object, i.e. takes
-        care of selecting the correct subclass."""
+        care of selecting the correct subclass.
+        """
         data = cls._parse_data(data)
 
         if not data:

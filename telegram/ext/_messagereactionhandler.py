@@ -118,7 +118,7 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
-        self.message_reaction_types = message_reaction_types
+        self.message_reaction_types: int = message_reaction_types
 
         self._chat_ids = parse_chat_id(chat_id)
         self._chat_usernames = parse_username(chat_username)

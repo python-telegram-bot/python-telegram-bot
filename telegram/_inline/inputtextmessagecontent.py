@@ -121,7 +121,7 @@ class InputTextMessageContent(InputMessageContent):
             # Optionals
             self.parse_mode: ODVInput[str] = parse_mode
             self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.link_preview_options = link_preview_options
+            self.link_preview_options: ODVInput["LinkPreviewOptions"] = link_preview_options
 
             self._id_attrs = (self.message_text,)
 

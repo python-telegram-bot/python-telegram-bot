@@ -7327,10 +7327,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> MessageId:
-        """
-        Use this method to copy messages of any kind. Service messages and invoice messages can't
-        be copied. The method is analogous to the method :meth:`forward_message`, but the copied
-        message doesn't have a link to the original message.
+        """Use this method to copy messages of any kind. Service messages and invoice messages
+        can't be copied. The method is analogous to the method :meth:`forward_message`, but the
+        copied message doesn't have a link to the original message.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
