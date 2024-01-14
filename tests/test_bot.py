@@ -1835,16 +1835,15 @@ class TestBotWithoutRequest:
             [{"emoji": ReactionEmoji.RED_HEART, "type": "emoji"}],
             [{"custom_emoji_id": "custom_emoji_1", "type": "custom_emoji"}],
             [{"custom_emoji_id": "custom_emoji_2", "type": "custom_emoji"}],
-            [{"emoji": ReactionEmoji.THUMB_DOWN, "type": "emoji"}],
+            [{"emoji": ReactionEmoji.THUMBS_DOWN, "type": "emoji"}],
             [{"custom_emoji_id": "custom_emoji_3", "type": "custom_emoji"}],
             [
                 {"emoji": ReactionEmoji.RED_HEART, "type": "emoji"},
-                {"emoji": ReactionEmoji.THUMB_DOWN, "type": "emoji"},
-            ],
-            [
                 {"custom_emoji_id": "custom_emoji_4", "type": "custom_emoji"},
+                {"emoji": ReactionEmoji.THUMBS_DOWN, "type": "emoji"},
                 {"custom_emoji_id": "custom_emoji_5", "type": "custom_emoji"},
             ],
+            [],
         ]
 
         amount = 0
@@ -1863,12 +1862,19 @@ class TestBotWithoutRequest:
         await bot.set_message_reaction(1, 2, ReactionTypeEmoji(ReactionEmoji.RED_HEART), True)
         await bot.set_message_reaction(1, 2, [ReactionTypeCustomEmoji("custom_emoji_1")], True)
         await bot.set_message_reaction(1, 2, ReactionTypeCustomEmoji("custom_emoji_2"), True)
-        await bot.set_message_reaction(1, 2, ReactionEmoji.THUMB_DOWN, True)
+        await bot.set_message_reaction(1, 2, ReactionEmoji.THUMBS_DOWN, True)
         await bot.set_message_reaction(1, 2, "custom_emoji_3", True)
         await bot.set_message_reaction(
-            1, 2, [ReactionEmoji.RED_HEART, ReactionEmoji.THUMB_DOWN], True
+            1,
+            2,
+            [
+                ReactionTypeEmoji(ReactionEmoji.RED_HEART),
+                ReactionTypeCustomEmoji("custom_emoji_4"),
+                ReactionEmoji.THUMBS_DOWN,
+                ReactionTypeCustomEmoji("custom_emoji_5"),
+            ],
+            True,
         )
-        await bot.set_message_reaction(1, 2, ["custom_emoji_4", "custom_emoji_5"], True)
 
 
 class TestBotWithRequest:

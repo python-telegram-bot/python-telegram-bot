@@ -35,6 +35,7 @@ from typing import (
     NoReturn,
     Optional,
     Sequence,
+    Set,
     Tuple,
     Type,
     TypeVar,
@@ -8591,7 +8592,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[str, int],
         message_id: int,
-        reaction: Optional[Union[Sequence[ReactionType], ReactionType, Sequence[str], str]] = None,
+        reaction: Optional[Union[Sequence[Union[ReactionType, str]], ReactionType, str]] = None,
         is_big: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -8612,7 +8613,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_id (:obj:`int`): Identifier of the target message. If the message belongs to a
                 media group, the reaction is set to the first non-deleted message in the group
                 instead.
-            reaction (Sequence[:class:`telegram.ReactionType`], optional): New list of reaction
+            reaction (Sequence[:class:`telegram.ReactionType` | :obj:`str`] | \
+                :class:`telegram.ReactionType` | :obj:`str`, optional): New list of reaction
                 types to set on the message. Currently, as non-premium users, bots can set up to
                 one reaction per message. A custom emoji reaction can be used if it is either
                 already present on the message or explicitly allowed by chat administrators.
@@ -8625,23 +8627,28 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        # this variable is also only here for mypy... Better solution to cast?
-        mypy_extra = None
-        if isinstance(reaction, (ReactionType, str)):
-            mypy_extra = [reaction]
-        if mypy_extra and all(isinstance(s, str) for s in mypy_extra):
-            # The extra str call is there to make mypy happy. Maybe there is a better way
-            reaction = [
-                ReactionTypeEmoji(emoji=str(emoji))
-                if emoji in list(ReactionEmoji)
-                else ReactionTypeCustomEmoji(custom_emoji_id=str(emoji))
-                for emoji in mypy_extra
+        allowed_reactions: Set[str] = set(ReactionEmoji)
+        parsed_reaction = (
+            [
+                entry
+                if isinstance(entry, ReactionType)
+                else (
+                    ReactionTypeEmoji(emoji=entry)
+                    if entry in allowed_reactions
+                    else ReactionTypeCustomEmoji(custom_emoji_id=entry)
+                )
+                for entry in (
+                    [reaction] if isinstance(reaction, (ReactionType, str)) else reaction
+                )
             ]
+            if reaction is not None
+            else None
+        )
 
         data: JSONDict = {
             "chat_id": chat_id,
             "message_id": message_id,
-            "reaction": reaction,
+            "reaction": parsed_reaction,
             "is_big": is_big,
         }
 
