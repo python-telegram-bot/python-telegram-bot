@@ -18,12 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the MessageReactionHandler class."""
 
-from typing import Final, FrozenSet, Optional
+from typing import Final, Optional
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import RT, SCT, DVType
 from telegram.ext._basehandler import BaseHandler
+from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 
@@ -119,8 +120,8 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
         super().__init__(callback, block=block)
         self.message_reaction_types = message_reaction_types
 
-        self._chat_ids = self._parse_chat_id(chat_id)
-        self._chat_usernames = self._parse_username(chat_username)
+        self._chat_ids = parse_chat_id(chat_id)
+        self._chat_usernames = parse_username(chat_username)
         if (
             (user_id or user_username)
             and message_reaction_types == self.MESSAGE_REACTION
@@ -130,24 +131,8 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
                 "You can not filter for users and include anonymous reactions. Set "
                 "`message_reaction_types` to MESSAGE_REACTION_COUNT_UPDATED."
             )
-        self._user_ids = self._parse_chat_id(user_id)
-        self._user_usernames = self._parse_username(user_username)
-
-    @staticmethod
-    def _parse_chat_id(chat_id: Optional[SCT[int]]) -> FrozenSet[int]:
-        if chat_id is None:
-            return frozenset()
-        if isinstance(chat_id, int):
-            return frozenset({chat_id})
-        return frozenset(chat_id)
-
-    @staticmethod
-    def _parse_username(username: Optional[SCT[str]]) -> FrozenSet[str]:
-        if username is None:
-            return frozenset()
-        if isinstance(username, str):
-            return frozenset({username[1:] if username.startswith("@") else username})
-        return frozenset({usr[1:] if usr.startswith("@") else usr for usr in username})
+        self._user_ids = parse_chat_id(user_id)
+        self._user_usernames = parse_username(user_username)
 
     # pylint: disable=too-many-return-statements
     def check_update(self, update: object) -> bool:

@@ -120,6 +120,7 @@ from telegram import Message, MessageEntity, Update
 from telegram import User as TGUser
 from telegram._utils.types import SCT
 from telegram.constants import DiceEmoji as DiceEmojiEnum
+from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import FilterDataDict
 
 
@@ -678,29 +679,13 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
     def _get_chat_or_user(self, message: Message) -> Union[TGChat, TGUser, None]:
         ...
 
-    @staticmethod
-    def _parse_chat_id(chat_id: Optional[SCT[int]]) -> Set[int]:
-        if chat_id is None:
-            return set()
-        if isinstance(chat_id, int):
-            return {chat_id}
-        return set(chat_id)
-
-    @staticmethod
-    def _parse_username(username: Optional[SCT[str]]) -> Set[str]:
-        if username is None:
-            return set()
-        if isinstance(username, str):
-            return {username[1:] if username.startswith("@") else username}
-        return {chat[1:] if chat.startswith("@") else chat for chat in username}
-
     def _set_chat_ids(self, chat_id: Optional[SCT[int]]) -> None:
         if chat_id and self._usernames:
             raise RuntimeError(
                 f"Can't set {self._chat_id_name} in conjunction with (already set) "
                 f"{self._username_name}s."
             )
-        self._chat_ids = self._parse_chat_id(chat_id)
+        self._chat_ids = set(parse_chat_id(chat_id))
 
     def _set_usernames(self, username: Optional[SCT[str]]) -> None:
         if username and self._chat_ids:
@@ -708,7 +693,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 f"Can't set {self._username_name} in conjunction with (already set) "
                 f"{self._chat_id_name}s."
             )
-        self._usernames = self._parse_username(username)
+        self._usernames = set(parse_username(username))
 
     @property
     def chat_ids(self) -> FrozenSet[int]:
@@ -752,7 +737,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 f"{self._chat_id_name}s."
             )
 
-        parsed_username = self._parse_username(username)
+        parsed_username = set(parse_username(username))
         self._usernames |= parsed_username
 
     def _add_chat_ids(self, chat_id: SCT[int]) -> None:
@@ -762,7 +747,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 f"{self._username_name}s."
             )
 
-        parsed_chat_id = self._parse_chat_id(chat_id)
+        parsed_chat_id = set(parse_chat_id(chat_id))
 
         self._chat_ids |= parsed_chat_id
 
@@ -780,7 +765,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 f"{self._chat_id_name}s."
             )
 
-        parsed_username = self._parse_username(username)
+        parsed_username = set(parse_username(username))
         self._usernames -= parsed_username
 
     def _remove_chat_ids(self, chat_id: SCT[int]) -> None:
@@ -789,7 +774,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 f"Can't set {self._chat_id_name} in conjunction with (already set) "
                 f"{self._username_name}s."
             )
-        parsed_chat_id = self._parse_chat_id(chat_id)
+        parsed_chat_id = set(parse_chat_id(chat_id))
         self._chat_ids -= parsed_chat_id
 
     def filter(self, message: Message) -> bool:
