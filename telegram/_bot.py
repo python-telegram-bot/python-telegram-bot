@@ -877,7 +877,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 13.10
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -886,7 +886,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1237,7 +1237,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1246,7 +1246,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1380,7 +1380,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1389,7 +1389,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1523,7 +1523,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1532,7 +1532,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1642,7 +1642,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1651,7 +1651,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1777,7 +1777,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1786,7 +1786,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1918,7 +1918,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -1927,7 +1927,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2060,7 +2060,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2069,7 +2069,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2207,7 +2207,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2216,7 +2216,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2326,7 +2326,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2335,7 +2335,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2495,7 +2495,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2504,7 +2504,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2772,7 +2772,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2781,7 +2781,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2903,7 +2903,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -2912,7 +2912,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -3013,7 +3013,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -3022,7 +3022,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -4792,7 +4792,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -4801,7 +4801,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -5064,7 +5064,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 permissions are set independently. Otherwise, the
                 :attr:`~telegram.ChatPermissions.can_send_other_messages` and
                 :attr:`~telegram.ChatPermissions.can_add_web_page_previews` permissions will imply
-                the :attr:`~telegram.ChatPermissions.caforward_messages_tod_messages`,
+                the :attr:`~telegram.ChatPermissions.can_send_messages`,
                 :attr:`~telegram.ChatPermissions.can_send_audios`,
                 :attr:`~telegram.ChatPermissions.can_send_documents`,
                 :attr:`~telegram.ChatPermissions.can_send_photos`,
@@ -6778,7 +6778,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -6787,7 +6787,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -6914,7 +6914,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -6942,7 +6942,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -7357,7 +7357,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -7366,7 +7366,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 |mutually_exc_rp|
 
-                .. versionchaned:: NEXT.VERSION
+                .. versionchanged:: NEXT.VERSION
                     |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
@@ -7464,7 +7464,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
             message_ids (Sequence[:obj:`int`]): Identifiers of
-                :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT` -
                 :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` messages in the chat.
                 :paramref:`from_chat_id` to copy. The identifiers must be specified in a strictly
                 increasing order.

@@ -20,7 +20,7 @@ import datetime as dtm
 
 import pytest
 
-from telegram import Chat, MaybeInaccessibleMessage
+from telegram import Chat, InaccessibleMessage, MaybeInaccessibleMessage
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ZERO_DATE
 from telegram.warnings import PTBDeprecationWarning
@@ -117,15 +117,20 @@ class TestMaybeInaccessibleMessageWithoutRequest(TestMaybeInaccessibleMessageBas
             MaybeInaccessibleMessage(self.chat, self.message_id, ZERO_DATE).is_accessible
         )
 
-    def test_bool_deprecation_warning(self):
+    @pytest.mark.parametrize("cls", [MaybeInaccessibleMessage, InaccessibleMessage])
+    def test_bool_deprecation_warning(self, cls):
+        if cls is MaybeInaccessibleMessage:
+            args = (self.chat, self.message_id, self.date)
+        else:
+            args = (self.chat, self.message_id)
+
         with pytest.warns(
             PTBDeprecationWarning,
             match=(
-                "`MaybeInaccessibleMessage.__bool__` will be reverted to Pythons default "
-                "implementation"
+                f"`{cls.__name__}.__bool__` will be reverted to Pythons default implementation"
             ),
         ) as record:
-            bool(MaybeInaccessibleMessage(self.chat, self.message_id, self.date))
+            bool(cls(*args))
 
         assert record[0].filename == __file__, "wrong stacklevel"
 

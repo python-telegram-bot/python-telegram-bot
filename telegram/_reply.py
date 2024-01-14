@@ -80,7 +80,7 @@ class ExternalReplyInfo(TelegramObject):
             sticker.
         story (:class:`telegram.Story`, optional): Message is a forwarded story.
         video (:class:`telegram.Video`, optional): Message is a video, information about the video.
-        video_note (:class:`telegram.VideNote`, optional): Message is a video note, information
+        video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
             about the video message.
         voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
             the file.
@@ -123,7 +123,7 @@ class ExternalReplyInfo(TelegramObject):
             sticker.
         story (:class:`telegram.Story`): Optional. Message is a forwarded story.
         video (:class:`telegram.Video`): Optional. Message is a video, information about the video.
-        video_note (:class:`telegram.VideNote`): Optional. Message is a video note, information
+        video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
             about the video message.
         voice (:class:`telegram.Voice`): Optional. Message is a voice message, information about
             the file.

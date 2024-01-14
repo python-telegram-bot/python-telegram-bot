@@ -611,6 +611,12 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         assert record[0].filename == __file__, "wrong stacklevel"
 
+    def test_bool(self, message, recwarn):
+        # Relevant as long as we override MaybeInaccessibleMessage.__bool__
+        # Can be removed once that's removed
+        assert bool(message) is True
+        assert len(recwarn) == 0
+
     async def test_parse_entity(self):
         text = (
             b"\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467"

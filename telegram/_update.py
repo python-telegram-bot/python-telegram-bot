@@ -309,8 +309,8 @@ class Update(TelegramObject):
     """:const:`telegram.constants.UpdateType.MESSAGE_REACTION`
 
     .. versionadded:: NEXT.VERSION"""
-    MESSAGE_COUNT_REACTION: Final[str] = constants.UpdateType.MESSAGE_COUNT_REACTION
-    """:const:`telegram.constants.UpdateType.MESSAGE_COUNT_REACTION`
+    MESSAGE_REACTION_COUNT: Final[str] = constants.UpdateType.MESSAGE_REACTION_COUNT
+    """:const:`telegram.constants.UpdateType.MESSAGE_REACTION_COUNT`
 
     .. versionadded:: NEXT.VERSION"""
     ALL_TYPES: Final[List[str]] = list(constants.UpdateType)

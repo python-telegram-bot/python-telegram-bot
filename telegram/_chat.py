@@ -169,7 +169,7 @@ class Chat(TelegramObject):
             .. versionadded:: 20.0
         available_reactions (Sequence[:class:`telegram.ReactionType`], optional): List of available
             reactions allowed in the chat. If omitted, then all of
-            :const:`telegram.constants.ReactionEmojis` are allowed. Returned only in
+            :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: NEXT.VERSION
@@ -302,7 +302,7 @@ class Chat(TelegramObject):
             .. versionadded:: 20.0
         available_reactions (Sequence[:class:`telegram.ReactionType`]): Optional. List of available
             reactions allowed in the chat. If omitted, then all of
-            :const:`telegram.constants.ReactionEmojis` are allowed. Returned only in
+            :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: NEXT.VERSION
@@ -2606,7 +2606,7 @@ class Chat(TelegramObject):
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`send_copies`.
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~tleegram.MessageId`
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of the sent messages is returned.
 
         """

@@ -14,6 +14,7 @@ Handlers
     telegram.ext.filters
     telegram.ext.inlinequeryhandler
     telegram.ext.messagehandler
+    telegram.ext.messagereactionhandler
     telegram.ext.pollanswerhandler
     telegram.ext.pollhandler
     telegram.ext.precheckoutqueryhandler

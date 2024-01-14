@@ -152,14 +152,6 @@ class MaybeInaccessibleMessage(TelegramObject):
 
         self._freeze()
 
-    @property
-    def is_accessible(self) -> bool:
-        """Convenience attribute. :obj:`True`, if the date is not 0 in Unix time.
-
-        .. versionadded:: NEXT.VERSION
-        """
-        return self.date != ZERO_DATE
-
     def __bool__(self) -> bool:
         """Overrides :meth:`object.__bool__` to return the value of :attr:`is_accessible`.
         This is intended to ease migration to Bot API 7.0, as this allows checks like
@@ -179,6 +171,11 @@ class MaybeInaccessibleMessage(TelegramObject):
 
         for cases where ``message.pinned_message`` is now no longer :obj:`None`.
 
+        Tip:
+            Since objects that can only be of type :class:`~telegram.Message` or :obj:`None` are
+            not affected by this change, :meth:`Message.__bool__` is not overridden and will
+            continue to work as before.
+
         .. versionadded:: NEXT.VERSION
         .. deprecated:: NEXT.VERSION
            This behavior is introduced only temporarily to ease migration to Bot API 7.0. It will
@@ -187,13 +184,25 @@ class MaybeInaccessibleMessage(TelegramObject):
         warn(
             category=PTBDeprecationWarning,
             message=(
-                f"`{self.__class__.__name__}.__bool__` will be reverted to Pythons default "
-                f"implementation in future versions. Please verify if you need to use `is None` "
-                f"instead."
+                "You probably see this warning "
+                "because you wrote `if callback_query.message` or `if message.pinned_message` in "
+                "your code. This is not the supported way of checking the existence of a message "
+                "as of API 7.0. Please use `if message.is_available` or `if isinstance(message, "
+                "Message)` instead. `if message is None` may be suitable for specific use cases "
+                f"as well.\n`{self.__class__.__name__}.__bool__` will be reverted to Pythons "
+                f"default implementation in future versions."
             ),
             stacklevel=2,
         )
         return self.is_accessible
+
+    @property
+    def is_accessible(self) -> bool:
+        """Convenience attribute. :obj:`True`, if the date is not 0 in Unix time.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self.date != ZERO_DATE
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaybeInaccessibleMessage"]:
@@ -235,8 +244,8 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier.
-        date (:class:`constants.ZERO_DATE`): Always :tg-const:`constants.ZERO_DATE`. The field can
-            be used to differentiate regular and inaccessible messages.
+        date (:class:`constants.ZERO_DATE`): Always :tg-const:`telegram.constants.ZERO_DATE`.
+            The field can be used to differentiate regular and inaccessible messages.
         chat (:class:`telegram.Chat`): Chat the message belongs to.
     """
 
@@ -248,18 +257,6 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(chat=chat, message_id=message_id, date=ZERO_DATE, api_kwargs=api_kwargs)
-
-    def __bool__(self) -> bool:
-        warn(
-            "We currently override the bool behaivour of this class. You probably see this error"
-            " because you wrote `if callback_query.message` or `if message.pinned_message` in your"
-            " code. This is not the supported way of checking the existence of a message as of"
-            " API 7.0, please use `if message.is_available` instead or check the type of the"
-            " message.",
-            PTBDeprecationWarning,
-            stacklevel=2,
-        )
-        return False
 
 
 class Message(MaybeInaccessibleMessage):
@@ -1186,6 +1183,17 @@ class Message(MaybeInaccessibleMessage):
             self._effective_attachment = DEFAULT_NONE
 
             self._id_attrs = (self.message_id, self.chat)
+
+    def __bool__(self) -> bool:
+        """Overrides :meth:`telegram.MaybeInaccessibleMessage.__bool__` to use Pythons
+        default implementation of :meth:`object.__bool__` instead.
+
+        Tip:
+            The current behavior is the same as before the introduction of
+            :class:`telegram.MaybeInaccessibleMessage`. This documentation is relevant only until
+            :meth:`telegram.MaybeInaccessibleMessage.__bool__` is removed.
+        """
+        return True
 
     @property
     def user_shared(self) -> Optional[UserShared]:

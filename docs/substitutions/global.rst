@@ -66,8 +66,8 @@
 
 .. |reply_parameters| replace:: Description of the message to reply to.
 
-.. |rtm_aswr_deprecated| replace:: Bot API 7.0 introduced :paramref:`reply_parameters` replacing this argument. PTB will automatically convert this argument to that one, but you should update your code to use the new argument.
+.. |rtm_aswr_deprecated| replace:: Bot API 7.0 introduced :paramref:`~telegram.Bot.send_message.reply_parameters` replacing this argument. PTB will automatically convert this argument to that one, but you should update your code to use the new argument.
 
 .. |keyword_only_arg| replace:: In future versions, this argument will become a keyword-only argument.
 
-.. |mutually_exc_rp| replace:: Mutually exclusive with :paramref:`reply_parameters`.
+.. |mutually_exc_rp| replace:: Mutually exclusive with :paramref:`~telegram.Bot.send_message.reply_parameters`.

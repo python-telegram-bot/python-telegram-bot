@@ -39,6 +39,7 @@ __all__ = [
     "BotCommandScopeType",
     "BotDescriptionLimit",
     "BotNameLimit",
+    "BulkRequestLimit",
     "CallbackQueryLimit",
     "ChatAction",
     "ChatBoostSources",
@@ -155,8 +156,9 @@ BOT_API_VERSION: Final[str] = str(BOT_API_VERSION_INFO)
 #:  :paramref:`telegram.Bot.set_webhook.url`.
 SUPPORTED_WEBHOOK_PORTS: Final[List[int]] = [443, 80, 88, 8443]
 
-#: :obj:`datetime.datetime`, value of unix 0."""
+#: :obj:`datetime.datetime`, value of unix 0.
 #: This date literal is used in :class:`telegram.InaccessibleMessage`
+#:
 #: .. versionadded:: NEXT.VERSION
 ZERO_DATE: Final[datetime.datetime] = datetime.datetime(1970, 1, 1, tzinfo=UTC)
 
@@ -2482,8 +2484,8 @@ class UpdateType(StringEnum):
 
     .. versionadded:: NEXT.VERSION
     """
-    MESSAGE_COUNT_REACTION = "message_count_reaction"
-    """:obj:`str`: Updates with :attr:`telegram.Update.message_count_reaction`.
+    MESSAGE_REACTION_COUNT = "message_reaction_count"
+    """:obj:`str`: Updates with :attr:`telegram.Update.message_reaction_count`.
 
     .. versionadded:: NEXT.VERSION
     """

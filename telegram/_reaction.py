@@ -92,13 +92,13 @@ class ReactionTypeEmoji(ReactionType):
 
     Args:
         emoji (:obj:`str`): Reaction emoji. It can be one of
-        :const:`telegram.constants.ReactionEmojis`.
+            :const:`telegram.constants.ReactionEmoji`.
 
     Attributes:
         type (:obj:`str`): Type of the reaction,
             always :tg-const:`telegram.ReactionType.EMOJI`.
         emoji (:obj:`str`): Reaction emoji. It can be one of
-        :const:`telegram.constants.ReactionEmojis`.
+        :const:`telegram.constants.ReactionEmoji`.
     """
 
     __slots__ = ("emoji",)
@@ -132,7 +132,6 @@ class ReactionTypeCustomEmoji(ReactionType):
         type (:obj:`str`): Type of the reaction,
             always :tg-const:`telegram.ReactionType.CUSTOM_EMOJI`.
         custom_emoji_id (:obj:`str`): Custom emoji identifier.
-
 
     """
 

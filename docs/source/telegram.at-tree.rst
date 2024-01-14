@@ -92,11 +92,14 @@ Available Types
     telegram.messageoriginchat
     telegram.messageoriginhiddenuser
     telegram.messageoriginuser
+    telegram.messagereactioncountupdated
+    telegram.messagereactionupdated
     telegram.photosize
     telegram.poll
     telegram.pollanswer
     telegram.polloption
     telegram.proximityalerttriggered
+    telegram.reactioncount
     telegram.reactiontype
     telegram.reactiontypecustomemoji
     telegram.reactiontypeemoji
