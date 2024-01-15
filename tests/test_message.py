@@ -262,11 +262,11 @@ def message(bot):
         },
         {
             "external_reply": ExternalReplyInfo(
-                MessageOriginChat(datetime.utcnow(), Chat(1, "private"))
+                MessageOriginChat(datetime.utcnow(), Chat(1, Chat.PRIVATE))
             )
         },
         {"quote": TextQuote("a text quote", 1)},
-        {"forward_origin": MessageOriginChat(datetime.utcnow(), Chat(1, "private"))},
+        {"forward_origin": MessageOriginChat(datetime.utcnow(), Chat(1, Chat.PRIVATE))},
     ],
     ids=[
         "forwarded_user",
