@@ -187,7 +187,7 @@ class MaybeInaccessibleMessage(TelegramObject):
                 "You probably see this warning "
                 "because you wrote `if callback_query.message` or `if message.pinned_message` in "
                 "your code. This is not the supported way of checking the existence of a message "
-                "as of API 7.0. Please use `if message.is_available` or `if isinstance(message, "
+                "as of API 7.0. Please use `if message.is_accessible` or `if isinstance(message, "
                 "Message)` instead. `if message is None` may be suitable for specific use cases "
                 f"as well.\n`{self.__class__.__name__}.__bool__` will be reverted to Pythons "
                 f"default implementation in future versions."

@@ -212,6 +212,10 @@ class Defaults:
     def disable_web_page_preview(self) -> ODVInput[bool]:
         """:obj:`bool`: Optional. Disables link previews for links in all outgoing
         messages.
+
+        .. deprecated:: NEXT.VERSION
+            Use :attr:`link_preview_options` instead. This attribute will be removed in future
+            versions.
         """
         return self._link_preview_options.is_disabled if self._link_preview_options else None
 
