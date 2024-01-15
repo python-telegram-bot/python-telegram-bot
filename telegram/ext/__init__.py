@@ -63,32 +63,32 @@ from . import filters
 from ._aioratelimiter import AIORateLimiter
 from ._application import Application, ApplicationHandlerStop
 from ._applicationbuilder import ApplicationBuilder
-from ._basehandler import BaseHandler
 from ._basepersistence import BasePersistence, PersistenceInput
 from ._baseratelimiter import BaseRateLimiter
 from ._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
 from ._callbackcontext import CallbackContext
 from ._callbackdatacache import CallbackDataCache, InvalidCallbackData
-from ._callbackqueryhandler import CallbackQueryHandler
-from ._chatjoinrequesthandler import ChatJoinRequestHandler
-from ._chatmemberhandler import ChatMemberHandler
-from ._choseninlineresulthandler import ChosenInlineResultHandler
-from ._commandhandler import CommandHandler
 from ._contexttypes import ContextTypes
-from ._conversationhandler import ConversationHandler
 from ._defaults import Defaults
 from ._dictpersistence import DictPersistence
 from ._extbot import ExtBot
-from ._inlinequeryhandler import InlineQueryHandler
+from ._handlers.basehandler import BaseHandler
+from ._handlers.callbackqueryhandler import CallbackQueryHandler
+from ._handlers.chatjoinrequesthandler import ChatJoinRequestHandler
+from ._handlers.chatmemberhandler import ChatMemberHandler
+from ._handlers.choseninlineresulthandler import ChosenInlineResultHandler
+from ._handlers.commandhandler import CommandHandler
+from ._handlers.conversationhandler import ConversationHandler
+from ._handlers.inlinequeryhandler import InlineQueryHandler
+from ._handlers.messagehandler import MessageHandler
+from ._handlers.pollanswerhandler import PollAnswerHandler
+from ._handlers.pollhandler import PollHandler
+from ._handlers.precheckoutqueryhandler import PreCheckoutQueryHandler
+from ._handlers.prefixhandler import PrefixHandler
+from ._handlers.shippingqueryhandler import ShippingQueryHandler
+from ._handlers.stringcommandhandler import StringCommandHandler
+from ._handlers.stringregexhandler import StringRegexHandler
+from ._handlers.typehandler import TypeHandler
 from ._jobqueue import Job, JobQueue
-from ._messagehandler import MessageHandler
 from ._picklepersistence import PicklePersistence
-from ._pollanswerhandler import PollAnswerHandler
-from ._pollhandler import PollHandler
-from ._precheckoutqueryhandler import PreCheckoutQueryHandler
-from ._prefixhandler import PrefixHandler
-from ._shippingqueryhandler import ShippingQueryHandler
-from ._stringcommandhandler import StringCommandHandler
-from ._stringregexhandler import StringRegexHandler
-from ._typehandler import TypeHandler
 from ._updater import Updater

@@ -16,35 +16,31 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the StringCommandHandler class."""
+"""This module contains the ChatMemberHandler class."""
+from typing import Final, Optional, TypeVar
 
-from typing import TYPE_CHECKING, Any, List, Optional
-
+from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVType
-from telegram.ext._basehandler import BaseHandler
-from telegram.ext._utils.types import CCT, RT, HandlerCallback
+from telegram.ext._handlers.basehandler import BaseHandler
+from telegram.ext._utils.types import CCT, HandlerCallback
 
-if TYPE_CHECKING:
-    from telegram.ext import Application
+RT = TypeVar("RT")
 
 
-class StringCommandHandler(BaseHandler[str, CCT]):
-    """Handler class to handle string commands. Commands are string updates that start with
-    ``/``. The handler will add a :obj:`list` to the
-    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
-    which is the text following the command split on single whitespace characters.
-
-    Note:
-        This handler is not used to handle Telegram :class:`telegram.Update`, but strings manually
-        put in the queue. For example to send messages with the bot using command line or API.
+class ChatMemberHandler(BaseHandler[Update, CCT]):
+    """Handler class to handle Telegram updates that contain a chat member update.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    Examples:
+        :any:`Chat Member Bot <examples.chatmemberbot>`
+
+    .. versionadded:: 13.4
+
     Args:
-        command (:obj:`str`): The command this handler should listen for.
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::
@@ -53,6 +49,10 @@ class StringCommandHandler(BaseHandler[str, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
+        chat_member_types (:obj:`int`, optional): Pass one of :attr:`MY_CHAT_MEMBER`,
+            :attr:`CHAT_MEMBER` or :attr:`ANY_CHAT_MEMBER` to specify if this handler should handle
+            only updates with :attr:`telegram.Update.my_chat_member`,
+            :attr:`telegram.Update.chat_member` or both. Defaults to :attr:`MY_CHAT_MEMBER`.
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
@@ -60,49 +60,51 @@ class StringCommandHandler(BaseHandler[str, CCT]):
             .. seealso:: :wiki:`Concurrency`
 
     Attributes:
-        command (:obj:`str`): The command this handler should listen for.
         callback (:term:`coroutine function`): The callback function for this handler.
+        chat_member_types (:obj:`int`): Optional. Specifies if this handler should handle
+            only updates with :attr:`telegram.Update.my_chat_member`,
+            :attr:`telegram.Update.chat_member` or both.
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
 
     """
 
-    __slots__ = ("command",)
+    __slots__ = ("chat_member_types",)
+    MY_CHAT_MEMBER: Final[int] = -1
+    """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.my_chat_member`."""
+    CHAT_MEMBER: Final[int] = 0
+    """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.chat_member`."""
+    ANY_CHAT_MEMBER: Final[int] = 1
+    """:obj:`int`: Used as a constant to handle both :attr:`telegram.Update.my_chat_member`
+    and :attr:`telegram.Update.chat_member`."""
 
     def __init__(
         self,
-        command: str,
-        callback: HandlerCallback[str, CCT, RT],
+        callback: HandlerCallback[Update, CCT, RT],
+        chat_member_types: int = MY_CHAT_MEMBER,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
-        self.command: str = command
 
-    def check_update(self, update: object) -> Optional[List[str]]:
+        self.chat_member_types: Optional[int] = chat_member_types
+
+    def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
-            update (:obj:`object`): The incoming update.
+            update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
-            List[:obj:`str`]: List containing the text command split on whitespace.
+            :obj:`bool`
 
         """
-        if isinstance(update, str) and update.startswith("/"):
-            args = update[1:].split(" ")
-            if args[0] == self.command:
-                return args[1:]
-        return None
-
-    def collect_additional_context(
-        self,
-        context: CCT,
-        update: str,  # skipcq: BAN-B301
-        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
-        check_result: Optional[List[str]],
-    ) -> None:
-        """Add text after the command to :attr:`CallbackContext.args` as list, split on single
-        whitespaces.
-        """
-        context.args = check_result
+        if isinstance(update, Update):
+            if not (update.my_chat_member or update.chat_member):
+                return False
+            if self.chat_member_types == self.ANY_CHAT_MEMBER:
+                return True
+            if self.chat_member_types == self.CHAT_MEMBER:
+                return bool(update.chat_member)
+            return bool(update.my_chat_member)
+        return False

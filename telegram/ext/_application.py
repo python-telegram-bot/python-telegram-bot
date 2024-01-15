@@ -64,10 +64,10 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import SCT, DVType, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
-from telegram.ext._basehandler import BaseHandler
 from telegram.ext._basepersistence import BasePersistence
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
+from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
@@ -494,7 +494,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         # Unfortunately due to circular imports this has to be here
         # pylint: disable=import-outside-toplevel
-        from telegram.ext._conversationhandler import ConversationHandler
+        from telegram.ext._handlers.conversationhandler import ConversationHandler
 
         # Initialize the persistent conversation handlers with the stored states
         for handler in itertools.chain.from_iterable(self.handlers.values()):
@@ -1304,7 +1304,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         """
         # Unfortunately due to circular imports this has to be here
         # pylint: disable=import-outside-toplevel
-        from telegram.ext._conversationhandler import ConversationHandler
+        from telegram.ext._handlers.conversationhandler import ConversationHandler
 
         if not isinstance(handler, BaseHandler):
             raise TypeError(f"handler is not an instance of {BaseHandler.__name__}")
@@ -1650,7 +1650,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         # Unfortunately due to circular imports this has to be here
         # pylint: disable=import-outside-toplevel
-        from telegram.ext._conversationhandler import PendingState
+        from telegram.ext._handlers.conversationhandler import PendingState
 
         for name, (key, new_state) in itertools.chain.from_iterable(
             zip(itertools.repeat(name), states_dict.pop_accessed_write_items())
