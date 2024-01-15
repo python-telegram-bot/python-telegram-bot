@@ -30,6 +30,7 @@ __all__ = (
     "CallbackContext",
     "CallbackDataCache",
     "CallbackQueryHandler",
+    "ChatBoostHandler",
     "ChatJoinRequestHandler",
     "ChatMemberHandler",
     "ChosenInlineResultHandler",
@@ -71,6 +72,7 @@ from ._baseupdateprocessor import BaseUpdateProcessor, SimpleUpdateProcessor
 from ._callbackcontext import CallbackContext
 from ._callbackdatacache import CallbackDataCache, InvalidCallbackData
 from ._callbackqueryhandler import CallbackQueryHandler
+from ._chatboosthandler import ChatBoostHandler
 from ._chatjoinrequesthandler import ChatJoinRequestHandler
 from ._chatmemberhandler import ChatMemberHandler
 from ._choseninlineresulthandler import ChosenInlineResultHandler

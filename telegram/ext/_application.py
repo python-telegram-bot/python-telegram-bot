@@ -1133,7 +1133,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 return await asyncio.create_task(coroutine)
             # If user uses generator in python 3.12+, Exception will happen and we cannot do
             # anything about it. (hence the type ignore if mypy is run on python 3.12-)
-            return await coroutine  # type: ignore[misc]
+            return await coroutine
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(

@@ -6,6 +6,7 @@ Handlers
 
     telegram.ext.basehandler
     telegram.ext.callbackqueryhandler
+    telegram.ext.chatboosthandler
     telegram.ext.chatjoinrequesthandler
     telegram.ext.chatmemberhandler
     telegram.ext.choseninlineresulthandler
