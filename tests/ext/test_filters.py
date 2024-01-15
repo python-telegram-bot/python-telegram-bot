@@ -281,7 +281,7 @@ class TestFilters:
         sre_type = type(re.match("", ""))
         update.message.text = "test it out"
         test_filter = filters.Regex("test") & (
-            (filters.StatusUpdate.ALL | filters.FORWARDED) | filters.Regex("out")
+            (filters.StatusUpdate.ALL | filters.AUDIO) | filters.Regex("out")
         )
         result = test_filter.check_update(update)
         assert result
@@ -290,7 +290,7 @@ class TestFilters:
         assert isinstance(matches, list)
         assert len(matches) == 2
         assert all(type(res) is sre_type for res in matches)
-        update.message.forward_origin = message_origin_user
+        update.message.audio = "test"
         result = test_filter.check_update(update)
         assert result
         assert isinstance(result, dict)
@@ -304,7 +304,7 @@ class TestFilters:
         matches = result["matches"]
         assert isinstance(matches, list)
         assert all(type(res) is sre_type for res in matches)
-        update.message.forward_origin = None
+        update.message.audio = None
         result = test_filter.check_update(update)
         assert not result
         update.message.text = "test it out"
@@ -488,7 +488,7 @@ class TestFilters:
         sre_type = type(re.match("", ""))
         update.message.caption = "test it out"
         test_filter = filters.CaptionRegex("test") & (
-            (filters.StatusUpdate.ALL | filters.FORWARDED) | filters.CaptionRegex("out")
+            (filters.StatusUpdate.ALL | filters.AUDIO) | filters.CaptionRegex("out")
         )
         result = test_filter.check_update(update)
         assert result
@@ -497,7 +497,7 @@ class TestFilters:
         assert isinstance(matches, list)
         assert len(matches) == 2
         assert all(type(res) is sre_type for res in matches)
-        update.message.forward_origin = message_origin_user
+        update.message.audio = "test"
         result = test_filter.check_update(update)
         assert result
         assert isinstance(result, dict)
@@ -511,7 +511,7 @@ class TestFilters:
         matches = result["matches"]
         assert isinstance(matches, list)
         assert all(type(res) is sre_type for res in matches)
-        update.message.forward_origin = None
+        update.message.audio = None
         result = test_filter.check_update(update)
         assert not result
         update.message.caption = "test it out"
