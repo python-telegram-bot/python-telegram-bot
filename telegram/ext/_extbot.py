@@ -436,12 +436,12 @@ class ExtBot(Bot, Generic[RLARGS]):
             # We need handle the LinkPreviewOptions case:
             # If Defaults.LPO is set, and LPO is passed in the bot method we should fuse
             # them, giving precedence to passed values.
-            # Defaults.LPO(True, "google.com", True) & # LPO=LPO(True, ..., False) ->
+            # Defaults.LPO(True, "google.com", True) & LPO=LPO(True, ..., False) ->
             # LPO(True, "google.com", False)
             elif (
                 isinstance(val, LinkPreviewOptions)
                 and self.defaults
-                and (passed_lpo := data.get(key, False)) is not DEFAULT_NONE
+                and (passed_lpo := data.get(key, False)) is val
                 and (defaults_lpo := self.defaults.api_defaults.get(key, None)) is not None
             ):
                 defaults_lpo_dict = defaults_lpo.to_dict()

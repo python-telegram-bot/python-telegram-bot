@@ -8534,6 +8534,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    @_log
     async def get_user_chat_boosts(
         self,
         chat_id: Union[str, int],
@@ -8576,6 +8577,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    @_log
     async def set_message_reaction(
         self,
         chat_id: Union[str, int],
