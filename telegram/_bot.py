@@ -8614,7 +8614,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     :class:`telegram.ReactionTypeEmoji` or
                     :class:`telegram.ReactionTypeCustomEmoji`
                     depending on whether they are listed in
-                    :enum:`~telegram.constants.ReactionEmoji`.
+                    :class:`~telegram.constants.ReactionEmoji`.
 
             is_big (:obj:`bool`, optional): Pass :obj:`True` to set the reaction with a big
                 animation.

@@ -1372,7 +1372,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
     or username(s) based on :attr:`telegram.Message.forward_origin` and in particular
 
     * :attr:`telegram.MessageOriginUser.sender_user`
-    * :attr:`telegram.MessageChat.sender_chat`
+    * :attr:`telegram.MessageOriginChat.sender_chat`
     * :attr:`telegram.MessageOriginChannel.chat`
 
     .. versionadded:: 13.5
