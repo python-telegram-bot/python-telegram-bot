@@ -14,25 +14,26 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU Lesser Public License
-# along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the ShippingQueryHandler class."""
+#  You should have received a copy of the GNU Lesser Public License
+#  along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""This module contains the PollAnswerHandler class."""
 
 
 from telegram import Update
-from telegram.ext._basehandler import BaseHandler
+from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._utils.types import CCT
 
 
-class ShippingQueryHandler(BaseHandler[Update, CCT]):
-    """Handler class to handle Telegram :attr:`telegram.Update.shipping_query`.
+class PollAnswerHandler(BaseHandler[Update, CCT]):
+    """Handler class to handle Telegram updates that contain a
+    :attr:`poll answer <telegram.Update.poll_answer>`.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Examples:
-        :any:`Payment Bot <examples.paymentbot>`
+        :any:`Poll Bot <examples.pollbot>`
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -67,4 +68,4 @@ class ShippingQueryHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
-        return isinstance(update, Update) and bool(update.shipping_query)
+        return isinstance(update, Update) and bool(update.poll_answer)

@@ -16,35 +16,29 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the ChatJoinRequestHandler class."""
-
-from typing import Optional
+"""This module contains the ChosenInlineResultHandler class."""
+import re
+from typing import TYPE_CHECKING, Any, Match, Optional, Pattern, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import RT, SCT, DVType
-from telegram.ext._basehandler import BaseHandler
-from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
+from telegram._utils.types import DVType
+from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
+RT = TypeVar("RT")
 
-class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
+if TYPE_CHECKING:
+    from telegram.ext import Application
+
+
+class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
     """Handler class to handle Telegram updates that contain
-    :attr:`telegram.Update.chat_join_request`.
-
-    Note:
-        If neither of :paramref:`username` and the :paramref:`chat_id` are passed, this handler
-        accepts *any* join request. Otherwise, this handler accepts all requests to join chats
-        for which the chat ID is listed in :paramref:`chat_id` or the username is listed in
-        :paramref:`username`, or both.
-
-        .. versionadded:: 20.0
+    :attr:`telegram.Update.chosen_inline_result`.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
-
-    .. versionadded:: 13.8
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -55,59 +49,73 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters requests to allow only
-            those which are asking to join the specified chat ID(s).
-
-            .. versionadded:: 20.0
-        username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
-            those which are asking to join the specified username(s).
-
-            .. versionadded:: 20.0
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Regex pattern. If not
+            :obj:`None`, :func:`re.match`
+            is used on :attr:`telegram.ChosenInlineResult.result_id` to determine if an update
+            should be handled by this handler. This is accessible in the callback as
+            :attr:`telegram.ext.CallbackContext.matches`.
 
+            .. versionadded:: 13.6
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
-        block (:obj:`bool`): Determines whether the callback will run in a blocking way..
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
+        pattern (`Pattern`): Optional. Regex pattern to test
+            :attr:`telegram.ChosenInlineResult.result_id` against.
+
+            .. versionadded:: 13.6
 
     """
 
-    __slots__ = (
-        "_chat_ids",
-        "_usernames",
-    )
+    __slots__ = ("pattern",)
 
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        chat_id: Optional[SCT[int]] = None,
-        username: Optional[SCT[str]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
+        pattern: Optional[Union[str, Pattern[str]]] = None,
     ):
         super().__init__(callback, block=block)
 
-        self._chat_ids = parse_chat_id(chat_id)
-        self._usernames = parse_username(username)
+        if isinstance(pattern, str):
+            pattern = re.compile(pattern)
 
-    def check_update(self, update: object) -> bool:
+        self.pattern: Optional[Union[str, Pattern[str]]] = pattern
+
+    def check_update(self, update: object) -> Optional[Union[bool, object]]:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
-            :obj:`bool`
+            :obj:`bool` | :obj:`re.match`
 
         """
-        if isinstance(update, Update) and update.chat_join_request:
-            if not self._chat_ids and not self._usernames:
+        if isinstance(update, Update) and update.chosen_inline_result:
+            if self.pattern:
+                if match := re.match(self.pattern, update.chosen_inline_result.result_id):
+                    return match
+            else:
                 return True
-            if update.chat_join_request.chat.id in self._chat_ids:
-                return True
-            if update.chat_join_request.from_user.username in self._usernames:
-                return True
-            return False
-        return False
+        return None
+
+    def collect_additional_context(
+        self,
+        context: CCT,
+        update: Update,  # skipcq: BAN-B301
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
+        check_result: Union[bool, Match[str]],
+    ) -> None:
+        """This function adds the matched regex pattern result to
+        :attr:`telegram.ext.CallbackContext.matches`.
+        """
+        if self.pattern:
+            check_result = cast(Match, check_result)
+            context.matches = [check_result]

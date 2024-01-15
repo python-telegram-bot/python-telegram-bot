@@ -21,7 +21,7 @@
 from typing import Final, Optional
 
 from telegram import Update
-from telegram.ext._basehandler import BaseHandler
+from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import CCT, HandlerCallback
 

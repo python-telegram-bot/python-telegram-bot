@@ -16,29 +16,35 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the ChatMemberHandler class."""
-from typing import Final, Optional, TypeVar
+"""This module contains the ChatJoinRequestHandler class."""
+
+from typing import Optional
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVType
-from telegram.ext._basehandler import BaseHandler
+from telegram._utils.types import RT, SCT, DVType
+from telegram.ext._handlers.basehandler import BaseHandler
+from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import CCT, HandlerCallback
 
-RT = TypeVar("RT")
 
+class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
+    """Handler class to handle Telegram updates that contain
+    :attr:`telegram.Update.chat_join_request`.
 
-class ChatMemberHandler(BaseHandler[Update, CCT]):
-    """Handler class to handle Telegram updates that contain a chat member update.
+    Note:
+        If neither of :paramref:`username` and the :paramref:`chat_id` are passed, this handler
+        accepts *any* join request. Otherwise, this handler accepts all requests to join chats
+        for which the chat ID is listed in :paramref:`chat_id` or the username is listed in
+        :paramref:`username`, or both.
+
+        .. versionadded:: 20.0
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    Examples:
-        :any:`Chat Member Bot <examples.chatmemberbot>`
-
-    .. versionadded:: 13.4
+    .. versionadded:: 13.8
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -49,10 +55,14 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        chat_member_types (:obj:`int`, optional): Pass one of :attr:`MY_CHAT_MEMBER`,
-            :attr:`CHAT_MEMBER` or :attr:`ANY_CHAT_MEMBER` to specify if this handler should handle
-            only updates with :attr:`telegram.Update.my_chat_member`,
-            :attr:`telegram.Update.chat_member` or both. Defaults to :attr:`MY_CHAT_MEMBER`.
+        chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters requests to allow only
+            those which are asking to join the specified chat ID(s).
+
+            .. versionadded:: 20.0
+        username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
+            those which are asking to join the specified username(s).
+
+            .. versionadded:: 20.0
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
@@ -61,33 +71,26 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
-        chat_member_types (:obj:`int`): Optional. Specifies if this handler should handle
-            only updates with :attr:`telegram.Update.my_chat_member`,
-            :attr:`telegram.Update.chat_member` or both.
-        block (:obj:`bool`): Determines whether the return value of the callback should be
-            awaited before processing the next handler in
-            :meth:`telegram.ext.Application.process_update`.
+        block (:obj:`bool`): Determines whether the callback will run in a blocking way..
 
     """
 
-    __slots__ = ("chat_member_types",)
-    MY_CHAT_MEMBER: Final[int] = -1
-    """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.my_chat_member`."""
-    CHAT_MEMBER: Final[int] = 0
-    """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.chat_member`."""
-    ANY_CHAT_MEMBER: Final[int] = 1
-    """:obj:`int`: Used as a constant to handle both :attr:`telegram.Update.my_chat_member`
-    and :attr:`telegram.Update.chat_member`."""
+    __slots__ = (
+        "_chat_ids",
+        "_usernames",
+    )
 
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        chat_member_types: int = MY_CHAT_MEMBER,
+        chat_id: Optional[SCT[int]] = None,
+        username: Optional[SCT[str]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
 
-        self.chat_member_types: Optional[int] = chat_member_types
+        self._chat_ids = parse_chat_id(chat_id)
+        self._usernames = parse_username(username)
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -99,12 +102,12 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
-        if isinstance(update, Update):
-            if not (update.my_chat_member or update.chat_member):
-                return False
-            if self.chat_member_types == self.ANY_CHAT_MEMBER:
+        if isinstance(update, Update) and update.chat_join_request:
+            if not self._chat_ids and not self._usernames:
                 return True
-            if self.chat_member_types == self.CHAT_MEMBER:
-                return bool(update.chat_member)
-            return bool(update.my_chat_member)
+            if update.chat_join_request.chat.id in self._chat_ids:
+                return True
+            if update.chat_join_request.from_user.username in self._usernames:
+                return True
+            return False
         return False
