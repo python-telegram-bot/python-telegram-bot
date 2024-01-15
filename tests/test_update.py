@@ -256,7 +256,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
         else:
             assert eff_message is None
 
-    def test_effective_message_future_warning(self):
+    def test_effective_message_inaccessible(self):
         update = Update(
             update_id=1,
             callback_query=CallbackQuery(
@@ -268,7 +268,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
         )
         with pytest.warns(
             PTBUserWarning,
-            match="`telegram.MaybeInaccessibleMessage` instead of `telegram.Message`",
+            match="update.callback_query` is not `None`, but of type `InaccessibleMessage`",
         ) as record:
             assert update.effective_message is None
 

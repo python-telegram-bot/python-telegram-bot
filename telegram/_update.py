@@ -508,18 +508,14 @@ class Update(TelegramObject):
             :attr:`callback_query` (i.e. :attr:`telegram.CallbackQuery.message`) or :obj:`None`, if
             none of those are present.
 
-        Warning:
-            In future versions of python-telegram-bot, this will return
-            :class:`telegram.MaybeInaccessibleMessage` instead of :class:`telegram.Message`.
+        Tip:
+            This property will only ever return objects of type :class:`telegram.Message` or
+            :obj:`None`, never :class:`telegram.MaybeInaccessibleMessage` or
+            :class:`telegram.InaccessibleMessage`.
+            Currently, this is only relevant for :attr:`callback_query`, as
+            :attr:`telegram.CallbackQuery.message` is the only attribute considered by this
+            property that can be an object of these types.
         """
-        # Stupid comment in hopes of making this easier to find when searching for things that
-        # we should change in the next major version:
-        # .. deprecated:: NEXT.VERSION
-        warn(
-            "In future versions, `Update.effective_message` will return "
-            "`telegram.MaybeInaccessibleMessage` instead of `telegram.Message`.",
-            stacklevel=2,
-        )
 
         if self._effective_message:
             return self._effective_message
@@ -532,8 +528,19 @@ class Update(TelegramObject):
         elif self.edited_message:
             message = self.edited_message
 
-        elif self.callback_query and isinstance(self.callback_query.message, Message):
-            message = self.callback_query.message
+        elif self.callback_query:
+            if isinstance(cbq_message := self.callback_query.message, Message):
+                message = cbq_message
+            else:
+                warn(
+                    (
+                        "`update.callback_query` is not `None`, but of type "
+                        f"`{cbq_message.__class__.__name__}`. This is not considered by "
+                        "`Update.effective_message`. Please manually access this attribute "
+                        "if necessary."
+                    ),
+                    stacklevel=2,
+                )
 
         elif self.channel_post:
             message = self.channel_post
