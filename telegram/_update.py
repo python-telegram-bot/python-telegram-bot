@@ -529,7 +529,10 @@ class Update(TelegramObject):
             message = self.edited_message
 
         elif self.callback_query:
-            if isinstance(cbq_message := self.callback_query.message, Message):
+            if (
+                isinstance(cbq_message := self.callback_query.message, Message)
+                or cbq_message is None
+            ):
                 message = cbq_message
             else:
                 warn(

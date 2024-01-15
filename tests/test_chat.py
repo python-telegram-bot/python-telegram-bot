@@ -108,7 +108,7 @@ class TestChatBase:
     has_aggressive_anti_spam_enabled = True
     has_hidden_members = True
     available_reactions = [
-        ReactionTypeEmoji(ReactionEmoji.THUMB_DOWN),
+        ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN),
         ReactionTypeCustomEmoji("custom_emoji_id"),
     ]
     accent_color_id = 1
@@ -151,7 +151,7 @@ class TestChatWithoutRequest(TestChatBase):
             "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
             "has_aggressive_anti_spam_enabled": self.has_aggressive_anti_spam_enabled,
             "has_hidden_members": self.has_hidden_members,
-            "available_reactions": self.available_reactions,
+            "available_reactions": [reaction.to_dict() for reaction in self.available_reactions],
             "accent_color_id": self.accent_color_id,
             "background_custom_emoji_id": self.background_custom_emoji_id,
             "profile_accent_color_id": self.profile_accent_color_id,
@@ -247,7 +247,9 @@ class TestChatWithoutRequest(TestChatBase):
             chat_dict["has_aggressive_anti_spam_enabled"] == chat.has_aggressive_anti_spam_enabled
         )
         assert chat_dict["has_hidden_members"] == chat.has_hidden_members
-        assert chat_dict["available_reactions"] == chat.available_reactions
+        assert chat_dict["available_reactions"] == [
+            reaction.to_dict() for reaction in chat.available_reactions
+        ]
         assert chat_dict["accent_color_id"] == chat.accent_color_id
         assert chat_dict["background_custom_emoji_id"] == chat.background_custom_emoji_id
         assert chat_dict["profile_accent_color_id"] == chat.profile_accent_color_id

@@ -147,6 +147,8 @@ class GiveawayCreated(TelegramObject):
     Currently holds no information.
     """
 
+    __slots__ = ()
+
 
 class GiveawayWinners(TelegramObject):
     """This object represents a message about the completion of a giveaway with public winners.

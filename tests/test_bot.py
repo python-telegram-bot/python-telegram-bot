@@ -65,6 +65,7 @@ from telegram import (
     PollOption,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
+    ReplyParameters,
     SentWebAppMessage,
     ShippingOption,
     Update,
@@ -1463,7 +1464,8 @@ class TestBotWithoutRequest:
                     data["message_id"] == media_message.message_id,
                     data.get("caption") == caption,
                     data["parse_mode"] == ParseMode.HTML,
-                    data["reply_to_message_id"] == media_message.message_id,
+                    data["reply_parameters"]
+                    == ReplyParameters(message_id=media_message.message_id),
                     (
                         data["reply_markup"] == keyboard.to_json()
                         if json_keyboard

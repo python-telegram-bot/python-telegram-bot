@@ -166,7 +166,7 @@ class TestChatMemberTypesWithoutRequest:
         b = ReactionTypeEmoji(emoji=CMDefaults.normal_emoji)
         c = ReactionTypeCustomEmoji(custom_emoji_id=CMDefaults.custom_emoji)
         d = ReactionTypeCustomEmoji(custom_emoji_id=CMDefaults.custom_emoji)
-        e = ReactionTypeEmoji(emoji=ReactionEmoji.READ_HEART)
+        e = ReactionTypeEmoji(emoji=ReactionEmoji.RED_HEART)
         f = ReactionTypeCustomEmoji(custom_emoji_id="1234custom")
         g = deepcopy(a)
         h = deepcopy(c)

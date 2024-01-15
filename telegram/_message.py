@@ -936,7 +936,6 @@ class Message(MaybeInaccessibleMessage):
         "sticker",
         "story",
         "successful_payment",
-        "successful_payment",
         "supergroup_chat_created",
         "text",
         "users_shared",
@@ -948,7 +947,6 @@ class Message(MaybeInaccessibleMessage):
         "video_chat_scheduled",
         "video_chat_started",
         "video_note",
-        "voice",
         "voice",
         "web_app_data",
         "write_access_allowed",
@@ -1273,7 +1271,7 @@ class Message(MaybeInaccessibleMessage):
            Bot API 7.0 deprecates :attr:`forward_signature` in favor of :attr:`forward_origin`.
         """
         warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="forward_from",
+            deprecated_attr_name="forward_signature",
             new_attr_name="forward_origin",
             bot_api_version="7.0",
         )
@@ -2995,6 +2993,7 @@ class Message(MaybeInaccessibleMessage):
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3026,6 +3025,7 @@ class Message(MaybeInaccessibleMessage):
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
