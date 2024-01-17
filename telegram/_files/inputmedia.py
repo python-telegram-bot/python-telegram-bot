@@ -19,6 +19,7 @@
 """Base class for Telegram InputMedia Objects."""
 from typing import Optional, Sequence, Tuple, Union
 
+from telegram import constants
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
 from telegram._files.document import Document
@@ -27,6 +28,7 @@ from telegram._files.photosize import PhotoSize
 from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
@@ -94,7 +96,7 @@ class InputMedia(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.type: str = media_type
+        self.type: str = enum.get_member(constants.InputMediaType, media_type, media_type)
         self.media: Union[str, InputFile, Animation, Audio, Document, PhotoSize, Video] = media
         self.caption: Optional[str] = caption
         self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
