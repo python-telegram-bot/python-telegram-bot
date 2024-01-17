@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, Dict, Final, Optional, Type
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
 from telegram._utils.types import JSONDict
 from telegram._webappinfo import WebAppInfo
 
@@ -61,7 +62,7 @@ class MenuButton(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):  # pylint: disable=redefined-builtin
         super().__init__(api_kwargs=api_kwargs)
-        self.type: str = type
+        self.type: str = enum.get_member(constants.MenuButtonType, type, type)
 
         self._id_attrs = (self.type,)
 

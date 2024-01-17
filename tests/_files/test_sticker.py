@@ -35,7 +35,7 @@ from telegram import (
     Sticker,
     StickerSet,
 )
-from telegram.constants import StickerFormat
+from telegram.constants import StickerFormat, StickerType
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
 from tests.auxil.bot_method_checks import (
@@ -195,6 +195,34 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert json_sticker.type == self.type
         assert json_sticker.custom_emoji_id == self.custom_emoji_id
         assert json_sticker.needs_repainting == self.needs_repainting
+
+    def test_type_enum_conversion(self):
+        assert (
+            type(
+                Sticker(
+                    file_id=self.sticker_file_id,
+                    file_unique_id=self.sticker_file_unique_id,
+                    width=self.width,
+                    height=self.height,
+                    is_animated=self.is_animated,
+                    is_video=self.is_video,
+                    type="regular",
+                ).type
+            )
+            is StickerType
+        )
+        assert (
+            Sticker(
+                file_id=self.sticker_file_id,
+                file_unique_id=self.sticker_file_unique_id,
+                width=self.width,
+                height=self.height,
+                is_animated=self.is_animated,
+                is_video=self.is_video,
+                type="unknown",
+            ).type
+            == "unknown"
+        )
 
     def test_equality(self, sticker):
         a = Sticker(

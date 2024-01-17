@@ -24,6 +24,7 @@ from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
@@ -175,7 +176,7 @@ class Sticker(_BaseThumbedMedium):
             self.height: int = height
             self.is_animated: bool = is_animated
             self.is_video: bool = is_video
-            self.type: str = type
+            self.type: str = enum.get_member(constants.StickerType, type, type)
             # Optional
             self.emoji: Optional[str] = emoji
             self.set_name: Optional[str] = set_name

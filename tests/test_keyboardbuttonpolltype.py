@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import KeyboardButtonPollType, Poll
+from telegram.constants import PollType
 from tests.auxil.slots import mro_slots
 
 
@@ -42,6 +43,22 @@ class TestKeyboardButtonPollTypeWithoutRequest(TestKeyboardButtonPollTypeBase):
         keyboard_button_poll_type_dict = keyboard_button_poll_type.to_dict()
         assert isinstance(keyboard_button_poll_type_dict, dict)
         assert keyboard_button_poll_type_dict["type"] == self.type
+
+    def test_type_enum_conversion(self):
+        assert (
+            type(
+                KeyboardButtonPollType(
+                    type="quiz",
+                ).type
+            )
+            is PollType
+        )
+        assert (
+            KeyboardButtonPollType(
+                type="unknown",
+            ).type
+            == "unknown"
+        )
 
     def test_equality(self):
         a = KeyboardButtonPollType(Poll.QUIZ)
