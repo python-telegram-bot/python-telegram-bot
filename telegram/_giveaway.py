@@ -149,6 +149,11 @@ class GiveawayCreated(TelegramObject):
 
     __slots__ = ()
 
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
+        super().__init__(api_kwargs=api_kwargs)
+
+        self._freeze()
+
 
 class GiveawayWinners(TelegramObject):
     """This object represents a message about the completion of a giveaway with public winners.

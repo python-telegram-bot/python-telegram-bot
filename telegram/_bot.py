@@ -1596,7 +1596,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = None,
+        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,

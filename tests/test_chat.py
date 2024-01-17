@@ -189,7 +189,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.emoji_status_expiration_date == (self.emoji_status_expiration_date)
         assert chat.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
         assert chat.has_hidden_members == self.has_hidden_members
-        assert chat.available_reactions == self.available_reactions
+        assert chat.available_reactions == tuple(self.available_reactions)
         assert chat.accent_color_id == self.accent_color_id
         assert chat.background_custom_emoji_id == self.background_custom_emoji_id
         assert chat.profile_accent_color_id == self.profile_accent_color_id

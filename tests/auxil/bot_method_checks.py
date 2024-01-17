@@ -93,9 +93,18 @@ def check_shortcut_signature(
     expected_args = set(bot_sig.parameters.keys()).difference(shortcut_kwargs)
     expected_args.discard("self")
 
-    args_check = expected_args == effective_shortcut_args
-    if not args_check:
-        raise Exception(f"Expected arguments {expected_args}, got {effective_shortcut_args}")
+    len_expected = len(expected_args)
+    len_effective = len(effective_shortcut_args)
+    if len_expected > len_effective:
+        raise Exception(
+            f"Shortcut signature is missing {len_expected - len_effective} arguments "
+            f"of the underlying Bot method: {expected_args - effective_shortcut_args}"
+        )
+    if len_expected < len_effective:
+        raise Exception(
+            f"Shortcut signature has {len_effective - len_expected} additional arguments "
+            f"that the Bot method doesn't have: {effective_shortcut_args - expected_args}"
+        )
 
     # TODO: Also check annotation of return type. Would currently be a hassle b/c typing doesn't
     # resolve `ForwardRef('Type')` to `Type`. For now we rely on MyPy, which probably allows the
