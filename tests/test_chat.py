@@ -1390,7 +1390,7 @@ class TestChatWithoutRequest(TestChatBase):
         async def make_assertion(*_, **kwargs):
             message_id = kwargs["message_id"] == 123
             chat_id = kwargs["chat_id"] == chat.id
-            reaction = kwargs["reaction"] == [ReactionTypeEmoji(ReactionEmoji.THUMB_DOWN)]
+            reaction = kwargs["reaction"] == [ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN)]
             return chat_id and message_id and reaction and kwargs["is_big"]
 
         assert check_shortcut_signature(
@@ -1403,7 +1403,7 @@ class TestChatWithoutRequest(TestChatBase):
 
         monkeypatch.setattr(chat.get_bot(), "set_message_reaction", make_assertion)
         assert await chat.set_message_reaction(
-            123, [ReactionTypeEmoji(ReactionEmoji.THUMB_DOWN)], True
+            123, [ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN)], True
         )
 
     def test_mention_html(self):

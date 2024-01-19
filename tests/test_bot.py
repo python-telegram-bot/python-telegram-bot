@@ -176,26 +176,26 @@ def bot_methods(ext_bot=True, include_camel_case=False):
     )
 
 
-class InputMessageContentDWPP(InputMessageContent):
+class InputMessageContentLPO(InputMessageContent):
     """
     This is here to cover the case of InputMediaContent classes in testing answer_ilq that have
-    `disable_web_page_preview` but not `parse_mode`. Unlikely to ever happen, but better be save
+    `link_preview_options` but not `parse_mode`. Unlikely to ever happen, but better be save
     than sorry …
     """
 
-    __slots__ = ("disable_web_page_preview", "parse_mode", "entities", "message_text")
+    __slots__ = ("link_preview_options", "parse_mode", "entities", "message_text")
 
     def __init__(
         self,
         message_text: str,
-        disable_web_page_preview=DEFAULT_NONE,
+        link_preview_options=DEFAULT_NONE,
         *,
         api_kwargs=None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self._unfreeze()
         self.message_text = message_text
-        self.disable_web_page_preview = disable_web_page_preview
+        self.link_preview_options = link_preview_options
 
 
 class TestBotWithoutRequest:
@@ -478,7 +478,10 @@ class TestBotWithoutRequest:
         assert await check_defaults_handling(bot_method, bot, return_value=return_value)
         assert await check_defaults_handling(raw_bot_method, raw_bot, return_value=return_value)
 
-    def test_ext_bot_signature(self):
+    @pytest.mark.parametrize(
+        ("name", "method"), inspect.getmembers(Bot, predicate=inspect.isfunction)
+    )
+    def test_ext_bot_signature(self, name, method):
         """
         Here we make sure that all methods of ext.ExtBot have the same signature as the
         corresponding methods of tg.Bot.
@@ -490,29 +493,28 @@ class TestBotWithoutRequest:
         )
         different_hints_per_method = defaultdict(set, {"__setattr__": {"ext_bot"}})
 
-        for name, method in inspect.getmembers(Bot, predicate=inspect.isfunction):
-            signature = inspect.signature(method)
-            ext_signature = inspect.signature(getattr(ExtBot, name))
+        signature = inspect.signature(method)
+        ext_signature = inspect.signature(getattr(ExtBot, name))
 
+        assert (
+            ext_signature.return_annotation == signature.return_annotation
+        ), f"Wrong return annotation for method {name}"
+        assert (
+            set(signature.parameters)
+            == set(ext_signature.parameters) - global_extra_args - extra_args_per_method[name]
+        ), f"Wrong set of parameters for method {name}"
+        for param_name, param in signature.parameters.items():
+            if param_name in different_hints_per_method[name]:
+                continue
             assert (
-                ext_signature.return_annotation == signature.return_annotation
-            ), f"Wrong return annotation for method {name}"
+                param.annotation == ext_signature.parameters[param_name].annotation
+            ), f"Wrong annotation for parameter {param_name} of method {name}"
             assert (
-                set(signature.parameters)
-                == set(ext_signature.parameters) - global_extra_args - extra_args_per_method[name]
-            ), f"Wrong set of parameters for method {name}"
-            for param_name, param in signature.parameters.items():
-                if param_name in different_hints_per_method[name]:
-                    continue
-                assert (
-                    param.annotation == ext_signature.parameters[param_name].annotation
-                ), f"Wrong annotation for parameter {param_name} of method {name}"
-                assert (
-                    param.default == ext_signature.parameters[param_name].default
-                ), f"Wrong default value for parameter {param_name} of method {name}"
-                assert (
-                    param.kind == ext_signature.parameters[param_name].kind
-                ), f"Wrong parameter kind for parameter {param_name} of method {name}"
+                param.default == ext_signature.parameters[param_name].default
+            ), f"Wrong default value for parameter {param_name} of method {name}"
+            assert (
+                param.kind == ext_signature.parameters[param_name].kind
+            ), f"Wrong parameter kind for parameter {param_name} of method {name}"
 
     async def test_unknown_kwargs(self, bot, monkeypatch):
         async def post(url, request_data: RequestData, *args, **kwargs):
@@ -586,7 +588,9 @@ class TestBotWithoutRequest:
                         "input_message_content": {
                             "message_text": "text",
                             "parse_mode": "Markdown",
-                            "disable_web_page_preview": True,
+                            "link_preview_options": {
+                                "is_disabled": True,
+                            },
                         },
                         "type": InlineQueryResultType.ARTICLE,
                         "id": "1",
@@ -608,7 +612,9 @@ class TestBotWithoutRequest:
                         "input_message_content": {
                             "message_text": "text",
                             "parse_mode": "HTML",
-                            "disable_web_page_preview": False,
+                            "link_preview_options": {
+                                "is_disabled": False,
+                            },
                         },
                         "type": InlineQueryResultType.ARTICLE,
                         "id": "1",
@@ -629,7 +635,9 @@ class TestBotWithoutRequest:
                         "title": "title",
                         "input_message_content": {
                             "message_text": "text",
-                            "disable_web_page_preview": "False",
+                            "link_preview_options": {
+                                "is_disabled": "False",
+                            },
                         },
                         "type": InlineQueryResultType.ARTICLE,
                         "id": "1",
@@ -721,7 +729,7 @@ class TestBotWithoutRequest:
 
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
+            InlineQueryResultArticle("12", "second", InputMessageContentLPO("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url=(
@@ -731,7 +739,7 @@ class TestBotWithoutRequest:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
-                input_message_content=InputMessageContentDWPP("imc"),
+                input_message_content=InputMessageContentLPO("imc"),
             ),
         ]
 
@@ -818,7 +826,7 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
+            InlineQueryResultArticle("12", "second", InputMessageContentLPO("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url=(
@@ -828,7 +836,7 @@ class TestBotWithoutRequest:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
-                input_message_content=InputMessageContentDWPP("imc"),
+                input_message_content=InputMessageContentLPO("imc"),
             ),
         ]
 
@@ -868,26 +876,30 @@ class TestBotWithoutRequest:
                     {
                         "title": "first",
                         "id": "11",
-                        "type": "article",
+                        "type": InlineQueryResultType.ARTICLE,
                         "input_message_content": {
                             "message_text": "first",
                             "parse_mode": "Markdown",
-                            "disable_web_page_preview": True,
+                            "link_preview_options": {
+                                "is_disabled": True,
+                            },
                         },
                     },
                     {
                         "title": "second",
                         "id": "12",
-                        "type": "article",
+                        "type": InlineQueryResultType.ARTICLE,
                         "input_message_content": {
                             "message_text": "second",
-                            "disable_web_page_preview": True,
+                            "link_preview_options": {
+                                "is_disabled": True,
+                            },
                         },
                     },
                     {
                         "title": "test_result",
                         "id": "123",
-                        "type": "document",
+                        "type": InlineQueryResultType.DOCUMENT,
                         "document_url": (
                             "https://raw.githubusercontent.com/"
                             "python-telegram-bot/logos/master/logo/png/"
@@ -898,7 +910,9 @@ class TestBotWithoutRequest:
                         "parse_mode": "Markdown",
                         "input_message_content": {
                             "message_text": "imc",
-                            "disable_web_page_preview": True,
+                            "link_preview_options": {
+                                "is_disabled": True,
+                            },
                             "parse_mode": "Markdown",
                         },
                     },
@@ -911,7 +925,7 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
+            InlineQueryResultArticle("12", "second", InputMessageContentLPO("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url=(
@@ -1465,7 +1479,7 @@ class TestBotWithoutRequest:
                     data.get("caption") == caption,
                     data["parse_mode"] == ParseMode.HTML,
                     data["reply_parameters"]
-                    == ReplyParameters(message_id=media_message.message_id),
+                    == ReplyParameters(message_id=media_message.message_id).to_dict(),
                     (
                         data["reply_markup"] == keyboard.to_json()
                         if json_keyboard
@@ -3731,5 +3745,5 @@ class TestBotWithRequest:
 
     async def test_set_message_reaction(self, bot, chat_id, message):
         assert await bot.set_message_reaction(
-            chat_id, message.message_id, ReactionEmoji.THUMB_DOWN, True
+            chat_id, message.message_id, ReactionEmoji.THUMBS_DOWN, True
         )

@@ -34,6 +34,7 @@ from telegram import (
     InlineQueryResultCachedPhoto,
     InputMediaPhoto,
     InputTextMessageContent,
+    LinkPreviewOptions,
     TelegramObject,
 )
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
@@ -287,6 +288,8 @@ def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAUL
             else:
                 # UTC
                 kws[name] = datetime.datetime(2000, 1, 1, 0)
+        elif name == "reply_parameters":
+            kws[name] = telegram.ReplyParameters(message_id=1, allow_sending_without_reply=dfv)
     return kws
 
 
@@ -311,11 +314,18 @@ async def check_defaults_handling(
     get_updates = method.__name__.lower().replace("_", "") == "getupdates"
 
     shortcut_signature = inspect.signature(method)
-    kwargs_need_default = [
+    kwargs_need_default = {
         kwarg
         for kwarg, value in shortcut_signature.parameters.items()
         if isinstance(value.default, DefaultValue) and not kwarg.endswith("_timeout")
-    ]
+    }
+    # We tested this for a long time, but Bot API 7.0 deprecated it in favor of
+    # reply_parameters. In the transition phase, both exist in a mutually exclusive
+    # way. Testing both cases would require a lot of additional code, so we just
+    # ignore this parameter here until it is removed.
+    # Same for disable_web_page_preview
+    kwargs_need_default.discard("allow_sending_without_reply")
+    kwargs_need_default.discard("disable_web_page_preview")
 
     if method.__name__.endswith("_media_group"):
         # the parse_mode is applied to the first media item, and we test this elsewhere
@@ -325,6 +335,9 @@ async def check_defaults_handling(
     kwargs = {kwarg: "custom_default" for kwarg in inspect.signature(Defaults).parameters}
     kwargs["tzinfo"] = pytz.timezone("America/New_York")
     kwargs.pop("disable_web_page_preview")  # mutually exclusive with link_preview_options
+    kwargs["link_preview_options"] = LinkPreviewOptions(
+        **{slot: "custom_default" for slot in LinkPreviewOptions.__slots__}
+    )
     defaults_custom_defaults = Defaults(**kwargs)
 
     expected_return_values = [None, ()] if return_value is None else [return_value]
@@ -346,6 +359,20 @@ async def check_defaults_handling(
                 value = data.get(arg, "`not passed at all`")
                 if value != df_value:
                     pytest.fail(f"Got value {value} for argument {arg} instead of {df_value}")
+
+        reply_parameters = data.pop("reply_parameters", None)
+        if reply_parameters:
+            if df_value in [DEFAULT_NONE, None]:
+                if "allow_sending_without_reply" in reply_parameters:
+                    pytest.fail(
+                        "Got value for reply_parameters.allow_sending_without_reply, "
+                        "expected it to be absent"
+                    )
+            elif reply_parameters.get("allow_sending_without_reply") != df_value:
+                pytest.fail(
+                    f"Got value {reply_parameters.get('allow_sending_without_reply')} for "
+                    f"reply_parameters.allow_sending_without_reply instead of {df_value}"
+                )
 
         # Check InputMedia (parse_mode can have a default)
         def check_input_media(m: Dict):
@@ -382,15 +409,27 @@ async def check_defaults_handling(
             imc = result.get("input_message_content")
             if not imc:
                 continue
-            for attr in ["parse_mode", "disable_web_page_preview"]:
-                if df_value in [DEFAULT_NONE, None]:
-                    if attr in imc:
-                        pytest.fail(f"ILQR.i_m_c has a {attr}, expected it to be absent")
-                # Here we explicitly use that we only pass InputTextMessageContent for testing
-                # which has both attributes
-                elif imc.get(attr) != df_value:
+            if df_value in [DEFAULT_NONE, None]:
+                if "parse_mode" in imc:
+                    pytest.fail("ILQR.i_m_c has a parse_mode, expected it to be absent")
+                if (lpo := imc.get("link_preview_options", None)) and lpo != {}:
                     pytest.fail(
-                        f"Got value {imc.get(attr)} for ILQR.i_m_c.{attr} instead of {df_value}"
+                        "ILQR.i_m_c.link_preview_options has entries, expected them to be absent"
+                    )
+            # Here we explicitly use that we only pass InputTextMessageContent for testing
+            # which has both attributes
+            else:
+                if imc.get("parse_mode") != df_value:
+                    pytest.fail(
+                        f"Got value {imc.parse_mode} for ILQR.i_m_c.parse_mode "
+                        "instead of {df_value}"
+                    )
+                if (lpo := imc.get("link_preview_options", None)) and any(
+                    value != df_value for value in lpo.values()
+                ):
+                    pytest.fail(
+                        f"Got value {lpo.get('is_disabled')} for ILQR.i_m_c.link_preview_options.*"
+                        f" instead of {df_value}"
                     )
 
         # Check datetime conversion

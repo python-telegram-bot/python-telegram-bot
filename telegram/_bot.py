@@ -677,7 +677,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -696,15 +696,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         # We don't check if (DEFAULT_)None here, so that _post is able to insert the defaults
         # correctly, if necessary:
-        if (
-            allow_sending_without_reply is not DEFAULT_NONE
-            and reply_parameters is not DEFAULT_NONE
-        ):
+        if allow_sending_without_reply is not DEFAULT_NONE and reply_parameters is not None:
             raise ValueError(
                 "`allow_sending_without_reply` and `reply_parameters` are mutually exclusive."
             )
 
-        if reply_to_message_id is not None and reply_parameters is not DEFAULT_NONE:
+        if reply_to_message_id is not None and reply_parameters is not None:
             raise ValueError(
                 "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
             )
@@ -834,7 +831,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         reply_markup: Optional[ReplyMarkup] = None,
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1183,7 +1180,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1317,7 +1314,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1461,7 +1458,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1596,7 +1593,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1709,7 +1706,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1862,7 +1859,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1998,7 +1995,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2145,7 +2142,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2277,7 +2274,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2390,15 +2387,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             media = list(media)
             media[0] = item_to_get_caption
 
-        if (
-            allow_sending_without_reply is not DEFAULT_NONE
-            and reply_parameters is not DEFAULT_NONE
-        ):
+        if allow_sending_without_reply is not DEFAULT_NONE and reply_parameters is not None:
             raise ValueError(
                 "`allow_sending_without_reply` and `reply_parameters` are mutually exclusive."
             )
 
-        if reply_to_message_id is not None and reply_parameters is not DEFAULT_NONE:
+        if reply_to_message_id is not None and reply_parameters is not None:
             raise ValueError(
                 "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
             )
@@ -2446,7 +2440,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2725,7 +2719,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         venue: Optional[Venue] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2866,7 +2860,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         contact: Optional[Contact] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2985,7 +2979,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3194,7 +3188,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 with res._unfrozen():
                     res.input_message_content = copy.copy(res.input_message_content)
                 with res.input_message_content._unfrozen():
-                    res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
+                    res.input_message_content.link_preview_options = DefaultValue.get_value(
                         res.input_message_content.link_preview_options
                     )
 
@@ -4682,7 +4676,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6699,7 +6693,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6887,7 +6881,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7308,7 +7302,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        reply_parameters: ODVInput["ReplyParameters"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7375,15 +7369,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        if (
-            allow_sending_without_reply is not DEFAULT_NONE
-            and reply_parameters is not DEFAULT_NONE
-        ):
+        if allow_sending_without_reply is not DEFAULT_NONE and reply_parameters is not None:
             raise ValueError(
                 "`allow_sending_without_reply` and `reply_parameters` are mutually exclusive."
             )
 
-        if reply_to_message_id is not None and reply_parameters is not DEFAULT_NONE:
+        if reply_to_message_id is not None and reply_parameters is not None:
             raise ValueError(
                 "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
             )
@@ -7428,14 +7419,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        remove_caption: ODVInput[bool] = DEFAULT_NONE,
+        remove_caption: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Tuple[MessageId, ...]:
+    ) -> Tuple["MessageId", ...]:
         """
         Use this method to copy messages of any kind. If some of the specified messages can't be
         found or copied, they are skipped. Service messages, giveaway messages, giveaway winners
