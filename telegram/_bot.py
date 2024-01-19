@@ -3187,7 +3187,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     res.input_message_content.parse_mode = DefaultValue.get_value(
                         res.input_message_content.parse_mode
                     )
-            if hasattr(res.input_message_content, "disable_web_page_preview"):
+            if hasattr(res.input_message_content, "link_preview_options"):
                 if not copied:
                     res = copy.copy(res)
 
@@ -3195,7 +3195,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     res.input_message_content = copy.copy(res.input_message_content)
                 with res.input_message_content._unfrozen():
                     res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
-                        res.input_message_content.disable_web_page_preview
+                        res.input_message_content.link_preview_options
                     )
 
         return res

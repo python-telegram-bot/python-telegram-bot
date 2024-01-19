@@ -27,6 +27,7 @@ from types import MappingProxyType
 import pytest
 
 from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
+from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
 from telegram.ext import PicklePersistence
 from telegram.warnings import PTBUserWarning
 from tests.auxil.files import data_file
@@ -206,6 +207,18 @@ class TestTelegramObject:
         assert isinstance(to_dict_recurse["subclass"], dict)
         assert to_dict_recurse["subclass"]["recursive"] == "recursive"
 
+    def test_to_dict_default_value(self):
+        class SubClass(TelegramObject):
+            def __init__(self):
+                super().__init__()
+                self.default_none = DEFAULT_NONE
+                self.default_false = DEFAULT_FALSE
+
+        to = SubClass()
+        to_dict = to.to_dict()
+        assert "default_none" not in to_dict
+        assert to_dict["default_false"] is False
+
     def test_slot_behaviour(self):
         inst = TelegramObject()
         for attr in inst.__slots__:
@@ -280,6 +293,7 @@ class TestTelegramObject:
             from_user=user,
             text="foobar",
             photo=[photo],
+            animation=DEFAULT_NONE,
             api_kwargs={"api": "kwargs"},
         )
         msg.set_bot(bot)
@@ -295,6 +309,8 @@ class TestTelegramObject:
         assert unpickled.from_user == user
         assert unpickled.date == date, f"{unpickled.date} != {date}"
         assert unpickled.photo[0] == photo
+        assert isinstance(unpickled.animation, DefaultValue)
+        assert unpickled.animation.value is None
         assert isinstance(unpickled.api_kwargs, MappingProxyType)
         assert unpickled.api_kwargs == {"api": "kwargs"}
 

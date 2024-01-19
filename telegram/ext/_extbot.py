@@ -385,6 +385,28 @@ class ExtBot(Bot, Generic[RLARGS]):
         # This is a property because the rate limiter shouldn't be changed at runtime
         return self._rate_limiter
 
+    def _merge_lop_defaults(
+        self, lpo: ODVInput[LinkPreviewOptions]
+    ) -> Optional[LinkPreviewOptions]:
+        # This is a standalone method because both _insert_defaults and
+        # _insert_defaults_for_ilq_results need this logic
+        #
+        # If Defaults.LPO is set, and LPO is passed in the bot method we should fuse
+        # them, giving precedence to passed values.
+        # Defaults.LPO(True, "google.com", True) & LPO=LPO(True, ..., False) ->
+        # LPO(True, "google.com", False)
+        if self.defaults is None or (defaults_lpo := self.defaults.link_preview_options) is None:
+            return DefaultValue.get_value(lpo)
+        return LinkPreviewOptions(
+            **{
+                attr: getattr(defaults_lpo, attr)
+                # only use the default value
+                # if the value was explicitly passed to the LOP object
+                if isinstance(orig_attr := getattr(lpo, attr), DefaultValue) else orig_attr
+                for attr in defaults_lpo.__slots__
+            }
+        )
+
     def _insert_defaults(self, data: Dict[str, object]) -> None:
         """Inserts the defaults values for optional kwargs for which tg.ext.Defaults provides
         convenience functionality, i.e. the kwargs with a tg.utils.helpers.DefaultValue default
@@ -394,33 +416,33 @@ class ExtBot(Bot, Generic[RLARGS]):
 
         This can only work, if all kwargs that may have defaults are passed in data!
         """
+        if self.defaults is None:
+            # If we have no defaults to insert, the behavior is the same as in `tg.Bot`
+            super()._insert_defaults(data)
+            return
+
         # if we have Defaults, we
         # 1) replace all DefaultValue instances with the relevant Defaults value. If there is none,
         #    we fall back to the default value of the bot method
         # 2) convert all datetime.datetime objects to timestamps wrt the correct default timezone
         # 3) set the correct parse_mode for all InputMedia objects
         # 4) handle the LinkPreviewOptions case (see below)
+        # 5) handle the ReplyParameters case (see below)
         for key, val in data.items():
             # 1)
             if isinstance(val, DefaultValue):
-                data[key] = (
-                    self.defaults.api_defaults.get(key, val.value)
-                    if self.defaults
-                    else DefaultValue.get_value(val)
-                )
+                data[key] = self.defaults.api_defaults.get(key, val.value)
 
             # 2)
             elif isinstance(val, datetime):
-                data[key] = to_timestamp(
-                    val, tzinfo=self.defaults.tzinfo if self.defaults else None
-                )
+                data[key] = to_timestamp(val, tzinfo=self.defaults.tzinfo)
 
             # 3)
             elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:
                 # Copy object as not to edit it in-place
                 copied_val = copy(val)
                 with copied_val._unfrozen():
-                    copied_val.parse_mode = self.defaults.parse_mode if self.defaults else None
+                    copied_val.parse_mode = self.defaults.parse_mode
                 data[key] = copied_val
             elif key == "media" and isinstance(val, Sequence):
                 # Copy objects as not to edit them in-place
@@ -428,32 +450,29 @@ class ExtBot(Bot, Generic[RLARGS]):
                 for media in copy_list:
                     if media.parse_mode is DEFAULT_NONE:
                         with media._unfrozen():
-                            media.parse_mode = self.defaults.parse_mode if self.defaults else None
+                            media.parse_mode = self.defaults.parse_mode
 
                 data[key] = copy_list
 
-            # 4)
-            # We need handle the LinkPreviewOptions case:
-            # If Defaults.LPO is set, and LPO is passed in the bot method we should fuse
-            # them, giving precedence to passed values.
-            # Defaults.LPO(True, "google.com", True) & LPO=LPO(True, ..., False) ->
-            # LPO(True, "google.com", False)
-            elif (
-                isinstance(val, LinkPreviewOptions)
-                and self.defaults
-                and (passed_lpo := data.get(key, False)) is val
-                and (defaults_lpo := self.defaults.api_defaults.get(key, None)) is not None
-            ):
-                defaults_lpo_dict = defaults_lpo.to_dict()
-                passed_lpo_dict = passed_lpo.to_dict()  # type: ignore[attr-defined]
+            # 4) LinkPreviewOptions:
+            elif isinstance(val, LinkPreviewOptions):
+                data[key] = self._merge_lop_defaults(val)
 
-                passed_lpo_dict.update(
-                    (k, DefaultValue.get_value(defaults_lpo_dict[k]))
-                    for k in defaults_lpo_dict
-                    if k not in passed_lpo_dict
-                )
-                fused_lpo = LinkPreviewOptions.de_json(passed_lpo_dict, self)
-                data[key] = fused_lpo
+            # 5)
+            # Similar to LinkPreviewOptions, but only one of the arguments of RPs has a default
+            elif (
+                isinstance(val, ReplyParameters)
+                and (defaults_aswr := self.defaults.allow_sending_without_reply) is not None
+            ):
+                new_value = copy(val)
+                with new_value._unfrozen():
+                    new_value.allow_sending_without_reply = (
+                        defaults_aswr
+                        if isinstance(val.allow_sending_without_reply, DefaultValue)
+                        else val.allow_sending_without_reply
+                    )
+
+                data[key] = new_value
 
     def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
@@ -644,13 +663,17 @@ class ExtBot(Bot, Generic[RLARGS]):
         `obj`.
         Overriding this to call insert the actual desired default values.
         """
+        if self.defaults is None:
+            # If we have no defaults to insert, the behavior is the same as in `tg.Bot`
+            return super()._insert_defaults_for_ilq_results(res)
+
         # Copy the objects that need modification to avoid modifying the original object
         copied = False
         if hasattr(res, "parse_mode") and res.parse_mode is DEFAULT_NONE:
             res = copy(res)
             with res._unfrozen():
                 copied = True
-                res.parse_mode = self.defaults.parse_mode if self.defaults else None
+                res.parse_mode = self.defaults.parse_mode
         if hasattr(res, "input_message_content") and res.input_message_content:
             if (
                 hasattr(res.input_message_content, "parse_mode")
@@ -660,19 +683,20 @@ class ExtBot(Bot, Generic[RLARGS]):
                     res = copy(res)
                     copied = True
                 with res.input_message_content._unfrozen():
-                    res.input_message_content.parse_mode = (
-                        self.defaults.parse_mode if self.defaults else None
-                    )
-            if (
-                hasattr(res.input_message_content, "disable_web_page_preview")
-                and res.input_message_content.disable_web_page_preview is DEFAULT_NONE
-            ):
+                    res.input_message_content.parse_mode = self.defaults.parse_mode
+            if hasattr(res.input_message_content, "link_preview_options"):
                 if not copied:
                     res = copy(res)
                 with res.input_message_content._unfrozen():
-                    res.input_message_content.disable_web_page_preview = (
-                        self.defaults.disable_web_page_preview if self.defaults else None
-                    )
+                    if res.input_message_content.link_preview_options is DEFAULT_NONE:
+                        res.input_message_content.link_preview_options = (
+                            self.defaults.disable_web_page_preview
+                        )
+                    else:
+                        # merge the existing options with the defaults
+                        res.input_message_content.link_preview_options = self._merge_lop_defaults(
+                            res.input_message_content.link_preview_options
+                        )
 
         return res
 

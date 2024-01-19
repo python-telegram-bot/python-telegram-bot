@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import JSONDict, ODVInput
 from telegram._utils.warnings_transition import (
     warn_about_deprecated_attr_in_property,
@@ -129,8 +129,9 @@ class InputTextMessageContent(InputMessageContent):
             bot_api_version="7.0",
             stacklevel=2,
         )
-        return (
-            self.link_preview_options.is_disabled  # type: ignore[union-attr]
-            if self.link_preview_options
-            else None
-        )
+        if (
+            isinstance(self.link_preview_options, DefaultValue)
+            or self.link_preview_options is None
+        ):
+            return None
+        return bool(self.link_preview_options.is_disabled)

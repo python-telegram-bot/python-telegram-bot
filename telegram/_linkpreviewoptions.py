@@ -22,7 +22,8 @@
 from typing import Optional
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import JSONDict, ODVInput
 
 
 class LinkPreviewOptions(TelegramObject):
@@ -74,11 +75,11 @@ class LinkPreviewOptions(TelegramObject):
 
     def __init__(
         self,
-        is_disabled: Optional[bool] = None,
-        url: Optional[str] = None,
-        prefer_small_media: Optional[bool] = None,
-        prefer_large_media: Optional[bool] = None,
-        show_above_text: Optional[bool] = None,
+        is_disabled: ODVInput[bool] = DEFAULT_NONE,
+        url: ODVInput[str] = DEFAULT_NONE,
+        prefer_small_media: ODVInput[bool] = DEFAULT_NONE,
+        prefer_large_media: ODVInput[bool] = DEFAULT_NONE,
+        show_above_text: ODVInput[bool] = DEFAULT_NONE,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -86,11 +87,11 @@ class LinkPreviewOptions(TelegramObject):
 
         # Optionals
 
-        self.is_disabled: Optional[bool] = is_disabled
-        self.url: Optional[str] = url
-        self.prefer_small_media: Optional[bool] = prefer_small_media
-        self.prefer_large_media: Optional[bool] = prefer_large_media
-        self.show_above_text: Optional[bool] = show_above_text
+        self.is_disabled: ODVInput[bool] = is_disabled
+        self.url: ODVInput[str] = url
+        self.prefer_small_media: ODVInput[bool] = prefer_small_media
+        self.prefer_large_media: ODVInput[bool] = prefer_large_media
+        self.show_above_text: ODVInput[bool] = show_above_text
 
         self._id_attrs = (
             self.is_disabled,
