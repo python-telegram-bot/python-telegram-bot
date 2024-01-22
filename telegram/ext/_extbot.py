@@ -556,7 +556,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

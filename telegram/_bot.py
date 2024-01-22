@@ -676,7 +676,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
-        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -715,8 +715,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         data["disable_notification"] = disable_notification
         data["protect_content"] = protect_content
         data["parse_mode"] = parse_mode
-        data["link_preview_options"] = link_preview_options
         data["reply_parameters"] = reply_parameters
+
+        if link_preview_options is not None:
+            data["link_preview_options"] = link_preview_options
 
         if reply_markup is not None:
             data["reply_markup"] = reply_markup
