@@ -81,7 +81,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
         :attr:`DELETED`.
         """
         keys = self.pop_accessed_keys()
-        return [(key, self.get(key, self.DELETED)) for key in keys]  # type: ignore[arg-type]
+        return [(key, self.get(key, self.DELETED)) for key in keys]
 
     def mark_as_accessed(self, key: _KT) -> None:
         """Use this method have the key returned again in the next call to
