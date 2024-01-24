@@ -460,9 +460,9 @@ class ExtBot(Bot, Generic[RLARGS]):
 
             # 5)
             # Similar to LinkPreviewOptions, but only two of the arguments of RPs have a default
-            elif (
-                isinstance(val, ReplyParameters)
-                and (defaults_aswr := self.defaults.allow_sending_without_reply) is not None
+            elif isinstance(val, ReplyParameters) and (
+                (defaults_aswr := self.defaults.allow_sending_without_reply) is not None
+                or self.defaults.quote_parse_mode is not None
             ):
                 new_value = copy(val)
                 with new_value._unfrozen():
