@@ -495,7 +495,7 @@ def check_param_type(
                 # mapped_type should not be a tuple since we need to check for equality:
                 # This can happen when the Defaults parameter is a class, e.g. LinkPreviewOptions
                 if isinstance(mapped_type, tuple):
-                    mapped_type = mapped_type[1]
+                    mapped_type = mapped_type[1]  # We select the ForwardRef
                 # Assert if it's ODVInput by checking equality:
                 parsed = ODVInput[mapped_type]
                 if (ptb_annotation | None) == parsed:  # We have to add back None in our annotation
