@@ -459,7 +459,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 data[key] = self._merge_lop_defaults(val)
 
             # 5)
-            # Similar to LinkPreviewOptions, but only one of the arguments of RPs has a default
+            # Similar to LinkPreviewOptions, but only two of the arguments of RPs have a default
             elif (
                 isinstance(val, ReplyParameters)
                 and (defaults_aswr := self.defaults.allow_sending_without_reply) is not None
@@ -470,6 +470,11 @@ class ExtBot(Bot, Generic[RLARGS]):
                         defaults_aswr
                         if isinstance(val.allow_sending_without_reply, DefaultValue)
                         else val.allow_sending_without_reply
+                    )
+                    new_value.quote_parse_mode = (
+                        self.defaults.quote_parse_mode
+                        if isinstance(val.quote_parse_mode, DefaultValue)
+                        else val.quote_parse_mode
                     )
 
                 data[key] = new_value

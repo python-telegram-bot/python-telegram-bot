@@ -300,7 +300,9 @@ def build_kwargs(
                 kws[name] = datetime.datetime(2000, 1, 1, 0)
         elif name == "reply_parameters":
             kws[name] = telegram.ReplyParameters(
-                message_id=1, allow_sending_without_reply=manually_passed_value
+                message_id=1,
+                allow_sending_without_reply=manually_passed_value,
+                quote_parse_mode=manually_passed_value,
             )
 
     return kws
@@ -363,22 +365,20 @@ async def make_assertion(
     # value for `allow_sending_without_reply`
     reply_parameters = data.pop("reply_parameters", None)
     if reply_parameters:
-        if no_value_expected and "allow_sending_without_reply" in reply_parameters:
-            pytest.fail(
-                "Got value for reply_parameters.allow_sending_without_reply, "
-                "expected it to be absent"
-            )
-        aswr = reply_parameters.get("allow_sending_without_reply")
-        if manual_value_expected and aswr != manually_passed_value:
-            pytest.fail(
-                f"Got value {aswr} for reply_parameters.allow_sending_without_reply "
-                f"instead of {manually_passed_value}"
-            )
-        elif default_value_expected and aswr != expected_defaults_value:
-            pytest.fail(
-                f"Got value {aswr} for reply_parameters.allow_sending_without_reply "
-                f"instead of {expected_defaults_value}"
-            )
+        for param in ["allow_sending_without_reply", "quote_parse_mode"]:
+            if no_value_expected and param in reply_parameters:
+                pytest.fail(f"Got value for reply_parameters.{param}, expected it to be absent")
+            param_value = reply_parameters.get(param)
+            if manual_value_expected and param_value != manually_passed_value:
+                pytest.fail(
+                    f"Got value {param_value} for reply_parameters.{param} "
+                    f"instead of {manually_passed_value}"
+                )
+            elif default_value_expected and param_value != expected_defaults_value:
+                pytest.fail(
+                    f"Got value {param_value} for reply_parameters.{param} "
+                    f"instead of {expected_defaults_value}"
+                )
 
     # Check link_preview_options - needs special handling b/c we merge this with the default
     # values specified in `Defaults.link_preview_options`
