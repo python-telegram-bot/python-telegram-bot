@@ -159,8 +159,8 @@ class TestCallbackDataCache:
         out2 = cdc.process_keyboard(reply_markup)
         assert len(cdc.persistence_data[0]) == 1
 
-        keyboard_1, button_1 = cdc.extract_uuids(out1.inline_keyboard[0][1].callback_data)
-        keyboard_2, button_2 = cdc.extract_uuids(out2.inline_keyboard[0][2].callback_data)
+        keyboard_1, _ = cdc.extract_uuids(out1.inline_keyboard[0][1].callback_data)
+        keyboard_2, _ = cdc.extract_uuids(out2.inline_keyboard[0][2].callback_data)
         assert cdc.persistence_data[0][0][0] != keyboard_1
         assert cdc.persistence_data[0][0][0] == keyboard_2
 

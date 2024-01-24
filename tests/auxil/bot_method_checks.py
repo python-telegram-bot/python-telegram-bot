@@ -339,7 +339,7 @@ async def check_defaults_handling(
 
         # Check InputMedia (parse_mode can have a default)
         def check_input_media(m: Dict):
-            parse_mode = m.get("parse_mode", None)
+            parse_mode = m.get("parse_mode")
             if df_value is DEFAULT_NONE:
                 if parse_mode is not None:
                     pytest.fail("InputMedia has non-None parse_mode")

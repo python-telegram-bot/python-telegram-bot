@@ -460,7 +460,7 @@ class TestTelegramObject:
                 "and can therefore not be frozen correctly"
             )
 
-        source_lines, first_line = inspect.getsourcelines(cls.__init__)
+        source_lines, _ = inspect.getsourcelines(cls.__init__)
 
         # We use regex matching since a simple "if self._freeze() in source_lines[-1]" would also
         # allo commented lines.

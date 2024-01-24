@@ -160,7 +160,7 @@ async def default_bot(request, bot_info):
     defaults = Defaults(**param)
 
     # If the bot is already created, return it. Else make a new one.
-    default_bot = _default_bots.get(defaults, None)
+    default_bot = _default_bots.get(defaults)
     if default_bot is None:
         default_bot = make_bot(bot_info, defaults=defaults)
         await default_bot.initialize()

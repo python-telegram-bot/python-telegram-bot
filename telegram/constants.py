@@ -29,11 +29,12 @@ those classes.
     * Most of the constants in this module are grouped into enums.
 """
 # TODO: Remove this when https://github.com/PyCQA/pylint/issues/6887 is resolved.
-# pylint: disable=invalid-enum-extension
+# pylint: disable=invalid-enum-extension,invalid-slots
 
 __all__ = [
     "BOT_API_VERSION",
     "BOT_API_VERSION_INFO",
+    "SUPPORTED_WEBHOOK_PORTS",
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
@@ -75,7 +76,6 @@ __all__ = [
     "PollType",
     "PollingLimit",
     "ReplyLimit",
-    "SUPPORTED_WEBHOOK_PORTS",
     "StickerFormat",
     "StickerLimit",
     "StickerSetLimit",
