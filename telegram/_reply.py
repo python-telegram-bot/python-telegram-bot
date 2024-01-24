@@ -345,10 +345,10 @@ class ReplyParameters(TelegramObject):
     """
     Describes reply parameters for the message that is being sent.
 
-    .. versionadded:: NEXT.VERSION
-
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_id` is equal.
+
+    .. versionadded:: NEXT.VERSION
 
     Args:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
@@ -409,7 +409,7 @@ class ReplyParameters(TelegramObject):
         chat_id: Optional[Union[int, str]] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: Optional[str] = None,
-        quote_parse_mode: Optional[str] = None,
+        quote_parse_mode: ODVInput[str] = DEFAULT_NONE,
         quote_entities: Optional[Sequence[MessageEntity]] = None,
         quote_position: Optional[int] = None,
         *,
@@ -421,7 +421,7 @@ class ReplyParameters(TelegramObject):
         self.chat_id: Optional[Union[int, str]] = chat_id
         self.allow_sending_without_reply: ODVInput[bool] = allow_sending_without_reply
         self.quote: Optional[str] = quote
-        self.quote_parse_mode: Optional[str] = quote_parse_mode
+        self.quote_parse_mode: ODVInput[str] = quote_parse_mode
         self.quote_entities: Optional[Tuple[MessageEntity, ...]] = parse_sequence_arg(
             quote_entities
         )
