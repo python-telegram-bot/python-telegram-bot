@@ -77,7 +77,7 @@ repos:
         - --diff
         - --check
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.1.9'
+    rev: 'v0.1.14'
     hooks:
     -   id: ruff
         name: ruff
@@ -88,9 +88,3 @@ repos:
           - APScheduler~=3.10.4
           - cachetools~=5.3.2
           - aiolimiter~=1.1.0
--   repo: https://github.com/aio-libs/sort-all/
-    rev: v1.2.0
-    hooks:
-    -   id: sort-all
-        name: sort-all
-        files: ^(telegram|examples|tests)/.*\.py$

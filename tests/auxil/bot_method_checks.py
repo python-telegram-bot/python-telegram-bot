@@ -409,7 +409,7 @@ async def make_assertion(
 
     # Check InputMedia (parse_mode can have a default)
     def check_input_media(m: Dict):
-        parse_mode = m.get("parse_mode", None)
+        parse_mode = m.get("parse_mode")
         if no_value_expected and parse_mode is not None:
             pytest.fail("InputMedia has non-None parse_mode, expected it to be absent")
         elif default_value_expected and parse_mode != expected_defaults_value:

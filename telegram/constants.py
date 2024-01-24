@@ -29,12 +29,14 @@ those classes.
     * Most of the constants in this module are grouped into enums.
 """
 # TODO: Remove this when https://github.com/PyCQA/pylint/issues/6887 is resolved.
-# pylint: disable=invalid-enum-extension
+# pylint: disable=invalid-enum-extension,invalid-slots
 
 __all__ = [
-    "AccentColor",
     "BOT_API_VERSION",
     "BOT_API_VERSION_INFO",
+    "SUPPORTED_WEBHOOK_PORTS",
+    "ZERO_DATE",
+    "AccentColor",
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
@@ -84,7 +86,6 @@ __all__ = [
     "ReactionEmoji",
     "ReactionType",
     "ReplyLimit",
-    "SUPPORTED_WEBHOOK_PORTS",
     "StickerFormat",
     "StickerLimit",
     "StickerSetLimit",
@@ -92,7 +93,6 @@ __all__ = [
     "UpdateType",
     "UserProfilePhotosLimit",
     "WebhookLimit",
-    "ZERO_DATE",
 ]
 
 import datetime
