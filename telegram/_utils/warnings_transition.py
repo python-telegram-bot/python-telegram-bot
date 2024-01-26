@@ -96,6 +96,9 @@ def warn_about_deprecated_arg_return_new_arg(
 def warn_for_link_preview_options(
     disable_web_page_preview: ODVInput[bool], link_preview_options: ODVInput[LinkPreviewOptions]
 ) -> ODVInput[LinkPreviewOptions]:
+    """Wrapper around warn_about_deprecated_arg_return_new_arg. Takes care of converting
+    disable_web_page_preview to LinkPreviewOptions.
+    """
     warn_about_deprecated_arg_return_new_arg(
         deprecated_arg=disable_web_page_preview,
         new_arg=link_preview_options,

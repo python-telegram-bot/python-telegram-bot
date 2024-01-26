@@ -516,7 +516,6 @@ class Update(TelegramObject):
             :attr:`telegram.CallbackQuery.message` is the only attribute considered by this
             property that can be an object of these types.
         """
-
         if self._effective_message:
             return self._effective_message
 
