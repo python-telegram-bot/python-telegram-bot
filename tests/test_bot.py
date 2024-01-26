@@ -3345,7 +3345,7 @@ class TestBotWithRequest:
         website = "https://python-telegram-bot.org/"
 
         # First test just the default passing:
-        coro = default_bot.send_message(chat_id, github_url)
+        coro1 = default_bot.send_message(chat_id, github_url)
         # Next test fusion of both LPOs:
         coro2 = default_bot.send_message(
             chat_id,
@@ -3358,11 +3358,13 @@ class TestBotWithRequest:
             github_url,
             link_preview_options=LinkPreviewOptions(show_above_text=False, url=website),
         )
+        # finally test explicitly setting to None
+        coro4 = default_bot.send_message(chat_id, github_url, link_preview_options=None)
 
-        msgs = asyncio.gather(coro, coro2, coro3)
-        msg, msg2, msg3 = await msgs
-        assert msg.link_preview_options
-        assert msg.link_preview_options.show_above_text
+        msgs = asyncio.gather(coro1, coro2, coro3, coro4)
+        msg1, msg2, msg3, msg4 = await msgs
+        assert msg1.link_preview_options
+        assert msg1.link_preview_options.show_above_text
 
         assert msg2.link_preview_options
         assert msg2.link_preview_options.show_above_text
@@ -3372,6 +3374,53 @@ class TestBotWithRequest:
         assert msg3.link_preview_options
         assert not msg3.link_preview_options.show_above_text
         assert msg3.link_preview_options.url == website
+
+        assert msg4.link_preview_options == LinkPreviewOptions(url=github_url)
+
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"link_preview_options": LinkPreviewOptions(show_above_text=True)}],
+        indirect=True,
+    )
+    async def test_edit_message_text_default_link_preview_options(self, default_bot, chat_id):
+        """Test whether Defaults.link_preview_options is correctly fused with the passed LPO."""
+        github_url = "https://github.com/python-telegram-bot/python-telegram-bot"
+        website = "https://python-telegram-bot.org/"
+        telegram_url = "https://telegram.org"
+        base_1, base_2, base_3, base_4 = await asyncio.gather(
+            *(default_bot.send_message(chat_id, telegram_url) for _ in range(4))
+        )
+
+        # First test just the default passing:
+        coro1 = base_1.edit_text(github_url)
+        # Next test fusion of both LPOs:
+        coro2 = base_2.edit_text(
+            github_url,
+            link_preview_options=LinkPreviewOptions(url=website, prefer_large_media=True),
+        )
+        # Now test fusion + overriding of passed LPO:
+        coro3 = base_3.edit_text(
+            github_url,
+            link_preview_options=LinkPreviewOptions(show_above_text=False, url=website),
+        )
+        # finally test explicitly setting to None
+        coro4 = base_4.edit_text(github_url, link_preview_options=None)
+
+        msgs = asyncio.gather(coro1, coro2, coro3, coro4)
+        msg1, msg2, msg3, msg4 = await msgs
+        assert msg1.link_preview_options
+        assert msg1.link_preview_options.show_above_text
+
+        assert msg2.link_preview_options
+        assert msg2.link_preview_options.show_above_text
+        assert msg2.link_preview_options.url == website
+        assert msg2.link_preview_options.prefer_large_media  # Now works correctly using new url..
+
+        assert msg3.link_preview_options
+        assert not msg3.link_preview_options.show_above_text
+        assert msg3.link_preview_options.url == website
+
+        assert msg4.link_preview_options == LinkPreviewOptions(url=github_url)
 
     async def test_send_message_entities(self, bot, chat_id):
         test_string = "Italic Bold Code Spoiler"
