@@ -41,6 +41,7 @@ from telegram import (
     PollAnswer,
     PollOption,
     PreCheckoutQuery,
+    ReactionCount,
     ReactionTypeEmoji,
     ShippingQuery,
     Update,
@@ -99,7 +100,7 @@ message_reaction_count = MessageReactionCountUpdated(
     chat=Chat(1, "chat"),
     message_id=1,
     date=from_timestamp(int(time.time())),
-    reactions=(ReactionTypeEmoji("👍"),),
+    reactions=(ReactionCount(ReactionTypeEmoji("👍"), 1),),
 )
 
 
@@ -276,6 +277,8 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.chat_join_request is not None
             or update.chat_boost is not None
             or update.removed_chat_boost is not None
+            or update.message_reaction is not None
+            or update.message_reaction_count is not None
         ):
             assert eff_message.message_id == message.message_id
         else:
