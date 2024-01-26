@@ -35,10 +35,13 @@ from telegram import (
     InaccessibleMessage,
     InlineQuery,
     Message,
+    MessageReactionCountUpdated,
+    MessageReactionUpdated,
     Poll,
     PollAnswer,
     PollOption,
     PreCheckoutQuery,
+    ReactionTypeEmoji,
     ShippingQuery,
     Update,
     User,
@@ -82,6 +85,23 @@ removed_chat_boost = ChatBoostRemoved(
     ChatBoostSourcePremium(User(1, "name", False)),
 )
 
+message_reaction = MessageReactionUpdated(
+    chat=Chat(1, "chat"),
+    message_id=1,
+    date=from_timestamp(int(time.time())),
+    old_reaction=(ReactionTypeEmoji("👍"),),
+    new_reaction=(ReactionTypeEmoji("👍"),),
+    user=User(1, "name", False),
+)
+
+
+message_reaction_count = MessageReactionCountUpdated(
+    chat=Chat(1, "chat"),
+    message_id=1,
+    date=from_timestamp(int(time.time())),
+    reactions=(ReactionTypeEmoji("👍"),),
+)
+
 
 params = [
     {"message": message},
@@ -111,6 +131,8 @@ params = [
     {"chat_join_request": chat_join_request},
     {"chat_boost": chat_boost},
     {"removed_chat_boost": removed_chat_boost},
+    {"message_reaction": message_reaction},
+    {"message_reaction_count": message_reaction_count},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -132,6 +154,8 @@ all_types = (
     "chat_join_request",
     "chat_boost",
     "removed_chat_boost",
+    "message_reaction",
+    "message_reaction_count",
 )
 
 ids = (*all_types, "callback_query_without_message")
@@ -230,6 +254,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.poll is not None
             or update.chat_boost is not None
             or update.removed_chat_boost is not None
+            or update.message_reaction_count is not None
         ):
             assert user.id == 1
         else:
