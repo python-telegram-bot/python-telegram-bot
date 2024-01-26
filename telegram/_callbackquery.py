@@ -37,6 +37,7 @@ if TYPE_CHECKING:
         LinkPreviewOptions,
         MessageEntity,
         MessageId,
+        ReplyParameters,
     )
 
 
@@ -826,6 +827,7 @@ class CallbackQuery(TelegramObject):
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -871,6 +873,7 @@ class CallbackQuery(TelegramObject):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
         )
 
     MAX_ANSWER_TEXT_LENGTH: Final[

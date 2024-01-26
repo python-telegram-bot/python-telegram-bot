@@ -548,7 +548,7 @@ async def check_defaults_handling(
     defaults_custom_defaults = Defaults(**kwargs)
 
     expected_return_values = [None, ()] if return_value is None else [return_value]
-    if method.__name__ == "get_file":
+    if method.__name__ in ["get_file", "get_small_file", "get_big_file"]:
         expected_return_values = [File(file_id="result", file_unique_id="result")]
 
     request = bot._request[0] if get_updates else bot.request
