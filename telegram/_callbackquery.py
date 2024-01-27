@@ -197,6 +197,14 @@ class CallbackQuery(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    def _get_message(self, action: str = "edit") -> Message:
+        """Helper method to get the message for the shortcut methods. Must be called only
+        if :attr:`inline_message_id` is *not* set.
+        """
+        if not isinstance(self.message, Message):
+            raise TypeError(f"Cannot {action} an inaccessible message")
+        return self.message
+
     async def edit_message_text(
         self,
         text: str,
@@ -253,9 +261,7 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.edit_text(
+        return await self._get_message().edit_text(
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
@@ -321,9 +327,7 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.edit_caption(
+        return await self._get_message().edit_caption(
             caption=caption,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -382,9 +386,7 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.edit_reply_markup(
+        return await self._get_message().edit_reply_markup(
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -441,9 +443,7 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.edit_media(
+        return await self._get_message().edit_media(
             media=media,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -512,9 +512,7 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.edit_live_location(
+        return await self._get_message().edit_live_location(
             latitude=latitude,
             longitude=longitude,
             location=location,
@@ -576,9 +574,7 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.stop_live_location(
+        return await self._get_message().stop_live_location(
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -639,9 +635,7 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.set_game_score(
+        return await self._get_message().set_game_score(
             user_id=user_id,
             score=score,
             force=force,
@@ -699,9 +693,7 @@ class CallbackQuery(TelegramObject):
                 chat_id=None,
                 message_id=None,
             )
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.get_game_high_scores(
+        return await self._get_message().get_game_high_scores(
             user_id=user_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -735,9 +727,7 @@ class CallbackQuery(TelegramObject):
             :exc:`TypeError` if :attr:`message` is not accessible.
 
         """
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.delete(
+        return await self._get_message(action="delete").delete(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -770,9 +760,7 @@ class CallbackQuery(TelegramObject):
         Raises:
             :exc:`TypeError` if :attr:`message` is not accessible.
         """
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.pin(
+        return await self._get_message(action="pin").pin(
             disable_notification=disable_notification,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -805,9 +793,7 @@ class CallbackQuery(TelegramObject):
         Raises:
             :exc:`TypeError` if :attr:`message` is not accessible.
         """
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.unpin(
+        return await self._get_message(action="unpin").unpin(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -855,9 +841,7 @@ class CallbackQuery(TelegramObject):
         Raises:
             :exc:`TypeError` if :attr:`message` is not accessible.
         """
-        if not isinstance(self.message, Message):
-            raise TypeError("Cannot edit an inaccessible message")
-        return await self.message.copy(
+        return await self._get_message(action="copy").copy(
             chat_id=chat_id,
             caption=caption,
             parse_mode=parse_mode,
