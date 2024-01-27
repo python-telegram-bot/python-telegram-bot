@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Dict, Final, Optional, Type, Union
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -77,7 +78,7 @@ class BotCommandScope(TelegramObject):
 
     def __init__(self, type: str, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)
-        self.type: str = type
+        self.type: str = enum.get_member(constants.BotCommandScopeType, type, type)
         self._id_attrs = (self.type,)
 
         self._freeze()

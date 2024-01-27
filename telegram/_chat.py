@@ -28,6 +28,7 @@ from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
 from telegram._forumtopic import ForumTopic
 from telegram._menubutton import MenuButton
+from telegram._reaction import ReactionType
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -53,12 +54,15 @@ if TYPE_CHECKING:
         InputMediaPhoto,
         InputMediaVideo,
         LabeledPrice,
+        LinkPreviewOptions,
         Location,
         Message,
         MessageEntity,
         MessageId,
         PhotoSize,
+        ReplyParameters,
         Sticker,
+        UserChatBoosts,
         Venue,
         Video,
         VideoNote,
@@ -165,6 +169,12 @@ class Chat(TelegramObject):
             only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        available_reactions (Sequence[:class:`telegram.ReactionType`], optional): List of available
+            reactions allowed in the chat. If omitted, then all of
+            :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         accent_color_id (:obj:`int`, optional): Identifier of the
             :class:`accent color <telegram.constants.AccentColor>` for the chat name and
             backgrounds of the chat photo, reply header, and link preview. See `accent colors`_
@@ -292,6 +302,12 @@ class Chat(TelegramObject):
             obtained via :meth:`~telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        available_reactions (Tuple[:class:`telegram.ReactionType`]): Optional. List of available
+            reactions allowed in the chat. If omitted, then all of
+            :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         accent_color_id (:obj:`int`): Optional. Identifier of the
             :class:`accent color <telegram.constants.AccentColor>` for the chat name and
             backgrounds of the chat photo, reply header, and link preview. See `accent colors`_
@@ -344,6 +360,7 @@ class Chat(TelegramObject):
     __slots__ = (
         "accent_color_id",
         "active_usernames",
+        "available_reactions",
         "background_custom_emoji_id",
         "bio",
         "can_set_sticker_set",
@@ -423,6 +440,7 @@ class Chat(TelegramObject):
         emoji_status_expiration_date: Optional[datetime] = None,
         has_aggressive_anti_spam_enabled: Optional[bool] = None,
         has_hidden_members: Optional[bool] = None,
+        available_reactions: Optional[Sequence[ReactionType]] = None,
         accent_color_id: Optional[int] = None,
         background_custom_emoji_id: Optional[str] = None,
         profile_accent_color_id: Optional[int] = None,
@@ -468,6 +486,9 @@ class Chat(TelegramObject):
         self.emoji_status_expiration_date: Optional[datetime] = emoji_status_expiration_date
         self.has_aggressive_anti_spam_enabled: Optional[bool] = has_aggressive_anti_spam_enabled
         self.has_hidden_members: Optional[bool] = has_hidden_members
+        self.available_reactions: Optional[Tuple[ReactionType, ...]] = parse_sequence_arg(
+            available_reactions
+        )
         self.accent_color_id: Optional[int] = accent_color_id
         self.background_custom_emoji_id: Optional[str] = background_custom_emoji_id
         self.profile_accent_color_id: Optional[int] = profile_accent_color_id
@@ -539,6 +560,7 @@ class Chat(TelegramObject):
         data["pinned_message"] = Message.de_json(data.get("pinned_message"), bot)
         data["permissions"] = ChatPermissions.de_json(data.get("permissions"), bot)
         data["location"] = ChatLocation.de_json(data.get("location"), bot)
+        data["available_reactions"] = ReactionType.de_list(data.get("available_reactions"), bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -1397,6 +1419,8 @@ class Chat(TelegramObject):
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1421,6 +1445,8 @@ class Chat(TelegramObject):
             disable_web_page_preview=disable_web_page_preview,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            link_preview_options=link_preview_options,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1507,6 +1533,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1544,6 +1571,7 @@ class Chat(TelegramObject):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            reply_parameters=reply_parameters,
         )
 
     async def send_chat_action(
@@ -1594,6 +1622,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1618,6 +1647,7 @@ class Chat(TelegramObject):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1645,6 +1675,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         contact: Optional["Contact"] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1670,6 +1701,7 @@ class Chat(TelegramObject):
             last_name=last_name,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1699,6 +1731,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1726,6 +1759,7 @@ class Chat(TelegramObject):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1755,6 +1789,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1780,6 +1815,7 @@ class Chat(TelegramObject):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1804,6 +1840,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1825,6 +1862,7 @@ class Chat(TelegramObject):
             chat_id=self.id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1846,6 +1884,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1868,6 +1907,7 @@ class Chat(TelegramObject):
             game_short_name=game_short_name,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1908,6 +1948,7 @@ class Chat(TelegramObject):
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1969,6 +2010,7 @@ class Chat(TelegramObject):
             suggested_tip_amounts=suggested_tip_amounts,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            reply_parameters=reply_parameters,
         )
 
     async def send_location(
@@ -1985,6 +2027,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         location: Optional["Location"] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2009,6 +2052,7 @@ class Chat(TelegramObject):
             longitude=longitude,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2042,6 +2086,7 @@ class Chat(TelegramObject):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2070,6 +2115,7 @@ class Chat(TelegramObject):
             parse_mode=parse_mode,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2095,6 +2141,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2117,6 +2164,7 @@ class Chat(TelegramObject):
             sticker=sticker,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2145,6 +2193,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         venue: Optional["Venue"] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2172,6 +2221,7 @@ class Chat(TelegramObject):
             foursquare_id=foursquare_id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2205,6 +2255,7 @@ class Chat(TelegramObject):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2230,6 +2281,7 @@ class Chat(TelegramObject):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2261,6 +2313,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2286,6 +2339,7 @@ class Chat(TelegramObject):
             length=length,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2312,6 +2366,7 @@ class Chat(TelegramObject):
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2337,6 +2392,7 @@ class Chat(TelegramObject):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2371,6 +2427,7 @@ class Chat(TelegramObject):
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2399,6 +2456,7 @@ class Chat(TelegramObject):
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2428,6 +2486,7 @@ class Chat(TelegramObject):
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2456,6 +2515,7 @@ class Chat(TelegramObject):
             caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -2480,6 +2540,7 @@ class Chat(TelegramObject):
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2508,6 +2569,7 @@ class Chat(TelegramObject):
             caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -2526,7 +2588,7 @@ class Chat(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        remove_caption: ODVInput[bool] = DEFAULT_NONE,
+        remove_caption: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2543,8 +2605,8 @@ class Chat(TelegramObject):
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`copy_messages`.
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, returns a tuple of `MessageId` of the
-            sent messages.
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of the sent messages is returned.
 
         """
         return await self.get_bot().copy_messages(
@@ -2569,7 +2631,7 @@ class Chat(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
-        remove_caption: ODVInput[bool] = DEFAULT_NONE,
+        remove_caption: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2586,8 +2648,8 @@ class Chat(TelegramObject):
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`send_copies`.
 
         Returns:
-            Tuple[:class:`telegram.MessageId`]: On success, returns a tuple of `MessageId` of the
-            sent messages.
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of the sent messages is returned.
 
         """
         return await self.get_bot().copy_messages(
@@ -2625,7 +2687,7 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
-        .. seealso:: :meth:`forward_to`, :meth:`forwards_from`, :meth:`forwards_to`
+        .. seealso:: :meth:`forward_to`, :meth:`forward_messages_from`, :meth:`forward_messages_to`
 
         .. versionadded:: 20.0
 
@@ -2667,7 +2729,8 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
-        .. seealso:: :meth:`forward_from`, :meth:`forwards_from`, :meth:`forwards_to`
+        .. seealso:: :meth:`forward_from`, :meth:`forward_messages_from`,
+            :meth:`forward_messages_to`
 
         .. versionadded:: 20.0
 
@@ -2689,7 +2752,7 @@ class Chat(TelegramObject):
             message_thread_id=message_thread_id,
         )
 
-    async def forwards_from(
+    async def forward_messages_from(
         self,
         from_chat_id: Union[str, int],
         message_ids: Sequence[int],
@@ -2709,13 +2772,13 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_messages`.
 
-        .. seealso:: :meth:`forward_to`, :meth:`forward_from`, :meth:`forwards_to`.
+        .. seealso:: :meth:`forward_to`, :meth:`forward_from`, :meth:`forward_messages_to`.
 
         .. versionadded:: NEXT.VERSION
 
         Returns:
-            Tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
-            is returned.
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of sent messages is returned.
 
         """
         return await self.get_bot().forward_messages(
@@ -2732,7 +2795,7 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    async def forwards_to(
+    async def forward_messages_to(
         self,
         chat_id: Union[int, str],
         message_ids: Sequence[int],
@@ -2752,13 +2815,13 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_messages`.
 
-        .. seealso:: :meth:`forward_from`, :meth:`forward_to`, :meth:`forwards_from`.
+        .. seealso:: :meth:`forward_from`, :meth:`forward_to`, :meth:`forward_messages_from`.
 
         .. versionadded:: NEXT.VERSION
 
         Returns:
-            Tuple[:class:`telegram.Message`]: On success, a tuple of ``MessageId`` of sent messages
-            is returned.
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of sent messages is returned.
 
         """
         return await self.get_bot().forward_messages(
@@ -3447,6 +3510,74 @@ class Chat(TelegramObject):
         """
         return await self.get_bot().get_chat_menu_button(
             chat_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_user_chat_boosts(
+        self,
+        user_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "UserChatBoosts":
+        """Shortcut for::
+
+             await bot.get_user_chat_boosts(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_user_chat_boosts`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.UserChatBoosts`: On success, returns the boosts applied in the chat.
+        """
+        return await self.get_bot().get_user_chat_boosts(
+            chat_id=self.id,
+            user_id=user_id,
+            api_kwargs=api_kwargs,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+        )
+
+    async def set_message_reaction(
+        self,
+        message_id: int,
+        reaction: Optional[Union[Sequence[Union[ReactionType, str]], ReactionType, str]] = None,
+        is_big: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.set_message_reaction(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_message_reaction`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().set_message_reaction(
+            chat_id=self.id,
+            message_id=message_id,
+            reaction=reaction,
+            is_big=is_big,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

@@ -53,7 +53,7 @@ class TestConstantsWithoutRequest:
                 not key.startswith("_")
                 # exclude imported stuff
                 and getattr(member, "__module__", "telegram.constants") == "telegram.constants"
-                and key != "sys"
+                and key not in ("sys", "datetime")
             )
         }
         actual = set(constants.__all__)
@@ -170,6 +170,9 @@ class TestConstantsWithoutRequest:
             "reply_markup",
             "reply_to_message",
             "sender_chat",
+            "is_accessible",
+            "quote",
+            "external_reply",
             # attribute is deprecated, no need to add it to MessageType
             "user_shared",
             "via_bot",

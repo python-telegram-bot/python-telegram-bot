@@ -42,7 +42,8 @@ from telegram._poll import Poll
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -52,6 +53,9 @@ class ExternalReplyInfo(TelegramObject):
     """
     This object contains information about a message that is being replied to, which may
     come from another chat or forum topic.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`origin` is equal.
 
     .. versionadded:: NEXT.VERSION
 
@@ -76,7 +80,7 @@ class ExternalReplyInfo(TelegramObject):
             sticker.
         story (:class:`telegram.Story`, optional): Message is a forwarded story.
         video (:class:`telegram.Video`, optional): Message is a video, information about the video.
-        video_note (:class:`telegram.VideNote`, optional): Message is a video note, information
+        video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
             about the video message.
         voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
             the file.
@@ -119,7 +123,7 @@ class ExternalReplyInfo(TelegramObject):
             sticker.
         story (:class:`telegram.Story`): Optional. Message is a forwarded story.
         video (:class:`telegram.Video`): Optional. Message is a video, information about the video.
-        video_note (:class:`telegram.VideNote`): Optional. Message is a video note, information
+        video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
             about the video message.
         voice (:class:`telegram.Voice`): Optional. Message is a voice message, information about
             the file.
@@ -266,6 +270,9 @@ class TextQuote(TelegramObject):
     This object contains information about the quoted part of a message that is replied to
     by the given message.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`text` and :attr:`position` are equal.
+
     .. versionadded:: NEXT.VERSION
 
     Args:
@@ -314,7 +321,10 @@ class TextQuote(TelegramObject):
         self.entities: Optional[Tuple[MessageEntity, ...]] = parse_sequence_arg(entities)
         self.is_manual: Optional[bool] = is_manual
 
-        self._id_attrs = (self.text,)
+        self._id_attrs = (
+            self.text,
+            self.position,
+        )
 
         self._freeze()
 
@@ -335,13 +345,16 @@ class ReplyParameters(TelegramObject):
     """
     Describes reply parameters for the message that is being sent.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`message_id` is equal.
+
     .. versionadded:: NEXT.VERSION
 
     Args:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
             chat, or in the chat :paramref:`chat_id` if it is specified.
         chat_id (:obj:`int` | :obj:`str`, optional): If the message to be replied to is from a
-            different chat, |channel_id_channel|
+            different chat, |chat_id_channel|
         allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply| Can be
             used only for replies in the same chat and forum topic.
         quote (:obj:`str`, optional): Quoted part of the message to be replied to; 0-1024
@@ -362,7 +375,7 @@ class ReplyParameters(TelegramObject):
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current
             chat, or in the chat :paramref:`chat_id` if it is specified.
         chat_id (:obj:`int` | :obj:`str`): Optional. If the message to be replied to is from a
-            different chat, |channel_id_channel|
+            different chat, |chat_id_channel|
         allow_sending_without_reply (:obj:`bool`): Optional. |allow_sending_without_reply| Can be
             used only for replies in the same chat and forum topic.
         quote (:obj:`str`): Optional. Quoted part of the message to be replied to; 0-1024
@@ -394,9 +407,9 @@ class ReplyParameters(TelegramObject):
         self,
         message_id: int,
         chat_id: Optional[Union[int, str]] = None,
-        allow_sending_without_reply: Optional[bool] = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: Optional[str] = None,
-        quote_parse_mode: Optional[str] = None,
+        quote_parse_mode: ODVInput[str] = DEFAULT_NONE,
         quote_entities: Optional[Sequence[MessageEntity]] = None,
         quote_position: Optional[int] = None,
         *,
@@ -406,9 +419,9 @@ class ReplyParameters(TelegramObject):
 
         self.message_id: int = message_id
         self.chat_id: Optional[Union[int, str]] = chat_id
-        self.allow_sending_without_reply: Optional[bool] = allow_sending_without_reply
+        self.allow_sending_without_reply: ODVInput[bool] = allow_sending_without_reply
         self.quote: Optional[str] = quote
-        self.quote_parse_mode: Optional[str] = quote_parse_mode
+        self.quote_parse_mode: ODVInput[str] = quote_parse_mode
         self.quote_entities: Optional[Tuple[MessageEntity, ...]] = parse_sequence_arg(
             quote_entities
         )

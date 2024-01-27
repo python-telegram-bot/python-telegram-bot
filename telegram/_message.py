@@ -20,7 +20,7 @@
 """This module contains an object that represents a Telegram Message."""
 import datetime
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -81,7 +81,7 @@ from telegram._videochat import (
 )
 from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
-from telegram.constants import Date, MessageAttachmentType, ParseMode
+from telegram.constants import ZERO_DATE, MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
 from telegram.warnings import PTBDeprecationWarning
 
@@ -101,6 +101,9 @@ if TYPE_CHECKING:
         InputMediaVideo,
         LabeledPrice,
         MessageId,
+        MessageOrigin,
+        ReactionType,
+        ReplyParameters,
         TextQuote,
     )
 
@@ -118,7 +121,7 @@ class MaybeInaccessibleMessage(TelegramObject):
         date (:class:`datetime.datetime`): Date the message was sent in Unix time or 0 in Unix
             time. Converted to :class:`datetime.datetime`
 
-            |datetime_localization| (Does not apply to the 0, which will always be in UTC).
+            |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
 
     Attributes:
@@ -126,7 +129,7 @@ class MaybeInaccessibleMessage(TelegramObject):
         date (:class:`datetime.datetime`): Date the message was sent in Unix time or 0 in Unix
             time. Converted to :class:`datetime.datetime`
 
-            |datetime_localization| (Does not apply to the 0, which will always be in UTC).
+            |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
     """
 
@@ -136,7 +139,6 @@ class MaybeInaccessibleMessage(TelegramObject):
         self,
         chat: Chat,
         message_id: int,
-        # TODO Should this also accept the literal
         date: datetime.datetime,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -149,6 +151,61 @@ class MaybeInaccessibleMessage(TelegramObject):
         self._id_attrs = (self.message_id, self.chat)
 
         self._freeze()
+
+    def __bool__(self) -> bool:
+        """Overrides :meth:`object.__bool__` to return the value of :attr:`is_accessible`.
+        This is intended to ease migration to Bot API 7.0, as this allows checks like
+
+        .. code-block:: python
+
+            if message.pinned_message:
+                ...
+
+        to work as before, when ``message.pinned_message`` was :obj:`None`. Note that this does not
+        help with check like
+
+        .. code-block:: python
+
+            if message.pinned_message is None:
+                ...
+
+        for cases where ``message.pinned_message`` is now no longer :obj:`None`.
+
+        Tip:
+            Since objects that can only be of type :class:`~telegram.Message` or :obj:`None` are
+            not affected by this change, :meth:`Message.__bool__` is not overridden and will
+            continue to work as before.
+
+        .. versionadded:: NEXT.VERSION
+        .. deprecated:: NEXT.VERSION
+           This behavior is introduced only temporarily to ease migration to Bot API 7.0. It will
+           be removed along with other functionality deprecated by Bot API 7.0.
+        """
+        # Once we remove this method, also remove `Message.__bool__`.
+        warn(
+            category=PTBDeprecationWarning,
+            message=(
+                "You probably see this warning "
+                "because you wrote `if callback_query.message` or `if message.pinned_message` in "
+                "your code. This is not the supported way of checking the existence of a message "
+                "as of API 7.0. Please use `if message.is_accessible` or `if isinstance(message, "
+                "Message)` instead. `if message is None` may be suitable for specific use cases "
+                f"as well.\n`{self.__class__.__name__}.__bool__` will be reverted to Pythons "
+                f"default implementation in future versions."
+            ),
+            stacklevel=2,
+        )
+        return self.is_accessible
+
+    @property
+    def is_accessible(self) -> bool:
+        """Convenience attribute. :obj:`True`, if the date is not 0 in Unix time.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        # Once we drop support for python 3.9, this can be made a TypeGuard function:
+        # def is_accessible(self) -> TypeGuard[Message]:
+        return self.date != ZERO_DATE
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaybeInaccessibleMessage"]:
@@ -168,7 +225,7 @@ class MaybeInaccessibleMessage(TelegramObject):
 
         # this is to include the Literal from InaccessibleMessage
         if data["date"] == 0:
-            data["date"] = Date.ZERO_DATE
+            data["date"] = ZERO_DATE
         else:
             data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
 
@@ -186,24 +243,26 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
 
     Args:
         message_id (:obj:`int`): Unique message identifier.
-        date (:class:`constants.Date.ZERO_DATE`): Always 0, which the literal value is.
         chat (:class:`telegram.Chat`): Chat the message belongs to.
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier.
-        date (:class:`constants.Date.ZERO_DATE`): Always 0, which the literal value is.
+        date (:class:`constants.ZERO_DATE`): Always :tg-const:`telegram.constants.ZERO_DATE`.
+            The field can be used to differentiate regular and inaccessible messages.
         chat (:class:`telegram.Chat`): Chat the message belongs to.
     """
+
+    __slots__ = ()
 
     def __init__(
         self,
         chat: Chat,
         message_id: int,
-        date: Literal[Date.ZERO_DATE],
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
-        super().__init__(chat=chat, message_id=message_id, date=date.value, api_kwargs=api_kwargs)
+        super().__init__(chat=chat, message_id=message_id, date=ZERO_DATE, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class Message(MaybeInaccessibleMessage):
@@ -217,7 +276,7 @@ class Message(MaybeInaccessibleMessage):
         In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
 
     .. versionchanged:: NEXT.VERSION
-        * This class now subclasses :class:`telegram.MaybeInaccessibleMessage`.
+        * This class is now a subclass of :class:`telegram.MaybeInaccessibleMessage`.
         * The :paramref:`pinned_message` now can be either class:`telegram.Message` or
           class:`telegram.InaccessibleMessage`.
 
@@ -254,17 +313,37 @@ class Message(MaybeInaccessibleMessage):
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`, optional): For forwarded messages, sender of
             the original message.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_from` in favor of
+               :paramref:`forward_origin`.
         forward_from_chat (:class:`telegram.Chat`, optional): For messages forwarded from channels
             or from anonymous administrators, information about the original sender chat.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_from_chat` in favor of
+               :paramref:`forward_origin`.
         forward_from_message_id (:obj:`int`, optional): For forwarded channel posts, identifier of
             the original message in the channel.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_from_message_id` in favor of
+               :paramref:`forward_origin`.
         forward_sender_name (:obj:`str`, optional): Sender's name for messages forwarded from
             users who disallow adding a link to their account in forwarded messages.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_sender_name` in favor of
+               :paramref:`forward_origin`.
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
 
             .. versionchanged:: 20.3
                 |datetime_localization|
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_date` in favor of
+               :paramref:`forward_origin`.
         is_automatic_forward (:obj:`bool`, optional): :obj:`True`, if the message is a channel
             post that was automatically forwarded to the connected discussion group.
 
@@ -272,14 +351,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message (:class:`telegram.Message`, optional): For replies, the original message.
             Note that the Message object in this field will not contain further
             ``reply_to_message`` fields even if it itself is a reply.
-        external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
-            message that is being replied to, which may come from another chat or forum topic.
-
-            .. versionadded:: NEXT.VERSION
-        quote (:class:`telegram.TextQuote`, optional): For replies that quote part of the original
-            message, the quoted part of the message.
-
-            .. versionadded:: NEXT.VERSION
         edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
 
@@ -400,6 +471,10 @@ class Message(MaybeInaccessibleMessage):
             has logged in.
         forward_signature (:obj:`str`, optional): For messages forwarded from channels, signature
             of the post author if present.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_signature` in favor of
+               :paramref:`forward_origin`.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
@@ -476,7 +551,7 @@ class Message(MaybeInaccessibleMessage):
             by a spoiler animation.
 
             .. versionadded:: 20.0
-        user_shared (:class:`telegram.UsersShared`, optional): Service message: a user was shared
+        user_shared (:class:`telegram.UserShared`, optional): Service message: a user was shared
             with the bot.
 
             .. versionadded:: 20.1
@@ -506,7 +581,18 @@ class Message(MaybeInaccessibleMessage):
             giveaway without public winners was completed
 
             .. versionadded:: NEXT.VERSION
+        external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
+            message that is being replied to, which may come from another chat or forum topic.
 
+            .. versionadded:: NEXT.VERSION
+        quote (:class:`telegram.TextQuote`, optional): For replies that quote part of the original
+            message, the quoted part of the message.
+
+            .. versionadded:: NEXT.VERSION
+        forward_origin (:class:`telegram.MessageOrigin`, optional): Information about the original
+            message for forwarded messages
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -525,17 +611,6 @@ class Message(MaybeInaccessibleMessage):
             .. versionchanged:: 20.3
                 |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
-        forward_from (:class:`telegram.User`): Optional. For forwarded messages, sender of the
-            original message.
-        forward_from_chat (:class:`telegram.Chat`): Optional. For messages forwarded from channels
-            or from anonymous administrators, information about the original sender chat.
-        forward_from_message_id (:obj:`int`): Optional. For forwarded channel posts, identifier of
-            the original message in the channel.
-        forward_date (:class:`datetime.datetime`): Optional. For forwarded messages, date the
-            original message was sent in Unix time. Converted to :class:`datetime.datetime`.
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
         is_automatic_forward (:obj:`bool`): Optional. :obj:`True`, if the message is a channel
             post that was automatically forwarded to the connected discussion group.
 
@@ -543,14 +618,6 @@ class Message(MaybeInaccessibleMessage):
         reply_to_message (:class:`telegram.Message`): Optional. For replies, the original message.
             Note that the Message object in this field will not contain further
             ``reply_to_message`` fields even if it itself is a reply.
-        external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
-            message that is being replied to, which may come from another chat or forum topic.
-
-            .. versionadded:: NEXT.VERSION
-        quote (:class:`telegram.TextQuote`): Optional. For replies that quote part of the original
-            message, the quoted part of the message.
-
-            .. versionadded:: NEXT.VERSION
         edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
 
@@ -684,12 +751,8 @@ class Message(MaybeInaccessibleMessage):
             message about a successful payment, information about the payment.
         connected_website (:obj:`str`): Optional. The domain name of the website on which the user
             has logged in.
-        forward_signature (:obj:`str`): Optional. For messages forwarded from channels, signature
-            of the post author if present.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
-        forward_sender_name (:obj:`str`): Optional. Sender's name for messages forwarded from
-            users who disallow adding a link to their account in forwarded messages.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
 
             Examples:
@@ -788,6 +851,18 @@ class Message(MaybeInaccessibleMessage):
             giveaway without public winners was completed
 
             .. versionadded:: NEXT.VERSION
+        external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
+            message that is being replied to, which may come from another chat or forum topic.
+
+            .. versionadded:: NEXT.VERSION
+        quote (:class:`telegram.TextQuote`): Optional. For replies that quote part of the original
+            message, the quoted part of the message.
+
+            .. versionadded:: NEXT.VERSION
+        forward_origin (:class:`telegram.MessageOrigin`, optional): Information about the original
+            message for forwarded messages
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
         function. Instead, the supplied replacement for the emoji will be used.
@@ -804,6 +879,12 @@ class Message(MaybeInaccessibleMessage):
     # fmt: on
     __slots__ = (
         "_effective_attachment",
+        "_forward_date",
+        "_forward_from",
+        "_forward_from_chat",
+        "_forward_from_message_id",
+        "_forward_sender_name",
+        "_forward_signature",
         "_user_shared",
         "animation",
         "audio",
@@ -824,12 +905,7 @@ class Message(MaybeInaccessibleMessage):
         "forum_topic_created",
         "forum_topic_edited",
         "forum_topic_reopened",
-        "forward_date",
-        "forward_from",
-        "forward_from_chat",
-        "forward_from_message_id",
-        "forward_sender_name",
-        "forward_signature",
+        "forward_origin",
         "from_user",
         "game",
         "general_forum_topic_hidden",
@@ -854,7 +930,6 @@ class Message(MaybeInaccessibleMessage):
         "migrate_to_chat_id",
         "new_chat_members",
         "new_chat_photo",
-        "new_chat_photo",
         "new_chat_title",
         "passport_data",
         "photo",
@@ -868,7 +943,6 @@ class Message(MaybeInaccessibleMessage):
         "sticker",
         "story",
         "successful_payment",
-        "successful_payment",
         "supergroup_chat_created",
         "text",
         "users_shared",
@@ -880,7 +954,6 @@ class Message(MaybeInaccessibleMessage):
         "video_chat_scheduled",
         "video_chat_started",
         "video_note",
-        "voice",
         "voice",
         "web_app_data",
         "write_access_allowed",
@@ -897,8 +970,6 @@ class Message(MaybeInaccessibleMessage):
         forward_from_message_id: Optional[int] = None,
         forward_date: Optional[datetime.datetime] = None,
         reply_to_message: Optional["Message"] = None,
-        external_reply: Optional["ExternalReplyInfo"] = None,
-        quote: Optional["TextQuote"] = None,
         edit_date: Optional[datetime.datetime] = None,
         text: Optional[str] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
@@ -970,6 +1041,9 @@ class Message(MaybeInaccessibleMessage):
         giveaway_winners: Optional["GiveawayWinners"] = None,
         users_shared: Optional[UsersShared] = None,
         link_preview_options: Optional[LinkPreviewOptions] = None,
+        external_reply: Optional["ExternalReplyInfo"] = None,
+        quote: Optional["TextQuote"] = None,
+        forward_origin: Optional["MessageOrigin"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -986,7 +1060,38 @@ class Message(MaybeInaccessibleMessage):
                 PTBDeprecationWarning,
                 stacklevel=2,
             )
-        # TODO I copied this from Chatmember, not sure if there is a better way
+
+        if any(
+            (
+                forward_from,
+                forward_from_chat,
+                forward_from_message_id,
+                forward_signature,
+                forward_sender_name,
+                forward_date,
+            )
+        ):
+            if forward_from:
+                _warn_param = "forward_from"
+            elif forward_from_chat:
+                _warn_param = "forward_from_chat"
+            elif forward_from_message_id:
+                _warn_param = "forward_from_message_id"
+            elif forward_signature:
+                _warn_param = "forward_signature"
+            elif forward_sender_name:
+                _warn_param = "forward_sender_name"
+            else:
+                _warn_param = "forward_date"
+
+            warn(
+                f"The information about parameter '{_warn_param}' was transferred to "
+                "'forward_origin' in Bot API 7.0. We recommend using 'forward_origin' instead of "
+                f"'{_warn_param}'",
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
+
         with self._unfrozen():
             # Required
             self.message_id: int = message_id
@@ -995,13 +1100,11 @@ class Message(MaybeInaccessibleMessage):
             self.sender_chat: Optional[Chat] = sender_chat
             self.date: datetime.datetime = date
             self.chat: Chat = chat
-            self.forward_from: Optional[User] = forward_from
-            self.forward_from_chat: Optional[Chat] = forward_from_chat
-            self.forward_date: Optional[datetime.datetime] = forward_date
+            self._forward_from: Optional[User] = forward_from
+            self._forward_from_chat: Optional[Chat] = forward_from_chat
+            self._forward_date: Optional[datetime.datetime] = forward_date
             self.is_automatic_forward: Optional[bool] = is_automatic_forward
             self.reply_to_message: Optional[Message] = reply_to_message
-            self.external_reply: Optional[ExternalReplyInfo] = external_reply
-            self.quote: Optional[TextQuote] = quote
             self.edit_date: Optional[datetime.datetime] = edit_date
             self.has_protected_content: Optional[bool] = has_protected_content
             self.text: Optional[str] = text
@@ -1033,12 +1136,12 @@ class Message(MaybeInaccessibleMessage):
                 MessageAutoDeleteTimerChanged
             ] = message_auto_delete_timer_changed
             self.pinned_message: Optional[MaybeInaccessibleMessage] = pinned_message
-            self.forward_from_message_id: Optional[int] = forward_from_message_id
+            self._forward_from_message_id: Optional[int] = forward_from_message_id
             self.invoice: Optional[Invoice] = invoice
             self.successful_payment: Optional[SuccessfulPayment] = successful_payment
             self.connected_website: Optional[str] = connected_website
-            self.forward_signature: Optional[str] = forward_signature
-            self.forward_sender_name: Optional[str] = forward_sender_name
+            self._forward_signature: Optional[str] = forward_signature
+            self._forward_sender_name: Optional[str] = forward_sender_name
             self.author_signature: Optional[str] = author_signature
             self.media_group_id: Optional[str] = media_group_id
             self.animation: Optional[Animation] = animation
@@ -1080,16 +1183,28 @@ class Message(MaybeInaccessibleMessage):
             self.giveaway_created: Optional[GiveawayCreated] = giveaway_created
             self.giveaway_winners: Optional[GiveawayWinners] = giveaway_winners
             self.link_preview_options: Optional[LinkPreviewOptions] = link_preview_options
+            self.external_reply: Optional[ExternalReplyInfo] = external_reply
+            self.quote: Optional[TextQuote] = quote
+            self.forward_origin: Optional[MessageOrigin] = forward_origin
 
             self._effective_attachment = DEFAULT_NONE
 
             self._id_attrs = (self.message_id, self.chat)
 
-            self._freeze()
+    def __bool__(self) -> bool:
+        """Overrides :meth:`telegram.MaybeInaccessibleMessage.__bool__` to use Pythons
+        default implementation of :meth:`object.__bool__` instead.
+
+        Tip:
+            The current behavior is the same as before the introduction of
+            :class:`telegram.MaybeInaccessibleMessage`. This documentation is relevant only until
+            :meth:`telegram.MaybeInaccessibleMessage.__bool__` is removed.
+        """
+        return True
 
     @property
-    def user_shared(self) -> Optional[UsersShared]:
-        """:class:`telegram.UsersShared`: Optional. Service message. A user was shared with the
+    def user_shared(self) -> Optional[UserShared]:
+        """:class:`telegram.UserShared`: Optional. Service message. A user was shared with the
         bot.
 
         Hint:
@@ -1107,6 +1222,100 @@ class Message(MaybeInaccessibleMessage):
             bot_api_version="7.0",
         )
         return self._user_shared
+
+    @property
+    def forward_from(self) -> Optional[User]:
+        """:class:`telegram.User`: Optional. For forwarded messages, sender of the original
+        message.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_from` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_from",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_from
+
+    @property
+    def forward_from_chat(self) -> Optional[Chat]:
+        """:class:`telegram.Chat`: Optional. For messages forwarded from channels or from anonymous
+        administrators, information about the original sender chat.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_from_chat` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_from_chat",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_from_chat
+
+    @property
+    def forward_from_message_id(self) -> Optional[int]:
+        """:obj:`int`: Optional. For forwarded channel posts, identifier of the original message
+        in the channel.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_from_message_id` in favor of
+           :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_from_message_id",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_from_message_id
+
+    @property
+    def forward_signature(self) -> Optional[str]:
+        """:obj:`str`: Optional. For messages forwarded from channels, signature
+        of the post author if present.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_signature` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_signature",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_signature
+
+    @property
+    def forward_sender_name(self) -> Optional[str]:
+        """:class:`telegram.User`: Optional. Sender's name for messages forwarded from users who
+        disallow adding a link to their account in forwarded messages.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_sender_name` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_sender_name",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_sender_name
+
+    @property
+    def forward_date(self) -> Optional[datetime.datetime]:
+        """:obj:`datetime.datetime`: Optional. For forwarded messages, date the original message
+        was sent in Unix time. Converted to :class:`datetime.datetime`.
+
+            .. versionchanged:: 20.3
+                |datetime_localization|
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_date` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_date",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_date
 
     @property
     def chat_id(self) -> int:
@@ -1229,13 +1438,14 @@ class Message(MaybeInaccessibleMessage):
             GiveawayCreated,
             GiveawayWinners,
         )
+        from telegram._messageorigin import (  # pylint: disable=import-outside-toplevel
+            MessageOrigin,
+        )
         from telegram._reply import (  # pylint: disable=import-outside-toplevel
             ExternalReplyInfo,
             TextQuote,
         )
 
-        data["external_reply"] = ExternalReplyInfo.de_json(data.get("external_reply"), bot)
-        data["quote"] = TextQuote.de_json(data.get("quote"), bot)
         data["giveaway"] = Giveaway.de_json(data.get("giveaway"), bot)
         data["giveaway_completed"] = GiveawayCompleted.de_json(data.get("giveaway_completed"), bot)
         data["giveaway_created"] = GiveawayCreated.de_json(data.get("giveaway_created"), bot)
@@ -1243,6 +1453,9 @@ class Message(MaybeInaccessibleMessage):
         data["link_preview_options"] = LinkPreviewOptions.de_json(
             data.get("link_preview_options"), bot
         )
+        data["external_reply"] = ExternalReplyInfo.de_json(data.get("external_reply"), bot)
+        data["quote"] = TextQuote.de_json(data.get("quote"), bot)
+        data["forward_origin"] = MessageOrigin.de_json(data.get("forward_origin"), bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
@@ -1346,6 +1559,8 @@ class Message(MaybeInaccessibleMessage):
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1375,8 +1590,10 @@ class Message(MaybeInaccessibleMessage):
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1400,6 +1617,8 @@ class Message(MaybeInaccessibleMessage):
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1439,8 +1658,10 @@ class Message(MaybeInaccessibleMessage):
             text=text,
             parse_mode=ParseMode.MARKDOWN,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1464,6 +1685,8 @@ class Message(MaybeInaccessibleMessage):
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1499,8 +1722,10 @@ class Message(MaybeInaccessibleMessage):
             text=text,
             parse_mode=ParseMode.MARKDOWN_V2,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1524,6 +1749,8 @@ class Message(MaybeInaccessibleMessage):
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1559,8 +1786,10 @@ class Message(MaybeInaccessibleMessage):
             text=text,
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1583,6 +1812,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1618,6 +1848,7 @@ class Message(MaybeInaccessibleMessage):
             media=media,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1644,6 +1875,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -1675,6 +1907,7 @@ class Message(MaybeInaccessibleMessage):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1706,6 +1939,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -1740,6 +1974,7 @@ class Message(MaybeInaccessibleMessage):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1769,6 +2004,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -1801,6 +2037,7 @@ class Message(MaybeInaccessibleMessage):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1833,6 +2070,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -1869,6 +2107,7 @@ class Message(MaybeInaccessibleMessage):
             parse_mode=parse_mode,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1894,6 +2133,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1923,6 +2163,7 @@ class Message(MaybeInaccessibleMessage):
             sticker=sticker,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1953,6 +2194,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -1985,6 +2227,7 @@ class Message(MaybeInaccessibleMessage):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2016,6 +2259,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -2049,6 +2293,7 @@ class Message(MaybeInaccessibleMessage):
             length=length,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2075,6 +2320,7 @@ class Message(MaybeInaccessibleMessage):
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -2108,6 +2354,7 @@ class Message(MaybeInaccessibleMessage):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2136,6 +2383,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         location: Optional[Location] = None,
         quote: Optional[bool] = None,
@@ -2167,6 +2415,7 @@ class Message(MaybeInaccessibleMessage):
             longitude=longitude,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2199,6 +2448,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         venue: Optional[Venue] = None,
         quote: Optional[bool] = None,
@@ -2233,6 +2483,7 @@ class Message(MaybeInaccessibleMessage):
             foursquare_id=foursquare_id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2260,6 +2511,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         contact: Optional[Contact] = None,
         quote: Optional[bool] = None,
@@ -2292,6 +2544,7 @@ class Message(MaybeInaccessibleMessage):
             last_name=last_name,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2325,6 +2578,7 @@ class Message(MaybeInaccessibleMessage):
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2360,6 +2614,7 @@ class Message(MaybeInaccessibleMessage):
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2385,6 +2640,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2413,6 +2669,7 @@ class Message(MaybeInaccessibleMessage):
             chat_id=self.chat_id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2468,6 +2725,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2499,6 +2757,7 @@ class Message(MaybeInaccessibleMessage):
             game_short_name=game_short_name,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2539,6 +2798,7 @@ class Message(MaybeInaccessibleMessage):
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2595,6 +2855,7 @@ class Message(MaybeInaccessibleMessage):
             is_flexible=is_flexible,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             provider_data=provider_data,
             send_phone_number_to_provider=send_phone_number_to_provider,
@@ -2673,6 +2934,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2705,6 +2967,7 @@ class Message(MaybeInaccessibleMessage):
             caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -2729,6 +2992,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2769,6 +3033,7 @@ class Message(MaybeInaccessibleMessage):
             caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -2787,6 +3052,7 @@ class Message(MaybeInaccessibleMessage):
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2818,6 +3084,7 @@ class Message(MaybeInaccessibleMessage):
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -3430,6 +3697,44 @@ class Message(MaybeInaccessibleMessage):
         return await self.get_bot().unpin_all_forum_topic_messages(
             chat_id=self.chat_id,
             message_thread_id=self.message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_reaction(
+        self,
+        reaction: Optional[
+            Union[Sequence["ReactionType"], "ReactionType", Sequence[str], str]
+        ] = None,
+        is_big: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.set_message_reaction(chat_id=message.chat_id, message_id=message.message_id,
+                *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_message_reaction`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().set_message_reaction(
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            reaction=reaction,
+            is_big=is_big,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

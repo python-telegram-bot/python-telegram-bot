@@ -17,16 +17,20 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
-from typing import Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._inline.inputmessagecontent import InputMessageContent
-from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import JSONDict, ODVInput
-from telegram._utils.warnings import warn
-from telegram.warnings import PTBDeprecationWarning
+from telegram._utils.warnings_transition import (
+    warn_about_deprecated_attr_in_property,
+    warn_for_link_preview_options,
+)
+
+if TYPE_CHECKING:
+    from telegram._linkpreviewoptions import LinkPreviewOptions
 
 
 class InputTextMessageContent(InputMessageContent):
@@ -56,7 +60,7 @@ class InputTextMessageContent(InputMessageContent):
             .. versionchanged:: NEXT.VERSION
                 Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
                 argument. PTB will automatically convert this argument to that one, but
-                you should update your code to use the new argument.
+                for advanced options, please use :paramref:`link_preview_options` directly.
 
             .. deprecated:: NEXT.VERSION
                 In future versions, this argument will become keyword only.
@@ -100,17 +104,6 @@ class InputTextMessageContent(InputMessageContent):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        if (
-            disable_web_page_preview is not DEFAULT_NONE
-            and link_preview_options is not DEFAULT_NONE
-        ):
-            raise ValueError(
-                "`disable_web_page_preview` and `link_preview_options` are mutually exclusive."
-            )
-
-        # Convert to LinkPreviewOptions:
-        if not isinstance(disable_web_page_preview, DefaultValue):
-            link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
 
         with self._unfrozen():
             # Required
@@ -118,7 +111,9 @@ class InputTextMessageContent(InputMessageContent):
             # Optionals
             self.parse_mode: ODVInput[str] = parse_mode
             self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.link_preview_options = link_preview_options
+            self.link_preview_options: ODVInput[
+                "LinkPreviewOptions"
+            ] = warn_for_link_preview_options(disable_web_page_preview, link_preview_options)
 
             self._id_attrs = (self.message_text,)
 
@@ -128,14 +123,15 @@ class InputTextMessageContent(InputMessageContent):
 
         .. deprecated:: NEXT.VERSION
         """
-        warn(
-            "The `disable_web_page_preview` attribute is deprecated. "
-            "Use `link_preview_options` instead.",
-            PTBDeprecationWarning,
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="disable_web_page_preview",
+            new_attr_name="link_preview_options",
+            bot_api_version="7.0",
             stacklevel=2,
         )
-        return (
-            self.link_preview_options.is_disabled  # type: ignore[union-attr]
-            if self.link_preview_options
-            else None
-        )
+        if (
+            isinstance(self.link_preview_options, DefaultValue)
+            or self.link_preview_options is None
+        ):
+            return None
+        return bool(self.link_preview_options.is_disabled)

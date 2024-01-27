@@ -16,29 +16,25 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the TypeHandler class."""
-
-from typing import Optional, Type, TypeVar
-
-from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVType
-from telegram.ext._basehandler import BaseHandler
-from telegram.ext._utils.types import CCT, HandlerCallback
-
-RT = TypeVar("RT")
-UT = TypeVar("UT")
+"""This module contains the ShippingQueryHandler class."""
 
 
-class TypeHandler(BaseHandler[UT, CCT]):
-    """Handler class to handle updates of custom types.
+from telegram import Update
+from telegram.ext._handlers.basehandler import BaseHandler
+from telegram.ext._utils.types import CCT
+
+
+class ShippingQueryHandler(BaseHandler[Update, CCT]):
+    """Handler class to handle Telegram :attr:`telegram.Update.shipping_query`.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    Examples:
+        :any:`Payment Bot <examples.paymentbot>`
+
     Args:
-        type (:external:class:`type`): The :external:class:`type` of updates this handler should
-            process, as determined by :obj:`isinstance`
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::
@@ -47,8 +43,6 @@ class TypeHandler(BaseHandler[UT, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        strict (:obj:`bool`, optional): Use ``type`` instead of :obj:`isinstance`.
-            Default is :obj:`False`.
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
@@ -56,40 +50,21 @@ class TypeHandler(BaseHandler[UT, CCT]):
             .. seealso:: :wiki:`Concurrency`
 
     Attributes:
-        type (:external:class:`type`): The :external:class:`type` of updates this handler should
-            process.
         callback (:term:`coroutine function`): The callback function for this handler.
-        strict (:obj:`bool`): Use :external:class:`type` instead of :obj:`isinstance`. Default is
-            :obj:`False`.
-        block (:obj:`bool`): Determines whether the return value of the callback should be
-            awaited before processing the next handler in
-            :meth:`telegram.ext.Application.process_update`.
+        block (:obj:`bool`): Determines whether the callback will run in a blocking way..
 
     """
 
-    __slots__ = ("type", "strict")
-
-    def __init__(
-        self,
-        type: Type[UT],  # pylint: disable=redefined-builtin
-        callback: HandlerCallback[UT, CCT, RT],
-        strict: bool = False,
-        block: DVType[bool] = DEFAULT_TRUE,
-    ):
-        super().__init__(callback, block=block)
-        self.type: Type[UT] = type
-        self.strict: Optional[bool] = strict
+    __slots__ = ()
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
-            update (:obj:`object`): Incoming update.
+            update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
             :obj:`bool`
 
         """
-        if not self.strict:
-            return isinstance(update, self.type)
-        return type(update) is self.type  # pylint: disable=unidiomatic-typecheck
+        return isinstance(update, Update) and bool(update.shipping_query)

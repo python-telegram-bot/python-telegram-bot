@@ -48,7 +48,8 @@ class Defaults:
                 Use :paramref:`link_preview_options` instead. This parameter will be removed in
                 future versions.
 
-        allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+        allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|.
+            Will be used for :attr:`telegram.ReplyParameters.allow_sending_without_reply`.
         quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
             to the message. If ``reply_to_message_id`` is passed, this parameter will
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
@@ -68,6 +69,44 @@ class Defaults:
         link_preview_options (:class:`telegram.LinkPreviewOptions`, optional):
             Link preview generation options for all outgoing messages. Mutually exclusive with
             :paramref:`disable_web_page_preview`.
+            This object is used for the corresponding parameter of
+            :meth:`telegram.Bot.send_message`, :meth:`telegram.Bot.edit_message_text`,
+            and :class:`telegram.InputTextMessageContent` if not specified. If a value is specified
+            for the corresponding parameter, only those parameters of
+            :class:`telegram.LinkPreviewOptions` will be overridden that are not
+            explicitly set.
+
+            Example:
+
+                .. code-block:: python
+
+                    from telegram import LinkPreviewOptions
+                    from telegram.ext import Defaults, ExtBot
+
+                    defaults = Defaults(
+                        link_preview_options=LinkPreviewOptions(show_above_text=True)
+                    )
+                    chat_id = 123
+
+                    async def main():
+                        async with ExtBot("Token", defaults=defaults) as bot:
+                            # The link preview will be shown above the text.
+                            await bot.send_message(chat_id, "https://python-telegram-bot.org")
+
+                            # The link preview will be shown below the text.
+                            await bot.send_message(
+                                chat_id,
+                                "https://python-telegram-bot.org",
+                                link_preview_options=LinkPreviewOptions(show_above_text=False)
+                            )
+
+                            # The link preview will be shown above the text, but the preview will
+                            # show Telegram.
+                            await bot.send_message(
+                                chat_id,
+                                "https://python-telegram-bot.org",
+                                link_preview_options=LinkPreviewOptions(url="https://telegram.org")
+                            )
 
             .. versionadded:: NEXT.VERSION
     """
@@ -196,6 +235,19 @@ class Defaults:
         )
 
     @property
+    def quote_parse_mode(self) -> Optional[str]:
+        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
+        the corresponding parameter of :meth:`telegram.ReplyParameters`.
+        """
+        return self._parse_mode
+
+    @quote_parse_mode.setter
+    def quote_parse_mode(self, value: object) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to quote_parse_mode after initialization."
+        )
+
+    @property
     def disable_notification(self) -> Optional[bool]:
         """:obj:`bool`: Optional. Sends the message silently. Users will
         receive a notification with no sound.
@@ -212,6 +264,10 @@ class Defaults:
     def disable_web_page_preview(self) -> ODVInput[bool]:
         """:obj:`bool`: Optional. Disables link previews for links in all outgoing
         messages.
+
+        .. deprecated:: NEXT.VERSION
+            Use :attr:`link_preview_options` instead. This attribute will be removed in future
+            versions.
         """
         return self._link_preview_options.is_disabled if self._link_preview_options else None
 

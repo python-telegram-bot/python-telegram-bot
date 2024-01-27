@@ -15,6 +15,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime
 from enum import Enum
 
 from docutils.nodes import Element
@@ -71,6 +72,12 @@ class TGConstXRefRole(PyXRefRole):
             if isinstance(value, tuple) and target in (
                 "telegram.constants.BOT_API_VERSION_INFO",
                 "telegram.__version_info__",
+            ):
+                return str(value), target
+            if (
+                isinstance(value, datetime.datetime)
+                and value == telegram.constants.ZERO_DATE
+                and target in ("telegram.constants.ZERO_DATE",)
             ):
                 return repr(value), target
             sphinx_logger.warning(

@@ -29,18 +29,22 @@ those classes.
     * Most of the constants in this module are grouped into enums.
 """
 # TODO: Remove this when https://github.com/PyCQA/pylint/issues/6887 is resolved.
-# pylint: disable=invalid-enum-extension
+# pylint: disable=invalid-enum-extension,invalid-slots
 
 __all__ = [
-    "AccentColor",
     "BOT_API_VERSION",
     "BOT_API_VERSION_INFO",
+    "SUPPORTED_WEBHOOK_PORTS",
+    "ZERO_DATE",
+    "AccentColor",
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
     "BotNameLimit",
+    "BulkRequestLimit",
     "CallbackQueryLimit",
     "ChatAction",
+    "ChatBoostSources",
     "ChatID",
     "ChatInviteLinkLimit",
     "ChatLimit",
@@ -49,7 +53,6 @@ __all__ = [
     "ChatType",
     "ContactLimit",
     "CustomEmojiStickerLimit",
-    "Date",
     "DiceEmoji",
     "DiceLimit",
     "FileSizeLimit",
@@ -57,15 +60,15 @@ __all__ = [
     "ForumIconColor",
     "ForumTopicLimit",
     "GiveawayLimit",
-    "KeyboardButtonRequestUsersLimit",
     "InlineKeyboardButtonLimit",
     "InlineKeyboardMarkupLimit",
     "InlineQueryLimit",
     "InlineQueryResultLimit",
-    "InlineQueryResultsButtonLimit",
     "InlineQueryResultType",
+    "InlineQueryResultsButtonLimit",
     "InputMediaType",
     "InvoiceLimit",
+    "KeyboardButtonRequestUsersLimit",
     "LocationLimit",
     "MaskPosition",
     "MediaGroupLimit",
@@ -75,22 +78,21 @@ __all__ = [
     "MessageLimit",
     "MessageOriginType",
     "MessageType",
-    "PollingLimit",
     "ParseMode",
     "PollLimit",
     "PollType",
+    "PollingLimit",
     "ProfileAccentColor",
-    "ReactionEmojis",
+    "ReactionEmoji",
     "ReactionType",
     "ReplyLimit",
-    "SUPPORTED_WEBHOOK_PORTS",
     "StickerFormat",
     "StickerLimit",
     "StickerSetLimit",
     "StickerType",
-    "WebhookLimit",
     "UpdateType",
     "UserProfilePhotosLimit",
+    "WebhookLimit",
 ]
 
 import datetime
@@ -153,6 +155,12 @@ BOT_API_VERSION: Final[str] = str(BOT_API_VERSION_INFO)
 #: List[:obj:`int`]: Ports supported by
 #:  :paramref:`telegram.Bot.set_webhook.url`.
 SUPPORTED_WEBHOOK_PORTS: Final[List[int]] = [443, 80, 88, 8443]
+
+#: :obj:`datetime.datetime`, value of unix 0.
+#: This date literal is used in :class:`telegram.InaccessibleMessage`
+#:
+#: .. versionadded:: NEXT.VERSION
+ZERO_DATE: Final[datetime.datetime] = datetime.datetime(1970, 1, 1, tzinfo=UTC)
 
 
 class AccentColor(Enum):
@@ -628,6 +636,22 @@ class BotNameLimit(IntEnum):
     """
 
 
+class BulkRequestLimit(IntEnum):
+    """This enum contains limitations for :meth:`telegram.Bot.delete_messages`,
+    :meth:`telegram.Bot.forward_messages` and :meth:`telegram.Bot.copy_messages`. The enum members
+    of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum number of messages required for bulk actions."""
+    MAX_LIMIT = 100
+    """:obj:`int`: Maximum number of messages required for bulk actions."""
+
+
 class CallbackQueryLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.CallbackQuery`/
     :meth:`telegram.Bot.answer_callback_query`. The enum members of this enumeration are instances
@@ -675,6 +699,24 @@ class ChatAction(StringEnum):
     """:obj:`str`: Chat action indicating that the bot is uploading a video."""
     UPLOAD_VIDEO_NOTE = "upload_video_note"
     """:obj:`str`: Chat action indicating that the bot is uploading a video note."""
+
+
+class ChatBoostSources(StringEnum):
+    """This enum contains the available sources for a
+    :class:`Telegram chat boost <telegram.ChatBoostSource>`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    GIFT_CODE = "gift_code"
+    """:obj:`str`: The source of the chat boost was a Telegram Premium gift code."""
+    GIVEAWAY = "giveaway"
+    """:obj:`str`: The source of the chat boost was a Telegram Premium giveaway."""
+    PREMIUM = "premium"
+    """:obj:`str`: The source of the chat boost was a Telegram Premium subscription/gift."""
 
 
 class ChatID(IntEnum):
@@ -2427,6 +2469,26 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_member`."""
     CHAT_JOIN_REQUEST = "chat_join_request"
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_join_request`."""
+    CHAT_BOOST = "chat_boost"
+    """:obj:`str`: Updates with :attr:`telegram.Update.chat_boost`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    REMOVED_CHAT_BOOST = "removed_chat_boost"
+    """:obj:`str`: Updates with :attr:`telegram.Update.removed_chat_boost`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MESSAGE_REACTION = "message_reaction"
+    """:obj:`str`: Updates with :attr:`telegram.Update.message_reaction`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MESSAGE_REACTION_COUNT = "message_reaction_count"
+    """:obj:`str`: Updates with :attr:`telegram.Update.message_reaction_count`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InvoiceLimit(IntEnum):
@@ -2594,20 +2656,8 @@ class ForumTopicLimit(IntEnum):
     """
 
 
-class Date(Enum):
-    """This enum contains the date literal for :class:`telegram.InaccessibleMessage`
-
-    .. versionadded:: NEXT.VERSION
-    """
-
-    __slots__ = ()
-
-    ZERO_DATE = datetime.datetime(1970, 1, 1, tzinfo=UTC)
-    """:obj:`datetime.datetime`, value of unix 0."""
-
-
 class ReactionType(StringEnum):
-    """This enum contains the available types of :class:`telegram.Update`. The enum
+    """This enum contains the available types of :class:`telegram.ReactionType`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
     .. versionadded:: NEXT.VERSION
@@ -2621,7 +2671,7 @@ class ReactionType(StringEnum):
     """:obj:`str`: A :class:`telegram.ReactionType` with a custom emoji."""
 
 
-class ReactionEmojis(StringEnum):
+class ReactionEmoji(StringEnum):
     """This enum contains the available emojis of :class:`telegram.ReactionTypeEmoji`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -2635,7 +2685,7 @@ class ReactionEmojis(StringEnum):
 
     THUMBS_UP = "👍"
     """:obj:`str`: A thumbs-up gesture indicating approval."""
-    THUMB_DOWN = "👎"
+    THUMBS_DOWN = "👎"
     """:obj:`str`: A thumbs-down gesture indicating disapproval."""
-    READ_HEART = "❤"
+    RED_HEART = "❤"
     """:obj:`str`: A classic red love heart emoji, used for expressions of love and romance."""

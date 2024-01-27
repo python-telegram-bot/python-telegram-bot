@@ -18,24 +18,31 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram MessageOigin."""
 import datetime
-from typing import Dict, Final, Optional, Type
+from typing import TYPE_CHECKING, Dict, Final, Optional, Type
 
 from telegram import constants
-from telegram._bot import Bot
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils import enum
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class MessageOrigin(TelegramObject):
     """
     Base class for telegram MessageOrigin object, it can be one of:
-    :class:`MessageOriginUser`
-    :class:`MessageOriginHiddenUser`
-    :class:`MessageOriginChat`
-    :class:`MessageOriginChannel`
+
+    * :class:`MessageOriginUser`
+    * :class:`MessageOriginHiddenUser`
+    * :class:`MessageOriginChat`
+    * :class:`MessageOriginChannel`
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`type` and :attr:`date` are equal.
 
     .. versionadded:: NEXT.VERSION
 
@@ -43,13 +50,15 @@ class MessageOrigin(TelegramObject):
         type (:obj:`str`): Type of the message origin, can be on of:
             :attr:`~telegram.MessageOrigin.USER`, :attr:`~telegram.MessageOrigin.HIDDEN_USER`,
             :attr:`~telegram.MessageOrigin.CHAT`, or :attr:`~telegram.MessageOrigin.CHANNEL`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally in Unix time.
+        date (:obj:`datetime.datetime`): Date the message was sent originally.
+            |datetime_localization|
 
     Attributes:
         type (:obj:`str`): Type of the message origin, can be on of:
             :attr:`~telegram.MessageOrigin.USER`, :attr:`~telegram.MessageOrigin.HIDDEN_USER`,
             :attr:`~telegram.MessageOrigin.CHAT`, or :attr:`~telegram.MessageOrigin.CHANNEL`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally in Unix time.
+        date (:obj:`datetime.datetime`): Date the message was sent originally.
+            |datetime_localization|
     """
 
     __slots__ = (
@@ -75,7 +84,7 @@ class MessageOrigin(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
-        self.type: str = type
+        self.type: str = enum.get_member(constants.MessageOriginType, type, type)
         self.date: datetime.datetime = date
 
         self._id_attrs = (
@@ -86,7 +95,9 @@ class MessageOrigin(TelegramObject):
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MessageOrigin"]:
-        """See :meth:`telegram.TelegramObject.de_json`."""
+        """Converts JSON data to the appropriate :class:`MessageOrigin` object, i.e. takes
+        care of selecting the correct subclass.
+        """
         data = cls._parse_data(data)
 
         if not data:
@@ -104,6 +115,15 @@ class MessageOrigin(TelegramObject):
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
         data["date"] = from_timestamp(data.get("date"), tzinfo=loc_tzinfo)
 
+        if "sender_user" in data:
+            data["sender_user"] = User.de_json(data.get("sender_user"), bot)
+
+        if "sender_chat" in data:
+            data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
+
+        if "chat" in data:
+            data["chat"] = Chat.de_json(data.get("chat"), bot)
+
         return super().de_json(data=data, bot=bot)
 
 
@@ -114,13 +134,15 @@ class MessageOriginUser(MessageOrigin):
     .. versionadded:: NEXT.VERSION
 
     Args:
-        date (:obj:`datetime.datetime`): Date the message was sent originally in Unix time.
+        date (:obj:`datetime.datetime`): Date the message was sent originally.
+            |datetime_localization|
         sender_user (:class:`telegram.User`): User that sent the message originally.
 
     Attributes:
         type (:obj:`str`): Type of the message origin. Always
             :tg-const:`~telegram.MessageOrigin.USER`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally in Unix time.
+        date (:obj:`datetime.datetime`): Date the message was sent originally.
+            |datetime_localization|
         sender_user (:class:`telegram.User`): User that sent the message originally.
     """
 
@@ -146,13 +168,15 @@ class MessageOriginHiddenUser(MessageOrigin):
     .. versionadded:: NEXT.VERSION
 
     Args:
-        date (:obj:`datetime.datetime`): Date the message was sent originally in Unix time.
+        date (:obj:`datetime.datetime`): Date the message was sent originally.
+            |datetime_localization|
         sender_user_name (:obj:`str`): Name of the user that sent the message originally.
 
     Attributes:
         type (:obj:`str`): Type of the message origin. Always
             :tg-const:`~telegram.MessageOrigin.HIDDEN_USER`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally in Unix time.
+        date (:obj:`datetime.datetime`): Date the message was sent originally.
+            |datetime_localization|
         sender_user_name (:obj:`str`): Name of the user that sent the message originally.
     """
 
@@ -178,7 +202,8 @@ class MessageOriginChat(MessageOrigin):
     .. versionadded:: NEXT.VERSION
 
     Args:
-        date (:obj:`datetime.datetime`): Date the message was sent originally in Unix time.
+        date (:obj:`datetime.datetime`): Date the message was sent originally.
+            |datetime_localization|
         sender_chat (:class:`telegram.Chat`): Chat that sent the message originally.
         author_signature (:obj:`str`, optional): For messages originally sent by an anonymous chat
             administrator, original message author signature
@@ -186,7 +211,8 @@ class MessageOriginChat(MessageOrigin):
     Attributes:
         type (:obj:`str`): Type of the message origin. Always
             :tg-const:`~telegram.MessageOrigin.CHAT`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally in Unix time.
+        date (:obj:`datetime.datetime`): Date the message was sent originally.
+            |datetime_localization|
         sender_chat (:class:`telegram.Chat`): Chat that sent the message originally.
         author_signature (:obj:`str`): Optional. For messages originally sent by an anonymous chat
             administrator, original message author signature
@@ -219,7 +245,8 @@ class MessageOriginChannel(MessageOrigin):
     .. versionadded:: NEXT.VERSION
 
     Args:
-        date (:obj:`datetime.datetime`): Date the message was sent originally in Unix time.
+        date (:obj:`datetime.datetime`): Date the message was sent originally.
+            |datetime_localization|
         chat (:class:`telegram.Chat`): Channel chat to which the message was originally sent.
         message_id (:obj:`int`): Unique message identifier inside the chat.
         author_signature (:obj:`str`, optional): Signature of the original post author.
@@ -227,7 +254,8 @@ class MessageOriginChannel(MessageOrigin):
     Attributes:
         type (:obj:`str`): Type of the message origin. Always
             :tg-const:`~telegram.MessageOrigin.CHANNEL`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally in Unix time.
+        date (:obj:`datetime.datetime`): Date the message was sent originally.
+            |datetime_localization|
         chat (:class:`telegram.Chat`): Channel chat to which the message was originally sent.
         message_id (:obj:`int`): Unique message identifier inside the chat.
         author_signature (:obj:`str`): Optional. Signature of the original post author.
@@ -244,7 +272,7 @@ class MessageOriginChannel(MessageOrigin):
         date: datetime.datetime,
         chat: Chat,
         message_id: int,
-        author_signature: Optional[str],
+        author_signature: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):

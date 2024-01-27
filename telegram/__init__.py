@@ -20,10 +20,6 @@
 
 __author__ = "devs@python-telegram-bot.org"
 __all__ = (  # Keep this alphabetically ordered
-    "__bot_api_version__",
-    "__bot_api_version_info__",
-    "__version__",
-    "__version_info__",
     "Animation",
     "Audio",
     "Bot",
@@ -43,22 +39,28 @@ __all__ = (  # Keep this alphabetically ordered
     "CallbackQuery",
     "Chat",
     "ChatAdministratorRights",
+    "ChatBoost",
+    "ChatBoostRemoved",
+    "ChatBoostSource",
+    "ChatBoostSourceGiftCode",
+    "ChatBoostSourceGiveaway",
+    "ChatBoostSourcePremium",
+    "ChatBoostUpdated",
     "ChatInviteLink",
     "ChatJoinRequest",
     "ChatLocation",
     "ChatMember",
-    "ChatMemberOwner",
     "ChatMemberAdministrator",
-    "ChatMemberMember",
-    "ChatMemberRestricted",
-    "ChatMemberLeft",
     "ChatMemberBanned",
+    "ChatMemberLeft",
+    "ChatMemberMember",
+    "ChatMemberOwner",
+    "ChatMemberRestricted",
     "ChatMemberUpdated",
     "ChatPermissions",
     "ChatPhoto",
     "ChatShared",
     "ChosenInlineResult",
-    "constants",
     "Contact",
     "Credentials",
     "DataCredentials",
@@ -67,7 +69,6 @@ __all__ = (  # Keep this alphabetically ordered
     "EncryptedCredentials",
     "EncryptedPassportElement",
     "ExternalReplyInfo",
-    "error",
     "File",
     "FileCredentials",
     "ForceReply",
@@ -81,10 +82,9 @@ __all__ = (  # Keep this alphabetically ordered
     "GeneralForumTopicHidden",
     "GeneralForumTopicUnhidden",
     "Giveaway",
-    "GiveawayCreated",
     "GiveawayCompleted",
+    "GiveawayCreated",
     "GiveawayWinners",
-    "helpers",
     "IdDocumentData",
     "InaccessibleMessage",
     "InlineKeyboardButton",
@@ -108,10 +108,10 @@ __all__ = (  # Keep this alphabetically ordered
     "InlineQueryResultLocation",
     "InlineQueryResultMpeg4Gif",
     "InlineQueryResultPhoto",
-    "InlineQueryResultsButton",
     "InlineQueryResultVenue",
     "InlineQueryResultVideo",
     "InlineQueryResultVoice",
+    "InlineQueryResultsButton",
     "InputContactMessageContent",
     "InputFile",
     "InputInvoiceMessageContent",
@@ -147,10 +147,12 @@ __all__ = (  # Keep this alphabetically ordered
     "MessageEntity",
     "MessageId",
     "MessageOrigin",
-    "MessageOriginUser",
-    "MessageOriginHiddenUser",
-    "MessageOriginChat",
     "MessageOriginChannel",
+    "MessageOriginChat",
+    "MessageOriginHiddenUser",
+    "MessageOriginUser",
+    "MessageReactionCountUpdated",
+    "MessageReactionUpdated",
     "OrderInfo",
     "PassportData",
     "PassportElementError",
@@ -171,13 +173,13 @@ __all__ = (  # Keep this alphabetically ordered
     "PollOption",
     "PreCheckoutQuery",
     "ProximityAlertTriggered",
+    "ReactionCount",
     "ReactionType",
     "ReactionTypeCustomEmoji",
     "ReactionTypeEmoji",
     "ReplyKeyboardMarkup",
     "ReplyKeyboardRemove",
     "ReplyParameters",
-    "request",
     "ResidentialAddress",
     "SecureData",
     "SecureValue",
@@ -194,9 +196,10 @@ __all__ = (  # Keep this alphabetically ordered
     "TextQuote",
     "Update",
     "User",
+    "UserChatBoosts",
     "UserProfilePhotos",
-    "UsersShared",
     "UserShared",
+    "UsersShared",
     "Venue",
     "Video",
     "VideoChatEnded",
@@ -205,11 +208,19 @@ __all__ = (  # Keep this alphabetically ordered
     "VideoChatStarted",
     "VideoNote",
     "Voice",
-    "warnings",
     "WebAppData",
     "WebAppInfo",
     "WebhookInfo",
     "WriteAccessAllowed",
+    "__bot_api_version__",
+    "__bot_api_version_info__",
+    "__version__",
+    "__version_info__",
+    "constants",
+    "error",
+    "helpers",
+    "request",
+    "warnings",
 )
 
 
@@ -231,6 +242,16 @@ from ._botname import BotName
 from ._callbackquery import CallbackQuery
 from ._chat import Chat
 from ._chatadministratorrights import ChatAdministratorRights
+from ._chatboost import (
+    ChatBoost,
+    ChatBoostRemoved,
+    ChatBoostSource,
+    ChatBoostSourceGiftCode,
+    ChatBoostSourceGiveaway,
+    ChatBoostSourcePremium,
+    ChatBoostUpdated,
+    UserChatBoosts,
+)
 from ._chatinvitelink import ChatInviteLink
 from ._chatjoinrequest import ChatJoinRequest
 from ._chatlocation import ChatLocation
@@ -336,6 +357,7 @@ from ._messageorigin import (
     MessageOriginHiddenUser,
     MessageOriginUser,
 )
+from ._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
 from ._passport.credentials import (
     Credentials,
     DataCredentials,
@@ -370,7 +392,7 @@ from ._payment.shippingquery import ShippingQuery
 from ._payment.successfulpayment import SuccessfulPayment
 from ._poll import Poll, PollAnswer, PollOption
 from ._proximityalerttriggered import ProximityAlertTriggered
-from ._reactiontype import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
+from ._reaction import ReactionCount, ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove

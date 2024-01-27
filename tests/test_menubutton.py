@@ -28,6 +28,7 @@ from telegram import (
     MenuButtonWebApp,
     WebAppInfo,
 )
+from telegram.constants import MenuButtonType
 from tests.auxil.slots import mro_slots
 
 
@@ -144,6 +145,10 @@ class TestMenuButtonWithoutRequest(TestMenuButtonselfBase):
             assert menu_button_dict["web_app"] == menu_button.web_app.to_dict()
         if hasattr(menu_button, "text"):
             assert menu_button_dict["text"] == menu_button.text
+
+    def test_type_enum_conversion(self):
+        assert type(MenuButton("commands").type) is MenuButtonType
+        assert MenuButton("unknown").type == "unknown"
 
     def test_equality(self, menu_button, bot):
         a = MenuButton("base_type")

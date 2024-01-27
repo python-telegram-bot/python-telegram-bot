@@ -22,7 +22,7 @@ from copy import deepcopy
 import pytest
 
 from telegram import Dice, ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
-from telegram.constants import ReactionEmojis
+from telegram.constants import ReactionEmoji
 from tests.auxil.slots import mro_slots
 
 ignored = ["self", "api_kwargs"]
@@ -30,7 +30,7 @@ ignored = ["self", "api_kwargs"]
 
 class CMDefaults:
     custom_emoji = "123custom"
-    normal_emoji = ReactionEmojis.THUMBS_UP
+    normal_emoji = ReactionEmoji.THUMBS_UP
 
 
 def reaction_type_custom_emoji():
@@ -166,7 +166,7 @@ class TestChatMemberTypesWithoutRequest:
         b = ReactionTypeEmoji(emoji=CMDefaults.normal_emoji)
         c = ReactionTypeCustomEmoji(custom_emoji_id=CMDefaults.custom_emoji)
         d = ReactionTypeCustomEmoji(custom_emoji_id=CMDefaults.custom_emoji)
-        e = ReactionTypeEmoji(emoji=ReactionEmojis.READ_HEART)
+        e = ReactionTypeEmoji(emoji=ReactionEmoji.RED_HEART)
         f = ReactionTypeCustomEmoji(custom_emoji_id="1234custom")
         g = deepcopy(a)
         h = deepcopy(c)

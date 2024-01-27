@@ -18,10 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram KeyboardButton."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
-from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
+from telegram._keyboardbuttonrequest import (
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestUser,
+    KeyboardButtonRequestUsers,
+)
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings_transition import (
@@ -79,7 +83,8 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.0
-        request_user (:class:`KeyboardButtonRequestUsers`, optional): Alias for
+        request_user (:class:`KeyboardButtonRequestUser` | :class:`KeyboardButtonRequestUsers`, \
+            optional): Alias for
             :attr:`request_users`.
 
             .. versionadded:: 20.1
@@ -145,7 +150,9 @@ class KeyboardButton(TelegramObject):
         request_location: Optional[bool] = None,
         request_poll: Optional[KeyboardButtonPollType] = None,
         web_app: Optional[WebAppInfo] = None,
-        request_user: Optional[KeyboardButtonRequestUsers] = None,
+        request_user: Optional[
+            Union[KeyboardButtonRequestUsers, KeyboardButtonRequestUser]
+        ] = None,
         request_chat: Optional[KeyboardButtonRequestChat] = None,
         request_users: Optional[KeyboardButtonRequestUsers] = None,
         *,

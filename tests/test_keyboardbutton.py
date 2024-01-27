@@ -23,6 +23,7 @@ from telegram import (
     KeyboardButton,
     KeyboardButtonPollType,
     KeyboardButtonRequestChat,
+    KeyboardButtonRequestUser,
     KeyboardButtonRequestUsers,
     WebAppInfo,
 )
@@ -100,6 +101,7 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert inline_keyboard_button.request_poll == self.request_poll
         assert inline_keyboard_button.web_app == self.web_app
         assert inline_keyboard_button.request_chat == self.request_chat
+        assert inline_keyboard_button.request_user == self.request_users
         assert inline_keyboard_button.request_users == self.request_users
 
         none = KeyboardButton.de_json({}, None)
@@ -117,7 +119,7 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         with pytest.warns(
             PTBDeprecationWarning, match="'request_user' to 'request_users'"
         ) as record:
-            KeyboardButton("test", request_user=KeyboardButtonRequestUsers(2))
+            KeyboardButton("test", request_user=KeyboardButtonRequestUser(2))
 
         assert record[0].filename == __file__, "wrong stacklevel"
 

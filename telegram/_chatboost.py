@@ -18,11 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram ChatBoosts."""
 
+from datetime import datetime
 from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Tuple, Type
 
+from telegram import constants
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
@@ -35,9 +38,9 @@ class ChatBoostSource(TelegramObject):
     """
     Base class for Telegram ChatBoostSource objects. It can be one of:
 
-    :class:`telegram.ChatBoostSourcePremium`
-    :class:`telegram.ChatBoostSourceGiftCode`
-    :class:`telegram.ChatBoostSourceGiveaway`
+    * :class:`telegram.ChatBoostSourcePremium`
+    * :class:`telegram.ChatBoostSourceGiftCode`
+    * :class:`telegram.ChatBoostSourceGiveaway`
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`source` is equal.
@@ -57,18 +60,18 @@ class ChatBoostSource(TelegramObject):
 
     __slots__ = ("source",)
 
-    PREMIUM: Final[str] = "premium"  # TODO: Make it a reference to constants
+    PREMIUM: Final[str] = constants.ChatBoostSources.PREMIUM
     """:const:`telegram.constants.ChatBoostSources.PREMIUM`"""
-    GIFT_CODE: Final[str] = "gift_code"
+    GIFT_CODE: Final[str] = constants.ChatBoostSources.GIFT_CODE
     """:const:`telegram.constants.ChatBoostSources.GIFT_CODE`"""
-    GIVEAWAY: Final[str] = "giveaway"
+    GIVEAWAY: Final[str] = constants.ChatBoostSources.GIVEAWAY
     """:const:`telegram.constants.ChatBoostSources.GIVEAWAY`"""
 
     def __init__(self, source: str, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required by all subclasses:
-        self.source: str = source
+        self.source: str = enum.get_member(constants.ChatBoostSources, source, source)
 
         self._id_attrs = (self.source,)
         self._freeze()
@@ -104,8 +107,6 @@ class ChatBoostSourcePremium(ChatBoostSource):
     .. versionadded:: NEXT.VERSION
 
     Args:
-        source (:obj:`str`): The source of the chat boost. Always
-            :attr:`~telegram.ChatBoostSource.PREMIUM`.
         user (:class:`telegram.User`): User that boosted the chat.
 
     Attributes:
@@ -132,8 +133,6 @@ class ChatBoostSourceGiftCode(ChatBoostSource):
     .. versionadded:: NEXT.VERSION
 
     Args:
-        source (:obj:`str`): Source of the boost. Always
-            :attr:`~telegram.ChatBoostSource.GIFT_CODE`.
         user (:class:`telegram.User`): User for which the gift code was created.
 
     Attributes:
@@ -159,8 +158,6 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
     .. versionadded:: NEXT.VERSION
 
     Args:
-        source (:obj:`str`): Source of the boost. Always
-            :attr:`~telegram.ChatBoostSource.GIVEAWAY`.
         giveaway_message_id (:obj:`int`): Identifier of a message in the chat with the giveaway;
             the message could have been deleted already. May be 0 if the message isn't sent yet.
         user (:class:`telegram.User`, optional): User that won the prize in the giveaway if any.
@@ -176,6 +173,8 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
         is_unclaimed (:obj:`bool`): Optional. :obj:`True`, if the giveaway was completed, but
             there was no user to win the prize.
     """
+
+    __slots__ = ("giveaway_message_id", "user", "is_unclaimed")
 
     def __init__(
         self,
@@ -205,18 +204,19 @@ class ChatBoost(TelegramObject):
 
     Args:
         boost_id (:obj:`str`): Unique identifier of the boost.
-        add_date (:obj:`int`): Point in time (Unix timestamp) when the chat was boosted.
-        expiration_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the boost
+        add_date (:obj:`datetime.datetime`): Point in time when the chat was boosted.
+        expiration_date (:obj:`datetime.datetime`): Point in time when the boost
             will automatically expire, unless the booster's Telegram Premium subscription is
             prolonged.
         source (:class:`telegram.ChatBoostSource`): Source of the added boost.
 
     Attributes:
         boost_id (:obj:`str`): Unique identifier of the boost.
-        add_date (:obj:`int`): Point in time (Unix timestamp) when the chat was boosted.
-        expiration_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the boost
+        add_date (:obj:`datetime.datetime`): Point in time when the chat was boosted.
+            |datetime_localization|
+        expiration_date (:obj:`datetime.datetime`): Point in time when the boost
             will automatically expire, unless the booster's Telegram Premium subscription is
-            prolonged.
+            prolonged. |datetime_localization|
         source (:class:`telegram.ChatBoostSource`): Source of the added boost.
     """
 
@@ -225,8 +225,8 @@ class ChatBoost(TelegramObject):
     def __init__(
         self,
         boost_id: str,
-        add_date: int,
-        expiration_date: int,
+        add_date: datetime,
+        expiration_date: datetime,
         source: ChatBoostSource,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -234,8 +234,8 @@ class ChatBoost(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         self.boost_id: str = boost_id
-        self.add_date: int = add_date
-        self.expiration_date: int = expiration_date
+        self.add_date: datetime = add_date
+        self.expiration_date: datetime = expiration_date
         self.source: ChatBoostSource = source
 
         self._id_attrs = (self.boost_id, self.add_date, self.expiration_date, self.source)
@@ -251,6 +251,7 @@ class ChatBoost(TelegramObject):
 
         data["source"] = ChatBoostSource.de_json(data.get("source"), bot)
         loc_tzinfo = extract_tzinfo_from_defaults(bot)
+        data["add_date"] = from_timestamp(data["add_date"], tzinfo=loc_tzinfo)
         data["expiration_date"] = from_timestamp(data["expiration_date"], tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)
@@ -315,15 +316,14 @@ class ChatBoostRemoved(TelegramObject):
     Args:
         chat (:class:`telegram.Chat`): Chat which was boosted.
         boost_id (:obj:`str`): Unique identifier of the boost.
-        remove_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the boost was
-            removed.
+        remove_date (:obj:`datetime.datetime`): Point in time when the boost was removed.
         source (:class:`telegram.ChatBoostSource`): Source of the removed boost.
 
     Attributes:
         chat (:class:`telegram.Chat`): Chat which was boosted.
         boost_id (:obj:`str`): Unique identifier of the boost.
-        remove_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the boost was
-            removed.
+        remove_date (:obj:`datetime.datetime`): Point in time when the boost was removed.
+            |datetime_localization|
         source (:class:`telegram.ChatBoostSource`): Source of the removed boost.
     """
 
@@ -333,7 +333,7 @@ class ChatBoostRemoved(TelegramObject):
         self,
         chat: Chat,
         boost_id: str,
-        remove_date: int,
+        remove_date: datetime,
         source: ChatBoostSource,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -342,7 +342,7 @@ class ChatBoostRemoved(TelegramObject):
 
         self.chat: Chat = chat
         self.boost_id: str = boost_id
-        self.remove_date: int = remove_date
+        self.remove_date: datetime = remove_date
         self.source: ChatBoostSource = source
 
         self._id_attrs = (self.chat, self.boost_id, self.remove_date, self.source)

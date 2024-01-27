@@ -45,7 +45,7 @@ class Giveaway(TelegramObject):
         chats (Tuple[:class:`telegram.Chat`]): The list of chats which the user must join to
             participate in the giveaway.
         winners_selection_date (:class:`datetime.datetime`): The date when the giveaway winner will
-            be selected.
+            be selected. |datetime_localization|
         winner_count (:obj:`int`): The number of users which are supposed to be selected as winners
             of the giveaway.
         only_new_members (:obj:`True`, optional): If :obj:`True`, only users who join the chats
@@ -64,7 +64,7 @@ class Giveaway(TelegramObject):
         chats (Sequence[:class:`telegram.Chat`]): The list of chats which the user must join to
             participate in the giveaway.
         winners_selection_date (:class:`datetime.datetime`): The date when the giveaway winner will
-            be selected.
+            be selected. |datetime_localization|
         winner_count (:obj:`int`): The number of users which are supposed to be selected as winners
             of the giveaway.
         only_new_members (:obj:`True`): Optional. If :obj:`True`, only users who join the chats
@@ -139,7 +139,7 @@ class Giveaway(TelegramObject):
             data.get("winners_selection_date"), tzinfo=loc_tzinfo
         )
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
 
 class GiveawayCreated(TelegramObject):
@@ -149,7 +149,7 @@ class GiveawayCreated(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(self, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)
 
         self._freeze()
@@ -168,7 +168,7 @@ class GiveawayWinners(TelegramObject):
         chat (:class:`telegram.Chat`): The chat that created the giveaway
         giveaway_message_id (:obj:`int`): Identifier of the message with the giveaway in the chat
         winners_selection_date (:class:`datetime.datetime`): Point in time when winners of the
-            giveaway were selected
+            giveaway were selected. |datetime_localization|
         winner_count (:obj:`int`): Total number of winners in the giveaway
         winners	(Sequence[:class:`telegram.User`]): List of up to
             :tg-const:`telegram.constants.GiveawayLimit.MAX_WINNERS` winners of the giveaway
@@ -187,7 +187,7 @@ class GiveawayWinners(TelegramObject):
         chat (:class:`telegram.Chat`): The chat that created the giveaway
         giveaway_message_id (:obj:`int`): Identifier of the message with the giveaway in the chat
         winners_selection_date (:class:`datetime.datetime`): Point in time when winners of the
-            giveaway were selected
+            giveaway were selected. |datetime_localization|
         winner_count (:obj:`int`): Total number of winners in the giveaway
         winners	(Tuple[:class:`telegram.User`]): tuple of up to
             :tg-const:`telegram.constants.GiveawayLimit.MAX_WINNERS` winners of the giveaway
@@ -274,7 +274,7 @@ class GiveawayWinners(TelegramObject):
             data.get("winners_selection_date"), tzinfo=loc_tzinfo
         )
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
 
 class GiveawayCompleted(TelegramObject):
@@ -333,4 +333,4 @@ class GiveawayCompleted(TelegramObject):
 
         data["giveaway_message"] = Message.de_json(data.get("giveaway_message"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

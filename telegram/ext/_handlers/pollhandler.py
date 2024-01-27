@@ -16,30 +16,24 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the PreCheckoutQueryHandler class."""
+"""This module contains the PollHandler class."""
 
-
-import re
-from typing import Optional, Pattern, TypeVar, Union
 
 from telegram import Update
-from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVType
-from telegram.ext._basehandler import BaseHandler
-from telegram.ext._utils.types import CCT, HandlerCallback
-
-RT = TypeVar("RT")
+from telegram.ext._handlers.basehandler import BaseHandler
+from telegram.ext._utils.types import CCT
 
 
-class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
-    """Handler class to handle Telegram :attr:`telegram.Update.pre_checkout_query`.
+class PollHandler(BaseHandler[Update, CCT]):
+    """Handler class to handle Telegram updates that contain a
+    :attr:`poll <telegram.Update.poll>`.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Examples:
-        :any:`Payment Bot <examples.paymentbot>`
+        :any:`Poll Bot <examples.pollbot>`
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -55,32 +49,14 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
-        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Optional. Regex pattern
-            to test :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
-
-            .. versionadded:: NEXT.VERSION
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the callback will run in a blocking way..
-        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Optional. Regex pattern
-            to test :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
-
-            .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ("pattern",)
-
-    def __init__(
-        self,
-        callback: HandlerCallback[Update, CCT, RT],
-        block: DVType[bool] = DEFAULT_TRUE,
-        pattern: Optional[Union[str, Pattern[str]]] = None,
-    ):
-        super().__init__(callback, block=block)
-
-        self.pattern: Optional[Pattern[str]] = re.compile(pattern) if pattern is not None else None
+    __slots__ = ()
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -92,11 +68,4 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
-        if isinstance(update, Update) and update.pre_checkout_query:
-            invoice_payload = update.pre_checkout_query.invoice_payload
-            if self.pattern:
-                if self.pattern.match(invoice_payload):
-                    return True
-            else:
-                return True
-        return False
+        return isinstance(update, Update) and bool(update.poll)

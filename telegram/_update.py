@@ -22,16 +22,19 @@ from typing import TYPE_CHECKING, Final, List, Optional
 
 from telegram import constants
 from telegram._callbackquery import CallbackQuery
+from telegram._chatboost import ChatBoostRemoved, ChatBoostUpdated
 from telegram._chatjoinrequest import ChatJoinRequest
 from telegram._chatmemberupdated import ChatMemberUpdated
 from telegram._choseninlineresult import ChosenInlineResult
 from telegram._inline.inlinequery import InlineQuery
 from telegram._message import Message
+from telegram._messagereactionupdated import MessageReactionCountUpdated, MessageReactionUpdated
 from telegram._payment.precheckoutquery import PreCheckoutQuery
 from telegram._payment.shippingquery import ShippingQuery
 from telegram._poll import Poll, PollAnswer
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
 
 if TYPE_CHECKING:
     from telegram import Bot, Chat, User
@@ -96,6 +99,39 @@ class Update(TelegramObject):
             receive these updates.
 
             .. versionadded:: 13.8
+
+        chat_boost (:class:`telegram.ChatBoostUpdated`, optional): A chat boost was added or
+            changed. The bot must be an administrator in the chat to receive these updates.
+
+            .. versionadded:: NEXT.VERSION
+
+        removed_chat_boost (:class:`telegram.ChatBoostRemoved`, optional): A boost was removed from
+            a chat. The bot must be an administrator in the chat to receive these updates.
+
+            .. versionadded:: NEXT.VERSION
+
+        message_reaction (:class:`telegram.MessageReactionUpdated`, optional): A reaction to a
+            message was changed by a user. The bot must be an administrator in the chat and must
+            explicitly specify :attr:`MESSAGE_REACTION` in the list of
+            :paramref:`telegram.ext.Application.run_polling.allowed_updates` to receive these
+            updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
+            :meth:`telegram.ext.Application.run_polling` and
+            :meth:`telegram.ext.Application.run_webhook`). The update isn't received for reactions
+            set by bots.
+
+            .. versionadded:: NEXT.VERSION
+
+        message_reaction_count (:class:`telegram.MessageReactionCountUpdated`, optional): Reactions
+            to a message with anonymous reactions were changed. The bot must be an administrator in
+            the chat and must explicitly specify :attr:`MESSAGE_REACTION_COUNT` in the list of
+            :paramref:`telegram.ext.Application.run_polling.allowed_updates` to receive these
+            updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
+            :meth:`telegram.ext.Application.run_polling` and
+            :meth:`telegram.ext.Application.run_webhook`). The updates are grouped and can be sent
+            with delay up to a few minutes.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
             certain positive number and increase sequentially. This ID becomes especially handy if
@@ -148,6 +184,37 @@ class Update(TelegramObject):
 
             .. versionadded:: 13.8
 
+        chat_boost (:class:`telegram.ChatBoostUpdated`): Optional. A chat boost was added or
+            changed. The bot must be an administrator in the chat to receive these updates.
+
+            .. versionadded:: NEXT.VERSION
+
+        removed_chat_boost (:class:`telegram.ChatBoostRemoved`): Optional. A boost was removed from
+            a chat. The bot must be an administrator in the chat to receive these updates.
+
+            .. versionadded:: NEXT.VERSION
+
+        message_reaction (:class:`telegram.MessageReactionUpdated`): Optional. A reaction to a
+            message was changed by a user. The bot must be an administrator in the chat and must
+            explicitly specify :attr:`MESSAGE_REACTION` in the list of
+            :paramref:`telegram.ext.Application.run_polling.allowed_updates` to receive these
+            updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
+            :meth:`telegram.ext.Application.run_polling` and
+            :meth:`telegram.ext.Application.run_webhook`). The update isn't received for reactions
+            set by bots.
+
+            .. versionadded:: NEXT.VERSION
+
+        message_reaction_count (:class:`telegram.MessageReactionCountUpdated`): Optional. Reactions
+            to a message with anonymous reactions were changed. The bot must be an administrator in
+            the chat and must explicitly specify :attr:`MESSAGE_REACTION_COUNT` in the list of
+            :paramref:`telegram.ext.Application.run_polling.allowed_updates` to receive these
+            updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
+            :meth:`telegram.ext.Application.run_polling` and
+            :meth:`telegram.ext.Application.run_webhook`). The updates are grouped and can be sent
+            with delay up to a few minutes.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -169,6 +236,10 @@ class Update(TelegramObject):
         "my_chat_member",
         "chat_member",
         "chat_join_request",
+        "chat_boost",
+        "removed_chat_boost",
+        "message_reaction",
+        "message_reaction_count",
     )
 
     MESSAGE: Final[str] = constants.UpdateType.MESSAGE
@@ -227,6 +298,22 @@ class Update(TelegramObject):
     """:const:`telegram.constants.UpdateType.CHAT_JOIN_REQUEST`
 
     .. versionadded:: 13.8"""
+    CHAT_BOOST: Final[str] = constants.UpdateType.CHAT_BOOST
+    """:const:`telegram.constants.UpdateType.CHAT_BOOST`
+
+    .. versionadded:: NEXT.VERSION"""
+    REMOVED_CHAT_BOOST: Final[str] = constants.UpdateType.REMOVED_CHAT_BOOST
+    """:const:`telegram.constants.UpdateType.REMOVED_CHAT_BOOST`
+
+    .. versionadded:: NEXT.VERSION"""
+    MESSAGE_REACTION: Final[str] = constants.UpdateType.MESSAGE_REACTION
+    """:const:`telegram.constants.UpdateType.MESSAGE_REACTION`
+
+    .. versionadded:: NEXT.VERSION"""
+    MESSAGE_REACTION_COUNT: Final[str] = constants.UpdateType.MESSAGE_REACTION_COUNT
+    """:const:`telegram.constants.UpdateType.MESSAGE_REACTION_COUNT`
+
+    .. versionadded:: NEXT.VERSION"""
     ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
     """List[:obj:`str`]: A list of all available update types.
 
@@ -249,6 +336,10 @@ class Update(TelegramObject):
         my_chat_member: Optional[ChatMemberUpdated] = None,
         chat_member: Optional[ChatMemberUpdated] = None,
         chat_join_request: Optional[ChatJoinRequest] = None,
+        chat_boost: Optional[ChatBoostUpdated] = None,
+        removed_chat_boost: Optional[ChatBoostRemoved] = None,
+        message_reaction: Optional[MessageReactionUpdated] = None,
+        message_reaction_count: Optional[MessageReactionCountUpdated] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -270,6 +361,10 @@ class Update(TelegramObject):
         self.my_chat_member: Optional[ChatMemberUpdated] = my_chat_member
         self.chat_member: Optional[ChatMemberUpdated] = chat_member
         self.chat_join_request: Optional[ChatJoinRequest] = chat_join_request
+        self.chat_boost: Optional[ChatBoostUpdated] = chat_boost
+        self.removed_chat_boost: Optional[ChatBoostRemoved] = removed_chat_boost
+        self.message_reaction: Optional[MessageReactionUpdated] = message_reaction
+        self.message_reaction_count: Optional[MessageReactionCountUpdated] = message_reaction_count
 
         self._effective_user: Optional[User] = None
         self._effective_chat: Optional[Chat] = None
@@ -284,7 +379,16 @@ class Update(TelegramObject):
         """
         :class:`telegram.User`: The user that sent this update, no matter what kind of update this
         is. If no user is associated with this update, this gives :obj:`None`. This is the case
-        if :attr:`channel_post`, :attr:`edited_channel_post` or :attr:`poll` is present.
+        if any of
+
+        * :attr:`channel_post`
+        * :attr:`edited_channel_post`
+        * :attr:`poll`
+        * :attr:`chat_boost`
+        * :attr:`removed_chat_boost`
+        * :attr:`message_reaction_count`
+
+        is present.
 
         Example:
             * If :attr:`message` is present, this will give
@@ -329,6 +433,9 @@ class Update(TelegramObject):
 
         elif self.chat_join_request:
             user = self.chat_join_request.from_user
+
+        elif self.message_reaction:
+            user = self.message_reaction.user
 
         self._effective_user = user
         return user
@@ -377,6 +484,18 @@ class Update(TelegramObject):
         elif self.chat_join_request:
             chat = self.chat_join_request.chat
 
+        elif self.chat_boost:
+            chat = self.chat_boost.chat
+
+        elif self.removed_chat_boost:
+            chat = self.removed_chat_boost.chat
+
+        elif self.message_reaction:
+            chat = self.message_reaction.chat
+
+        elif self.message_reaction_count:
+            chat = self.message_reaction_count.chat
+
         self._effective_chat = chat
         return chat
 
@@ -389,11 +508,18 @@ class Update(TelegramObject):
             :attr:`callback_query` (i.e. :attr:`telegram.CallbackQuery.message`) or :obj:`None`, if
             none of those are present.
 
+        Tip:
+            This property will only ever return objects of type :class:`telegram.Message` or
+            :obj:`None`, never :class:`telegram.MaybeInaccessibleMessage` or
+            :class:`telegram.InaccessibleMessage`.
+            Currently, this is only relevant for :attr:`callback_query`, as
+            :attr:`telegram.CallbackQuery.message` is the only attribute considered by this
+            property that can be an object of these types.
         """
         if self._effective_message:
             return self._effective_message
 
-        message = None
+        message: Optional[Message] = None
 
         if self.message:
             message = self.message
@@ -402,7 +528,21 @@ class Update(TelegramObject):
             message = self.edited_message
 
         elif self.callback_query:
-            message = self.callback_query.message
+            if (
+                isinstance(cbq_message := self.callback_query.message, Message)
+                or cbq_message is None
+            ):
+                message = cbq_message
+            else:
+                warn(
+                    (
+                        "`update.callback_query` is not `None`, but of type "
+                        f"`{cbq_message.__class__.__name__}`. This is not considered by "
+                        "`Update.effective_message`. Please manually access this attribute "
+                        "if necessary."
+                    ),
+                    stacklevel=2,
+                )
 
         elif self.channel_post:
             message = self.channel_post
@@ -437,5 +577,13 @@ class Update(TelegramObject):
         data["my_chat_member"] = ChatMemberUpdated.de_json(data.get("my_chat_member"), bot)
         data["chat_member"] = ChatMemberUpdated.de_json(data.get("chat_member"), bot)
         data["chat_join_request"] = ChatJoinRequest.de_json(data.get("chat_join_request"), bot)
+        data["chat_boost"] = ChatBoostUpdated.de_json(data.get("chat_boost"), bot)
+        data["removed_chat_boost"] = ChatBoostRemoved.de_json(data.get("removed_chat_boost"), bot)
+        data["message_reaction"] = MessageReactionUpdated.de_json(
+            data.get("message_reaction"), bot
+        )
+        data["message_reaction_count"] = MessageReactionCountUpdated.de_json(
+            data.get("message_reaction_count"), bot
+        )
 
         return super().de_json(data=data, bot=bot)
