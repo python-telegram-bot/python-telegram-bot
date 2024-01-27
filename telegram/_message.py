@@ -864,9 +864,6 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: NEXT.VERSION
 
-    .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
-        function. Instead, the supplied replacement for the emoji will be used.
-
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
        :exc:`ValueError` when encountering a custom emoji.
@@ -3858,8 +3855,9 @@ class Message(MaybeInaccessibleMessage):
             if entity.type in types
         }
 
-    @staticmethod
+    @classmethod
     def _parse_html(
+        cls,
         message_text: Optional[str],
         entities: Dict[MessageEntity, str],
         urled: bool = False,
@@ -3889,7 +3887,7 @@ class Message(MaybeInaccessibleMessage):
             parsed_entities.extend(list(nested_entities.keys()))
 
             if nested_entities:
-                escaped_text = Message._parse_html(
+                escaped_text = cls._parse_html(
                     text, nested_entities, urled=urled, offset=entity.offset
                 )
             else:
@@ -3938,7 +3936,7 @@ class Message(MaybeInaccessibleMessage):
             last_offset = entity.offset - offset + entity.length
 
         # see comment above
-        html_text += escape(utf_16_text[last_offset * 2 :].decode("utf-16-le"))  # type: ignor
+        html_text += escape(utf_16_text[last_offset * 2 :].decode("utf-16-le"))
 
         return html_text
 
@@ -3948,6 +3946,9 @@ class Message(MaybeInaccessibleMessage):
 
         Use this if you want to retrieve the message text with the entities formatted as HTML in
         the same way the original message was formatted.
+
+        Warning:
+            |text_html|
 
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
@@ -3970,6 +3971,9 @@ class Message(MaybeInaccessibleMessage):
 
         Use this if you want to retrieve the message text with the entities formatted as HTML.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Warning:
+            |text_html|
 
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
@@ -3994,6 +3998,9 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML in the same way the original message was formatted.
 
+        Warning:
+            |text_html|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
@@ -4016,6 +4023,9 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        Warning:
+            |text_html|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
@@ -4030,8 +4040,9 @@ class Message(MaybeInaccessibleMessage):
         """
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
-    @staticmethod
+    @classmethod
     def _parse_markdown(
+        cls,
         message_text: Optional[str],
         entities: Dict[MessageEntity, str],
         urled: bool = False,
@@ -4077,7 +4088,7 @@ class Message(MaybeInaccessibleMessage):
                 if version < 2:
                     raise ValueError("Nested entities are not supported for Markdown version 1")
 
-                escaped_text = Message._parse_markdown(
+                escaped_text = cls._parse_markdown(
                     text,
                     nested_entities,
                     urled=urled,
@@ -4169,12 +4180,12 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
-        Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use
-              :meth:`text_markdown_v2` instead.
+        Warning:
+            |text_markdown|
 
-            * |custom_emoji_formatting_note|
+        Note:
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`text_markdown_v2` instead.
 
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
@@ -4200,6 +4211,9 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
+        Warning:
+            |text_markdown|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
@@ -4222,12 +4236,13 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
-              instead.
+        Warning:
+            |text_markdown|
 
-            * |custom_emoji_formatting_note|
+        Note:
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
+            instead.
 
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
@@ -4253,6 +4268,9 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        Warning:
+            |text_markdown|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
@@ -4275,13 +4293,12 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
 
+        Warning:
+            |text_markdown|
+
         Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use :meth:`caption_markdown_v2`
-              instead.
-
-            * |custom_emoji_formatting_note|
-
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`caption_markdown_v2`
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
@@ -4305,6 +4322,9 @@ class Message(MaybeInaccessibleMessage):
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
+
+        Warning:
+            |text_markdown|
 
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
@@ -4330,12 +4350,13 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use
-              :meth:`caption_markdown_v2_urled` instead.
+        Warning:
+            |text_markdown|
 
-            * |custom_emoji_formatting_note|
+        Note:
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use
+            :meth:`caption_markdown_v2_urled` instead.
 
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
@@ -4360,6 +4381,9 @@ class Message(MaybeInaccessibleMessage):
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Warning:
+            |text_markdown|
 
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
