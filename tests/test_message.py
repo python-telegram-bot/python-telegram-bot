@@ -388,13 +388,13 @@ class TestMessageBase:
         {"length": 10, "offset": 129, "type": "pre", "language": "python"},
         {"length": 7, "offset": 141, "type": "spoiler"},
         {"length": 2, "offset": 150, "type": "custom_emoji", "custom_emoji_id": "1"},
-        {"length": 10, "offset": 154, "type": "blockquote"},
-        {"length": 15, "offset": 166, "type": "blockquote"},
+        {"length": 34, "offset": 154, "type": "blockquote"},
+        {"length": 6, "offset": 181, "type": "bold"},
     ]
     test_text_v2 = (
         r"Test for <bold, ita_lic, \`code, links, text-mention and `\pre. "
         "http://google.com and bold nested in strk>trgh nested in italic. Python pre. Spoiled. "
-        "👍. blockquote. Multiline\nquote"
+        "👍.\nMultiline\nblock quote\nwith nested."
     )
     test_message = Message(
         message_id=1,
@@ -707,8 +707,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             "and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. "
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>. '
-            '<tg-emoji emoji-id="1">👍</tg-emoji>. '
-            "<blockquote>blockquote</blockquote>. <blockquote>Multiline\nquote</blockquote>"
+            '<tg-emoji emoji-id="1">👍</tg-emoji>.\n'
+            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>"
         )
         text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
@@ -728,8 +728,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             "and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. "
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>. '
-            '<tg-emoji emoji-id="1">👍</tg-emoji>. '
-            "<blockquote>blockquote</blockquote>. <blockquote>Multiline\nquote</blockquote>"
+            '<tg-emoji emoji-id="1">👍</tg-emoji>.\n'
+            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>"
         )
         text_html = self.test_message_v2.text_html_urled
         assert text_html == test_html_string
@@ -750,13 +750,25 @@ class TestMessageWithoutRequest(TestMessageBase):
             "[links](http://github.com/abc\\\\\\)def), "
             "[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. "
             r"http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. "
-            "```python\nPython pre```\\. ||Spoiled||\\. ![👍](tg://emoji?id=1)\\. "
-            "\n>blockquote\n\\. \n>Multiline\n>quote"
+            "```python\nPython pre```\\. ||Spoiled||\\. ![👍](tg://emoji?id=1)\\.\n"
+            ">Multiline\n"
+            ">block quote\n"
+            r">with *nested*\."
         )
         text_markdown = self.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
 
-    def test_text_markdown_new_in_v2(self, message):
+    @pytest.mark.parametrize(
+        "entity_type",
+        [
+            MessageEntity.UNDERLINE,
+            MessageEntity.STRIKETHROUGH,
+            MessageEntity.SPOILER,
+            MessageEntity.BLOCKQUOTE,
+            MessageEntity.CUSTOM_EMOJI,
+        ],
+    )
+    def test_text_markdown_new_in_v2(self, message, entity_type):
         message.text = "test"
         message.entities = [
             MessageEntity(MessageEntity.BOLD, offset=0, length=4),
@@ -765,20 +777,8 @@ class TestMessageWithoutRequest(TestMessageBase):
         with pytest.raises(ValueError, match="Nested entities are not supported for"):
             assert message.text_markdown
 
-        message.entities = [MessageEntity(MessageEntity.UNDERLINE, offset=0, length=4)]
-        with pytest.raises(ValueError, match="Underline entities are not supported for"):
-            message.text_markdown
-
-        message.entities = [MessageEntity(MessageEntity.STRIKETHROUGH, offset=0, length=4)]
-        with pytest.raises(ValueError, match="Strikethrough entities are not supported for"):
-            message.text_markdown
-
-        message.entities = [MessageEntity(MessageEntity.SPOILER, offset=0, length=4)]
-        with pytest.raises(ValueError, match="Spoiler entities are not supported for"):
-            message.text_markdown
-
-        message.entities = [MessageEntity(MessageEntity.BLOCKQUOTE, offset=0, length=4)]
-        with pytest.raises(ValueError, match="Blockquote entities are not supported for"):
+        message.entities = [MessageEntity(entity_type, offset=0, length=4)]
+        with pytest.raises(ValueError, match="entities are not supported for"):
             message.text_markdown
 
         message.entities = []
@@ -806,7 +806,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             "[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. "
             r"[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ "
             "nested in* italic_\\. ```python\nPython pre```\\. ||Spoiled||\\. "
-            "![👍](tg://emoji?id=1)\\. \n>blockquote\n\\. \n>Multiline\n>quote"
+            "![👍](tg://emoji?id=1)\\.\n"
+            ">Multiline\n"
+            ">block quote\n"
+            r">with *nested*\."
         )
         text_markdown = self.test_message_v2.text_markdown_v2_urled
         assert text_markdown == test_md_string
@@ -857,7 +860,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             text=text,
             entities=[emoji_entity],
         )
-        with pytest.raises(ValueError, match="Custom emoji entities are not supported for"):
+        with pytest.raises(ValueError, match="Custom Emoji entities are not supported for"):
             getattr(message, type_)
 
     @pytest.mark.parametrize(
@@ -922,8 +925,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             "and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. "
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>. '
-            '<tg-emoji emoji-id="1">👍</tg-emoji>. '
-            "<blockquote>blockquote</blockquote>. <blockquote>Multiline\nquote</blockquote>"
+            '<tg-emoji emoji-id="1">👍</tg-emoji>.\n'
+            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>"
         )
         caption_html = self.test_message_v2.caption_html
         assert caption_html == test_html_string
@@ -943,8 +946,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             "and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. "
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>. '
-            '<tg-emoji emoji-id="1">👍</tg-emoji>. '
-            "<blockquote>blockquote</blockquote>. <blockquote>Multiline\nquote</blockquote>"
+            '<tg-emoji emoji-id="1">👍</tg-emoji>.\n'
+            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>"
         )
         caption_html = self.test_message_v2.caption_html_urled
         assert caption_html == test_html_string
@@ -965,8 +968,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             "[links](http://github.com/abc\\\\\\)def), "
             "[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. "
             r"http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. "
-            "```python\nPython pre```\\. ||Spoiled||\\. ![👍](tg://emoji?id=1)\\. "
-            "\n>blockquote\n\\. \n>Multiline\n>quote"
+            "```python\nPython pre```\\. ||Spoiled||\\. ![👍](tg://emoji?id=1)\\.\n"
+            ">Multiline\n"
+            ">block quote\n"
+            r">with *nested*\."
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2
         assert caption_markdown == test_md_string
@@ -994,7 +999,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             "[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. "
             r"[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ "
             "nested in* italic_\\. ```python\nPython pre```\\. ||Spoiled||\\. "
-            "![👍](tg://emoji?id=1)\\. \n>blockquote\n\\. \n>Multiline\n>quote"
+            "![👍](tg://emoji?id=1)\\.\n"
+            ">Multiline\n"
+            ">block quote\n"
+            r">with *nested*\."
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2_urled
         assert caption_markdown == test_md_string
@@ -1050,7 +1058,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             caption=caption,
             caption_entities=[emoji_entity],
         )
-        with pytest.raises(ValueError, match="Custom emoji entities are not supported for"):
+        with pytest.raises(ValueError, match="Custom Emoji entities are not supported for"):
             getattr(message, type_)
 
     @pytest.mark.parametrize(
@@ -1261,8 +1269,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             "[links](http://github.com/abc\\\\\\)def), "
             "[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. "
             r"http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. "
-            "```python\nPython pre```\\. ||Spoiled||\\. ![👍](tg://emoji?id=1)\\. "
-            "\n>blockquote\n\\. \n>Multiline\n>quote"
+            "```python\nPython pre```\\. ||Spoiled||\\. ![👍](tg://emoji?id=1)\\.\n"
+            ">Multiline\n"
+            ">block quote\n"
+            r">with *nested*\."
         )
 
         async def make_assertion(*_, **kwargs):
@@ -1303,8 +1313,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             "and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. "
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>. '
-            '<tg-emoji emoji-id="1">👍</tg-emoji>. '
-            "<blockquote>blockquote</blockquote>. <blockquote>Multiline\nquote</blockquote>"
+            '<tg-emoji emoji-id="1">👍</tg-emoji>.\n'
+            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>"
         )
 
         async def make_assertion(*_, **kwargs):
