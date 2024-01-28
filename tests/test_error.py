@@ -25,6 +25,7 @@ from telegram.error import (
     BadRequest,
     ChatMigrated,
     Conflict,
+    EndPointNotFound,
     Forbidden,
     InvalidToken,
     NetworkError,
@@ -32,7 +33,6 @@ from telegram.error import (
     RetryAfter,
     TelegramError,
     TimedOut,
-    EndPointNotFound,
 )
 from telegram.ext import InvalidCallbackData
 from tests.auxil.slots import mro_slots

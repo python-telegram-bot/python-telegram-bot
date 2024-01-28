@@ -27,6 +27,8 @@ import socket
 import time
 from collections import defaultdict
 from http import HTTPStatus
+from io import BytesIO
+from typing import Tuple
 
 import httpx
 import pytest
@@ -50,6 +52,7 @@ from telegram import (
     InlineQueryResultsButton,
     InlineQueryResultVoice,
     InputFile,
+    InputMediaDocument,
     InputMessageContent,
     InputTextMessageContent,
     LabeledPrice,
@@ -77,7 +80,7 @@ from telegram.constants import (
     MenuButtonType,
     ParseMode,
 )
-from telegram.error import BadRequest, InvalidToken, NetworkError
+from telegram.error import BadRequest, EndPointNotFound, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
@@ -152,6 +155,7 @@ def bot_methods(ext_bot=True, include_camel_case=False):
         "initialize",
         "shutdown",
         "insert_callback_data",
+        "do_api_request",
     ]
     classes = (Bot, ExtBot) if ext_bot else (Bot,)
     for cls in classes:
@@ -1787,6 +1791,75 @@ class TestBotWithoutRequest:
         assert await asyncio.gather(
             bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
         ) == 3 * [BotName(default_name)]
+
+    async def test_do_api_request_camel_case_conversion(self, bot, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return url.endswith("camelCase")
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.do_api_request("camel_case")
+
+    async def test_do_api_request_media_write_timeout(self, bot, chat_id, monkeypatch):
+        test_flag = None
+
+        class CustomRequest(BaseRequest):
+            async def initialize(self_) -> None:
+                pass
+
+            async def shutdown(self_) -> None:
+                pass
+
+            async def do_request(self_, *args, **kwargs) -> Tuple[int, bytes]:
+                nonlocal test_flag
+                test_flag = (
+                    kwargs.get("read_timeout"),
+                    kwargs.get("connect_timeout"),
+                    kwargs.get("write_timeout"),
+                    kwargs.get("pool_timeout"),
+                )
+                return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
+
+        custom_request = CustomRequest()
+
+        bot = Bot(bot.token, request=custom_request)
+        await bot.do_api_request(
+            "send_document",
+            api_kwargs={
+                "chat_id": chat_id,
+                "caption": "test_caption",
+                "document": InputFile(data_file("telegram.png").open("rb")),
+            },
+        )
+        assert test_flag == (
+            DEFAULT_NONE,
+            DEFAULT_NONE,
+            20,
+            DEFAULT_NONE,
+        )
+
+    async def test_do_api_request_default_timezone(self, tz_bot, monkeypatch):
+        until = dtm.datetime(2020, 1, 11, 16, 13)
+        until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.parameters
+            chat_id = data["chat_id"] == 2
+            user_id = data["user_id"] == 32
+            until_date = data.get("until_date", until_timestamp) == until_timestamp
+            return chat_id and user_id and until_date
+
+        monkeypatch.setattr(tz_bot.request, "post", make_assertion)
+
+        assert await tz_bot.do_api_request(
+            "banChatMember", api_kwargs={"chat_id": 2, "user_id": 32}
+        )
+        assert await tz_bot.do_api_request(
+            "banChatMember", api_kwargs={"chat_id": 2, "user_id": 32, "until_date": until}
+        )
+        assert await tz_bot.do_api_request(
+            "banChatMember",
+            api_kwargs={"chat_id": 2, "user_id": 32, "until_date": until_timestamp},
+        )
 
 
 class TestBotWithRequest:
@@ -3498,4 +3571,88 @@ class TestBotWithRequest:
         with pytest.warns(PTBDeprecationWarning, match="Please use 'Bot.get_me'") as record:
             await bot.do_api_request("get_me")
 
-        assert record[0].file == __file__, "Wrong stack level!"
+        assert record[0].filename == __file__, "Wrong stack level!"
+
+    async def test_do_api_request_unknown_method(self, bot):
+        with pytest.raises(EndPointNotFound, match="'unknownEndpoint' not found"):
+            await bot.do_api_request("unknown_endpoint")
+
+    async def test_do_api_request_invalid_token(self, bot):
+        # we do not initialize the bot here on purpose b/c that's the case were we actually
+        # do not know for sure if the token is invalid or the method was not found
+        with pytest.raises(
+            InvalidToken, match="token was rejected by Telegram or the endpoint 'getMe'"
+        ):
+            await Bot("invalid_token").do_api_request("get_me")
+
+        # same test, but with a valid token bot and unknown endpoint
+        with pytest.raises(
+            InvalidToken, match="token was rejected by Telegram or the endpoint 'unknownEndpoint'"
+        ):
+            await Bot(bot.token).do_api_request("unknown_endpoint")
+
+    @pytest.mark.parametrize("return_type", [Message, None])
+    async def test_do_api_request_basic_and_files(self, bot, chat_id, return_type):
+        result = await bot.do_api_request(
+            "send_document",
+            api_kwargs={
+                "chat_id": chat_id,
+                "caption": "test_caption",
+                "document": InputFile(data_file("telegram.png").open("rb")),
+            },
+            return_type=return_type,
+        )
+        if return_type is None:
+            assert isinstance(result, dict)
+            result = Message.de_json(result, bot)
+
+        assert isinstance(result, Message)
+        assert result.chat_id == int(chat_id)
+        assert result.caption == "test_caption"
+        out = BytesIO()
+        await (await result.document.get_file()).download_to_memory(out)
+        out.seek(0)
+        assert out.read() == data_file("telegram.png").open("rb").read()
+        assert result.document.file_name == "telegram.png"
+
+    @pytest.mark.parametrize("return_type", [Message, None])
+    async def test_do_api_request_list_return_type(self, bot, chat_id, return_type):
+        result = await bot.do_api_request(
+            "send_media_group",
+            api_kwargs={
+                "chat_id": chat_id,
+                "media": [
+                    InputMediaDocument(
+                        InputFile(
+                            data_file("text_file.txt").open("rb"),
+                            attach=True,
+                        )
+                    ),
+                    InputMediaDocument(
+                        InputFile(
+                            data_file("local_file.txt").open("rb"),
+                            attach=True,
+                        )
+                    ),
+                ],
+            },
+            return_type=return_type,
+        )
+        if return_type is None:
+            assert isinstance(result, list)
+            for entry in result:
+                assert isinstance(entry, dict)
+            result = Message.de_list(result, bot)
+
+        for message, file_name in zip(result, ("text_file.txt", "local_file.txt")):
+            assert isinstance(message, Message)
+            assert message.chat_id == int(chat_id)
+            out = BytesIO()
+            await (await message.document.get_file()).download_to_memory(out)
+            out.seek(0)
+            assert out.read() == data_file(file_name).open("rb").read()
+            assert message.document.file_name == file_name
+
+    @pytest.mark.parametrize("return_type", [Message, None])
+    async def test_do_api_request_bool_return_type(self, bot, chat_id, return_type):
+        assert await bot.do_api_request("delete_my_commands", return_type=return_type) is True

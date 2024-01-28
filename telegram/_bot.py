@@ -43,8 +43,6 @@ from typing import (
     no_type_check,
 )
 
-from telegram._utils.strings import to_camel_case
-
 try:
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization
@@ -95,6 +93,7 @@ from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
+from telegram._utils.strings import to_camel_case
 from telegram._utils.types import CorrectOptionID, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram._utils.warnings import warn
 from telegram._webhookinfo import WebhookInfo
@@ -785,12 +784,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             Since PTB does not know which arguments are passed to this method, some caution is
             necessary in terms of PTBs utility functionalities. In particular
 
+            * passing objects of any class defined in the :mod:`telegram` module is supported
             * when uploading files, a :class:`telegram.InputFile` must be passed as the value for
               the corresponding argument. Passing a file path or file-like object will not work.
               File paths will work only in combination with :paramref:`~Bot.local_mode`.
             * when uploading files, PTB can still correctly determine that
-              :attr:`telegram.request.BaseRequest.media_write_timeout` should be used instead of
-              :attr:`telegram.request.BaseRequest.write_timeout`.
+              a special write timeout value should be used instead of the default
+              :paramref:`telegram.request.HTTPXRequest.write_timeout`.
             * insertion of default values specified via :class:`telegram.ext.Defaults` will not
               work (only relevant for :class:`telegram.ext.ExtBot`).
             * The only exception is :class:`telegram.ext.Defaults.tzinfo`, which will be correctly
@@ -828,7 +828,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         camel_case_endpoint = to_camel_case(endpoint)
         try:
             result = await self._post(
-                endpoint,
+                camel_case_endpoint,
                 api_kwargs=api_kwargs,
                 read_timeout=read_timeout,
                 write_timeout=write_timeout,
@@ -843,12 +843,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             # that here rather than in BaseRequest._request_wrapper
             if self._initialized:
                 raise EndPointNotFound(
-                    f"Endpoint {camel_case_endpoint} not found in Bot API"
+                    f"Endpoint '{camel_case_endpoint}' not found in Bot API"
                 ) from exc
 
             raise InvalidToken(
                 "Either the bot token was rejected by Telegram or the endpoint "
-                f"{camel_case_endpoint} does not exist."
+                f"'{camel_case_endpoint}' does not exist."
             ) from exc
 
         if return_type is None or isinstance(result, bool):

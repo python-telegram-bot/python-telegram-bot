@@ -136,7 +136,7 @@ class InvalidToken(TelegramError):
 
 class EndPointNotFound(TelegramError):
     """Raised when the requested endpoint is not found. Only relevant for
-    :method:`telegram.Bot.do_api_request`.
+    :meth:`telegram.Bot.do_api_request`.
 
     Args:
         endpoint (:obj:`str`): The endpoint that was not found
