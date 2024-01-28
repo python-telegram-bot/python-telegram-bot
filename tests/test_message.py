@@ -70,11 +70,7 @@ from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
 from telegram.warnings import PTBDeprecationWarning
 from tests._passport.test_passport import RAW_PASSPORT_DATA
-from tests.auxil.bot_method_checks import (
-    check_defaults_handling,
-    check_shortcut_call,
-    check_shortcut_signature,
-)
+from tests.auxil.bot_method_checks import check_shortcut_call, check_shortcut_signature
 from tests.auxil.build_messages import make_message
 from tests.auxil.slots import mro_slots
 
