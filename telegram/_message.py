@@ -1585,6 +1585,25 @@ class Message(MaybeInaccessibleMessage):
     ) -> _ReplyKwargs:
         """
         Use this function to build ``reply_paramters`` for ``telegram.Message.reply_*`` methods.
+
+            .. versionadded:: NEXT.VERSION
+
+        Args:
+            quote (:obj:`str`, optional): Quoted part of the message to be replied to; 0-1024
+                characters after entities parsing. The quote must be an exact substring of the
+                message to be replied to, including bold, italic, underline, strikethrough,
+                spoiler, and custom_emoji entities. The message will fail to send if the quote
+                isn't found in the original message.
+            quote_index (:obj:`int`, optional): Position of the quote in the original message in
+                UTF-16 code units.
+            target_chat_id (:obj:`int` | :obj:`str`, optional): If the message to be replied to is
+                from a different chat, |chat_id_channel|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+            message_thread_id (:obj:`int`, optional): |message_thread_id|
+
+        Returns:
+            :obj:`dict`: On success, a dict containing information about ``reply_parameters`` is
+            returned.
         """
         kwargs: _ReplyKwargs = {
             "chat_id": target_chat_id or self.chat_id
@@ -1666,6 +1685,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -1737,6 +1757,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -1803,6 +1824,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -1869,6 +1891,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -1929,6 +1952,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -1991,6 +2015,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2057,6 +2082,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2124,6 +2150,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2192,6 +2219,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2255,6 +2283,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2319,6 +2348,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2386,6 +2416,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2448,6 +2479,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2512,6 +2544,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2579,6 +2612,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2644,6 +2678,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2712,6 +2747,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2776,6 +2812,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2863,6 +2900,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -2950,6 +2988,7 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 
@@ -3141,6 +3180,7 @@ class Message(MaybeInaccessibleMessage):
 
                 .. versionadded:: 13.1
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
 
                 .. versionadded:: NEXT.VERSION
 

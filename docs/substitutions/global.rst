@@ -66,12 +66,10 @@
 
 .. |reply_parameters| replace:: Description of the message to reply to.
 
-.. |rtm_aswr_deprecated| replace:: Bot API 7.0 introduced :paramref:`~telegram.Bot.send_message.reply_parameters` replacing this argument. PTB will automatically convert this argument to that one, but you should update your code to use the new argument.
+.. |rtm_aswr_deprecated| replace:: replacing this argument. PTB will automatically convert this argument to that one, but you should update your code to use the new argument.
 
 .. |keyword_only_arg| replace:: In future versions, this argument will become a keyword-only argument.
 
-.. |mutually_exc_rp| replace:: Mutually exclusive with :paramref:`~telegram.Bot.send_message.reply_parameters`.
-
 .. |reply_quote| replace:: If set to :obj:`True`, the message is sent as an actual reply to this message. If ``reply_to_message_id`` is passed, this parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
 
-.. |do_quote| replace:: If set to :obj:`True`, the replied message is quoted. For a dict, it must be the output of :meth:`~telegram.Message.build_reply_arguments` to specify exact ``reply_parameters``. Mutually exclusive with :paramref:`~telegram.Message.reply_text.quote`.
+.. |do_quote| replace:: If set to :obj:`True`, the replied message is quoted. For a dict, it must be the output of :meth:`~telegram.Message.build_reply_arguments` to specify exact ``reply_parameters``.
