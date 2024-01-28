@@ -146,9 +146,6 @@ class EndPointNotFound(TelegramError):
 
     __slots__ = ()
 
-    def __init__(self, endpoint: str) -> None:
-        super().__init__(f"Endpoint '{endpoint}' not found in Bot API")
-
 
 class NetworkError(TelegramError):
     """Base class for exceptions due to networking errors.

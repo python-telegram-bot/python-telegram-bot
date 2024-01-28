@@ -43,7 +43,7 @@ from typing import (
     no_type_check,
 )
 
-from tests.test_bot import to_camel_case
+from telegram._utils.strings import to_camel_case
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -842,7 +842,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             # 2) is relevant only for Bot.do_api_request, that's why we have special handling for
             # that here rather than in BaseRequest._request_wrapper
             if self._initialized:
-                raise EndPointNotFound(camel_case_endpoint) from exc
+                raise EndPointNotFound(
+                    f"Endpoint {camel_case_endpoint} not found in Bot API"
+                ) from exc
 
             raise InvalidToken(
                 "Either the bot token was rejected by Telegram or the endpoint "

@@ -69,6 +69,7 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.strings import to_camel_case
 from telegram.constants import (
     ChatAction,
     InlineQueryLimit,
@@ -88,14 +89,6 @@ from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
-
-
-def to_camel_case(snake_str):
-    """https://stackoverflow.com/a/19053800"""
-    components = snake_str.split("_")
-    # We capitalize the first letter of each component except the first one
-    # with the 'title' method and join them together.
-    return components[0] + "".join(x.title() for x in components[1:])
 
 
 @pytest.fixture()
@@ -3500,3 +3493,9 @@ class TestBotWithRequest:
             bot.get_my_short_description("en"),
             bot.get_my_short_description("de"),
         ) == 3 * [BotShortDescription("")]
+
+    async def test_do_api_request_warning_known_method(self, bot):
+        with pytest.warns(PTBDeprecationWarning, match="Please use 'Bot.get_me'") as record:
+            await bot.do_api_request("get_me")
+
+        assert record[0].file == __file__, "Wrong stack level!"
