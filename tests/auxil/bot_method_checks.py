@@ -35,6 +35,7 @@ from telegram import (
     InputMediaPhoto,
     InputTextMessageContent,
     LinkPreviewOptions,
+    ReplyParameters,
     TelegramObject,
 )
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
@@ -160,6 +161,9 @@ def check_shortcut_signature(
             )
 
     for kwarg in additional_kwargs:
+        if kwarg == "reply_to_message_id":
+            # special case for deprecated argument of Message.reply_*
+            continue
         if not shortcut_sig.parameters[kwarg].kind == inspect.Parameter.KEYWORD_ONLY:
             raise Exception(f"Argument {kwarg} must be a positional-only argument!")
 
@@ -203,14 +207,24 @@ async def check_shortcut_call(
 
     shortcut_signature = inspect.signature(shortcut_method)
     # auto_pagination: Special casing for InlineQuery.answer
-    kwargs = {name: name for name in shortcut_signature.parameters if name != "auto_pagination"}
+    # quote: Don't test deprecated "quote" parameter of Message.reply_*
+    kwargs = {
+        name: name
+        for name in shortcut_signature.parameters
+        if name not in ["auto_pagination", "quote"]
+    }
+    if "reply_parameters" in kwargs:
+        kwargs["reply_parameters"] = ReplyParameters(message_id=1)
 
     async def make_assertion(**kw):
         # name == value makes sure that
         # a) we receive non-None input for all parameters
         # b) we receive the correct input for each kwarg
         received_kwargs = {
-            name for name, value in kw.items() if name in ignored_args or value == name
+            name
+            for name, value in kw.items()
+            if name in ignored_args
+            or (value == name or (name == "reply_parameters" and value.message_id == 1))
         }
         if not received_kwargs == expected_args:
             raise Exception(

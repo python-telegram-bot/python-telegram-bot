@@ -110,6 +110,8 @@ if TYPE_CHECKING:
 
 
 class _ReplyKwargs(TypedDict):
+    __slots__ = ("chat_id", "reply_parameters")  # type: ignore[misc]
+
     chat_id: Union[str, int]
     reply_parameters: ReplyParameters
 
@@ -1637,11 +1639,16 @@ class Message(MaybeInaccessibleMessage):
         do_quote: Optional[Union[bool, _ReplyKwargs]],
         quote: Optional[bool],
         reply_to_message_id: Optional[int],
+        reply_parameters: Optional["ReplyParameters"],
     ) -> Tuple[Union[str, int], ReplyParameters]:
         if quote and do_quote:
             raise ValueError("Mutually exclusive")
+
+        if reply_parameters:
+            return reply_parameters.chat_id, reply_parameters
+
         effective_do_quote = quote or do_quote
-        bool_do_quote = isinstance(effective_do_quote, bool)
+        bool_do_quote = not isinstance(reply_parameters, ReplyParameters)
         reply_parameters = (
             self._quote(quote, reply_to_message_id)
             if bool_do_quote
@@ -1667,6 +1674,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -1693,8 +1701,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_message(
             chat_id=chat_id,
@@ -1703,7 +1711,7 @@ class Message(MaybeInaccessibleMessage):
             disable_web_page_preview=disable_web_page_preview,
             link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1728,6 +1736,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -1764,8 +1773,8 @@ class Message(MaybeInaccessibleMessage):
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_message(
             chat_id=chat_id,
@@ -1774,7 +1783,7 @@ class Message(MaybeInaccessibleMessage):
             disable_web_page_preview=disable_web_page_preview,
             link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1799,6 +1808,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -1831,8 +1841,8 @@ class Message(MaybeInaccessibleMessage):
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_message(
             chat_id=chat_id,
@@ -1841,7 +1851,7 @@ class Message(MaybeInaccessibleMessage):
             disable_web_page_preview=disable_web_page_preview,
             link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1866,6 +1876,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -1898,8 +1909,8 @@ class Message(MaybeInaccessibleMessage):
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_message(
             chat_id=chat_id,
@@ -1908,7 +1919,7 @@ class Message(MaybeInaccessibleMessage):
             disable_web_page_preview=disable_web_page_preview,
             link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1931,6 +1942,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -1962,14 +1974,14 @@ class Message(MaybeInaccessibleMessage):
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_media_group(
             chat_id=chat_id,
             media=media,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1996,6 +2008,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -2023,15 +2036,15 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_photo(
             chat_id=chat_id,
             photo=photo,
             caption=caption,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -2063,6 +2076,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -2090,8 +2104,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_audio(
             chat_id=chat_id,
@@ -2101,7 +2115,7 @@ class Message(MaybeInaccessibleMessage):
             title=title,
             caption=caption,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -2131,6 +2145,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -2158,8 +2173,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_document(
             chat_id=chat_id,
@@ -2167,7 +2182,7 @@ class Message(MaybeInaccessibleMessage):
             filename=filename,
             caption=caption,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2200,6 +2215,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -2227,8 +2243,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_animation(
             chat_id=chat_id,
@@ -2239,7 +2255,7 @@ class Message(MaybeInaccessibleMessage):
             caption=caption,
             parse_mode=parse_mode,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2265,6 +2281,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -2291,14 +2308,14 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_sticker(
             chat_id=chat_id,
             sticker=sticker,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2329,6 +2346,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -2356,8 +2374,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_video(
             chat_id=chat_id,
@@ -2365,7 +2383,7 @@ class Message(MaybeInaccessibleMessage):
             duration=duration,
             caption=caption,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2397,6 +2415,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -2424,8 +2443,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_video_note(
             chat_id=chat_id,
@@ -2433,7 +2452,7 @@ class Message(MaybeInaccessibleMessage):
             duration=duration,
             length=length,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2460,6 +2479,7 @@ class Message(MaybeInaccessibleMessage):
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
@@ -2487,8 +2507,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_voice(
             chat_id=chat_id,
@@ -2496,7 +2516,7 @@ class Message(MaybeInaccessibleMessage):
             duration=duration,
             caption=caption,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2525,6 +2545,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         location: Optional[Location] = None,
         quote: Optional[bool] = None,
@@ -2552,15 +2573,15 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_location(
             chat_id=chat_id,
             latitude=latitude,
             longitude=longitude,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2593,6 +2614,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         venue: Optional[Venue] = None,
         quote: Optional[bool] = None,
@@ -2620,8 +2642,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_venue(
             chat_id=chat_id,
@@ -2631,7 +2653,7 @@ class Message(MaybeInaccessibleMessage):
             address=address,
             foursquare_id=foursquare_id,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2659,6 +2681,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         contact: Optional[Contact] = None,
         quote: Optional[bool] = None,
@@ -2686,8 +2709,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_contact(
             chat_id=chat_id,
@@ -2695,7 +2718,7 @@ class Message(MaybeInaccessibleMessage):
             first_name=first_name,
             last_name=last_name,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2729,6 +2752,7 @@ class Message(MaybeInaccessibleMessage):
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -2755,8 +2779,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_poll(
             chat_id=chat_id,
@@ -2768,7 +2792,7 @@ class Message(MaybeInaccessibleMessage):
             correct_option_id=correct_option_id,
             is_closed=is_closed,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2794,6 +2818,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -2820,13 +2845,13 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_dice(
             chat_id=chat_id,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2882,6 +2907,7 @@ class Message(MaybeInaccessibleMessage):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -2910,14 +2936,14 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_game(
             chat_id=chat_id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2958,6 +2984,7 @@ class Message(MaybeInaccessibleMessage):
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -2996,8 +3023,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_invoice(
             chat_id=chat_id,
@@ -3018,7 +3045,7 @@ class Message(MaybeInaccessibleMessage):
             need_shipping_address=need_shipping_address,
             is_flexible=is_flexible,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             provider_data=provider_data,
             send_phone_number_to_provider=send_phone_number_to_provider,
@@ -3155,6 +3182,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
         do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
@@ -3188,8 +3216,8 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
         """
-        chat_id, reply_parameters = await self._parse_quote_arguments(
-            do_quote, quote, reply_to_message_id
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().copy_message(
             chat_id=chat_id,
@@ -3199,7 +3227,7 @@ class Message(MaybeInaccessibleMessage):
             parse_mode=parse_mode,
             caption_entities=caption_entities,
             disable_notification=disable_notification,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
