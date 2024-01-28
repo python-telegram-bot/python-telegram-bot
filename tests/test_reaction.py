@@ -21,24 +21,31 @@ from copy import deepcopy
 
 import pytest
 
-from telegram import Dice, ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
+from telegram import (
+    BotCommand,
+    Dice,
+    ReactionCount,
+    ReactionType,
+    ReactionTypeCustomEmoji,
+    ReactionTypeEmoji,
+)
 from telegram.constants import ReactionEmoji
 from tests.auxil.slots import mro_slots
 
 ignored = ["self", "api_kwargs"]
 
 
-class CMDefaults:
+class RTDefaults:
     custom_emoji = "123custom"
     normal_emoji = ReactionEmoji.THUMBS_UP
 
 
 def reaction_type_custom_emoji():
-    return ReactionTypeCustomEmoji(CMDefaults.custom_emoji)
+    return ReactionTypeCustomEmoji(RTDefaults.custom_emoji)
 
 
 def reaction_type_emoji():
-    return ReactionTypeEmoji(CMDefaults.normal_emoji)
+    return ReactionTypeEmoji(RTDefaults.normal_emoji)
 
 
 def make_json_dict(instance: ReactionType, include_optional_args: bool = False) -> dict:
@@ -58,6 +65,7 @@ def make_json_dict(instance: ReactionType, include_optional_args: bool = False) 
             json_dict[param.name] = val
 
         # If we want to test all args (for de_json)-
+        # currently not needed, keeping for completeness
         elif param.default is not inspect.Parameter.empty and include_optional_args:
             json_dict[param.name] = val
     return json_dict
@@ -94,7 +102,7 @@ def reaction_type(request):
     ],
     indirect=True,
 )
-class TestChatMemberTypesWithoutRequest:
+class TestReactionTypesWithoutRequest:
     def test_slot_behaviour(self, reaction_type):
         inst = reaction_type
         for attr in inst.__slots__:
@@ -162,10 +170,10 @@ class TestChatMemberTypesWithoutRequest:
         }
 
     def test_equality(self, reaction_type):
-        a = ReactionTypeEmoji(emoji=CMDefaults.normal_emoji)
-        b = ReactionTypeEmoji(emoji=CMDefaults.normal_emoji)
-        c = ReactionTypeCustomEmoji(custom_emoji_id=CMDefaults.custom_emoji)
-        d = ReactionTypeCustomEmoji(custom_emoji_id=CMDefaults.custom_emoji)
+        a = ReactionTypeEmoji(emoji=RTDefaults.normal_emoji)
+        b = ReactionTypeEmoji(emoji=RTDefaults.normal_emoji)
+        c = ReactionTypeCustomEmoji(custom_emoji_id=RTDefaults.custom_emoji)
+        d = ReactionTypeCustomEmoji(custom_emoji_id=RTDefaults.custom_emoji)
         e = ReactionTypeEmoji(emoji=ReactionEmoji.RED_HEART)
         f = ReactionTypeCustomEmoji(custom_emoji_id="1234custom")
         g = deepcopy(a)
@@ -201,3 +209,68 @@ class TestChatMemberTypesWithoutRequest:
 
         assert c != i
         assert hash(c) != hash(i)
+
+
+@pytest.fixture(scope="module")
+def reaction_count():
+    return ReactionCount(
+        type=TestReactionCountWithoutRequest.type,
+        total_count=TestReactionCountWithoutRequest.total_count,
+    )
+
+
+class TestReactionCountWithoutRequest:
+    type = ReactionTypeEmoji(ReactionEmoji.THUMBS_UP)
+    total_count = 42
+
+    def test_slot_behaviour(self, reaction_count):
+        for attr in reaction_count.__slots__:
+            assert getattr(reaction_count, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(reaction_count)) == len(
+            set(mro_slots(reaction_count))
+        ), "duplicate slot"
+
+    def test_de_json(self, bot):
+        json_dict = {
+            "type": self.type.to_dict(),
+            "total_count": self.total_count,
+        }
+
+        reaction_count = ReactionCount.de_json(json_dict, bot)
+        assert reaction_count.api_kwargs == {}
+
+        assert isinstance(reaction_count, ReactionCount)
+        assert reaction_count.type == self.type
+        assert reaction_count.type.type == self.type.type
+        assert reaction_count.type.emoji == self.type.emoji
+        assert reaction_count.total_count == self.total_count
+
+        assert ReactionCount.de_json(None, bot) is None
+
+    def test_to_dict(self, reaction_count):
+        reaction_count_dict = reaction_count.to_dict()
+
+        assert isinstance(reaction_count_dict, dict)
+        assert reaction_count_dict["type"] == reaction_count.type.to_dict()
+        assert reaction_count_dict["total_count"] == reaction_count.total_count
+
+    def test_equality(self, reaction_count):
+        a = reaction_count
+        b = ReactionCount(
+            type=self.type,
+            total_count=self.total_count,
+        )
+        c = ReactionCount(
+            type=self.type,
+            total_count=self.total_count + 1,
+        )
+        d = BotCommand("start", "description")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

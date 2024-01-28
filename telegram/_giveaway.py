@@ -21,7 +21,6 @@ import datetime
 from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._chat import Chat
-from telegram._message import Message
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -29,7 +28,7 @@ from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestam
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot
+    from telegram import Bot, Message
 
 
 class Giveaway(TelegramObject):
@@ -330,6 +329,9 @@ class GiveawayCompleted(TelegramObject):
 
         if data is None:
             return None
+
+        # Unfortunately, this needs to be here due to cyclic imports
+        from telegram._message import Message  # pylint: disable=import-outside-toplevel
 
         data["giveaway_message"] = Message.de_json(data.get("giveaway_message"), bot)
 
