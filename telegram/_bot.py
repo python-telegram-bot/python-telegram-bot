@@ -876,19 +876,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -1229,19 +1230,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -1372,19 +1374,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -1515,19 +1518,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -1634,19 +1638,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -1769,19 +1774,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.0
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -1910,19 +1916,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -2052,19 +2059,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.0
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -2199,19 +2207,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -2318,19 +2327,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -2484,19 +2494,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -2761,19 +2772,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -2892,19 +2904,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -3002,19 +3015,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -4775,19 +4788,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -6761,19 +6775,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -6897,10 +6911,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             disable_notification (:obj:`bool`, optional): |disable_notification|
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -6925,10 +6940,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 13.4
                    Added the :tg-const:`telegram.Dice.BOWLING` emoji.
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
@@ -7339,19 +7354,20 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionadded:: 20.0
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id| |mutually_exc_rp|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                |mutually_exc_rp|
+                Mutually exclusive with :paramref:`reply_parameters`.
 
                 .. versionchanged:: NEXT.VERSION
-                    |rtm_aswr_deprecated|
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
                 .. deprecated:: NEXT.VERSION
                     |keyword_only_arg|

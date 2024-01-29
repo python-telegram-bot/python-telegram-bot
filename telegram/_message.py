@@ -19,8 +19,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 import datetime
+import re
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -53,6 +54,7 @@ from telegram._payment.invoice import Invoice
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
+from telegram._reply import ReplyParameters
 from telegram._shared import ChatShared, UserShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
@@ -103,9 +105,15 @@ if TYPE_CHECKING:
         MessageId,
         MessageOrigin,
         ReactionType,
-        ReplyParameters,
         TextQuote,
     )
+
+
+class _ReplyKwargs(TypedDict):
+    __slots__ = ("chat_id", "reply_parameters")  # type: ignore[misc]
+
+    chat_id: Union[str, int]
+    reply_parameters: ReplyParameters
 
 
 class MaybeInaccessibleMessage(TelegramObject):
@@ -1523,14 +1531,16 @@ class Message(MaybeInaccessibleMessage):
 
         return self._effective_attachment  # type: ignore[return-value]
 
-    def _quote(self, quote: Optional[bool], reply_to_message_id: Optional[int]) -> Optional[int]:
+    def _quote(
+        self, quote: Optional[bool], reply_to_message_id: Optional[int] = None
+    ) -> Optional[ReplyParameters]:
         """Modify kwargs for replying with or without quoting."""
         if reply_to_message_id is not None:
-            return reply_to_message_id
+            return ReplyParameters(reply_to_message_id)
 
         if quote is not None:
             if quote:
-                return self.message_id
+                return ReplyParameters(self.message_id)
 
         else:
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
@@ -1540,9 +1550,117 @@ class Message(MaybeInaccessibleMessage):
             else:
                 default_quote = None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
-                return self.message_id
+                return ReplyParameters(self.message_id)
 
         return None
+
+    def compute_quote_position_and_entities(
+        self, quote: str, index: Optional[int] = None
+    ) -> Tuple[int, Tuple[MessageEntity, ...]]:
+        if not (text := (self.text or self.caption)):
+            raise RuntimeError("This message has neither text nor caption.")
+
+        effective_index = 0 or index
+
+        matches = list(re.finditer(re.escape(quote), text))
+        if (length := len(matches)) < effective_index:
+            raise ValueError(
+                f"You requested the {index}-nth occurrence of '{quote}', but this text appears "
+                f"only {length} times."
+            )
+        # apply utf-16 conversion
+        position = matches[index].start()
+        end_position = position + len(quote)
+        entities = tuple(
+            entity
+            for entity in self.entities or self.caption_entities
+            if position <= entity.offset <= end_position
+        )
+        return position, entities
+
+    def build_reply_arguments(
+        self,
+        quote: Optional[str] = None,
+        quote_index: Optional[int] = None,
+        target_chat_id: Optional[Union[int, str]] = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+    ) -> _ReplyKwargs:
+        """
+        Use this function to build ``reply_paramters`` for ``telegram.Message.reply_*`` methods.
+
+            .. versionadded:: NEXT.VERSION
+
+        Args:
+            quote (:obj:`str`, optional): Quoted part of the message to be replied to; 0-1024
+                characters after entities parsing. The quote must be an exact substring of the
+                message to be replied to, including bold, italic, underline, strikethrough,
+                spoiler, and custom_emoji entities. The message will fail to send if the quote
+                isn't found in the original message.
+            quote_index (:obj:`int`, optional): Position of the quote in the original message in
+                UTF-16 code units.
+            target_chat_id (:obj:`int` | :obj:`str`, optional): If the message to be replied to is
+                from a different chat, |chat_id_channel|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+            message_thread_id (:obj:`int`, optional): |message_thread_id|
+
+        Returns:
+            :obj:`dict`: On success, a dict containing information about ``reply_parameters`` is
+            returned.
+        """
+        kwargs: _ReplyKwargs = {
+            "chat_id": target_chat_id or self.chat_id
+        }  # type: ignore [typeddict-item]
+        target_chat_is_self = target_chat_id in (None, self.chat_id, f"@{self.chat.username}")
+
+        if target_chat_is_self and message_thread_id in (
+            None,
+            self.message_thread_id,
+        ):
+            # defaults handling will take place in `Bot._insert_defaults`
+            effective_aswr: ODVInput[bool] = allow_sending_without_reply
+        else:
+            effective_aswr = None
+
+        quote_position, quote_entities = (
+            self.compute_quote_position_and_entities(quote, quote_index) if quote else (None, None)
+        )
+        kwargs["reply_parameters"] = ReplyParameters(
+            chat_id=None if target_chat_is_self else self.chat_id,
+            message_id=self.message_id,
+            quote_position=quote_position,
+            quote_entities=quote_entities,
+            allow_sending_without_reply=effective_aswr,
+        )
+
+        return kwargs
+
+    async def _parse_quote_arguments(
+        self,
+        do_quote: Optional[Union[bool, _ReplyKwargs]],
+        quote: Optional[bool],
+        reply_to_message_id: Optional[int],
+        reply_parameters: Optional["ReplyParameters"],
+    ) -> Tuple[Union[str, int], ReplyParameters]:
+        if quote and do_quote:
+            raise ValueError("Mutually exclusive")
+
+        if reply_parameters:
+            return reply_parameters.chat_id, reply_parameters
+
+        effective_do_quote = quote or do_quote
+        bool_do_quote = not isinstance(reply_parameters, ReplyParameters)
+        reply_parameters = (
+            self._quote(quote, reply_to_message_id)
+            if bool_do_quote
+            else effective_do_quote["reply_parameters"]  # type: ignore [index]
+        )
+        chat_id = (
+            self.chat_id
+            if bool_do_quote
+            else effective_do_quote["chat_id"]  # type: ignore [index]
+        )
+        return chat_id, reply_parameters
 
     async def reply_text(
         self,
@@ -1560,6 +1678,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1573,24 +1692,27 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
             link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1618,6 +1740,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1642,23 +1765,26 @@ class Message(MaybeInaccessibleMessage):
             Telegram for backward compatibility. You should use :meth:`reply_markdown_v2` instead.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             text=text,
             parse_mode=ParseMode.MARKDOWN,
             disable_web_page_preview=disable_web_page_preview,
             link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1686,6 +1812,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1706,23 +1833,26 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             text=text,
             parse_mode=ParseMode.MARKDOWN_V2,
             disable_web_page_preview=disable_web_page_preview,
             link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1750,6 +1880,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1770,23 +1901,26 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             text=text,
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=disable_web_page_preview,
             link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1812,6 +1946,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1828,10 +1963,11 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the media group is sent as an
-                actual reply to this message. If ``reply_to_message_id`` is passed, this parameter
-                will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private
-                chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             Tuple[:class:`telegram.Message`]: An array of the sent Messages.
@@ -1839,13 +1975,14 @@ class Message(MaybeInaccessibleMessage):
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_media_group(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             media=media,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1876,6 +2013,7 @@ class Message(MaybeInaccessibleMessage):
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1889,22 +2027,25 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the photo is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_photo(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             photo=photo,
             caption=caption,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1940,6 +2081,7 @@ class Message(MaybeInaccessibleMessage):
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1953,25 +2095,28 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the audio is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_audio(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             audio=audio,
             duration=duration,
             performer=performer,
             title=title,
             caption=caption,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -2005,6 +2150,7 @@ class Message(MaybeInaccessibleMessage):
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2018,23 +2164,26 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the document is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_document(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             document=document,
             filename=filename,
             caption=caption,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2071,6 +2220,7 @@ class Message(MaybeInaccessibleMessage):
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2084,18 +2234,21 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the animation is sent as an
-                actual reply to this message. If ``reply_to_message_id`` is passed, this parameter
-                will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private
-                chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_animation(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             animation=animation,
             duration=duration,
             width=width,
@@ -2103,8 +2256,7 @@ class Message(MaybeInaccessibleMessage):
             caption=caption,
             parse_mode=parse_mode,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2133,6 +2285,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2146,21 +2299,24 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the sticker is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_sticker(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             sticker=sticker,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2195,6 +2351,7 @@ class Message(MaybeInaccessibleMessage):
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2208,23 +2365,26 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the video is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_video(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             video=video,
             duration=duration,
             caption=caption,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2260,6 +2420,7 @@ class Message(MaybeInaccessibleMessage):
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2273,24 +2434,26 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the video note is sent as an
-                actual reply to this message. If ``reply_to_message_id`` is passed, this parameter
-                will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private
-                chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_video_note(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             video_note=video_note,
             duration=duration,
             length=length,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2321,6 +2484,7 @@ class Message(MaybeInaccessibleMessage):
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2334,24 +2498,26 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the voice note is sent as an
-                actual reply to this message. If ``reply_to_message_id`` is passed, this parameter
-                will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private
-                chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_voice(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             voice=voice,
             duration=duration,
             caption=caption,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2384,6 +2550,7 @@ class Message(MaybeInaccessibleMessage):
         *,
         location: Optional[Location] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2397,22 +2564,25 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the location is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_location(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             latitude=latitude,
             longitude=longitude,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2449,6 +2619,7 @@ class Message(MaybeInaccessibleMessage):
         *,
         venue: Optional[Venue] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2462,25 +2633,28 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the venue is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_venue(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             latitude=latitude,
             longitude=longitude,
             title=title,
             address=address,
             foursquare_id=foursquare_id,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2512,6 +2686,7 @@ class Message(MaybeInaccessibleMessage):
         *,
         contact: Optional[Contact] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2525,23 +2700,26 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the contact is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_contact(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             phone_number=phone_number,
             first_name=first_name,
             last_name=last_name,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2578,6 +2756,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2591,17 +2770,21 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the poll is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_poll(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             question=question,
             options=options,
             is_anonymous=is_anonymous,
@@ -2610,8 +2793,7 @@ class Message(MaybeInaccessibleMessage):
             correct_option_id=correct_option_id,
             is_closed=is_closed,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2640,6 +2822,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2653,20 +2836,23 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the dice is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_dice(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2725,6 +2911,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2738,9 +2925,11 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the game is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         .. versionadded:: 13.2
 
@@ -2748,13 +2937,14 @@ class Message(MaybeInaccessibleMessage):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_game(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2798,6 +2988,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2823,17 +3014,21 @@ class Message(MaybeInaccessibleMessage):
             :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>` is optional.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the invoice is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_invoice(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             title=title,
             description=description,
             payload=payload,
@@ -2851,8 +3046,7 @@ class Message(MaybeInaccessibleMessage):
             need_shipping_address=need_shipping_address,
             is_flexible=is_flexible,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             provider_data=provider_data,
             send_phone_number_to_provider=send_phone_number_to_provider,
@@ -2992,6 +3186,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3010,27 +3205,30 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the copy is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
 
                 .. versionadded:: 13.1
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().copy_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_id=message_id,
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_parameters=reply_parameters,
+            reply_parameters=effective_reply_parameters,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
