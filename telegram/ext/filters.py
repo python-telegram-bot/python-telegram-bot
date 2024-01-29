@@ -877,7 +877,11 @@ class _Chat(MessageFilter):
 
 
 CHAT = _Chat(name="filters.CHAT")
-"""This filter filters *any* message that has a :attr:`telegram.Message.chat`."""
+"""This filter filters *any* message that has a :attr:`telegram.Message.chat`.
+
+.. deprecated:: NEXT.VERSION
+   This filter has no effect since :attr:`telegram.Message.chat` is always present.
+"""
 
 
 class ChatType:  # A convenience namespace for Chat types.
