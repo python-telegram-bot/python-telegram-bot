@@ -172,6 +172,7 @@ class TestChatBoostSourceTypesWithoutRequest:
     def test_de_json_required_args(self, bot, chat_boost_source):
         cls = chat_boost_source.__class__
         assert cls.de_json({}, bot) is None
+        assert ChatBoost.de_json({}, bot) is None
 
         json_dict = make_json_dict(chat_boost_source)
         const_boost_source = ChatBoostSource.de_json(json_dict, bot)
