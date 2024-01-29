@@ -41,6 +41,8 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
             specific attribute.
          * If a chat ID **and** a username are passed, an update containing **any** of them will be
             filtered.
+         * :attr:`telegram.MessageReactionUpdated.actor_chat` is *not* considered for
+           :paramref:`user_id` and :paramref:`user_username` filtering.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
@@ -122,14 +124,13 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
 
         self._chat_ids = parse_chat_id(chat_id)
         self._chat_usernames = parse_username(chat_username)
-        if (
-            (user_id or user_username)
-            and message_reaction_types == self.MESSAGE_REACTION
-            or self.MESSAGE_REACTION_COUNT_UPDATED
+        if (user_id or user_username) and message_reaction_types in (
+            self.MESSAGE_REACTION,
+            self.MESSAGE_REACTION_COUNT_UPDATED,
         ):
             raise ValueError(
                 "You can not filter for users and include anonymous reactions. Set "
-                "`message_reaction_types` to MESSAGE_REACTION_COUNT_UPDATED."
+                "`message_reaction_types` to MESSAGE_REACTION_UPDATED."
             )
         self._user_ids = parse_chat_id(user_id)
         self._user_usernames = parse_username(user_username)
@@ -170,13 +171,6 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
         chat_username = chat.username if chat else None
         user_id = user.id if (user := update.effective_user) else None
         user_username = user.username if user else None
-
-        # Special casing for anonymous reactions
-        if (message_reaction := update.message_reaction) and message_reaction.actor_chat:
-            if user_id is None:
-                user_id = message_reaction.actor_chat.id
-            if user_username is None:
-                user_username = message_reaction.actor_chat.username
 
         return (
             bool(self._chat_ids and (chat_id in self._chat_ids))
