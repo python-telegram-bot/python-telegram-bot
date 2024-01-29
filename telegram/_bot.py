@@ -778,7 +778,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """Do a request to the Telegram API.
 
         This method is here to make it easier to use new API methods that are not yet supported
-        by the python-telegram-bot library.
+        by this library.
 
         Hint:
             Since PTB does not know which arguments are passed to this method, some caution is
