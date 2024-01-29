@@ -3570,9 +3570,10 @@ class TestBotWithRequest:
             bot.get_my_short_description("de"),
         ) == 3 * [BotShortDescription("")]
 
-    async def test_do_api_request_warning_known_method(self, bot):
+    @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
+    async def test_do_api_request_warning_known_method(self, bot, bot_class):
         with pytest.warns(PTBDeprecationWarning, match="Please use 'Bot.get_me'") as record:
-            await bot.do_api_request("get_me")
+            await bot_class(bot.token).do_api_request("get_me")
 
         assert record[0].filename == __file__, "Wrong stack level!"
 

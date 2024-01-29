@@ -822,7 +822,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     f"'Bot.do_api_request(\"{endpoint}\", ...)'"
                 ),
                 PTBDeprecationWarning,
-                stacklevel=2,
+                stacklevel=3,
             )
 
         camel_case_endpoint = to_camel_case(endpoint)
