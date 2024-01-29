@@ -141,7 +141,7 @@ xfail = pytest.mark.xfail(
 )
 
 
-def bot_methods(ext_bot=True, include_camel_case=False):
+def bot_methods(ext_bot=True, include_camel_case=False, include_do_api_request=False):
     arg_values = []
     ids = []
     non_api_methods = [
@@ -155,8 +155,10 @@ def bot_methods(ext_bot=True, include_camel_case=False):
         "initialize",
         "shutdown",
         "insert_callback_data",
-        "do_api_request",
     ]
+    if not include_do_api_request:
+        non_api_methods.append("do_api_request")
+
     classes = (Bot, ExtBot) if ext_bot else (Bot,)
     for cls in classes:
         for name, attribute in inspect.getmembers(cls, predicate=inspect.isfunction):
@@ -167,6 +169,7 @@ def bot_methods(ext_bot=True, include_camel_case=False):
             arg_values.append((cls, name, attribute))
             ids.append(f"{cls.__name__}.{name}")
 
+    print(arg_values)
     return pytest.mark.parametrize(
         argnames="bot_class, bot_method_name,bot_method", argvalues=arg_values, ids=ids
     )
@@ -417,13 +420,13 @@ class TestBotWithoutRequest:
         assert camel_case_function is not False, f"{camel_case_name} not found"
         assert camel_case_function is bot_method, f"{camel_case_name} is not {bot_method}"
 
-    @bot_methods()
+    @bot_methods(include_do_api_request=True)
     def test_coroutine_functions(self, bot_class, bot_method_name, bot_method):
         """Check that all bot methods are defined as async def  ..."""
         meth = getattr(bot_method, "__wrapped__", bot_method)  # to unwrap the @_log decorator
         assert inspect.iscoroutinefunction(meth), f"{bot_method_name} must be a coroutine function"
 
-    @bot_methods()
+    @bot_methods(include_do_api_request=True)
     def test_api_kwargs_and_timeouts_present(self, bot_class, bot_method_name, bot_method):
         """Check that all bot methods have `api_kwargs` and timeout params."""
         param_names = inspect.signature(bot_method).parameters.keys()
