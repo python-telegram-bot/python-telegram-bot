@@ -23,7 +23,7 @@ from typing import ForwardRef
 
 from tests.test_official.helpers import _get_params_base
 
-IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
+IGNORED_OBJECTS = ("ResponseParameters",)
 GLOBALLY_IGNORED_PARAMETERS = {
     "self",
     "read_timeout",
