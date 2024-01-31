@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains functions which are used to scrape the official Bot API documentation."""
 
+import asyncio
 from dataclasses import dataclass
 from typing import Literal, overload
 
@@ -68,8 +69,9 @@ class Scraper:
     request: httpx.Response | None = None
     soup: BeautifulSoup | None = None
 
-    def make_request(self) -> None:
-        self.request = httpx.get("https://core.telegram.org/bots/api", timeout=10)
+    async def make_request(self) -> None:
+        async with httpx.AsyncClient() as client:
+            self.request = await client.get("https://core.telegram.org/bots/api", timeout=10)
         self.soup = BeautifulSoup(self.request.text, "html.parser")
 
     @overload
@@ -84,7 +86,7 @@ class Scraper:
         argvalues = []
         names: list[str] = []
         if self.request is None:
-            self.make_request()
+            asyncio.run(self.make_request())
 
         for unparsed in self.soup.select("h4 > a.anchor"):
             if "-" not in unparsed["name"]:
