@@ -21,6 +21,7 @@ match the official API. It also checks if the type annotations are correct and i
 are required or not."""
 
 import inspect
+import logging
 import re
 from datetime import datetime
 from types import FunctionType
@@ -47,6 +48,8 @@ TYPE_MAPPING: dict[str, set[Any]] = {
     r"Array of (?:Array of )?[\w\,\s]*": {Sequence},
     r"InputFile(?: or String)?": {FileInput},
 }
+
+ALL_DEFAULTS = inspect.getmembers(Defaults, lambda x: isinstance(x, property))
 
 
 def check_required_param(
@@ -138,6 +141,18 @@ def check_param_type(
             ptb_annotation = wrapped[ptb_annotation]
         # We have put back our annotation together after removing the NoneType!
 
+    logging.debug(
+        "At the end of PRE-PROCESSING, the values of variables are:\n"
+        "Parameter name: %s\n"
+        "ptb_annotation= %s\n"
+        "mapped_type= %s\n"
+        "tg_param_type= %s\n",
+        ptb_param.name,
+        ptb_annotation,
+        mapped_type,
+        tg_param_type,
+    )
+
     # CHECKING:
     # Each branch may have exits in the form of return statements. If the annotation is found to be
     # correct, the function will return True. If not, it will return False.
@@ -145,6 +160,7 @@ def check_param_type(
     # 1) HANDLING ARRAY TYPES:
     # Now let's do the checking, starting with "Array of ..." types.
     if "Array of " in tg_param_type:
+        logging.debug("Array of type found in `%s`\n", tg_param_type)
         assert mapped_type is Sequence
         # For exceptions just check if they contain the annotation
         if ptb_param.name in PTCE.ARRAY_OF_EXCEPTIONS:
@@ -176,6 +192,7 @@ def check_param_type(
     # 2) HANDLING DEFAULTS PARAMETERS:
     # Classes whose parameters are all ODVInput should be converted and checked.
     if obj.__name__ in PTCE.IGNORED_DEFAULTS_CLASSES:
+        logging.debug("Checking that `%s`'s param is ODVInput:\n", obj.__name__)
         parsed = ODVInput[mapped_type]
         return (ptb_annotation | None) == parsed  # We have to add back None in our annotation
     if not (
@@ -186,8 +203,9 @@ def check_param_type(
         and ptb_param.name in PTCE.IGNORED_DEFAULTS_PARAM_NAMES
     ):
         # Now let's check if the parameter is a Defaults parameter, it should be
-        for name, _ in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
+        for name, _ in ALL_DEFAULTS:
             if name == ptb_param.name or "parse_mode" in ptb_param.name:
+                logging.debug("Checking that `%s` is a Defaults parameter!\n", ptb_param.name)
                 # mapped_type should not be a tuple since we need to check for equality:
                 # This can happen when the Defaults parameter is a class, e.g. LinkPreviewOptions
                 if isinstance(mapped_type, tuple):
@@ -205,6 +223,7 @@ def check_param_type(
         and not isinstance(mapped_type, tuple)
         and obj.__name__.startswith("send")
     ):
+        logging.debug("Checking that `%s` has an additional argument!\n", ptb_param.name)
         mapped_type = mapped_type | PTCE.ADDITIONAL_TYPES[ptb_param.name]
 
     # 4) HANDLING DATETIMES:
@@ -219,6 +238,7 @@ def check_param_type(
         )
         or "Unix time" in tg_parameter.param_description
     ):
+        logging.debug("Checking that `%s` is a datetime!\n", ptb_param.name)
         if ptb_param.name in PTCE.DATETIME_EXCEPTIONS:
             return True
         # If it's a class, we only accept datetime as the parameter
@@ -228,6 +248,7 @@ def check_param_type(
     # Some types are too complicated, so we replace them with a simpler type:
     for (param_name, expected_class), exception_type in PTCE.COMPLEX_TYPES.items():
         if ptb_param.name == param_name and is_class is expected_class:
+            logging.debug("Converting `%s` to a simpler type!\n", ptb_param.name)
             ptb_annotation = exception_type
 
     # Final check, if the annotation is a tuple, we need to check if any of the types in the tuple
