@@ -34,54 +34,62 @@ GLOBALLY_IGNORED_PARAMETERS = {
     "api_kwargs",
 }
 
-# Types for certain parameters accepted by PTB but not in the official API
-ADDITIONAL_TYPES = {
-    "photo": ForwardRef("PhotoSize"),
-    "video": ForwardRef("Video"),
-    "video_note": ForwardRef("VideoNote"),
-    "audio": ForwardRef("Audio"),
-    "document": ForwardRef("Document"),
-    "animation": ForwardRef("Animation"),
-    "voice": ForwardRef("Voice"),
-    "sticker": ForwardRef("Sticker"),
-}
 
-# Exceptions to the "Array of" types, where we accept more types than the official API
-# key: parameter name, value: type which must be present in the annotation
-ARRAY_OF_EXCEPTIONS = {
-    "results": "InlineQueryResult",  # + Callable
-    "commands": "BotCommand",  # + tuple[str, str]
-    "keyboard": "KeyboardButton",  # + sequence[sequence[str]]
-    "reaction": "ReactionType",  # + str
-    # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
-    "file_hashes": "list[str]",
-}
+class ParamTypeCheckingExceptions:
+    # Types for certain parameters accepted by PTB but not in the official API
+    ADDITIONAL_TYPES = {
+        "photo": ForwardRef("PhotoSize"),
+        "video": ForwardRef("Video"),
+        "video_note": ForwardRef("VideoNote"),
+        "audio": ForwardRef("Audio"),
+        "document": ForwardRef("Document"),
+        "animation": ForwardRef("Animation"),
+        "voice": ForwardRef("Voice"),
+        "sticker": ForwardRef("Sticker"),
+    }
 
-# Special cases for other parameters that accept more types than the official API, and are
-# too complex to compare/predict with official API:
-COMPLEX_TYPES = {  # (param_name, is_class (i.e appears in a class?)): reduced form of annotation
-    ("correct_option_id", False): int,  # actual: Literal
-    ("file_id", False): str,  # actual: Union[str, objs_with_file_id_attr]
-    ("invite_link", False): str,  # actual: Union[str, ChatInviteLink]
-    ("provider_data", False): str,  # actual: Union[str, obj]
-    ("callback_data", True): str,  # actual: Union[str, obj]
-    ("media", True): str,  # actual: Union[str, InputMedia*, FileInput]
-    ("data", True): str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
-}
+    # Exceptions to the "Array of" types, where we accept more types than the official API
+    # key: parameter name, value: type which must be present in the annotation
+    ARRAY_OF_EXCEPTIONS = {
+        "results": "InlineQueryResult",  # + Callable
+        "commands": "BotCommand",  # + tuple[str, str]
+        "keyboard": "KeyboardButton",  # + sequence[sequence[str]]
+        "reaction": "ReactionType",  # + str
+        # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
+        "file_hashes": "list[str]",
+    }
 
-# These are param names ignored in the param type checking in classes for the `tg.Defaults` case.
-IGNORED_DEFAULTS_PARAM_NAMES = {
-    "quote",
-    "link_preview_options",
-}
+    # Special cases for other parameters that accept more types than the official API, and are
+    # too complex to compare/predict with official API:
+    COMPLEX_TYPES = (
+        {  # (param_name, is_class (i.e appears in a class?)): reduced form of annotation
+            ("correct_option_id", False): int,  # actual: Literal
+            ("file_id", False): str,  # actual: Union[str, objs_with_file_id_attr]
+            ("invite_link", False): str,  # actual: Union[str, ChatInviteLink]
+            ("provider_data", False): str,  # actual: Union[str, obj]
+            ("callback_data", True): str,  # actual: Union[str, obj]
+            ("media", True): str,  # actual: Union[str, InputMedia*, FileInput]
+            (
+                "data",
+                True,
+            ): str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
+        }
+    )
 
-# These classes' params are all ODVInput, so we ignore them in the defaults type checking.
-IGNORED_DEFAULTS_CLASSES = {"LinkPreviewOptions"}
+    # param names ignored in the param type checking in classes for the `tg.Defaults` case.
+    IGNORED_DEFAULTS_PARAM_NAMES = {
+        "quote",
+        "link_preview_options",
+    }
 
-# TODO: Remove this in v22 when it becomes a datetime (also remove from arg_type_checker.py)
-DATETIME_EXCEPTIONS = {
-    "file_date",
-}
+    # These classes' params are all ODVInput, so we ignore them in the defaults type checking.
+    IGNORED_DEFAULTS_CLASSES = {"LinkPreviewOptions"}
+
+    # TODO: Remove this in v22 when it becomes a datetime (also remove from arg_type_checker.py)
+    DATETIME_EXCEPTIONS = {
+        "file_date",
+    }
+
 
 # Arguments *added* to the official API
 PTB_EXTRA_PARAMS = {

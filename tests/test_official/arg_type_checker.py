@@ -30,17 +30,23 @@ import telegram
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import FileInput, ODVInput
 from telegram.ext import Defaults
-from tests.test_official.exceptions import (
-    ADDITIONAL_TYPES,
-    ARRAY_OF_EXCEPTIONS,
-    COMPLEX_TYPES,
-    DATETIME_EXCEPTIONS,
-    IGNORED_DEFAULTS_CLASSES,
-    IGNORED_DEFAULTS_PARAM_NAMES,
-    ignored_param_requirements,
-)
+from tests.test_official.exceptions import ParamTypeCheckingExceptions as PTCE
+from tests.test_official.exceptions import ignored_param_requirements
 from tests.test_official.helpers import _extract_words, _get_params_base, _unionizer
 from tests.test_official.scraper import TelegramParameter
+
+# In order to evaluate the type annotation, we need to first have a mapping of the types
+# specified in the official API to our types. The keys are types in the column of official API.
+TYPE_MAPPING: dict[str, set[Any]] = {
+    "Integer or String": {int | str},
+    "Integer": {int},
+    "String": {str},
+    r"Boolean|True": {bool},
+    r"Float(?: number)?": {float},
+    # Distinguishing 1D and 2D Sequences and finding the inner type is done later.
+    r"Array of (?:Array of )?[\w\,\s]*": {Sequence},
+    r"InputFile(?: or String)?": {FileInput},
+}
 
 
 def check_required_param(
@@ -80,18 +86,7 @@ def check_param_type(
     """
     # PRE-PROCESSING:
     # In order to evaluate the type annotation, we need to first have a mapping of the types
-    # specified in the official API to our types. The keys are types in the column of official API.
-    TYPE_MAPPING: dict[str, set[Any]] = {
-        "Integer or String": {int | str},
-        "Integer": {int},
-        "String": {str},
-        r"Boolean|True": {bool},
-        r"Float(?: number)?": {float},
-        # Distinguishing 1D and 2D Sequences and finding the inner type is done later.
-        r"Array of (?:Array of )?[\w\,\s]*": {Sequence},
-        r"InputFile(?: or String)?": {FileInput},
-    }
-
+    # (see TYPE_MAPPING comment defined above)
     tg_param_type: str = tg_parameter.param_type
     is_class = inspect.isclass(obj)
     # Let's check for a match:
@@ -152,8 +147,8 @@ def check_param_type(
     if "Array of " in tg_param_type:
         assert mapped_type is Sequence
         # For exceptions just check if they contain the annotation
-        if ptb_param.name in ARRAY_OF_EXCEPTIONS:
-            return ARRAY_OF_EXCEPTIONS[ptb_param.name] in str(ptb_annotation)
+        if ptb_param.name in PTCE.ARRAY_OF_EXCEPTIONS:
+            return PTCE.ARRAY_OF_EXCEPTIONS[ptb_param.name] in str(ptb_annotation)
 
         pattern = r"Array of(?: Array of)? ([\w\,\s]*)"
         obj_match: re.Match | None = re.search(pattern, tg_param_type)  # extract obj from string
@@ -180,7 +175,7 @@ def check_param_type(
 
     # 2) HANDLING DEFAULTS PARAMETERS:
     # Classes whose parameters are all ODVInput should be converted and checked.
-    if obj.__name__ in IGNORED_DEFAULTS_CLASSES:
+    if obj.__name__ in PTCE.IGNORED_DEFAULTS_CLASSES:
         parsed = ODVInput[mapped_type]
         return (ptb_annotation | None) == parsed  # We have to add back None in our annotation
     if not (
@@ -188,7 +183,7 @@ def check_param_type(
         # 1. Parameters that have name conflict with `Defaults.name`
         is_class
         and obj.__name__ in ("ReplyParameters", "Message", "ExternalReplyInfo")
-        and ptb_param.name in IGNORED_DEFAULTS_PARAM_NAMES
+        and ptb_param.name in PTCE.IGNORED_DEFAULTS_PARAM_NAMES
     ):
         # Now let's check if the parameter is a Defaults parameter, it should be
         for name, _ in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
@@ -206,11 +201,11 @@ def check_param_type(
     # 3) HANDLING OTHER TYPES:
     # Special case for send_* methods where we accept more types than the official API:
     if (
-        ptb_param.name in ADDITIONAL_TYPES
+        ptb_param.name in PTCE.ADDITIONAL_TYPES
         and not isinstance(mapped_type, tuple)
         and obj.__name__.startswith("send")
     ):
-        mapped_type = mapped_type | ADDITIONAL_TYPES[ptb_param.name]
+        mapped_type = mapped_type | PTCE.ADDITIONAL_TYPES[ptb_param.name]
 
     # 4) HANDLING DATETIMES:
     if (
@@ -224,14 +219,14 @@ def check_param_type(
         )
         or "Unix time" in tg_parameter.param_description
     ):
-        if ptb_param.name in DATETIME_EXCEPTIONS:
+        if ptb_param.name in PTCE.DATETIME_EXCEPTIONS:
             return True
         # If it's a class, we only accept datetime as the parameter
         mapped_type = datetime if is_class else mapped_type | datetime
 
     # RESULTS: ALL OTHER BASIC TYPES-
     # Some types are too complicated, so we replace them with a simpler type:
-    for (param_name, expected_class), exception_type in COMPLEX_TYPES.items():
+    for (param_name, expected_class), exception_type in PTCE.COMPLEX_TYPES.items():
         if ptb_param.name == param_name and is_class is expected_class:
             ptb_annotation = exception_type
 
