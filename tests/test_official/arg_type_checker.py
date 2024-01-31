@@ -59,7 +59,7 @@ def check_required_param(
 
     Returns:
         :obj:`bool`: The boolean returned represents whether our parameter's requirement (optional
-        or required) is the same as Telegram's or not.
+            or required) is the same as Telegram's or not.
     """
     is_ours_required = param.default is inspect.Parameter.empty
     # Handle cases where we provide convenience intentionally-
@@ -79,13 +79,13 @@ def check_param_type(
     specified in the official API. It also checks for some special cases where we accept more types
 
     Args:
-        ptb_param (inspect.Parameter): The parameter object from our methods/classes
-        tg_parameter (list[str]): The table row corresponding to the parameter from official API.
-        obj (object): The object (method/class) that we are checking.
+        ptb_param: The parameter object from our methods/classes
+        tg_parameter: The table row corresponding to the parameter from official API.
+        obj: The object (method/class) that we are checking.
 
     Returns:
         :obj:`bool`: The boolean returned represents whether our parameter's type annotation is the
-        same as Telegram's or not.
+            same as Telegram's or not.
     """
     # PRE-PROCESSING:
     # In order to evaluate the type annotation, we need to first have a mapping of the types
