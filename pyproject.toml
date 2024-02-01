@@ -108,7 +108,7 @@ ignore_missing_imports = true
 # COVERAGE:
 [tool.coverage.run]
 branch = true
-source = "telegram"
+source = ["telegram"]
 parallel = true
 concurrency = ["thread", "multiprocessing"]
 omit = [
