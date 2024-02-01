@@ -38,6 +38,8 @@ disable = ["duplicate-code", "too-many-arguments", "too-many-public-methods",
 ]
 
 [tool.pylint.main]
+#  run pylint across multiple cpu cores to speed it up-
+# https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
 jobs = 0
 
 [tool.pylint.classes]
@@ -121,6 +123,3 @@ exclude_also = [
     "@overload",
     "if TYPE_CHECKING:"
 ]
-
-[tool.setuptools]
-license-files = ["LICENSE", "LICENSE.dual", "LICENSE.lesser"]

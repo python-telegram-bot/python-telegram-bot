@@ -21,12 +21,6 @@ repos:
     hooks:
     -   id: pylint
         files: ^(telegram|examples)/.*\.py$
-        args:
-          - --rcfile=setup.cfg
-          #  run pylint across multiple cpu cores to speed it up-
-          # https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
-          - --jobs=0
-
         additional_dependencies:
           - httpx~=0.26.0
           - tornado~=6.4
