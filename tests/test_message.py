@@ -70,7 +70,11 @@ from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
 from telegram.warnings import PTBDeprecationWarning
 from tests._passport.test_passport import RAW_PASSPORT_DATA
-from tests.auxil.bot_method_checks import check_shortcut_call, check_shortcut_signature
+from tests.auxil.bot_method_checks import (
+    check_defaults_handling,
+    check_shortcut_call,
+    check_shortcut_signature,
+)
 from tests.auxil.build_messages import make_message
 from tests.auxil.slots import mro_slots
 
@@ -1205,7 +1209,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_message",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_text, message.get_bot())
+        assert await check_defaults_handling(message.reply_text, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
         assert await message.reply_text("test")
@@ -1242,7 +1246,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_message",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_text, message.get_bot())
+        assert await check_defaults_handling(message.reply_text, message.get_bot())
 
         text_markdown = self.test_message.text_markdown
         assert text_markdown == test_md_string
@@ -1285,7 +1289,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_message",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_text, message.get_bot())
+        assert await check_defaults_handling(message.reply_text, message.get_bot())
 
         text_markdown = self.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
@@ -1334,7 +1338,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_message",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_text, message.get_bot())
+        assert await check_defaults_handling(message.reply_text, message.get_bot())
 
         text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
@@ -1368,7 +1372,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_media_group",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_media_group, message.get_bot())
+        assert await check_defaults_handling(message.reply_media_group, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_media_group", make_assertion)
         assert await message.reply_media_group(media="reply_media_group")
@@ -1396,7 +1400,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_photo",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_photo, message.get_bot())
+        assert await check_defaults_handling(message.reply_photo, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_photo", make_assertion)
         assert await message.reply_photo(photo="test_photo")
@@ -1424,7 +1428,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_audio",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_audio, message.get_bot())
+        assert await check_defaults_handling(message.reply_audio, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_audio", make_assertion)
         assert await message.reply_audio(audio="test_audio")
@@ -1452,7 +1456,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_document",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_document, message.get_bot())
+        assert await check_defaults_handling(message.reply_document, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_document", make_assertion)
         assert await message.reply_document(document="test_document")
@@ -1480,7 +1484,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_animation",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_animation, message.get_bot())
+        assert await check_defaults_handling(message.reply_animation, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_animation", make_assertion)
         assert await message.reply_animation(animation="test_animation")
@@ -1508,7 +1512,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_sticker",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_sticker, message.get_bot())
+        assert await check_defaults_handling(message.reply_sticker, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_sticker", make_assertion)
         assert await message.reply_sticker(sticker="test_sticker")
@@ -1536,7 +1540,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_video",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_video, message.get_bot())
+        assert await check_defaults_handling(message.reply_video, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_video", make_assertion)
         assert await message.reply_video(video="test_video")
@@ -1564,7 +1568,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_video_note",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_video_note, message.get_bot())
+        assert await check_defaults_handling(message.reply_video_note, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_video_note", make_assertion)
         assert await message.reply_video_note(video_note="test_video_note")
@@ -1592,7 +1596,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_voice",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_voice, message.get_bot())
+        assert await check_defaults_handling(message.reply_voice, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_voice", make_assertion)
         assert await message.reply_voice(voice="test_voice")
@@ -1620,7 +1624,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_location",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_location, message.get_bot())
+        assert await check_defaults_handling(message.reply_location, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_location", make_assertion)
         assert await message.reply_location(location="test_location")
@@ -1648,7 +1652,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_venue",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_venue, message.get_bot())
+        assert await check_defaults_handling(message.reply_venue, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_venue", make_assertion)
         assert await message.reply_venue(venue="test_venue")
@@ -1676,7 +1680,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_contact",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_contact, message.get_bot())
+        assert await check_defaults_handling(message.reply_contact, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_contact", make_assertion)
         assert await message.reply_contact(contact="test_contact")
@@ -1702,7 +1706,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert await check_shortcut_call(
             message.reply_poll, message.get_bot(), "send_poll", skip_params=["reply_to_message_id"]
         )
-        # assert await check_defaults_handling(message.reply_poll, message.get_bot())
+        assert await check_defaults_handling(message.reply_poll, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_poll", make_assertion)
         assert await message.reply_poll(question="test_poll", options=["1", "2", "3"])
@@ -1727,7 +1731,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert await check_shortcut_call(
             message.reply_dice, message.get_bot(), "send_dice", skip_params=["reply_to_message_id"]
         )
-        # assert await check_defaults_handling(message.reply_dice, message.get_bot())
+        assert await check_defaults_handling(message.reply_dice, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_dice", make_assertion)
         assert await message.reply_dice(disable_notification=True)
@@ -1745,7 +1749,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert await check_shortcut_call(
             message.reply_chat_action, message.get_bot(), "send_chat_action"
         )
-        # assert await check_defaults_handling(message.reply_chat_action, message.get_bot())
+        assert await check_defaults_handling(message.reply_chat_action, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_chat_action", make_assertion)
         assert await message.reply_chat_action(action=ChatAction.TYPING)
@@ -1765,7 +1769,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert await check_shortcut_call(
             message.reply_game, message.get_bot(), "send_game", skip_params=["reply_to_message_id"]
         )
-        # assert await check_defaults_handling(message.reply_game, message.get_bot())
+        assert await check_defaults_handling(message.reply_game, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_game", make_assertion)
         assert await message.reply_game(game_short_name="test_game")
@@ -1794,7 +1798,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "send_invoice",
             skip_params=["reply_to_message_id"],
         )
-        # assert await check_defaults_handling(message.reply_invoice, message.get_bot())
+        assert await check_defaults_handling(message.reply_invoice, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_invoice", make_assertion)
         assert await message.reply_invoice(
@@ -1829,7 +1833,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             Message.forward, Bot.forward_message, ["from_chat_id", "message_id"], []
         )
         assert await check_shortcut_call(message.forward, message.get_bot(), "forward_message")
-        # assert await check_defaults_handling(message.forward, message.get_bot())
+        assert await check_defaults_handling(message.forward, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "forward_message", make_assertion)
         assert await message.forward(
@@ -1864,7 +1868,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             Message.copy, Bot.copy_message, ["from_chat_id", "message_id"], []
         )
         assert await check_shortcut_call(message.copy, message.get_bot(), "copy_message")
-        # assert await check_defaults_handling(message.copy, message.get_bot())
+        assert await check_defaults_handling(message.copy, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "copy_message", make_assertion)
         assert await message.copy(
@@ -1913,7 +1917,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(message.copy, message.get_bot(), "copy_message")
-        # assert await check_defaults_handling(message.copy, message.get_bot())
+        assert await check_defaults_handling(message.copy, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "copy_message", make_assertion)
         assert await message.reply_copy(
@@ -1962,7 +1966,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             skip_params=["inline_message_id"],
             shortcut_kwargs=["message_id", "chat_id"],
         )
-        # assert await check_defaults_handling(message.edit_text, message.get_bot())
+        assert await check_defaults_handling(message.edit_text, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "edit_message_text", make_assertion)
         assert await message.edit_text(text="test")
@@ -1987,7 +1991,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             skip_params=["inline_message_id"],
             shortcut_kwargs=["message_id", "chat_id"],
         )
-        # assert await check_defaults_handling(message.edit_caption, message.get_bot())
+        assert await check_defaults_handling(message.edit_caption, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "edit_message_caption", make_assertion)
         assert await message.edit_caption(caption="new caption")
@@ -2012,7 +2016,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             skip_params=["inline_message_id"],
             shortcut_kwargs=["message_id", "chat_id"],
         )
-        # assert await check_defaults_handling(message.edit_media, message.get_bot())
+        assert await check_defaults_handling(message.edit_media, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "edit_message_media", make_assertion)
         assert await message.edit_media("my_media")
@@ -2037,7 +2041,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             skip_params=["inline_message_id"],
             shortcut_kwargs=["message_id", "chat_id"],
         )
-        # assert await check_defaults_handling(message.edit_reply_markup, message.get_bot())
+        assert await check_defaults_handling(message.edit_reply_markup, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "edit_message_reply_markup", make_assertion)
         assert await message.edit_reply_markup(reply_markup=[["1", "2"]])
@@ -2063,7 +2067,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             skip_params=["inline_message_id"],
             shortcut_kwargs=["message_id", "chat_id"],
         )
-        # assert await check_defaults_handling(message.edit_live_location, message.get_bot())
+        assert await check_defaults_handling(message.edit_live_location, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "edit_message_live_location", make_assertion)
         assert await message.edit_live_location(latitude=1, longitude=2)
@@ -2087,7 +2091,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             skip_params=["inline_message_id"],
             shortcut_kwargs=["message_id", "chat_id"],
         )
-        # assert await check_defaults_handling(message.stop_live_location, message.get_bot())
+        assert await check_defaults_handling(message.stop_live_location, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "stop_message_live_location", make_assertion)
         assert await message.stop_live_location()
@@ -2113,7 +2117,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             skip_params=["inline_message_id"],
             shortcut_kwargs=["message_id", "chat_id"],
         )
-        # assert await check_defaults_handling(message.set_game_score, message.get_bot())
+        assert await check_defaults_handling(message.set_game_score, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "set_game_score", make_assertion)
         assert await message.set_game_score(user_id=1, score=2)
@@ -2138,7 +2142,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             skip_params=["inline_message_id"],
             shortcut_kwargs=["message_id", "chat_id"],
         )
-        # assert await check_defaults_handling(message.get_game_high_scores, message.get_bot())
+        assert await check_defaults_handling(message.get_game_high_scores, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "get_game_high_scores", make_assertion)
         assert await message.get_game_high_scores(user_id=1)
@@ -2153,7 +2157,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             Message.delete, Bot.delete_message, ["chat_id", "message_id"], []
         )
         assert await check_shortcut_call(message.delete, message.get_bot(), "delete_message")
-        # assert await check_defaults_handling(message.delete, message.get_bot())
+        assert await check_defaults_handling(message.delete, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "delete_message", make_assertion)
         assert await message.delete()
@@ -2168,7 +2172,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             Message.stop_poll, Bot.stop_poll, ["chat_id", "message_id"], []
         )
         assert await check_shortcut_call(message.stop_poll, message.get_bot(), "stop_poll")
-        # assert await check_defaults_handling(message.stop_poll, message.get_bot())
+        assert await check_defaults_handling(message.stop_poll, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "stop_poll", make_assertion)
         assert await message.stop_poll()
@@ -2183,7 +2187,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             Message.pin, Bot.pin_chat_message, ["chat_id", "message_id"], []
         )
         assert await check_shortcut_call(message.pin, message.get_bot(), "pin_chat_message")
-        # assert await check_defaults_handling(message.pin, message.get_bot())
+        assert await check_defaults_handling(message.pin, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "pin_chat_message", make_assertion)
         assert await message.pin()
@@ -2203,7 +2207,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "unpin_chat_message",
             shortcut_kwargs=["chat_id", "message_id"],
         )
-        # assert await check_defaults_handling(message.unpin, message.get_bot())
+        assert await check_defaults_handling(message.unpin, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "unpin_chat_message", make_assertion)
         assert await message.unpin()
@@ -2247,7 +2251,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "edit_forum_topic",
             shortcut_kwargs=["chat_id", "message_thread_id"],
         )
-        # assert await check_defaults_handling(message.edit_forum_topic, message.get_bot())
+        assert await check_defaults_handling(message.edit_forum_topic, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "edit_forum_topic", make_assertion)
         assert await message.edit_forum_topic(name="New Name", icon_custom_emoji_id="12345")
@@ -2268,7 +2272,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "close_forum_topic",
             shortcut_kwargs=["chat_id", "message_thread_id"],
         )
-        # assert await check_defaults_handling(message.close_forum_topic, message.get_bot())
+        assert await check_defaults_handling(message.close_forum_topic, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "close_forum_topic", make_assertion)
         assert await message.close_forum_topic()
@@ -2292,7 +2296,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "reopen_forum_topic",
             shortcut_kwargs=["chat_id", "message_thread_id"],
         )
-        # assert await check_defaults_handling(message.reopen_forum_topic, message.get_bot())
+        assert await check_defaults_handling(message.reopen_forum_topic, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "reopen_forum_topic", make_assertion)
         assert await message.reopen_forum_topic()
@@ -2316,7 +2320,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             "delete_forum_topic",
             shortcut_kwargs=["chat_id", "message_thread_id"],
         )
-        # assert await check_defaults_handling(message.delete_forum_topic, message.get_bot())
+        assert await check_defaults_handling(message.delete_forum_topic, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "delete_forum_topic", make_assertion)
         assert await message.delete_forum_topic()
@@ -2340,9 +2344,9 @@ class TestMessageWithoutRequest(TestMessageBase):
             "unpin_all_forum_topic_messages",
             shortcut_kwargs=["chat_id", "message_thread_id"],
         )
-        # assert await check_defaults_handling(
-        #    message.unpin_all_forum_topic_messages, message.get_bot()
-        # )
+        assert await check_defaults_handling(
+            message.unpin_all_forum_topic_messages, message.get_bot()
+        )
 
         monkeypatch.setattr(message.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
         assert await message.unpin_all_forum_topic_messages()

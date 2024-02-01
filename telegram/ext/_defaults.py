@@ -50,9 +50,11 @@ class Defaults:
 
         allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|.
             Will be used for :attr:`telegram.ReplyParameters.allow_sending_without_reply`.
-        quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
-            to the message. If ``reply_to_message_id`` is passed, this parameter will
-            be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+        quote (:obj:`bool`, optional): |reply_quote|
+
+            .. deprecated:: NEXT.VERSION
+                Use :paramref:`do_quote` instead. This parameter will be removed in future
+                versions.
         tzinfo (:class:`datetime.tzinfo`, optional): A timezone to be used for all date(time)
             inputs appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
             somewhere, it will be assumed to be in :paramref:`tzinfo`. If the
@@ -109,18 +111,21 @@ class Defaults:
                             )
 
             .. versionadded:: NEXT.VERSION
+        do_quote(:obj:`bool`, optional): |reply_quote|
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
         "_tzinfo",
         "_block",
-        "_quote",
         "_disable_notification",
         "_allow_sending_without_reply",
         "_parse_mode",
         "_api_defaults",
         "_protect_content",
         "_link_preview_options",
+        "_do_quote",
     )
 
     def __init__(
@@ -134,11 +139,11 @@ class Defaults:
         allow_sending_without_reply: Optional[bool] = None,
         protect_content: Optional[bool] = None,
         link_preview_options: Optional["LinkPreviewOptions"] = None,
+        do_quote: Optional[bool] = None,
     ):
         self._parse_mode: Optional[str] = parse_mode
         self._disable_notification: Optional[bool] = disable_notification
         self._allow_sending_without_reply: Optional[bool] = allow_sending_without_reply
-        self._quote: Optional[bool] = quote
         self._tzinfo: datetime.tzinfo = tzinfo
         self._block: bool = block
         self._protect_content: Optional[bool] = protect_content
@@ -147,7 +152,8 @@ class Defaults:
             raise ValueError(
                 "`disable_web_page_preview` and `link_preview_options` are mutually exclusive."
             )
-
+        if quote is not None and do_quote is not None:
+            raise ValueError("`quote` and `do_quote` are mutually exclusive")
         if disable_web_page_preview is not None:
             warn(
                 "`Defaults.disable_web_page_preview` is deprecated. Use "
@@ -160,6 +166,16 @@ class Defaults:
             )
         else:
             self._link_preview_options = link_preview_options
+
+        if quote is not None:
+            warn(
+                "`Defaults.quote` is deprecated. Use `Defaults.do_quote` instead.",
+                category=PTBDeprecationWarning,
+                stacklevel=2,
+            )
+            self._do_quote: Optional[bool] = quote
+        else:
+            self._do_quote = do_quote
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
         for kwarg in (
@@ -169,6 +185,7 @@ class Defaults:
             "allow_sending_without_reply",
             "protect_content",
             "link_preview_options",
+            "do_quote",
         ):
             value = getattr(self, kwarg)
             if value is not None:
@@ -187,7 +204,7 @@ class Defaults:
                 self._disable_notification,
                 self.disable_web_page_preview,
                 self._allow_sending_without_reply,
-                self._quote,
+                self.quote,
                 self._tzinfo,
                 self._block,
                 self._protect_content,
@@ -292,11 +309,13 @@ class Defaults:
 
     @property
     def quote(self) -> Optional[bool]:
-        """:obj:`bool`: Optional. If set to :obj:`True`, the reply is sent as an actual reply
-        to the message. If ``reply_to_message_id`` is passed, this parameter will
-        be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+        """:obj:`bool`: Optional. |reply_quote|
+
+        .. deprecated:: NEXT.VERSION
+            Use :attr:`do_quote` instead. This attribute will be removed in future
+            versions.
         """
-        return self._quote
+        return self._do_quote if self._do_quote is not None else None
 
     @quote.setter
     def quote(self, value: object) -> NoReturn:
@@ -348,3 +367,11 @@ class Defaults:
         .. versionadded:: NEXT.VERSION
         """
         return self._link_preview_options
+
+    @property
+    def do_quote(self) -> Optional[bool]:
+        """:obj:`bool`: Optional. |reply_quote|
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self._do_quote

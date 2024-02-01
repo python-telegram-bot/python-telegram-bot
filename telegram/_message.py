@@ -1556,6 +1556,23 @@ class Message(MaybeInaccessibleMessage):
     def compute_quote_position_and_entities(
         self, quote: str, index: Optional[int] = None
     ) -> Tuple[int, Tuple[MessageEntity, ...]]:
+        """
+        Use this function to compute position and entities of quote.
+
+        Args:
+            quote (:obj:`str`): Part of the message which is to be quoted. This is
+                expected to have plain text without formatting entities.
+            index (:obj:`int`, optional): Position of the quote in the original message in
+                UTF-16 code units.
+
+        Returns:
+            :obj:`tuple`: On success, a tuple containing information about quote position and
+            entities is returned.
+
+        Raises:
+            RuntimeError: If the message has no text.
+            ValueError: If the requested index of quote doesn't exist in the message.
+        """
         if not (text := (self.text or self.caption)):
             raise RuntimeError("This message has neither text nor caption.")
 
@@ -1591,15 +1608,14 @@ class Message(MaybeInaccessibleMessage):
             .. versionadded:: NEXT.VERSION
 
         Args:
-            quote (:obj:`str`, optional): Quoted part of the message to be replied to; 0-1024
-                characters after entities parsing. The quote must be an exact substring of the
-                message to be replied to, including bold, italic, underline, strikethrough,
-                spoiler, and custom_emoji entities. The message will fail to send if the quote
-                isn't found in the original message.
-            quote_index (:obj:`int`, optional): Position of the quote in the original message in
-                UTF-16 code units.
-            target_chat_id (:obj:`int` | :obj:`str`, optional): If the message to be replied to is
-                from a different chat, |chat_id_channel|
+            quote (:obj:`str`, optional): Passed in :meth:`compute_quote_position_and_entities`
+                as parameter :paramref:`compute_quote_position_and_entities.quote` to compute quote
+                entities.
+            quote_index (:obj:`int`, optional): Passed in
+                :meth:`compute_quote_position_and_entities` as parameter
+                :paramref:`compute_quote_position_and_entities.quote_index` to compute quote
+                position.
+            target_chat_id (:obj:`int` | :obj:`str`, optional): |chat_id_channel|
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             message_thread_id (:obj:`int`, optional): |message_thread_id|
 
@@ -1642,8 +1658,15 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"],
     ) -> Tuple[Union[str, int], ReplyParameters]:
         if quote and do_quote:
-            raise ValueError("Mutually exclusive")
+            raise ValueError("The arguments `quote` and `do_quote` are mutually exclusive")
 
+        if quote is not None:
+            warn(
+                "The `quote` parameter is deprecated in favor of the `do_quote` parameter. Please "
+                "update your code to use `do_quote` instead.",
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
         if reply_parameters:
             return reply_parameters.chat_id, reply_parameters
 
@@ -1692,6 +1715,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -1765,6 +1791,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -1833,6 +1862,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -1901,6 +1933,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -1963,6 +1998,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2027,6 +2065,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2095,6 +2136,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2164,6 +2208,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2234,6 +2281,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2299,6 +2349,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2365,6 +2418,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2434,6 +2490,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2498,6 +2557,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2564,6 +2626,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2633,6 +2698,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2700,6 +2768,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2770,6 +2841,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2836,6 +2910,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -2925,6 +3002,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -3014,6 +3094,9 @@ class Message(MaybeInaccessibleMessage):
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
@@ -3207,6 +3290,8 @@ class Message(MaybeInaccessibleMessage):
             quote (:obj:`bool`, optional): |reply_quote|
 
                 .. versionadded:: 13.1
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
