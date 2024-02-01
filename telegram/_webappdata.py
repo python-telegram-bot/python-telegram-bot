@@ -51,7 +51,7 @@ class WebAppData(TelegramObject):
                 Be aware that a bad client can send arbitrary data in this field.
     """
 
-    __slots__ = ("data", "button_text")
+    __slots__ = ("button_text", "data")
 
     def __init__(self, data: str, button_text: str, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)

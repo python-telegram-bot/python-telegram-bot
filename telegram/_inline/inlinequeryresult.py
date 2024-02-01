@@ -54,7 +54,7 @@ class InlineQueryResult(TelegramObject):
 
     """
 
-    __slots__ = ("type", "id")
+    __slots__ = ("id", "type")
 
     def __init__(self, type: str, id: str, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)

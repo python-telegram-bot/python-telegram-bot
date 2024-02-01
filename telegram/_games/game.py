@@ -88,12 +88,12 @@ class Game(TelegramObject):
     """
 
     __slots__ = (
-        "title",
-        "photo",
-        "description",
-        "text_entities",
-        "text",
         "animation",
+        "description",
+        "photo",
+        "text",
+        "text_entities",
+        "title",
     )
 
     def __init__(

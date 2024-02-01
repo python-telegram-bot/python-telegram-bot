@@ -75,7 +75,7 @@ class ForceReply(TelegramObject):
 
     """
 
-    __slots__ = ("selective", "force_reply", "input_field_placeholder")
+    __slots__ = ("force_reply", "input_field_placeholder", "selective")
 
     def __init__(
         self,

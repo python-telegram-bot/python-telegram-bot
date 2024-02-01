@@ -605,79 +605,79 @@ class Message(TelegramObject):
 
     # fmt: on
     __slots__ = (
-        "reply_markup",
-        "audio",
-        "contact",
-        "migrate_to_chat_id",
-        "forward_signature",
-        "chat",
-        "successful_payment",
-        "game",
-        "text",
-        "forward_sender_name",
-        "document",
-        "new_chat_title",
-        "forward_date",
-        "group_chat_created",
-        "media_group_id",
-        "caption",
-        "video",
-        "entities",
-        "via_bot",
-        "new_chat_members",
-        "connected_website",
-        "animation",
-        "migrate_from_chat_id",
-        "forward_from",
-        "sticker",
-        "location",
-        "venue",
-        "edit_date",
-        "reply_to_message",
-        "passport_data",
-        "pinned_message",
-        "forward_from_chat",
-        "new_chat_photo",
-        "message_id",
-        "delete_chat_photo",
-        "from_user",
-        "author_signature",
-        "proximity_alert_triggered",
-        "sender_chat",
-        "dice",
-        "forward_from_message_id",
-        "caption_entities",
-        "voice",
-        "date",
-        "supergroup_chat_created",
-        "poll",
-        "left_chat_member",
-        "photo",
-        "channel_chat_created",
-        "invoice",
-        "video_note",
         "_effective_attachment",
-        "message_auto_delete_timer_changed",
-        "video_chat_ended",
-        "video_chat_participants_invited",
-        "video_chat_started",
-        "video_chat_scheduled",
-        "is_automatic_forward",
-        "has_protected_content",
-        "web_app_data",
-        "is_topic_message",
-        "message_thread_id",
-        "forum_topic_created",
+        "animation",
+        "audio",
+        "author_signature",
+        "caption",
+        "caption_entities",
+        "channel_chat_created",
+        "chat",
+        "chat_shared",
+        "connected_website",
+        "contact",
+        "date",
+        "delete_chat_photo",
+        "dice",
+        "document",
+        "edit_date",
+        "entities",
         "forum_topic_closed",
-        "forum_topic_reopened",
+        "forum_topic_created",
         "forum_topic_edited",
+        "forum_topic_reopened",
+        "forward_date",
+        "forward_from",
+        "forward_from_chat",
+        "forward_from_message_id",
+        "forward_sender_name",
+        "forward_signature",
+        "from_user",
+        "game",
         "general_forum_topic_hidden",
         "general_forum_topic_unhidden",
-        "write_access_allowed",
+        "group_chat_created",
         "has_media_spoiler",
-        "user_shared",
-        "chat_shared",
+        "has_protected_content",
+        "invoice",
+        "is_automatic_forward",
+        "is_topic_message",
+        "left_chat_member",
+        "location",
+        "media_group_id",
+        "message_auto_delete_timer_changed",
+        "message_id",
+        "message_thread_id",
+        "migrate_from_chat_id",
+        "migrate_to_chat_id",
+        "new_chat_members",
+        "new_chat_photo",
+        "new_chat_title",
+        "passport_data",
+        "photo",
+        "pinned_message",
+        "poll",
+        "proximity_alert_triggered",
+        "reply_markup",
+        "reply_to_message",
+        "sender_chat",
+        "sticker",
         "story",
+        "successful_payment",
+        "supergroup_chat_created",
+        "text",
+        "user_shared",
+        "venue",
+        "via_bot",
+        "video",
+        "video_chat_ended",
+        "video_chat_participants_invited",
+        "video_chat_scheduled",
+        "video_chat_started",
+        "video_note",
+        "voice",
+        "web_app_data",
+        "write_access_allowed",
     )
 
     def __init__(
@@ -798,9 +798,9 @@ class Message(TelegramObject):
         self.migrate_to_chat_id: Optional[int] = migrate_to_chat_id
         self.migrate_from_chat_id: Optional[int] = migrate_from_chat_id
         self.channel_chat_created: Optional[bool] = bool(channel_chat_created)
-        self.message_auto_delete_timer_changed: Optional[
-            MessageAutoDeleteTimerChanged
-        ] = message_auto_delete_timer_changed
+        self.message_auto_delete_timer_changed: Optional[MessageAutoDeleteTimerChanged] = (
+            message_auto_delete_timer_changed
+        )
         self.pinned_message: Optional[Message] = pinned_message
         self.forward_from_message_id: Optional[int] = forward_from_message_id
         self.invoice: Optional[Invoice] = invoice
@@ -815,15 +815,15 @@ class Message(TelegramObject):
         self.poll: Optional[Poll] = poll
         self.dice: Optional[Dice] = dice
         self.via_bot: Optional[User] = via_bot
-        self.proximity_alert_triggered: Optional[
-            ProximityAlertTriggered
-        ] = proximity_alert_triggered
+        self.proximity_alert_triggered: Optional[ProximityAlertTriggered] = (
+            proximity_alert_triggered
+        )
         self.video_chat_scheduled: Optional[VideoChatScheduled] = video_chat_scheduled
         self.video_chat_started: Optional[VideoChatStarted] = video_chat_started
         self.video_chat_ended: Optional[VideoChatEnded] = video_chat_ended
-        self.video_chat_participants_invited: Optional[
-            VideoChatParticipantsInvited
-        ] = video_chat_participants_invited
+        self.video_chat_participants_invited: Optional[VideoChatParticipantsInvited] = (
+            video_chat_participants_invited
+        )
         self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
         self.web_app_data: Optional[WebAppData] = web_app_data
         self.is_topic_message: Optional[bool] = is_topic_message
@@ -832,12 +832,12 @@ class Message(TelegramObject):
         self.forum_topic_closed: Optional[ForumTopicClosed] = forum_topic_closed
         self.forum_topic_reopened: Optional[ForumTopicReopened] = forum_topic_reopened
         self.forum_topic_edited: Optional[ForumTopicEdited] = forum_topic_edited
-        self.general_forum_topic_hidden: Optional[
-            GeneralForumTopicHidden
-        ] = general_forum_topic_hidden
-        self.general_forum_topic_unhidden: Optional[
-            GeneralForumTopicUnhidden
-        ] = general_forum_topic_unhidden
+        self.general_forum_topic_hidden: Optional[GeneralForumTopicHidden] = (
+            general_forum_topic_hidden
+        )
+        self.general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = (
+            general_forum_topic_unhidden
+        )
         self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
         self.has_media_spoiler: Optional[bool] = has_media_spoiler
         self.user_shared: Optional[UserShared] = user_shared

@@ -53,7 +53,7 @@ class PhotoSize(_BaseMedium):
 
     """
 
-    __slots__ = ("width", "height")
+    __slots__ = ("height", "width")
 
     def __init__(
         self,

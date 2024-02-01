@@ -68,7 +68,7 @@ class WriteAccessAllowed(TelegramObject):
 
     """
 
-    __slots__ = ("web_app_name", "from_request", "from_attachment_menu")
+    __slots__ = ("from_attachment_menu", "from_request", "web_app_name")
 
     def __init__(
         self,

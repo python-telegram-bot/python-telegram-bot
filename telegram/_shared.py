@@ -91,7 +91,7 @@ class ChatShared(TelegramObject):
             float type are safe for storing this identifier.
     """
 
-    __slots__ = ("request_id", "chat_id")
+    __slots__ = ("chat_id", "request_id")
 
     def __init__(
         self,

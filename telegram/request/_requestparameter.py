@@ -57,7 +57,7 @@ class RequestParameter:
             be uploaded along with this parameter.
     """
 
-    __slots__ = ("name", "value", "input_files")
+    __slots__ = ("input_files", "name", "value")
 
     name: str
     value: object

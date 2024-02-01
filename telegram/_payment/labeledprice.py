@@ -53,7 +53,7 @@ class LabeledPrice(TelegramObject):
 
     """
 
-    __slots__ = ("label", "amount")
+    __slots__ = ("amount", "label")
 
     def __init__(self, label: str, amount: int, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)

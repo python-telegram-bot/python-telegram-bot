@@ -69,7 +69,7 @@ class Animation(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ("duration", "height", "file_name", "mime_type", "width")
+    __slots__ = ("duration", "file_name", "height", "mime_type", "width")
 
     def __init__(
         self,

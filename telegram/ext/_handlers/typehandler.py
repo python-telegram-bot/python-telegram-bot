@@ -67,7 +67,7 @@ class TypeHandler(BaseHandler[UT, CCT]):
 
     """
 
-    __slots__ = ("type", "strict")
+    __slots__ = ("strict", "type")
 
     def __init__(
         self,

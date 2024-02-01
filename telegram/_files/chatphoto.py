@@ -74,10 +74,10 @@ class ChatPhoto(TelegramObject):
     """
 
     __slots__ = (
+        "big_file_id",
         "big_file_unique_id",
         "small_file_id",
         "small_file_unique_id",
-        "big_file_id",
     )
 
     def __init__(

@@ -61,16 +61,16 @@ class PersonalDetails(TelegramObject):
     """
 
     __slots__ = (
-        "middle_name",
-        "first_name_native",
-        "last_name_native",
-        "residence_country_code",
-        "first_name",
-        "last_name",
-        "country_code",
-        "gender",
-        "middle_name_native",
         "birth_date",
+        "country_code",
+        "first_name",
+        "first_name_native",
+        "gender",
+        "last_name",
+        "last_name_native",
+        "middle_name",
+        "middle_name_native",
+        "residence_country_code",
     )
 
     def __init__(
@@ -126,12 +126,12 @@ class ResidentialAddress(TelegramObject):
     """
 
     __slots__ = (
-        "post_code",
         "city",
         "country_code",
-        "street_line2",
-        "street_line1",
+        "post_code",
         "state",
+        "street_line1",
+        "street_line2",
     )
 
     def __init__(

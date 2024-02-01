@@ -122,18 +122,18 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     """
 
     __slots__ = (
+        "caption",
+        "caption_entities",
+        "input_message_content",
+        "mpeg4_duration",
+        "mpeg4_height",
+        "mpeg4_url",
+        "mpeg4_width",
+        "parse_mode",
         "reply_markup",
         "thumbnail_mime_type",
-        "caption_entities",
-        "mpeg4_duration",
-        "mpeg4_width",
-        "title",
-        "caption",
-        "parse_mode",
-        "input_message_content",
-        "mpeg4_url",
-        "mpeg4_height",
         "thumbnail_url",
+        "title",
     )
 
     def __init__(

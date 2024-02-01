@@ -89,7 +89,7 @@ class TelegramObject:
 
     """
 
-    __slots__ = ("_id_attrs", "_bot", "_frozen", "api_kwargs")
+    __slots__ = ("_bot", "_frozen", "_id_attrs", "api_kwargs")
 
     # Used to cache the names of the parameters of the __init__ method of the class
     # Must be a private attribute to avoid name clashes between subclasses

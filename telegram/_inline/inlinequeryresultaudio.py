@@ -87,15 +87,15 @@ class InlineQueryResultAudio(InlineQueryResult):
     """
 
     __slots__ = (
-        "reply_markup",
-        "caption_entities",
-        "caption",
-        "title",
-        "parse_mode",
-        "audio_url",
-        "performer",
-        "input_message_content",
         "audio_duration",
+        "audio_url",
+        "caption",
+        "caption_entities",
+        "input_message_content",
+        "parse_mode",
+        "performer",
+        "reply_markup",
+        "title",
     )
 
     def __init__(

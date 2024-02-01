@@ -93,7 +93,7 @@ class MessageEntity(TelegramObject):
 
     """
 
-    __slots__ = ("length", "url", "user", "type", "language", "offset", "custom_emoji_id")
+    __slots__ = ("custom_emoji_id", "language", "length", "offset", "type", "url", "user")
 
     def __init__(
         self,

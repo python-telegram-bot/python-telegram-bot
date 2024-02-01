@@ -66,7 +66,7 @@ class _ConversationTimeoutContext(Generic[CCT]):
     :paramref:`JobQueue.run_once.data` parameter. See :meth:`_trigger_timeout`.
     """
 
-    __slots__ = ("conversation_key", "update", "application", "callback_context")
+    __slots__ = ("application", "callback_context", "conversation_key", "update")
 
     conversation_key: ConversationKey
     update: Update
@@ -81,7 +81,7 @@ class PendingState:
     It's still hidden from users, since this module itself is private.
     """
 
-    __slots__ = ("task", "old_state")
+    __slots__ = ("old_state", "task")
 
     task: asyncio.Task
     old_state: object
@@ -332,9 +332,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         self._per_user: bool = per_user
         self._per_chat: bool = per_chat
         self._per_message: bool = per_message
-        self._conversation_timeout: Optional[
-            Union[float, datetime.timedelta]
-        ] = conversation_timeout
+        self._conversation_timeout: Optional[Union[float, datetime.timedelta]] = (
+            conversation_timeout
+        )
         self._name: Optional[str] = name
         self._map_to_parent: Optional[Dict[object, object]] = map_to_parent
 

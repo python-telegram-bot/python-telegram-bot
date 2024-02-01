@@ -155,7 +155,7 @@ class TestTelegramObject:
 
     def test_to_dict_private_attribute(self):
         class TelegramObjectSubclass(TelegramObject):
-            __slots__ = ("a", "_b")  # Added slots so that the attrs are converted to dict
+            __slots__ = ("_b", "a")  # Added slots so that the attrs are converted to dict
 
             def __init__(self):
                 super().__init__()
