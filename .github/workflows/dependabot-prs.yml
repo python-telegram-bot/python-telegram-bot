@@ -31,7 +31,7 @@ jobs:
         exclude: CHANGES.rst
 
     - name: Commit & Push Changes to PR
-      uses: EndBug/add-and-commit@v9.1.3
+      uses: EndBug/add-and-commit@v9.1.4
       with:
         message: 'Update version number in other files'
         committer_name: GitHub Actions
