@@ -92,3 +92,4 @@ jobs:
           env_vars: OS,PYTHON
           name: ${{ matrix.os }}-${{ matrix.python-version }}
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
