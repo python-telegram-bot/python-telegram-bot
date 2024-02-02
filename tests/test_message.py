@@ -48,6 +48,7 @@ from telegram import (
     Poll,
     PollOption,
     ProximityAlertTriggered,
+    ReplyParameters,
     Sticker,
     Story,
     SuccessfulPayment,
@@ -76,6 +77,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
+from tests.auxil.pytest_classes import PytestExtBot
 from tests.auxil.slots import mro_slots
 
 
@@ -2212,24 +2214,38 @@ class TestMessageWithoutRequest(TestMessageBase):
         monkeypatch.setattr(message.get_bot(), "unpin_chat_message", make_assertion)
         assert await message.unpin()
 
-    # TODO: fix this
-    @pytest.mark.xfail(reason="TODO fix this")
-    def test_default_quote(self, message):
-        message.get_bot()._defaults = Defaults()
+    @pytest.mark.parametrize(
+        ("default_quote", "chat_type", "expected"),
+        [
+            (False, Chat.PRIVATE, False),
+            (None, Chat.PRIVATE, False),
+            (True, Chat.PRIVATE, True),
+            (False, Chat.GROUP, False),
+            (None, Chat.GROUP, True),
+            (True, Chat.GROUP, True),
+            (False, Chat.SUPERGROUP, False),
+            (None, Chat.SUPERGROUP, True),
+            (True, Chat.SUPERGROUP, True),
+            (False, Chat.CHANNEL, False),
+            (None, Chat.CHANNEL, True),
+            (True, Chat.CHANNEL, True),
+        ],
+    )
+    async def test_default_do_quote(
+        self, bot, message, default_quote, chat_type, expected, monkeypatch
+    ):
+        message.set_bot(PytestExtBot(token=bot.token, defaults=Defaults(do_quote=default_quote)))
+
+        async def make_assertion(*_, **kwargs):
+            reply_parameters = kwargs.get("reply_parameters") or ReplyParameters(message_id=False)
+            condition = reply_parameters.message_id == message.message_id
+            return condition == expected
+
+        monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
 
         try:
-            message.get_bot().defaults._quote = False
-            assert message._quote(None, None) is None
-
-            message.get_bot().defaults._quote = True
-            assert message._quote(None, None) == message.message_id
-
-            message.get_bot().defaults._quote = None
-            message.chat.type = Chat.PRIVATE
-            assert message._quote(None, None) is None
-
-            message.chat.type = Chat.GROUP
-            assert message._quote(None, None)
+            message.chat.type = chat_type
+            assert await message.reply_text("test")
         finally:
             message.get_bot()._defaults = None
 
