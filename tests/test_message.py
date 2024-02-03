@@ -1189,6 +1189,43 @@ class TestMessageWithoutRequest(TestMessageBase):
                 )
                 assert not condition, "effective_attachment was None even though it should not be"
 
+    def test_compute_quote_position_and_entities_false_index(self, message):
+        message.text = "AA"
+        with pytest.raises(
+            ValueError,
+            match="You requested the 5-th occurrence of 'A', "
+            "but this text appears only 2 times.",
+        ):
+            message.compute_quote_position_and_entities("A", 5)
+
+    def test_compute_quote_position_and_entities_no_text_or_caption(self, message):
+        message.text = None
+        message.caption = None
+        with pytest.raises(
+            RuntimeError,
+            match="This message has neither text nor caption.",
+        ):
+            message.compute_quote_position_and_entities("A", 5)
+
+    @pytest.mark.parametrize(
+        ("text", "quote", "index", "expected"),
+        argvalues=[
+            ("AA", "A", 0, 0),
+            ("AA", "A", 1, 1),
+            ("ABC ABC ABC ABC", "ABC", 0, 0),
+            ("ABC ABC ABC ABC", "ABC", 3, 12),
+            ("👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧", "👨‍👨‍👧", 0, 0),
+            ("👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧", "👨‍👨‍👧", 3, 24),
+            ("👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧", "👨", 1, 3),
+            ("👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧", "👧", 2, 22),
+        ],
+    )
+    def test_compute_quote_position_and_entities_position(
+        self, message, text, quote, index, expected
+    ):
+        message.text = text
+        assert message.compute_quote_position_and_entities(quote, index)[0] == expected
+
     async def test_reply_text(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
