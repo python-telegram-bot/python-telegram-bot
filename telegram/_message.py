@@ -1576,23 +1576,43 @@ class Message(MaybeInaccessibleMessage):
         if not (text := (self.text or self.caption)):
             raise RuntimeError("This message has neither text nor caption.")
 
+        # Telegram wants the position in UTF-16 code units, so we have to calculate in that space
+        utf16_text = text.encode("utf-16-le")
+        utf16_quote = quote.encode("utf-16-le")
         effective_index = 0 or index
 
-        matches = list(re.finditer(re.escape(quote), text))
-        if (length := len(matches)) < effective_index:
+        matches = list(re.finditer(re.escape(utf16_quote), utf16_text))
+        if (length := len(matches)) < effective_index + 1:
             raise ValueError(
-                f"You requested the {index}-nth occurrence of '{quote}', but this text appears "
+                f"You requested the {index}-th occurrence of '{quote}', but this text appears "
                 f"only {length} times."
             )
-        # apply utf-16 conversion
-        position = matches[index].start()
-        end_position = position + len(quote)
-        entities = tuple(
-            entity
-            for entity in self.entities or self.caption_entities
-            if position <= entity.offset <= end_position
-        )
-        return position, entities
+
+        position = len(utf16_text[: matches[effective_index].start()]) // 2
+        length = len(utf16_quote) // 2
+        end_position = position + length
+
+        entities = []
+        for entity in self.entities or self.caption_entities:
+            if position <= entity.offset + entity.length and entity.offset <= end_position:
+                # shift the offset by the position of the quote
+                offset = max(0, entity.offset - position)
+                # trim the entity length to the length of the overlap with the quote
+                e_length = min(end_position, entity.offset + entity.length) - max(
+                    position, entity.offset
+                )
+                if e_length <= 0:
+                    continue
+
+                # create a new entity with the correct offset and length
+                # looping over slots rather manually accessing the attributes
+                # is more future-proof
+                kwargs = {attr: getattr(entity, attr) for attr in entity.__slots__}
+                kwargs["offset"] = offset
+                kwargs["length"] = e_length
+                entities.append(MessageEntity(**kwargs))
+
+        return position, tuple(entities)
 
     def build_reply_arguments(
         self,
@@ -1623,9 +1643,6 @@ class Message(MaybeInaccessibleMessage):
             :obj:`dict`: On success, a dict containing information about ``reply_parameters`` is
             returned.
         """
-        kwargs: _ReplyKwargs = {
-            "chat_id": target_chat_id or self.chat_id
-        }  # type: ignore [typeddict-item]
         target_chat_is_self = target_chat_id in (None, self.chat_id, f"@{self.chat.username}")
 
         if target_chat_is_self and message_thread_id in (
@@ -1640,15 +1657,17 @@ class Message(MaybeInaccessibleMessage):
         quote_position, quote_entities = (
             self.compute_quote_position_and_entities(quote, quote_index) if quote else (None, None)
         )
-        kwargs["reply_parameters"] = ReplyParameters(
-            chat_id=None if target_chat_is_self else self.chat_id,
-            message_id=self.message_id,
-            quote_position=quote_position,
-            quote_entities=quote_entities,
-            allow_sending_without_reply=effective_aswr,
-        )
-
-        return kwargs
+        return {  # type: ignore[typeddict-item]
+            "reply_parameters": ReplyParameters(
+                chat_id=None if target_chat_is_self else self.chat_id,
+                message_id=self.message_id,
+                quote=quote,
+                quote_position=quote_position,
+                quote_entities=quote_entities,
+                allow_sending_without_reply=effective_aswr,
+            ),
+            "chat_id": target_chat_id or self.chat_id,
+        }
 
     async def _parse_quote_arguments(
         self,
@@ -1667,22 +1686,28 @@ class Message(MaybeInaccessibleMessage):
                 PTBDeprecationWarning,
                 stacklevel=2,
             )
-        if reply_parameters:
-            return reply_parameters.chat_id, reply_parameters
 
         effective_do_quote = quote or do_quote
-        bool_do_quote = not isinstance(reply_parameters, ReplyParameters)
-        reply_parameters = (
-            self._quote(quote, reply_to_message_id)
-            if bool_do_quote
-            else effective_do_quote["reply_parameters"]  # type: ignore [index]
-        )
-        chat_id = (
-            self.chat_id
-            if bool_do_quote
-            else effective_do_quote["chat_id"]  # type: ignore [index]
-        )
-        return chat_id, reply_parameters
+
+        if reply_parameters is not None:
+            effective_reply_parameters = reply_parameters
+        else:
+            effective_reply_parameters = (
+                self._quote(effective_do_quote, reply_to_message_id)
+                if not isinstance(effective_do_quote, dict)
+                else effective_do_quote["reply_parameters"]
+            )
+
+        if effective_reply_parameters.chat_id is None:
+            chat_id = (
+                self.chat_id
+                if not isinstance(effective_do_quote, dict)
+                else effective_do_quote["chat_id"]
+            )
+        else:
+            chat_id = effective_reply_parameters.chat_id
+
+        return chat_id, effective_reply_parameters
 
     async def reply_text(
         self,
