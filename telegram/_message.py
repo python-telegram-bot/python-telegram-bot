@@ -1555,22 +1555,37 @@ class Message(MaybeInaccessibleMessage):
 
     def compute_quote_position_and_entities(
         self, quote: str, index: Optional[int] = None
-    ) -> Tuple[int, Tuple[MessageEntity, ...]]:
+    ) -> Tuple[int, Optional[Tuple[MessageEntity, ...]]]:
         """
-        Use this function to compute position and entities of quote.
+        Use this function to compute position and entities of a quote in the message text or
+        caption. Useful for filling the parameters
+        :paramref:`~telegram.ReplyParameters.quote_position` and
+        :paramref:`~telegram.ReplyParameters.quote_entities` of :class:`telegram.ReplyParameters`
+        when replying to a message.
+
+        Example:
+
+            Given a message with the text ``"Hello, world! Hello, world!"``, the following code
+            will return the position and entities of the second occurrence of ``"Hello, world!"``.
+
+            .. code-block:: python
+
+                message.compute_quote_position_and_entities("Hello, world!", 1)
+
+        .. versionadded:: NEXT.VERSION
 
         Args:
             quote (:obj:`str`): Part of the message which is to be quoted. This is
                 expected to have plain text without formatting entities.
-            index (:obj:`int`, optional): Position of the quote in the original message in
-                UTF-16 code units.
+            index (:obj:`int`, optional): 0-based index of the occurrence of the quote in the
+                message. If not specified, the first occurrence is used.
 
         Returns:
-            :obj:`tuple`: On success, a tuple containing information about quote position and
-            entities is returned.
+            Tuple[:obj:`int`, :obj:`None` | Tuple[:class:`~telegram.MessageEntity`, ...]]: On
+            success, a tuple containing information about quote position and entities is returned.
 
         Raises:
-            RuntimeError: If the message has no text.
+            RuntimeError: If the message has neither :attr:`text` nor :attr:`caption`.
             ValueError: If the requested index of quote doesn't exist in the message.
         """
         if not (text := (self.text or self.caption)):
@@ -1579,7 +1594,7 @@ class Message(MaybeInaccessibleMessage):
         # Telegram wants the position in UTF-16 code units, so we have to calculate in that space
         utf16_text = text.encode("utf-16-le")
         utf16_quote = quote.encode("utf-16-le")
-        effective_index = 0 or index
+        effective_index = index or 0
 
         matches = list(re.finditer(re.escape(utf16_quote), utf16_text))
         if (length := len(matches)) < effective_index + 1:
@@ -1612,7 +1627,7 @@ class Message(MaybeInaccessibleMessage):
                 kwargs["length"] = e_length
                 entities.append(MessageEntity(**kwargs))
 
-        return position, tuple(entities)
+        return position, tuple(entities) or None
 
     def build_reply_arguments(
         self,
@@ -1623,25 +1638,59 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
     ) -> _ReplyKwargs:
         """
-        Use this function to build ``reply_paramters`` for ``telegram.Message.reply_*`` methods.
+        Builds a dictionary with the keys ``chat_id`` and ``reply_parameters``. This dictionary can
+        be used to reply to a message with the given quote and target chat.
 
-            .. versionadded:: NEXT.VERSION
+        Examples:
+
+            Usage with :meth:`telegram.Bot.send_message`:
+
+            .. code-block:: python
+
+                await bot.send_message(
+                    text="This is a reply",
+                    **message.build_reply_arguments(quote="Quoted Text")
+                )
+
+            Usage with :meth:`reply_text`, replying in the same chat:
+
+            .. code-block:: python
+
+                await message.reply_text(
+                    "This is a reply",
+                    do_quote=message.build_reply_arguments(quote="Quoted Text")
+                )
+
+            Usage with :meth:`reply_text`, replying in a different chat:
+
+            .. code-block:: python
+
+                await message.reply_text(
+                    "This is a reply",
+                    do_quote=message.build_reply_arguments(
+                        quote="Quoted Text",
+                        target_chat_id=-100123456789
+                    )
+                )
+
+        .. versionadded:: NEXT.VERSION
 
         Args:
             quote (:obj:`str`, optional): Passed in :meth:`compute_quote_position_and_entities`
-                as parameter :paramref:`compute_quote_position_and_entities.quote` to compute quote
-                entities.
+                as parameter :paramref:`~compute_quote_position_and_entities.quote` to compute
+                quote entities. Defaults to :obj:`None`.
             quote_index (:obj:`int`, optional): Passed in
                 :meth:`compute_quote_position_and_entities` as parameter
-                :paramref:`compute_quote_position_and_entities.quote_index` to compute quote
-                position.
+                :paramref:`~compute_quote_position_and_entities.quote_index` to compute quote
+                position. Defaults to :obj:`None`.
             target_chat_id (:obj:`int` | :obj:`str`, optional): |chat_id_channel|
+                Defaults to :attr:`chat_id`.
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Will be applied only if the reply happens in the same chat and forum topic.
             message_thread_id (:obj:`int`, optional): |message_thread_id|
 
         Returns:
-            :obj:`dict`: On success, a dict containing information about ``reply_parameters`` is
-            returned.
+            :obj:`dict`:
         """
         target_chat_is_self = target_chat_id in (None, self.chat_id, f"@{self.chat.username}")
 

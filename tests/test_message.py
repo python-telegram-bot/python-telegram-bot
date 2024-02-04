@@ -77,13 +77,13 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
-from tests.auxil.pytest_classes import PytestExtBot
+from tests.auxil.pytest_classes import PytestExtBot, PytestMessage
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
 def message(bot):
-    message = Message(
+    message = PytestMessage(
         message_id=TestMessageBase.id_,
         date=TestMessageBase.date,
         chat=copy(TestMessageBase.chat),
@@ -418,7 +418,13 @@ class TestMessageBase:
 
 
 class TestMessageWithoutRequest(TestMessageBase):
-    def test_slot_behaviour(self, message):
+    def test_slot_behaviour(self):
+        message = Message(
+            message_id=TestMessageBase.id_,
+            date=TestMessageBase.date,
+            chat=copy(TestMessageBase.chat),
+            from_user=copy(TestMessageBase.from_user),
+        )
         for attr in message.__slots__:
             assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
@@ -1210,8 +1216,10 @@ class TestMessageWithoutRequest(TestMessageBase):
     @pytest.mark.parametrize(
         ("text", "quote", "index", "expected"),
         argvalues=[
+            ("AA", "A", None, 0),
             ("AA", "A", 0, 0),
             ("AA", "A", 1, 1),
+            ("ABC ABC ABC ABC", "ABC", None, 0),
             ("ABC ABC ABC ABC", "ABC", 0, 0),
             ("ABC ABC ABC ABC", "ABC", 3, 12),
             ("👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧", "👨‍👨‍👧", 0, 0),
@@ -1220,11 +1228,140 @@ class TestMessageWithoutRequest(TestMessageBase):
             ("👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧", "👧", 2, 22),
         ],
     )
+    @pytest.mark.parametrize("caption", [True, False])
     def test_compute_quote_position_and_entities_position(
-        self, message, text, quote, index, expected
+        self, message, text, quote, index, expected, caption
     ):
-        message.text = text
+        if caption:
+            message.caption = text
+            message.text = None
+        else:
+            message.text = text
+            message.caption = None
+
         assert message.compute_quote_position_and_entities(quote, index)[0] == expected
+
+    def test_compute_quote_position_and_entities_entities(self, message):
+        message.text = "A A A"
+        message.entities = ()
+        assert message.compute_quote_position_and_entities("A", 0)[1] is None
+
+        message.entities = (
+            # covers complete string
+            MessageEntity(type=MessageEntity.BOLD, offset=0, length=6),
+            # covers first 2 As only
+            MessageEntity(type=MessageEntity.ITALIC, offset=0, length=3),
+            # covers second 2 As only
+            MessageEntity(type=MessageEntity.UNDERLINE, offset=2, length=3),
+            # covers middle A only
+            MessageEntity(type=MessageEntity.STRIKETHROUGH, offset=2, length=1),
+            # covers only whitespace, should be ignored
+            MessageEntity(type=MessageEntity.CODE, offset=1, length=1),
+        )
+
+        assert message.compute_quote_position_and_entities("A", 0)[1] == (
+            MessageEntity(type=MessageEntity.BOLD, offset=0, length=1),
+            MessageEntity(type=MessageEntity.ITALIC, offset=0, length=1),
+        )
+
+        assert message.compute_quote_position_and_entities("A", 1)[1] == (
+            MessageEntity(type=MessageEntity.BOLD, offset=0, length=1),
+            MessageEntity(type=MessageEntity.ITALIC, offset=0, length=1),
+            MessageEntity(type=MessageEntity.UNDERLINE, offset=0, length=1),
+            MessageEntity(type=MessageEntity.STRIKETHROUGH, offset=0, length=1),
+        )
+
+        assert message.compute_quote_position_and_entities("A", 2)[1] == (
+            MessageEntity(type=MessageEntity.BOLD, offset=0, length=1),
+            MessageEntity(type=MessageEntity.UNDERLINE, offset=0, length=1),
+        )
+
+    @pytest.mark.parametrize(
+        ("target_chat_id", "expected"),
+        argvalues=[
+            (None, 3),
+            (3, 3),
+            (-1003, -1003),
+            ("@username", "@username"),
+        ],
+    )
+    def test_reply_arguments_chat_id_and_message_id(self, message, target_chat_id, expected):
+        message.chat.id = 3
+        reply_kwargs = message.build_reply_arguments(target_chat_id=target_chat_id)
+        assert reply_kwargs["chat_id"] == expected
+        assert reply_kwargs["reply_parameters"].chat_id == (None if expected == 3 else 3)
+        assert reply_kwargs["reply_parameters"].message_id == message.message_id
+
+    @pytest.mark.parametrize(
+        ("target_chat_id", "message_thread_id", "expected"),
+        argvalues=[
+            (None, None, True),
+            (None, 123, True),
+            (None, 0, False),
+            (None, -1, False),
+            (3, None, True),
+            (3, 123, True),
+            (3, 0, False),
+            (3, -1, False),
+            (-1003, None, False),
+            (-1003, 123, False),
+            (-1003, 0, False),
+            (-1003, -1, False),
+            ("@username", None, True),
+            ("@username", 123, True),
+            ("@username", 0, False),
+            ("@username", -1, False),
+            ("@other_username", None, False),
+            ("@other_username", 123, False),
+            ("@other_username", 0, False),
+            ("@other_username", -1, False),
+        ],
+    )
+    def test_reply_arguments_aswr(self, message, target_chat_id, message_thread_id, expected):
+        message.chat.id = 3
+        message.chat.username = "username"
+        message.message_thread_id = 123
+        assert (
+            message.build_reply_arguments(
+                target_chat_id=target_chat_id, message_thread_id=message_thread_id
+            )["reply_parameters"].allow_sending_without_reply
+            is not None
+        ) == expected
+
+        assert (
+            message.build_reply_arguments(
+                target_chat_id=target_chat_id,
+                message_thread_id=message_thread_id,
+                allow_sending_without_reply="custom",
+            )["reply_parameters"].allow_sending_without_reply
+        ) == ("custom" if expected else None)
+
+    def test_reply_arguments_quote(self, message, monkeypatch):
+        reply_parameters = message.build_reply_arguments()["reply_parameters"]
+        assert reply_parameters.quote is None
+        assert reply_parameters.quote_entities == ()
+        assert reply_parameters.quote_position is None
+        assert not reply_parameters.quote_parse_mode
+
+        quote_obj = object()
+        quote_index = object()
+        quote_entities = (object(), object())
+        quote_position = object()
+
+        def mock_compute(quote, index):
+            if quote is quote_obj and index is quote_index:
+                return quote_position, quote_entities
+            return False, False
+
+        monkeypatch.setattr(message, "compute_quote_position_and_entities", mock_compute)
+        reply_parameters = message.build_reply_arguments(quote=quote_obj, quote_index=quote_index)[
+            "reply_parameters"
+        ]
+
+        assert reply_parameters.quote is quote_obj
+        assert reply_parameters.quote_entities is quote_entities
+        assert reply_parameters.quote_position is quote_position
+        assert not reply_parameters.quote_parse_mode
 
     async def test_reply_text(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
