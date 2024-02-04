@@ -231,6 +231,10 @@ class File(TelegramObject):
 
         .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
 
+        Hint:
+            If you want to immediately read the data from ``out`` after calling this method, you
+            should call ``out.seek(0)`` first. See also :meth:`io.IOBase.seek`.
+
         .. versionadded:: 20.0
 
         Args:
