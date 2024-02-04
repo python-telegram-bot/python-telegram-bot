@@ -2604,6 +2604,8 @@ class Chat(TelegramObject):
 
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`copy_messages`.
 
+        .. versionadded:: NEXT.VERSION
+
         Returns:
             Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
             of the sent messages is returned.
@@ -2646,6 +2648,8 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_messages`.
 
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`send_copies`.
+
+        .. versionadded:: NEXT.VERSION
 
         Returns:
             Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`

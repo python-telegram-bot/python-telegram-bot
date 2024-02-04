@@ -124,6 +124,8 @@ class MaybeInaccessibleMessage(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_id` and :attr:`chat` are equal
 
+    .. versionadded:: NEXT.VERSION
+
     Args:
         message_id (:obj:`int`): Unique message identifier.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time or 0 in Unix
@@ -248,6 +250,8 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_id` and :attr:`chat` are equal
+
+    .. versionadded:: NEXT.VERSION
 
     Args:
         message_id (:obj:`int`): Unique message identifier.
@@ -1001,8 +1005,6 @@ class Message(MaybeInaccessibleMessage):
         channel_chat_created: Optional[bool] = None,
         migrate_to_chat_id: Optional[int] = None,
         migrate_from_chat_id: Optional[int] = None,
-        # TODO changing this results in a couple mypy errors. Not touching them till we decide
-        # on how to continue with this
         pinned_message: Optional[MaybeInaccessibleMessage] = None,
         invoice: Optional[Invoice] = None,
         successful_payment: Optional[SuccessfulPayment] = None,

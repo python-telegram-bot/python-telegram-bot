@@ -532,7 +532,9 @@ class TelegramObject:
                 found) in the attributes to a dictionary. Else, preserves it as an object itself.
             remove_bot (:obj:`bool`): Whether the bot should be included in the result.
             convert_default_vault (:obj:`bool`): Whether :class:`telegram.DefaultValue` should be
-                converted to its true value.
+                converted to its true value. This is necessary when converting to a dictionary for
+                end users since DefaultValue is used in some classes that work with
+                `tg.ext.defaults` (like `LinkPreviewOptions`)
 
         Returns:
             :obj:`dict`: A dict where the keys are attribute names and values are their values.
@@ -540,8 +542,6 @@ class TelegramObject:
         data = {}
 
         for key in self._get_attrs_names(include_private=include_private):
-            # Converting DefaultValue to its value is necessary, since DefaultValue is
-            # used in some classes that work with `tg.ext.defaults` like `LinkPreviewOptions`
             value = (
                 DefaultValue.get_value(getattr(self, key, None))
                 if convert_default_vault
