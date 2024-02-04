@@ -3,12 +3,10 @@ on:
   pull_request:
     branches:
       - master
-      - api-7.0
 
   push:
     branches:
       - master
-      - api-7.0
 
   schedule:
     # Run monday and friday morning at 03:07 - odd time to spread load on GitHub Actions
