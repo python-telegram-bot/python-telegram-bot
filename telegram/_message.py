@@ -872,12 +872,13 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: NEXT.VERSION
 
-    .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
-        function. Instead, the supplied replacement for the emoji will be used.
-
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
        :exc:`ValueError` when encountering a custom emoji.
+
+    .. |blockquote_no_md1_support| replace:: Since block quotation entities are not supported
+       by :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
+       :exc:`ValueError` when encountering a block quotation.
     """
 
     # fmt: on
@@ -4211,8 +4212,9 @@ class Message(MaybeInaccessibleMessage):
             if entity.type in types
         }
 
-    @staticmethod
+    @classmethod
     def _parse_html(
+        cls,
         message_text: Optional[str],
         entities: Dict[MessageEntity, str],
         urled: bool = False,
@@ -4221,8 +4223,7 @@ class Message(MaybeInaccessibleMessage):
         if message_text is None:
             return None
 
-        message_text = message_text.encode("utf-16-le")  # type: ignore
-
+        utf_16_text = message_text.encode("utf-16-le")
         html_text = ""
         last_offset = 0
 
@@ -4230,81 +4231,69 @@ class Message(MaybeInaccessibleMessage):
         parsed_entities = []
 
         for entity, text in sorted_entities:
-            if entity not in parsed_entities:
-                nested_entities = {
-                    e: t
-                    for (e, t) in sorted_entities
-                    if e.offset >= entity.offset
-                    and e.offset + e.length <= entity.offset + entity.length
-                    and e != entity
-                }
-                parsed_entities.extend(list(nested_entities.keys()))
+            if entity in parsed_entities:
+                continue
 
-                orig_text = text
+            nested_entities = {
+                e: t
+                for (e, t) in sorted_entities
+                if e.offset >= entity.offset
+                and e.offset + e.length <= entity.offset + entity.length
+                and e != entity
+            }
+            parsed_entities.extend(list(nested_entities.keys()))
+
+            if nested_entities:
+                escaped_text = cls._parse_html(
+                    text, nested_entities, urled=urled, offset=entity.offset
+                )
+            else:
                 escaped_text = escape(text)
 
-                if nested_entities:
-                    escaped_text = Message._parse_html(
-                        orig_text, nested_entities, urled=urled, offset=entity.offset
-                    )
-
-                if entity.type == MessageEntity.TEXT_LINK:
-                    insert = f'<a href="{entity.url}">{escaped_text}</a>'
-                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = f'<a href="tg://user?id={entity.user.id}">{escaped_text}</a>'
-                elif entity.type == MessageEntity.URL and urled:
-                    insert = f'<a href="{escaped_text}">{escaped_text}</a>'
-                elif entity.type == MessageEntity.BOLD:
-                    insert = f"<b>{escaped_text}</b>"
-                elif entity.type == MessageEntity.ITALIC:
-                    insert = f"<i>{escaped_text}</i>"
-                elif entity.type == MessageEntity.CODE:
-                    insert = f"<code>{escaped_text}</code>"
-                elif entity.type == MessageEntity.PRE:
-                    if entity.language:
-                        insert = (
-                            f'<pre><code class="{entity.language}">{escaped_text}</code></pre>'
-                        )
-                    else:
-                        insert = f"<pre>{escaped_text}</pre>"
-                elif entity.type == MessageEntity.UNDERLINE:
-                    insert = f"<u>{escaped_text}</u>"
-                elif entity.type == MessageEntity.STRIKETHROUGH:
-                    insert = f"<s>{escaped_text}</s>"
-                elif entity.type == MessageEntity.SPOILER:
-                    insert = f'<span class="tg-spoiler">{escaped_text}</span>'
-                elif entity.type == MessageEntity.CUSTOM_EMOJI:
-                    insert = (
-                        f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
-                    )
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = f'<a href="{entity.url}">{escaped_text}</a>'
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = f'<a href="tg://user?id={entity.user.id}">{escaped_text}</a>'
+            elif entity.type == MessageEntity.URL and urled:
+                insert = f'<a href="{escaped_text}">{escaped_text}</a>'
+            elif entity.type == MessageEntity.BLOCKQUOTE:
+                insert = f"<blockquote>{escaped_text}</blockquote>"
+            elif entity.type == MessageEntity.BOLD:
+                insert = f"<b>{escaped_text}</b>"
+            elif entity.type == MessageEntity.ITALIC:
+                insert = f"<i>{escaped_text}</i>"
+            elif entity.type == MessageEntity.CODE:
+                insert = f"<code>{escaped_text}</code>"
+            elif entity.type == MessageEntity.PRE:
+                if entity.language:
+                    insert = f'<pre><code class="{entity.language}">{escaped_text}</code></pre>'
                 else:
-                    insert = escaped_text
+                    insert = f"<pre>{escaped_text}</pre>"
+            elif entity.type == MessageEntity.UNDERLINE:
+                insert = f"<u>{escaped_text}</u>"
+            elif entity.type == MessageEntity.STRIKETHROUGH:
+                insert = f"<s>{escaped_text}</s>"
+            elif entity.type == MessageEntity.SPOILER:
+                insert = f'<span class="tg-spoiler">{escaped_text}</span>'
+            elif entity.type == MessageEntity.CUSTOM_EMOJI:
+                insert = f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
+            else:
+                insert = escaped_text
 
-                if offset == 0:
-                    html_text += (
-                        escape(
-                            message_text[  # type: ignore
-                                last_offset * 2 : (entity.offset - offset) * 2
-                            ].decode("utf-16-le")
-                        )
-                        + insert
-                    )
-                else:
-                    html_text += (
-                        message_text[  # type: ignore
-                            last_offset * 2 : (entity.offset - offset) * 2
-                        ].decode("utf-16-le")
-                        + insert
-                    )
-
-                last_offset = entity.offset - offset + entity.length
-
-        if offset == 0:
-            html_text += escape(
-                message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+            # Make sure to escape the text that is not part of the entity
+            # if we're in a nested entity, this is still required, since in that case this
+            # text is part of the parent entity
+            html_text += (
+                escape(
+                    utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode("utf-16-le")
+                )
+                + insert
             )
-        else:
-            html_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+
+            last_offset = entity.offset - offset + entity.length
+
+        # see comment above
+        html_text += escape(utf_16_text[last_offset * 2 :].decode("utf-16-le"))
 
         return html_text
 
@@ -4315,11 +4304,17 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message text with the entities formatted as HTML in
         the same way the original message was formatted.
 
+        Warning:
+            |text_html|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
@@ -4334,11 +4329,17 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message text with the entities formatted as HTML.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        Warning:
+            |text_html|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
@@ -4354,11 +4355,17 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML in the same way the original message was formatted.
 
+        Warning:
+            |text_html|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
@@ -4373,32 +4380,48 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        Warning:
+            |text_html|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
         """
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
-    @staticmethod
+    @classmethod
     def _parse_markdown(
+        cls,
         message_text: Optional[str],
         entities: Dict[MessageEntity, str],
         urled: bool = False,
         version: MarkdownVersion = 1,
         offset: int = 0,
     ) -> Optional[str]:
-        version = int(version)  # type: ignore
+        if version == 1:
+            for entity_type in (
+                MessageEntity.UNDERLINE,
+                MessageEntity.STRIKETHROUGH,
+                MessageEntity.SPOILER,
+                MessageEntity.BLOCKQUOTE,
+                MessageEntity.CUSTOM_EMOJI,
+            ):
+                if any(entity.type == entity_type for entity in entities):
+                    name = entity_type.name.title().replace("_", " ")  # type:ignore[attr-defined]
+                    raise ValueError(f"{name} entities are not supported for Markdown version 1")
 
         if message_text is None:
             return None
 
-        message_text = message_text.encode("utf-16-le")  # type: ignore
-
+        utf_16_text = message_text.encode("utf-16-le")
         markdown_text = ""
         last_offset = 0
 
@@ -4406,125 +4429,103 @@ class Message(MaybeInaccessibleMessage):
         parsed_entities = []
 
         for entity, text in sorted_entities:
-            if entity not in parsed_entities:
-                nested_entities = {
-                    e: t
-                    for (e, t) in sorted_entities
-                    if e.offset >= entity.offset
-                    and e.offset + e.length <= entity.offset + entity.length
-                    and e != entity
-                }
-                parsed_entities.extend(list(nested_entities.keys()))
+            if entity in parsed_entities:
+                continue
 
+            nested_entities = {
+                e: t
+                for (e, t) in sorted_entities
+                if e.offset >= entity.offset
+                and e.offset + e.length <= entity.offset + entity.length
+                and e != entity
+            }
+            parsed_entities.extend(list(nested_entities.keys()))
+
+            if nested_entities:
+                if version < 2:
+                    raise ValueError("Nested entities are not supported for Markdown version 1")
+
+                escaped_text = cls._parse_markdown(
+                    text,
+                    nested_entities,
+                    urled=urled,
+                    offset=entity.offset,
+                    version=version,
+                )
+            else:
                 escaped_text = escape_markdown(text, version=version)
 
-                if nested_entities:
-                    if version < 2:
-                        raise ValueError(
-                            "Nested entities are not supported for Markdown version 1"
-                        )
-
-                    escaped_text = Message._parse_markdown(
-                        text,
-                        nested_entities,
-                        urled=urled,
-                        offset=entity.offset,
-                        version=version,
-                    )
-
-                if entity.type == MessageEntity.TEXT_LINK:
-                    if version == 1:
-                        url = entity.url
-                    else:
-                        # Links need special escaping. Also can't have entities nested within
-                        url = escape_markdown(
-                            entity.url, version=version, entity_type=MessageEntity.TEXT_LINK
-                        )
-                    insert = f"[{escaped_text}]({url})"
-                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = f"[{escaped_text}](tg://user?id={entity.user.id})"
-                elif entity.type == MessageEntity.URL and urled:
-                    link = text if version == 1 else escaped_text
-                    insert = f"[{link}]({text})"
-                elif entity.type == MessageEntity.BOLD:
-                    insert = f"*{escaped_text}*"
-                elif entity.type == MessageEntity.ITALIC:
-                    insert = f"_{escaped_text}_"
-                elif entity.type == MessageEntity.CODE:
-                    # Monospace needs special escaping. Also can't have entities nested within
-                    insert = f"`{escape_markdown(text, version, MessageEntity.CODE)}`"
-
-                elif entity.type == MessageEntity.PRE:
-                    # Monospace needs special escaping. Also can't have entities nested within
-                    code = escape_markdown(text, version=version, entity_type=MessageEntity.PRE)
-                    if entity.language:
-                        prefix = f"```{entity.language}\n"
-                    elif code.startswith("\\"):
-                        prefix = "```"
-                    else:
-                        prefix = "```\n"
-                    insert = f"{prefix}{code}```"
-                elif entity.type == MessageEntity.UNDERLINE:
-                    if version == 1:
-                        raise ValueError(
-                            "Underline entities are not supported for Markdown version 1"
-                        )
-                    insert = f"__{escaped_text}__"
-                elif entity.type == MessageEntity.STRIKETHROUGH:
-                    if version == 1:
-                        raise ValueError(
-                            "Strikethrough entities are not supported for Markdown version 1"
-                        )
-                    insert = f"~{escaped_text}~"
-                elif entity.type == MessageEntity.SPOILER:
-                    if version == 1:
-                        raise ValueError(
-                            "Spoiler entities are not supported for Markdown version 1"
-                        )
-                    insert = f"||{escaped_text}||"
-                elif entity.type == MessageEntity.CUSTOM_EMOJI:
-                    if version == 1:
-                        raise ValueError(
-                            "Custom emoji entities are not supported for Markdown version 1"
-                        )
-                    # This should never be needed because ids are numeric but the documentation
-                    # specifically mentions it so here we are
-                    custom_emoji_id = escape_markdown(
-                        entity.custom_emoji_id,
-                        version=version,
-                        entity_type=MessageEntity.CUSTOM_EMOJI,
-                    )
-                    insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+            if entity.type == MessageEntity.TEXT_LINK:
+                if version == 1:
+                    url = entity.url
                 else:
-                    insert = escaped_text
-
-                if offset == 0:
-                    markdown_text += (
-                        escape_markdown(
-                            message_text[  # type: ignore
-                                last_offset * 2 : (entity.offset - offset) * 2
-                            ].decode("utf-16-le"),
-                            version=version,
-                        )
-                        + insert
+                    # Links need special escaping. Also can't have entities nested within
+                    url = escape_markdown(
+                        entity.url, version=version, entity_type=MessageEntity.TEXT_LINK
                     )
+                insert = f"[{escaped_text}]({url})"
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = f"[{escaped_text}](tg://user?id={entity.user.id})"
+            elif entity.type == MessageEntity.URL and urled:
+                link = text if version == 1 else escaped_text
+                insert = f"[{link}]({text})"
+            elif entity.type == MessageEntity.BOLD:
+                insert = f"*{escaped_text}*"
+            elif entity.type == MessageEntity.ITALIC:
+                insert = f"_{escaped_text}_"
+            elif entity.type == MessageEntity.CODE:
+                # Monospace needs special escaping. Also can't have entities nested within
+                insert = f"`{escape_markdown(text, version, MessageEntity.CODE)}`"
+            elif entity.type == MessageEntity.PRE:
+                # Monospace needs special escaping. Also can't have entities nested within
+                code = escape_markdown(text, version=version, entity_type=MessageEntity.PRE)
+                if entity.language:
+                    prefix = f"```{entity.language}\n"
+                elif code.startswith("\\"):
+                    prefix = "```"
                 else:
-                    markdown_text += (
-                        message_text[  # type: ignore
-                            last_offset * 2 : (entity.offset - offset) * 2
-                        ].decode("utf-16-le")
-                        + insert
-                    )
+                    prefix = "```\n"
+                insert = f"{prefix}{code}```"
+            elif entity.type == MessageEntity.UNDERLINE:
+                insert = f"__{escaped_text}__"
+            elif entity.type == MessageEntity.STRIKETHROUGH:
+                insert = f"~{escaped_text}~"
+            elif entity.type == MessageEntity.SPOILER:
+                insert = f"||{escaped_text}||"
+            elif entity.type == MessageEntity.BLOCKQUOTE:
+                insert = ">" + "\n>".join(escaped_text.splitlines())
+            elif entity.type == MessageEntity.CUSTOM_EMOJI:
+                # This should never be needed because ids are numeric but the documentation
+                # specifically mentions it so here we are
+                custom_emoji_id = escape_markdown(
+                    entity.custom_emoji_id,
+                    version=version,
+                    entity_type=MessageEntity.CUSTOM_EMOJI,
+                )
+                insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+            else:
+                insert = escaped_text
 
-                last_offset = entity.offset - offset + entity.length
-
-        if offset == 0:
-            markdown_text += escape_markdown(
-                message_text[last_offset * 2 :].decode("utf-16-le"),  # type: ignore
-                version=version,
+            # Make sure to escape the text that is not part of the entity
+            # if we're in a nested entity, this is still required, since in that case this
+            # text is part of the parent entity
+            markdown_text += (
+                escape_markdown(
+                    utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode(
+                        "utf-16-le"
+                    ),
+                    version=version,
+                )
+                + insert
             )
-        else:
-            markdown_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+
+            last_offset = entity.offset - offset + entity.length
+
+        # see comment above
+        markdown_text += escape_markdown(
+            utf_16_text[last_offset * 2 :].decode("utf-16-le"),
+            version=version,
+        )
 
         return markdown_text
 
@@ -4536,22 +4537,25 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
-        Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use
-              :meth:`text_markdown_v2` instead.
+        Warning:
+            |text_markdown|
 
-            * |custom_emoji_formatting_note|
+        Note:
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`text_markdown_v2` instead.
 
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
+
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=False)
@@ -4564,11 +4568,17 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
+        Warning:
+            |text_markdown|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -4583,22 +4593,26 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
-              instead.
+        Warning:
+            |text_markdown|
 
-            * |custom_emoji_formatting_note|
+        Note:
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
+            instead.
 
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
+
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=True)
@@ -4611,11 +4625,17 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        Warning:
+            |text_markdown|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -4630,22 +4650,24 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
 
+        Warning:
+            |text_markdown|
+
         Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use :meth:`caption_markdown_v2`
-              instead.
-
-            * |custom_emoji_formatting_note|
-
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`caption_markdown_v2`
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
+
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=False)
@@ -4658,11 +4680,17 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
 
+        Warning:
+            |text_markdown|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -4679,22 +4707,26 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use
-              :meth:`caption_markdown_v2_urled` instead.
+        Warning:
+            |text_markdown|
 
-            * |custom_emoji_formatting_note|
+        Note:
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use
+            :meth:`caption_markdown_v2_urled` instead.
 
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
+
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)
@@ -4707,11 +4739,17 @@ class Message(MaybeInaccessibleMessage):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        Warning:
+            |text_markdown|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
