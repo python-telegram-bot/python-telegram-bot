@@ -1748,14 +1748,11 @@ class Message(MaybeInaccessibleMessage):
                 else effective_do_quote["reply_parameters"]
             )
 
-        if effective_reply_parameters and effective_reply_parameters.chat_id:
-            chat_id = effective_reply_parameters.chat_id
-        else:
-            chat_id = (
-                self.chat_id
-                if not isinstance(effective_do_quote, dict)
-                else effective_do_quote["chat_id"]
-            )
+        chat_id = (
+            self.chat_id
+            if not isinstance(effective_do_quote, dict)
+            else effective_do_quote["chat_id"]
+        )
 
         return chat_id, effective_reply_parameters
 

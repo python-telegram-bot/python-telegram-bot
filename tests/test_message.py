@@ -421,6 +421,52 @@ class TestMessageBase:
 
 
 class TestMessageWithoutRequest(TestMessageBase):
+    @staticmethod
+    async def check_quote_parsing(
+        message: Message, method, bot_method_name: str, args, monkeypatch
+    ):
+        """Used in testing reply_* below. Makes sure that quote and do_quote are handled
+        correctly
+        """
+        with pytest.raises(ValueError, match="`quote` and `do_quote` are mutually exclusive"):
+            await method(*args, quote=True, do_quote=True)
+
+        with pytest.warns(PTBDeprecationWarning, match="`quote` parameter is deprecated"):
+            await method(*args, quote=True)
+
+        async def make_assertion(*args, **kwargs):
+            return kwargs.get("chat_id"), kwargs.get("reply_parameters")
+
+        monkeypatch.setattr(message.get_bot(), bot_method_name, make_assertion)
+
+        for param in ("quote", "do_quote"):
+            chat_id, reply_parameters = await method(*args, **{param: True})
+            if chat_id != message.chat.id:
+                pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
+            if reply_parameters is None or reply_parameters.message_id != message.message_id:
+                pytest.fail(
+                    f"reply_parameters is {reply_parameters} but should be {message.message_id}"
+                )
+
+        input_chat_id = object()
+        input_reply_parameters = ReplyParameters(message_id=1, chat_id=42)
+        chat_id, reply_parameters = await method(
+            *args, do_quote={"chat_id": input_chat_id, "reply_parameters": input_reply_parameters}
+        )
+        if chat_id is not input_chat_id:
+            pytest.fail(f"chat_id is {chat_id} but should be {chat_id}")
+        if reply_parameters is not input_reply_parameters:
+            pytest.fail(f"reply_parameters is {reply_parameters} but should be {reply_parameters}")
+
+        chat_id, reply_parameters = await method(
+            *args,
+            reply_to_message_id=42,
+        )
+        if chat_id != message.chat.id:
+            pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
+        if reply_parameters is None or reply_parameters.message_id != 42:
+            pytest.fail(f"reply_parameters is {reply_parameters} but should be 42")
+
     def test_slot_behaviour(self):
         message = Message(
             message_id=TestMessageBase.id_,
@@ -1306,7 +1352,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             ("@username", "@username"),
         ],
     )
-    def test_reply_arguments_chat_id_and_message_id(self, message, target_chat_id, expected):
+    def test_build_reply_arguments_chat_id_and_message_id(self, message, target_chat_id, expected):
         message.chat.id = 3
         reply_kwargs = message.build_reply_arguments(target_chat_id=target_chat_id)
         assert reply_kwargs["chat_id"] == expected
@@ -1338,7 +1384,9 @@ class TestMessageWithoutRequest(TestMessageBase):
             ("@other_username", -1, False),
         ],
     )
-    def test_reply_arguments_aswr(self, message, target_chat_id, message_thread_id, expected):
+    def test_build_reply_arguments_aswr(
+        self, message, target_chat_id, message_thread_id, expected
+    ):
         message.chat.id = 3
         message.chat.username = "username"
         message.message_thread_id = 123
@@ -1357,7 +1405,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             )["reply_parameters"].allow_sending_without_reply
         ) == ("custom" if expected else None)
 
-    def test_reply_arguments_quote(self, message, monkeypatch):
+    def test_build_reply_arguments_quote(self, message, monkeypatch):
         reply_parameters = message.build_reply_arguments()["reply_parameters"]
         assert reply_parameters.quote is None
         assert reply_parameters.quote_entities == ()
@@ -1388,11 +1436,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             text = kwargs["text"] == "test"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and text and reply
+            return id_ and text
 
         assert check_shortcut_signature(
             Message.reply_text,
@@ -1410,8 +1454,9 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
         assert await message.reply_text("test")
-        assert await message.reply_text("test", quote=True)
-        assert await message.reply_text("test", reply_to_message_id=message.message_id, quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_text, "send_message", ["test"], monkeypatch
+        )
 
     async def test_reply_markdown(self, monkeypatch, message):
         test_md_string = (
@@ -1425,11 +1470,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             cid = kwargs["chat_id"] == message.chat_id
             markdown_text = kwargs["text"] == test_md_string
             markdown_enabled = kwargs["parse_mode"] == ParseMode.MARKDOWN
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return all([cid, markdown_text, reply, markdown_enabled])
+            return all([cid, markdown_text, markdown_enabled])
 
         assert check_shortcut_signature(
             Message.reply_markdown,
@@ -1450,10 +1491,6 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
         assert await message.reply_markdown(self.test_message.text_markdown)
-        assert await message.reply_markdown(self.test_message.text_markdown, quote=True)
-        assert await message.reply_markdown(
-            self.test_message.text_markdown, reply_to_message_id=message.message_id, quote=True
-        )
 
     async def test_reply_markdown_v2(self, monkeypatch, message):
         test_md_string = (
@@ -1471,11 +1508,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             cid = kwargs["chat_id"] == message.chat_id
             markdown_text = kwargs["text"] == test_md_string
             markdown_enabled = kwargs["parse_mode"] == ParseMode.MARKDOWN_V2
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return all([cid, markdown_text, reply, markdown_enabled])
+            return all([cid, markdown_text, markdown_enabled])
 
         assert check_shortcut_signature(
             Message.reply_markdown_v2,
@@ -1496,11 +1529,8 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
         assert await message.reply_markdown_v2(self.test_message_v2.text_markdown_v2)
-        assert await message.reply_markdown_v2(self.test_message_v2.text_markdown_v2, quote=True)
-        assert await message.reply_markdown_v2(
-            self.test_message_v2.text_markdown_v2,
-            reply_to_message_id=message.message_id,
-            quote=True,
+        await self.check_quote_parsing(
+            message, message.reply_markdown_v2, "send_message", [test_md_string], monkeypatch
         )
 
     async def test_reply_html(self, monkeypatch, message):
@@ -1521,11 +1551,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             cid = kwargs["chat_id"] == message.chat_id
             html_text = kwargs["text"] == test_html_string
             html_enabled = kwargs["parse_mode"] == ParseMode.HTML
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return all([cid, html_text, reply, html_enabled])
+            return all([cid, html_text, html_enabled])
 
         assert check_shortcut_signature(
             Message.reply_html,
@@ -1546,20 +1572,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
         assert await message.reply_html(self.test_message_v2.text_html)
-        assert await message.reply_html(self.test_message_v2.text_html, quote=True)
-        assert await message.reply_html(
-            self.test_message_v2.text_html, reply_to_message_id=message.message_id, quote=True
+        await self.check_quote_parsing(
+            message, message.reply_html, "send_message", [test_html_string], monkeypatch
         )
 
     async def test_reply_media_group(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             media = kwargs["media"] == "reply_media_group"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and media and reply
+            return id_ and media
 
         assert check_shortcut_signature(
             Message.reply_media_group,
@@ -1577,17 +1598,19 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_media_group", make_assertion)
         assert await message.reply_media_group(media="reply_media_group")
-        assert await message.reply_media_group(media="reply_media_group", quote=True)
+        await self.check_quote_parsing(
+            message,
+            message.reply_media_group,
+            "send_media_group",
+            ["reply_media_group"],
+            monkeypatch,
+        )
 
     async def test_reply_photo(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             photo = kwargs["photo"] == "test_photo"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and photo and reply
+            return id_ and photo
 
         assert check_shortcut_signature(
             Message.reply_photo,
@@ -1605,17 +1628,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_photo", make_assertion)
         assert await message.reply_photo(photo="test_photo")
-        assert await message.reply_photo(photo="test_photo", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_photo, "send_photo", ["test_photo"], monkeypatch
+        )
 
     async def test_reply_audio(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             audio = kwargs["audio"] == "test_audio"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and audio and reply
+            return id_ and audio
 
         assert check_shortcut_signature(
             Message.reply_audio,
@@ -1633,17 +1654,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_audio", make_assertion)
         assert await message.reply_audio(audio="test_audio")
-        assert await message.reply_audio(audio="test_audio", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_audio, "send_audio", ["test_audio"], monkeypatch
+        )
 
     async def test_reply_document(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             document = kwargs["document"] == "test_document"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and document and reply
+            return id_ and document
 
         assert check_shortcut_signature(
             Message.reply_document,
@@ -1661,17 +1680,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_document", make_assertion)
         assert await message.reply_document(document="test_document")
-        assert await message.reply_document(document="test_document", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_document, "send_document", ["test_document"], monkeypatch
+        )
 
     async def test_reply_animation(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             animation = kwargs["animation"] == "test_animation"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and animation and reply
+            return id_ and animation
 
         assert check_shortcut_signature(
             Message.reply_animation,
@@ -1689,17 +1706,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_animation", make_assertion)
         assert await message.reply_animation(animation="test_animation")
-        assert await message.reply_animation(animation="test_animation", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_animation, "send_animation", ["test_animation"], monkeypatch
+        )
 
     async def test_reply_sticker(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             sticker = kwargs["sticker"] == "test_sticker"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and sticker and reply
+            return id_ and sticker
 
         assert check_shortcut_signature(
             Message.reply_sticker,
@@ -1717,17 +1732,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_sticker", make_assertion)
         assert await message.reply_sticker(sticker="test_sticker")
-        assert await message.reply_sticker(sticker="test_sticker", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_sticker, "send_sticker", ["test_sticker"], monkeypatch
+        )
 
     async def test_reply_video(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             video = kwargs["video"] == "test_video"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and video and reply
+            return id_ and video
 
         assert check_shortcut_signature(
             Message.reply_video,
@@ -1745,17 +1758,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_video", make_assertion)
         assert await message.reply_video(video="test_video")
-        assert await message.reply_video(video="test_video", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_video, "send_video", ["test_video"], monkeypatch
+        )
 
     async def test_reply_video_note(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             video_note = kwargs["video_note"] == "test_video_note"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and video_note and reply
+            return id_ and video_note
 
         assert check_shortcut_signature(
             Message.reply_video_note,
@@ -1773,17 +1784,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_video_note", make_assertion)
         assert await message.reply_video_note(video_note="test_video_note")
-        assert await message.reply_video_note(video_note="test_video_note", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_video_note, "send_video_note", ["test_video_note"], monkeypatch
+        )
 
     async def test_reply_voice(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             voice = kwargs["voice"] == "test_voice"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and voice and reply
+            return id_ and voice
 
         assert check_shortcut_signature(
             Message.reply_voice,
@@ -1801,17 +1810,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_voice", make_assertion)
         assert await message.reply_voice(voice="test_voice")
-        assert await message.reply_voice(voice="test_voice", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_voice, "send_voice", ["test_voice"], monkeypatch
+        )
 
     async def test_reply_location(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             location = kwargs["location"] == "test_location"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and location and reply
+            return id_ and location
 
         assert check_shortcut_signature(
             Message.reply_location,
@@ -1829,17 +1836,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_location", make_assertion)
         assert await message.reply_location(location="test_location")
-        assert await message.reply_location(location="test_location", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_location, "send_location", ["test_location"], monkeypatch
+        )
 
     async def test_reply_venue(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             venue = kwargs["venue"] == "test_venue"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and venue and reply
+            return id_ and venue
 
         assert check_shortcut_signature(
             Message.reply_venue,
@@ -1857,17 +1862,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_venue", make_assertion)
         assert await message.reply_venue(venue="test_venue")
-        assert await message.reply_venue(venue="test_venue", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_venue, "send_venue", ["test_venue"], monkeypatch
+        )
 
     async def test_reply_contact(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             contact = kwargs["contact"] == "test_contact"
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and contact and reply
+            return id_ and contact
 
         assert check_shortcut_signature(
             Message.reply_contact,
@@ -1885,18 +1888,16 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_contact", make_assertion)
         assert await message.reply_contact(contact="test_contact")
-        assert await message.reply_contact(contact="test_contact", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_contact, "send_contact", ["test_contact"], monkeypatch
+        )
 
     async def test_reply_poll(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             question = kwargs["question"] == "test_poll"
             options = kwargs["options"] == ["1", "2", "3"]
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and question and options and reply
+            return id_ and question and options
 
         assert check_shortcut_signature(
             Message.reply_poll,
@@ -1911,17 +1912,15 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_poll", make_assertion)
         assert await message.reply_poll(question="test_poll", options=["1", "2", "3"])
-        assert await message.reply_poll(question="test_poll", quote=True, options=["1", "2", "3"])
+        await self.check_quote_parsing(
+            message, message.reply_poll, "send_poll", ["test_poll", ["1", "2", "3"]], monkeypatch
+        )
 
     async def test_reply_dice(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
             contact = kwargs["disable_notification"] is True
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
-            return id_ and contact and reply
+            return id_ and contact
 
         assert check_shortcut_signature(
             Message.reply_dice,
@@ -1936,7 +1935,13 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_dice", make_assertion)
         assert await message.reply_dice(disable_notification=True)
-        assert await message.reply_dice(disable_notification=True, quote=True)
+        await self.check_quote_parsing(
+            message,
+            message.reply_dice,
+            "send_dice",
+            [],
+            monkeypatch,
+        )
 
     async def test_reply_action(self, monkeypatch, message: Message):
         async def make_assertion(*_, **kwargs):
@@ -1974,7 +1979,9 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_game", make_assertion)
         assert await message.reply_game(game_short_name="test_game")
-        assert await message.reply_game(game_short_name="test_game", quote=True)
+        await self.check_quote_parsing(
+            message, message.reply_game, "send_game", ["test_game"], monkeypatch
+        )
 
     async def test_reply_invoice(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
@@ -2010,14 +2017,12 @@ class TestMessageWithoutRequest(TestMessageBase):
             "currency",
             "prices",
         )
-        assert await message.reply_invoice(
-            "title",
-            "description",
-            "payload",
-            "provider_token",
-            "currency",
-            "prices",
-            quote=True,
+        await self.check_quote_parsing(
+            message,
+            message.reply_invoice,
+            "send_invoice",
+            ["title", "description", "payload", "provider_token", "currency", "prices"],
+            monkeypatch,
         )
 
     @pytest.mark.parametrize(("disable_notification", "protected"), [(False, True), (True, False)])
@@ -2097,17 +2102,12 @@ class TestMessageWithoutRequest(TestMessageBase):
                 reply_markup = kwargs["reply_markup"] is keyboard
             else:
                 reply_markup = True
-            if kwargs.get("reply_to_message_id") is not None:
-                reply = kwargs["reply_to_message_id"] == message.message_id
-            else:
-                reply = True
             return (
                 chat_id
                 and from_chat
                 and message_id
                 and notification
                 and reply_markup
-                and reply
                 and is_protected
             )
 
@@ -2131,20 +2131,12 @@ class TestMessageWithoutRequest(TestMessageBase):
             disable_notification=disable_notification,
             protect_content=protected,
         )
-        assert await message.reply_copy(
-            123456,
-            456789,
-            quote=True,
-            disable_notification=disable_notification,
-            protect_content=protected,
-        )
-        assert await message.reply_copy(
-            123456,
-            456789,
-            quote=True,
-            reply_to_message_id=message.message_id,
-            disable_notification=disable_notification,
-            protect_content=protected,
+        await self.check_quote_parsing(
+            message,
+            message.reply_copy,
+            "copy_message",
+            [123456, 456789],
+            monkeypatch,
         )
 
     async def test_edit_text(self, monkeypatch, message):
