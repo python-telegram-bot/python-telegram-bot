@@ -58,6 +58,24 @@ class TestLinkPreviewOptionsWithoutRequest(TestLinkPreviewOptionsBase):
         assert link_preview_options_dict["prefer_large_media"] == self.prefer_large_media
         assert link_preview_options_dict["show_above_text"] == self.show_above_text
 
+    def test_de_json(self, link_preview_options):
+        link_preview_options_dict = {
+            "is_disabled": self.is_disabled,
+            "url": self.url,
+            "prefer_small_media": self.prefer_small_media,
+            "prefer_large_media": self.prefer_large_media,
+            "show_above_text": self.show_above_text,
+        }
+
+        link_preview_options = LinkPreviewOptions.de_json(link_preview_options_dict, bot=None)
+        assert link_preview_options.api_kwargs == {}
+
+        assert link_preview_options.is_disabled == self.is_disabled
+        assert link_preview_options.url == self.url
+        assert link_preview_options.prefer_small_media == self.prefer_small_media
+        assert link_preview_options.prefer_large_media == self.prefer_large_media
+        assert link_preview_options.show_above_text == self.show_above_text
+
     def test_equality(self):
         a = LinkPreviewOptions(
             self.is_disabled,

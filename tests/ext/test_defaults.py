@@ -82,15 +82,21 @@ class TestDefaults:
             Defaults(quote=True, do_quote=False)
 
     def test_deprecation_warning_for_disable_web_page_preview(self):
-        with pytest.warns(PTBDeprecationWarning, match="`Defaults.disable_web_page_preview` is "):
+        with pytest.warns(
+            PTBDeprecationWarning, match="`Defaults.disable_web_page_preview` is "
+        ) as record:
             Defaults(disable_web_page_preview=True)
+
+        assert record[0].filename == __file__, "wrong stacklevel!"
 
         assert Defaults(disable_web_page_preview=True).link_preview_options.is_disabled is True
         assert Defaults(disable_web_page_preview=False).disable_web_page_preview is False
 
     def test_deprecation_warning_for_quote(self):
-        with pytest.warns(PTBDeprecationWarning, match="`Defaults.quote` is "):
+        with pytest.warns(PTBDeprecationWarning, match="`Defaults.quote` is ") as record:
             Defaults(quote=True)
+
+        assert record[0].filename == __file__, "wrong stacklevel!"
 
         assert Defaults(quote=True).do_quote is True
         assert Defaults(quote=False).quote is False
