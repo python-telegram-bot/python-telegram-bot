@@ -434,6 +434,12 @@ class TestMessageWithoutRequest(TestMessageBase):
         with pytest.warns(PTBDeprecationWarning, match="`quote` parameter is deprecated"):
             await method(*args, quote=True)
 
+        with pytest.raises(
+            ValueError,
+            match="`reply_to_message_id` and `reply_parameters` are mutually exclusive.",
+        ):
+            await method(*args, reply_to_message_id=42, reply_parameters=42)
+
         async def make_assertion(*args, **kwargs):
             return kwargs.get("chat_id"), kwargs.get("reply_parameters")
 
@@ -458,9 +464,25 @@ class TestMessageWithoutRequest(TestMessageBase):
         if reply_parameters is not input_reply_parameters:
             pytest.fail(f"reply_parameters is {reply_parameters} but should be {reply_parameters}")
 
+        input_parameters_2 = ReplyParameters(message_id=2, chat_id=43)
+        chat_id, reply_parameters = await method(
+            *args,
+            reply_parameters=input_parameters_2,
+            # passing these here to make sure that `reply_parameters` has higher priority
+            do_quote={"chat_id": input_chat_id, "reply_parameters": input_reply_parameters},
+        )
+        if chat_id is not message.chat.id:
+            pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
+        if reply_parameters is not input_parameters_2:
+            pytest.fail(
+                f"reply_parameters is {reply_parameters} but should be {input_parameters_2}"
+            )
+
         chat_id, reply_parameters = await method(
             *args,
             reply_to_message_id=42,
+            # passing these here to make sure that `reply_to_message_id` has higher priority
+            do_quote={"chat_id": input_chat_id, "reply_parameters": input_reply_parameters},
         )
         if chat_id != message.chat.id:
             pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")

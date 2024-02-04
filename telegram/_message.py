@@ -1729,6 +1729,11 @@ class Message(MaybeInaccessibleMessage):
         if quote and do_quote:
             raise ValueError("The arguments `quote` and `do_quote` are mutually exclusive")
 
+        if reply_to_message_id is not None and reply_parameters is not None:
+            raise ValueError(
+                "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
+            )
+
         if quote is not None:
             warn(
                 "The `quote` parameter is deprecated in favor of the `do_quote` parameter. Please "
@@ -1738,21 +1743,18 @@ class Message(MaybeInaccessibleMessage):
             )
 
         effective_do_quote = quote or do_quote
+        chat_id: Union[str, int] = self.chat_id
 
+        # reply_parameters and reply_to_message_id overrule the do_quote parameter
         if reply_parameters is not None:
             effective_reply_parameters = reply_parameters
+        elif reply_to_message_id is not None:
+            effective_reply_parameters = ReplyParameters(message_id=reply_to_message_id)
+        elif isinstance(effective_do_quote, dict):
+            effective_reply_parameters = effective_do_quote["reply_parameters"]
+            chat_id = effective_do_quote["chat_id"]
         else:
-            effective_reply_parameters = (
-                self._quote(effective_do_quote, reply_to_message_id)
-                if not isinstance(effective_do_quote, dict)
-                else effective_do_quote["reply_parameters"]
-            )
-
-        chat_id = (
-            self.chat_id
-            if not isinstance(effective_do_quote, dict)
-            else effective_do_quote["chat_id"]
-        )
+            effective_reply_parameters = self._quote(effective_do_quote)
 
         return chat_id, effective_reply_parameters
 
