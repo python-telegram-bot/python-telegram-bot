@@ -56,9 +56,9 @@ def test_check_method(tg_method: TelegramMethod) -> None:
 
     - Method existence
     - Parameter existence
+    - Parameter requirement correctness
     - Parameter type annotation existence
     - Parameter type annotation correctness
-    - Parameter requirement correctness
     - Parameter default value correctness
     - No unexpected parameters
     - Extra parameters should be keyword only
@@ -77,20 +77,25 @@ def test_check_method(tg_method: TelegramMethod) -> None:
             ptb_param is not None
         ), f"Parameter {tg_parameter.param_name} not found in {ptb_method.__name__}"
 
+        # Now check if the parameter is required or not
+        assert check_required_param(
+            tg_parameter, ptb_param, ptb_method.__name__
+        ), f"Param {ptb_param.name!r} of {ptb_method.__name__!r} requirement mismatch"
+
         # Check if type annotation is present
         assert (
             ptb_param.annotation is not inspect.Parameter.empty
         ), f"Param {ptb_param.name!r} of {ptb_method.__name__!r} should have a type annotation!"
         # Check if type annotation is correct
-        assert check_param_type(ptb_param, tg_parameter, ptb_method), (
-            f"Param {ptb_param.name!r} of {ptb_method.__name__!r} should be "
-            f"{tg_parameter.param_type} or something else!"
+        correct_type_hint, expected_type_hint = check_param_type(
+            ptb_param,
+            tg_parameter,
+            ptb_method,
         )
-
-        # Now check if the parameter is required or not
-        assert check_required_param(
-            tg_parameter, ptb_param, ptb_method.__name__
-        ), f"Param {ptb_param.name!r} of method {ptb_method.__name__!r} requirement mismatch!"
+        assert correct_type_hint, (
+            f"Type hint of param {ptb_param.name!r} of {ptb_method.__name__!r} should be "
+            f"{expected_type_hint!r} or something else!"
+        )
 
         # Now we will check that we don't pass default values if the parameter is not required.
         if ptb_param.default is not inspect.Parameter.empty:  # If there is a default argument...
@@ -126,9 +131,9 @@ def test_check_object(tg_class: TelegramClass) -> None:
 
     - Class existence
     - Parameter existence
+    - Parameter requirement correctness
     - Parameter type annotation existence
     - Parameter type annotation correctness
-    - Parameter requirement correctness
     - Parameter default value correctness
     - No unexpected parameters
     """
@@ -152,21 +157,22 @@ def test_check_object(tg_class: TelegramClass) -> None:
         ptb_param = sig.parameters.get(field)
         assert ptb_param is not None, f"Attribute {field} not found in {obj.__name__}"
 
+        # Now check if the parameter is required or not
+        assert check_required_param(
+            tg_parameter, ptb_param, obj.__name__
+        ), f"Param {ptb_param.name!r} of {obj.__name__!r} requirement mismatch"
+
         # Check if type annotation is present
         assert (
             ptb_param.annotation is not inspect.Parameter.empty
         ), f"Param {ptb_param.name!r} of {obj.__name__!r} should have a type annotation"
 
         # Check if type annotation is correct
-        assert check_param_type(ptb_param, tg_parameter, obj), (
-            f"Param {ptb_param.name!r} of {obj.__name__!r} should be {tg_parameter.param_type} or "
-            "something else"
+        correct_type_hint, expected_type_hint = check_param_type(ptb_param, tg_parameter, obj)
+        assert correct_type_hint, (
+            f"Type hint of param {ptb_param.name!r} of {obj.__name__!r} should be "
+            f"{expected_type_hint!r} or something else!"
         )
-
-        # Now check if the parameter is required or not
-        assert check_required_param(
-            tg_parameter, ptb_param, obj.__name__
-        ), f"Param {ptb_param.name!r} of {obj.__name__!r} requirement mismatch"
 
         # Now we will check that we don't pass default values if the parameter is not required.
         if ptb_param.default is not inspect.Parameter.empty:  # If there is a default argument...

@@ -18,12 +18,23 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains helper functions for the official API tests used in the other modules."""
 
+import functools
 import re
-from typing import Any, ForwardRef, Sequence
+from typing import TYPE_CHECKING, Any, Sequence, _eval_type, get_type_hints
 
 from bs4 import PageElement, Tag
 
 import telegram
+import telegram._utils.defaultvalue
+import telegram._utils.types
+
+if TYPE_CHECKING:
+    from tests.test_official.scraper import TelegramParameter
+
+
+tg_objects = vars(telegram)
+tg_objects.update(vars(telegram._utils.types))
+tg_objects.update(vars(telegram._utils.defaultvalue))
 
 
 def _get_params_base(object_name: str, search_dict: dict[str, set[Any]]) -> set[Any]:
@@ -48,14 +59,11 @@ def _extract_words(text: str) -> set[str]:
     return set(re.sub(r"[^\w\s]", "", text).split()) - {"and", "or"}
 
 
-def _unionizer(annotation: Sequence[Any] | set[Any], forward_ref: bool) -> Any:
-    """Returns a union of all the types in the annotation. If forward_ref is True, it wraps the
-    annotation in a ForwardRef and then unionizes."""
+def _unionizer(annotation: Sequence[Any] | set[Any]) -> Any:
+    """Returns a union of all the types in the annotation. Also imports objects from lib."""
     union = None
     for t in annotation:
-        if forward_ref:
-            t = ForwardRef(t)  # noqa: PLW2901
-        elif not forward_ref and isinstance(t, str):  # we have to import objects from lib
+        if isinstance(t, str):  # we have to import objects from lib
             t = getattr(telegram, t)  # noqa: PLW2901
         union = t if union is None else union | t
     return union
@@ -71,7 +79,7 @@ def find_next_sibling_until(tag: Tag, name: str, until: Tag) -> PageElement | No
 
 
 def is_pascal_case(s):
-    # Check if the string starts with a capital letter and contains only alphanumeric characters
+    "PascalCase. Starts with a capital letter and has no spaces. Useful for identifying classes."
     return bool(re.match(r"^[A-Z][a-zA-Z\d]*$", s))
 
 
@@ -79,3 +87,25 @@ def is_parameter_required_by_tg(field: str) -> bool:
     if field in {"Required", "Yes"}:
         return True
     return field.split(".", 1)[0] != "Optional"  # splits the sentence and extracts first word
+
+
+def wrap_with_none(tg_parameter: "TelegramParameter", mapped_type: Any, obj: object) -> type:
+    """Adds `None` to type annotation if the parameter isn't required. Respects ignored params."""
+    # have to import here to avoid circular imports
+    from tests.test_official.exceptions import ignored_param_requirements
+
+    if tg_parameter.param_name in ignored_param_requirements(obj.__name__):
+        return mapped_type | type(None)
+    return mapped_type | type(None) if not tg_parameter.param_required else mapped_type
+
+
+@functools.cache
+def cached_type_hints(obj: Any, is_class: bool) -> dict[str, Any]:
+    """Returns type hints of a class, method, or function, with forward refs evaluated."""
+    return get_type_hints(obj.__init__ if is_class else obj, localns=tg_objects)
+
+
+@functools.cache
+def resolve_forward_refs_in_type(obj: type) -> type:
+    """Resolves forward references in a type hint."""
+    return _eval_type(obj, localns=tg_objects, globalns=None)

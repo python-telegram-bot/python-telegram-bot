@@ -19,8 +19,7 @@
 """This module contains exceptions to our API compared to the official API."""
 
 
-from typing import ForwardRef
-
+from telegram import Animation, Audio, Document, PhotoSize, Sticker, Video, VideoNote, Voice
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -38,14 +37,14 @@ GLOBALLY_IGNORED_PARAMETERS = {
 class ParamTypeCheckingExceptions:
     # Types for certain parameters accepted by PTB but not in the official API
     ADDITIONAL_TYPES = {
-        "photo": ForwardRef("PhotoSize"),
-        "video": ForwardRef("Video"),
-        "video_note": ForwardRef("VideoNote"),
-        "audio": ForwardRef("Audio"),
-        "document": ForwardRef("Document"),
-        "animation": ForwardRef("Animation"),
-        "voice": ForwardRef("Voice"),
-        "sticker": ForwardRef("Sticker"),
+        "photo": PhotoSize,
+        "video": Video,
+        "video_note": VideoNote,
+        "audio": Audio,
+        "document": Document,
+        "animation": Animation,
+        "voice": Voice,
+        "sticker": Sticker,
     }
 
     # Exceptions to the "Array of" types, where we accept more types than the official API
@@ -56,7 +55,7 @@ class ParamTypeCheckingExceptions:
         "keyboard": "KeyboardButton",  # + sequence[sequence[str]]
         "reaction": "ReactionType",  # + str
         # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
-        "file_hashes": "list[str]",
+        "file_hashes": "List[str]",
     }
 
     # Special cases for other parameters that accept more types than the official API, and are

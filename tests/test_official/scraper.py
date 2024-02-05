@@ -75,12 +75,12 @@ class Scraper:
         self.soup = BeautifulSoup(self.request.text, "html.parser")
 
     @overload
-    def parse_docs(self, doc_type: Literal["method"]) -> tuple[list[TelegramMethod], list[str]]:
-        ...
+    def parse_docs(
+        self, doc_type: Literal["method"]
+    ) -> tuple[list[TelegramMethod], list[str]]: ...
 
     @overload
-    def parse_docs(self, doc_type: Literal["class"]) -> tuple[list[TelegramClass], list[str]]:
-        ...
+    def parse_docs(self, doc_type: Literal["class"]) -> tuple[list[TelegramClass], list[str]]: ...
 
     def parse_docs(self, doc_type):
         argvalues = []
