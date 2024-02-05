@@ -48,7 +48,7 @@ class ForumTopic(TelegramObject):
             as the topic icon.
     """
 
-    __slots__ = ("message_thread_id", "name", "icon_color", "icon_custom_emoji_id")
+    __slots__ = ("icon_color", "icon_custom_emoji_id", "message_thread_id", "name")
 
     def __init__(
         self,
@@ -93,7 +93,7 @@ class ForumTopicCreated(TelegramObject):
             as the topic icon.
     """
 
-    __slots__ = ("name", "icon_color", "icon_custom_emoji_id")
+    __slots__ = ("icon_color", "icon_custom_emoji_id", "name")
 
     def __init__(
         self,
@@ -165,7 +165,7 @@ class ForumTopicEdited(TelegramObject):
             the topic icon, if it was edited; an empty string if the icon was removed.
     """
 
-    __slots__ = ("name", "icon_custom_emoji_id")
+    __slots__ = ("icon_custom_emoji_id", "name")
 
     def __init__(
         self,

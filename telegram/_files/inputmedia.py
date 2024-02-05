@@ -186,7 +186,7 @@ class InputMediaAnimation(InputMedia):
             .. versionadded:: 20.2
     """
 
-    __slots__ = ("duration", "height", "width", "has_spoiler", "thumbnail")
+    __slots__ = ("duration", "has_spoiler", "height", "thumbnail", "width")
 
     def __init__(
         self,
@@ -389,11 +389,11 @@ class InputMediaVideo(InputMedia):
 
     __slots__ = (
         "duration",
+        "has_spoiler",
         "height",
         "supports_streaming",
-        "width",
-        "has_spoiler",
         "thumbnail",
+        "width",
     )
 
     def __init__(
@@ -507,7 +507,7 @@ class InputMediaAudio(InputMedia):
 
     """
 
-    __slots__ = ("duration", "performer", "title", "thumbnail")
+    __slots__ = ("duration", "performer", "thumbnail", "title")
 
     def __init__(
         self,

@@ -79,7 +79,7 @@ class InvalidCallbackData(TelegramError):
 
 
 class _KeyboardData:
-    __slots__ = ("keyboard_uuid", "button_data", "access_time")
+    __slots__ = ("access_time", "button_data", "keyboard_uuid")
 
     def __init__(
         self,
@@ -148,7 +148,7 @@ class CallbackDataCache:
 
     """
 
-    __slots__ = ("bot", "_maxsize", "_keyboard_data", "_callback_queries")
+    __slots__ = ("_callback_queries", "_keyboard_data", "_maxsize", "bot")
 
     def __init__(
         self,

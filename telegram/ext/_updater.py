@@ -101,14 +101,14 @@ class Updater(AsyncContextManager["Updater"]):
     """
 
     __slots__ = (
-        "bot",
-        "update_queue",
-        "_last_update_id",
-        "_running",
-        "_initialized",
-        "_httpd",
         "__lock",
         "__polling_task",
+        "_httpd",
+        "_initialized",
+        "_last_update_id",
+        "_running",
+        "bot",
+        "update_queue",
     )
 
     def __init__(

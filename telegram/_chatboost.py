@@ -174,7 +174,7 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
             there was no user to win the prize.
     """
 
-    __slots__ = ("giveaway_message_id", "user", "is_unclaimed")
+    __slots__ = ("giveaway_message_id", "is_unclaimed", "user")
 
     def __init__(
         self,
@@ -220,7 +220,7 @@ class ChatBoost(TelegramObject):
         source (:class:`telegram.ChatBoostSource`): Source of the added boost.
     """
 
-    __slots__ = ("boost_id", "add_date", "expiration_date", "source")
+    __slots__ = ("add_date", "boost_id", "expiration_date", "source")
 
     def __init__(
         self,
@@ -274,7 +274,7 @@ class ChatBoostUpdated(TelegramObject):
         boost (:class:`telegram.ChatBoost`): Information about the chat boost.
     """
 
-    __slots__ = ("chat", "boost")
+    __slots__ = ("boost", "chat")
 
     def __init__(
         self,
@@ -327,7 +327,7 @@ class ChatBoostRemoved(TelegramObject):
         source (:class:`telegram.ChatBoostSource`): Source of the removed boost.
     """
 
-    __slots__ = ("chat", "boost_id", "remove_date", "source")
+    __slots__ = ("boost_id", "chat", "remove_date", "source")
 
     def __init__(
         self,

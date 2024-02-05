@@ -98,13 +98,11 @@ class DefaultValue(Generic[DVType]):
 
     @overload
     @staticmethod
-    def get_value(obj: "DefaultValue[OT]") -> OT:
-        ...
+    def get_value(obj: "DefaultValue[OT]") -> OT: ...
 
     @overload
     @staticmethod
-    def get_value(obj: OT) -> OT:
-        ...
+    def get_value(obj: OT) -> OT: ...
 
     @staticmethod
     def get_value(obj: Union[OT, "DefaultValue[OT]"]) -> OT:

@@ -188,7 +188,7 @@ class BaseFilter:
             (depends on the handler).
     """
 
-    __slots__ = ("_name", "_data_filter")
+    __slots__ = ("_data_filter", "_name")
 
     def __init__(self, name: Optional[str] = None, data_filter: bool = False):
         self._name = self.__class__.__name__ if name is None else name
@@ -407,7 +407,7 @@ class _MergedFilter(UpdateFilter):
 
     """
 
-    __slots__ = ("base_filter", "and_filter", "or_filter")
+    __slots__ = ("and_filter", "base_filter", "or_filter")
 
     def __init__(
         self,
@@ -498,7 +498,7 @@ class _XORFilter(UpdateFilter):
 
     """
 
-    __slots__ = ("base_filter", "xor_filter", "merged_filter")
+    __slots__ = ("base_filter", "merged_filter", "xor_filter")
 
     def __init__(self, base_filter: BaseFilter, xor_filter: BaseFilter):
         super().__init__()
@@ -659,10 +659,10 @@ class CaptionRegex(MessageFilter):
 class _ChatUserBaseFilter(MessageFilter, ABC):
     __slots__ = (
         "_chat_id_name",
-        "_username_name",
-        "allow_empty",
         "_chat_ids",
+        "_username_name",
         "_usernames",
+        "allow_empty",
     )
 
     def __init__(
@@ -683,8 +683,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         self._set_usernames(username)
 
     @abstractmethod
-    def _get_chat_or_user(self, message: Message) -> Union[TGChat, TGUser, None]:
-        ...
+    def _get_chat_or_user(self, message: Message) -> Union[TGChat, TGUser, None]: ...
 
     def _set_chat_ids(self, chat_id: Optional[SCT[int]]) -> None:
         if chat_id and self._usernames:
@@ -2376,9 +2375,11 @@ class SuccessfulPayment(MessageFilter):
     def __init__(self, invoice_payloads: Optional[Union[List[str], Tuple[str, ...]]] = None):
         self.invoice_payloads: Optional[Sequence[str]] = invoice_payloads
         super().__init__(
-            name=f"filters.SuccessfulPayment({invoice_payloads})"
-            if invoice_payloads
-            else "filters.SUCCESSFUL_PAYMENT"
+            name=(
+                f"filters.SuccessfulPayment({invoice_payloads})"
+                if invoice_payloads
+                else "filters.SUCCESSFUL_PAYMENT"
+            )
         )
 
     def filter(self, message: Message) -> bool:

@@ -64,11 +64,11 @@ class SwitchInlineQueryChosenChat(TelegramObject):
     """
 
     __slots__ = (
-        "query",
-        "allow_user_chats",
         "allow_bot_chats",
-        "allow_group_chats",
         "allow_channel_chats",
+        "allow_group_chats",
+        "allow_user_chats",
+        "query",
     )
 
     def __init__(

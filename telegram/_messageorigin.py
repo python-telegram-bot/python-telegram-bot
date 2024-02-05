@@ -62,8 +62,8 @@ class MessageOrigin(TelegramObject):
     """
 
     __slots__ = (
-        "type",
         "date",
+        "type",
     )
 
     USER: Final[str] = constants.MessageOriginType.USER
@@ -219,8 +219,8 @@ class MessageOriginChat(MessageOrigin):
     """
 
     __slots__ = (
-        "sender_chat",
         "author_signature",
+        "sender_chat",
     )
 
     def __init__(
@@ -262,9 +262,9 @@ class MessageOriginChannel(MessageOrigin):
     """
 
     __slots__ = (
+        "author_signature",
         "chat",
         "message_id",
-        "author_signature",
     )
 
     def __init__(

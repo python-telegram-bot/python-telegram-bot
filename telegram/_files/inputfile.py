@@ -63,7 +63,7 @@ class InputFile:
 
     """
 
-    __slots__ = ("filename", "attach_name", "input_file_content", "mimetype")
+    __slots__ = ("attach_name", "filename", "input_file_content", "mimetype")
 
     def __init__(
         self,

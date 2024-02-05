@@ -55,7 +55,7 @@ class ShippingQuery(TelegramObject):
 
     """
 
-    __slots__ = ("invoice_payload", "shipping_address", "id", "from_user")
+    __slots__ = ("from_user", "id", "invoice_payload", "shipping_address")
 
     def __init__(
         self,

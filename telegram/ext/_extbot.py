@@ -184,8 +184,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         defaults: Optional["Defaults"] = None,
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
@@ -201,8 +200,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
         rate_limiter: Optional["BaseRateLimiter[RLARGS]"] = None,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,
@@ -399,10 +397,13 @@ class ExtBot(Bot, Generic[RLARGS]):
             return DefaultValue.get_value(lpo)
         return LinkPreviewOptions(
             **{
-                attr: getattr(defaults_lpo, attr)
-                # only use the default value
-                # if the value was explicitly passed to the LOP object
-                if isinstance(orig_attr := getattr(lpo, attr), DefaultValue) else orig_attr
+                attr: (
+                    getattr(defaults_lpo, attr)
+                    # only use the default value
+                    # if the value was explicitly passed to the LOP object
+                    if isinstance(orig_attr := getattr(lpo, attr), DefaultValue)
+                    else orig_attr
+                )
                 for attr in defaults_lpo.__slots__
             }
         )

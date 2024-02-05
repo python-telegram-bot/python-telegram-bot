@@ -120,12 +120,12 @@ class ReplyKeyboardMarkup(TelegramObject):
     """
 
     __slots__ = (
-        "selective",
-        "keyboard",
-        "resize_keyboard",
-        "one_time_keyboard",
         "input_field_placeholder",
         "is_persistent",
+        "keyboard",
+        "one_time_keyboard",
+        "resize_keyboard",
+        "selective",
     )
 
     def __init__(

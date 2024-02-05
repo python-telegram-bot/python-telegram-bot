@@ -111,13 +111,13 @@ class CallbackQuery(TelegramObject):
     """
 
     __slots__ = (
-        "game_short_name",
-        "message",
         "chat_instance",
-        "id",
-        "from_user",
-        "inline_message_id",
         "data",
+        "from_user",
+        "game_short_name",
+        "id",
+        "inline_message_id",
+        "message",
     )
 
     def __init__(
@@ -860,9 +860,9 @@ class CallbackQuery(TelegramObject):
             reply_parameters=reply_parameters,
         )
 
-    MAX_ANSWER_TEXT_LENGTH: Final[
-        int
-    ] = constants.CallbackQueryLimit.ANSWER_CALLBACK_QUERY_TEXT_LENGTH
+    MAX_ANSWER_TEXT_LENGTH: Final[int] = (
+        constants.CallbackQueryLimit.ANSWER_CALLBACK_QUERY_TEXT_LENGTH
+    )
     """
     :const:`telegram.constants.CallbackQueryLimit.ANSWER_CALLBACK_QUERY_TEXT_LENGTH`
 

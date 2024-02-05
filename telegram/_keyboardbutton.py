@@ -134,13 +134,14 @@ class KeyboardButton(TelegramObject):
     """
 
     __slots__ = (
-        "request_location",
+        "request_chat",
+        "request_chat",
         "request_contact",
+        "request_location",
         "request_poll",
+        "request_users",
         "text",
         "web_app",
-        "request_users",
-        "request_chat",
     )
 
     def __init__(
@@ -167,14 +168,14 @@ class KeyboardButton(TelegramObject):
         self.request_location: Optional[bool] = request_location
         self.request_poll: Optional[KeyboardButtonPollType] = request_poll
         self.web_app: Optional[WebAppInfo] = web_app
-        self.request_users: Optional[
-            KeyboardButtonRequestUsers
-        ] = warn_about_deprecated_arg_return_new_arg(
-            deprecated_arg=request_user,
-            new_arg=request_users,
-            deprecated_arg_name="request_user",
-            new_arg_name="request_users",
-            bot_api_version="7.0",
+        self.request_users: Optional[KeyboardButtonRequestUsers] = (
+            warn_about_deprecated_arg_return_new_arg(
+                deprecated_arg=request_user,
+                new_arg=request_users,
+                deprecated_arg_name="request_user",
+                new_arg_name="request_users",
+                bot_api_version="7.0",
+            )
         )
         self.request_chat: Optional[KeyboardButtonRequestChat] = request_chat
 

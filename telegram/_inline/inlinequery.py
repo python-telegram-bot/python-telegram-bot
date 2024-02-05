@@ -96,7 +96,7 @@ class InlineQuery(TelegramObject):
 
     """
 
-    __slots__ = ("location", "chat_type", "id", "offset", "from_user", "query")
+    __slots__ = ("chat_type", "from_user", "id", "location", "offset", "query")
 
     def __init__(
         self,

@@ -93,11 +93,11 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
     """
 
     __slots__ = (
-        "message_reaction_types",
         "_chat_ids",
         "_chat_usernames",
         "_user_ids",
         "_user_usernames",
+        "message_reaction_types",
     )
 
     MESSAGE_REACTION_UPDATED: Final[int] = -1

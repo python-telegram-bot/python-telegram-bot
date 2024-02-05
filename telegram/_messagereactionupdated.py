@@ -60,8 +60,8 @@ class MessageReactionCountUpdated(TelegramObject):
 
     __slots__ = (
         "chat",
-        "message_id",
         "date",
+        "message_id",
         "reactions",
     )
 
@@ -143,13 +143,13 @@ class MessageReactionUpdated(TelegramObject):
     """
 
     __slots__ = (
-        "chat",
-        "message_id",
-        "date",
-        "old_reaction",
-        "new_reaction",
-        "user",
         "actor_chat",
+        "chat",
+        "date",
+        "message_id",
+        "new_reaction",
+        "old_reaction",
+        "user",
     )
 
     def __init__(

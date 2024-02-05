@@ -169,8 +169,8 @@ class ReactionCount(TelegramObject):
     """
 
     __slots__ = (
-        "type",
         "total_count",
+        "type",
     )
 
     def __init__(

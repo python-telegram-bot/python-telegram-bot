@@ -117,15 +117,15 @@ class Defaults:
     """
 
     __slots__ = (
-        "_tzinfo",
+        "_allow_sending_without_reply",
+        "_api_defaults",
         "_block",
         "_disable_notification",
-        "_allow_sending_without_reply",
-        "_parse_mode",
-        "_api_defaults",
-        "_protect_content",
-        "_link_preview_options",
         "_do_quote",
+        "_link_preview_options",
+        "_parse_mode",
+        "_protect_content",
+        "_tzinfo",
     )
 
     def __init__(

@@ -91,7 +91,7 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
-    __slots__ = ("parse_mode", "entities", "message_text", "link_preview_options")
+    __slots__ = ("entities", "link_preview_options", "message_text", "parse_mode")
 
     def __init__(
         self,
@@ -111,9 +111,9 @@ class InputTextMessageContent(InputMessageContent):
             # Optionals
             self.parse_mode: ODVInput[str] = parse_mode
             self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.link_preview_options: ODVInput[
-                "LinkPreviewOptions"
-            ] = warn_for_link_preview_options(disable_web_page_preview, link_preview_options)
+            self.link_preview_options: ODVInput["LinkPreviewOptions"] = (
+                warn_for_link_preview_options(disable_web_page_preview, link_preview_options)
+            )
 
             self._id_attrs = (self.message_text,)
 

@@ -81,13 +81,13 @@ class Giveaway(TelegramObject):
 
     __slots__ = (
         "chats",
-        "winners_selection_date",
-        "winner_count",
-        "only_new_members",
-        "has_public_winners",
-        "prize_description",
         "country_codes",
+        "has_public_winners",
+        "only_new_members",
         "premium_subscription_month_count",
+        "prize_description",
+        "winner_count",
+        "winners_selection_date",
     )
 
     def __init__(
@@ -203,17 +203,17 @@ class GiveawayWinners(TelegramObject):
     """
 
     __slots__ = (
+        "additional_chat_count",
         "chat",
         "giveaway_message_id",
-        "winners_selection_date",
+        "only_new_members",
+        "premium_subscription_month_count",
+        "prize_description",
+        "unclaimed_prize_count",
+        "was_refunded",
         "winner_count",
         "winners",
-        "additional_chat_count",
-        "premium_subscription_month_count",
-        "unclaimed_prize_count",
-        "only_new_members",
-        "was_refunded",
-        "prize_description",
+        "winners_selection_date",
     )
 
     def __init__(
@@ -299,7 +299,7 @@ class GiveawayCompleted(TelegramObject):
             completed, if it wasn't deleted
     """
 
-    __slots__ = ("winner_count", "unclaimed_prize_count", "giveaway_message")
+    __slots__ = ("giveaway_message", "unclaimed_prize_count", "winner_count")
 
     def __init__(
         self,

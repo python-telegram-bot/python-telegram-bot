@@ -70,9 +70,9 @@ class ChatBoostHandler(BaseHandler[Update, CCT]):
     """
 
     __slots__ = (
-        "chat_boost_types",
         "_chat_ids",
         "_chat_usernames",
+        "chat_boost_types",
     )
 
     CHAT_BOOST: Final[int] = -1

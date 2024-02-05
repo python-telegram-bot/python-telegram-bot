@@ -184,7 +184,7 @@ class InputMessageContentLPO(InputMessageContent):
     than sorry …
     """
 
-    __slots__ = ("link_preview_options", "parse_mode", "entities", "message_text")
+    __slots__ = ("entities", "link_preview_options", "message_text", "parse_mode")
 
     def __init__(
         self,

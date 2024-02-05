@@ -84,7 +84,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
 
     """
 
-    __slots__ = ("pattern", "chat_types")
+    __slots__ = ("chat_types", "pattern")
 
     def __init__(
         self,

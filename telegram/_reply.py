@@ -147,29 +147,29 @@ class ExternalReplyInfo(TelegramObject):
     """
 
     __slots__ = (
-        "origin",
-        "chat",
-        "message_id",
-        "link_preview_options",
         "animation",
         "audio",
-        "document",
-        "photo",
-        "sticker",
-        "story",
-        "video",
-        "video_note",
-        "voice",
-        "has_media_spoiler",
+        "chat",
         "contact",
         "dice",
+        "document",
         "game",
         "giveaway",
         "giveaway_winners",
+        "has_media_spoiler",
         "invoice",
+        "link_preview_options",
         "location",
+        "message_id",
+        "origin",
+        "photo",
         "poll",
+        "sticker",
+        "story",
         "venue",
+        "video",
+        "video_note",
+        "voice",
     )
 
     def __init__(
@@ -299,10 +299,10 @@ class TextQuote(TelegramObject):
     """
 
     __slots__ = (
-        "text",
-        "position",
         "entities",
         "is_manual",
+        "position",
+        "text",
     )
 
     def __init__(
@@ -394,12 +394,12 @@ class ReplyParameters(TelegramObject):
     """
 
     __slots__ = (
-        "message_id",
-        "chat_id",
         "allow_sending_without_reply",
+        "chat_id",
+        "message_id",
         "quote",
-        "quote_parse_mode",
         "quote_entities",
+        "quote_parse_mode",
         "quote_position",
     )
 

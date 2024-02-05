@@ -228,14 +228,14 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     _LOGGER = get_logger(__name__)
 
     __slots__ = (
-        "_token",
-        "_base_url",
         "_base_file_url",
-        "_private_key",
+        "_base_url",
         "_bot_user",
-        "_request",
         "_initialized",
         "_local_mode",
+        "_private_key",
+        "_request",
+        "_token",
     )
 
     def __init__(
@@ -8637,12 +8637,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         allowed_reactions: Set[str] = set(ReactionEmoji)
         parsed_reaction = (
             [
-                entry
-                if isinstance(entry, ReactionType)
-                else (
-                    ReactionTypeEmoji(emoji=entry)
-                    if entry in allowed_reactions
-                    else ReactionTypeCustomEmoji(custom_emoji_id=entry)
+                (
+                    entry
+                    if isinstance(entry, ReactionType)
+                    else (
+                        ReactionTypeEmoji(emoji=entry)
+                        if entry in allowed_reactions
+                        else ReactionTypeCustomEmoji(custom_emoji_id=entry)
+                    )
                 )
                 for entry in (
                     [reaction] if isinstance(reaction, (ReactionType, str)) else reaction

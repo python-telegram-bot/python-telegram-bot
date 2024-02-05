@@ -67,10 +67,10 @@ class LinkPreviewOptions(TelegramObject):
 
     __slots__ = (
         "is_disabled",
-        "url",
-        "prefer_small_media",
         "prefer_large_media",
+        "prefer_small_media",
         "show_above_text",
+        "url",
     )
 
     def __init__(

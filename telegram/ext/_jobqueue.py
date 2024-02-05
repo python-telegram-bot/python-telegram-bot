@@ -93,7 +93,7 @@ class JobQueue(Generic[CCT]):
 
     """
 
-    __slots__ = ("_application", "scheduler", "_executor")
+    __slots__ = ("_application", "_executor", "scheduler")
     _CRON_MAPPING = ("sun", "mon", "tue", "wed", "thu", "fri", "sat")
 
     def __init__(self) -> None:
@@ -169,16 +169,14 @@ class JobQueue(Generic[CCT]):
         return datetime.datetime.now(self.scheduler.timezone)
 
     @overload
-    def _parse_time_input(self, time: None, shift_day: bool = False) -> None:
-        ...
+    def _parse_time_input(self, time: None, shift_day: bool = False) -> None: ...
 
     @overload
     def _parse_time_input(
         self,
         time: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
         shift_day: bool = False,
-    ) -> datetime.datetime:
-        ...
+    ) -> datetime.datetime: ...
 
     def _parse_time_input(
         self,
@@ -785,13 +783,13 @@ class Job(Generic[CCT]):
     """
 
     __slots__ = (
-        "callback",
-        "data",
-        "name",
-        "_removed",
         "_enabled",
         "_job",
+        "_removed",
+        "callback",
         "chat_id",
+        "data",
+        "name",
         "user_id",
     )
 

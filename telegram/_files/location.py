@@ -60,12 +60,12 @@ class Location(TelegramObject):
     """
 
     __slots__ = (
-        "longitude",
-        "horizontal_accuracy",
-        "proximity_alert_radius",
-        "live_period",
-        "latitude",
         "heading",
+        "horizontal_accuracy",
+        "latitude",
+        "live_period",
+        "longitude",
+        "proximity_alert_radius",
     )
 
     def __init__(
