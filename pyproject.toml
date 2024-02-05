@@ -1,11 +1,14 @@
+# BLACK:
 [tool.black]
 line-length = 99
 target-version = ['py38', 'py39', 'py310', 'py311']
 
+# ISORT:
 [tool.isort]  # black config
 profile = "black"
 line_length = 99
 
+# RUFF:
 [tool.ruff]
 line-length = 99
 target-version = "py38"
@@ -24,3 +27,99 @@ explicit-preview-rules = true
 [tool.ruff.per-file-ignores]
 "tests/*.py" = ["B018"]
 "tests/**.py" = ["RUF012"]
+
+# PYLINT:
+[tool.pylint."messages control"]
+enable = ["useless-suppression"]
+disable = ["duplicate-code", "too-many-arguments", "too-many-public-methods", 
+        "too-few-public-methods", "broad-exception-caught", "too-many-instance-attributes", 
+        "fixme", "missing-function-docstring", "missing-class-docstring", "too-many-locals", 
+        "too-many-lines", "too-many-branches", "too-many-statements", "cyclic-import"
+]
+
+[tool.pylint.main]
+#  run pylint across multiple cpu cores to speed it up-
+# https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
+jobs = 0
+
+[tool.pylint.classes]
+exclude-protected = ["_unfrozen"]
+
+# PYTEST:
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--no-success-flaky-report -rsxX"
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    'ignore:Tasks created via `Application\.create_task` while the application is not running',
+    "ignore::ResourceWarning",
+    # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
+    # Unfortunately due to https://github.com/pytest-dev/pytest/issues/8343 we can't have this here
+    # and instead do a trick directly in tests/conftest.py
+    # ignore::telegram.utils.deprecate.TelegramDeprecationWarning
+]
+markers = [
+    "dev", # If you want to test a specific test, use this
+    "no_req",
+    "req",
+]
+asyncio_mode = "auto"
+
+# MYPY:
+[tool.mypy]
+warn_unused_ignores = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+show_error_codes = true
+python_version = "3.8"
+
+# For some files, it's easier to just disable strict-optional all together instead of
+# cluttering the code with `# type: ignore`s or stuff like
+# `if self.text is None: raise RuntimeError()`
+[[tool.mypy.overrides]]
+module = [
+    "telegram._callbackquery",
+    "telegram._file",
+    "telegram._message",
+    "telegram._files.file"
+]
+strict_optional = false
+
+# type hinting for asyncio in webhookhandler is a bit tricky because it depends on the OS
+[[tool.mypy.overrides]]
+module = "telegram.ext._utils.webhookhandler"
+warn_unused_ignores = false
+
+# The libs listed below are only used for the `customwebhookbot_*.py` examples
+# let's just ignore type checking for them for now
+[[tool.mypy.overrides]]
+module = [
+    "flask.*",
+    "quart.*",
+    "starlette.*",
+    "uvicorn.*",
+    "asgiref.*",
+    "django.*",
+    "apscheduler.*",  # not part of `customwebhookbot_*.py` examples
+]
+ignore_missing_imports = true
+
+# COVERAGE:
+[tool.coverage.run]
+branch = true
+source = ["telegram"]
+parallel = true
+concurrency = ["thread", "multiprocessing"]
+omit = [
+    "tests/",
+    "telegram/__main__.py"
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "@overload",
+    "if TYPE_CHECKING:"
+]
