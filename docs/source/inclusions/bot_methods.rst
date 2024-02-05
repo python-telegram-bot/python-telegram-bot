@@ -390,6 +390,8 @@
       - The last name of the bot
     * - :attr:`~telegram.Bot.local_mode`
       - Whether the bot is running in local mode
+    * - :attr:`~telegram.Bot.test_env`
+      - Whether the bot should use the test endpoints
     * - :attr:`~telegram.Bot.username`
       - The username of the bot, without leading ``@``
     * - :attr:`~telegram.Bot.link`

@@ -180,6 +180,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         defaults: Optional["Defaults"] = None,
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
+        test_env: bool = False,
     ):
         ...
 
@@ -196,6 +197,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         defaults: Optional["Defaults"] = None,
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
+        test_env: bool = False,
         rate_limiter: Optional["BaseRateLimiter[RLARGS]"] = None,
     ):
         ...
@@ -212,6 +214,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         defaults: Optional["Defaults"] = None,
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
+        test_env: bool = False,
         rate_limiter: Optional["BaseRateLimiter[RLARGS]"] = None,
     ):
         super().__init__(
@@ -223,6 +226,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             private_key=private_key,
             private_key_password=private_key_password,
             local_mode=local_mode,
+            test_env=test_env,
         )
         with self._unfrozen():
             self._defaults: Optional[Defaults] = defaults
