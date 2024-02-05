@@ -84,8 +84,8 @@ class BaseHandler(Generic[UT, CCT], ABC):
     """
 
     __slots__ = (
-        "callback",
         "block",
+        "callback",
     )
 
     def __init__(

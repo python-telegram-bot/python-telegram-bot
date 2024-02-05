@@ -70,7 +70,7 @@ class InputSticker(TelegramObject):
 
     """
 
-    __slots__ = ("sticker", "emoji_list", "mask_position", "keywords")
+    __slots__ = ("emoji_list", "keywords", "mask_position", "sticker")
 
     def __init__(
         self,

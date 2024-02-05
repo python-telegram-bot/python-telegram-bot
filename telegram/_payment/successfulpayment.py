@@ -68,12 +68,12 @@ class SuccessfulPayment(TelegramObject):
     """
 
     __slots__ = (
-        "invoice_payload",
-        "shipping_option_id",
         "currency",
+        "invoice_payload",
         "order_info",
-        "telegram_payment_charge_id",
         "provider_payment_charge_id",
+        "shipping_option_id",
+        "telegram_payment_charge_id",
         "total_amount",
     )
 

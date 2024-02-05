@@ -130,17 +130,17 @@ class Sticker(_BaseThumbedMedium):
     """
 
     __slots__ = (
+        "custom_emoji_id",
         "emoji",
         "height",
         "is_animated",
         "is_video",
         "mask_position",
-        "set_name",
-        "width",
-        "premium_animation",
-        "type",
-        "custom_emoji_id",
         "needs_repainting",
+        "premium_animation",
+        "set_name",
+        "type",
+        "width",
     )
 
     def __init__(
@@ -279,10 +279,10 @@ class StickerSet(TelegramObject):
         "is_animated",
         "is_video",
         "name",
+        "sticker_type",
         "stickers",
         "thumbnail",
         "title",
-        "sticker_type",
     )
 
     def __init__(

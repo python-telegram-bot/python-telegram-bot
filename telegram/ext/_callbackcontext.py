@@ -121,15 +121,15 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     """
 
     __slots__ = (
+        "__dict__",
         "_application",
         "_chat_id",
         "_user_id",
         "args",
-        "matches",
+        "coroutine",
         "error",
         "job",
-        "coroutine",
-        "__dict__",
+        "matches",
     )
 
     def __init__(

@@ -138,9 +138,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     """
 
     __slots__ = (
+        "_update_interval",
         "bot",
         "store_data",
-        "_update_interval",
     )
 
     def __init__(

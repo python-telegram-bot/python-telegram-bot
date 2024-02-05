@@ -180,8 +180,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         defaults: Optional["Defaults"] = None,
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
@@ -197,8 +196,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         arbitrary_callback_data: Union[bool, int] = False,
         local_mode: bool = False,
         rate_limiter: Optional["BaseRateLimiter[RLARGS]"] = None,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,

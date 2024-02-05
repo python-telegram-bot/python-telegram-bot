@@ -86,14 +86,14 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
     """
 
     __slots__ = (
-        "reply_markup",
-        "caption_entities",
-        "document_file_id",
         "caption",
-        "title",
+        "caption_entities",
         "description",
-        "parse_mode",
+        "document_file_id",
         "input_message_content",
+        "parse_mode",
+        "reply_markup",
+        "title",
     )
 
     def __init__(

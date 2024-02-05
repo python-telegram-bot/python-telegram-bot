@@ -62,9 +62,9 @@ class Invoice(TelegramObject):
 
     __slots__ = (
         "currency",
+        "description",
         "start_parameter",
         "title",
-        "description",
         "total_amount",
     )
 

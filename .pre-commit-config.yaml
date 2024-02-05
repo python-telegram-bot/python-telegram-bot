@@ -5,8 +5,20 @@ ci:
     autoupdate_schedule: monthly
 
 repos:
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 'v0.2.0'
+    hooks:
+    -   id: ruff
+        name: ruff
+        files: ^(telegram|examples|tests)/.*\.py$
+        additional_dependencies:
+          - httpx~=0.26.0
+          - tornado~=6.4
+          - APScheduler~=3.10.4
+          - cachetools~=5.3.2
+          - aiolimiter~=1.1.0
 -   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.12.1
+    rev: 24.1.1
     hooks:
     -   id: black
         args:
@@ -70,15 +82,3 @@ repos:
         args:
         - --diff
         - --check
--   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.1.14'
-    hooks:
-    -   id: ruff
-        name: ruff
-        files: ^(telegram|examples|tests)/.*\.py$
-        additional_dependencies:
-          - httpx~=0.26.0
-          - tornado~=6.4
-          - APScheduler~=3.10.4
-          - cachetools~=5.3.2
-          - aiolimiter~=1.1.0

@@ -135,16 +135,16 @@ class EncryptedPassportElement(TelegramObject):
     """
 
     __slots__ = (
-        "selfie",
-        "files",
-        "type",
-        "translation",
+        "data",
         "email",
+        "files",
+        "front_side",
         "hash",
         "phone_number",
         "reverse_side",
-        "front_side",
-        "data",
+        "selfie",
+        "translation",
+        "type",
     )
 
     def __init__(

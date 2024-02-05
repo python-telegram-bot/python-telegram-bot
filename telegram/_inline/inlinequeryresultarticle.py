@@ -88,15 +88,15 @@ class InlineQueryResultArticle(InlineQueryResult):
     """
 
     __slots__ = (
-        "reply_markup",
-        "hide_url",
-        "url",
-        "title",
         "description",
+        "hide_url",
         "input_message_content",
-        "thumbnail_width",
+        "reply_markup",
         "thumbnail_height",
         "thumbnail_url",
+        "thumbnail_width",
+        "title",
+        "url",
     )
 
     def __init__(

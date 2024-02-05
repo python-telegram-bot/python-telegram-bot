@@ -40,13 +40,11 @@ _T = TypeVar("_T", bound=Union[bytes, "InputFile", str, Path, None])
 
 
 @overload
-def load_file(obj: IO[bytes]) -> Tuple[Optional[str], bytes]:
-    ...
+def load_file(obj: IO[bytes]) -> Tuple[Optional[str], bytes]: ...
 
 
 @overload
-def load_file(obj: _T) -> Tuple[None, _T]:
-    ...
+def load_file(obj: _T) -> Tuple[None, _T]: ...
 
 
 def load_file(

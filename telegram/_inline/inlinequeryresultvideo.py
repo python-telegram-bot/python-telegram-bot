@@ -131,19 +131,19 @@ class InlineQueryResultVideo(InlineQueryResult):
     """
 
     __slots__ = (
-        "video_url",
-        "reply_markup",
-        "caption_entities",
         "caption",
-        "title",
+        "caption_entities",
         "description",
-        "video_duration",
-        "parse_mode",
-        "mime_type",
         "input_message_content",
-        "video_height",
-        "video_width",
+        "mime_type",
+        "parse_mode",
+        "reply_markup",
         "thumbnail_url",
+        "title",
+        "video_duration",
+        "video_height",
+        "video_url",
+        "video_width",
     )
 
     def __init__(
