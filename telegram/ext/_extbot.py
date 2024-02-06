@@ -383,7 +383,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         # This is a property because the rate limiter shouldn't be changed at runtime
         return self._rate_limiter
 
-    def _merge_lop_defaults(
+    def _merge_lpo_defaults(
         self, lpo: ODVInput[LinkPreviewOptions]
     ) -> Optional[LinkPreviewOptions]:
         # This is a standalone method because both _insert_defaults and
@@ -400,7 +400,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 attr: (
                     getattr(defaults_lpo, attr)
                     # only use the default value
-                    # if the value was explicitly passed to the LOP object
+                    # if the value was explicitly passed to the LPO object
                     if isinstance(orig_attr := getattr(lpo, attr), DefaultValue)
                     else orig_attr
                 )
@@ -457,7 +457,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
             # 4) LinkPreviewOptions:
             elif isinstance(val, LinkPreviewOptions):
-                data[key] = self._merge_lop_defaults(val)
+                data[key] = self._merge_lpo_defaults(val)
 
             # 5)
             # Similar to LinkPreviewOptions, but only two of the arguments of RPs have a default
@@ -700,7 +700,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                         )
                     else:
                         # merge the existing options with the defaults
-                        res.input_message_content.link_preview_options = self._merge_lop_defaults(
+                        res.input_message_content.link_preview_options = self._merge_lpo_defaults(
                             res.input_message_content.link_preview_options
                         )
 

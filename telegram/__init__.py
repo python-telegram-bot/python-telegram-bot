@@ -19,7 +19,7 @@
 """A library that provides a Python interface to the Telegram Bot API"""
 
 __author__ = "devs@python-telegram-bot.org"
-__all__ = (  # Keep this alphabetically ordered
+__all__ = (
     "Animation",
     "Audio",
     "Bot",

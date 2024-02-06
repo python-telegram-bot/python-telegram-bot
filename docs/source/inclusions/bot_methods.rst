@@ -80,6 +80,10 @@
       - Used for answering a shipping query
     * - :meth:`~telegram.Bot.answer_web_app_query`
       - Used for answering a web app query
+    * - :meth:`~telegram.Bot.delete_message`
+      - Used for deleting messages.
+    * - :meth:`~telegram.Bot.delete_messages`
+      - Used for deleting multiple messages as once.
     * - :meth:`~telegram.Bot.edit_message_caption`
       - Used for editing captions
     * - :meth:`~telegram.Bot.edit_message_media`
@@ -92,10 +96,8 @@
       - Used for editing text messages
     * - :meth:`~telegram.Bot.stop_poll`
       - Used for stopping the running poll
-    * - :meth:`~telegram.Bot.delete_message`
-      - Used for deleting messages.
-    * - :meth:`~telegram.Bot.delete_messages`
-      - Used for deleting multiple messages as once.
+    * - :meth:`~telegram.Bot.set_message_reaction`
+      - Used for setting reactions on messages
 
 .. raw:: html
 
@@ -363,8 +365,6 @@
       - Used for getting basic info about a file
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
-    * - :meth:`~telegram.Bot.set_message_reaction`
-      - Used for setting reactions on messages
 
 .. raw:: html
 

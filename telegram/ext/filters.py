@@ -2159,7 +2159,7 @@ class StatusUpdate:
 
     .. versionadded:: 20.1
     .. deprecated:: NEXT.VERSION
-       User :attr:`USERS_SHARED` instead.
+       Use :attr:`USERS_SHARED` instead.
     """
 
     class _UsersShared(MessageFilter):
