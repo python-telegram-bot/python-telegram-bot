@@ -53,11 +53,11 @@ class WebhookServer:
 
     __slots__ = (
         "_http_server",
-        "listen",
-        "port",
-        "is_running",
         "_server_lock",
         "_shutdown_lock",
+        "is_running",
+        "listen",
+        "port",
         "unix",
     )
 
@@ -130,7 +130,7 @@ class WebhookAppClass(tornado.web.Application):
 class TelegramHandler(tornado.web.RequestHandler):
     """BaseHandler that processes incoming requests from Telegram"""
 
-    __slots__ = ("bot", "update_queue", "secret_token")
+    __slots__ = ("bot", "secret_token", "update_queue")
 
     SUPPORTED_METHODS = ("POST",)  # type: ignore[assignment]
 

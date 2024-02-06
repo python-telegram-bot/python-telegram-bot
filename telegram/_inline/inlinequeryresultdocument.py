@@ -113,18 +113,18 @@ class InlineQueryResultDocument(InlineQueryResult):
     """
 
     __slots__ = (
-        "reply_markup",
-        "caption_entities",
-        "document_url",
-        "thumbnail_width",
-        "thumbnail_height",
         "caption",
-        "title",
+        "caption_entities",
         "description",
-        "parse_mode",
-        "mime_type",
-        "thumbnail_url",
+        "document_url",
         "input_message_content",
+        "mime_type",
+        "parse_mode",
+        "reply_markup",
+        "thumbnail_height",
+        "thumbnail_url",
+        "thumbnail_width",
+        "title",
     )
 
     def __init__(

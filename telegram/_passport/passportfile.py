@@ -61,10 +61,10 @@ class PassportFile(TelegramObject):
     """
 
     __slots__ = (
+        "_credentials",
         "_file_date",
         "file_id",
         "file_size",
-        "_credentials",
         "file_unique_id",
     )
 

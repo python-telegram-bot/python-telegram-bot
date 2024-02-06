@@ -205,16 +205,16 @@ class InlineKeyboardButton(TelegramObject):
     """
 
     __slots__ = (
-        "callback_game",
-        "url",
-        "switch_inline_query_current_chat",
         "callback_data",
+        "callback_game",
+        "login_url",
         "pay",
         "switch_inline_query",
-        "text",
-        "login_url",
-        "web_app",
         "switch_inline_query_chosen_chat",
+        "switch_inline_query_current_chat",
+        "text",
+        "url",
+        "web_app",
     )
 
     def __init__(
@@ -245,9 +245,9 @@ class InlineKeyboardButton(TelegramObject):
         self.callback_game: Optional[CallbackGame] = callback_game
         self.pay: Optional[bool] = pay
         self.web_app: Optional[WebAppInfo] = web_app
-        self.switch_inline_query_chosen_chat: Optional[
-            SwitchInlineQueryChosenChat
-        ] = switch_inline_query_chosen_chat
+        self.switch_inline_query_chosen_chat: Optional[SwitchInlineQueryChosenChat] = (
+            switch_inline_query_chosen_chat
+        )
         self._id_attrs = ()
         self._set_id_attrs()
 

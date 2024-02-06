@@ -106,19 +106,19 @@ class InlineQueryResultVenue(InlineQueryResult):
     """
 
     __slots__ = (
-        "longitude",
-        "reply_markup",
-        "google_place_type",
-        "thumbnail_width",
-        "thumbnail_height",
-        "title",
         "address",
         "foursquare_id",
         "foursquare_type",
         "google_place_id",
+        "google_place_type",
         "input_message_content",
         "latitude",
+        "longitude",
+        "reply_markup",
+        "thumbnail_height",
         "thumbnail_url",
+        "thumbnail_width",
+        "title",
     )
 
     def __init__(

@@ -87,14 +87,14 @@ class InlineQueryResultVoice(InlineQueryResult):
     """
 
     __slots__ = (
-        "reply_markup",
-        "caption_entities",
-        "voice_duration",
         "caption",
-        "title",
-        "voice_url",
-        "parse_mode",
+        "caption_entities",
         "input_message_content",
+        "parse_mode",
+        "reply_markup",
+        "title",
+        "voice_duration",
+        "voice_url",
     )
 
     def __init__(

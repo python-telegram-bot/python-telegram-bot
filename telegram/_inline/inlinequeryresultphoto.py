@@ -109,17 +109,17 @@ class InlineQueryResultPhoto(InlineQueryResult):
     """
 
     __slots__ = (
-        "photo_url",
-        "reply_markup",
-        "caption_entities",
-        "photo_width",
         "caption",
-        "title",
+        "caption_entities",
         "description",
-        "parse_mode",
         "input_message_content",
+        "parse_mode",
         "photo_height",
+        "photo_url",
+        "photo_width",
+        "reply_markup",
         "thumbnail_url",
+        "title",
     )
 
     def __init__(

@@ -115,17 +115,17 @@ class User(TelegramObject):
     """
 
     __slots__ = (
-        "is_bot",
-        "can_read_all_group_messages",
-        "username",
-        "first_name",
-        "last_name",
-        "can_join_groups",
-        "supports_inline_queries",
-        "id",
-        "language_code",
-        "is_premium",
         "added_to_attachment_menu",
+        "can_join_groups",
+        "can_read_all_group_messages",
+        "first_name",
+        "id",
+        "is_bot",
+        "is_premium",
+        "language_code",
+        "last_name",
+        "supports_inline_queries",
+        "username",
     )
 
     def __init__(

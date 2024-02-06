@@ -186,15 +186,15 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     """
 
     __slots__ = (
-        "filepath",
-        "single_file",
-        "on_flush",
-        "user_data",
-        "chat_data",
         "bot_data",
         "callback_data",
-        "conversations",
+        "chat_data",
         "context_types",
+        "conversations",
+        "filepath",
+        "on_flush",
+        "single_file",
+        "user_data",
     )
 
     @overload
@@ -205,8 +205,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         single_file: bool = True,
         on_flush: bool = False,
         update_interval: float = 60,
-    ):
-        ...
+    ): ...
 
     @overload
     def __init__(
@@ -217,8 +216,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         on_flush: bool = False,
         update_interval: float = 60,
         context_types: Optional[ContextTypes[Any, UD, CD, BD]] = None,
-    ):
-        ...
+    ): ...
 
     def __init__(
         self,

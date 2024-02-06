@@ -50,7 +50,7 @@ class BotCommand(TelegramObject):
 
     """
 
-    __slots__ = ("description", "command")
+    __slots__ = ("command", "description")
 
     def __init__(self, command: str, description: str, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)

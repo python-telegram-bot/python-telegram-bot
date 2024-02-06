@@ -13,27 +13,26 @@ line_length = 99
 line-length = 99
 target-version = "py38"
 show-fixes = true
-ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203"]
-select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
-          "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022", "Q",
-          "INP",]
-
-# Add "FURB" after it's out of preview
 
 [tool.ruff.lint]
 preview = true
 explicit-preview-rules = true
+ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203"]
+select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
+          "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022",
+          "RUF023", "Q", "INP",]
+# Add "FURB" after it's out of preview
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["B018"]
-"tests/**.py" = ["RUF012"]
+"tests/**.py" = ["RUF012", "ASYNC101"]
 
 # PYLINT:
 [tool.pylint."messages control"]
 enable = ["useless-suppression"]
-disable = ["duplicate-code", "too-many-arguments", "too-many-public-methods", 
-        "too-few-public-methods", "broad-exception-caught", "too-many-instance-attributes", 
-        "fixme", "missing-function-docstring", "missing-class-docstring", "too-many-locals", 
+disable = ["duplicate-code", "too-many-arguments", "too-many-public-methods",
+        "too-few-public-methods", "broad-exception-caught", "too-many-instance-attributes",
+        "fixme", "missing-function-docstring", "missing-class-docstring", "too-many-locals",
         "too-many-lines", "too-many-branches", "too-many-statements", "cyclic-import"
 ]
 
@@ -121,5 +120,6 @@ omit = [
 [tool.coverage.report]
 exclude_also = [
     "@overload",
+    "@abstractmethod",
     "if TYPE_CHECKING:"
 ]

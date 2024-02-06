@@ -119,18 +119,18 @@ class InlineQueryResultGif(InlineQueryResult):
     """
 
     __slots__ = (
-        "reply_markup",
-        "gif_height",
-        "thumbnail_mime_type",
-        "caption_entities",
-        "gif_width",
-        "title",
         "caption",
-        "parse_mode",
+        "caption_entities",
         "gif_duration",
-        "input_message_content",
+        "gif_height",
         "gif_url",
+        "gif_width",
+        "input_message_content",
+        "parse_mode",
+        "reply_markup",
+        "thumbnail_mime_type",
         "thumbnail_url",
+        "title",
     )
 
     def __init__(

@@ -116,18 +116,18 @@ class InlineQueryResultLocation(InlineQueryResult):
     """
 
     __slots__ = (
-        "longitude",
-        "reply_markup",
-        "thumbnail_width",
-        "thumbnail_height",
         "heading",
-        "title",
-        "live_period",
-        "proximity_alert_radius",
+        "horizontal_accuracy",
         "input_message_content",
         "latitude",
-        "horizontal_accuracy",
+        "live_period",
+        "longitude",
+        "proximity_alert_radius",
+        "reply_markup",
+        "thumbnail_height",
         "thumbnail_url",
+        "thumbnail_width",
+        "title",
     )
 
     def __init__(

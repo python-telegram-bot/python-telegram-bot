@@ -47,7 +47,7 @@ class ProximityAlertTriggered(TelegramObject):
 
     """
 
-    __slots__ = ("traveler", "distance", "watcher")
+    __slots__ = ("distance", "traveler", "watcher")
 
     def __init__(
         self,
