@@ -103,8 +103,8 @@ class StringRegexHandler(BaseHandler[str, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: str,  # skipcq: BAN-B301
-        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
+        update: str,
+        application: "Application[Any, CCT, Any, Any, Any, Any]",
         check_result: Optional[Match[str]],
     ) -> None:
         """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as
