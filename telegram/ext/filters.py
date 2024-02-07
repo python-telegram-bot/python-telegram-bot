@@ -256,9 +256,7 @@ class BaseFilter:
     def name(self, name: str) -> None:
         self._name = name
 
-    def check_update(  # skipcq: PYL-R0201
-        self, update: Update
-    ) -> Optional[Union[bool, FilterDataDict]]:
+    def check_update(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
         """Checks if the specified update should be handled by this filter.
 
         Args:
@@ -1121,7 +1119,7 @@ class Dice(_Dice):
         def __init__(self, values: SCT[int]):
             super().__init__(values, emoji=DiceEmojiEnum.DICE)
 
-    DICE = _Dice(emoji=DiceEmojiEnum.DICE)  # skipcq: PTC-W0052
+    DICE = _Dice(emoji=DiceEmojiEnum.DICE)
     """Dice messages with the emoji 🎲. Matches any dice value."""
 
     class Football(_Dice):
@@ -1294,7 +1292,7 @@ class Document:
         __slots__ = ("mimetype",)
 
         def __init__(self, mimetype: str):
-            self.mimetype: str = mimetype  # skipcq: PTC-W0052
+            self.mimetype: str = mimetype
             super().__init__(name=f"filters.Document.MimeType('{self.mimetype}')")
 
         def filter(self, message: Message) -> bool:

@@ -98,7 +98,7 @@ class Dice(TelegramObject):
 
         self._freeze()
 
-    DICE: Final[str] = constants.DiceEmoji.DICE  # skipcq: PTC-W0052
+    DICE: Final[str] = constants.DiceEmoji.DICE
     """:const:`telegram.constants.DiceEmoji.DICE`"""
     DARTS: Final[str] = constants.DiceEmoji.DARTS
     """:const:`telegram.constants.DiceEmoji.DARTS`"""

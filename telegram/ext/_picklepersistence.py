@@ -74,7 +74,7 @@ class _BotPickler(pickle.Pickler):
         self._bot = bot
         super().__init__(*args, **kwargs)
 
-    def reducer_override(  # skipcq: PYL-R0201
+    def reducer_override(
         self, obj: TelegramObj
     ) -> Tuple[Callable, Tuple[Type[TelegramObj], dict]]:
         """

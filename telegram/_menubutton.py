@@ -57,7 +57,7 @@ class MenuButton(TelegramObject):
 
     def __init__(
         self,
-        type: str,  # skipcq: PYL-W0622
+        type: str,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):  # pylint: disable=redefined-builtin

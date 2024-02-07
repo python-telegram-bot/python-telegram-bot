@@ -816,7 +816,7 @@ class Job(Generic[CCT]):
         self._removed = False
         self._enabled = False
 
-        self._job = cast("APSJob", None)  # skipcq: PTC-W0052
+        self._job = cast("APSJob", None)
 
     def __getattr__(self, item: str) -> object:
         """Overrides :py:meth:`object.__getattr__` to get specific attribute of the
