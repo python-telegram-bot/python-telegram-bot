@@ -532,7 +532,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         async def decorator(self: "Bot", *args: Any, **kwargs: Any) -> Any:
             # pylint: disable=protected-access
             self._LOGGER.debug("Entering: %s", func.__name__)
-            result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+            result = await func(self, *args, **kwargs)
             self._LOGGER.debug(result)
             self._LOGGER.debug("Exiting: %s", func.__name__)
             return result
@@ -554,7 +554,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             local_mode=self._local_mode,
         )
 
-    def _insert_defaults(self, data: Dict[str, object]) -> None:  # skipcq: PYL-R0201
+    def _insert_defaults(self, data: Dict[str, object]) -> None:
         """This method is here to make ext.Defaults work. Because we need to be able to tell
         e.g. `send_message(chat_id, text)` from `send_message(chat_id, text, parse_mode=None)`, the
         default values for `parse_mode` etc are not `None` but `DEFAULT_NONE`. While this *could*
@@ -2667,7 +2667,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    def _effective_inline_results(  # skipcq: PYL-R0201
+    def _effective_inline_results(
         self,
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
@@ -5511,7 +5511,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> Tuple[Sticker, ...]:
-        # skipcq: FLK-D207
         """
         Use this method to get information about emoji stickers by their identifiers.
 
@@ -7904,7 +7903,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:  # skipcq: PYL-W0613
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
 

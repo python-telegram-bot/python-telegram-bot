@@ -208,7 +208,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
         callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, List[JSONDict]]]],
         args: Any,
         kwargs: Dict[str, Any],
-        endpoint: str,  # skipcq: PYL-W0613
+        endpoint: str,
         data: Dict[str, Any],
         rate_limit_args: Optional[int],
     ) -> Union[bool, JSONDict, List[JSONDict]]:
