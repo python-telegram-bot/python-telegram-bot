@@ -73,6 +73,7 @@ from telegram import (
     SentWebAppMessage,
     Sticker,
     StickerSet,
+    TelegramObject,
     Update,
     User,
     UserProfilePhotos,
@@ -643,6 +644,28 @@ class ExtBot(Bot, Generic[RLARGS]):
                     )
 
         return res
+
+    async def do_api_request(
+        self,
+        endpoint: str,
+        api_kwargs: Optional[JSONDict] = None,
+        return_type: Optional[Type[TelegramObject]] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> Any:
+        return await super().do_api_request(
+            endpoint=endpoint,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            return_type=return_type,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+        )
 
     async def stop_poll(
         self,
