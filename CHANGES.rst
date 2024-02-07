@@ -4,7 +4,7 @@
 Changelog
 =========
 
-Version 20.6
+Version 20.7
 ============
 
 *Released 2023-11-27*
