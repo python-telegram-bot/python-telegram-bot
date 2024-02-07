@@ -100,14 +100,14 @@ class ChatInviteLink(TelegramObject):
     """
 
     __slots__ = (
-        "invite_link",
+        "creates_join_request",
         "creator",
+        "expire_date",
+        "invite_link",
         "is_primary",
         "is_revoked",
-        "expire_date",
         "member_limit",
         "name",
-        "creates_join_request",
         "pending_join_request_count",
     )
 

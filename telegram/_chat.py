@@ -286,35 +286,35 @@ class Chat(TelegramObject):
     """
 
     __slots__ = (
-        "bio",
-        "id",
-        "type",
-        "last_name",
-        "sticker_set_name",
-        "slow_mode_delay",
-        "location",
-        "first_name",
-        "permissions",
-        "invite_link",
-        "pinned_message",
-        "description",
-        "can_set_sticker_set",
-        "username",
-        "title",
-        "photo",
-        "linked_chat_id",
-        "message_auto_delete_time",
-        "has_protected_content",
-        "has_private_forwards",
-        "join_to_send_messages",
-        "join_by_request",
-        "has_restricted_voice_and_video_messages",
-        "is_forum",
         "active_usernames",
+        "bio",
+        "can_set_sticker_set",
+        "description",
         "emoji_status_custom_emoji_id",
         "emoji_status_expiration_date",
-        "has_hidden_members",
+        "first_name",
         "has_aggressive_anti_spam_enabled",
+        "has_hidden_members",
+        "has_private_forwards",
+        "has_protected_content",
+        "has_restricted_voice_and_video_messages",
+        "id",
+        "invite_link",
+        "is_forum",
+        "join_by_request",
+        "join_to_send_messages",
+        "last_name",
+        "linked_chat_id",
+        "location",
+        "message_auto_delete_time",
+        "permissions",
+        "photo",
+        "pinned_message",
+        "slow_mode_delay",
+        "sticker_set_name",
+        "title",
+        "type",
+        "username",
     )
 
     SENDER: Final[str] = constants.ChatType.SENDER
@@ -392,9 +392,9 @@ class Chat(TelegramObject):
         self.location: Optional[ChatLocation] = location
         self.join_to_send_messages: Optional[bool] = join_to_send_messages
         self.join_by_request: Optional[bool] = join_by_request
-        self.has_restricted_voice_and_video_messages: Optional[
-            bool
-        ] = has_restricted_voice_and_video_messages
+        self.has_restricted_voice_and_video_messages: Optional[bool] = (
+            has_restricted_voice_and_video_messages
+        )
         self.is_forum: Optional[bool] = is_forum
         self.active_usernames: Tuple[str, ...] = parse_sequence_arg(active_usernames)
         self.emoji_status_custom_emoji_id: Optional[str] = emoji_status_custom_emoji_id

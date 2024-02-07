@@ -143,14 +143,14 @@ class KeyboardButtonRequestChat(TelegramObject):
     """
 
     __slots__ = (
-        "request_id",
-        "chat_is_channel",
-        "chat_is_forum",
-        "chat_has_username",
-        "chat_is_created",
-        "user_administrator_rights",
         "bot_administrator_rights",
         "bot_is_member",
+        "chat_has_username",
+        "chat_is_channel",
+        "chat_is_created",
+        "chat_is_forum",
+        "request_id",
+        "user_administrator_rights",
     )
 
     def __init__(
@@ -175,9 +175,9 @@ class KeyboardButtonRequestChat(TelegramObject):
         self.chat_is_forum: Optional[bool] = chat_is_forum
         self.chat_has_username: Optional[bool] = chat_has_username
         self.chat_is_created: Optional[bool] = chat_is_created
-        self.user_administrator_rights: Optional[
-            ChatAdministratorRights
-        ] = user_administrator_rights
+        self.user_administrator_rights: Optional[ChatAdministratorRights] = (
+            user_administrator_rights
+        )
         self.bot_administrator_rights: Optional[ChatAdministratorRights] = bot_administrator_rights
         self.bot_is_member: Optional[bool] = bot_is_member
 

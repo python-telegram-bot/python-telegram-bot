@@ -83,13 +83,13 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
     """
 
     __slots__ = (
-        "reply_markup",
-        "caption_entities",
         "caption",
-        "title",
+        "caption_entities",
         "description",
-        "parse_mode",
         "input_message_content",
+        "parse_mode",
+        "reply_markup",
+        "title",
         "video_file_id",
     )
 

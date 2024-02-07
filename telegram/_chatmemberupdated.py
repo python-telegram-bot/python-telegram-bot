@@ -85,11 +85,11 @@ class ChatMemberUpdated(TelegramObject):
 
     __slots__ = (
         "chat",
-        "from_user",
         "date",
-        "old_chat_member",
-        "new_chat_member",
+        "from_user",
         "invite_link",
+        "new_chat_member",
+        "old_chat_member",
         "via_chat_folder_invite_link",
     )
 

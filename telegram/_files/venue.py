@@ -66,11 +66,11 @@ class Venue(TelegramObject):
 
     __slots__ = (
         "address",
-        "location",
         "foursquare_id",
         "foursquare_type",
         "google_place_id",
         "google_place_type",
+        "location",
         "title",
     )
 

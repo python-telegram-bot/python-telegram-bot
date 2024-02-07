@@ -84,13 +84,13 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
     """
 
     __slots__ = (
-        "reply_markup",
-        "caption_entities",
         "caption",
-        "title",
-        "parse_mode",
-        "voice_file_id",
+        "caption_entities",
         "input_message_content",
+        "parse_mode",
+        "reply_markup",
+        "title",
+        "voice_file_id",
     )
 
     def __init__(

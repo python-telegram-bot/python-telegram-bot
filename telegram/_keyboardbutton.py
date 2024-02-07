@@ -117,13 +117,13 @@ class KeyboardButton(TelegramObject):
     """
 
     __slots__ = (
-        "request_location",
+        "request_chat",
         "request_contact",
+        "request_location",
         "request_poll",
+        "request_user",
         "text",
         "web_app",
-        "request_user",
-        "request_chat",
     )
 
     def __init__(

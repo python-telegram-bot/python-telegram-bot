@@ -59,15 +59,15 @@ class Defaults:
     """
 
     __slots__ = (
-        "_tzinfo",
-        "_disable_web_page_preview",
-        "_block",
-        "_quote",
-        "_disable_notification",
         "_allow_sending_without_reply",
-        "_parse_mode",
         "_api_defaults",
+        "_block",
+        "_disable_notification",
+        "_disable_web_page_preview",
+        "_parse_mode",
         "_protect_content",
+        "_quote",
+        "_tzinfo",
     )
 
     def __init__(

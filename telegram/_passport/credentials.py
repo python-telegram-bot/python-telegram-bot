@@ -130,11 +130,11 @@ class EncryptedCredentials(TelegramObject):
     """
 
     __slots__ = (
+        "_decrypted_data",
+        "_decrypted_secret",
+        "data",
         "hash",
         "secret",
-        "data",
-        "_decrypted_secret",
-        "_decrypted_data",
     )
 
     def __init__(
@@ -295,17 +295,17 @@ class SecureData(TelegramObject):
     """
 
     __slots__ = (
-        "utility_bill",
-        "personal_details",
-        "temporary_registration",
         "address",
-        "driver_license",
-        "rental_agreement",
-        "internal_passport",
-        "identity_card",
         "bank_statement",
+        "driver_license",
+        "identity_card",
+        "internal_passport",
         "passport",
         "passport_registration",
+        "personal_details",
+        "rental_agreement",
+        "temporary_registration",
+        "utility_bill",
     )
 
     def __init__(
@@ -424,7 +424,7 @@ class SecureValue(TelegramObject):
 
     """
 
-    __slots__ = ("data", "front_side", "reverse_side", "selfie", "files", "translation")
+    __slots__ = ("data", "files", "front_side", "reverse_side", "selfie", "translation")
 
     def __init__(
         self,
@@ -468,7 +468,7 @@ class SecureValue(TelegramObject):
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
 
-    __slots__ = ("hash", "secret", "file_hash", "data_hash")
+    __slots__ = ("data_hash", "file_hash", "hash", "secret")
 
     def __init__(
         self,

@@ -87,14 +87,14 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
     """
 
     __slots__ = (
-        "reply_markup",
-        "caption_entities",
         "caption",
-        "title",
+        "caption_entities",
         "description",
+        "input_message_content",
         "parse_mode",
         "photo_file_id",
-        "input_message_content",
+        "reply_markup",
+        "title",
     )
 
     def __init__(
