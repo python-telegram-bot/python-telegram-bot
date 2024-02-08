@@ -44,7 +44,7 @@ class MessageOrigin(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type` and :attr:`date` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         type (:obj:`str`): Type of the message origin, can be on of:
@@ -131,7 +131,7 @@ class MessageOriginUser(MessageOrigin):
     """
     The message was originally sent by a known user.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         date (:obj:`datetime.datetime`): Date the message was sent originally.
@@ -165,7 +165,7 @@ class MessageOriginHiddenUser(MessageOrigin):
     """
     The message was originally sent by an unknown user.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         date (:obj:`datetime.datetime`): Date the message was sent originally.
@@ -199,7 +199,7 @@ class MessageOriginChat(MessageOrigin):
     """
     The message was originally sent on behalf of a chat to a group chat.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         date (:obj:`datetime.datetime`): Date the message was sent originally.
@@ -242,7 +242,7 @@ class MessageOriginChannel(MessageOrigin):
     """
     The message was originally sent to a channel chat.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         date (:obj:`datetime.datetime`): Date the message was sent originally.

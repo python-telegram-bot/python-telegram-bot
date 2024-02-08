@@ -453,7 +453,7 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.delete_message`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -485,7 +485,7 @@ class User(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.delete_messages`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -1635,7 +1635,7 @@ class User(TelegramObject):
 
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`copy_messages`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
@@ -1680,7 +1680,7 @@ class User(TelegramObject):
 
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`send_copies`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
@@ -1809,7 +1809,7 @@ class User(TelegramObject):
 
         .. seealso:: :meth:`forward_to`, :meth:`forward_from`, :meth:`forward_messages_to`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
@@ -1852,7 +1852,7 @@ class User(TelegramObject):
 
         .. seealso:: :meth:`forward_from`, :meth:`forward_to`, :meth:`forward_messages_from`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
@@ -2034,7 +2034,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_user_chat_boosts`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.UserChatBoosts`: On success, returns the boosts applied by the user.

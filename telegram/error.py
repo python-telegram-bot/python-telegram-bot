@@ -138,7 +138,7 @@ class EndPointNotFound(TelegramError):
     """Raised when the requested endpoint is not found. Only relevant for
     :meth:`telegram.Bot.do_api_request`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ()

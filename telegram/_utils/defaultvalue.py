@@ -138,11 +138,11 @@ DEFAULT_20: DefaultValue[int] = DefaultValue(20)
 DEFAULT_IP: DefaultValue[str] = DefaultValue("127.0.0.1")
 """:class:`DefaultValue`: Default :obj:`127.0.0.1`
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 20.8
 """
 
 DEFAULT_80: DefaultValue[int] = DefaultValue(80)
 """:class:`DefaultValue`: Default :obj:`80`
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 20.8
 """

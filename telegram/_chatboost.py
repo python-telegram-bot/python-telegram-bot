@@ -45,7 +45,7 @@ class ChatBoostSource(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`source` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         source (:obj:`str`): The source of the chat boost. Can be one of:
@@ -104,7 +104,7 @@ class ChatBoostSourcePremium(ChatBoostSource):
     The boost was obtained by subscribing to Telegram Premium or by gifting a Telegram Premium
     subscription to another user.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         user (:class:`telegram.User`): User that boosted the chat.
@@ -130,7 +130,7 @@ class ChatBoostSourceGiftCode(ChatBoostSource):
     such code boosts the chat 4 times for the duration of the corresponding Telegram Premium
     subscription.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         user (:class:`telegram.User`): User for which the gift code was created.
@@ -155,7 +155,7 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
     The boost was obtained by the creation of a Telegram Premium giveaway. This boosts the chat 4
     times for the duration of the corresponding Telegram Premium subscription.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         giveaway_message_id (:obj:`int`): Identifier of a message in the chat with the giveaway;
@@ -200,7 +200,7 @@ class ChatBoost(TelegramObject):
     considered equal, if their :attr:`boost_id`, :attr:`add_date`, :attr:`expiration_date`,
     and :attr:`source` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         boost_id (:obj:`str`): Unique identifier of the boost.
@@ -263,7 +263,7 @@ class ChatBoostUpdated(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`chat`, and :attr:`boost` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         chat (:class:`telegram.Chat`): Chat which was boosted.
@@ -370,7 +370,7 @@ class UserChatBoosts(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`boosts` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         boosts (Sequence[:class:`telegram.ChatBoost`]): List of boosts added to the chat by the

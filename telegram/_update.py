@@ -105,12 +105,12 @@ class Update(TelegramObject):
         chat_boost (:class:`telegram.ChatBoostUpdated`, optional): A chat boost was added or
             changed. The bot must be an administrator in the chat to receive these updates.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
         removed_chat_boost (:class:`telegram.ChatBoostRemoved`, optional): A boost was removed from
             a chat. The bot must be an administrator in the chat to receive these updates.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
         message_reaction (:class:`telegram.MessageReactionUpdated`, optional): A reaction to a
             message was changed by a user. The bot must be an administrator in the chat and must
@@ -121,7 +121,7 @@ class Update(TelegramObject):
             :meth:`telegram.ext.Application.run_webhook`). The update isn't received for reactions
             set by bots.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
         message_reaction_count (:class:`telegram.MessageReactionCountUpdated`, optional): Reactions
             to a message with anonymous reactions were changed. The bot must be an administrator in
@@ -132,7 +132,7 @@ class Update(TelegramObject):
             :meth:`telegram.ext.Application.run_webhook`). The updates are grouped and can be sent
             with delay up to a few minutes.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
     Attributes:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
@@ -191,12 +191,12 @@ class Update(TelegramObject):
         chat_boost (:class:`telegram.ChatBoostUpdated`): Optional. A chat boost was added or
             changed. The bot must be an administrator in the chat to receive these updates.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
         removed_chat_boost (:class:`telegram.ChatBoostRemoved`): Optional. A boost was removed from
             a chat. The bot must be an administrator in the chat to receive these updates.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
         message_reaction (:class:`telegram.MessageReactionUpdated`): Optional. A reaction to a
             message was changed by a user. The bot must be an administrator in the chat and must
@@ -207,7 +207,7 @@ class Update(TelegramObject):
             :meth:`telegram.ext.Application.run_webhook`). The update isn't received for reactions
             set by bots.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
         message_reaction_count (:class:`telegram.MessageReactionCountUpdated`): Optional. Reactions
             to a message with anonymous reactions were changed. The bot must be an administrator in
@@ -218,7 +218,7 @@ class Update(TelegramObject):
             :meth:`telegram.ext.Application.run_webhook`). The updates are grouped and can be sent
             with delay up to a few minutes.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
     """
 
     __slots__ = (
@@ -305,19 +305,19 @@ class Update(TelegramObject):
     CHAT_BOOST: Final[str] = constants.UpdateType.CHAT_BOOST
     """:const:`telegram.constants.UpdateType.CHAT_BOOST`
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: 20.8"""
     REMOVED_CHAT_BOOST: Final[str] = constants.UpdateType.REMOVED_CHAT_BOOST
     """:const:`telegram.constants.UpdateType.REMOVED_CHAT_BOOST`
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: 20.8"""
     MESSAGE_REACTION: Final[str] = constants.UpdateType.MESSAGE_REACTION
     """:const:`telegram.constants.UpdateType.MESSAGE_REACTION`
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: 20.8"""
     MESSAGE_REACTION_COUNT: Final[str] = constants.UpdateType.MESSAGE_REACTION_COUNT
     """:const:`telegram.constants.UpdateType.MESSAGE_REACTION_COUNT`
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: 20.8"""
     ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
     """List[:obj:`str`]: A list of all available update types.
 

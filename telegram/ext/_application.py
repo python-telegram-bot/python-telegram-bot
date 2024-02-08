@@ -968,7 +968,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     this param, you must also run a reverse proxy to the unix socket and set the
                     appropriate :paramref:`webhook_url`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
         """
         if not self.updater:
             raise RuntimeError(

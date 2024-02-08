@@ -88,7 +88,7 @@ class KeyboardButton(TelegramObject):
             :attr:`request_users`.
 
             .. versionadded:: 20.1
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                Bot API 7.0 deprecates this argument in favor of ref`request_users`.
 
         request_users (:class:`KeyboardButtonRequestUsers`, optional): If specified, pressing the
@@ -96,7 +96,7 @@ class KeyboardButton(TelegramObject):
             identifier to the bot in a :attr:`telegram.Message.user_shared` service message.
             Available in private chats only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         request_chat (:class:`KeyboardButtonRequestChat`, optional): If specified, pressing the
             button will open a list of suitable chats. Tapping on a chat will send its
             identifier to the bot in a :attr:`telegram.Message.chat_shared` service message.
@@ -124,7 +124,7 @@ class KeyboardButton(TelegramObject):
             identifier to the bot in a :attr:`telegram.Message.user_shared` service message.
             Available in private chats only.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         request_chat (:class:`KeyboardButtonRequestChat`): Optional. If specified, pressing the
             button will open a list of suitable chats. Tapping on a chat will send its
             identifier to the bot in a :attr:`telegram.Message.chat_shared` service message.
@@ -195,7 +195,7 @@ class KeyboardButton(TelegramObject):
         """Optional[:class:`KeyboardButtonRequestUsers`]: Alias for :attr:`request_users`.
 
         .. versionadded:: 20.1
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
            Bot API 7.0 deprecates this attribute in favor of :attr:`request_users`.
         """
         warn_about_deprecated_attr_in_property(

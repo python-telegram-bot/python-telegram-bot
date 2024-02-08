@@ -4,6 +4,75 @@
 Changelog
 =========
 
+Version 20.8
+============
+
+*Released 2024-02-08*
+
+This is the technical changelog for version 20.8. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
+
+Major Changes
+-------------
+
+-  API 7.0 (:pr:`4034` closes :issue:`4033`, :pr:`4038` by `@aelkheir <https://github.com/aelkheir>`__)
+
+Minor Changes
+-------------
+
+-  Fix Type Hint for ``filters`` Parameter of ``MessageHandler`` (:pr:`4039` by `@Palaptin <https://github.com/Palaptin>`__)
+-  Deprecate ``filters.CHAT`` (:pr:`4083` closes :issue:`4062`)
+-  Improve Error Handling in Built-In Webhook Handler (:pr:`3987` closes :issue:`3979`)
+
+New Features
+------------
+
+-  Add Parameter ``pattern`` to ``PreCheckoutQueryHandler`` and ``filters.SuccessfulPayment`` (:pr:`4005` by `@aelkheir <https://github.com/aelkheir>`__ closes :issue:`3752`)
+-  Add Missing Conversions of ``type`` to Corresponding Enum from ``telegram.constants`` (:pr:`4067`)
+-  Add Support for Unix Sockets to ``Updater.start_webhook`` (:pr:`3986` closes :issue:`3978`)
+-  Add ``Bot.do_api_request`` (:pr:`4084` closes :issue:`4053`)
+-  Add ``AsyncContextManager`` as Parent Class to ``BaseUpdateProcessor`` (:pr:`4001`)
+
+Documentation Improvements
+--------------------------
+
+-  Documentation Improvements (:pr:`3919`)
+-  Add Docstring to Dunder Methods (:pr:`3929` closes :issue:`3926`)
+-  Documentation Improvements (:pr:`4002`, :pr:`4079` by `@kenjitagawa <https://github.com/kenjitagawa>`__, :pr:`4104` by `@xTudoS <https://github.com/xTudoS>`__)
+
+Internal Changes
+----------------
+
+-  Drop Usage of DeepSource (:pr:`4100`)
+-  Improve Type Completeness & Corresponding Workflow (:pr:`4035`)
+-  Bump ``ruff`` and Remove ``sort-all`` (:pr:`4075`)
+-  Move Handler Files to ``_handlers`` Subdirectory (:pr:`4064` by `@lucasmolinari <https://github.com/lucasmolinari>`__ closes :issue:`4060`)
+-  Introduce ``sort-all`` Hook for ``pre-commit`` (:pr:`4052`)
+-  Use Recommended ``pre-commit`` Mirror for ``black`` (:pr:`4051`)
+-  Remove Unused ``DEFAULT_20`` (:pr:`3997`)
+-  Migrate From ``setup.cfg`` to ``pyproject.toml`` Where Possible (:pr:`4088`)
+
+Dependency Updates
+------------------
+
+-  Bump ``black`` and ``ruff`` (:pr:`4089`)
+-  Bump ``srvaroa/labeler`` from 1.8.0 to 1.10.0 (:pr:`4048`)
+-  Update ``tornado`` requirement from ~=6.3.3 to ~=6.4 (:pr:`3992`)
+-  Bump ``actions/stale`` from 8 to 9 (:pr:`4046`)
+-  Bump ``actions/setup-python`` from 4 to 5 (:pr:`4047`)
+-  ``pre-commit`` autoupdate (:pr:`4101`)
+-  Bump ``actions/upload-artifact`` from 3 to 4 (:pr:`4045`)
+-  ``pre-commit`` autoupdate (:pr:`3996`)
+-  Bump ``furo`` from 2023.9.10 to 2024.1.29 (:pr:`4094`)
+-  ``pre-commit`` autoupdate (:pr:`4043`)
+-  Bump ``codecov/codecov-action`` from 3 to 4 (:pr:`4091`)
+-  Bump ``EndBug/add-and-commit`` from 9.1.3 to 9.1.4 (:pr:`4090`)
+-  Update ``httpx`` requirement from ~=0.25.2 to ~=0.26.0 (:pr:`4024`)
+-  Bump ``pytest`` from 7.4.3 to 7.4.4 (:pr:`4056`)
+-  Bump ``srvaroa/labeler`` from 1.7.0 to 1.8.0 (:pr:`3993`)
+-  Bump ``test-summary/action`` from 2.1 to 2.2 (:pr:`4044`)
+-  Bump ``dessant/lock-threads`` from 4.0.1 to 5.0.1 (:pr:`3994`)
+
+
 Version 20.7
 ============
 

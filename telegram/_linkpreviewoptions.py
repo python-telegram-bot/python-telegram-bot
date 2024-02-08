@@ -34,7 +34,7 @@ class LinkPreviewOptions(TelegramObject):
     considered equal, if their :attr:`is_disabled`, :attr:`url`, :attr:`prefer_small_media`,
     :attr:`prefer_large_media`, and :attr:`show_above_text` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         is_disabled (:obj:`bool`, optional): :obj:`True`, if the link preview is disabled.

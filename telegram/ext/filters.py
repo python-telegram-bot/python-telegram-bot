@@ -870,7 +870,7 @@ class _Chat(MessageFilter):
 CHAT = _Chat(name="filters.CHAT")
 """This filter filters *any* message that has a :attr:`telegram.Message.chat`.
 
-.. deprecated:: NEXT.VERSION
+.. deprecated:: 20.8
    This filter has no effect since :attr:`telegram.Message.chat` is always present.
 """
 
@@ -1362,7 +1362,7 @@ class _Forwarded(MessageFilter):
 FORWARDED = _Forwarded(name="filters.FORWARDED")
 """Messages that contain :attr:`telegram.Message.forward_origin`.
 
-.. versionchanged:: NEXT.VERSION
+.. versionchanged:: 20.8
    Now based on :attr:`telegram.Message.forward_origin` instead of
    :attr:`telegram.Message.forward_date`.
 """
@@ -1378,7 +1378,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
 
     .. versionadded:: 13.5
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.8
        Was previously based on :attr:`telegram.Message.forward_from` and
          :attr:`telegram.Message.forward_from_chat`.
 
@@ -2048,7 +2048,7 @@ class StatusUpdate:
     GIVEAWAY_CREATED = _GiveawayCreated(name="filters.StatusUpdate.GIVEAWAY_CREATED")
     """Messages that contain :attr:`telegram.Message.giveaway_created`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     class _GiveawayCompleted(MessageFilter):
@@ -2059,7 +2059,7 @@ class StatusUpdate:
 
     GIVEAWAY_COMPLETED = _GiveawayCompleted(name="filters.StatusUpdate.GIVEAWAY_COMPLETED")
     """Messages that contain :attr:`telegram.Message.giveaway_completed`.
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     class _LeftChatMember(MessageFilter):
@@ -2156,7 +2156,7 @@ class StatusUpdate:
         new :attr:`telegram.Message.users_shared` attribute!
 
     .. versionadded:: 20.1
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 20.8
        Use :attr:`USERS_SHARED` instead.
     """
 
@@ -2169,7 +2169,7 @@ class StatusUpdate:
     USERS_SHARED = _UsersShared(name="filters.StatusUpdate.USERS_SHARED")
     """Messages that contain :attr:`telegram.Message.users_shared`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     class _VideoChatEnded(MessageFilter):
@@ -2365,7 +2365,7 @@ class SuccessfulPayment(MessageFilter):
             invoice payloads to allow. Only exact matches are allowed. If not
             specified, will allow any invoice payload.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ("invoice_payloads",)

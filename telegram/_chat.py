@@ -134,7 +134,7 @@ class Chat(TelegramObject):
             access to old messages; available only to chat administrators. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the
@@ -174,30 +174,30 @@ class Chat(TelegramObject):
             :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         accent_color_id (:obj:`int`, optional): Identifier of the
             :class:`accent color <telegram.constants.AccentColor>` for the chat name and
             backgrounds of the chat photo, reply header, and link preview. See `accent colors`_
             for more details. Returned only in :meth:`telegram.Bot.get_chat`. Always returned in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         background_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of emoji chosen
             by the chat for the reply header and link preview background. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         profile_accent_color_id (:obj:`int`, optional): Identifier of the
             :class:`accent color <telegram.constants.ProfileAccentColor>` for the chat's profile
             background. See profile `accent colors`_ for more details. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         profile_background_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of
             the emoji chosen by the chat for its profile background. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         emoji_status_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of emoji
             status of the chat or the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
@@ -265,7 +265,7 @@ class Chat(TelegramObject):
             access to old messages; available only to chat administrators. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
@@ -307,30 +307,30 @@ class Chat(TelegramObject):
             :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         accent_color_id (:obj:`int`): Optional. Identifier of the
             :class:`accent color <telegram.constants.AccentColor>` for the chat name and
             backgrounds of the chat photo, reply header, and link preview. See `accent colors`_
             for more details. Returned only in :meth:`telegram.Bot.get_chat`. Always returned in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         background_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji chosen
             by the chat for the reply header and link preview background. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         profile_accent_color_id (:obj:`int`): Optional. Identifier of the
             :class:`accent color <telegram.constants.ProfileAccentColor>` for the chat's profile
             background. See profile `accent colors`_ for more details. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         profile_background_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of
             the emoji chosen by the chat for its profile background. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         emoji_status_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji
             status of the chat or the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
@@ -1475,7 +1475,7 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.delete_message`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -1507,7 +1507,7 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.delete_messages`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -2604,7 +2604,7 @@ class Chat(TelegramObject):
 
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`copy_messages`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
@@ -2649,7 +2649,7 @@ class Chat(TelegramObject):
 
         .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`send_copies`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
@@ -2778,7 +2778,7 @@ class Chat(TelegramObject):
 
         .. seealso:: :meth:`forward_to`, :meth:`forward_from`, :meth:`forward_messages_to`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
@@ -2821,7 +2821,7 @@ class Chat(TelegramObject):
 
         .. seealso:: :meth:`forward_from`, :meth:`forward_to`, :meth:`forward_messages_from`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
@@ -3538,7 +3538,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_user_chat_boosts`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.UserChatBoosts`: On success, returns the boosts applied in the chat.
@@ -3572,7 +3572,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_message_reaction`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.

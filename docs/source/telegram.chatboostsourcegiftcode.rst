@@ -1,7 +1,7 @@
 ChatBoostSourceGiftCode
 =======================
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 20.8
 
 .. autoclass:: telegram.ChatBoostSourceGiftCode
     :members:

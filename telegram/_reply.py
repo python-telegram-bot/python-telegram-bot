@@ -57,7 +57,7 @@ class ExternalReplyInfo(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`origin` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         origin (:class:`telegram.MessageOrigin`): Origin of the message replied to by the given
@@ -273,7 +273,7 @@ class TextQuote(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text` and :attr:`position` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         text (:obj:`str`): Text of the quoted part of a message that is replied to by the given
@@ -348,7 +348,7 @@ class ReplyParameters(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_id` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         message_id (:obj:`int`): Identifier of the message that will be replied to in the current

@@ -124,7 +124,7 @@ class MaybeInaccessibleMessage(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_id` and :attr:`chat` are equal
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         message_id (:obj:`int`): Unique message identifier.
@@ -186,8 +186,8 @@ class MaybeInaccessibleMessage(TelegramObject):
             not affected by this change, :meth:`Message.__bool__` is not overridden and will
             continue to work as before.
 
-        .. versionadded:: NEXT.VERSION
-        .. deprecated:: NEXT.VERSION
+        .. versionadded:: 20.8
+        .. deprecated:: 20.8
            This behavior is introduced only temporarily to ease migration to Bot API 7.0. It will
            be removed along with other functionality deprecated by Bot API 7.0.
         """
@@ -211,7 +211,7 @@ class MaybeInaccessibleMessage(TelegramObject):
     def is_accessible(self) -> bool:
         """Convenience attribute. :obj:`True`, if the date is not 0 in Unix time.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
         """
         # Once we drop support for python 3.9, this can be made a TypeGuard function:
         # def is_accessible(self) -> TypeGuard[Message]:
@@ -251,7 +251,7 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_id` and :attr:`chat` are equal
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         message_id (:obj:`int`): Unique message identifier.
@@ -287,7 +287,7 @@ class Message(MaybeInaccessibleMessage):
     Note:
         In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 20.8
         * This class is now a subclass of :class:`telegram.MaybeInaccessibleMessage`.
         * The :paramref:`pinned_message` now can be either class:`telegram.Message` or
           class:`telegram.InaccessibleMessage`.
@@ -326,25 +326,25 @@ class Message(MaybeInaccessibleMessage):
         forward_from (:class:`telegram.User`, optional): For forwarded messages, sender of
             the original message.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                Bot API 7.0 deprecates :paramref:`forward_from` in favor of
                :paramref:`forward_origin`.
         forward_from_chat (:class:`telegram.Chat`, optional): For messages forwarded from channels
             or from anonymous administrators, information about the original sender chat.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                Bot API 7.0 deprecates :paramref:`forward_from_chat` in favor of
                :paramref:`forward_origin`.
         forward_from_message_id (:obj:`int`, optional): For forwarded channel posts, identifier of
             the original message in the channel.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                Bot API 7.0 deprecates :paramref:`forward_from_message_id` in favor of
                :paramref:`forward_origin`.
         forward_sender_name (:obj:`str`, optional): Sender's name for messages forwarded from
             users who disallow adding a link to their account in forwarded messages.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                Bot API 7.0 deprecates :paramref:`forward_sender_name` in favor of
                :paramref:`forward_origin`.
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
@@ -353,7 +353,7 @@ class Message(MaybeInaccessibleMessage):
             .. versionchanged:: 20.3
                 |datetime_localization|
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                Bot API 7.0 deprecates :paramref:`forward_date` in favor of
                :paramref:`forward_origin`.
         is_automatic_forward (:obj:`bool`, optional): :obj:`True`, if the message is a channel
@@ -388,7 +388,7 @@ class Message(MaybeInaccessibleMessage):
             link preview generation for the message, if it is a text message and link preview
             options were changed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -472,7 +472,7 @@ class Message(MaybeInaccessibleMessage):
             was pinned. Note that the Message object in this field will not contain further
             :attr:`reply_to_message` fields even if it is itself a reply.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.8
                 This attribute now is either class:`telegram.Message` or
                 class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
@@ -484,7 +484,7 @@ class Message(MaybeInaccessibleMessage):
         forward_signature (:obj:`str`, optional): For messages forwarded from channels, signature
             of the post author if present.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                Bot API 7.0 deprecates :paramref:`forward_signature` in favor of
                :paramref:`forward_origin`.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
@@ -567,12 +567,12 @@ class Message(MaybeInaccessibleMessage):
             with the bot.
 
             .. versionadded:: 20.1
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                Bot API 7.0 deprecates :paramref:`user_shared` in favor of :paramref:`users_shared`.
         users_shared (:class:`telegram.UsersShared`, optional): Service message: users were shared
             with the bot
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         chat_shared (:class:`telegram.ChatShared`, optional):Service message: a chat was shared
             with the bot.
 
@@ -580,31 +580,31 @@ class Message(MaybeInaccessibleMessage):
         giveaway_created (:class:`telegram.GiveawayCreated`, optional): Service message: a
             scheduled giveaway was created
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         giveaway (:class:`telegram.Giveaway`, optional): The message is a scheduled giveaway
             message
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         giveaway_winners (:class:`telegram.GiveawayWinners`, optional): A giveaway with public
             winners was completed
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         giveaway_completed (:class:`telegram.GiveawayCompleted`, optional): Service message: a
             giveaway without public winners was completed
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         quote (:class:`telegram.TextQuote`, optional): For replies that quote part of the original
             message, the quoted part of the message.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         forward_origin (:class:`telegram.MessageOrigin`, optional): Information about the original
             message for forwarded messages
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -655,7 +655,7 @@ class Message(MaybeInaccessibleMessage):
             link preview generation for the message, if it is a text message and link preview
             options were changed.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -754,7 +754,7 @@ class Message(MaybeInaccessibleMessage):
             was pinned. Note that the Message object in this field will not contain further
             :attr:`reply_to_message` fields even if it is itself a reply.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.8
                 This attribute now is either class:`telegram.Message` or
                 class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
@@ -842,7 +842,7 @@ class Message(MaybeInaccessibleMessage):
         users_shared (:class:`telegram.UsersShared`): Optional. Service message: users were shared
             with the bot
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         chat_shared (:class:`telegram.ChatShared`): Optional. Service message: a chat was shared
             with the bot.
 
@@ -850,31 +850,31 @@ class Message(MaybeInaccessibleMessage):
         giveaway_created (:class:`telegram.GiveawayCreated`): Optional. Service message: a
             scheduled giveaway was created
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         giveaway (:class:`telegram.Giveaway`): Optional. The message is a scheduled giveaway
             message
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         giveaway_winners (:class:`telegram.GiveawayWinners`): Optional. A giveaway with public
             winners was completed
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         giveaway_completed (:class:`telegram.GiveawayCompleted`): Optional. Service message: a
             giveaway without public winners was completed
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
             message that is being replied to, which may come from another chat or forum topic.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         quote (:class:`telegram.TextQuote`): Optional. For replies that quote part of the original
             message, the quoted part of the message.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         forward_origin (:class:`telegram.MessageOrigin`, optional): Information about the original
             message for forwarded messages
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1220,7 +1220,7 @@ class Message(MaybeInaccessibleMessage):
             be present. However, this behavior is not documented and may be changed by Telegram.
 
         .. versionadded:: 20.1
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
            Bot API 7.0 deprecates :attr:`user_shared` in favor of :attr:`users_shared`.
         """
         warn_about_deprecated_attr_in_property(
@@ -1235,7 +1235,7 @@ class Message(MaybeInaccessibleMessage):
         """:class:`telegram.User`: Optional. For forwarded messages, sender of the original
         message.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
            Bot API 7.0 deprecates :attr:`forward_from` in favor of :attr:`forward_origin`.
         """
         warn_about_deprecated_attr_in_property(
@@ -1250,7 +1250,7 @@ class Message(MaybeInaccessibleMessage):
         """:class:`telegram.Chat`: Optional. For messages forwarded from channels or from anonymous
         administrators, information about the original sender chat.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
            Bot API 7.0 deprecates :attr:`forward_from_chat` in favor of :attr:`forward_origin`.
         """
         warn_about_deprecated_attr_in_property(
@@ -1265,7 +1265,7 @@ class Message(MaybeInaccessibleMessage):
         """:obj:`int`: Optional. For forwarded channel posts, identifier of the original message
         in the channel.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
            Bot API 7.0 deprecates :attr:`forward_from_message_id` in favor of
            :attr:`forward_origin`.
         """
@@ -1281,7 +1281,7 @@ class Message(MaybeInaccessibleMessage):
         """:obj:`str`: Optional. For messages forwarded from channels, signature
         of the post author if present.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
            Bot API 7.0 deprecates :attr:`forward_signature` in favor of :attr:`forward_origin`.
         """
         warn_about_deprecated_attr_in_property(
@@ -1296,7 +1296,7 @@ class Message(MaybeInaccessibleMessage):
         """:class:`telegram.User`: Optional. Sender's name for messages forwarded from users who
         disallow adding a link to their account in forwarded messages.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
            Bot API 7.0 deprecates :attr:`forward_sender_name` in favor of :attr:`forward_origin`.
         """
         warn_about_deprecated_attr_in_property(
@@ -1314,7 +1314,7 @@ class Message(MaybeInaccessibleMessage):
             .. versionchanged:: 20.3
                 |datetime_localization|
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
            Bot API 7.0 deprecates :attr:`forward_date` in favor of :attr:`forward_origin`.
         """
         warn_about_deprecated_attr_in_property(
@@ -1575,7 +1575,7 @@ class Message(MaybeInaccessibleMessage):
 
                 message.compute_quote_position_and_entities("Hello, world!", 1)
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Args:
             quote (:obj:`str`): Part of the message which is to be quoted. This is
@@ -1676,7 +1676,7 @@ class Message(MaybeInaccessibleMessage):
                     )
                 )
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Args:
             quote (:obj:`str`, optional): Passed in :meth:`compute_quote_position_and_entities`
@@ -1792,12 +1792,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -1868,12 +1868,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -1939,12 +1939,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2010,12 +2010,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2075,12 +2075,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             Tuple[:class:`telegram.Message`]: An array of the sent Messages.
@@ -2142,12 +2142,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2213,12 +2213,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2285,12 +2285,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2358,12 +2358,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2426,12 +2426,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2495,12 +2495,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2567,12 +2567,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2634,12 +2634,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2703,12 +2703,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2775,12 +2775,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2845,12 +2845,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2918,12 +2918,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -2987,12 +2987,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -3079,12 +3079,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         .. versionadded:: 13.2
 
@@ -3171,12 +3171,12 @@ class Message(MaybeInaccessibleMessage):
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -3366,12 +3366,12 @@ class Message(MaybeInaccessibleMessage):
             quote (:obj:`bool`, optional): |reply_quote|
 
                 .. versionadded:: 13.1
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     This argument is deprecated in favor of :paramref:`do_quote`
             do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
                 Mutually exclusive with :paramref:`quote`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
@@ -4080,7 +4080,7 @@ class Message(MaybeInaccessibleMessage):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_message_reaction`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
@@ -4314,7 +4314,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Blockquote entities are now supported.
 
         Returns:
@@ -4339,7 +4339,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Blockquote entities are now supported.
 
         Returns:
@@ -4365,7 +4365,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Blockquote entities are now supported.
 
         Returns:
@@ -4390,7 +4390,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Blockquote entities are now supported.
 
         Returns:
@@ -4548,7 +4548,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
             |blockquote_no_md1_support|
 
         Returns:
@@ -4578,7 +4578,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Blockquote entities are now supported.
 
         Returns:
@@ -4605,7 +4605,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
             |blockquote_no_md1_support|
 
         Returns:
@@ -4635,7 +4635,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Blockquote entities are now supported.
 
         Returns:
@@ -4660,7 +4660,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
             |blockquote_no_md1_support|
 
         Returns:
@@ -4690,7 +4690,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Blockquote entities are now supported.
 
         Returns:
@@ -4719,7 +4719,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
             |blockquote_no_md1_support|
 
         Returns:
@@ -4749,7 +4749,7 @@ class Message(MaybeInaccessibleMessage):
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Blockquote entities are now supported.
 
         Returns:

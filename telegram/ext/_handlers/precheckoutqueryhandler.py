@@ -58,7 +58,7 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Optional. Regex pattern
             to test :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
@@ -66,7 +66,7 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Optional. Regex pattern
             to test :attr:`telegram.PreCheckoutQuery.invoice_payload` against.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
     """
 

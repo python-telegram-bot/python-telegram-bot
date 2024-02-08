@@ -1,7 +1,7 @@
 ChatBoostSourcePremium
 ======================
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 20.8
 
 .. autoclass:: telegram.ChatBoostSourcePremium
     :members:

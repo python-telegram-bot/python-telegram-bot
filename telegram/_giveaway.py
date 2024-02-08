@@ -38,7 +38,7 @@ class Giveaway(TelegramObject):
     considered equal, if their :attr:`chats`, :attr:`winners_selection_date` and
     :attr:`winner_count` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         chats (Tuple[:class:`telegram.Chat`]): The list of chats which the user must join to
@@ -161,7 +161,7 @@ class GiveawayWinners(TelegramObject):
     considered equal, if their :attr:`chat`, :attr:`giveaway_message_id`,
     :attr:`winners_selection_date`, :attr:`winner_count` and :attr:`winners` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         chat (:class:`telegram.Chat`): The chat that created the giveaway
@@ -283,7 +283,7 @@ class GiveawayCompleted(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`winner_count` and :attr:`unclaimed_prize_count` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
 
     Args:

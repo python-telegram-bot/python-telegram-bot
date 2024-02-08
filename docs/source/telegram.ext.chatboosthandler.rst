@@ -1,7 +1,7 @@
 ChatBoostHandler
 ================
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 20.8
 
 .. autoclass:: telegram.ext.ChatBoostHandler
     :members:

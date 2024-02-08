@@ -44,7 +44,7 @@ class Defaults:
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in this
             message. Mutually exclusive with :paramref:`link_preview_options`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                 Use :paramref:`link_preview_options` instead. This parameter will be removed in
                 future versions.
 
@@ -52,7 +52,7 @@ class Defaults:
             Will be used for :attr:`telegram.ReplyParameters.allow_sending_without_reply`.
         quote (:obj:`bool`, optional): |reply_quote|
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                 Use :paramref:`do_quote` instead. This parameter will be removed in future
                 versions.
         tzinfo (:class:`datetime.tzinfo`, optional): A timezone to be used for all date(time)
@@ -110,10 +110,10 @@ class Defaults:
                                 link_preview_options=LinkPreviewOptions(url="https://telegram.org")
                             )
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
         do_quote(:obj:`bool`, optional): |reply_quote|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
     """
 
     __slots__ = (
@@ -282,7 +282,7 @@ class Defaults:
         """:obj:`bool`: Optional. Disables link previews for links in all outgoing
         messages.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
             Use :attr:`link_preview_options` instead. This attribute will be removed in future
             versions.
         """
@@ -311,7 +311,7 @@ class Defaults:
     def quote(self) -> Optional[bool]:
         """:obj:`bool`: Optional. |reply_quote|
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
             Use :attr:`do_quote` instead. This attribute will be removed in future
             versions.
         """
@@ -364,7 +364,7 @@ class Defaults:
         """:class:`telegram.LinkPreviewOptions`: Optional. Link preview generation options for all
         outgoing messages.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
         """
         return self._link_preview_options
 
@@ -372,6 +372,6 @@ class Defaults:
     def do_quote(self) -> Optional[bool]:
         """:obj:`bool`: Optional. |reply_quote|
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
         """
         return self._do_quote

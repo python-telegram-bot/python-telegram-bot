@@ -159,7 +159,7 @@ SUPPORTED_WEBHOOK_PORTS: Final[List[int]] = [443, 80, 88, 8443]
 #: :obj:`datetime.datetime`, value of unix 0.
 #: This date literal is used in :class:`telegram.InaccessibleMessage`
 #:
-#: .. versionadded:: NEXT.VERSION
+#: .. versionadded:: 20.8
 ZERO_DATE: Final[datetime.datetime] = datetime.datetime(1970, 1, 1, tzinfo=UTC)
 
 
@@ -177,7 +177,7 @@ class AccentColor(Enum):
     Since Telegram gives no exact specification for the accent colors, future accent colors might
     have a different data type.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ()
@@ -641,7 +641,7 @@ class BulkRequestLimit(IntEnum):
     :meth:`telegram.Bot.forward_messages` and :meth:`telegram.Bot.copy_messages`. The enum members
     of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ()
@@ -706,7 +706,7 @@ class ChatBoostSources(StringEnum):
     :class:`Telegram chat boost <telegram.ChatBoostSource>`.
     The enum members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ()
@@ -1114,7 +1114,7 @@ class GiveawayLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.Giveaway` and related classes.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ()
@@ -1128,7 +1128,7 @@ class KeyboardButtonRequestUsersLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.KeyboardButtonRequestUsers`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ()
@@ -1610,7 +1610,7 @@ class MessageEntityType(StringEnum):
     BLOCKQUOTE = "blockquote"
     """:obj:`str`: Message entities representing a block quotation.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
 
@@ -1674,7 +1674,7 @@ class MessageOriginType(StringEnum):
     """This enum contains the available types of :class:`telegram.MessageOrigin`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ()
@@ -1710,7 +1710,7 @@ class MessageType(StringEnum):
     CHAT_SHARED = "chat_shared"
     """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     CONNECTED_WEBSITE = "connected_website"
     """:obj:`str`: Messages with :attr:`telegram.Message.connected_website`."""
@@ -1725,54 +1725,54 @@ class MessageType(StringEnum):
     FORUM_TOPIC_CREATED = "forum_topic_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_created`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     FORUM_TOPIC_CLOSED = "forum_topic_closed"
     """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_closed`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     FORUM_TOPIC_EDITED = "forum_topic_edited"
     """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_edited`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     FORUM_TOPIC_REOPENED = "forum_topic_reopened"
     """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_reopened`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     GAME = "game"
     """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
     GENERAL_FORUM_TOPIC_HIDDEN = "general_forum_topic_hidden"
     """:obj:`str`: Messages with :attr:`telegram.Message.general_forum_topic_hidden`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     GENERAL_FORUM_TOPIC_UNHIDDEN = "general_forum_topic_unhidden"
     """:obj:`str`: Messages with :attr:`telegram.Message.general_forum_topic_unhidden`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     GIVEAWAY = "giveaway"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     GIVEAWAY_CREATED = "giveaway_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_created`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     GIVEAWAY_WINNERS = "giveaway_winners"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_winners`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     GIVEAWAY_COMPLETED = "giveaway_completed"
     """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_completed`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     GROUP_CHAT_CREATED = "group_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.group_chat_created`."""
@@ -1815,7 +1815,7 @@ class MessageType(StringEnum):
     USERS_SHARED = "users_shared"
     """:obj:`str`: Messages with :attr:`telegram.Message.users_shared`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     VENUE = "venue"
     """:obj:`str`: Messages with :attr:`telegram.Message.venue`."""
@@ -1836,12 +1836,12 @@ class MessageType(StringEnum):
     WEB_APP_DATA = "web_app_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.web_app_data`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     WRITE_ACCESS_ALLOWED = "write_access_allowed"
     """:obj:`str`: Messages with :attr:`telegram.Message.write_access_allowed`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
 
@@ -1879,7 +1879,7 @@ class ProfileAccentColor(Enum):
     Since Telegram gives no exact specification for the accent colors, future accent colors might
     have a different data type.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ()
@@ -2472,22 +2472,22 @@ class UpdateType(StringEnum):
     CHAT_BOOST = "chat_boost"
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_boost`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     REMOVED_CHAT_BOOST = "removed_chat_boost"
     """:obj:`str`: Updates with :attr:`telegram.Update.removed_chat_boost`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     MESSAGE_REACTION = "message_reaction"
     """:obj:`str`: Updates with :attr:`telegram.Update.message_reaction`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
     MESSAGE_REACTION_COUNT = "message_reaction_count"
     """:obj:`str`: Updates with :attr:`telegram.Update.message_reaction_count`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
 
@@ -2660,7 +2660,7 @@ class ReactionType(StringEnum):
     """This enum contains the available types of :class:`telegram.ReactionType`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ()
@@ -2675,7 +2675,7 @@ class ReactionEmoji(StringEnum):
     """This enum contains the available emojis of :class:`telegram.ReactionTypeEmoji`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
     """
 
     __slots__ = ()

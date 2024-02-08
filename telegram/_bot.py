@@ -818,7 +818,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             * The only exception is :class:`telegram.ext.Defaults.tzinfo`, which will be correctly
               applied to :class:`datetime.datetime` objects.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Args:
             endpoint (:obj:`str`): The API endpoint to use, e.g. ``getMe`` or ``get_me``.
@@ -955,17 +955,17 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 options for the message. Mutually exclusive with
                 :paramref:`disable_web_page_preview`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message. Mutually exclusive with :paramref:`link_preview_options`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
                     argument. PTB will automatically convert this argument to that one, but
                     for advanced options, please use :paramref:`link_preview_options` directly.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     In future versions, this argument will become a keyword-only argument.
 
             disable_notification (:obj:`bool`, optional): |disable_notification|
@@ -975,19 +975,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -999,7 +999,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
@@ -1109,7 +1109,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Use this method to delete multiple messages simultaneously. If some of the specified
         messages can't be found, they are skipped.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1222,7 +1222,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         found or forwarded, they are skipped. Service messages and messages with protected content
         can't be forwarded. Album grouping is kept for forwarded messages.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -1329,19 +1329,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -1354,7 +1354,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the photo, when uploading a
@@ -1473,19 +1473,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -1498,7 +1498,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.2
             reply_parameters (:obj:`ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the audio, when uploading a
@@ -1617,19 +1617,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -1642,7 +1642,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.2
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the document, when uploading a
@@ -1737,19 +1737,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -1758,7 +1758,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1873,19 +1873,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -1902,7 +1902,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.2
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video, when uploading a
@@ -2015,19 +2015,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -2040,7 +2040,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.2
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video note, when uploading a
@@ -2158,19 +2158,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -2187,7 +2187,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.2
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the animation, when uploading a
@@ -2306,19 +2306,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -2327,7 +2327,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the voice, when uploading a
@@ -2426,24 +2426,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             caption (:obj:`str`, optional): Caption that will be added to the
@@ -2593,19 +2593,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -2614,7 +2614,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             location (:class:`telegram.Location`, optional): The location to send.
@@ -2871,19 +2871,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -2892,7 +2892,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             venue (:class:`telegram.Venue`, optional): The venue to send.
@@ -3003,19 +3003,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -3024,7 +3024,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Keyword Args:
             contact (:class:`telegram.Contact`, optional): The contact to send.
@@ -3113,19 +3113,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
@@ -3133,7 +3133,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 shown. If not empty, the first button must launch the game.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -3827,17 +3827,17 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 options for the message. Mutually exclusive with
                 :paramref:`disable_web_page_preview`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message. Mutually exclusive with :paramref:`link_preview_options`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
                     argument. PTB will automatically convert this argument to that one, but
                     for advanced options, please use :paramref:`link_preview_options` directly.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     In future versions, this argument will become keyword only.
 
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
@@ -4887,19 +4887,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
@@ -4907,7 +4907,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 shown. If not empty, the first button must be a Pay button.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -6872,19 +6872,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -6893,7 +6893,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -7009,10 +7009,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -7037,10 +7037,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             protect_content (:obj:`bool`, optional): |protect_content|
@@ -7051,7 +7051,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 20.0
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -7452,19 +7452,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`.
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 20.8
                     |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
@@ -7473,7 +7473,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
 
         Returns:
             :class:`telegram.MessageId`: On success
@@ -7548,7 +7548,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :meth:`forward_messages`, but the copied messages don't have a link to the original
         message. Album grouping is kept for copied messages.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -8654,7 +8654,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to get the list of boosts added to a chat by a user. Requires
         administrator rights in the chat.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -8700,7 +8700,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         reacted to. Automatically forwarded messages from a channel to its discussion group have
         the same available reactions as messages in the channel.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 20.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|

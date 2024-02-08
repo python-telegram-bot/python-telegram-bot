@@ -32,7 +32,7 @@ class ReactionType(TelegramObject):
     """Base class for Telegram ReactionType Objects.
     There exist :class:`telegram.ReactionTypeEmoji` and :class:`telegram.ReactionTypeCustomEmoji`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         type (:obj:`str`): Type of the reaction. Can be
@@ -88,7 +88,7 @@ class ReactionTypeEmoji(ReactionType):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if the :attr:`emoji` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         emoji (:obj:`str`): Reaction emoji. It can be one of
@@ -123,7 +123,7 @@ class ReactionTypeCustomEmoji(ReactionType):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if the :attr:`custom_emoji_id` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         custom_emoji_id (:obj:`str`): Custom emoji identifier.
@@ -157,7 +157,7 @@ class ReactionCount(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if the :attr:`type` and :attr:`total_count` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         type (:class:`telegram.ReactionType`): Type of the reaction.

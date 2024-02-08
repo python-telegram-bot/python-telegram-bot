@@ -48,7 +48,7 @@ class MessageReactionHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

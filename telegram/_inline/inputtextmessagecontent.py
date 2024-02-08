@@ -57,19 +57,19 @@ class InputTextMessageContent(InputMessageContent):
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message. Mutually exclusive with :paramref:`link_preview_options`.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.8
                 Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
                 argument. PTB will automatically convert this argument to that one, but
                 for advanced options, please use :paramref:`link_preview_options` directly.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 20.8
                 In future versions, this argument will become keyword only.
 
         link_preview_options (:obj:`LinkPreviewOptions`, optional): Link preview generation
             options for the message. Mutually exclusive with
             :paramref:`disable_web_page_preview`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
     Attributes:
         message_text (:obj:`str`): Text of the message to be sent,
@@ -87,7 +87,7 @@ class InputTextMessageContent(InputMessageContent):
             options for the message. Mutually exclusive with
             :attr:`disable_web_page_preview`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
     """
 
@@ -121,7 +121,7 @@ class InputTextMessageContent(InputMessageContent):
     def disable_web_page_preview(self) -> Optional[bool]:
         """Optional[:obj:`bool`]: Disables link previews for links in the sent message.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 20.8
         """
         warn_about_deprecated_attr_in_property(
             deprecated_attr_name="disable_web_page_preview",

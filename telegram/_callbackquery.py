@@ -75,7 +75,7 @@ class CallbackQuery(TelegramObject):
         message (:class:`telegram.MaybeInaccessibleMessage`, optional): Message sent by the bot
             with the callback button that originated the query.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.8
                Accept objects of type :class:`telegram.MaybeInaccessibleMessage` since Bot API 7.0.
         data (:obj:`str`, optional): Data associated with the callback button. Be aware that the
             message, which originated the query, can contain no callback buttons with this data.
@@ -92,7 +92,7 @@ class CallbackQuery(TelegramObject):
         message (:class:`telegram.MaybeInaccessibleMessage`): Optional. Message sent by the bot
             with the callback button that originated the query.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 20.8
                Objects maybe be of type :class:`telegram.MaybeInaccessibleMessage` since Bot API
                7.0.
         data (:obj:`str` | :obj:`object`): Optional. Data associated with the callback button.
@@ -233,7 +233,7 @@ class CallbackQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_text` and :meth:`telegram.Message.edit_text`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -301,7 +301,7 @@ class CallbackQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_caption` and :meth:`telegram.Message.edit_caption`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -363,7 +363,7 @@ class CallbackQuery(TelegramObject):
         :meth:`telegram.Bot.edit_message_reply_markup` and
         :meth:`telegram.Message.edit_reply_markup`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -419,7 +419,7 @@ class CallbackQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_media` and :meth:`telegram.Message.edit_media`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -483,7 +483,7 @@ class CallbackQuery(TelegramObject):
         :meth:`telegram.Bot.edit_message_live_location` and
         :meth:`telegram.Message.edit_live_location`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -551,7 +551,7 @@ class CallbackQuery(TelegramObject):
         :meth:`telegram.Bot.stop_message_live_location` and
         :meth:`telegram.Message.stop_live_location`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -609,7 +609,7 @@ class CallbackQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_game_score` and :meth:`telegram.Message.set_game_score`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -671,7 +671,7 @@ class CallbackQuery(TelegramObject):
         :meth:`telegram.Bot.get_game_high_scores` and
         :meth:`telegram.Message.get_game_high_scores`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -717,7 +717,7 @@ class CallbackQuery(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Message.delete`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -751,7 +751,7 @@ class CallbackQuery(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Message.pin`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -784,7 +784,7 @@ class CallbackQuery(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Message.unpin`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:
@@ -832,7 +832,7 @@ class CallbackQuery(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Message.copy`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 20.8
            Raises :exc:`TypeError` if :attr:`message` is not accessible.
 
         Returns:

@@ -546,7 +546,7 @@ class Updater(AsyncContextManager["Updater"]):
                     this param, you must also run a reverse proxy to the unix socket and set the
                     appropriate :paramref:`webhook_url`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 20.8
         Returns:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.
 

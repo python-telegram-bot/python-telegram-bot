@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains helper functions related to parsing updates and their contents.
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 20.8
 
 Warning:
     Contents of this module are intended to be used internally by the library and *not* by the

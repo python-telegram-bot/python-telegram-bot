@@ -39,7 +39,7 @@ class MessageReactionCountUpdated(TelegramObject):
     considered equal, if the :attr:`chat`, :attr:`message_id`, :attr:`date` and :attr:`reactions`
     is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         chat (:class:`telegram.Chat`): The chat containing the message.
@@ -111,7 +111,7 @@ class MessageReactionUpdated(TelegramObject):
     considered equal, if the :attr:`chat`, :attr:`message_id`, :attr:`date`, :attr:`old_reaction`
     and :attr:`new_reaction` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
 
     Args:
         chat (:class:`telegram.Chat`): The chat containing the message.

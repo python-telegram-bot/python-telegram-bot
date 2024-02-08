@@ -41,7 +41,7 @@ class KeyboardButtonRequestUsers(TelegramObject):
         `Telegram Docs on requesting users \
         <https://core.telegram.org/bots/features#chat-and-user-selection>`_
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 20.8
         This class was previously named :class:`KeyboardButtonRequestUser`.
 
     Args:
@@ -58,7 +58,7 @@ class KeyboardButtonRequestUsers(TelegramObject):
             Defaults to :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY`
             .
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
 
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
@@ -73,7 +73,7 @@ class KeyboardButtonRequestUsers(TelegramObject):
             Defaults to :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY`
             .
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 20.8
     """
 
     __slots__ = (
@@ -111,7 +111,7 @@ class KeyboardButtonRequestUser(KeyboardButtonRequestUsers):
 
     .. versionadded:: 20.1
 
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 20.8
         Use :class:`KeyboardButtonRequestUsers` instead.
 
     """
