@@ -73,13 +73,13 @@ class PreCheckoutQuery(TelegramObject):
     """
 
     __slots__ = (
-        "invoice_payload",
-        "shipping_option_id",
         "currency",
-        "order_info",
-        "total_amount",
-        "id",
         "from_user",
+        "id",
+        "invoice_payload",
+        "order_info",
+        "shipping_option_id",
+        "total_amount",
     )
 
     def __init__(

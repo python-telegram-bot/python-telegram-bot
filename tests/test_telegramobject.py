@@ -27,6 +27,7 @@ from types import MappingProxyType
 import pytest
 
 from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
+from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
 from telegram.ext import PicklePersistence
 from telegram.warnings import PTBUserWarning
 from tests.auxil.files import data_file
@@ -155,7 +156,7 @@ class TestTelegramObject:
 
     def test_to_dict_private_attribute(self):
         class TelegramObjectSubclass(TelegramObject):
-            __slots__ = ("a", "_b")  # Added slots so that the attrs are converted to dict
+            __slots__ = ("_b", "a")  # Added slots so that the attrs are converted to dict
 
             def __init__(self):
                 super().__init__()
@@ -205,6 +206,18 @@ class TestTelegramObject:
         assert to_dict_recurse
         assert isinstance(to_dict_recurse["subclass"], dict)
         assert to_dict_recurse["subclass"]["recursive"] == "recursive"
+
+    def test_to_dict_default_value(self):
+        class SubClass(TelegramObject):
+            def __init__(self):
+                super().__init__()
+                self.default_none = DEFAULT_NONE
+                self.default_false = DEFAULT_FALSE
+
+        to = SubClass()
+        to_dict = to.to_dict()
+        assert "default_none" not in to_dict
+        assert to_dict["default_false"] is False
 
     def test_slot_behaviour(self):
         inst = TelegramObject()
@@ -280,6 +293,7 @@ class TestTelegramObject:
             from_user=user,
             text="foobar",
             photo=[photo],
+            animation=DEFAULT_NONE,
             api_kwargs={"api": "kwargs"},
         )
         msg.set_bot(bot)
@@ -295,6 +309,8 @@ class TestTelegramObject:
         assert unpickled.from_user == user
         assert unpickled.date == date, f"{unpickled.date} != {date}"
         assert unpickled.photo[0] == photo
+        assert isinstance(unpickled.animation, DefaultValue)
+        assert unpickled.animation.value is None
         assert isinstance(unpickled.api_kwargs, MappingProxyType)
         assert unpickled.api_kwargs == {"api": "kwargs"}
 
@@ -460,7 +476,7 @@ class TestTelegramObject:
                 "and can therefore not be frozen correctly"
             )
 
-        source_lines, first_line = inspect.getsourcelines(cls.__init__)
+        source_lines, _ = inspect.getsourcelines(cls.__init__)
 
         # We use regex matching since a simple "if self._freeze() in source_lines[-1]" would also
         # allo commented lines.

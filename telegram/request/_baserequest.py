@@ -372,7 +372,7 @@ class BaseRequest(
             # TG returns 404 Not found for
             #   1) malformed tokens
             #   2) correct tokens but non-existing method, e.g. api.tg.org/botTOKEN/unkonwnMethod
-            # We can basically rule out 2) since we don't let users make requests manually
+            # 2) is relevant only for Bot.do_api_request, where we have special handing for it.
             # TG returns 401 Unauthorized for correctly formatted tokens that are not valid
             raise InvalidToken(message)
         if code == HTTPStatus.BAD_REQUEST:  # 400

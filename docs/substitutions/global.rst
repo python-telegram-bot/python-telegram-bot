@@ -63,3 +63,17 @@
 .. |removed_thumb_wildcard_note| replace:: Removed the deprecated arguments and attributes ``thumb_*``.
 
 .. |async_context_manager| replace:: Asynchronous context manager which
+
+.. |reply_parameters| replace:: Description of the message to reply to.
+
+.. |rtm_aswr_deprecated| replace:: replacing this argument. PTB will automatically convert this argument to that one, but you should update your code to use the new argument.
+
+.. |keyword_only_arg| replace:: In future versions, this argument will become a keyword-only argument.
+
+.. |text_html| replace:: The return value of this property is a best-effort approach. Unfortunately, it can not be guaranteed that sending a message with the returned string will render in the same way as the original message produces the same :attr:`~telegram.Message.entities`/:attr:`~telegram.Message.caption_entities` as the original message. For example, Telegram recommends that entities of type :attr:`~telegram.MessageEntity.BLOCKQUOTE` and :attr:`~telegram.MessageEntity.PRE` *should* start and end on a new line, but does not enforce this and leaves rendering decisions up to the clients.
+
+.. |text_markdown| replace:: |text_html| Moreover, markdown formatting is inherently less expressive than HTML, so some edge cases may not be coverable at all. For example, markdown formatting can not specify two consecutive block quotes without a blank line in between, but HTML can.
+
+.. |reply_quote| replace:: If set to :obj:`True`, the reply is sent as an actual reply to this message. If ``reply_to_message_id`` is passed, this parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+
+.. |do_quote| replace:: If set to :obj:`True`, the replied message is quoted. For a dict, it must be the output of :meth:`~telegram.Message.build_reply_arguments` to specify exact ``reply_parameters``. If ``reply_to_message_id`` or ``reply_parameters`` are passed, this parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.

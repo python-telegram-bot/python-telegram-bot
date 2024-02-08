@@ -47,7 +47,7 @@ class InlineQueryResultGame(InlineQueryResult):
 
     """
 
-    __slots__ = ("reply_markup", "game_short_name")
+    __slots__ = ("game_short_name", "reply_markup")
 
     def __init__(
         self,

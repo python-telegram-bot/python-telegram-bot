@@ -74,11 +74,11 @@ class File(TelegramObject):
     """
 
     __slots__ = (
+        "_credentials",
         "file_id",
+        "file_path",
         "file_size",
         "file_unique_id",
-        "file_path",
-        "_credentials",
     )
 
     def __init__(

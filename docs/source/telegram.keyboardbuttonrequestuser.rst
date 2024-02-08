@@ -1,5 +1,5 @@
 KeyboardButtonRequestUser
-==================================
+=========================
 
 .. autoclass:: telegram.KeyboardButtonRequestUser
     :members:

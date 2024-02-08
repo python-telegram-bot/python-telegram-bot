@@ -79,7 +79,7 @@ class InvalidCallbackData(TelegramError):
 
 
 class _KeyboardData:
-    __slots__ = ("keyboard_uuid", "button_data", "access_time")
+    __slots__ = ("access_time", "button_data", "keyboard_uuid")
 
     def __init__(
         self,
@@ -148,7 +148,7 @@ class CallbackDataCache:
 
     """
 
-    __slots__ = ("bot", "_maxsize", "_keyboard_data", "_callback_queries")
+    __slots__ = ("_callback_queries", "_keyboard_data", "_maxsize", "bot")
 
     def __init__(
         self,
@@ -395,14 +395,14 @@ class CallbackDataCache:
 
         # Get the cached callback data for the inline keyboard attached to the
         # CallbackQuery.
-        if callback_query.message:
+        if isinstance(callback_query.message, Message):
             self.__process_message(callback_query.message)
-            for message in (
+            for maybe_message in (
                 callback_query.message.pinned_message,
                 callback_query.message.reply_to_message,
             ):
-                if message:
-                    self.__process_message(message)
+                if isinstance(maybe_message, Message):
+                    self.__process_message(maybe_message)
 
     def drop_data(self, callback_query: CallbackQuery) -> None:
         """Deletes the data for the specified callback query.

@@ -19,7 +19,7 @@
 # pylint: disable=missing-module-docstring
 from typing import Final, NamedTuple
 
-__all__ = ("__version__", "__version_info__", "__bot_api_version__", "__bot_api_version_info__")
+__all__ = ("__bot_api_version__", "__bot_api_version_info__", "__version__", "__version_info__")
 
 
 class Version(NamedTuple):

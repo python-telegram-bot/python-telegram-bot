@@ -78,16 +78,16 @@ class DictPersistence(BasePersistence[Dict[Any, Any], Dict[Any, Any], Dict[Any, 
     """
 
     __slots__ = (
-        "_user_data",
-        "_chat_data",
         "_bot_data",
-        "_callback_data",
-        "_conversations",
-        "_user_data_json",
-        "_chat_data_json",
         "_bot_data_json",
+        "_callback_data",
         "_callback_data_json",
+        "_chat_data",
+        "_chat_data_json",
+        "_conversations",
         "_conversations_json",
+        "_user_data",
+        "_user_data_json",
     )
 
     def __init__(

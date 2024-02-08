@@ -20,7 +20,9 @@
 from typing import Optional
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
 from telegram._utils.types import JSONDict
+from telegram.constants import PollType
 
 
 class KeyboardButtonPollType(TelegramObject):
@@ -51,10 +53,10 @@ class KeyboardButtonPollType(TelegramObject):
         self,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         *,
-        api_kwargs: Optional[JSONDict] = None,  # skipcq: PYL-W0622
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.type: Optional[str] = type
+        self.type: Optional[str] = enum.get_member(PollType, type, type)
 
         self._id_attrs = (self.type,)
 

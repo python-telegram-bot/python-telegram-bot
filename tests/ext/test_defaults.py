@@ -22,8 +22,9 @@ import inspect
 
 import pytest
 
-from telegram import User
+from telegram import LinkPreviewOptions, User
 from telegram.ext import Defaults
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
 
@@ -50,11 +51,13 @@ class TestDefaults:
                 setattr(defaults, name, True)
 
     def test_equality(self):
-        a = Defaults(parse_mode="HTML", quote=True)
-        b = Defaults(parse_mode="HTML", quote=True)
-        c = Defaults(parse_mode="HTML", quote=True, protect_content=True)
+        a = Defaults(parse_mode="HTML", do_quote=True)
+        b = Defaults(parse_mode="HTML", do_quote=True)
+        c = Defaults(parse_mode="HTML", do_quote=True, protect_content=True)
         d = Defaults(parse_mode="HTML", protect_content=True)
         e = User(123, "test_user", False)
+        f = Defaults(parse_mode="HTML", disable_web_page_preview=True)
+        g = Defaults(parse_mode="HTML", disable_web_page_preview=True)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -68,3 +71,32 @@ class TestDefaults:
 
         assert a != e
         assert hash(a) != hash(e)
+
+        assert f == g
+        assert hash(f) == hash(g)
+
+    def test_mutually_exclusive(self):
+        with pytest.raises(ValueError, match="mutually exclusive"):
+            Defaults(disable_web_page_preview=True, link_preview_options=LinkPreviewOptions(False))
+        with pytest.raises(ValueError, match="mutually exclusive"):
+            Defaults(quote=True, do_quote=False)
+
+    def test_deprecation_warning_for_disable_web_page_preview(self):
+        with pytest.warns(
+            PTBDeprecationWarning, match="`Defaults.disable_web_page_preview` is "
+        ) as record:
+            Defaults(disable_web_page_preview=True)
+
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+        assert Defaults(disable_web_page_preview=True).link_preview_options.is_disabled is True
+        assert Defaults(disable_web_page_preview=False).disable_web_page_preview is False
+
+    def test_deprecation_warning_for_quote(self):
+        with pytest.warns(PTBDeprecationWarning, match="`Defaults.quote` is ") as record:
+            Defaults(quote=True)
+
+        assert record[0].filename == __file__, "wrong stacklevel!"
+
+        assert Defaults(quote=True).do_quote is True
+        assert Defaults(quote=False).quote is False

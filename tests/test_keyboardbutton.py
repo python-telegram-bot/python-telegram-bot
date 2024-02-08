@@ -24,8 +24,10 @@ from telegram import (
     KeyboardButtonPollType,
     KeyboardButtonRequestChat,
     KeyboardButtonRequestUser,
+    KeyboardButtonRequestUsers,
     WebAppInfo,
 )
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -38,7 +40,7 @@ def keyboard_button():
         request_poll=TestKeyboardButtonBase.request_poll,
         web_app=TestKeyboardButtonBase.web_app,
         request_chat=TestKeyboardButtonBase.request_chat,
-        request_user=TestKeyboardButtonBase.request_user,
+        request_users=TestKeyboardButtonBase.request_users,
     )
 
 
@@ -49,7 +51,7 @@ class TestKeyboardButtonBase:
     request_poll = KeyboardButtonPollType("quiz")
     web_app = WebAppInfo(url="https://example.com")
     request_chat = KeyboardButtonRequestChat(1, True)
-    request_user = KeyboardButtonRequestUser(2)
+    request_users = KeyboardButtonRequestUsers(2)
 
 
 class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
@@ -66,7 +68,7 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert keyboard_button.request_poll == self.request_poll
         assert keyboard_button.web_app == self.web_app
         assert keyboard_button.request_chat == self.request_chat
-        assert keyboard_button.request_user == self.request_user
+        assert keyboard_button.request_users == self.request_users
 
     def test_to_dict(self, keyboard_button):
         keyboard_button_dict = keyboard_button.to_dict()
@@ -78,7 +80,7 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert keyboard_button_dict["request_poll"] == keyboard_button.request_poll.to_dict()
         assert keyboard_button_dict["web_app"] == keyboard_button.web_app.to_dict()
         assert keyboard_button_dict["request_chat"] == keyboard_button.request_chat.to_dict()
-        assert keyboard_button_dict["request_user"] == keyboard_button.request_user.to_dict()
+        assert keyboard_button_dict["request_users"] == keyboard_button.request_users.to_dict()
 
     def test_de_json(self, bot):
         json_dict = {
@@ -88,7 +90,7 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
             "request_poll": self.request_poll.to_dict(),
             "web_app": self.web_app.to_dict(),
             "request_chat": self.request_chat.to_dict(),
-            "request_user": self.request_user.to_dict(),
+            "request_users": self.request_users.to_dict(),
         }
 
         inline_keyboard_button = KeyboardButton.de_json(json_dict, None)
@@ -99,10 +101,35 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert inline_keyboard_button.request_poll == self.request_poll
         assert inline_keyboard_button.web_app == self.web_app
         assert inline_keyboard_button.request_chat == self.request_chat
-        assert inline_keyboard_button.request_user == self.request_user
+        assert inline_keyboard_button.request_user == self.request_users
+        assert inline_keyboard_button.request_users == self.request_users
 
         none = KeyboardButton.de_json({}, None)
         assert none is None
+
+    def test_request_user_deprecation_mutually_exclusive(self):
+        with pytest.raises(ValueError, match="'request_user' was renamed to 'request_users'"):
+            KeyboardButton(
+                "test",
+                request_users=KeyboardButtonRequestUsers(1),
+                request_user=KeyboardButtonRequestUsers(2),
+            )
+
+    def test_request_user_argument_deprecation_warning(self):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'request_user' to 'request_users'"
+        ) as record:
+            KeyboardButton("test", request_user=KeyboardButtonRequestUser(2))
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+    def test_request_user_property_deprecation_warning(self, keyboard_button):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'request_user' to 'request_users'"
+        ) as record:
+            assert keyboard_button.request_user is keyboard_button.request_users
+
+        assert record[0].filename == __file__, "wrong stacklevel"
 
     def test_equality(self):
         a = KeyboardButton("test", request_contact=True)
@@ -114,13 +141,13 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
             "test",
             request_contact=True,
             request_chat=KeyboardButtonRequestChat(1, False),
-            request_user=KeyboardButtonRequestUser(2),
+            request_users=KeyboardButtonRequestUsers(2),
         )
         g = KeyboardButton(
             "test",
             request_contact=True,
             request_chat=KeyboardButtonRequestChat(1, False),
-            request_user=KeyboardButtonRequestUser(2),
+            request_users=KeyboardButtonRequestUsers(2),
         )
 
         assert a == b

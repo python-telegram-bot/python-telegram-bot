@@ -25,7 +25,7 @@ from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import BD, CD, UD, CDCData, ConversationDict, ConversationKey
 
 
-class PersistenceInput(NamedTuple):  # skipcq: PYL-E0239
+class PersistenceInput(NamedTuple):
     """Convenience wrapper to group boolean input for the :paramref:`~BasePersistence.store_data`
     parameter for :class:`BasePersistence`.
 
@@ -138,9 +138,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     """
 
     __slots__ = (
+        "_update_interval",
         "bot",
         "store_data",
-        "_update_interval",
     )
 
     def __init__(

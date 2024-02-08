@@ -132,21 +132,21 @@ class ChatAdministratorRights(TelegramObject):
     """
 
     __slots__ = (
-        "is_anonymous",
-        "can_manage_chat",
-        "can_delete_messages",
-        "can_manage_video_chats",
-        "can_restrict_members",
-        "can_promote_members",
         "can_change_info",
-        "can_invite_users",
-        "can_post_messages",
-        "can_edit_messages",
-        "can_pin_messages",
-        "can_manage_topics",
-        "can_post_stories",
-        "can_edit_stories",
+        "can_delete_messages",
         "can_delete_stories",
+        "can_edit_messages",
+        "can_edit_stories",
+        "can_invite_users",
+        "can_manage_chat",
+        "can_manage_topics",
+        "can_manage_video_chats",
+        "can_pin_messages",
+        "can_post_messages",
+        "can_post_stories",
+        "can_promote_members",
+        "can_restrict_members",
+        "is_anonymous",
     )
 
     def __init__(

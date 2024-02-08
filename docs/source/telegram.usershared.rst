@@ -1,5 +1,5 @@
 UserShared
-===================
+==========
 
 .. autoclass:: telegram.UserShared
     :members:

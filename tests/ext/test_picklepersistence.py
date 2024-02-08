@@ -246,7 +246,7 @@ class TestPicklePersistence:
             self._bot = b
 
     class SlotsSub(TelegramObject):
-        __slots__ = ("new_var", "_private")
+        __slots__ = ("_private", "new_var")
 
         def __init__(self, new_var, private):
             super().__init__()

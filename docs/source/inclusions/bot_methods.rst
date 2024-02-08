@@ -49,8 +49,12 @@
           - Used for sending voice messages
         * - :meth:`~telegram.Bot.copy_message`
           - Used for copying the contents of an arbitrary message
+        * - :meth:`~telegram.Bot.copy_messages`
+          - Used for copying the contents of an multiple arbitrary messages
         * - :meth:`~telegram.Bot.forward_message`
           - Used for forwarding messages
+        * - :meth:`~telegram.Bot.forward_messages`
+          - Used for forwarding multiple messages at once
 
 .. raw:: html
 
@@ -76,6 +80,10 @@
       - Used for answering a shipping query
     * - :meth:`~telegram.Bot.answer_web_app_query`
       - Used for answering a web app query
+    * - :meth:`~telegram.Bot.delete_message`
+      - Used for deleting messages.
+    * - :meth:`~telegram.Bot.delete_messages`
+      - Used for deleting multiple messages as once.
     * - :meth:`~telegram.Bot.edit_message_caption`
       - Used for editing captions
     * - :meth:`~telegram.Bot.edit_message_media`
@@ -88,8 +96,8 @@
       - Used for editing text messages
     * - :meth:`~telegram.Bot.stop_poll`
       - Used for stopping the running poll
-    * - :meth:`~telegram.Bot.delete_message`
-      - Used for deleting messages.
+    * - :meth:`~telegram.Bot.set_message_reaction`
+      - Used for setting reactions on messages
 
 .. raw:: html
 
@@ -157,6 +165,8 @@
       - Used for getting the number of members in a chat
     * - :meth:`~telegram.Bot.get_chat_member`
       - Used for getting a member of a chat
+    * - :meth:`~telegram.Bot.get_user_chat_boosts`
+      - Used for getting the list of boosts added to a chat
     * - :meth:`~telegram.Bot.leave_chat`
       - Used for leaving a chat
 

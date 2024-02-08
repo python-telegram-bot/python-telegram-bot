@@ -46,8 +46,8 @@ class ReplyKeyboardRemove(TelegramObject):
             for specific users only. Targets:
 
             1) Users that are @mentioned in the text of the :class:`telegram.Message` object.
-            2) If the bot's message is a reply (has ``reply_to_message_id``), sender of
-               the original message.
+            2) If the bot's message is a reply to a message in the same chat and forum topic,
+               sender of the original message.
 
     Attributes:
         remove_keyboard (:obj:`True`): Requests clients to remove the custom keyboard.
@@ -55,12 +55,12 @@ class ReplyKeyboardRemove(TelegramObject):
             Targets:
 
             1) Users that are @mentioned in the text of the :class:`telegram.Message` object.
-            2) If the bot's message is a reply (has ``reply_to_message_id``), sender of
-               the original message.
+            2) If the bot's message is a reply to a message in the same chat and forum topic,
+                sender of the original message.
 
     """
 
-    __slots__ = ("selective", "remove_keyboard")
+    __slots__ = ("remove_keyboard", "selective")
 
     def __init__(self, selective: Optional[bool] = None, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)

@@ -32,10 +32,11 @@ from telegram import (
     InputSticker,
     MaskPosition,
     PhotoSize,
+    ReplyParameters,
     Sticker,
     StickerSet,
 )
-from telegram.constants import StickerFormat
+from telegram.constants import ParseMode, StickerFormat, StickerType
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
 from tests.auxil.bot_method_checks import (
@@ -43,6 +44,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -196,6 +198,34 @@ class TestStickerWithoutRequest(TestStickerBase):
         assert json_sticker.custom_emoji_id == self.custom_emoji_id
         assert json_sticker.needs_repainting == self.needs_repainting
 
+    def test_type_enum_conversion(self):
+        assert (
+            type(
+                Sticker(
+                    file_id=self.sticker_file_id,
+                    file_unique_id=self.sticker_file_unique_id,
+                    width=self.width,
+                    height=self.height,
+                    is_animated=self.is_animated,
+                    is_video=self.is_video,
+                    type="regular",
+                ).type
+            )
+            is StickerType
+        )
+        assert (
+            Sticker(
+                file_id=self.sticker_file_id,
+                file_unique_id=self.sticker_file_unique_id,
+                width=self.width,
+                height=self.height,
+                is_animated=self.is_animated,
+                is_video=self.is_video,
+                type="unknown",
+            ).type
+            == "unknown"
+        )
+
     def test_equality(self, sticker):
         a = Sticker(
             sticker.file_id,
@@ -286,6 +316,33 @@ class TestStickerWithoutRequest(TestStickerBase):
             assert test_flag
         finally:
             bot._local_mode = False
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_sticker_default_quote_parse_mode(
+        self, default_bot, chat_id, sticker, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
+
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_sticker(
+            chat_id, sticker, reply_parameters=ReplyParameters(**kwargs)
+        )
 
 
 class TestStickerWithRequest(TestStickerBase):

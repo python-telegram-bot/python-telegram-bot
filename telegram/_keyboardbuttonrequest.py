@@ -22,12 +22,15 @@ from typing import TYPE_CHECKING, Optional
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import build_deprecation_warning_message
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 
-class KeyboardButtonRequestUser(TelegramObject):
+class KeyboardButtonRequestUsers(TelegramObject):
     """This object defines the criteria used to request a suitable user. The identifier of the
     selected user will be shared with the bot when the corresponding button is pressed.
 
@@ -38,16 +41,25 @@ class KeyboardButtonRequestUser(TelegramObject):
         `Telegram Docs on requesting users \
         <https://core.telegram.org/bots/features#chat-and-user-selection>`_
 
-    .. versionadded:: 20.1
+    .. versionadded:: NEXT.VERSION
+        This class was previously named :class:`KeyboardButtonRequestUser`.
 
     Args:
         request_id (:obj:`int`): Signed 32-bit identifier of the request, which will be received
-            back in the :class:`telegram.UserShared` object. Must be unique within the message.
+            back in the :class:`telegram.UsersShared` object. Must be unique within the message.
         user_is_bot (:obj:`bool`, optional): Pass :obj:`True` to request a bot, pass :obj:`False`
             to request a regular user. If not specified, no additional restrictions are applied.
         user_is_premium (:obj:`bool`, optional): Pass :obj:`True` to request a premium user, pass
             :obj:`False` to request a non-premium user. If not specified, no additional
             restrictions are applied.
+        max_quantity (:obj:`int`, optional): The maximum number of users to be selected;
+            :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY` -
+            :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MAX_QUANTITY`.
+            Defaults to :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY`
+            .
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
         user_is_bot (:obj:`bool`): Optional. Pass :obj:`True` to request a bot, pass :obj:`False`
@@ -55,9 +67,17 @@ class KeyboardButtonRequestUser(TelegramObject):
         user_is_premium (:obj:`bool`): Optional. Pass :obj:`True` to request a premium user, pass
             :obj:`False` to request a non-premium user. If not specified, no additional
             restrictions are applied.
+        max_quantity (:obj:`int`): Optional. The maximum number of users to be selected;
+            :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY` -
+            :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MAX_QUANTITY`.
+            Defaults to :tg-const:`telegram.constants.KeyboardButtonRequestUsersLimit.MIN_QUANTITY`
+            .
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
+        "max_quantity",
         "request_id",
         "user_is_bot",
         "user_is_premium",
@@ -68,8 +88,9 @@ class KeyboardButtonRequestUser(TelegramObject):
         request_id: int,
         user_is_bot: Optional[bool] = None,
         user_is_premium: Optional[bool] = None,
+        max_quantity: Optional[int] = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,  # skipcq: PYL-W0622
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -78,8 +99,52 @@ class KeyboardButtonRequestUser(TelegramObject):
         # Optionals
         self.user_is_bot: Optional[bool] = user_is_bot
         self.user_is_premium: Optional[bool] = user_is_premium
+        self.max_quantity: Optional[int] = max_quantity
 
         self._id_attrs = (self.request_id,)
+
+        self._freeze()
+
+
+class KeyboardButtonRequestUser(KeyboardButtonRequestUsers):
+    """Alias for :class:`KeyboardButtonRequestUsers`, kept for backward compatibility.
+
+    .. versionadded:: 20.1
+
+    .. deprecated:: NEXT.VERSION
+        Use :class:`KeyboardButtonRequestUsers` instead.
+
+    """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        request_id: int,
+        user_is_bot: Optional[bool] = None,
+        user_is_premium: Optional[bool] = None,
+        max_quantity: Optional[int] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,  # skipcq: PYL-W0622
+    ):
+        super().__init__(
+            request_id=request_id,
+            user_is_bot=user_is_bot,
+            user_is_premium=user_is_premium,
+            max_quantity=max_quantity,
+            api_kwargs=api_kwargs,
+        )
+
+        warn(
+            build_deprecation_warning_message(
+                deprecated_name="KeyboardButtonRequestUser",
+                new_name="KeyboardButtonRequestUsers",
+                object_type="class",
+                bot_api_version="7.0",
+            ),
+            PTBDeprecationWarning,
+            stacklevel=2,
+        )
 
         self._freeze()
 
@@ -143,14 +208,14 @@ class KeyboardButtonRequestChat(TelegramObject):
     """
 
     __slots__ = (
-        "request_id",
-        "chat_is_channel",
-        "chat_is_forum",
-        "chat_has_username",
-        "chat_is_created",
-        "user_administrator_rights",
         "bot_administrator_rights",
         "bot_is_member",
+        "chat_has_username",
+        "chat_is_channel",
+        "chat_is_created",
+        "chat_is_forum",
+        "request_id",
+        "user_administrator_rights",
     )
 
     def __init__(
@@ -164,7 +229,7 @@ class KeyboardButtonRequestChat(TelegramObject):
         bot_administrator_rights: Optional[ChatAdministratorRights] = None,
         bot_is_member: Optional[bool] = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,  # skipcq: PYL-W0622
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # required
@@ -175,9 +240,9 @@ class KeyboardButtonRequestChat(TelegramObject):
         self.chat_is_forum: Optional[bool] = chat_is_forum
         self.chat_has_username: Optional[bool] = chat_has_username
         self.chat_is_created: Optional[bool] = chat_is_created
-        self.user_administrator_rights: Optional[
-            ChatAdministratorRights
-        ] = user_administrator_rights
+        self.user_administrator_rights: Optional[ChatAdministratorRights] = (
+            user_administrator_rights
+        )
         self.bot_administrator_rights: Optional[ChatAdministratorRights] = bot_administrator_rights
         self.bot_is_member: Optional[bool] = bot_is_member
 

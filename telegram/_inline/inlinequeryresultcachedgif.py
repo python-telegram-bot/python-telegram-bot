@@ -85,13 +85,13 @@ class InlineQueryResultCachedGif(InlineQueryResult):
     """
 
     __slots__ = (
-        "reply_markup",
-        "caption_entities",
         "caption",
-        "title",
+        "caption_entities",
+        "gif_file_id",
         "input_message_content",
         "parse_mode",
-        "gif_file_id",
+        "reply_markup",
+        "title",
     )
 
     def __init__(

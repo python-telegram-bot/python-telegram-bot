@@ -24,6 +24,7 @@ from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
@@ -129,17 +130,17 @@ class Sticker(_BaseThumbedMedium):
     """
 
     __slots__ = (
+        "custom_emoji_id",
         "emoji",
         "height",
         "is_animated",
         "is_video",
         "mask_position",
-        "set_name",
-        "width",
-        "premium_animation",
-        "type",
-        "custom_emoji_id",
         "needs_repainting",
+        "premium_animation",
+        "set_name",
+        "type",
+        "width",
     )
 
     def __init__(
@@ -175,7 +176,7 @@ class Sticker(_BaseThumbedMedium):
             self.height: int = height
             self.is_animated: bool = is_animated
             self.is_video: bool = is_video
-            self.type: str = type
+            self.type: str = enum.get_member(constants.StickerType, type, type)
             # Optional
             self.emoji: Optional[str] = emoji
             self.set_name: Optional[str] = set_name
@@ -278,10 +279,10 @@ class StickerSet(TelegramObject):
         "is_animated",
         "is_video",
         "name",
+        "sticker_type",
         "stickers",
         "thumbnail",
         "title",
-        "sticker_type",
     )
 
     def __init__(

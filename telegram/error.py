@@ -26,6 +26,7 @@ __all__ = (
     "BadRequest",
     "ChatMigrated",
     "Conflict",
+    "EndPointNotFound",
     "Forbidden",
     "InvalidToken",
     "NetworkError",
@@ -131,6 +132,16 @@ class InvalidToken(TelegramError):
 
     def __init__(self, message: Optional[str] = None) -> None:
         super().__init__("Invalid token" if message is None else message)
+
+
+class EndPointNotFound(TelegramError):
+    """Raised when the requested endpoint is not found. Only relevant for
+    :meth:`telegram.Bot.do_api_request`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
 
 
 class NetworkError(TelegramError):

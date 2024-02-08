@@ -25,8 +25,28 @@ inside warnings.py.
 """
 from typing import Any, Callable, Type
 
+from telegram._linkpreviewoptions import LinkPreviewOptions
+from telegram._utils.defaultvalue import DefaultValue
+from telegram._utils.types import ODVInput
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
+
+
+def build_deprecation_warning_message(
+    deprecated_name: str,
+    new_name: str,
+    object_type: str,
+    bot_api_version: str,
+) -> str:
+    """Builds a warning message for the transition in API when an object is renamed.
+
+    Returns a warning message that can be used in `warn` function.
+    """
+    return (
+        f"The {object_type} '{deprecated_name}' was renamed to '{new_name}' in Bot API "
+        f"{bot_api_version}. We recommend using '{new_name}' instead of "
+        f"'{deprecated_name}'."
+    )
 
 
 # Narrower type hints will cause linting errors and/or circular imports.
@@ -50,11 +70,15 @@ def warn_about_deprecated_arg_return_new_arg(
     different.
     """
     if deprecated_arg and new_arg and deprecated_arg != new_arg:
+        base_message = build_deprecation_warning_message(
+            deprecated_name=deprecated_arg_name,
+            new_name=new_arg_name,
+            object_type="parameter",
+            bot_api_version=bot_api_version,
+        )
         raise ValueError(
             f"You passed different entities as '{deprecated_arg_name}' and '{new_arg_name}'. "
-            f"The parameter '{deprecated_arg_name}' was renamed to '{new_arg_name}' in Bot API "
-            f"{bot_api_version}. We recommend using '{new_arg_name}' instead of "
-            f"'{deprecated_arg_name}'."
+            f"{base_message}"
         )
 
     if deprecated_arg:
@@ -67,6 +91,28 @@ def warn_about_deprecated_arg_return_new_arg(
         return deprecated_arg
 
     return new_arg
+
+
+def warn_for_link_preview_options(
+    disable_web_page_preview: ODVInput[bool], link_preview_options: ODVInput[LinkPreviewOptions]
+) -> ODVInput[LinkPreviewOptions]:
+    """Wrapper around warn_about_deprecated_arg_return_new_arg. Takes care of converting
+    disable_web_page_preview to LinkPreviewOptions.
+    """
+    warn_about_deprecated_arg_return_new_arg(
+        deprecated_arg=disable_web_page_preview,
+        new_arg=link_preview_options,
+        deprecated_arg_name="disable_web_page_preview",
+        new_arg_name="link_preview_options",
+        bot_api_version="7.0",
+        stacklevel=2,
+    )
+
+    # Convert to LinkPreviewOptions:
+    if not isinstance(disable_web_page_preview, DefaultValue):
+        link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
+
+    return link_preview_options
 
 
 def warn_about_deprecated_attr_in_property(

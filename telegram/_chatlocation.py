@@ -50,7 +50,7 @@ class ChatLocation(TelegramObject):
 
     """
 
-    __slots__ = ("location", "address")
+    __slots__ = ("address", "location")
 
     def __init__(
         self,

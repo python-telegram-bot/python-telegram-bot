@@ -55,7 +55,7 @@ class PollOption(TelegramObject):
 
     """
 
-    __slots__ = ("voter_count", "text")
+    __slots__ = ("text", "voter_count")
 
     def __init__(self, text: str, voter_count: int, *, api_kwargs: Optional[JSONDict] = None):
         super().__init__(api_kwargs=api_kwargs)
@@ -255,19 +255,19 @@ class Poll(TelegramObject):
     """
 
     __slots__ = (
-        "total_voter_count",
         "allows_multiple_answers",
+        "close_date",
+        "correct_option_id",
+        "explanation",
+        "explanation_entities",
+        "id",
+        "is_anonymous",
+        "is_closed",
         "open_period",
         "options",
-        "type",
-        "explanation_entities",
-        "is_anonymous",
-        "close_date",
-        "is_closed",
-        "id",
-        "explanation",
         "question",
-        "correct_option_id",
+        "total_voter_count",
+        "type",
     )
 
     def __init__(
