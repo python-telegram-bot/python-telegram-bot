@@ -4,12 +4,12 @@
 Changelog
 =========
 
-Version 20.6
+Version 20.7
 ============
 
 *Released 2023-11-27*
 
-This is the technical changelog for version 20.6. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
+This is the technical changelog for version 20.7. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
 
 New Features
 ------------

@@ -157,6 +157,18 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
     .. seealso:: :meth:`__aenter__` and :meth:`__aexit__`.
 
+    This class is a :class:`~typing.Generic` class and accepts six type variables:
+
+    1. The type of :attr:`bot`. Must be :class:`telegram.Bot` or a subclass of that class.
+    2. The type of the argument ``context`` of callback functions for (error) handlers and jobs.
+       Must be :class:`telegram.ext.CallbackContext` or a subclass of that class. This must be
+       consistent with the following types.
+    3. The type of the values of :attr:`user_data`.
+    4. The type of the values of :attr:`chat_data`.
+    5. The type of :attr:`bot_data`.
+    6. The type of :attr:`job_queue`. Must either be :class:`telegram.ext.JobQueue` or a subclass
+       of that or :obj:`None`.
+
     Examples:
         :any:`Echo Bot <examples.echobot>`
 

@@ -25,6 +25,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Abshar <https://github.com/abxhr>`_
 - `Alateas <https://github.com/alateas>`_
 - `Ales Dokshanin <https://github.com/alesdokshanin>`_
+- `Alexandre <https://github.com/xTudoS>`_
 - `Alizia <https://github.com/thefunkycat>`_
 - `Ambro17 <https://github.com/Ambro17>`_
 - `Andrej Zhilenkov <https://github.com/Andrej730>`_
@@ -69,6 +70,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Joscha Götzer <https://github.com/Rostgnom>`_
 - `jossalgon <https://github.com/jossalgon>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
+- `kenjitagawa <https://github.com/kenjitagawa>`_
 - `kennethcheo <https://github.com/kennethcheo>`_
 - `Kirill Vasin <https://github.com/vasinkd>`_
 - `Kjwon15 <https://github.com/kjwon15>`_

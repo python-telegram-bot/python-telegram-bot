@@ -128,6 +128,10 @@ class ExtBot(Bot, Generic[RLARGS]):
     This can be used to pass additional information to the rate limiter, specifically to
     :paramref:`telegram.ext.BaseRateLimiter.process_request.rate_limit_args`.
 
+    This class is a :class:`~typing.Generic` class and accepts one type variable that specifies
+    the generic type of the :attr:`rate_limiter` used by the bot. Use :obj:`None` if no rate
+    limiter is used.
+
     Warning:
         * The keyword argument ``rate_limit_args`` can `not` be used, if :attr:`rate_limiter`
           is :obj:`None`.

@@ -4820,7 +4820,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 `@BotFather <https://t.me/BotFather>`_.
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_.
-            prices (Sequence[:class:`telegram.LabeledPrice`)]: Price breakdown, a sequence
+            prices (Sequence[:class:`telegram.LabeledPrice`]): Price breakdown, a sequence
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
 
