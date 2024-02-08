@@ -30,6 +30,7 @@ __all__ = (
     "CallbackContext",
     "CallbackDataCache",
     "CallbackQueryHandler",
+    "ChatBoostHandler",
     "ChatJoinRequestHandler",
     "ChatMemberHandler",
     "ChosenInlineResultHandler",
@@ -44,6 +45,7 @@ __all__ = (
     "Job",
     "JobQueue",
     "MessageHandler",
+    "MessageReactionHandler",
     "PersistenceInput",
     "PicklePersistence",
     "PollAnswerHandler",
@@ -74,6 +76,7 @@ from ._dictpersistence import DictPersistence
 from ._extbot import ExtBot
 from ._handlers.basehandler import BaseHandler
 from ._handlers.callbackqueryhandler import CallbackQueryHandler
+from ._handlers.chatboosthandler import ChatBoostHandler
 from ._handlers.chatjoinrequesthandler import ChatJoinRequestHandler
 from ._handlers.chatmemberhandler import ChatMemberHandler
 from ._handlers.choseninlineresulthandler import ChosenInlineResultHandler
@@ -81,6 +84,7 @@ from ._handlers.commandhandler import CommandHandler
 from ._handlers.conversationhandler import ConversationHandler
 from ._handlers.inlinequeryhandler import InlineQueryHandler
 from ._handlers.messagehandler import MessageHandler
+from ._handlers.messagereactionhandler import MessageReactionHandler
 from ._handlers.pollanswerhandler import PollAnswerHandler
 from ._handlers.pollhandler import PollHandler
 from ._handlers.precheckoutqueryhandler import PreCheckoutQueryHandler

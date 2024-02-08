@@ -53,9 +53,11 @@ from telegram import (
     InlineQueryResultVoice,
     InputFile,
     InputMediaDocument,
+    InputMediaPhoto,
     InputMessageContent,
     InputTextMessageContent,
     LabeledPrice,
+    LinkPreviewOptions,
     MenuButton,
     MenuButtonCommands,
     MenuButtonDefault,
@@ -64,6 +66,9 @@ from telegram import (
     MessageEntity,
     Poll,
     PollOption,
+    ReactionTypeCustomEmoji,
+    ReactionTypeEmoji,
+    ReplyParameters,
     SentWebAppMessage,
     ShippingOption,
     Update,
@@ -79,6 +84,7 @@ from telegram.constants import (
     InlineQueryResultType,
     MenuButtonType,
     ParseMode,
+    ReactionEmoji,
 )
 from telegram.error import BadRequest, EndPointNotFound, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
@@ -92,6 +98,9 @@ from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
+
+from ._files.test_photo import photo_file
+from .auxil.build_messages import make_message
 
 
 @pytest.fixture()
@@ -174,26 +183,26 @@ def bot_methods(ext_bot=True, include_camel_case=False, include_do_api_request=F
     )
 
 
-class InputMessageContentDWPP(InputMessageContent):
+class InputMessageContentLPO(InputMessageContent):
     """
     This is here to cover the case of InputMediaContent classes in testing answer_ilq that have
-    `disable_web_page_preview` but not `parse_mode`. Unlikely to ever happen, but better be save
+    `link_preview_options` but not `parse_mode`. Unlikely to ever happen, but better be save
     than sorry …
     """
 
-    __slots__ = ("disable_web_page_preview", "entities", "message_text", "parse_mode")
+    __slots__ = ("entities", "link_preview_options", "message_text", "parse_mode")
 
     def __init__(
         self,
         message_text: str,
-        disable_web_page_preview=DEFAULT_NONE,
+        link_preview_options=DEFAULT_NONE,
         *,
         api_kwargs=None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self._unfreeze()
         self.message_text = message_text
-        self.disable_web_page_preview = disable_web_page_preview
+        self.link_preview_options = link_preview_options
 
 
 class TestBotWithoutRequest:
@@ -476,7 +485,10 @@ class TestBotWithoutRequest:
         assert await check_defaults_handling(bot_method, bot, return_value=return_value)
         assert await check_defaults_handling(raw_bot_method, raw_bot, return_value=return_value)
 
-    def test_ext_bot_signature(self):
+    @pytest.mark.parametrize(
+        ("name", "method"), inspect.getmembers(Bot, predicate=inspect.isfunction)
+    )
+    def test_ext_bot_signature(self, name, method):
         """
         Here we make sure that all methods of ext.ExtBot have the same signature as the
         corresponding methods of tg.Bot.
@@ -488,29 +500,28 @@ class TestBotWithoutRequest:
         )
         different_hints_per_method = defaultdict(set, {"__setattr__": {"ext_bot"}})
 
-        for name, method in inspect.getmembers(Bot, predicate=inspect.isfunction):
-            signature = inspect.signature(method)
-            ext_signature = inspect.signature(getattr(ExtBot, name))
+        signature = inspect.signature(method)
+        ext_signature = inspect.signature(getattr(ExtBot, name))
 
+        assert (
+            ext_signature.return_annotation == signature.return_annotation
+        ), f"Wrong return annotation for method {name}"
+        assert (
+            set(signature.parameters)
+            == set(ext_signature.parameters) - global_extra_args - extra_args_per_method[name]
+        ), f"Wrong set of parameters for method {name}"
+        for param_name, param in signature.parameters.items():
+            if param_name in different_hints_per_method[name]:
+                continue
             assert (
-                ext_signature.return_annotation == signature.return_annotation
-            ), f"Wrong return annotation for method {name}"
+                param.annotation == ext_signature.parameters[param_name].annotation
+            ), f"Wrong annotation for parameter {param_name} of method {name}"
             assert (
-                set(signature.parameters)
-                == set(ext_signature.parameters) - global_extra_args - extra_args_per_method[name]
-            ), f"Wrong set of parameters for method {name}"
-            for param_name, param in signature.parameters.items():
-                if param_name in different_hints_per_method[name]:
-                    continue
-                assert (
-                    param.annotation == ext_signature.parameters[param_name].annotation
-                ), f"Wrong annotation for parameter {param_name} of method {name}"
-                assert (
-                    param.default == ext_signature.parameters[param_name].default
-                ), f"Wrong default value for parameter {param_name} of method {name}"
-                assert (
-                    param.kind == ext_signature.parameters[param_name].kind
-                ), f"Wrong parameter kind for parameter {param_name} of method {name}"
+                param.default == ext_signature.parameters[param_name].default
+            ), f"Wrong default value for parameter {param_name} of method {name}"
+            assert (
+                param.kind == ext_signature.parameters[param_name].kind
+            ), f"Wrong parameter kind for parameter {param_name} of method {name}"
 
     async def test_unknown_kwargs(self, bot, monkeypatch):
         async def post(url, request_data: RequestData, *args, **kwargs):
@@ -584,7 +595,9 @@ class TestBotWithoutRequest:
                         "input_message_content": {
                             "message_text": "text",
                             "parse_mode": "Markdown",
-                            "disable_web_page_preview": True,
+                            "link_preview_options": {
+                                "is_disabled": True,
+                            },
                         },
                         "type": InlineQueryResultType.ARTICLE,
                         "id": "1",
@@ -606,7 +619,9 @@ class TestBotWithoutRequest:
                         "input_message_content": {
                             "message_text": "text",
                             "parse_mode": "HTML",
-                            "disable_web_page_preview": False,
+                            "link_preview_options": {
+                                "is_disabled": False,
+                            },
                         },
                         "type": InlineQueryResultType.ARTICLE,
                         "id": "1",
@@ -627,7 +642,9 @@ class TestBotWithoutRequest:
                         "title": "title",
                         "input_message_content": {
                             "message_text": "text",
-                            "disable_web_page_preview": "False",
+                            "link_preview_options": {
+                                "is_disabled": "False",
+                            },
                         },
                         "type": InlineQueryResultType.ARTICLE,
                         "id": "1",
@@ -719,7 +736,7 @@ class TestBotWithoutRequest:
 
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
+            InlineQueryResultArticle("12", "second", InputMessageContentLPO("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url=(
@@ -729,7 +746,7 @@ class TestBotWithoutRequest:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
-                input_message_content=InputMessageContentDWPP("imc"),
+                input_message_content=InputMessageContentLPO("imc"),
             ),
         ]
 
@@ -816,7 +833,7 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
+            InlineQueryResultArticle("12", "second", InputMessageContentLPO("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url=(
@@ -826,7 +843,7 @@ class TestBotWithoutRequest:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
-                input_message_content=InputMessageContentDWPP("imc"),
+                input_message_content=InputMessageContentLPO("imc"),
             ),
         ]
 
@@ -866,26 +883,30 @@ class TestBotWithoutRequest:
                     {
                         "title": "first",
                         "id": "11",
-                        "type": "article",
+                        "type": InlineQueryResultType.ARTICLE,
                         "input_message_content": {
                             "message_text": "first",
                             "parse_mode": "Markdown",
-                            "disable_web_page_preview": True,
+                            "link_preview_options": {
+                                "is_disabled": True,
+                            },
                         },
                     },
                     {
                         "title": "second",
                         "id": "12",
-                        "type": "article",
+                        "type": InlineQueryResultType.ARTICLE,
                         "input_message_content": {
                             "message_text": "second",
-                            "disable_web_page_preview": True,
+                            "link_preview_options": {
+                                "is_disabled": True,
+                            },
                         },
                     },
                     {
                         "title": "test_result",
                         "id": "123",
-                        "type": "document",
+                        "type": InlineQueryResultType.DOCUMENT,
                         "document_url": (
                             "https://raw.githubusercontent.com/"
                             "python-telegram-bot/logos/master/logo/png/"
@@ -896,7 +917,9 @@ class TestBotWithoutRequest:
                         "parse_mode": "Markdown",
                         "input_message_content": {
                             "message_text": "imc",
-                            "disable_web_page_preview": True,
+                            "link_preview_options": {
+                                "is_disabled": True,
+                            },
                             "parse_mode": "Markdown",
                         },
                     },
@@ -909,7 +932,7 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
+            InlineQueryResultArticle("12", "second", InputMessageContentLPO("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url=(
@@ -1035,6 +1058,52 @@ class TestBotWithoutRequest:
         assert await bot.answer_inline_query(
             1234, results=inline_results_callback, current_offset=6
         )
+
+    async def test_send_edit_message_mutually_exclusive_link_preview(self, bot, chat_id):
+        """Test that link_preview is mutually exclusive with disable_web_page_preview."""
+        with pytest.raises(ValueError, match="'disable_web_page_preview' was renamed to"):
+            await bot.send_message(
+                chat_id, "text", disable_web_page_preview=True, link_preview_options="something"
+            )
+
+        with pytest.raises(ValueError, match="'disable_web_page_preview' was renamed to"):
+            await bot.edit_message_text(
+                "text", chat_id, 1, disable_web_page_preview=True, link_preview_options="something"
+            )
+
+    async def test_rtm_aswr_mutually_exclusive_reply_parameters(self, bot, chat_id):
+        """Test that reply_to_message_id and allow_sending_without_reply are mutually exclusive
+        with reply_parameters."""
+        with pytest.raises(ValueError, match="`reply_to_message_id` and"):
+            await bot.send_message(chat_id, "text", reply_to_message_id=1, reply_parameters=True)
+
+        with pytest.raises(ValueError, match="`allow_sending_without_reply` and"):
+            await bot.send_message(
+                chat_id, "text", allow_sending_without_reply=True, reply_parameters=True
+            )
+
+        # Test with copy message
+        with pytest.raises(ValueError, match="`reply_to_message_id` and"):
+            await bot.copy_message(
+                chat_id, chat_id, 1, reply_to_message_id=1, reply_parameters=True
+            )
+
+        with pytest.raises(ValueError, match="`allow_sending_without_reply` and"):
+            await bot.copy_message(
+                chat_id, chat_id, 1, allow_sending_without_reply=True, reply_parameters=True
+            )
+
+        # Test with send media group
+        media = InputMediaPhoto(photo_file)
+        with pytest.raises(ValueError, match="`reply_to_message_id` and"):
+            await bot.send_media_group(
+                chat_id, media, reply_to_message_id=1, reply_parameters=True
+            )
+
+        with pytest.raises(ValueError, match="`allow_sending_without_reply` and"):
+            await bot.send_media_group(
+                chat_id, media, allow_sending_without_reply=True, reply_parameters=True
+            )
 
     # get_file is tested multiple times in the test_*media* modules.
     # Here we only test the behaviour for bot apis in local mode
@@ -1416,7 +1485,8 @@ class TestBotWithoutRequest:
                     data["message_id"] == media_message.message_id,
                     data.get("caption") == caption,
                     data["parse_mode"] == ParseMode.HTML,
-                    data["reply_to_message_id"] == media_message.message_id,
+                    data["reply_parameters"]
+                    == ReplyParameters(message_id=media_message.message_id).to_dict(),
                     (
                         data["reply_markup"] == keyboard.to_json()
                         if json_keyboard
@@ -1794,6 +1864,165 @@ class TestBotWithoutRequest:
             bot.get_my_name(), bot.get_my_name("en"), bot.get_my_name("de")
         ) == 3 * [BotName(default_name)]
 
+    async def test_set_message_reaction(self, bot, monkeypatch):
+        """This is here so we can test the convenient conversion we do in the function without
+        having to do multiple requests to Telegram"""
+
+        expected_param = [
+            [{"emoji": ReactionEmoji.THUMBS_UP, "type": "emoji"}],
+            [{"emoji": ReactionEmoji.RED_HEART, "type": "emoji"}],
+            [{"custom_emoji_id": "custom_emoji_1", "type": "custom_emoji"}],
+            [{"custom_emoji_id": "custom_emoji_2", "type": "custom_emoji"}],
+            [{"emoji": ReactionEmoji.THUMBS_DOWN, "type": "emoji"}],
+            [{"custom_emoji_id": "custom_emoji_3", "type": "custom_emoji"}],
+            [
+                {"emoji": ReactionEmoji.RED_HEART, "type": "emoji"},
+                {"custom_emoji_id": "custom_emoji_4", "type": "custom_emoji"},
+                {"emoji": ReactionEmoji.THUMBS_DOWN, "type": "emoji"},
+                {"custom_emoji_id": "custom_emoji_5", "type": "custom_emoji"},
+            ],
+            [],
+        ]
+
+        amount = 0
+
+        async def post(url, request_data: RequestData, *args, **kwargs):
+            # The mock-post now just fetches the predefined responses from the queues
+            assert request_data.json_parameters["chat_id"] == "1"
+            assert request_data.json_parameters["message_id"] == "2"
+            assert request_data.json_parameters["is_big"]
+            nonlocal amount
+            assert request_data.parameters["reaction"] == expected_param[amount]
+            amount += 1
+
+        monkeypatch.setattr(bot.request, "post", post)
+        await bot.set_message_reaction(1, 2, [ReactionTypeEmoji(ReactionEmoji.THUMBS_UP)], True)
+        await bot.set_message_reaction(1, 2, ReactionTypeEmoji(ReactionEmoji.RED_HEART), True)
+        await bot.set_message_reaction(1, 2, [ReactionTypeCustomEmoji("custom_emoji_1")], True)
+        await bot.set_message_reaction(1, 2, ReactionTypeCustomEmoji("custom_emoji_2"), True)
+        await bot.set_message_reaction(1, 2, ReactionEmoji.THUMBS_DOWN, True)
+        await bot.set_message_reaction(1, 2, "custom_emoji_3", True)
+        await bot.set_message_reaction(
+            1,
+            2,
+            [
+                ReactionTypeEmoji(ReactionEmoji.RED_HEART),
+                ReactionTypeCustomEmoji("custom_emoji_4"),
+                ReactionEmoji.THUMBS_DOWN,
+                ReactionTypeCustomEmoji("custom_emoji_5"),
+            ],
+            True,
+        )
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_message_default_quote_parse_mode(
+        self, default_bot, chat_id, message, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
+
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_message(
+            chat_id, message, reply_parameters=ReplyParameters(**kwargs)
+        )
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_poll_default_quote_parse_mode(
+        self, default_bot, chat_id, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
+
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_poll(
+            chat_id,
+            question="question",
+            options=["option1", "option2"],
+            reply_parameters=ReplyParameters(**kwargs),
+        )
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_game_default_quote_parse_mode(
+        self, default_bot, chat_id, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
+
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_game(
+            chat_id, "game_short_name", reply_parameters=ReplyParameters(**kwargs)
+        )
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_copy_message_default_quote_parse_mode(
+        self, default_bot, chat_id, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
+
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.copy_message(chat_id, 1, 1, reply_parameters=ReplyParameters(**kwargs))
+
     async def test_do_api_request_camel_case_conversion(self, bot, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return url.endswith("camelCase")
@@ -1917,6 +2146,41 @@ class TestBotWithRequest:
         result = await tasks
         assert all("can't be forwarded" in str(exc) for exc in result)
 
+    async def test_forward_messages(self, bot, chat_id):
+        tasks = asyncio.gather(
+            bot.send_message(chat_id, text="will be forwarded"),
+            bot.send_message(chat_id, text="will be forwarded"),
+        )
+
+        msg1, msg2 = await tasks
+
+        forward_messages = await bot.forward_messages(
+            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
+        )
+
+        assert isinstance(forward_messages, tuple)
+
+        tasks = asyncio.gather(
+            bot.send_message(
+                chat_id, "temp 1", reply_to_message_id=forward_messages[0].message_id
+            ),
+            bot.send_message(
+                chat_id, "temp 2", reply_to_message_id=forward_messages[1].message_id
+            ),
+        )
+
+        temp_msg1, temp_msg2 = await tasks
+        forward_msg1 = temp_msg1.reply_to_message
+        forward_msg2 = temp_msg2.reply_to_message
+
+        assert forward_msg1.text == msg1.text
+        assert forward_msg1.forward_from.username == msg1.from_user.username
+        assert isinstance(forward_msg1.forward_date, dtm.datetime)
+
+        assert forward_msg2.text == msg2.text
+        assert forward_msg2.forward_from.username == msg2.from_user.username
+        assert isinstance(forward_msg2.forward_date, dtm.datetime)
+
     async def test_delete_message(self, bot, chat_id):
         message = await bot.send_message(chat_id, text="will be deleted")
         await asyncio.sleep(2)
@@ -1929,8 +2193,15 @@ class TestBotWithRequest:
             await bot.delete_message(chat_id=chat_id, message_id=1)
 
     # send_photo, send_audio, send_document, send_sticker, send_video, send_voice, send_video_note,
-    # send_media_group and send_animation are tested in their respective test modules. No need to
-    # duplicate here.
+    # send_media_group, send_animation, get_user_chat_boosts are tested in their respective
+    # test modules. No need to duplicate here.
+
+    async def test_delete_messages(self, bot, chat_id):
+        msg1 = await bot.send_message(chat_id, text="will be deleted")
+        msg2 = await bot.send_message(chat_id, text="will be deleted")
+        await asyncio.sleep(2)
+
+        assert await bot.delete_messages(chat_id=chat_id, message_ids=(msg1.id, msg2.id)) is True
 
     async def test_send_venue(self, bot, chat_id):
         longitude = -46.788279
@@ -3112,6 +3383,119 @@ class TestBotWithRequest:
 
     # get_forum_topic_icon_stickers, edit_forum_topic, general_forum etc...
     # are tested in the test_forum module.
+    async def test_send_message_disable_web_page_preview(self, bot, chat_id):
+        """Test that disable_web_page_preview is substituted for link_preview_options and that
+        it still works as expected for backward compatability."""
+        msg = await bot.send_message(
+            chat_id,
+            "https://github.com/python-telegram-bot/python-telegram-bot",
+            disable_web_page_preview=True,
+        )
+        assert msg.link_preview_options
+        assert msg.link_preview_options.is_disabled
+
+    async def test_send_message_link_preview_options(self, bot, chat_id):
+        """Test whether link_preview_options is correctly passed to the API."""
+        # btw it is possible to have no url in the text, but set a url for the preview.
+        msg = await bot.send_message(
+            chat_id,
+            "https://github.com/python-telegram-bot/python-telegram-bot",
+            link_preview_options=LinkPreviewOptions(prefer_small_media=True, show_above_text=True),
+        )
+        assert msg.link_preview_options
+        assert not msg.link_preview_options.is_disabled
+        # The prefer_* options aren't very consistent on the client side (big pic shown) +
+        # they are not returned by the API.
+        # assert msg.link_preview_options.prefer_small_media
+        assert msg.link_preview_options.show_above_text
+
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"link_preview_options": LinkPreviewOptions(show_above_text=True)}],
+        indirect=True,
+    )
+    async def test_send_message_default_link_preview_options(self, default_bot, chat_id):
+        """Test whether Defaults.link_preview_options is correctly fused with the passed LPO."""
+        github_url = "https://github.com/python-telegram-bot/python-telegram-bot"
+        website = "https://python-telegram-bot.org/"
+
+        # First test just the default passing:
+        coro1 = default_bot.send_message(chat_id, github_url)
+        # Next test fusion of both LPOs:
+        coro2 = default_bot.send_message(
+            chat_id,
+            github_url,
+            link_preview_options=LinkPreviewOptions(url=website, prefer_large_media=True),
+        )
+        # Now test fusion + overriding of passed LPO:
+        coro3 = default_bot.send_message(
+            chat_id,
+            github_url,
+            link_preview_options=LinkPreviewOptions(show_above_text=False, url=website),
+        )
+        # finally test explicitly setting to None
+        coro4 = default_bot.send_message(chat_id, github_url, link_preview_options=None)
+
+        msgs = asyncio.gather(coro1, coro2, coro3, coro4)
+        msg1, msg2, msg3, msg4 = await msgs
+        assert msg1.link_preview_options
+        assert msg1.link_preview_options.show_above_text
+
+        assert msg2.link_preview_options
+        assert msg2.link_preview_options.show_above_text
+        assert msg2.link_preview_options.url == website
+        assert msg2.link_preview_options.prefer_large_media  # Now works correctly using new url..
+
+        assert msg3.link_preview_options
+        assert not msg3.link_preview_options.show_above_text
+        assert msg3.link_preview_options.url == website
+
+        assert msg4.link_preview_options == LinkPreviewOptions(url=github_url)
+
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"link_preview_options": LinkPreviewOptions(show_above_text=True)}],
+        indirect=True,
+    )
+    async def test_edit_message_text_default_link_preview_options(self, default_bot, chat_id):
+        """Test whether Defaults.link_preview_options is correctly fused with the passed LPO."""
+        github_url = "https://github.com/python-telegram-bot/python-telegram-bot"
+        website = "https://python-telegram-bot.org/"
+        telegram_url = "https://telegram.org"
+        base_1, base_2, base_3, base_4 = await asyncio.gather(
+            *(default_bot.send_message(chat_id, telegram_url) for _ in range(4))
+        )
+
+        # First test just the default passing:
+        coro1 = base_1.edit_text(github_url)
+        # Next test fusion of both LPOs:
+        coro2 = base_2.edit_text(
+            github_url,
+            link_preview_options=LinkPreviewOptions(url=website, prefer_large_media=True),
+        )
+        # Now test fusion + overriding of passed LPO:
+        coro3 = base_3.edit_text(
+            github_url,
+            link_preview_options=LinkPreviewOptions(show_above_text=False, url=website),
+        )
+        # finally test explicitly setting to None
+        coro4 = base_4.edit_text(github_url, link_preview_options=None)
+
+        msgs = asyncio.gather(coro1, coro2, coro3, coro4)
+        msg1, msg2, msg3, msg4 = await msgs
+        assert msg1.link_preview_options
+        assert msg1.link_preview_options.show_above_text
+
+        assert msg2.link_preview_options
+        assert msg2.link_preview_options.show_above_text
+        assert msg2.link_preview_options.url == website
+        assert msg2.link_preview_options.prefer_large_media  # Now works correctly using new url..
+
+        assert msg3.link_preview_options
+        assert not msg3.link_preview_options.show_above_text
+        assert msg3.link_preview_options.url == website
+
+        assert msg4.link_preview_options == LinkPreviewOptions(url=github_url)
 
     async def test_send_message_entities(self, bot, chat_id):
         test_string = "Italic Bold Code Spoiler"
@@ -3349,6 +3733,30 @@ class TestBotWithRequest:
         else:
             assert len(message.caption_entities) == 0
 
+    async def test_copy_messages(self, bot, chat_id):
+        tasks = asyncio.gather(
+            bot.send_message(chat_id, text="will be copied 1"),
+            bot.send_message(chat_id, text="will be copied 2"),
+        )
+        msg1, msg2 = await tasks
+
+        copy_messages = await bot.copy_messages(
+            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
+        )
+        assert isinstance(copy_messages, tuple)
+
+        tasks = asyncio.gather(
+            bot.send_message(chat_id, "temp 1", reply_to_message_id=copy_messages[0].message_id),
+            bot.send_message(chat_id, "temp 2", reply_to_message_id=copy_messages[1].message_id),
+        )
+        temp_msg1, temp_msg2 = await tasks
+
+        forward_msg1 = temp_msg1.reply_to_message
+        forward_msg2 = temp_msg2.reply_to_message
+
+        assert forward_msg1.text == msg1.text
+        assert forward_msg2.text == msg2.text
+
     # Continue testing arbitrary callback data here with actual requests:
     async def test_replace_callback_data_send_message(self, cdc_bot, chat_id):
         bot = cdc_bot
@@ -3568,6 +3976,11 @@ class TestBotWithRequest:
             bot.get_my_short_description("en"),
             bot.get_my_short_description("de"),
         ) == 3 * [BotShortDescription("")]
+
+    async def test_set_message_reaction(self, bot, chat_id, message):
+        assert await bot.set_message_reaction(
+            chat_id, message.message_id, ReactionEmoji.THUMBS_DOWN, True
+        )
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     async def test_do_api_request_warning_known_method(self, bot, bot_class):

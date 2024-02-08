@@ -18,12 +18,20 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram KeyboardButton."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
-from telegram._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUser
+from telegram._keyboardbuttonrequest import (
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestUser,
+    KeyboardButtonRequestUsers,
+)
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings_transition import (
+    warn_about_deprecated_arg_return_new_arg,
+    warn_about_deprecated_attr_in_property,
+)
 from telegram._webappinfo import WebAppInfo
 
 if TYPE_CHECKING:
@@ -37,7 +45,8 @@ class KeyboardButton(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location`,
-    :attr:`request_poll`, :attr:`web_app`, :attr:`request_user` and :attr:`request_chat` are equal.
+    :attr:`request_poll`, :attr:`web_app`, :attr:`request_users` and :attr:`request_chat` are
+    equal.
 
     Note:
         * Optional fields are mutually exclusive.
@@ -47,7 +56,7 @@ class KeyboardButton(TelegramObject):
           January, 2020. Older clients will display unsupported message.
         * :attr:`web_app` option will only work in Telegram versions released after 16 April, 2022.
           Older clients will display unsupported message.
-        * :attr:`request_user` and :attr:`request_chat` options will only work in Telegram
+        * :attr:`request_users` and :attr:`request_chat` options will only work in Telegram
           versions released after 3 February, 2023. Older clients will display unsupported
           message.
 
@@ -55,7 +64,7 @@ class KeyboardButton(TelegramObject):
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.
     .. versionchanged:: 20.5
-       :attr:`request_user` and :attr:`request_chat` are considered as well when
+       :attr:`request_users` and :attr:`request_chat` are considered as well when
        comparing objects of this type in terms of equality.
 
     Args:
@@ -74,12 +83,20 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.0
-        request_user (:class:`KeyboardButtonRequestUser`, optional): If specified, pressing the
+        request_user (:class:`KeyboardButtonRequestUser` | :class:`KeyboardButtonRequestUsers`, \
+            optional): Alias for
+            :attr:`request_users`.
+
+            .. versionadded:: 20.1
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates this argument in favor of ref`request_users`.
+
+        request_users (:class:`KeyboardButtonRequestUsers`, optional): If specified, pressing the
             button will open a list of suitable users. Tapping on any user will send its
             identifier to the bot in a :attr:`telegram.Message.user_shared` service message.
             Available in private chats only.
 
-            .. versionadded:: 20.1
+            .. versionadded:: NEXT.VERSION
         request_chat (:class:`KeyboardButtonRequestChat`, optional): If specified, pressing the
             button will open a list of suitable chats. Tapping on a chat will send its
             identifier to the bot in a :attr:`telegram.Message.chat_shared` service message.
@@ -102,12 +119,12 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.0
-        request_user (:class:`KeyboardButtonRequestUser`): Optional. If specified, pressing the
+        request_users (:class:`KeyboardButtonRequestUsers`): Optional. If specified, pressing the
             button will open a list of suitable users. Tapping on any user will send its
             identifier to the bot in a :attr:`telegram.Message.user_shared` service message.
             Available in private chats only.
 
-            .. versionadded:: 20.1
+            .. versionadded:: NEXT.VERSION
         request_chat (:class:`KeyboardButtonRequestChat`): Optional. If specified, pressing the
             button will open a list of suitable chats. Tapping on a chat will send its
             identifier to the bot in a :attr:`telegram.Message.chat_shared` service message.
@@ -121,7 +138,7 @@ class KeyboardButton(TelegramObject):
         "request_contact",
         "request_location",
         "request_poll",
-        "request_user",
+        "request_users",
         "text",
         "web_app",
     )
@@ -133,12 +150,16 @@ class KeyboardButton(TelegramObject):
         request_location: Optional[bool] = None,
         request_poll: Optional[KeyboardButtonPollType] = None,
         web_app: Optional[WebAppInfo] = None,
-        request_user: Optional[KeyboardButtonRequestUser] = None,
+        request_user: Optional[
+            Union[KeyboardButtonRequestUsers, KeyboardButtonRequestUser]
+        ] = None,
         request_chat: Optional[KeyboardButtonRequestChat] = None,
+        request_users: Optional[KeyboardButtonRequestUsers] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.text: str = text
         # Optionals
@@ -146,7 +167,15 @@ class KeyboardButton(TelegramObject):
         self.request_location: Optional[bool] = request_location
         self.request_poll: Optional[KeyboardButtonPollType] = request_poll
         self.web_app: Optional[WebAppInfo] = web_app
-        self.request_user: Optional[KeyboardButtonRequestUser] = request_user
+        self.request_users: Optional[KeyboardButtonRequestUsers] = (
+            warn_about_deprecated_arg_return_new_arg(
+                deprecated_arg=request_user,
+                new_arg=request_users,
+                deprecated_arg_name="request_user",
+                new_arg_name="request_users",
+                bot_api_version="7.0",
+            )
+        )
         self.request_chat: Optional[KeyboardButtonRequestChat] = request_chat
 
         self._id_attrs = (
@@ -155,11 +184,26 @@ class KeyboardButton(TelegramObject):
             self.request_location,
             self.request_poll,
             self.web_app,
-            self.request_user,
+            self.request_users,
             self.request_chat,
         )
 
         self._freeze()
+
+    @property
+    def request_user(self) -> Optional[KeyboardButtonRequestUsers]:
+        """Optional[:class:`KeyboardButtonRequestUsers`]: Alias for :attr:`request_users`.
+
+        .. versionadded:: 20.1
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates this attribute in favor of :attr:`request_users`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="request_user",
+            new_attr_name="request_users",
+            bot_api_version="7.0",
+        )
+        return self.request_users
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["KeyboardButton"]:
@@ -170,7 +214,7 @@ class KeyboardButton(TelegramObject):
             return None
 
         data["request_poll"] = KeyboardButtonPollType.de_json(data.get("request_poll"), bot)
-        data["request_user"] = KeyboardButtonRequestUser.de_json(data.get("request_user"), bot)
+        data["request_users"] = KeyboardButtonRequestUsers.de_json(data.get("request_users"), bot)
         data["request_chat"] = KeyboardButtonRequestChat.de_json(data.get("request_chat"), bot)
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 

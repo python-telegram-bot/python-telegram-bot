@@ -43,27 +43,6 @@ GLOBALLY_IGNORED_PARAMETERS = {
     "api_kwargs",
 }
 
-# Arguments *added* to the official API
-PTB_EXTRA_PARAMS = {
-    "send_contact": {"contact"},
-    "send_location": {"location"},
-    "edit_message_live_location": {"location"},
-    "send_venue": {"venue"},
-    "answer_inline_query": {"current_offset"},
-    "send_media_group": {"caption", "parse_mode", "caption_entities"},
-    "send_(animation|audio|document|photo|video(_note)?|voice)": {"filename"},
-    "InlineQueryResult": {"id", "type"},  # attributes common to all subclasses
-    "ChatMember": {"user", "status"},  # attributes common to all subclasses
-    "BotCommandScope": {"type"},  # attributes common to all subclasses
-    "MenuButton": {"type"},  # attributes common to all subclasses
-    "PassportFile": {"credentials"},
-    "EncryptedPassportElement": {"credentials"},
-    "PassportElementError": {"source", "type", "message"},
-    "InputMedia": {"caption", "caption_entities", "media", "media_type", "parse_mode"},
-    "InputMedia(Animation|Audio|Document|Photo|Video|VideoNote|Voice)": {"filename"},
-    "InputFile": {"attach", "filename", "obj"},
-}
-
 # Types for certain parameters accepted by PTB but not in the official API
 ADDITIONAL_TYPES = {
     "photo": ForwardRef("PhotoSize"),
@@ -82,13 +61,14 @@ ARRAY_OF_EXCEPTIONS = {
     "results": "InlineQueryResult",  # + Callable
     "commands": "BotCommand",  # + tuple[str, str]
     "keyboard": "KeyboardButton",  # + sequence[sequence[str]]
+    "reaction": "ReactionType",  # + str
     # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
     "file_hashes": "list[str]",
 }
 
 # Special cases for other parameters that accept more types than the official API, and are
 # too complex to compare/predict with official API:
-EXCEPTIONS = {  # (param_name, is_class): reduced form of annotation
+COMPLEX_TYPES = {  # (param_name, is_class (i.e appears in a class?)): reduced form of annotation
     ("correct_option_id", False): int,  # actual: Literal
     ("file_id", False): str,  # actual: Union[str, objs_with_file_id_attr]
     ("invite_link", False): str,  # actual: Union[str, ChatInviteLink]
@@ -97,6 +77,15 @@ EXCEPTIONS = {  # (param_name, is_class): reduced form of annotation
     ("media", True): str,  # actual: Union[str, InputMedia*, FileInput]
     ("data", True): str,  # actual: Union[IdDocumentData, PersonalDetails, ResidentialAddress]
 }
+
+# These are param names ignored in the param type checking in classes for the `tg.Defaults` case.
+IGNORED_DEFAULTS_PARAM_NAMES = {
+    "quote",
+    "link_preview_options",
+}
+
+# These classes' params are all ODVInput, so we ignore them in the defaults type checking.
+IGNORED_DEFAULTS_CLASSES = {"LinkPreviewOptions"}
 
 
 def _get_params_base(object_name: str, search_dict: dict[str, set[Any]]) -> set[Any]:
@@ -116,11 +105,39 @@ def _get_params_base(object_name: str, search_dict: dict[str, set[Any]]) -> set[
     return out
 
 
+# Arguments *added* to the official API
+PTB_EXTRA_PARAMS = {
+    "send_contact": {"contact"},
+    "send_location": {"location"},
+    "edit_message_live_location": {"location"},
+    "send_venue": {"venue"},
+    "answer_inline_query": {"current_offset"},
+    "send_media_group": {"caption", "parse_mode", "caption_entities"},
+    "send_(animation|audio|document|photo|video(_note)?|voice)": {"filename"},
+    "InlineQueryResult": {"id", "type"},  # attributes common to all subclasses
+    "ChatMember": {"user", "status"},  # attributes common to all subclasses
+    "BotCommandScope": {"type"},  # attributes common to all subclasses
+    "MenuButton": {"type"},  # attributes common to all subclasses
+    "PassportFile": {"credentials"},
+    "EncryptedPassportElement": {"credentials"},
+    "PassportElementError": {"source", "type", "message"},
+    "InputMedia": {"caption", "caption_entities", "media", "media_type", "parse_mode"},
+    "InputMedia(Animation|Audio|Document|Photo|Video|VideoNote|Voice)": {"filename"},
+    "InputFile": {"attach", "filename", "obj"},
+    "MaybeInaccessibleMessage": {"date", "message_id", "chat"},  # attributes common to all subcls
+    "ChatBoostSource": {"source"},  # attributes common to all subclasses
+    "MessageOrigin": {"type", "date"},  # attributes common to all subclasses
+    "ReactionType": {"type"},  # attributes common to all subclasses
+    "InputTextMessageContent": {"disable_web_page_preview"},  # convenience arg, here for bw compat
+}
+
+
 def ptb_extra_params(object_name: str) -> set[str]:
     return _get_params_base(object_name, PTB_EXTRA_PARAMS)
 
 
 # Arguments *removed* from the official API
+# Mostly due to the value being fixed anyway
 PTB_IGNORED_PARAMS = {
     r"InlineQueryResult\w+": {"type"},
     r"ChatMember\w+": {"status"},
@@ -130,6 +147,10 @@ PTB_IGNORED_PARAMS = {
     r"BotCommandScope\w+": {"type"},
     r"MenuButton\w+": {"type"},
     r"InputMedia\w+": {"type"},
+    "InaccessibleMessage": {"date"},
+    r"MessageOrigin\w+": {"type"},
+    r"ChatBoostSource\w+": {"source"},
+    r"ReactionType\w+": {"type"},
 }
 
 
@@ -153,7 +174,25 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 
 # Arguments that are optional arguments for now for backwards compatibility
-BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {}
+BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
+    # Deprecated by Bot API 7.0, kept for now for bw compat:
+    "KeyboardButton": {"request_user"},
+    "Message": {
+        "forward_from",
+        "forward_signature",
+        "forward_sender_name",
+        "forward_date",
+        "forward_from_chat",
+        "forward_from_message_id",
+        "user_shared",
+    },
+    "(send_message|edit_message_text)": {
+        "disable_web_page_preview",
+        "reply_to_message_id",
+        "allow_sending_without_reply",
+    },
+    r"copy_message|send_\w+": {"allow_sending_without_reply", "reply_to_message_id"},
+}
 
 
 def backwards_compat_kwargs(object_name: str) -> set[str]:
@@ -206,7 +245,8 @@ def check_method(h4: Tag) -> None:
             )
         if not check_param_type(param, tg_parameter, method):
             raise AssertionError(
-                f"Param {param.name!r} of {method.__name__!r} should be {tg_parameter[1]}"
+                f"Param {param.name!r} of {method.__name__!r} should be {tg_parameter[1]} or "
+                "something else!"
             )
 
         # Now check if the parameter is required or not
@@ -273,7 +313,8 @@ def check_object(h4: Tag) -> None:
             )
         if not check_param_type(param, tg_parameter, obj):
             raise AssertionError(
-                f"Param {param.name!r} of {obj.__name__!r} should be {tg_parameter[1]}"
+                f"Param {param.name!r} of {obj.__name__!r} should be {tg_parameter[1]} or "
+                "something else!"
             )
         if not check_required_param(tg_parameter, param, obj.__name__):
             raise AssertionError(f"{obj.__name__!r} parameter {param.name!r} requirement mismatch")
@@ -336,6 +377,7 @@ def check_param_type(
         :obj:`bool`: The boolean returned represents whether our parameter's type annotation is the
         same as Telegram's or not.
     """
+    # PRE-PROCESSING:
     # In order to evaluate the type annotation, we need to first have a mapping of the types
     # specified in the official API to our types. The keys are types in the column of official API.
     TYPE_MAPPING: dict[str, set[Any]] = {
@@ -400,6 +442,11 @@ def check_param_type(
             ptb_annotation = wrapped[ptb_annotation]
         # We have put back our annotation together after removing the NoneType!
 
+    # CHECKING:
+    # Each branch may have exits in the form of return statements. If the annotation is found to be
+    # correct, the function will return True. If not, it will return False.
+
+    # 1) HANDLING ARRAY TYPES:
     # Now let's do the checking, starting with "Array of ..." types.
     if "Array of " in tg_param_type:
         assert mapped_type is Sequence
@@ -430,15 +477,32 @@ def check_param_type(
         # This means it is Array of [obj]
         return any(mapped_type[o] == ptb_annotation for o in unionized_objs)
 
-    # Special case for when the parameter is a default value parameter
-    for name, _ in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
-        if name in ptb_param.name:  # no strict == since we have a param: `explanation_parse_mode`
-            # Check if it's ODVInput
-            parsed = ODVInput[mapped_type]
-            if (ptb_annotation | None) == parsed:  # We have to add back None in our annotation
-                return True
-            return False
+    # 2) HANDLING DEFAULTS PARAMETERS:
+    # Classes whose parameters are all ODVInput should be converted and checked.
+    if obj.__name__ in IGNORED_DEFAULTS_CLASSES:
+        parsed = ODVInput[mapped_type]
+        return (ptb_annotation | None) == parsed  # We have to add back None in our annotation
+    if not (
+        # Defaults checking should not be done for:
+        # 1. Parameters that have name conflict with `Defaults.name`
+        is_class
+        and obj.__name__ in ("ReplyParameters", "Message", "ExternalReplyInfo")
+        and ptb_param.name in IGNORED_DEFAULTS_PARAM_NAMES
+    ):
+        # Now let's check if the parameter is a Defaults parameter, it should be
+        for name, _ in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
+            if name == ptb_param.name or "parse_mode" in ptb_param.name:
+                # mapped_type should not be a tuple since we need to check for equality:
+                # This can happen when the Defaults parameter is a class, e.g. LinkPreviewOptions
+                if isinstance(mapped_type, tuple):
+                    mapped_type = mapped_type[1]  # We select the ForwardRef
+                # Assert if it's ODVInput by checking equality:
+                parsed = ODVInput[mapped_type]
+                if (ptb_annotation | None) == parsed:  # We have to add back None in our annotation
+                    return True
+                return False
 
+    # 3) HANDLING OTHER TYPES:
     # Special case for send_* methods where we accept more types than the official API:
     if (
         ptb_param.name in ADDITIONAL_TYPES
@@ -447,11 +511,7 @@ def check_param_type(
     ):
         mapped_type = mapped_type | ADDITIONAL_TYPES[ptb_param.name]
 
-    for (param_name, expected_class), exception_type in EXCEPTIONS.items():
-        if ptb_param.name == param_name and is_class is expected_class:
-            ptb_annotation = exception_type
-
-    # Special case for datetimes
+    # 4) HANDLING DATETIMES:
     if (
         re.search(
             r"""([_]+|\b)  # check for word boundary or underscore
@@ -472,10 +532,18 @@ def check_param_type(
         # If it's a class, we only accept datetime as the parameter
         mapped_type = datetime if is_class else mapped_type | datetime
 
-    # Final check for the basic types
+    # RESULTS: ALL OTHER BASIC TYPES-
+    # Some types are too complicated, so we replace them with a simpler type:
+    for (param_name, expected_class), exception_type in COMPLEX_TYPES.items():
+        if ptb_param.name == param_name and is_class is expected_class:
+            ptb_annotation = exception_type
+
+    # Final check, if the annotation is a tuple, we need to check if any of the types in the tuple
+    # match the mapped type.
     if isinstance(mapped_type, tuple) and any(ptb_annotation == t for t in mapped_type):
         return True
 
+    # If the annotation is not a tuple, we can just check if it's equal to the mapped type.
     return mapped_type == ptb_annotation
 
 

@@ -43,6 +43,7 @@ from typing import (
 )
 
 from telegram._utils.datetime import to_timestamp
+from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 
@@ -271,7 +272,9 @@ class TelegramObject:
         Returns:
             state (Dict[:obj:`str`, :obj:`object`]): The state of the object.
         """
-        out = self._get_attrs(include_private=True, recursive=False, remove_bot=True)
+        out = self._get_attrs(
+            include_private=True, recursive=False, remove_bot=True, convert_default_vault=False
+        )
         # MappingProxyType is not pickable, so we convert it to a dict and revert in
         # __setstate__
         out["api_kwargs"] = dict(self.api_kwargs)
@@ -519,6 +522,7 @@ class TelegramObject:
         include_private: bool = False,
         recursive: bool = False,
         remove_bot: bool = False,
+        convert_default_vault: bool = True,
     ) -> Dict[str, Union[str, object]]:
         """This method is used for obtaining the attributes of the object.
 
@@ -527,6 +531,10 @@ class TelegramObject:
             recursive (:obj:`bool`): If :obj:`True`, will convert any ``TelegramObjects`` (if
                 found) in the attributes to a dictionary. Else, preserves it as an object itself.
             remove_bot (:obj:`bool`): Whether the bot should be included in the result.
+            convert_default_vault (:obj:`bool`): Whether :class:`telegram.DefaultValue` should be
+                converted to its true value. This is necessary when converting to a dictionary for
+                end users since DefaultValue is used in some classes that work with
+                `tg.ext.defaults` (like `LinkPreviewOptions`)
 
         Returns:
             :obj:`dict`: A dict where the keys are attribute names and values are their values.
@@ -534,7 +542,12 @@ class TelegramObject:
         data = {}
 
         for key in self._get_attrs_names(include_private=include_private):
-            value = getattr(self, key, None)
+            value = (
+                DefaultValue.get_value(getattr(self, key, None))
+                if convert_default_vault
+                else getattr(self, key, None)
+            )
+
             if value is not None:
                 if recursive and hasattr(value, "to_dict"):
                     data[key] = value.to_dict(recursive=True)

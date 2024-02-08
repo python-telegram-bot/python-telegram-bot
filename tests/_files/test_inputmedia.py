@@ -33,6 +33,7 @@ from telegram import (
     InputMediaVideo,
     Message,
     MessageEntity,
+    ReplyParameters,
 )
 from telegram.constants import InputMediaType, ParseMode
 
@@ -46,6 +47,8 @@ from tests.auxil.slots import mro_slots
 
 # noinspection PyUnresolvedReferences
 from tests.test_forum import emoji_id, real_topic  # noqa: F401
+
+from ..auxil.build_messages import make_message
 
 # noinspection PyUnresolvedReferences
 from .test_audio import audio, audio_file  # noqa: F401
@@ -608,6 +611,33 @@ class TestSendMediaGroupWithoutRequest:
         input_video = InputMediaVideo(video_file, thumbnail=photo_file)
         with pytest.raises(Exception, match="Test was successful"):
             await bot.edit_message_media(chat_id=chat_id, message_id=123, media=input_video)
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_media_group_default_quote_parse_mode(
+        self, default_bot, chat_id, media_group, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return [make_message("dummy reply").to_dict()]
+
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_media_group(
+            chat_id, media_group, reply_parameters=ReplyParameters(**kwargs)
+        )
 
 
 class CustomSequence(Sequence):

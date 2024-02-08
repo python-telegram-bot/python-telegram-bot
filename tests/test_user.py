@@ -454,6 +454,23 @@ class TestUserWithoutRequest(TestUserBase):
         monkeypatch.setattr(user.get_bot(), "copy_message", make_assertion)
         assert await user.copy_message(chat_id="chat_id", message_id="message_id")
 
+    async def test_instance_method_get_user_chat_boosts(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            chat_id = kwargs["chat_id"] == "chat_id"
+            user_id = kwargs["user_id"] == user.id
+            return chat_id and user_id
+
+        assert check_shortcut_signature(
+            User.get_chat_boosts, Bot.get_user_chat_boosts, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.get_chat_boosts, user.get_bot(), "get_user_chat_boosts"
+        )
+        assert await check_defaults_handling(user.get_chat_boosts, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "get_user_chat_boosts", make_assertion)
+        assert await user.get_chat_boosts(chat_id="chat_id")
+
     async def test_instance_method_get_menu_button(self, monkeypatch, user):
         async def make_assertion(*_, **kwargs):
             return kwargs["chat_id"] == user.id
@@ -562,3 +579,119 @@ class TestUserWithoutRequest(TestUserBase):
             "the\\{name\\>\u2022", user.id
         )
         assert user.mention_markdown_v2(user.username) == expected.format(user.username, user.id)
+
+    async def test_delete_message(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == user.id and kwargs["message_id"] == 42
+
+        assert check_shortcut_signature(user.delete_message, Bot.delete_message, ["chat_id"], [])
+        assert await check_shortcut_call(user.delete_message, user.get_bot(), "delete_message")
+        assert await check_defaults_handling(user.delete_message, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "delete_message", make_assertion)
+        assert await user.delete_message(message_id=42)
+
+    async def test_delete_messages(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == user.id and kwargs["message_ids"] == (42, 43)
+
+        assert check_shortcut_signature(user.delete_messages, Bot.delete_messages, ["chat_id"], [])
+        assert await check_shortcut_call(user.delete_messages, user.get_bot(), "delete_messages")
+        assert await check_defaults_handling(user.delete_messages, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "delete_messages", make_assertion)
+        assert await user.delete_messages(message_ids=(42, 43))
+
+    async def test_instance_method_send_copies(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            from_chat_id = kwargs["from_chat_id"] == "test_copies"
+            message_ids = kwargs["message_ids"] == (42, 43)
+            user_id = kwargs["chat_id"] == user.id
+            return from_chat_id and message_ids and user_id
+
+        assert check_shortcut_signature(user.send_copies, Bot.copy_messages, ["chat_id"], [])
+        assert await check_shortcut_call(user.send_copies, user.get_bot(), "copy_messages")
+        assert await check_defaults_handling(user.send_copies, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "copy_messages", make_assertion)
+        assert await user.send_copies(from_chat_id="test_copies", message_ids=(42, 43))
+
+    async def test_instance_method_copy_messages(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            from_chat_id = kwargs["from_chat_id"] == user.id
+            message_ids = kwargs["message_ids"] == (42, 43)
+            user_id = kwargs["chat_id"] == "test_copies"
+            return from_chat_id and message_ids and user_id
+
+        assert check_shortcut_signature(
+            user.copy_messages, Bot.copy_messages, ["from_chat_id"], []
+        )
+        assert await check_shortcut_call(user.copy_messages, user.get_bot(), "copy_messages")
+        assert await check_defaults_handling(user.copy_messages, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "copy_messages", make_assertion)
+        assert await user.copy_messages(chat_id="test_copies", message_ids=(42, 43))
+
+    async def test_instance_method_forward_from(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            user_id = kwargs["chat_id"] == user.id
+            message_id = kwargs["message_id"] == 42
+            from_chat_id = kwargs["from_chat_id"] == "test_forward"
+            return from_chat_id and message_id and user_id
+
+        assert check_shortcut_signature(user.forward_from, Bot.forward_message, ["chat_id"], [])
+        assert await check_shortcut_call(user.forward_from, user.get_bot(), "forward_message")
+        assert await check_defaults_handling(user.forward_from, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "forward_message", make_assertion)
+        assert await user.forward_from(from_chat_id="test_forward", message_id=42)
+
+    async def test_instance_method_forward_to(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            from_chat_id = kwargs["from_chat_id"] == user.id
+            message_id = kwargs["message_id"] == 42
+            user_id = kwargs["chat_id"] == "test_forward"
+            return from_chat_id and message_id and user_id
+
+        assert check_shortcut_signature(user.forward_to, Bot.forward_message, ["from_chat_id"], [])
+        assert await check_shortcut_call(user.forward_to, user.get_bot(), "forward_message")
+        assert await check_defaults_handling(user.forward_to, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "forward_message", make_assertion)
+        assert await user.forward_to(chat_id="test_forward", message_id=42)
+
+    async def test_instance_method_forward_messages_from(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            user_id = kwargs["chat_id"] == user.id
+            message_ids = kwargs["message_ids"] == (42, 43)
+            from_chat_id = kwargs["from_chat_id"] == "test_forwards"
+            return from_chat_id and message_ids and user_id
+
+        assert check_shortcut_signature(
+            user.forward_messages_from, Bot.forward_messages, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            user.forward_messages_from, user.get_bot(), "forward_messages"
+        )
+        assert await check_defaults_handling(user.forward_messages_from, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "forward_messages", make_assertion)
+        assert await user.forward_messages_from(from_chat_id="test_forwards", message_ids=(42, 43))
+
+    async def test_instance_method_forward_messages_to(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            from_chat_id = kwargs["from_chat_id"] == user.id
+            message_ids = kwargs["message_ids"] == (42, 43)
+            user_id = kwargs["chat_id"] == "test_forwards"
+            return from_chat_id and message_ids and user_id
+
+        assert check_shortcut_signature(
+            user.forward_messages_to, Bot.forward_messages, ["from_chat_id"], []
+        )
+        assert await check_shortcut_call(
+            user.forward_messages_to, user.get_bot(), "forward_messages"
+        )
+        assert await check_defaults_handling(user.forward_messages_to, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "forward_messages", make_assertion)
+        assert await user.forward_messages_to(chat_id="test_forwards", message_ids=(42, 43))

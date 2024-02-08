@@ -45,12 +45,15 @@ class MessageEntity(TelegramObject):
             :attr:`EMAIL` (do-not-reply@telegram.org), :attr:`PHONE_NUMBER` (+1-212-555-0123),
             :attr:`BOLD` (**bold text**), :attr:`ITALIC` (*italic text*), :attr:`UNDERLINE`
             (underlined text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
-            :attr:`CODE` (monowidth string), :attr:`PRE` (monowidth block), :attr:`TEXT_LINK`
-            (for clickable text URLs), :attr:`TEXT_MENTION` (for users without usernames),
-            :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
+            :attr:`BLOCKQUOTE` (block quotation), :attr:`CODE` (monowidth string), :attr:`PRE`
+            (monowidth block), :attr:`TEXT_LINK` (for clickable text URLs), :attr:`TEXT_MENTION`
+            (for users without usernames), :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
 
             .. versionadded:: 20.0
                 Added inline custom emoji
+
+            .. versionadded:: NEXT.VERSION
+                Added block quotation
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`, optional): For :attr:`TEXT_LINK` only, url that will be opened after
@@ -71,12 +74,15 @@ class MessageEntity(TelegramObject):
             :attr:`EMAIL` (do-not-reply@telegram.org), :attr:`PHONE_NUMBER` (+1-212-555-0123),
             :attr:`BOLD` (**bold text**), :attr:`ITALIC` (*italic text*), :attr:`UNDERLINE`
             (underlined text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
-            :attr:`CODE` (monowidth string), :attr:`PRE` (monowidth block), :attr:`TEXT_LINK`
-            (for clickable text URLs), :attr:`TEXT_MENTION` (for users without usernames),
-            :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
+            :attr:`BLOCKQUOTE` (block quotation), :attr:`CODE` (monowidth string), :attr:`PRE`
+            (monowidth block), :attr:`TEXT_LINK` (for clickable text URLs), :attr:`TEXT_MENTION`
+            (for users without usernames), :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
 
             .. versionadded:: 20.0
                 Added inline custom emoji
+
+            .. versionadded:: NEXT.VERSION
+                Added block quotation
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`): Optional. For :attr:`TEXT_LINK` only, url that will be opened after
@@ -173,6 +179,11 @@ class MessageEntity(TelegramObject):
     """:const:`telegram.constants.MessageEntityType.CUSTOM_EMOJI`
 
     .. versionadded:: 20.0
+    """
+    BLOCKQUOTE: Final[str] = constants.MessageEntityType.BLOCKQUOTE
+    """:const:`telegram.constants.MessageEntityType.BLOCKQUOTE`
+
+    .. versionadded:: NEXT.VERSION
     """
     ALL_TYPES: Final[List[str]] = list(constants.MessageEntityType)
     """List[:obj:`str`]: A list of all available message entity types."""

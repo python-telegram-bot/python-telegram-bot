@@ -35,12 +35,16 @@ __all__ = [
     "BOT_API_VERSION",
     "BOT_API_VERSION_INFO",
     "SUPPORTED_WEBHOOK_PORTS",
+    "ZERO_DATE",
+    "AccentColor",
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
     "BotNameLimit",
+    "BulkRequestLimit",
     "CallbackQueryLimit",
     "ChatAction",
+    "ChatBoostSources",
     "ChatID",
     "ChatInviteLinkLimit",
     "ChatLimit",
@@ -55,6 +59,7 @@ __all__ = [
     "FloodLimit",
     "ForumIconColor",
     "ForumTopicLimit",
+    "GiveawayLimit",
     "InlineKeyboardButtonLimit",
     "InlineKeyboardMarkupLimit",
     "InlineQueryLimit",
@@ -63,6 +68,7 @@ __all__ = [
     "InlineQueryResultsButtonLimit",
     "InputMediaType",
     "InvoiceLimit",
+    "KeyboardButtonRequestUsersLimit",
     "LocationLimit",
     "MaskPosition",
     "MediaGroupLimit",
@@ -70,11 +76,15 @@ __all__ = [
     "MessageAttachmentType",
     "MessageEntityType",
     "MessageLimit",
+    "MessageOriginType",
     "MessageType",
     "ParseMode",
     "PollLimit",
     "PollType",
     "PollingLimit",
+    "ProfileAccentColor",
+    "ReactionEmoji",
+    "ReactionType",
     "ReplyLimit",
     "StickerFormat",
     "StickerLimit",
@@ -85,9 +95,12 @@ __all__ = [
     "WebhookLimit",
 ]
 
+import datetime
 import sys
-from typing import Final, List, NamedTuple
+from enum import Enum
+from typing import Final, List, NamedTuple, Optional, Tuple
 
+from telegram._utils.datetime import UTC
 from telegram._utils.enum import IntEnum, StringEnum
 
 
@@ -109,6 +122,19 @@ class _BotAPIVersion(NamedTuple):
         return f"{self.major}.{self.minor}"
 
 
+class _AccentColor(NamedTuple):
+    """A helper class for (profile) accent colors. Since TG doesn't define a class for this and
+    the behavior is quite different for the different accent colors, we don't make this a public
+    class. This gives us more flexibility to change the implementation if necessary for future
+    versions.
+    """
+
+    identifier: int
+    name: Optional[str] = None
+    light_colors: Tuple[int, ...] = ()
+    dark_colors: Tuple[int, ...] = ()
+
+
 #: :class:`typing.NamedTuple`: A tuple containing the two components of the version number:
 # ``major`` and ``minor``. Both values are integers.
 #: The components can also be accessed by name, so ``BOT_API_VERSION_INFO[0]`` is equivalent
@@ -116,7 +142,7 @@ class _BotAPIVersion(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=6, minor=9)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=0)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -129,6 +155,390 @@ BOT_API_VERSION: Final[str] = str(BOT_API_VERSION_INFO)
 #: List[:obj:`int`]: Ports supported by
 #:  :paramref:`telegram.Bot.set_webhook.url`.
 SUPPORTED_WEBHOOK_PORTS: Final[List[int]] = [443, 80, 88, 8443]
+
+#: :obj:`datetime.datetime`, value of unix 0.
+#: This date literal is used in :class:`telegram.InaccessibleMessage`
+#:
+#: .. versionadded:: NEXT.VERSION
+ZERO_DATE: Final[datetime.datetime] = datetime.datetime(1970, 1, 1, tzinfo=UTC)
+
+
+class AccentColor(Enum):
+    """This enum contains the available accent colors for :class:`telegram.Chat.accent_color_id`.
+    The members of this enum are named tuples with the following attributes:
+
+    - ``identifier`` (:obj:`int`): The identifier of the accent color.
+    - ``name`` (:obj:`str`): Optional. The name of the accent color.
+    - ``light_colors`` (Tuple[:obj:`str`]): Optional. The light colors of the accent color as HEX
+      value.
+    - ``dark_colors`` (Tuple[:obj:`str`]): Optional. The dark colors of the accent color as HEX
+      value.
+
+    Since Telegram gives no exact specification for the accent colors, future accent colors might
+    have a different data type.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    COLOR_000 = _AccentColor(identifier=0, name="red")
+    """Accent color 0. This color can be customized by app themes."""
+    COLOR_001 = _AccentColor(identifier=1, name="orange")
+    """Accent color 1. This color can be customized by app themes."""
+    COLOR_002 = _AccentColor(identifier=2, name="purple/violet")
+    """Accent color 2. This color can be customized by app themes."""
+    COLOR_003 = _AccentColor(identifier=3, name="green")
+    """Accent color 3. This color can be customized by app themes."""
+    COLOR_004 = _AccentColor(identifier=4, name="cyan")
+    """Accent color 4. This color can be customized by app themes."""
+    COLOR_005 = _AccentColor(identifier=5, name="blue")
+    """Accent color 5. This color can be customized by app themes."""
+    COLOR_006 = _AccentColor(identifier=6, name="pink")
+    """Accent color 6. This color can be customized by app themes."""
+    COLOR_007 = _AccentColor(
+        identifier=7, light_colors=(0xE15052, 0xF9AE63), dark_colors=(0xFF9380, 0x992F37)
+    )
+    """Accent color 7. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#E15052;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#F9AE63;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FF9380;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#992F37;">
+        </div><br>
+    """
+    COLOR_008 = _AccentColor(
+        identifier=8, light_colors=(0xE0802B, 0xFAC534), dark_colors=(0xECB04E, 0xC35714)
+    )
+    """Accent color 8. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#E0802B;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FAC534;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#ECB04E;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#C35714;">
+        </div><br>
+    """
+    COLOR_009 = _AccentColor(
+        identifier=9, light_colors=(0xA05FF3, 0xF48FFF), dark_colors=(0xC697FF, 0x5E31C8)
+    )
+    """Accent color 9. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#A05FF3;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#F48FFF;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#C697FF;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#5E31C8;">
+        </div><br>
+    """
+    COLOR_010 = _AccentColor(
+        identifier=10, light_colors=(0x27A910, 0xA7DC57), dark_colors=(0xA7EB6E, 0x167E2D)
+    )
+    """Accent color 10. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#27A910;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#A7DC57;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#A7EB6E;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#167E2D;">
+        </div><br>
+    """
+    COLOR_011 = _AccentColor(
+        identifier=11, light_colors=(0x27ACCE, 0x82E8D6), dark_colors=(0x40D8D0, 0x045C7F)
+    )
+    """Accent color 11. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#27ACCE;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#82E8D6;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#40D8D0;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#045C7F;">
+        </div><br>
+    """
+
+    COLOR_012 = _AccentColor(
+        identifier=12, light_colors=(0x3391D4, 0x7DD3F0), dark_colors=(0x52BFFF, 0x0B5494)
+    )
+    """Accent color 12. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#3391D4;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#7DD3F0;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#52BFFF;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#0B5494;">
+        </div><br>
+    """
+    COLOR_013 = _AccentColor(
+        identifier=13, light_colors=(0xDD4371, 0xFFBE9F), dark_colors=(0xFF86A6, 0x8E366E)
+    )
+    """Accent color 13. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#DD4371;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFBE9F;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FF86A6;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#8E366E;">
+        </div><br>
+    """
+    COLOR_014 = _AccentColor(
+        identifier=14,
+        light_colors=(0x247BED, 0xF04856, 0xFFFFFF),
+        dark_colors=(0x3FA2FE, 0xE5424F, 0xFFFFFF),
+    )
+    """Accent color 14. This contains three light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#247BED;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#F04856;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFFFFF;">
+        </div><br>
+
+    and three dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#3FA2FE;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#E5424F;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFFFFF;">
+        </div><br>
+    """
+
+    COLOR_015 = _AccentColor(
+        identifier=15,
+        light_colors=(0xD67722, 0x1EA011, 0xFFFFFF),
+        dark_colors=(0xFF905E, 0x32A527, 0xFFFFFF),
+    )
+    """Accent color 15. This contains three light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#D67722;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#1EA011;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFFFFF;">
+        </div><br>
+
+    and three dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FF905E;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#32A527;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFFFFF;">
+        </div><br>
+    """
+
+    COLOR_016 = _AccentColor(
+        identifier=16,
+        light_colors=(0x179E42, 0xE84A3F, 0xFFFFFF),
+        dark_colors=(0x66D364, 0xD5444F, 0xFFFFFF),
+    )
+    """Accent color 16. This contains three light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#179E42;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#E84A3F;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFFFFF;">
+        </div><br>
+
+    and three dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#66D364;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#D5444F;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFFFFF;">
+        </div><br>
+    """
+
+    COLOR_017 = _AccentColor(
+        identifier=17,
+        light_colors=(0x2894AF, 0x6FC456, 0xFFFFFF),
+        dark_colors=(0x22BCE2, 0x3DA240, 0xFFFFFF),
+    )
+    """Accent color 17. This contains three light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#2894AF;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#6FC456;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFFFFF;">
+        </div><br>
+
+    and three dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#22BCE2;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#3DA240;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFFFFF;">
+        </div><br>
+    """
+
+    COLOR_018 = _AccentColor(
+        identifier=18,
+        light_colors=(0x0C9AB3, 0xFFAD95, 0xFFE6B5),
+        dark_colors=(0x22BCE2, 0xFF9778, 0xFFDA6B),
+    )
+    """Accent color 18. This contains three light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#0C9AB3;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFAD95;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFE6B5;">
+        </div><br>
+
+    and three dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#22BCE2;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FF9778;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFDA6B;">
+        </div><br>
+    """
+
+    COLOR_019 = _AccentColor(
+        identifier=19,
+        light_colors=(0x7757D6, 0xF79610, 0xFFDE8E),
+        dark_colors=(0x9791FF, 0xF2731D, 0xFFDB59),
+    )
+    """Accent color 19. This contains three light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#7757D6;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#F79610;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFDE8E;">
+        </div><br>
+
+    and three dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#9791FF;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#F2731D;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFDB59;">
+        </div><br>
+    """
+
+    COLOR_020 = _AccentColor(
+        identifier=20,
+        light_colors=(0x1585CF, 0xF2AB1D, 0xFFFFFF),
+        dark_colors=(0x3DA6EB, 0xEEA51D, 0xFFFFFF),
+    )
+    """Accent color 20. This contains three light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#1585CF;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#F2AB1D;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFFFFF;">
+        </div><br>
+
+    and three dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#3DA6EB;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#EEA51D;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#FFFFFF;">
+        </div><br>
+    """
 
 
 class BotCommandLimit(IntEnum):
@@ -226,6 +636,22 @@ class BotNameLimit(IntEnum):
     """
 
 
+class BulkRequestLimit(IntEnum):
+    """This enum contains limitations for :meth:`telegram.Bot.delete_messages`,
+    :meth:`telegram.Bot.forward_messages` and :meth:`telegram.Bot.copy_messages`. The enum members
+    of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum number of messages required for bulk actions."""
+    MAX_LIMIT = 100
+    """:obj:`int`: Maximum number of messages required for bulk actions."""
+
+
 class CallbackQueryLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.CallbackQuery`/
     :meth:`telegram.Bot.answer_callback_query`. The enum members of this enumeration are instances
@@ -273,6 +699,24 @@ class ChatAction(StringEnum):
     """:obj:`str`: Chat action indicating that the bot is uploading a video."""
     UPLOAD_VIDEO_NOTE = "upload_video_note"
     """:obj:`str`: Chat action indicating that the bot is uploading a video note."""
+
+
+class ChatBoostSources(StringEnum):
+    """This enum contains the available sources for a
+    :class:`Telegram chat boost <telegram.ChatBoostSource>`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    GIFT_CODE = "gift_code"
+    """:obj:`str`: The source of the chat boost was a Telegram Premium gift code."""
+    GIVEAWAY = "giveaway"
+    """:obj:`str`: The source of the chat boost was a Telegram Premium giveaway."""
+    PREMIUM = "premium"
+    """:obj:`str`: The source of the chat boost was a Telegram Premium subscription/gift."""
 
 
 class ChatID(IntEnum):
@@ -663,6 +1107,41 @@ class ForumIconColor(IntEnum):
 
         <div style="height:15px; width:15px; background-color:#FB6F5F;"></div>
 
+    """
+
+
+class GiveawayLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.Giveaway` and related classes.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_WINNERS = 100
+    """:obj:`int`: Maximum number of winners allowed for :class:`telegram.GiveawayWinners.winners`.
+    """
+
+
+class KeyboardButtonRequestUsersLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.KeyboardButtonRequestUsers`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MIN_QUANTITY = 1
+    """:obj:`int`: Minimum value allowed for
+    :paramref:`~telegram.KeyboardButtonRequestUsers.max_quantity` parameter of
+    :class:`telegram.KeyboardButtonRequestUsers`.
+    """
+    MAX_QUANTITY = 10
+    """:obj:`int`: Maximum value allowed for
+    :paramref:`~telegram.KeyboardButtonRequestUsers.max_quantity` parameter of
+    :class:`telegram.KeyboardButtonRequestUsers`.
     """
 
 
@@ -1128,6 +1607,11 @@ class MessageEntityType(StringEnum):
 
     .. versionadded:: 20.0
     """
+    BLOCKQUOTE = "blockquote"
+    """:obj:`str`: Message entities representing a block quotation.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class MessageLimit(IntEnum):
@@ -1186,9 +1670,27 @@ class MessageLimit(IntEnum):
     """
 
 
+class MessageOriginType(StringEnum):
+    """This enum contains the available types of :class:`telegram.MessageOrigin`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    USER = "user"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by an user."""
+    HIDDEN_USER = "hidden_user"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by a hidden user."""
+    CHAT = "chat"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by a chat."""
+    CHANNEL = "channel"
+    """:obj:`str`: A :class:`telegram.MessageOrigin` who is sent by a channel."""
+
+
 class MessageType(StringEnum):
-    """This enum contains the available types of :class:`telegram.Message` that can be seen
-    as attachment. The enum
+    """This enum contains the available types of :class:`telegram.Message`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
     .. versionadded:: 20.0
@@ -1199,72 +1701,126 @@ class MessageType(StringEnum):
     # Make sure that all attachment type constants are also listed in the
     # MessageAttachmentType Enum! (Enums are not extendable)
 
-    # -------------------------------------------------- Attachment types
     ANIMATION = "animation"
     """:obj:`str`: Messages with :attr:`telegram.Message.animation`."""
     AUDIO = "audio"
     """:obj:`str`: Messages with :attr:`telegram.Message.audio`."""
+    CHANNEL_CHAT_CREATED = "channel_chat_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
+    CHAT_SHARED = "chat_shared"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    CONNECTED_WEBSITE = "connected_website"
+    """:obj:`str`: Messages with :attr:`telegram.Message.connected_website`."""
     CONTACT = "contact"
     """:obj:`str`: Messages with :attr:`telegram.Message.contact`."""
+    DELETE_CHAT_PHOTO = "delete_chat_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.delete_chat_photo`."""
     DICE = "dice"
     """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
     DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
+    FORUM_TOPIC_CREATED = "forum_topic_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_created`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    FORUM_TOPIC_CLOSED = "forum_topic_closed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_closed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    FORUM_TOPIC_EDITED = "forum_topic_edited"
+    """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_edited`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    FORUM_TOPIC_REOPENED = "forum_topic_reopened"
+    """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_reopened`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     GAME = "game"
     """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
-    INVOICE = "invoice"
-    """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
-    LOCATION = "location"
-    """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
-    PASSPORT_DATA = "passport_data"
-    """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
-    PHOTO = "photo"
-    """:obj:`str`: Messages with :attr:`telegram.Message.photo`."""
-    POLL = "poll"
-    """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
-    STICKER = "sticker"
-    """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
-    STORY = "story"
-    """:obj:`str`: Messages with :attr:`telegram.Message.story`."""
-    SUCCESSFUL_PAYMENT = "successful_payment"
-    """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
-    VIDEO = "video"
-    """:obj:`str`: Messages with :attr:`telegram.Message.video`."""
-    VIDEO_NOTE = "video_note"
-    """:obj:`str`: Messages with :attr:`telegram.Message.video_note`."""
-    VOICE = "voice"
-    """:obj:`str`: Messages with :attr:`telegram.Message.voice`."""
-    VENUE = "venue"
-    """:obj:`str`: Messages with :attr:`telegram.Message.venue`."""
-    # -------------------------------------------------- Other types
-    TEXT = "text"
-    """:obj:`str`: Messages with :attr:`telegram.Message.text`."""
-    NEW_CHAT_MEMBERS = "new_chat_members"
-    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_members`."""
-    LEFT_CHAT_MEMBER = "left_chat_member"
-    """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
-    NEW_CHAT_TITLE = "new_chat_title"
-    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_title`."""
-    NEW_CHAT_PHOTO = "new_chat_photo"
-    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_photo`."""
-    DELETE_CHAT_PHOTO = "delete_chat_photo"
-    """:obj:`str`: Messages with :attr:`telegram.Message.delete_chat_photo`."""
+    GENERAL_FORUM_TOPIC_HIDDEN = "general_forum_topic_hidden"
+    """:obj:`str`: Messages with :attr:`telegram.Message.general_forum_topic_hidden`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    GENERAL_FORUM_TOPIC_UNHIDDEN = "general_forum_topic_unhidden"
+    """:obj:`str`: Messages with :attr:`telegram.Message.general_forum_topic_unhidden`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    GIVEAWAY = "giveaway"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    GIVEAWAY_CREATED = "giveaway_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_created`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    GIVEAWAY_WINNERS = "giveaway_winners"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_winners`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    GIVEAWAY_COMPLETED = "giveaway_completed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.giveaway_completed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     GROUP_CHAT_CREATED = "group_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.group_chat_created`."""
-    SUPERGROUP_CHAT_CREATED = "supergroup_chat_created"
-    """:obj:`str`: Messages with :attr:`telegram.Message.supergroup_chat_created`."""
-    CHANNEL_CHAT_CREATED = "channel_chat_created"
-    """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
+    INVOICE = "invoice"
+    """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
+    LEFT_CHAT_MEMBER = "left_chat_member"
+    """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
+    LOCATION = "location"
+    """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     MESSAGE_AUTO_DELETE_TIMER_CHANGED = "message_auto_delete_timer_changed"
     """:obj:`str`: Messages with :attr:`telegram.Message.message_auto_delete_timer_changed`."""
     MIGRATE_TO_CHAT_ID = "migrate_to_chat_id"
     """:obj:`str`: Messages with :attr:`telegram.Message.migrate_to_chat_id`."""
-    MIGRATE_FROM_CHAT_ID = "migrate_from_chat_id"
-    """:obj:`str`: Messages with :attr:`telegram.Message.migrate_from_chat_id`."""
+    NEW_CHAT_MEMBERS = "new_chat_members"
+    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_members`."""
+    NEW_CHAT_TITLE = "new_chat_title"
+    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_title`."""
+    NEW_CHAT_PHOTO = "new_chat_photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_photo`."""
+    PASSPORT_DATA = "passport_data"
+    """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
+    PHOTO = "photo"
+    """:obj:`str`: Messages with :attr:`telegram.Message.photo`."""
     PINNED_MESSAGE = "pinned_message"
     """:obj:`str`: Messages with :attr:`telegram.Message.pinned_message`."""
+    POLL = "poll"
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
     PROXIMITY_ALERT_TRIGGERED = "proximity_alert_triggered"
     """:obj:`str`: Messages with :attr:`telegram.Message.proximity_alert_triggered`."""
+    STICKER = "sticker"
+    """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
+    STORY = "story"
+    """:obj:`str`: Messages with :attr:`telegram.Message.story`."""
+    SUPERGROUP_CHAT_CREATED = "supergroup_chat_created"
+    """:obj:`str`: Messages with :attr:`telegram.Message.supergroup_chat_created`."""
+    SUCCESSFUL_PAYMENT = "successful_payment"
+    """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
+    TEXT = "text"
+    """:obj:`str`: Messages with :attr:`telegram.Message.text`."""
+    USERS_SHARED = "users_shared"
+    """:obj:`str`: Messages with :attr:`telegram.Message.users_shared`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    VENUE = "venue"
+    """:obj:`str`: Messages with :attr:`telegram.Message.venue`."""
+    VIDEO = "video"
+    """:obj:`str`: Messages with :attr:`telegram.Message.video`."""
     VIDEO_CHAT_SCHEDULED = "video_chat_scheduled"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_scheduled`."""
     VIDEO_CHAT_STARTED = "video_chat_started"
@@ -1273,6 +1829,20 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_ended`."""
     VIDEO_CHAT_PARTICIPANTS_INVITED = "video_chat_participants_invited"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_participants_invited`."""
+    VIDEO_NOTE = "video_note"
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_note`."""
+    VOICE = "voice"
+    """:obj:`str`: Messages with :attr:`telegram.Message.voice`."""
+    WEB_APP_DATA = "web_app_data"
+    """:obj:`str`: Messages with :attr:`telegram.Message.web_app_data`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    WRITE_ACCESS_ALLOWED = "write_access_allowed"
+    """:obj:`str`: Messages with :attr:`telegram.Message.write_access_allowed`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class PollingLimit(IntEnum):
@@ -1291,6 +1861,316 @@ class PollingLimit(IntEnum):
     MAX_LIMIT = 100
     """:obj:`int`: Maximum value allowed for the :paramref:`~telegram.Bot.get_updates.limit`
     parameter of :meth:`telegram.Bot.get_updates`.
+    """
+
+
+class ProfileAccentColor(Enum):
+    """This enum contains the available accent colors for
+    :class:`telegram.Chat.profile_accent_color_id`.
+    The members of this enum are named tuples with the following attributes:
+
+    - ``identifier`` (:obj:`int`): The identifier of the accent color.
+    - ``name`` (:obj:`str`): Optional. The name of the accent color.
+    - ``light_colors`` (Tuple[:obj:`str`]): Optional. The light colors of the accent color as HEX
+      value.
+    - ``dark_colors`` (Tuple[:obj:`str`]): Optional. The dark colors of the accent color as HEX
+      value.
+
+    Since Telegram gives no exact specification for the accent colors, future accent colors might
+    have a different data type.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    COLOR_000 = _AccentColor(identifier=0, light_colors=(0xBA5650,), dark_colors=(0x9C4540,))
+    """Accent color 0. This contains one light color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#BA5650;">
+        </div>
+
+    and one dark color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#9C4540;">
+        </div>
+    """
+    COLOR_001 = _AccentColor(identifier=1, light_colors=(0xC27C3E,), dark_colors=(0x945E2C,))
+    """Accent color 1. This contains one light color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#C27C3E;">
+        </div>
+
+    and one dark color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#945E2C;">
+        </div>
+    """
+    COLOR_002 = _AccentColor(identifier=2, light_colors=(0x956AC8,), dark_colors=(0x715099,))
+    """Accent color 2. This contains one light color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#956AC8;">
+        </div>
+
+    and one dark color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#715099;">
+        </div>
+    """
+    COLOR_003 = _AccentColor(identifier=3, light_colors=(0x49A355,), dark_colors=(0x33713B,))
+    """Accent color 3. This contains one light color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#49A355;">
+        </div>
+
+    and one dark color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#33713B;">
+        </div>
+    """
+    COLOR_004 = _AccentColor(identifier=4, light_colors=(0x3E97AD,), dark_colors=(0x387E87,))
+    """Accent color 4. This contains one light color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#3E97AD;">
+        </div>
+
+    and one dark color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#387E87;">
+        </div>
+    """
+    COLOR_005 = _AccentColor(identifier=5, light_colors=(0x5A8FBB,), dark_colors=(0x477194,))
+    """Accent color 5. This contains one light color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#5A8FBB;">
+        </div>
+
+    and one dark color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#477194;">
+        </div>
+    """
+    COLOR_006 = _AccentColor(identifier=6, light_colors=(0xB85378,), dark_colors=(0x944763,))
+    """Accent color 6. This contains one light color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#B85378;">
+        </div>
+
+    and one dark color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#944763;">
+        </div>
+    """
+    COLOR_007 = _AccentColor(identifier=7, light_colors=(0x7F8B95,), dark_colors=(0x435261,))
+    """Accent color 7. This contains one light color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#7F8B95;">
+        </div>
+
+    and one dark color
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#435261;">
+        </div>
+    """
+    COLOR_008 = _AccentColor(
+        identifier=8, light_colors=(0xC9565D, 0xD97C57), dark_colors=(0x994343, 0xAC583E)
+    )
+    """Accent color 8. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#C9565D;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#D97C57;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#994343;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#AC583E;">
+        </div><br>
+    """
+    COLOR_009 = _AccentColor(
+        identifier=9, light_colors=(0xCF7244, 0xCC9433), dark_colors=(0x8F552F, 0xA17232)
+    )
+    """Accent color 9. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#CF7244;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#CC9433;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#8F552F;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#A17232;">
+        </div><br>
+    """
+    COLOR_010 = _AccentColor(
+        identifier=10, light_colors=(0x9662D4, 0xB966B6), dark_colors=(0x634691, 0x9250A2)
+    )
+    """Accent color 10. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#9662D4;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#B966B6;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#634691;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#9250A2;">
+        </div><br>
+    """
+    COLOR_011 = _AccentColor(
+        identifier=11, light_colors=(0x3D9755, 0x89A650), dark_colors=(0x296A43, 0x5F8F44)
+    )
+    """Accent color 11. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#3D9755;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#89A650;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#296A43;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#5F8F44;">
+        </div><br>
+    """
+    COLOR_012 = _AccentColor(
+        identifier=12, light_colors=(0x3D95BA, 0x50AD98), dark_colors=(0x306C7C, 0x3E987E)
+    )
+    """Accent color 12. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#3D95BA;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#50AD98;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#306C7C;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#3E987E;">
+        </div><br>
+    """
+    COLOR_013 = _AccentColor(
+        identifier=13, light_colors=(0x538BC2, 0x4DA8BD), dark_colors=(0x38618C, 0x458BA1)
+    )
+    """Accent color 13. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#538BC2;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#4DA8BD;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#38618C;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#458BA1;">
+        </div><br>
+    """
+    COLOR_014 = _AccentColor(
+        identifier=14, light_colors=(0xB04F74, 0xD1666D), dark_colors=(0x884160, 0xA65259)
+    )
+    """Accent color 14. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#B04F74;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#D1666D;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color:#884160;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color:#A65259;">
+        </div><br>
+    """
+    COLOR_015 = _AccentColor(
+        identifier=15, light_colors=(0x637482, 0x7B8A97), dark_colors=(0x53606E, 0x384654)
+    )
+    """Accent color 15. This contains two light colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color: #637482;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color: #7B8A97;">
+        </div><br>
+
+    and two dark colors
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; display: inline-block; background-color: #53606E;">
+        </div>
+        <div style="height:15px; width:15px; display: inline-block; background-color: #384654;">
+        </div><br>
     """
 
 
@@ -1589,6 +2469,26 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_member`."""
     CHAT_JOIN_REQUEST = "chat_join_request"
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_join_request`."""
+    CHAT_BOOST = "chat_boost"
+    """:obj:`str`: Updates with :attr:`telegram.Update.chat_boost`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    REMOVED_CHAT_BOOST = "removed_chat_boost"
+    """:obj:`str`: Updates with :attr:`telegram.Update.removed_chat_boost`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MESSAGE_REACTION = "message_reaction"
+    """:obj:`str`: Updates with :attr:`telegram.Update.message_reaction`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    MESSAGE_REACTION_COUNT = "message_reaction_count"
+    """:obj:`str`: Updates with :attr:`telegram.Update.message_reaction_count`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InvoiceLimit(IntEnum):
@@ -1754,3 +2654,175 @@ class ForumTopicLimit(IntEnum):
     * :paramref:`~telegram.Bot.edit_general_forum_topic.name` parameter of
       :meth:`telegram.Bot.edit_general_forum_topic`
     """
+
+
+class ReactionType(StringEnum):
+    """This enum contains the available types of :class:`telegram.ReactionType`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    EMOJI = "emoji"
+    """:obj:`str`: A :class:`telegram.ReactionType` with a normal emoji."""
+    CUSTOM_EMOJI = "custom_emoji"
+    """:obj:`str`: A :class:`telegram.ReactionType` with a custom emoji."""
+
+
+class ReactionEmoji(StringEnum):
+    """This enum contains the available emojis of :class:`telegram.ReactionTypeEmoji`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    THUMBS_UP = "👍"
+    """:obj:`str`: Thumbs Up"""
+    THUMBS_DOWN = "👎"
+    """:obj:`str`: Thumbs Down"""
+    RED_HEART = "❤"
+    """:obj:`str`: Red Heart"""
+    FIRE = "🔥"
+    """:obj:`str`: Fire"""
+    SMILING_FACE_WITH_HEARTS = "🥰"
+    """:obj:`str`: Smiling Face with Hearts"""
+    CLAPPING_HANDS = "👏"
+    """:obj:`str`: Clapping Hands"""
+    GRINNING_FACE_WITH_SMILING_EYES = "😁"
+    """:obj:`str`: Grinning face with smiling eyes"""
+    THINKING_FACE = "🤔"
+    """:obj:`str`: Thinking face"""
+    SHOCKED_FACE_WITH_EXPLODING_HEAD = "🤯"
+    """:obj:`str`: Shocked face with exploding head"""
+    FACE_SCREAMING_IN_FEAR = "😱"
+    """:obj:`str`: Face screaming in fear"""
+    SERIOUS_FACE_WITH_SYMBOLS_COVERING_MOUTH = "🤬"
+    """:obj:`str`: Serious face with symbols covering mouth"""
+    CRYING_FACE = "😢"
+    """:obj:`str`: Crying face"""
+    PARTY_POPPER = "🎉"
+    """:obj:`str`: Party popper"""
+    GRINNING_FACE_WITH_STAR_EYES = "🤩"
+    """:obj:`str`: Grinning face with star eyes"""
+    FACE_WITH_OPEN_MOUTH_VOMITING = "🤮"
+    """:obj:`str`: Face with open mouth vomiting"""
+    PILE_OF_POO = "💩"
+    """:obj:`str`: Pile of poo"""
+    PERSON_WITH_FOLDED_HANDS = "🙏"
+    """:obj:`str`: Person with folded hands"""
+    OK_HAND_SIGN = "👌"
+    """:obj:`str`: Ok hand sign"""
+    DOVE_OF_PEACE = "🕊"
+    """:obj:`str`: Dove of peace"""
+    CLOWN_FACE = "🤡"
+    """:obj:`str`: Clown face"""
+    YAWNING_FACE = "🥱"
+    """:obj:`str`: Yawning face"""
+    FACE_WITH_UNEVEN_EYES_AND_WAVY_MOUTH = "🥴"
+    """:obj:`str`: Face with uneven eyes and wavy mouth"""
+    SMILING_FACE_WITH_HEART_SHAPED_EYES = "😍"
+    """:obj:`str`: Smiling face with heart-shaped eyes"""
+    SPOUTING_WHALE = "🐳"
+    """:obj:`str`: Spouting whale"""
+    HEART_ON_FIRE = "❤️‍🔥"
+    """:obj:`str`: Heart on fire"""
+    NEW_MOON_WITH_FACE = "🌚"
+    """:obj:`str`: New moon with face"""
+    HOT_DOG = "🌭"
+    """:obj:`str`: Hot dog"""
+    HUNDRED_POINTS_SYMBOL = "💯"
+    """:obj:`str`: Hundred points symbol"""
+    ROLLING_ON_THE_FLOOR_LAUGHING = "🤣"
+    """:obj:`str`: Rolling on the floor laughing"""
+    HIGH_VOLTAGE_SIGN = "⚡"
+    """:obj:`str`: High voltage sign"""
+    BANANA = "🍌"
+    """:obj:`str`: Banana"""
+    TROPHY = "🏆"
+    """:obj:`str`: Trophy"""
+    BROKEN_HEART = "💔"
+    """:obj:`str`: Broken heart"""
+    FACE_WITH_ONE_EYEBROW_RAISED = "🤨"
+    """:obj:`str`: Face with one eyebrow raised"""
+    NEUTRAL_FACE = "😐"
+    """:obj:`str`: Neutral face"""
+    STRAWBERRY = "🍓"
+    """:obj:`str`: Strawberry"""
+    BOTTLE_WITH_POPPING_CORK = "🍾"
+    """:obj:`str`: Bottle with popping cork"""
+    KISS_MARK = "💋"
+    """:obj:`str`: Kiss mark"""
+    REVERSED_HAND_WITH_MIDDLE_FINGER_EXTENDED = "🖕"
+    """:obj:`str`: Reversed hand with middle finger extended"""
+    SMILING_FACE_WITH_HORNS = "😈"
+    """:obj:`str`: Smiling face with horns"""
+    SLEEPING_FACE = "😴"
+    """:obj:`str`: Sleeping face"""
+    LOUDLY_CRYING_FACE = "😭"
+    """:obj:`str`: Loudly crying face"""
+    NERD_FACE = "🤓"
+    """:obj:`str`: Nerd face"""
+    GHOST = "👻"
+    """:obj:`str`: Ghost"""
+    MAN_TECHNOLOGIST = "👨‍💻"
+    """:obj:`str`: Man Technologist"""
+    EYES = "👀"
+    """:obj:`str`: Eyes"""
+    JACK_O_LANTERN = "🎃"
+    """:obj:`str`: Jack-o-lantern"""
+    SEE_NO_EVIL_MONKEY = "🙈"
+    """:obj:`str`: See-no-evil monkey"""
+    SMILING_FACE_WITH_HALO = "😇"
+    """:obj:`str`: Smiling face with halo"""
+    FEARFUL_FACE = "😨"
+    """:obj:`str`: Fearful face"""
+    HANDSHAKE = "🤝"
+    """:obj:`str`: Handshake"""
+    WRITING_HAND = "✍"
+    """:obj:`str`: Writing hand"""
+    HUGGING_FACE = "🤗"
+    """:obj:`str`: Hugging face"""
+    SALUTING_FACE = "🫡"
+    """:obj:`str`: Saluting face"""
+    FATHER_CHRISTMAS = "🎅"
+    """:obj:`str`: Father christmas"""
+    CHRISTMAS_TREE = "🎄"
+    """:obj:`str`: Christmas tree"""
+    SNOWMAN = "☃"
+    """:obj:`str`: Snowman"""
+    NAIL_POLISH = "💅"
+    """:obj:`str`: Nail polish"""
+    GRINNING_FACE_WITH_ONE_LARGE_AND_ONE_SMALL_EYE = "🤪"
+    """:obj:`str`: Grinning face with one large and one small eye"""
+    MOYAI = "🗿"
+    """:obj:`str`: Moyai"""
+    SQUARED_COOL = "🆒"
+    """:obj:`str`: Squared cool"""
+    HEART_WITH_ARROW = "💘"
+    """:obj:`str`: Heart with arrow"""
+    HEAR_NO_EVIL_MONKEY = "🙉"
+    """:obj:`str`: Hear-no-evil monkey"""
+    UNICORN_FACE = "🦄"
+    """:obj:`str`: Unicorn face"""
+    FACE_THROWING_A_KISS = "😘"
+    """:obj:`str`: Face throwing a kiss"""
+    PILL = "💊"
+    """:obj:`str`: Pill"""
+    SPEAK_NO_EVIL_MONKEY = "🙊"
+    """:obj:`str`: Speak-no-evil monkey"""
+    SMILING_FACE_WITH_SUNGLASSES = "😎"
+    """:obj:`str`: Smiling face with sunglasses"""
+    ALIEN_MONSTER = "👾"
+    """:obj:`str`: Alien monster"""
+    MAN_SHRUGGING = "🤷‍♂️"
+    """:obj:`str`: Man Shrugging"""
+    SHRUG = "🤷"
+    """:obj:`str`: Shrug"""
+    WOMAN_SHRUGGING = "🤷‍♀️"
+    """:obj:`str`: Woman Shrugging"""
+    POUTING_FACE = "😡"
+    """:obj:`str`: Pouting face"""

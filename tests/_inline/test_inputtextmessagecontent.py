@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import InputTextMessageContent, MessageEntity
+from telegram import InputTextMessageContent, LinkPreviewOptions, MessageEntity
 from telegram.constants import ParseMode
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -29,7 +30,7 @@ def input_text_message_content():
         TestInputTextMessageContentBase.message_text,
         parse_mode=TestInputTextMessageContentBase.parse_mode,
         entities=TestInputTextMessageContentBase.entities,
-        disable_web_page_preview=TestInputTextMessageContentBase.disable_web_page_preview,
+        link_preview_options=TestInputTextMessageContentBase.link_preview_options,
     )
 
 
@@ -37,7 +38,8 @@ class TestInputTextMessageContentBase:
     message_text = "*message text*"
     parse_mode = ParseMode.MARKDOWN
     entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
-    disable_web_page_preview = True
+    disable_web_page_preview = False
+    link_preview_options = LinkPreviewOptions(False, url="https://python-telegram-bot.org")
 
 
 class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase):
@@ -52,6 +54,7 @@ class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase)
         assert input_text_message_content.message_text == self.message_text
         assert input_text_message_content.disable_web_page_preview == self.disable_web_page_preview
         assert input_text_message_content.entities == tuple(self.entities)
+        assert input_text_message_content.link_preview_options == self.link_preview_options
 
     def test_entities_always_tuple(self):
         input_text_message_content = InputTextMessageContent("text")
@@ -72,8 +75,8 @@ class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase)
             ce.to_dict() for ce in input_text_message_content.entities
         ]
         assert (
-            input_text_message_content_dict["disable_web_page_preview"]
-            == input_text_message_content.disable_web_page_preview
+            input_text_message_content_dict["link_preview_options"]
+            == input_text_message_content.link_preview_options.to_dict()
         )
 
     def test_equality(self):
@@ -90,3 +93,15 @@ class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase)
 
         assert a != d
         assert hash(a) != hash(d)
+
+    def test_mutually_exclusive(self):
+        with pytest.raises(ValueError, match="'link_preview_options' in Bot API 7.0"):
+            InputTextMessageContent(
+                "text", disable_web_page_preview=True, link_preview_options=LinkPreviewOptions()
+            )
+
+    def test_disable_web_page_preview_deprecated(self):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'disable_web_page_preview' to 'link_preview_options'"
+        ):
+            InputTextMessageContent("text", disable_web_page_preview=True).disable_web_page_preview

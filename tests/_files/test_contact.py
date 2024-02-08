@@ -21,9 +21,11 @@ import asyncio
 
 import pytest
 
-from telegram import Contact, Voice
+from telegram import Contact, ReplyParameters, Voice
+from telegram.constants import ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from tests.auxil.build_messages import make_message
 from tests.auxil.slots import mro_slots
 
 
@@ -125,6 +127,33 @@ class TestContactWithoutRequest(TestContactBase):
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_contact(contact=contact, chat_id=chat_id)
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_contact_default_quote_parse_mode(
+        self, default_bot, chat_id, contact, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
+
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_contact(
+            chat_id, contact=contact, reply_parameters=ReplyParameters(**kwargs)
+        )
 
 
 class TestContactWithRequest(TestContactBase):

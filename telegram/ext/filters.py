@@ -47,6 +47,8 @@ __all__ = (
     "CONTACT",
     "FORWARDED",
     "GAME",
+    "GIVEAWAY",
+    "GIVEAWAY_WINNERS",
     "HAS_MEDIA_SPOILER",
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
@@ -114,10 +116,18 @@ from typing import (
 )
 
 from telegram import Chat as TGChat
-from telegram import Message, MessageEntity, Update
+from telegram import (
+    Message,
+    MessageEntity,
+    MessageOriginChannel,
+    MessageOriginChat,
+    MessageOriginUser,
+    Update,
+)
 from telegram import User as TGUser
 from telegram._utils.types import SCT
 from telegram.constants import DiceEmoji as DiceEmojiEnum
+from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import FilterDataDict
 
 
@@ -673,29 +683,13 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
     @abstractmethod
     def _get_chat_or_user(self, message: Message) -> Union[TGChat, TGUser, None]: ...
 
-    @staticmethod
-    def _parse_chat_id(chat_id: Optional[SCT[int]]) -> Set[int]:
-        if chat_id is None:
-            return set()
-        if isinstance(chat_id, int):
-            return {chat_id}
-        return set(chat_id)
-
-    @staticmethod
-    def _parse_username(username: Optional[SCT[str]]) -> Set[str]:
-        if username is None:
-            return set()
-        if isinstance(username, str):
-            return {username[1:] if username.startswith("@") else username}
-        return {chat[1:] if chat.startswith("@") else chat for chat in username}
-
     def _set_chat_ids(self, chat_id: Optional[SCT[int]]) -> None:
         if chat_id and self._usernames:
             raise RuntimeError(
                 f"Can't set {self._chat_id_name} in conjunction with (already set) "
                 f"{self._username_name}s."
             )
-        self._chat_ids = self._parse_chat_id(chat_id)
+        self._chat_ids = set(parse_chat_id(chat_id))
 
     def _set_usernames(self, username: Optional[SCT[str]]) -> None:
         if username and self._chat_ids:
@@ -703,7 +697,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 f"Can't set {self._username_name} in conjunction with (already set) "
                 f"{self._chat_id_name}s."
             )
-        self._usernames = self._parse_username(username)
+        self._usernames = set(parse_username(username))
 
     @property
     def chat_ids(self) -> FrozenSet[int]:
@@ -747,7 +741,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 f"{self._chat_id_name}s."
             )
 
-        parsed_username = self._parse_username(username)
+        parsed_username = set(parse_username(username))
         self._usernames |= parsed_username
 
     def _add_chat_ids(self, chat_id: SCT[int]) -> None:
@@ -757,7 +751,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 f"{self._username_name}s."
             )
 
-        parsed_chat_id = self._parse_chat_id(chat_id)
+        parsed_chat_id = set(parse_chat_id(chat_id))
 
         self._chat_ids |= parsed_chat_id
 
@@ -775,7 +769,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 f"{self._chat_id_name}s."
             )
 
-        parsed_username = self._parse_username(username)
+        parsed_username = set(parse_username(username))
         self._usernames -= parsed_username
 
     def _remove_chat_ids(self, chat_id: SCT[int]) -> None:
@@ -784,7 +778,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 f"Can't set {self._chat_id_name} in conjunction with (already set) "
                 f"{self._username_name}s."
             )
-        parsed_chat_id = self._parse_chat_id(chat_id)
+        parsed_chat_id = set(parse_chat_id(chat_id))
         self._chat_ids -= parsed_chat_id
 
     def filter(self, message: Message) -> bool:
@@ -1362,28 +1356,40 @@ class _Forwarded(MessageFilter):
     __slots__ = ()
 
     def filter(self, message: Message) -> bool:
-        return bool(message.forward_date)
+        return bool(message.forward_origin)
 
 
 FORWARDED = _Forwarded(name="filters.FORWARDED")
-"""Messages that contain :attr:`telegram.Message.forward_date`."""
+"""Messages that contain :attr:`telegram.Message.forward_origin`.
+
+.. versionchanged:: NEXT.VERSION
+   Now based on :attr:`telegram.Message.forward_origin` instead of
+   :attr:`telegram.Message.forward_date`.
+"""
 
 
 class ForwardedFrom(_ChatUserBaseFilter):
     """Filters messages to allow only those which are forwarded from the specified chat ID(s)
-    or username(s) based on :attr:`telegram.Message.forward_from` and
-    :attr:`telegram.Message.forward_from_chat`.
+    or username(s) based on :attr:`telegram.Message.forward_origin` and in particular
+
+    * :attr:`telegram.MessageOriginUser.sender_user`
+    * :attr:`telegram.MessageOriginChat.sender_chat`
+    * :attr:`telegram.MessageOriginChannel.chat`
 
     .. versionadded:: 13.5
+
+    .. versionchanged:: NEXT.VERSION
+       Was previously based on :attr:`telegram.Message.forward_from` and
+         :attr:`telegram.Message.forward_from_chat`.
 
     Examples:
         ``MessageHandler(filters.ForwardedFrom(chat_id=1234), callback_method)``
 
     Note:
         When a user has disallowed adding a link to their account while forwarding their
-        messages, this filter will *not* work since both
-        :attr:`telegram.Message.forward_from` and
-        :attr:`telegram.Message.forward_from_chat` are :obj:`None`. However, this behaviour
+        messages, this filter will *not* work since
+        :attr:`telegram.Message.forward_origin` will be of type
+        :class:`telegram.MessageOriginHiddenUser`. However, this behaviour
         is undocumented and might be changed by Telegram.
 
     Warning:
@@ -1414,7 +1420,17 @@ class ForwardedFrom(_ChatUserBaseFilter):
     __slots__ = ()
 
     def _get_chat_or_user(self, message: Message) -> Union[TGUser, TGChat, None]:
-        return message.forward_from or message.forward_from_chat
+        if (forward_origin := message.forward_origin) is None:
+            return None
+
+        if isinstance(forward_origin, MessageOriginUser):
+            return forward_origin.sender_user
+        if isinstance(forward_origin, MessageOriginChat):
+            return forward_origin.sender_chat
+        if isinstance(forward_origin, MessageOriginChannel):
+            return forward_origin.chat
+
+        return None
 
     def add_chat_ids(self, chat_id: SCT[int]) -> None:
         """
@@ -1446,6 +1462,28 @@ class _Game(MessageFilter):
 
 GAME = _Game(name="filters.GAME")
 """Messages that contain :attr:`telegram.Message.game`."""
+
+
+class _Giveaway(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.giveaway)
+
+
+GIVEAWAY = _Giveaway(name="filters.GIVEAWAY")
+"""Messages that contain :attr:`telegram.Message.giveaway`."""
+
+
+class _GiveawayWinners(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.giveaway_winners)
+
+
+GIVEAWAY_WINNERS = _GiveawayWinners(name="filters.GIVEAWAY_WINNERS")
+"""Messages that contain :attr:`telegram.Message.giveaway_winners`."""
 
 
 class _HasMediaSpoiler(MessageFilter):
@@ -1846,31 +1884,35 @@ class StatusUpdate:
 
         def filter(self, update: Update) -> bool:
             return bool(
-                StatusUpdate.NEW_CHAT_MEMBERS.check_update(update)
-                or StatusUpdate.LEFT_CHAT_MEMBER.check_update(update)
-                or StatusUpdate.NEW_CHAT_TITLE.check_update(update)
-                or StatusUpdate.NEW_CHAT_PHOTO.check_update(update)
-                or StatusUpdate.DELETE_CHAT_PHOTO.check_update(update)
-                or StatusUpdate.CHAT_CREATED.check_update(update)
-                or StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED.check_update(update)
-                or StatusUpdate.MIGRATE.check_update(update)
-                or StatusUpdate.PINNED_MESSAGE.check_update(update)
+                # keep this alphabetically sorted for easier maintenance
+                StatusUpdate.CHAT_CREATED.check_update(update)
+                or StatusUpdate.CHAT_SHARED.check_update(update)
                 or StatusUpdate.CONNECTED_WEBSITE.check_update(update)
-                or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
-                or StatusUpdate.VIDEO_CHAT_SCHEDULED.check_update(update)
-                or StatusUpdate.VIDEO_CHAT_STARTED.check_update(update)
-                or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
-                or StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
-                or StatusUpdate.WEB_APP_DATA.check_update(update)
-                or StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
+                or StatusUpdate.DELETE_CHAT_PHOTO.check_update(update)
                 or StatusUpdate.FORUM_TOPIC_CLOSED.check_update(update)
-                or StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
+                or StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
                 or StatusUpdate.FORUM_TOPIC_EDITED.check_update(update)
+                or StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
                 or StatusUpdate.GENERAL_FORUM_TOPIC_HIDDEN.check_update(update)
                 or StatusUpdate.GENERAL_FORUM_TOPIC_UNHIDDEN.check_update(update)
-                or StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
+                or StatusUpdate.GIVEAWAY_COMPLETED.check_update(update)
+                or StatusUpdate.GIVEAWAY_CREATED.check_update(update)
+                or StatusUpdate.LEFT_CHAT_MEMBER.check_update(update)
+                or StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED.check_update(update)
+                or StatusUpdate.MIGRATE.check_update(update)
+                or StatusUpdate.NEW_CHAT_MEMBERS.check_update(update)
+                or StatusUpdate.NEW_CHAT_PHOTO.check_update(update)
+                or StatusUpdate.NEW_CHAT_TITLE.check_update(update)
+                or StatusUpdate.PINNED_MESSAGE.check_update(update)
+                or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
+                or StatusUpdate.USERS_SHARED.check_update(update)
                 or StatusUpdate.USER_SHARED.check_update(update)
-                or StatusUpdate.CHAT_SHARED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_SCHEDULED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_STARTED.check_update(update)
+                or StatusUpdate.WEB_APP_DATA.check_update(update)
+                or StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -1997,6 +2039,29 @@ class StatusUpdate:
     .. versionadded:: 20.0
     """
 
+    class _GiveawayCreated(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.giveaway_created)
+
+    GIVEAWAY_CREATED = _GiveawayCreated(name="filters.StatusUpdate.GIVEAWAY_CREATED")
+    """Messages that contain :attr:`telegram.Message.giveaway_created`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _GiveawayCompleted(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.giveaway_completed)
+
+    GIVEAWAY_COMPLETED = _GiveawayCompleted(name="filters.StatusUpdate.GIVEAWAY_COMPLETED")
+    """Messages that contain :attr:`telegram.Message.giveaway_completed`.
+    .. versionadded:: NEXT.VERSION
+    """
+
     class _LeftChatMember(MessageFilter):
         __slots__ = ()
 
@@ -2086,7 +2151,25 @@ class StatusUpdate:
     USER_SHARED = _UserShared(name="filters.StatusUpdate.USER_SHARED")
     """Messages that contain :attr:`telegram.Message.user_shared`.
 
+    Warning:
+        This will only catch the legacy :attr:`telegram.Message.user_shared` attribute, not the
+        new :attr:`telegram.Message.users_shared` attribute!
+
     .. versionadded:: 20.1
+    .. deprecated:: NEXT.VERSION
+       Use :attr:`USERS_SHARED` instead.
+    """
+
+    class _UsersShared(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.users_shared)
+
+    USERS_SHARED = _UsersShared(name="filters.StatusUpdate.USERS_SHARED")
+    """Messages that contain :attr:`telegram.Message.users_shared`.
+
+    .. versionadded:: NEXT.VERSION
     """
 
     class _VideoChatEnded(MessageFilter):

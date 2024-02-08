@@ -19,8 +19,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 import datetime
+import re
 from html import escape
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -45,6 +46,7 @@ from telegram._forumtopic import (
 )
 from telegram._games.game import Game
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._linkpreviewoptions import LinkPreviewOptions
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from telegram._messageentity import MessageEntity
 from telegram._passport.passportdata import PassportData
@@ -52,7 +54,8 @@ from telegram._payment.invoice import Invoice
 from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
-from telegram._shared import ChatShared, UserShared
+from telegram._reply import ReplyParameters
+from telegram._shared import ChatShared, UserShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -67,6 +70,11 @@ from telegram._utils.types import (
     ODVInput,
     ReplyMarkup,
 )
+from telegram._utils.warnings import warn
+from telegram._utils.warnings_transition import (
+    build_deprecation_warning_message,
+    warn_about_deprecated_attr_in_property,
+)
 from telegram._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -75,13 +83,19 @@ from telegram._videochat import (
 )
 from telegram._webappdata import WebAppData
 from telegram._writeaccessallowed import WriteAccessAllowed
-from telegram.constants import MessageAttachmentType, ParseMode
+from telegram.constants import ZERO_DATE, MessageAttachmentType, ParseMode
 from telegram.helpers import escape_markdown
+from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import (
         Bot,
+        ExternalReplyInfo,
         GameHighScore,
+        Giveaway,
+        GiveawayCompleted,
+        GiveawayCreated,
+        GiveawayWinners,
         InputMedia,
         InputMediaAudio,
         InputMediaDocument,
@@ -89,10 +103,181 @@ if TYPE_CHECKING:
         InputMediaVideo,
         LabeledPrice,
         MessageId,
+        MessageOrigin,
+        ReactionType,
+        TextQuote,
     )
 
 
-class Message(TelegramObject):
+class _ReplyKwargs(TypedDict):
+    __slots__ = ("chat_id", "reply_parameters")  # type: ignore[misc]
+
+    chat_id: Union[str, int]
+    reply_parameters: ReplyParameters
+
+
+class MaybeInaccessibleMessage(TelegramObject):
+    """Base class for Telegram Message Objects.
+
+    Currently, that includes :class:`telegram.Message` and :class:`telegram.InaccessibleMessage`.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`message_id` and :attr:`chat` are equal
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        message_id (:obj:`int`): Unique message identifier.
+        date (:class:`datetime.datetime`): Date the message was sent in Unix time or 0 in Unix
+            time. Converted to :class:`datetime.datetime`
+
+            |datetime_localization|
+        chat (:class:`telegram.Chat`): Conversation the message belongs to.
+
+    Attributes:
+        message_id (:obj:`int`): Unique message identifier.
+        date (:class:`datetime.datetime`): Date the message was sent in Unix time or 0 in Unix
+            time. Converted to :class:`datetime.datetime`
+
+            |datetime_localization|
+        chat (:class:`telegram.Chat`): Conversation the message belongs to.
+    """
+
+    __slots__ = ("chat", "date", "message_id")
+
+    def __init__(
+        self,
+        chat: Chat,
+        message_id: int,
+        date: datetime.datetime,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.chat: Chat = chat
+        self.message_id: int = message_id
+        self.date: datetime.datetime = date
+
+        self._id_attrs = (self.message_id, self.chat)
+
+        self._freeze()
+
+    def __bool__(self) -> bool:
+        """Overrides :meth:`object.__bool__` to return the value of :attr:`is_accessible`.
+        This is intended to ease migration to Bot API 7.0, as this allows checks like
+
+        .. code-block:: python
+
+            if message.pinned_message:
+                ...
+
+        to work as before, when ``message.pinned_message`` was :obj:`None`. Note that this does not
+        help with check like
+
+        .. code-block:: python
+
+            if message.pinned_message is None:
+                ...
+
+        for cases where ``message.pinned_message`` is now no longer :obj:`None`.
+
+        Tip:
+            Since objects that can only be of type :class:`~telegram.Message` or :obj:`None` are
+            not affected by this change, :meth:`Message.__bool__` is not overridden and will
+            continue to work as before.
+
+        .. versionadded:: NEXT.VERSION
+        .. deprecated:: NEXT.VERSION
+           This behavior is introduced only temporarily to ease migration to Bot API 7.0. It will
+           be removed along with other functionality deprecated by Bot API 7.0.
+        """
+        # Once we remove this method, also remove `Message.__bool__`.
+        warn(
+            category=PTBDeprecationWarning,
+            message=(
+                "You probably see this warning "
+                "because you wrote `if callback_query.message` or `if message.pinned_message` in "
+                "your code. This is not the supported way of checking the existence of a message "
+                "as of API 7.0. Please use `if message.is_accessible` or `if isinstance(message, "
+                "Message)` instead. `if message is None` may be suitable for specific use cases "
+                f"as well.\n`{self.__class__.__name__}.__bool__` will be reverted to Pythons "
+                f"default implementation in future versions."
+            ),
+            stacklevel=2,
+        )
+        return self.is_accessible
+
+    @property
+    def is_accessible(self) -> bool:
+        """Convenience attribute. :obj:`True`, if the date is not 0 in Unix time.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        # Once we drop support for python 3.9, this can be made a TypeGuard function:
+        # def is_accessible(self) -> TypeGuard[Message]:
+        return self.date != ZERO_DATE
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaybeInaccessibleMessage"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        if cls is MaybeInaccessibleMessage:
+            if data["date"] == 0:
+                return InaccessibleMessage.de_json(data=data, bot=bot)
+            return Message.de_json(data=data, bot=bot)
+
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+
+        # this is to include the Literal from InaccessibleMessage
+        if data["date"] == 0:
+            data["date"] = ZERO_DATE
+        else:
+            data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
+
+        data["chat"] = Chat.de_json(data.get("chat"), bot)
+        return super().de_json(data=data, bot=bot)
+
+
+class InaccessibleMessage(MaybeInaccessibleMessage):
+    """This object represents an inaccessible message.
+
+    These are messages that are e.g. deleted.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`message_id` and :attr:`chat` are equal
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        message_id (:obj:`int`): Unique message identifier.
+        chat (:class:`telegram.Chat`): Chat the message belongs to.
+
+    Attributes:
+        message_id (:obj:`int`): Unique message identifier.
+        date (:class:`constants.ZERO_DATE`): Always :tg-const:`telegram.constants.ZERO_DATE`.
+            The field can be used to differentiate regular and inaccessible messages.
+        chat (:class:`telegram.Chat`): Chat the message belongs to.
+    """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        chat: Chat,
+        message_id: int,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(chat=chat, message_id=message_id, date=ZERO_DATE, api_kwargs=api_kwargs)
+        self._freeze()
+
+
+class Message(MaybeInaccessibleMessage):
     # fmt: off
     """This object represents a message.
 
@@ -101,6 +286,11 @@ class Message(TelegramObject):
 
     Note:
         In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
+
+    .. versionchanged:: NEXT.VERSION
+        * This class is now a subclass of :class:`telegram.MaybeInaccessibleMessage`.
+        * The :paramref:`pinned_message` now can be either class:`telegram.Message` or
+          class:`telegram.InaccessibleMessage`.
 
     .. versionchanged:: 20.0
 
@@ -135,17 +325,37 @@ class Message(TelegramObject):
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`, optional): For forwarded messages, sender of
             the original message.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_from` in favor of
+               :paramref:`forward_origin`.
         forward_from_chat (:class:`telegram.Chat`, optional): For messages forwarded from channels
             or from anonymous administrators, information about the original sender chat.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_from_chat` in favor of
+               :paramref:`forward_origin`.
         forward_from_message_id (:obj:`int`, optional): For forwarded channel posts, identifier of
             the original message in the channel.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_from_message_id` in favor of
+               :paramref:`forward_origin`.
         forward_sender_name (:obj:`str`, optional): Sender's name for messages forwarded from
             users who disallow adding a link to their account in forwarded messages.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_sender_name` in favor of
+               :paramref:`forward_origin`.
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
 
             .. versionchanged:: 20.3
                 |datetime_localization|
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_date` in favor of
+               :paramref:`forward_origin`.
         is_automatic_forward (:obj:`bool`, optional): :obj:`True`, if the message is a channel
             post that was automatically forwarded to the connected discussion group.
 
@@ -173,6 +383,12 @@ class Message(TelegramObject):
 
             .. versionchanged:: 20.0
                 |sequenceclassargs|
+
+        link_preview_options (:class:`telegram.LinkPreviewOptions`, optional): Options used for
+            link preview generation for the message, if it is a text message and link preview
+            options were changed.
+
+            .. versionadded:: NEXT.VERSION
 
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -252,9 +468,13 @@ class Message(TelegramObject):
             with the specified identifier.
         migrate_from_chat_id (:obj:`int`, optional): The supergroup has been migrated from a group
             with the specified identifier.
-        pinned_message (:class:`telegram.Message`, optional): Specified message was pinned. Note
-            that the Message object in this field will not contain further
+        pinned_message (:class:`telegram.MaybeInaccessibleMessage`, optional): Specified message
+            was pinned. Note that the Message object in this field will not contain further
             :attr:`reply_to_message` fields even if it is itself a reply.
+
+            .. versionchanged:: NEXT.VERSION
+                This attribute now is either class:`telegram.Message` or
+                class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
@@ -263,6 +483,10 @@ class Message(TelegramObject):
             has logged in.
         forward_signature (:obj:`str`, optional): For messages forwarded from channels, signature
             of the post author if present.
+
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`forward_signature` in favor of
+               :paramref:`forward_origin`.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
@@ -343,10 +567,44 @@ class Message(TelegramObject):
             with the bot.
 
             .. versionadded:: 20.1
+            .. deprecated:: NEXT.VERSION
+               Bot API 7.0 deprecates :paramref:`user_shared` in favor of :paramref:`users_shared`.
+        users_shared (:class:`telegram.UsersShared`, optional): Service message: users were shared
+            with the bot
+
+            .. versionadded:: NEXT.VERSION
         chat_shared (:class:`telegram.ChatShared`, optional):Service message: a chat was shared
             with the bot.
 
             .. versionadded:: 20.1
+        giveaway_created (:class:`telegram.GiveawayCreated`, optional): Service message: a
+            scheduled giveaway was created
+
+            .. versionadded:: NEXT.VERSION
+        giveaway (:class:`telegram.Giveaway`, optional): The message is a scheduled giveaway
+            message
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_winners (:class:`telegram.GiveawayWinners`, optional): A giveaway with public
+            winners was completed
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_completed (:class:`telegram.GiveawayCompleted`, optional): Service message: a
+            giveaway without public winners was completed
+
+            .. versionadded:: NEXT.VERSION
+        external_reply (:class:`telegram.ExternalReplyInfo`, optional): Information about the
+            message that is being replied to, which may come from another chat or forum topic.
+
+            .. versionadded:: NEXT.VERSION
+        quote (:class:`telegram.TextQuote`, optional): For replies that quote part of the original
+            message, the quoted part of the message.
+
+            .. versionadded:: NEXT.VERSION
+        forward_origin (:class:`telegram.MessageOrigin`, optional): Information about the original
+            message for forwarded messages
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -365,17 +623,6 @@ class Message(TelegramObject):
             .. versionchanged:: 20.3
                 |datetime_localization|
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
-        forward_from (:class:`telegram.User`): Optional. For forwarded messages, sender of the
-            original message.
-        forward_from_chat (:class:`telegram.Chat`): Optional. For messages forwarded from channels
-            or from anonymous administrators, information about the original sender chat.
-        forward_from_message_id (:obj:`int`): Optional. For forwarded channel posts, identifier of
-            the original message in the channel.
-        forward_date (:class:`datetime.datetime`): Optional. For forwarded messages, date the
-            original message was sent in Unix time. Converted to :class:`datetime.datetime`.
-
-            .. versionchanged:: 20.3
-                |datetime_localization|
         is_automatic_forward (:obj:`bool`): Optional. :obj:`True`, if the message is a channel
             post that was automatically forwarded to the connected discussion group.
 
@@ -403,6 +650,12 @@ class Message(TelegramObject):
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
+
+        link_preview_options (:class:`telegram.LinkPreviewOptions`): Optional. Options used for
+            link preview generation for the message, if it is a text message and link preview
+            options were changed.
+
+            .. versionadded:: NEXT.VERSION
 
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -497,21 +750,21 @@ class Message(TelegramObject):
             with the specified identifier.
         migrate_from_chat_id (:obj:`int`): Optional. The supergroup has been migrated from a group
             with the specified identifier.
-        pinned_message (:class:`telegram.Message`): Optional. Specified message was pinned. Note
-            that the Message object in this field will not contain further
+        pinned_message (:class:`telegram.MaybeInaccessibleMessage`): Optional. Specified message
+            was pinned. Note that the Message object in this field will not contain further
             :attr:`reply_to_message` fields even if it is itself a reply.
+
+            .. versionchanged:: NEXT.VERSION
+                This attribute now is either class:`telegram.Message` or
+                class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
             information about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service
             message about a successful payment, information about the payment.
         connected_website (:obj:`str`): Optional. The domain name of the website on which the user
             has logged in.
-        forward_signature (:obj:`str`): Optional. For messages forwarded from channels, signature
-            of the post author if present.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
-        forward_sender_name (:obj:`str`): Optional. Sender's name for messages forwarded from
-            users who disallow adding a link to their account in forwarded messages.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
 
             Examples:
@@ -586,56 +839,90 @@ class Message(TelegramObject):
             by a spoiler animation.
 
             .. versionadded:: 20.0
-        user_shared (:class:`telegram.UserShared`): Optional. Service message: a user was shared
-            with the bot.
+        users_shared (:class:`telegram.UsersShared`): Optional. Service message: users were shared
+            with the bot
 
-            .. versionadded:: 20.1
+            .. versionadded:: NEXT.VERSION
         chat_shared (:class:`telegram.ChatShared`): Optional. Service message: a chat was shared
             with the bot.
 
             .. versionadded:: 20.1
+        giveaway_created (:class:`telegram.GiveawayCreated`): Optional. Service message: a
+            scheduled giveaway was created
 
-    .. |custom_emoji_formatting_note| replace:: Custom emoji entities will be ignored by this
-        function. Instead, the supplied replacement for the emoji will be used.
+            .. versionadded:: NEXT.VERSION
+        giveaway (:class:`telegram.Giveaway`): Optional. The message is a scheduled giveaway
+            message
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_winners (:class:`telegram.GiveawayWinners`): Optional. A giveaway with public
+            winners was completed
+
+            .. versionadded:: NEXT.VERSION
+        giveaway_completed (:class:`telegram.GiveawayCompleted`): Optional. Service message: a
+            giveaway without public winners was completed
+
+            .. versionadded:: NEXT.VERSION
+        external_reply (:class:`telegram.ExternalReplyInfo`): Optional. Information about the
+            message that is being replied to, which may come from another chat or forum topic.
+
+            .. versionadded:: NEXT.VERSION
+        quote (:class:`telegram.TextQuote`): Optional. For replies that quote part of the original
+            message, the quoted part of the message.
+
+            .. versionadded:: NEXT.VERSION
+        forward_origin (:class:`telegram.MessageOrigin`, optional): Information about the original
+            message for forwarded messages
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
        :exc:`ValueError` when encountering a custom emoji.
+
+    .. |blockquote_no_md1_support| replace:: Since block quotation entities are not supported
+       by :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
+       :exc:`ValueError` when encountering a block quotation.
     """
 
     # fmt: on
     __slots__ = (
         "_effective_attachment",
+        "_forward_date",
+        "_forward_from",
+        "_forward_from_chat",
+        "_forward_from_message_id",
+        "_forward_sender_name",
+        "_forward_signature",
+        "_user_shared",
         "animation",
         "audio",
         "author_signature",
         "caption",
         "caption_entities",
         "channel_chat_created",
-        "chat",
         "chat_shared",
         "connected_website",
         "contact",
-        "date",
         "delete_chat_photo",
         "dice",
         "document",
         "edit_date",
         "entities",
+        "external_reply",
         "forum_topic_closed",
         "forum_topic_created",
         "forum_topic_edited",
         "forum_topic_reopened",
-        "forward_date",
-        "forward_from",
-        "forward_from_chat",
-        "forward_from_message_id",
-        "forward_sender_name",
-        "forward_signature",
+        "forward_origin",
         "from_user",
         "game",
         "general_forum_topic_hidden",
         "general_forum_topic_unhidden",
+        "giveaway",
+        "giveaway_completed",
+        "giveaway_created",
+        "giveaway_winners",
         "group_chat_created",
         "has_media_spoiler",
         "has_protected_content",
@@ -643,10 +930,10 @@ class Message(TelegramObject):
         "is_automatic_forward",
         "is_topic_message",
         "left_chat_member",
+        "link_preview_options",
         "location",
         "media_group_id",
         "message_auto_delete_timer_changed",
-        "message_id",
         "message_thread_id",
         "migrate_from_chat_id",
         "migrate_to_chat_id",
@@ -658,6 +945,7 @@ class Message(TelegramObject):
         "pinned_message",
         "poll",
         "proximity_alert_triggered",
+        "quote",
         "reply_markup",
         "reply_to_message",
         "sender_chat",
@@ -666,7 +954,7 @@ class Message(TelegramObject):
         "successful_payment",
         "supergroup_chat_created",
         "text",
-        "user_shared",
+        "users_shared",
         "venue",
         "via_bot",
         "video",
@@ -717,7 +1005,7 @@ class Message(TelegramObject):
         channel_chat_created: Optional[bool] = None,
         migrate_to_chat_id: Optional[int] = None,
         migrate_from_chat_id: Optional[int] = None,
-        pinned_message: Optional["Message"] = None,
+        pinned_message: Optional[MaybeInaccessibleMessage] = None,
         invoice: Optional[Invoice] = None,
         successful_payment: Optional[SuccessfulPayment] = None,
         forward_signature: Optional[str] = None,
@@ -754,101 +1042,287 @@ class Message(TelegramObject):
         user_shared: Optional[UserShared] = None,
         chat_shared: Optional[ChatShared] = None,
         story: Optional[Story] = None,
+        giveaway: Optional["Giveaway"] = None,
+        giveaway_completed: Optional["GiveawayCompleted"] = None,
+        giveaway_created: Optional["GiveawayCreated"] = None,
+        giveaway_winners: Optional["GiveawayWinners"] = None,
+        users_shared: Optional[UsersShared] = None,
+        link_preview_options: Optional[LinkPreviewOptions] = None,
+        external_reply: Optional["ExternalReplyInfo"] = None,
+        quote: Optional["TextQuote"] = None,
+        forward_origin: Optional["MessageOrigin"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
-        super().__init__(api_kwargs=api_kwargs)
+        super().__init__(chat=chat, message_id=message_id, date=date, api_kwargs=api_kwargs)
 
-        # Required
-        self.message_id: int = message_id
-        # Optionals
-        self.from_user: Optional[User] = from_user
-        self.sender_chat: Optional[Chat] = sender_chat
-        self.date: datetime.datetime = date
-        self.chat: Chat = chat
-        self.forward_from: Optional[User] = forward_from
-        self.forward_from_chat: Optional[Chat] = forward_from_chat
-        self.forward_date: Optional[datetime.datetime] = forward_date
-        self.is_automatic_forward: Optional[bool] = is_automatic_forward
-        self.reply_to_message: Optional[Message] = reply_to_message
-        self.edit_date: Optional[datetime.datetime] = edit_date
-        self.has_protected_content: Optional[bool] = has_protected_content
-        self.text: Optional[str] = text
-        self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-        self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-        self.audio: Optional[Audio] = audio
-        self.game: Optional[Game] = game
-        self.document: Optional[Document] = document
-        self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
-        self.sticker: Optional[Sticker] = sticker
-        self.video: Optional[Video] = video
-        self.voice: Optional[Voice] = voice
-        self.video_note: Optional[VideoNote] = video_note
-        self.caption: Optional[str] = caption
-        self.contact: Optional[Contact] = contact
-        self.location: Optional[Location] = location
-        self.venue: Optional[Venue] = venue
-        self.new_chat_members: Tuple[User, ...] = parse_sequence_arg(new_chat_members)
-        self.left_chat_member: Optional[User] = left_chat_member
-        self.new_chat_title: Optional[str] = new_chat_title
-        self.new_chat_photo: Tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
-        self.delete_chat_photo: Optional[bool] = bool(delete_chat_photo)
-        self.group_chat_created: Optional[bool] = bool(group_chat_created)
-        self.supergroup_chat_created: Optional[bool] = bool(supergroup_chat_created)
-        self.migrate_to_chat_id: Optional[int] = migrate_to_chat_id
-        self.migrate_from_chat_id: Optional[int] = migrate_from_chat_id
-        self.channel_chat_created: Optional[bool] = bool(channel_chat_created)
-        self.message_auto_delete_timer_changed: Optional[MessageAutoDeleteTimerChanged] = (
-            message_auto_delete_timer_changed
-        )
-        self.pinned_message: Optional[Message] = pinned_message
-        self.forward_from_message_id: Optional[int] = forward_from_message_id
-        self.invoice: Optional[Invoice] = invoice
-        self.successful_payment: Optional[SuccessfulPayment] = successful_payment
-        self.connected_website: Optional[str] = connected_website
-        self.forward_signature: Optional[str] = forward_signature
-        self.forward_sender_name: Optional[str] = forward_sender_name
-        self.author_signature: Optional[str] = author_signature
-        self.media_group_id: Optional[str] = media_group_id
-        self.animation: Optional[Animation] = animation
-        self.passport_data: Optional[PassportData] = passport_data
-        self.poll: Optional[Poll] = poll
-        self.dice: Optional[Dice] = dice
-        self.via_bot: Optional[User] = via_bot
-        self.proximity_alert_triggered: Optional[ProximityAlertTriggered] = (
-            proximity_alert_triggered
-        )
-        self.video_chat_scheduled: Optional[VideoChatScheduled] = video_chat_scheduled
-        self.video_chat_started: Optional[VideoChatStarted] = video_chat_started
-        self.video_chat_ended: Optional[VideoChatEnded] = video_chat_ended
-        self.video_chat_participants_invited: Optional[VideoChatParticipantsInvited] = (
-            video_chat_participants_invited
-        )
-        self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
-        self.web_app_data: Optional[WebAppData] = web_app_data
-        self.is_topic_message: Optional[bool] = is_topic_message
-        self.message_thread_id: Optional[int] = message_thread_id
-        self.forum_topic_created: Optional[ForumTopicCreated] = forum_topic_created
-        self.forum_topic_closed: Optional[ForumTopicClosed] = forum_topic_closed
-        self.forum_topic_reopened: Optional[ForumTopicReopened] = forum_topic_reopened
-        self.forum_topic_edited: Optional[ForumTopicEdited] = forum_topic_edited
-        self.general_forum_topic_hidden: Optional[GeneralForumTopicHidden] = (
-            general_forum_topic_hidden
-        )
-        self.general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = (
-            general_forum_topic_unhidden
-        )
-        self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
-        self.has_media_spoiler: Optional[bool] = has_media_spoiler
-        self.user_shared: Optional[UserShared] = user_shared
-        self.chat_shared: Optional[ChatShared] = chat_shared
-        self.story: Optional[Story] = story
+        if user_shared:
+            warn(
+                build_deprecation_warning_message(
+                    deprecated_name="user_shared",
+                    new_name="users_shared",
+                    object_type="parameter",
+                    bot_api_version="7.0",
+                ),
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
 
-        self._effective_attachment = DEFAULT_NONE
+        if any(
+            (
+                forward_from,
+                forward_from_chat,
+                forward_from_message_id,
+                forward_signature,
+                forward_sender_name,
+                forward_date,
+            )
+        ):
+            if forward_from:
+                _warn_param = "forward_from"
+            elif forward_from_chat:
+                _warn_param = "forward_from_chat"
+            elif forward_from_message_id:
+                _warn_param = "forward_from_message_id"
+            elif forward_signature:
+                _warn_param = "forward_signature"
+            elif forward_sender_name:
+                _warn_param = "forward_sender_name"
+            else:
+                _warn_param = "forward_date"
 
-        self._id_attrs = (self.message_id, self.chat)
+            warn(
+                f"The information about parameter '{_warn_param}' was transferred to "
+                "'forward_origin' in Bot API 7.0. We recommend using 'forward_origin' instead of "
+                f"'{_warn_param}'",
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
 
-        self._freeze()
+        with self._unfrozen():
+            # Required
+            self.message_id: int = message_id
+            # Optionals
+            self.from_user: Optional[User] = from_user
+            self.sender_chat: Optional[Chat] = sender_chat
+            self.date: datetime.datetime = date
+            self.chat: Chat = chat
+            self._forward_from: Optional[User] = forward_from
+            self._forward_from_chat: Optional[Chat] = forward_from_chat
+            self._forward_date: Optional[datetime.datetime] = forward_date
+            self.is_automatic_forward: Optional[bool] = is_automatic_forward
+            self.reply_to_message: Optional[Message] = reply_to_message
+            self.edit_date: Optional[datetime.datetime] = edit_date
+            self.has_protected_content: Optional[bool] = has_protected_content
+            self.text: Optional[str] = text
+            self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
+            self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
+            self.audio: Optional[Audio] = audio
+            self.game: Optional[Game] = game
+            self.document: Optional[Document] = document
+            self.photo: Tuple[PhotoSize, ...] = parse_sequence_arg(photo)
+            self.sticker: Optional[Sticker] = sticker
+            self.video: Optional[Video] = video
+            self.voice: Optional[Voice] = voice
+            self.video_note: Optional[VideoNote] = video_note
+            self.caption: Optional[str] = caption
+            self.contact: Optional[Contact] = contact
+            self.location: Optional[Location] = location
+            self.venue: Optional[Venue] = venue
+            self.new_chat_members: Tuple[User, ...] = parse_sequence_arg(new_chat_members)
+            self.left_chat_member: Optional[User] = left_chat_member
+            self.new_chat_title: Optional[str] = new_chat_title
+            self.new_chat_photo: Tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
+            self.delete_chat_photo: Optional[bool] = bool(delete_chat_photo)
+            self.group_chat_created: Optional[bool] = bool(group_chat_created)
+            self.supergroup_chat_created: Optional[bool] = bool(supergroup_chat_created)
+            self.migrate_to_chat_id: Optional[int] = migrate_to_chat_id
+            self.migrate_from_chat_id: Optional[int] = migrate_from_chat_id
+            self.channel_chat_created: Optional[bool] = bool(channel_chat_created)
+            self.message_auto_delete_timer_changed: Optional[MessageAutoDeleteTimerChanged] = (
+                message_auto_delete_timer_changed
+            )
+            self.pinned_message: Optional[MaybeInaccessibleMessage] = pinned_message
+            self._forward_from_message_id: Optional[int] = forward_from_message_id
+            self.invoice: Optional[Invoice] = invoice
+            self.successful_payment: Optional[SuccessfulPayment] = successful_payment
+            self.connected_website: Optional[str] = connected_website
+            self._forward_signature: Optional[str] = forward_signature
+            self._forward_sender_name: Optional[str] = forward_sender_name
+            self.author_signature: Optional[str] = author_signature
+            self.media_group_id: Optional[str] = media_group_id
+            self.animation: Optional[Animation] = animation
+            self.passport_data: Optional[PassportData] = passport_data
+            self.poll: Optional[Poll] = poll
+            self.dice: Optional[Dice] = dice
+            self.via_bot: Optional[User] = via_bot
+            self.proximity_alert_triggered: Optional[ProximityAlertTriggered] = (
+                proximity_alert_triggered
+            )
+            self.video_chat_scheduled: Optional[VideoChatScheduled] = video_chat_scheduled
+            self.video_chat_started: Optional[VideoChatStarted] = video_chat_started
+            self.video_chat_ended: Optional[VideoChatEnded] = video_chat_ended
+            self.video_chat_participants_invited: Optional[VideoChatParticipantsInvited] = (
+                video_chat_participants_invited
+            )
+            self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
+            self.web_app_data: Optional[WebAppData] = web_app_data
+            self.is_topic_message: Optional[bool] = is_topic_message
+            self.message_thread_id: Optional[int] = message_thread_id
+            self.forum_topic_created: Optional[ForumTopicCreated] = forum_topic_created
+            self.forum_topic_closed: Optional[ForumTopicClosed] = forum_topic_closed
+            self.forum_topic_reopened: Optional[ForumTopicReopened] = forum_topic_reopened
+            self.forum_topic_edited: Optional[ForumTopicEdited] = forum_topic_edited
+            self.general_forum_topic_hidden: Optional[GeneralForumTopicHidden] = (
+                general_forum_topic_hidden
+            )
+            self.general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = (
+                general_forum_topic_unhidden
+            )
+            self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
+            self.has_media_spoiler: Optional[bool] = has_media_spoiler
+            self._user_shared: Optional[UserShared] = user_shared
+            self.users_shared: Optional[UsersShared] = users_shared
+            self.chat_shared: Optional[ChatShared] = chat_shared
+            self.story: Optional[Story] = story
+            self.giveaway: Optional[Giveaway] = giveaway
+            self.giveaway_completed: Optional[GiveawayCompleted] = giveaway_completed
+            self.giveaway_created: Optional[GiveawayCreated] = giveaway_created
+            self.giveaway_winners: Optional[GiveawayWinners] = giveaway_winners
+            self.link_preview_options: Optional[LinkPreviewOptions] = link_preview_options
+            self.external_reply: Optional[ExternalReplyInfo] = external_reply
+            self.quote: Optional[TextQuote] = quote
+            self.forward_origin: Optional[MessageOrigin] = forward_origin
+
+            self._effective_attachment = DEFAULT_NONE
+
+            self._id_attrs = (self.message_id, self.chat)
+
+    def __bool__(self) -> bool:
+        """Overrides :meth:`telegram.MaybeInaccessibleMessage.__bool__` to use Pythons
+        default implementation of :meth:`object.__bool__` instead.
+
+        Tip:
+            The current behavior is the same as before the introduction of
+            :class:`telegram.MaybeInaccessibleMessage`. This documentation is relevant only until
+            :meth:`telegram.MaybeInaccessibleMessage.__bool__` is removed.
+        """
+        return True
+
+    @property
+    def user_shared(self) -> Optional[UserShared]:
+        """:class:`telegram.UserShared`: Optional. Service message. A user was shared with the
+        bot.
+
+        Hint:
+            In case a single user was shared, :attr:`user_shared` will be present in addition to
+            :attr:`users_shared`. If multiple users where shared, only :attr:`users_shared` will
+            be present. However, this behavior is not documented and may be changed by Telegram.
+
+        .. versionadded:: 20.1
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`user_shared` in favor of :attr:`users_shared`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="user_shared",
+            new_attr_name="users_shared",
+            bot_api_version="7.0",
+        )
+        return self._user_shared
+
+    @property
+    def forward_from(self) -> Optional[User]:
+        """:class:`telegram.User`: Optional. For forwarded messages, sender of the original
+        message.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_from` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_from",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_from
+
+    @property
+    def forward_from_chat(self) -> Optional[Chat]:
+        """:class:`telegram.Chat`: Optional. For messages forwarded from channels or from anonymous
+        administrators, information about the original sender chat.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_from_chat` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_from_chat",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_from_chat
+
+    @property
+    def forward_from_message_id(self) -> Optional[int]:
+        """:obj:`int`: Optional. For forwarded channel posts, identifier of the original message
+        in the channel.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_from_message_id` in favor of
+           :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_from_message_id",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_from_message_id
+
+    @property
+    def forward_signature(self) -> Optional[str]:
+        """:obj:`str`: Optional. For messages forwarded from channels, signature
+        of the post author if present.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_signature` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_signature",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_signature
+
+    @property
+    def forward_sender_name(self) -> Optional[str]:
+        """:class:`telegram.User`: Optional. Sender's name for messages forwarded from users who
+        disallow adding a link to their account in forwarded messages.
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_sender_name` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_sender_name",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_sender_name
+
+    @property
+    def forward_date(self) -> Optional[datetime.datetime]:
+        """:obj:`datetime.datetime`: Optional. For forwarded messages, date the original message
+        was sent in Unix time. Converted to :class:`datetime.datetime`.
+
+            .. versionchanged:: 20.3
+                |datetime_localization|
+
+        .. deprecated:: NEXT.VERSION
+           Bot API 7.0 deprecates :attr:`forward_date` in favor of :attr:`forward_origin`.
+        """
+        warn_about_deprecated_attr_in_property(
+            deprecated_attr_name="forward_date",
+            new_attr_name="forward_origin",
+            bot_api_version="7.0",
+        )
+        return self._forward_date
 
     @property
     def chat_id(self) -> int:
@@ -897,8 +1371,6 @@ class Message(TelegramObject):
 
         data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
-        data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
-        data["chat"] = Chat.de_json(data.get("chat"), bot)
         data["entities"] = MessageEntity.de_list(data.get("entities"), bot)
         data["caption_entities"] = MessageEntity.de_list(data.get("caption_entities"), bot)
         data["forward_from"] = User.de_json(data.get("forward_from"), bot)
@@ -925,7 +1397,7 @@ class Message(TelegramObject):
         data["message_auto_delete_timer_changed"] = MessageAutoDeleteTimerChanged.de_json(
             data.get("message_auto_delete_timer_changed"), bot
         )
-        data["pinned_message"] = Message.de_json(data.get("pinned_message"), bot)
+        data["pinned_message"] = MaybeInaccessibleMessage.de_json(data.get("pinned_message"), bot)
         data["invoice"] = Invoice.de_json(data.get("invoice"), bot)
         data["successful_payment"] = SuccessfulPayment.de_json(data.get("successful_payment"), bot)
         data["passport_data"] = PassportData.de_json(data.get("passport_data"), bot)
@@ -963,9 +1435,36 @@ class Message(TelegramObject):
             data.get("write_access_allowed"), bot
         )
         data["user_shared"] = UserShared.de_json(data.get("user_shared"), bot)
+        data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
 
-        return super().de_json(data=data, bot=bot)
+        # Unfortunately, this needs to be here due to cyclic imports
+        from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
+            Giveaway,
+            GiveawayCompleted,
+            GiveawayCreated,
+            GiveawayWinners,
+        )
+        from telegram._messageorigin import (  # pylint: disable=import-outside-toplevel
+            MessageOrigin,
+        )
+        from telegram._reply import (  # pylint: disable=import-outside-toplevel
+            ExternalReplyInfo,
+            TextQuote,
+        )
+
+        data["giveaway"] = Giveaway.de_json(data.get("giveaway"), bot)
+        data["giveaway_completed"] = GiveawayCompleted.de_json(data.get("giveaway_completed"), bot)
+        data["giveaway_created"] = GiveawayCreated.de_json(data.get("giveaway_created"), bot)
+        data["giveaway_winners"] = GiveawayWinners.de_json(data.get("giveaway_winners"), bot)
+        data["link_preview_options"] = LinkPreviewOptions.de_json(
+            data.get("link_preview_options"), bot
+        )
+        data["external_reply"] = ExternalReplyInfo.de_json(data.get("external_reply"), bot)
+        data["quote"] = TextQuote.de_json(data.get("quote"), bot)
+        data["forward_origin"] = MessageOrigin.de_json(data.get("forward_origin"), bot)
+
+        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
     @property
     def effective_attachment(
@@ -1034,14 +1533,16 @@ class Message(TelegramObject):
 
         return self._effective_attachment  # type: ignore[return-value]
 
-    def _quote(self, quote: Optional[bool], reply_to_message_id: Optional[int]) -> Optional[int]:
+    def _quote(
+        self, quote: Optional[bool], reply_to_message_id: Optional[int] = None
+    ) -> Optional[ReplyParameters]:
         """Modify kwargs for replying with or without quoting."""
         if reply_to_message_id is not None:
-            return reply_to_message_id
+            return ReplyParameters(reply_to_message_id)
 
         if quote is not None:
             if quote:
-                return self.message_id
+                return ReplyParameters(self.message_id)
 
         else:
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
@@ -1051,9 +1552,213 @@ class Message(TelegramObject):
             else:
                 default_quote = None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
-                return self.message_id
+                return ReplyParameters(self.message_id)
 
         return None
+
+    def compute_quote_position_and_entities(
+        self, quote: str, index: Optional[int] = None
+    ) -> Tuple[int, Optional[Tuple[MessageEntity, ...]]]:
+        """
+        Use this function to compute position and entities of a quote in the message text or
+        caption. Useful for filling the parameters
+        :paramref:`~telegram.ReplyParameters.quote_position` and
+        :paramref:`~telegram.ReplyParameters.quote_entities` of :class:`telegram.ReplyParameters`
+        when replying to a message.
+
+        Example:
+
+            Given a message with the text ``"Hello, world! Hello, world!"``, the following code
+            will return the position and entities of the second occurrence of ``"Hello, world!"``.
+
+            .. code-block:: python
+
+                message.compute_quote_position_and_entities("Hello, world!", 1)
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            quote (:obj:`str`): Part of the message which is to be quoted. This is
+                expected to have plain text without formatting entities.
+            index (:obj:`int`, optional): 0-based index of the occurrence of the quote in the
+                message. If not specified, the first occurrence is used.
+
+        Returns:
+            Tuple[:obj:`int`, :obj:`None` | Tuple[:class:`~telegram.MessageEntity`, ...]]: On
+            success, a tuple containing information about quote position and entities is returned.
+
+        Raises:
+            RuntimeError: If the message has neither :attr:`text` nor :attr:`caption`.
+            ValueError: If the requested index of quote doesn't exist in the message.
+        """
+        if not (text := (self.text or self.caption)):
+            raise RuntimeError("This message has neither text nor caption.")
+
+        # Telegram wants the position in UTF-16 code units, so we have to calculate in that space
+        utf16_text = text.encode("utf-16-le")
+        utf16_quote = quote.encode("utf-16-le")
+        effective_index = index or 0
+
+        matches = list(re.finditer(re.escape(utf16_quote), utf16_text))
+        if (length := len(matches)) < effective_index + 1:
+            raise ValueError(
+                f"You requested the {index}-th occurrence of '{quote}', but this text appears "
+                f"only {length} times."
+            )
+
+        position = len(utf16_text[: matches[effective_index].start()]) // 2
+        length = len(utf16_quote) // 2
+        end_position = position + length
+
+        entities = []
+        for entity in self.entities or self.caption_entities:
+            if position <= entity.offset + entity.length and entity.offset <= end_position:
+                # shift the offset by the position of the quote
+                offset = max(0, entity.offset - position)
+                # trim the entity length to the length of the overlap with the quote
+                e_length = min(end_position, entity.offset + entity.length) - max(
+                    position, entity.offset
+                )
+                if e_length <= 0:
+                    continue
+
+                # create a new entity with the correct offset and length
+                # looping over slots rather manually accessing the attributes
+                # is more future-proof
+                kwargs = {attr: getattr(entity, attr) for attr in entity.__slots__}
+                kwargs["offset"] = offset
+                kwargs["length"] = e_length
+                entities.append(MessageEntity(**kwargs))
+
+        return position, tuple(entities) or None
+
+    def build_reply_arguments(
+        self,
+        quote: Optional[str] = None,
+        quote_index: Optional[int] = None,
+        target_chat_id: Optional[Union[int, str]] = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+    ) -> _ReplyKwargs:
+        """
+        Builds a dictionary with the keys ``chat_id`` and ``reply_parameters``. This dictionary can
+        be used to reply to a message with the given quote and target chat.
+
+        Examples:
+
+            Usage with :meth:`telegram.Bot.send_message`:
+
+            .. code-block:: python
+
+                await bot.send_message(
+                    text="This is a reply",
+                    **message.build_reply_arguments(quote="Quoted Text")
+                )
+
+            Usage with :meth:`reply_text`, replying in the same chat:
+
+            .. code-block:: python
+
+                await message.reply_text(
+                    "This is a reply",
+                    do_quote=message.build_reply_arguments(quote="Quoted Text")
+                )
+
+            Usage with :meth:`reply_text`, replying in a different chat:
+
+            .. code-block:: python
+
+                await message.reply_text(
+                    "This is a reply",
+                    do_quote=message.build_reply_arguments(
+                        quote="Quoted Text",
+                        target_chat_id=-100123456789
+                    )
+                )
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            quote (:obj:`str`, optional): Passed in :meth:`compute_quote_position_and_entities`
+                as parameter :paramref:`~compute_quote_position_and_entities.quote` to compute
+                quote entities. Defaults to :obj:`None`.
+            quote_index (:obj:`int`, optional): Passed in
+                :meth:`compute_quote_position_and_entities` as parameter
+                :paramref:`~compute_quote_position_and_entities.quote_index` to compute quote
+                position. Defaults to :obj:`None`.
+            target_chat_id (:obj:`int` | :obj:`str`, optional): |chat_id_channel|
+                Defaults to :attr:`chat_id`.
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Will be applied only if the reply happens in the same chat and forum topic.
+            message_thread_id (:obj:`int`, optional): |message_thread_id|
+
+        Returns:
+            :obj:`dict`:
+        """
+        target_chat_is_self = target_chat_id in (None, self.chat_id, f"@{self.chat.username}")
+
+        if target_chat_is_self and message_thread_id in (
+            None,
+            self.message_thread_id,
+        ):
+            # defaults handling will take place in `Bot._insert_defaults`
+            effective_aswr: ODVInput[bool] = allow_sending_without_reply
+        else:
+            effective_aswr = None
+
+        quote_position, quote_entities = (
+            self.compute_quote_position_and_entities(quote, quote_index) if quote else (None, None)
+        )
+        return {  # type: ignore[typeddict-item]
+            "reply_parameters": ReplyParameters(
+                chat_id=None if target_chat_is_self else self.chat_id,
+                message_id=self.message_id,
+                quote=quote,
+                quote_position=quote_position,
+                quote_entities=quote_entities,
+                allow_sending_without_reply=effective_aswr,
+            ),
+            "chat_id": target_chat_id or self.chat_id,
+        }
+
+    async def _parse_quote_arguments(
+        self,
+        do_quote: Optional[Union[bool, _ReplyKwargs]],
+        quote: Optional[bool],
+        reply_to_message_id: Optional[int],
+        reply_parameters: Optional["ReplyParameters"],
+    ) -> Tuple[Union[str, int], ReplyParameters]:
+        if quote and do_quote:
+            raise ValueError("The arguments `quote` and `do_quote` are mutually exclusive")
+
+        if reply_to_message_id is not None and reply_parameters is not None:
+            raise ValueError(
+                "`reply_to_message_id` and `reply_parameters` are mutually exclusive."
+            )
+
+        if quote is not None:
+            warn(
+                "The `quote` parameter is deprecated in favor of the `do_quote` parameter. Please "
+                "update your code to use `do_quote` instead.",
+                PTBDeprecationWarning,
+                stacklevel=2,
+            )
+
+        effective_do_quote = quote or do_quote
+        chat_id: Union[str, int] = self.chat_id
+
+        # reply_parameters and reply_to_message_id overrule the do_quote parameter
+        if reply_parameters is not None:
+            effective_reply_parameters = reply_parameters
+        elif reply_to_message_id is not None:
+            effective_reply_parameters = ReplyParameters(message_id=reply_to_message_id)
+        elif isinstance(effective_do_quote, dict):
+            effective_reply_parameters = effective_do_quote["reply_parameters"]
+            chat_id = effective_do_quote["chat_id"]
+        else:
+            effective_reply_parameters = self._quote(effective_do_quote)
+
+        return chat_id, effective_reply_parameters
 
     async def reply_text(
         self,
@@ -1067,8 +1772,11 @@ class Message(TelegramObject):
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1082,22 +1790,30 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1121,8 +1837,11 @@ class Message(TelegramObject):
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1147,21 +1866,29 @@ class Message(TelegramObject):
             Telegram for backward compatibility. You should use :meth:`reply_markdown_v2` instead.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             text=text,
             parse_mode=ParseMode.MARKDOWN,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1185,8 +1912,11 @@ class Message(TelegramObject):
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1207,21 +1937,29 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             text=text,
             parse_mode=ParseMode.MARKDOWN_V2,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1245,8 +1983,11 @@ class Message(TelegramObject):
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1267,21 +2008,29 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             text=text,
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
@@ -1304,8 +2053,10 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1322,10 +2073,14 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the media group is sent as an
-                actual reply to this message. If ``reply_to_message_id`` is passed, this parameter
-                will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private
-                chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             Tuple[:class:`telegram.Message`]: An array of the sent Messages.
@@ -1333,12 +2088,14 @@ class Message(TelegramObject):
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_media_group(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             media=media,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1365,9 +2122,11 @@ class Message(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1381,21 +2140,28 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the photo is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_photo(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             photo=photo,
             caption=caption,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1427,9 +2193,11 @@ class Message(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1443,24 +2211,31 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the audio is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_audio(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             audio=audio,
             duration=duration,
             performer=performer,
             title=title,
             caption=caption,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1490,9 +2265,11 @@ class Message(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1506,22 +2283,29 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the document is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_document(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             document=document,
             filename=filename,
             caption=caption,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1554,9 +2338,11 @@ class Message(TelegramObject):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1570,18 +2356,24 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the animation is sent as an
-                actual reply to this message. If ``reply_to_message_id`` is passed, this parameter
-                will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private
-                chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_animation(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             animation=animation,
             duration=duration,
             width=width,
@@ -1589,7 +2381,7 @@ class Message(TelegramObject):
             caption=caption,
             parse_mode=parse_mode,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1615,8 +2407,10 @@ class Message(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1630,20 +2424,27 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the sticker is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_sticker(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             sticker=sticker,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1674,9 +2475,11 @@ class Message(TelegramObject):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1690,22 +2493,29 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the video is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_video(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             video=video,
             duration=duration,
             caption=caption,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1737,9 +2547,11 @@ class Message(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1753,23 +2565,29 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the video note is sent as an
-                actual reply to this message. If ``reply_to_message_id`` is passed, this parameter
-                will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private
-                chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_video_note(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             video_note=video_note,
             duration=duration,
             length=length,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1796,9 +2614,11 @@ class Message(TelegramObject):
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1812,23 +2632,29 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the voice note is sent as an
-                actual reply to this message. If ``reply_to_message_id`` is passed, this parameter
-                will be ignored. Default: :obj:`True` in group chats and :obj:`False` in private
-                chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_voice(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             voice=voice,
             duration=duration,
             caption=caption,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1857,9 +2683,11 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         location: Optional[Location] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1873,21 +2701,28 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the location is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_location(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             latitude=latitude,
             longitude=longitude,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1920,9 +2755,11 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         venue: Optional[Venue] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1936,24 +2773,31 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the venue is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_venue(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             latitude=latitude,
             longitude=longitude,
             title=title,
             address=address,
             foursquare_id=foursquare_id,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1981,9 +2825,11 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         contact: Optional[Contact] = None,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1997,22 +2843,29 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the contact is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_contact(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             phone_number=phone_number,
             first_name=first_name,
             last_name=last_name,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2046,8 +2899,10 @@ class Message(TelegramObject):
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2061,17 +2916,24 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the poll is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_poll(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             question=question,
             options=options,
             is_anonymous=is_anonymous,
@@ -2080,7 +2942,7 @@ class Message(TelegramObject):
             correct_option_id=correct_option_id,
             is_closed=is_closed,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2106,8 +2968,10 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2121,19 +2985,26 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the dice is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_dice(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2189,8 +3060,10 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2204,9 +3077,14 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the game is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         .. versionadded:: 13.2
 
@@ -2214,12 +3092,14 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_game(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2260,8 +3140,10 @@ class Message(TelegramObject):
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2287,17 +3169,24 @@ class Message(TelegramObject):
             :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>` is optional.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the invoice is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
+
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().send_invoice(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             title=title,
             description=description,
             payload=payload,
@@ -2315,7 +3204,7 @@ class Message(TelegramObject):
             need_shipping_address=need_shipping_address,
             is_flexible=is_flexible,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             reply_markup=reply_markup,
             provider_data=provider_data,
             send_phone_number_to_provider=send_phone_number_to_provider,
@@ -2394,6 +3283,7 @@ class Message(TelegramObject):
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2426,6 +3316,7 @@ class Message(TelegramObject):
             caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -2450,8 +3341,10 @@ class Message(TelegramObject):
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         quote: Optional[bool] = None,
+        do_quote: Optional[Union[bool, _ReplyKwargs]] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2470,26 +3363,32 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
         Keyword Args:
-            quote (:obj:`bool`, optional): If set to :obj:`True`, the copy is sent as an actual
-                reply to this message. If ``reply_to_message_id`` is passed, this parameter will be
-                ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
+            quote (:obj:`bool`, optional): |reply_quote|
 
                 .. versionadded:: 13.1
+                .. deprecated:: NEXT.VERSION
+                    This argument is deprecated in favor of :paramref:`do_quote`
+            do_quote (:obj:`bool` | :obj:`dict`, optional): |do_quote|
+                Mutually exclusive with :paramref:`quote`.
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
         """
-        reply_to_message_id = self._quote(quote, reply_to_message_id)
+        chat_id, effective_reply_parameters = await self._parse_quote_arguments(
+            do_quote, quote, reply_to_message_id, reply_parameters
+        )
         return await self.get_bot().copy_message(
-            chat_id=self.chat_id,
+            chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_id=message_id,
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
             disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
+            reply_parameters=effective_reply_parameters,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -2508,6 +3407,7 @@ class Message(TelegramObject):
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2539,6 +3439,7 @@ class Message(TelegramObject):
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -3158,6 +4059,44 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    async def set_reaction(
+        self,
+        reaction: Optional[
+            Union[Sequence["ReactionType"], "ReactionType", Sequence[str], str]
+        ] = None,
+        is_big: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.set_message_reaction(chat_id=message.chat_id, message_id=message.message_id,
+                *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_message_reaction`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().set_message_reaction(
+            chat_id=self.chat_id,
+            message_id=self.message_id,
+            reaction=reaction,
+            is_big=is_big,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 
@@ -3274,8 +4213,9 @@ class Message(TelegramObject):
             if entity.type in types
         }
 
-    @staticmethod
+    @classmethod
     def _parse_html(
+        cls,
         message_text: Optional[str],
         entities: Dict[MessageEntity, str],
         urled: bool = False,
@@ -3284,8 +4224,7 @@ class Message(TelegramObject):
         if message_text is None:
             return None
 
-        message_text = message_text.encode("utf-16-le")  # type: ignore
-
+        utf_16_text = message_text.encode("utf-16-le")
         html_text = ""
         last_offset = 0
 
@@ -3293,81 +4232,69 @@ class Message(TelegramObject):
         parsed_entities = []
 
         for entity, text in sorted_entities:
-            if entity not in parsed_entities:
-                nested_entities = {
-                    e: t
-                    for (e, t) in sorted_entities
-                    if e.offset >= entity.offset
-                    and e.offset + e.length <= entity.offset + entity.length
-                    and e != entity
-                }
-                parsed_entities.extend(list(nested_entities.keys()))
+            if entity in parsed_entities:
+                continue
 
-                orig_text = text
+            nested_entities = {
+                e: t
+                for (e, t) in sorted_entities
+                if e.offset >= entity.offset
+                and e.offset + e.length <= entity.offset + entity.length
+                and e != entity
+            }
+            parsed_entities.extend(list(nested_entities.keys()))
+
+            if nested_entities:
+                escaped_text = cls._parse_html(
+                    text, nested_entities, urled=urled, offset=entity.offset
+                )
+            else:
                 escaped_text = escape(text)
 
-                if nested_entities:
-                    escaped_text = Message._parse_html(
-                        orig_text, nested_entities, urled=urled, offset=entity.offset
-                    )
-
-                if entity.type == MessageEntity.TEXT_LINK:
-                    insert = f'<a href="{entity.url}">{escaped_text}</a>'
-                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = f'<a href="tg://user?id={entity.user.id}">{escaped_text}</a>'
-                elif entity.type == MessageEntity.URL and urled:
-                    insert = f'<a href="{escaped_text}">{escaped_text}</a>'
-                elif entity.type == MessageEntity.BOLD:
-                    insert = f"<b>{escaped_text}</b>"
-                elif entity.type == MessageEntity.ITALIC:
-                    insert = f"<i>{escaped_text}</i>"
-                elif entity.type == MessageEntity.CODE:
-                    insert = f"<code>{escaped_text}</code>"
-                elif entity.type == MessageEntity.PRE:
-                    if entity.language:
-                        insert = (
-                            f'<pre><code class="{entity.language}">{escaped_text}</code></pre>'
-                        )
-                    else:
-                        insert = f"<pre>{escaped_text}</pre>"
-                elif entity.type == MessageEntity.UNDERLINE:
-                    insert = f"<u>{escaped_text}</u>"
-                elif entity.type == MessageEntity.STRIKETHROUGH:
-                    insert = f"<s>{escaped_text}</s>"
-                elif entity.type == MessageEntity.SPOILER:
-                    insert = f'<span class="tg-spoiler">{escaped_text}</span>'
-                elif entity.type == MessageEntity.CUSTOM_EMOJI:
-                    insert = (
-                        f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
-                    )
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = f'<a href="{entity.url}">{escaped_text}</a>'
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = f'<a href="tg://user?id={entity.user.id}">{escaped_text}</a>'
+            elif entity.type == MessageEntity.URL and urled:
+                insert = f'<a href="{escaped_text}">{escaped_text}</a>'
+            elif entity.type == MessageEntity.BLOCKQUOTE:
+                insert = f"<blockquote>{escaped_text}</blockquote>"
+            elif entity.type == MessageEntity.BOLD:
+                insert = f"<b>{escaped_text}</b>"
+            elif entity.type == MessageEntity.ITALIC:
+                insert = f"<i>{escaped_text}</i>"
+            elif entity.type == MessageEntity.CODE:
+                insert = f"<code>{escaped_text}</code>"
+            elif entity.type == MessageEntity.PRE:
+                if entity.language:
+                    insert = f'<pre><code class="{entity.language}">{escaped_text}</code></pre>'
                 else:
-                    insert = escaped_text
+                    insert = f"<pre>{escaped_text}</pre>"
+            elif entity.type == MessageEntity.UNDERLINE:
+                insert = f"<u>{escaped_text}</u>"
+            elif entity.type == MessageEntity.STRIKETHROUGH:
+                insert = f"<s>{escaped_text}</s>"
+            elif entity.type == MessageEntity.SPOILER:
+                insert = f'<span class="tg-spoiler">{escaped_text}</span>'
+            elif entity.type == MessageEntity.CUSTOM_EMOJI:
+                insert = f'<tg-emoji emoji-id="{entity.custom_emoji_id}">{escaped_text}</tg-emoji>'
+            else:
+                insert = escaped_text
 
-                if offset == 0:
-                    html_text += (
-                        escape(
-                            message_text[  # type: ignore
-                                last_offset * 2 : (entity.offset - offset) * 2
-                            ].decode("utf-16-le")
-                        )
-                        + insert
-                    )
-                else:
-                    html_text += (
-                        message_text[  # type: ignore
-                            last_offset * 2 : (entity.offset - offset) * 2
-                        ].decode("utf-16-le")
-                        + insert
-                    )
-
-                last_offset = entity.offset - offset + entity.length
-
-        if offset == 0:
-            html_text += escape(
-                message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+            # Make sure to escape the text that is not part of the entity
+            # if we're in a nested entity, this is still required, since in that case this
+            # text is part of the parent entity
+            html_text += (
+                escape(
+                    utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode("utf-16-le")
+                )
+                + insert
             )
-        else:
-            html_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+
+            last_offset = entity.offset - offset + entity.length
+
+        # see comment above
+        html_text += escape(utf_16_text[last_offset * 2 :].decode("utf-16-le"))
 
         return html_text
 
@@ -3378,11 +4305,17 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as HTML in
         the same way the original message was formatted.
 
+        Warning:
+            |text_html|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
@@ -3397,11 +4330,17 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as HTML.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        Warning:
+            |text_html|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
@@ -3417,11 +4356,17 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML in the same way the original message was formatted.
 
+        Warning:
+            |text_html|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
@@ -3436,32 +4381,48 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        Warning:
+            |text_html|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
 
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
         """
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
-    @staticmethod
+    @classmethod
     def _parse_markdown(
+        cls,
         message_text: Optional[str],
         entities: Dict[MessageEntity, str],
         urled: bool = False,
         version: MarkdownVersion = 1,
         offset: int = 0,
     ) -> Optional[str]:
-        version = int(version)  # type: ignore
+        if version == 1:
+            for entity_type in (
+                MessageEntity.UNDERLINE,
+                MessageEntity.STRIKETHROUGH,
+                MessageEntity.SPOILER,
+                MessageEntity.BLOCKQUOTE,
+                MessageEntity.CUSTOM_EMOJI,
+            ):
+                if any(entity.type == entity_type for entity in entities):
+                    name = entity_type.name.title().replace("_", " ")  # type:ignore[attr-defined]
+                    raise ValueError(f"{name} entities are not supported for Markdown version 1")
 
         if message_text is None:
             return None
 
-        message_text = message_text.encode("utf-16-le")  # type: ignore
-
+        utf_16_text = message_text.encode("utf-16-le")
         markdown_text = ""
         last_offset = 0
 
@@ -3469,125 +4430,103 @@ class Message(TelegramObject):
         parsed_entities = []
 
         for entity, text in sorted_entities:
-            if entity not in parsed_entities:
-                nested_entities = {
-                    e: t
-                    for (e, t) in sorted_entities
-                    if e.offset >= entity.offset
-                    and e.offset + e.length <= entity.offset + entity.length
-                    and e != entity
-                }
-                parsed_entities.extend(list(nested_entities.keys()))
+            if entity in parsed_entities:
+                continue
 
+            nested_entities = {
+                e: t
+                for (e, t) in sorted_entities
+                if e.offset >= entity.offset
+                and e.offset + e.length <= entity.offset + entity.length
+                and e != entity
+            }
+            parsed_entities.extend(list(nested_entities.keys()))
+
+            if nested_entities:
+                if version < 2:
+                    raise ValueError("Nested entities are not supported for Markdown version 1")
+
+                escaped_text = cls._parse_markdown(
+                    text,
+                    nested_entities,
+                    urled=urled,
+                    offset=entity.offset,
+                    version=version,
+                )
+            else:
                 escaped_text = escape_markdown(text, version=version)
 
-                if nested_entities:
-                    if version < 2:
-                        raise ValueError(
-                            "Nested entities are not supported for Markdown version 1"
-                        )
-
-                    escaped_text = Message._parse_markdown(
-                        text,
-                        nested_entities,
-                        urled=urled,
-                        offset=entity.offset,
-                        version=version,
-                    )
-
-                if entity.type == MessageEntity.TEXT_LINK:
-                    if version == 1:
-                        url = entity.url
-                    else:
-                        # Links need special escaping. Also can't have entities nested within
-                        url = escape_markdown(
-                            entity.url, version=version, entity_type=MessageEntity.TEXT_LINK
-                        )
-                    insert = f"[{escaped_text}]({url})"
-                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = f"[{escaped_text}](tg://user?id={entity.user.id})"
-                elif entity.type == MessageEntity.URL and urled:
-                    link = text if version == 1 else escaped_text
-                    insert = f"[{link}]({text})"
-                elif entity.type == MessageEntity.BOLD:
-                    insert = f"*{escaped_text}*"
-                elif entity.type == MessageEntity.ITALIC:
-                    insert = f"_{escaped_text}_"
-                elif entity.type == MessageEntity.CODE:
-                    # Monospace needs special escaping. Also can't have entities nested within
-                    insert = f"`{escape_markdown(text, version, MessageEntity.CODE)}`"
-
-                elif entity.type == MessageEntity.PRE:
-                    # Monospace needs special escaping. Also can't have entities nested within
-                    code = escape_markdown(text, version=version, entity_type=MessageEntity.PRE)
-                    if entity.language:
-                        prefix = f"```{entity.language}\n"
-                    elif code.startswith("\\"):
-                        prefix = "```"
-                    else:
-                        prefix = "```\n"
-                    insert = f"{prefix}{code}```"
-                elif entity.type == MessageEntity.UNDERLINE:
-                    if version == 1:
-                        raise ValueError(
-                            "Underline entities are not supported for Markdown version 1"
-                        )
-                    insert = f"__{escaped_text}__"
-                elif entity.type == MessageEntity.STRIKETHROUGH:
-                    if version == 1:
-                        raise ValueError(
-                            "Strikethrough entities are not supported for Markdown version 1"
-                        )
-                    insert = f"~{escaped_text}~"
-                elif entity.type == MessageEntity.SPOILER:
-                    if version == 1:
-                        raise ValueError(
-                            "Spoiler entities are not supported for Markdown version 1"
-                        )
-                    insert = f"||{escaped_text}||"
-                elif entity.type == MessageEntity.CUSTOM_EMOJI:
-                    if version == 1:
-                        raise ValueError(
-                            "Custom emoji entities are not supported for Markdown version 1"
-                        )
-                    # This should never be needed because ids are numeric but the documentation
-                    # specifically mentions it so here we are
-                    custom_emoji_id = escape_markdown(
-                        entity.custom_emoji_id,
-                        version=version,
-                        entity_type=MessageEntity.CUSTOM_EMOJI,
-                    )
-                    insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+            if entity.type == MessageEntity.TEXT_LINK:
+                if version == 1:
+                    url = entity.url
                 else:
-                    insert = escaped_text
-
-                if offset == 0:
-                    markdown_text += (
-                        escape_markdown(
-                            message_text[  # type: ignore
-                                last_offset * 2 : (entity.offset - offset) * 2
-                            ].decode("utf-16-le"),
-                            version=version,
-                        )
-                        + insert
+                    # Links need special escaping. Also can't have entities nested within
+                    url = escape_markdown(
+                        entity.url, version=version, entity_type=MessageEntity.TEXT_LINK
                     )
+                insert = f"[{escaped_text}]({url})"
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = f"[{escaped_text}](tg://user?id={entity.user.id})"
+            elif entity.type == MessageEntity.URL and urled:
+                link = text if version == 1 else escaped_text
+                insert = f"[{link}]({text})"
+            elif entity.type == MessageEntity.BOLD:
+                insert = f"*{escaped_text}*"
+            elif entity.type == MessageEntity.ITALIC:
+                insert = f"_{escaped_text}_"
+            elif entity.type == MessageEntity.CODE:
+                # Monospace needs special escaping. Also can't have entities nested within
+                insert = f"`{escape_markdown(text, version, MessageEntity.CODE)}`"
+            elif entity.type == MessageEntity.PRE:
+                # Monospace needs special escaping. Also can't have entities nested within
+                code = escape_markdown(text, version=version, entity_type=MessageEntity.PRE)
+                if entity.language:
+                    prefix = f"```{entity.language}\n"
+                elif code.startswith("\\"):
+                    prefix = "```"
                 else:
-                    markdown_text += (
-                        message_text[  # type: ignore
-                            last_offset * 2 : (entity.offset - offset) * 2
-                        ].decode("utf-16-le")
-                        + insert
-                    )
+                    prefix = "```\n"
+                insert = f"{prefix}{code}```"
+            elif entity.type == MessageEntity.UNDERLINE:
+                insert = f"__{escaped_text}__"
+            elif entity.type == MessageEntity.STRIKETHROUGH:
+                insert = f"~{escaped_text}~"
+            elif entity.type == MessageEntity.SPOILER:
+                insert = f"||{escaped_text}||"
+            elif entity.type == MessageEntity.BLOCKQUOTE:
+                insert = ">" + "\n>".join(escaped_text.splitlines())
+            elif entity.type == MessageEntity.CUSTOM_EMOJI:
+                # This should never be needed because ids are numeric but the documentation
+                # specifically mentions it so here we are
+                custom_emoji_id = escape_markdown(
+                    entity.custom_emoji_id,
+                    version=version,
+                    entity_type=MessageEntity.CUSTOM_EMOJI,
+                )
+                insert = f"![{escaped_text}](tg://emoji?id={custom_emoji_id})"
+            else:
+                insert = escaped_text
 
-                last_offset = entity.offset - offset + entity.length
-
-        if offset == 0:
-            markdown_text += escape_markdown(
-                message_text[last_offset * 2 :].decode("utf-16-le"),  # type: ignore
-                version=version,
+            # Make sure to escape the text that is not part of the entity
+            # if we're in a nested entity, this is still required, since in that case this
+            # text is part of the parent entity
+            markdown_text += (
+                escape_markdown(
+                    utf_16_text[last_offset * 2 : (entity.offset - offset) * 2].decode(
+                        "utf-16-le"
+                    ),
+                    version=version,
+                )
+                + insert
             )
-        else:
-            markdown_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
+
+            last_offset = entity.offset - offset + entity.length
+
+        # see comment above
+        markdown_text += escape_markdown(
+            utf_16_text[last_offset * 2 :].decode("utf-16-le"),
+            version=version,
+        )
 
         return markdown_text
 
@@ -3599,22 +4538,25 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
-        Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use
-              :meth:`text_markdown_v2` instead.
+        Warning:
+            |text_markdown|
 
-            * |custom_emoji_formatting_note|
+        Note:
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`text_markdown_v2` instead.
 
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
+
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=False)
@@ -3627,11 +4569,17 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
+        Warning:
+            |text_markdown|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3646,22 +4594,26 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
-              instead.
+        Warning:
+            |text_markdown|
 
-            * |custom_emoji_formatting_note|
+        Note:
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
+            instead.
 
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
+
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=True)
@@ -3674,11 +4626,17 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        Warning:
+            |text_markdown|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3693,22 +4651,24 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
 
+        Warning:
+            |text_markdown|
+
         Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use :meth:`caption_markdown_v2`
-              instead.
-
-            * |custom_emoji_formatting_note|
-
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`caption_markdown_v2`
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
+
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=False)
@@ -3721,11 +4681,17 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
 
+        Warning:
+            |text_markdown|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -3742,22 +4708,26 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Note:
-            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-              Telegram for backward compatibility. You should use
-              :meth:`caption_markdown_v2_urled` instead.
+        Warning:
+            |text_markdown|
 
-            * |custom_emoji_formatting_note|
+        Note:
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use
+            :meth:`caption_markdown_v2_urled` instead.
 
         .. versionchanged:: 20.5
             |custom_emoji_no_md1_support|
+
+        .. versionchanged:: NEXT.VERSION
+            |blockquote_no_md1_support|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
         Raises:
-            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
-                entities.
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler,
+                blockquote or nested entities.
 
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)
@@ -3770,11 +4740,17 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        Warning:
+            |text_markdown|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
         .. versionchanged:: 20.3
            Custom emoji entities are now supported.
+
+        .. versionchanged:: NEXT.VERSION
+           Blockquote entities are now supported.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.

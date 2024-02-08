@@ -18,12 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatJoinRequestHandler class."""
 
-from typing import FrozenSet, Optional
+from typing import Optional
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import RT, SCT, DVType
 from telegram.ext._handlers.basehandler import BaseHandler
+from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 
@@ -88,24 +89,8 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
     ):
         super().__init__(callback, block=block)
 
-        self._chat_ids = self._parse_chat_id(chat_id)
-        self._usernames = self._parse_username(username)
-
-    @staticmethod
-    def _parse_chat_id(chat_id: Optional[SCT[int]]) -> FrozenSet[int]:
-        if chat_id is None:
-            return frozenset()
-        if isinstance(chat_id, int):
-            return frozenset({chat_id})
-        return frozenset(chat_id)
-
-    @staticmethod
-    def _parse_username(username: Optional[SCT[str]]) -> FrozenSet[str]:
-        if username is None:
-            return frozenset()
-        if isinstance(username, str):
-            return frozenset({username[1:] if username.startswith("@") else username})
-        return frozenset({usr[1:] if usr.startswith("@") else usr for usr in username})
+        self._chat_ids = parse_chat_id(chat_id)
+        self._usernames = parse_username(username)
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.

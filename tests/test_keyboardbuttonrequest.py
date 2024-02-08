@@ -16,59 +16,73 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
-from telegram import ChatAdministratorRights, KeyboardButtonRequestChat, KeyboardButtonRequestUser
+from telegram import (
+    ChatAdministratorRights,
+    KeyboardButtonRequestChat,
+    KeyboardButtonRequestUser,
+    KeyboardButtonRequestUsers,
+)
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
-def request_user():
-    return KeyboardButtonRequestUser(
-        TestKeyboardButtonRequestUserBase.request_id,
-        TestKeyboardButtonRequestUserBase.user_is_bot,
-        TestKeyboardButtonRequestUserBase.user_is_premium,
+def request_users():
+    return KeyboardButtonRequestUsers(
+        TestKeyboardButtonRequestUsersBase.request_id,
+        TestKeyboardButtonRequestUsersBase.user_is_bot,
+        TestKeyboardButtonRequestUsersBase.user_is_premium,
+        TestKeyboardButtonRequestUsersBase.max_quantity,
     )
 
 
-class TestKeyboardButtonRequestUserBase:
+class TestKeyboardButtonRequestUsersBase:
     request_id = 123
     user_is_bot = True
     user_is_premium = False
+    max_quantity = 10
 
 
-class TestKeyboardButtonRequestUserWithoutRequest(TestKeyboardButtonRequestUserBase):
-    def test_slot_behaviour(self, request_user):
-        for attr in request_user.__slots__:
-            assert getattr(request_user, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(request_user)) == len(set(mro_slots(request_user))), "duplicate slot"
+class TestKeyboardButtonRequestUsersWithoutRequest(TestKeyboardButtonRequestUsersBase):
+    def test_slot_behaviour(self, request_users):
+        for attr in request_users.__slots__:
+            assert getattr(request_users, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(request_users)) == len(
+            set(mro_slots(request_users))
+        ), "duplicate slot"
 
-    def test_to_dict(self, request_user):
-        request_user_dict = request_user.to_dict()
+    def test_to_dict(self, request_users):
+        request_users_dict = request_users.to_dict()
 
-        assert isinstance(request_user_dict, dict)
-        assert request_user_dict["request_id"] == self.request_id
-        assert request_user_dict["user_is_bot"] == self.user_is_bot
-        assert request_user_dict["user_is_premium"] == self.user_is_premium
+        assert isinstance(request_users_dict, dict)
+        assert request_users_dict["request_id"] == self.request_id
+        assert request_users_dict["user_is_bot"] == self.user_is_bot
+        assert request_users_dict["user_is_premium"] == self.user_is_premium
+        assert request_users_dict["max_quantity"] == self.max_quantity
 
     def test_de_json(self, bot):
         json_dict = {
             "request_id": self.request_id,
             "user_is_bot": self.user_is_bot,
             "user_is_premium": self.user_is_premium,
+            "max_quantity": self.max_quantity,
         }
-        request_user = KeyboardButtonRequestUser.de_json(json_dict, bot)
-        assert request_user.api_kwargs == {}
+        request_users = KeyboardButtonRequestUsers.de_json(json_dict, bot)
+        assert request_users.api_kwargs == {}
 
-        assert request_user.request_id == self.request_id
-        assert request_user.user_is_bot == self.user_is_bot
-        assert request_user.user_is_premium == self.user_is_premium
+        assert request_users.request_id == self.request_id
+        assert request_users.user_is_bot == self.user_is_bot
+        assert request_users.user_is_premium == self.user_is_premium
+        assert request_users.max_quantity == self.max_quantity
 
     def test_equality(self):
-        a = KeyboardButtonRequestUser(self.request_id)
-        b = KeyboardButtonRequestUser(self.request_id)
-        c = KeyboardButtonRequestUser(1)
+        a = KeyboardButtonRequestUsers(self.request_id)
+        b = KeyboardButtonRequestUsers(self.request_id)
+        c = KeyboardButtonRequestUsers(1)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -76,6 +90,28 @@ class TestKeyboardButtonRequestUserWithoutRequest(TestKeyboardButtonRequestUserB
 
         assert a != c
         assert hash(a) != hash(c)
+
+
+class TestKeyboardButtonRequestUserWithoutRequest:
+    def test_slot_behaviour(self):
+        inst = KeyboardButtonRequestUser(1)
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_signature(self):
+        assert inspect.signature(KeyboardButtonRequestUser) == inspect.signature(
+            KeyboardButtonRequestUsers
+        )
+
+    def test_deprecation_warning(self):
+        with pytest.warns(
+            PTBDeprecationWarning,
+            match="'KeyboardButtonRequestUser' was renamed to 'KeyboardButtonRequestUsers'",
+        ) as record:
+            KeyboardButtonRequestUser(request_id=1)
+
+        assert record[0].filename == __file__, "wrong stacklevel"
 
 
 @pytest.fixture(scope="class")

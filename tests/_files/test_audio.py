@@ -22,8 +22,9 @@ from pathlib import Path
 
 import pytest
 
-from telegram import Audio, Bot, InputFile, MessageEntity, Voice
-from telegram.error import TelegramError
+from telegram import Audio, Bot, InputFile, MessageEntity, ReplyParameters, Voice
+from telegram.constants import ParseMode
+from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
 from tests.auxil.bot_method_checks import (
@@ -31,6 +32,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -194,6 +196,31 @@ class TestAudioWithoutRequest(TestAudioBase):
         monkeypatch.setattr(audio._bot, "get_file", make_assertion)
         assert await audio.get_file()
 
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_audio_default_quote_parse_mode(
+        self, default_bot, chat_id, audio, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["reply_parameters"].get("quote_parse_mode") == (
+                custom or default_bot.defaults.quote_parse_mode
+            )
+            return make_message("dummy reply").to_dict()
+
+        kwargs = {"message_id": 1}
+        if custom is not None:
+            kwargs["quote_parse_mode"] = custom
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_audio(chat_id, audio, reply_parameters=ReplyParameters(**kwargs))
+
 
 class TestAudioWithRequest(TestAudioBase):
     async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
@@ -322,3 +349,36 @@ class TestAudioWithRequest(TestAudioBase):
     async def test_error_send_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             await bot.send_audio(chat_id=chat_id)
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
+            ({"allow_sending_without_reply": True}, None),
+            ({"allow_sending_without_reply": False}, None),
+            ({"allow_sending_without_reply": False}, True),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_audio_default_allow_sending_without_reply(
+        self, default_bot, chat_id, audio, custom
+    ):
+        reply_to_message = await default_bot.send_message(chat_id, "test")
+        await reply_to_message.delete()
+        if custom is not None:
+            message = await default_bot.send_audio(
+                chat_id,
+                audio,
+                allow_sending_without_reply=custom,
+                reply_to_message_id=reply_to_message.message_id,
+            )
+            assert message.reply_to_message is None
+        elif default_bot.defaults.allow_sending_without_reply:
+            message = await default_bot.send_audio(
+                chat_id, audio, reply_to_message_id=reply_to_message.message_id
+            )
+            assert message.reply_to_message is None
+        else:
+            with pytest.raises(BadRequest, match="Message to reply not found"):
+                await default_bot.send_audio(
+                    chat_id, audio, reply_to_message_id=reply_to_message.message_id
+                )

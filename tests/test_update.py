@@ -24,21 +24,31 @@ import pytest
 from telegram import (
     CallbackQuery,
     Chat,
+    ChatBoost,
+    ChatBoostRemoved,
+    ChatBoostSourcePremium,
+    ChatBoostUpdated,
     ChatJoinRequest,
     ChatMemberOwner,
     ChatMemberUpdated,
     ChosenInlineResult,
+    InaccessibleMessage,
     InlineQuery,
     Message,
+    MessageReactionCountUpdated,
+    MessageReactionUpdated,
     Poll,
     PollAnswer,
     PollOption,
     PreCheckoutQuery,
+    ReactionCount,
+    ReactionTypeEmoji,
     ShippingQuery,
     Update,
     User,
 )
 from telegram._utils.datetime import from_timestamp
+from telegram.warnings import PTBUserWarning
 from tests.auxil.slots import mro_slots
 
 message = Message(1, datetime.utcnow(), Chat(1, ""), from_user=User(1, "", False), text="Text")
@@ -58,6 +68,41 @@ chat_join_request = ChatJoinRequest(
     user_chat_id=1,
     bio="bio",
 )
+
+chat_boost = ChatBoostUpdated(
+    chat=Chat(1, "priv"),
+    boost=ChatBoost(
+        "1",
+        from_timestamp(int(time.time())),
+        from_timestamp(int(time.time())),
+        ChatBoostSourcePremium(User(1, "", False)),
+    ),
+)
+
+removed_chat_boost = ChatBoostRemoved(
+    Chat(1, "private"),
+    "2",
+    from_timestamp(int(time.time())),
+    ChatBoostSourcePremium(User(1, "name", False)),
+)
+
+message_reaction = MessageReactionUpdated(
+    chat=Chat(1, "chat"),
+    message_id=1,
+    date=from_timestamp(int(time.time())),
+    old_reaction=(ReactionTypeEmoji("👍"),),
+    new_reaction=(ReactionTypeEmoji("👍"),),
+    user=User(1, "name", False),
+)
+
+
+message_reaction_count = MessageReactionCountUpdated(
+    chat=Chat(1, "chat"),
+    message_id=1,
+    date=from_timestamp(int(time.time())),
+    reactions=(ReactionCount(ReactionTypeEmoji("👍"), 1),),
+)
+
 
 params = [
     {"message": message},
@@ -85,6 +130,10 @@ params = [
     {"my_chat_member": chat_member_updated},
     {"chat_member": chat_member_updated},
     {"chat_join_request": chat_join_request},
+    {"chat_boost": chat_boost},
+    {"removed_chat_boost": removed_chat_boost},
+    {"message_reaction": message_reaction},
+    {"message_reaction_count": message_reaction_count},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -104,6 +153,10 @@ all_types = (
     "my_chat_member",
     "chat_member",
     "chat_join_request",
+    "chat_boost",
+    "removed_chat_boost",
+    "message_reaction",
+    "message_reaction_count",
 )
 
 ids = (*all_types, "callback_query_without_message")
@@ -200,6 +253,9 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             update.channel_post is not None
             or update.edited_channel_post is not None
             or update.poll is not None
+            or update.chat_boost is not None
+            or update.removed_chat_boost is not None
+            or update.message_reaction_count is not None
         ):
             assert user.id == 1
         else:
@@ -219,7 +275,29 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.my_chat_member is not None
             or update.chat_member is not None
             or update.chat_join_request is not None
+            or update.chat_boost is not None
+            or update.removed_chat_boost is not None
+            or update.message_reaction is not None
+            or update.message_reaction_count is not None
         ):
             assert eff_message.message_id == message.message_id
         else:
             assert eff_message is None
+
+    def test_effective_message_inaccessible(self):
+        update = Update(
+            update_id=1,
+            callback_query=CallbackQuery(
+                "id",
+                User(1, "", False),
+                "chat",
+                message=InaccessibleMessage(message_id=1, chat=Chat(1, "")),
+            ),
+        )
+        with pytest.warns(
+            PTBUserWarning,
+            match="update.callback_query` is not `None`, but of type `InaccessibleMessage`",
+        ) as record:
+            assert update.effective_message is None
+
+        assert record[0].filename == __file__

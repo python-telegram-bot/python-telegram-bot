@@ -27,6 +27,8 @@ exclude_dirs = {
     / "_passport",
 }
 
+exclude_patterns = {re.compile(re.escape("self.type: ReactionType = type"))}
+
 
 def test_types_are_converted_to_enum():
     """We want to convert all attributes of name "type" to an enum from telegram.constants.
@@ -43,6 +45,9 @@ def test_types_are_converted_to_enum():
 
         text = path.read_text(encoding="utf-8")
         for match in re.finditer(pattern, text):
+            if any(exclude_pattern.match(match.group(0)) for exclude_pattern in exclude_patterns):
+                continue
+
             assert match.group(1).startswith("enum.get_member") or match.group(1).startswith(
                 "get_member"
             ), (

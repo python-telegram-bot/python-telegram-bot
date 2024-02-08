@@ -21,6 +21,13 @@ Available Types
     telegram.callbackquery
     telegram.chat
     telegram.chatadministratorrights
+    telegram.chatboost
+    telegram.chatboostremoved
+    telegram.chatboostsource
+    telegram.chatboostsourcegiftcode
+    telegram.chatboostsourcegiveaway
+    telegram.chatboostsourcepremium
+    telegram.chatboostupdated
     telegram.chatinvitelink
     telegram.chatjoinrequest
     telegram.chatlocation
@@ -38,6 +45,7 @@ Available Types
     telegram.contact
     telegram.dice
     telegram.document
+    telegram.externalreplyinfo
     telegram.file
     telegram.forcereply
     telegram.forumtopic
@@ -47,6 +55,11 @@ Available Types
     telegram.forumtopicreopened
     telegram.generalforumtopichidden
     telegram.generalforumtopicunhidden
+    telegram.giveaway
+    telegram.giveawaycompleted
+    telegram.giveawaycreated
+    telegram.giveawaywinners
+    telegram.inaccessiblemessage
     telegram.inlinekeyboardbutton
     telegram.inlinekeyboardmarkup
     telegram.inputfile
@@ -61,8 +74,11 @@ Available Types
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat
     telegram.keyboardbuttonrequestuser
+    telegram.keyboardbuttonrequestusers
+    telegram.linkpreviewoptions
     telegram.location
     telegram.loginurl
+    telegram.maybeinaccessiblemessage
     telegram.menubutton
     telegram.menubuttoncommands
     telegram.menubuttondefault
@@ -71,21 +87,36 @@ Available Types
     telegram.messageautodeletetimerchanged
     telegram.messageentity
     telegram.messageid
+    telegram.messageorigin
+    telegram.messageoriginchannel
+    telegram.messageoriginchat
+    telegram.messageoriginhiddenuser
+    telegram.messageoriginuser
+    telegram.messagereactioncountupdated
+    telegram.messagereactionupdated
     telegram.photosize
     telegram.poll
     telegram.pollanswer
     telegram.polloption
     telegram.proximityalerttriggered
+    telegram.reactioncount
+    telegram.reactiontype
+    telegram.reactiontypecustomemoji
+    telegram.reactiontypeemoji
     telegram.replykeyboardmarkup
     telegram.replykeyboardremove
+    telegram.replyparameters
     telegram.sentwebappmessage
     telegram.story
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
+    telegram.textquote
     telegram.update
     telegram.user
+    telegram.userchatboosts
     telegram.userprofilephotos
     telegram.usershared
+    telegram.usersshared
     telegram.venue
     telegram.video
     telegram.videochatended

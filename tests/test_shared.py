@@ -16,27 +16,73 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
+import inspect
 
 import pytest
 
-from telegram import ChatShared, UserShared
+from telegram import ChatShared, UserShared, UsersShared
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
 def user_shared():
-    return UserShared(
-        TestUserSharedBase.request_id,
-        TestUserSharedBase.user_id,
-    )
+    return UserShared(TestUsersSharedBase.request_id, TestUsersSharedBase.user_id)
 
 
-class TestUserSharedBase:
+@pytest.fixture(scope="class")
+def users_shared():
+    return UsersShared(TestUsersSharedBase.request_id, TestUsersSharedBase.user_ids)
+
+
+class TestUsersSharedBase:
     request_id = 789
     user_id = 101112
+    user_ids = (user_id, 101113)
 
 
-class TestUserSharedWithoutRequest(TestUserSharedBase):
+class TestUsersSharedWithoutRequest(TestUsersSharedBase):
+    def test_slot_behaviour(self, users_shared):
+        for attr in users_shared.__slots__:
+            assert getattr(users_shared, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(users_shared)) == len(set(mro_slots(users_shared))), "duplicate slot"
+
+    def test_to_dict(self, users_shared):
+        users_shared_dict = users_shared.to_dict()
+
+        assert isinstance(users_shared_dict, dict)
+        assert users_shared_dict["request_id"] == self.request_id
+        assert users_shared_dict["user_ids"] == list(self.user_ids)
+
+    def test_de_json(self, bot):
+        json_dict = {
+            "request_id": self.request_id,
+            "user_ids": self.user_ids,
+        }
+        users_shared = UsersShared.de_json(json_dict, bot)
+        assert users_shared.api_kwargs == {}
+
+        assert users_shared.request_id == self.request_id
+        assert users_shared.user_ids == tuple(self.user_ids)
+
+    def test_equality(self):
+        a = UsersShared(self.request_id, self.user_ids)
+        b = UsersShared(self.request_id, self.user_ids)
+        c = UsersShared(1, self.user_ids)
+        d = UsersShared(self.request_id, [1, 2])
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+
+class TestUserSharedWithoutRequest(TestUsersSharedBase):
     def test_slot_behaviour(self, user_shared):
         for attr in user_shared.__slots__:
             assert getattr(user_shared, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -47,7 +93,7 @@ class TestUserSharedWithoutRequest(TestUserSharedBase):
 
         assert isinstance(user_shared_dict, dict)
         assert user_shared_dict["request_id"] == self.request_id
-        assert user_shared_dict["user_id"] == self.user_id
+        assert user_shared_dict["user_ids"] == [self.user_id]
 
     def test_de_json(self, bot):
         json_dict = {
@@ -59,6 +105,34 @@ class TestUserSharedWithoutRequest(TestUserSharedBase):
 
         assert user_shared.request_id == self.request_id
         assert user_shared.user_id == self.user_id
+        assert user_shared.user_ids == (self.user_id,)
+
+    def test_signature(self):
+        user_signature = inspect.signature(UserShared)
+        users_signature = inspect.signature(UsersShared)
+
+        assert user_signature.return_annotation == users_signature.return_annotation
+
+        for name, parameter in user_signature.parameters.items():
+            if name not in users_signature.parameters:
+                assert name == "user_id"
+            else:
+                assert parameter.annotation == users_signature.parameters[name].annotation
+
+        assert set(users_signature.parameters) - set(user_signature.parameters) == {"user_ids"}
+
+    def test_deprecation_warnings(self):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'UserShared' was renamed to 'UsersShared'"
+        ) as record:
+            user_shared = UserShared(request_id=1, user_id=1)
+
+        assert record[0].filename == __file__, "wrong stacklevel"
+
+        with pytest.warns(PTBDeprecationWarning, match="'user_id' to 'user_ids'") as record:
+            user_shared.user_id
+
+        assert record[0].filename == __file__, "wrong stacklevel"
 
     def test_equality(self):
         a = UserShared(self.request_id, self.user_id)

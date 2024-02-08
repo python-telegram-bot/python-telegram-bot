@@ -30,6 +30,10 @@ from telegram import (
     File,
     Message,
     MessageEntity,
+    MessageOriginChannel,
+    MessageOriginChat,
+    MessageOriginHiddenUser,
+    MessageOriginUser,
     Sticker,
     SuccessfulPayment,
     Update,
@@ -50,8 +54,9 @@ def update():
             from_user=User(0, "Testuser", False),
             via_bot=User(0, "Testbot", True),
             sender_chat=Chat(0, "Channel"),
-            forward_from=User(0, "HAL9000", False),
-            forward_from_chat=Chat(0, "Channel"),
+            forward_origin=MessageOriginUser(
+                datetime.datetime.utcnow(), User(0, "Testuser", False)
+            ),
         ),
     )
     update._unfreeze()
@@ -60,8 +65,8 @@ def update():
     update.message.from_user._unfreeze()
     update.message.via_bot._unfreeze()
     update.message.sender_chat._unfreeze()
-    update.message.forward_from._unfreeze()
-    update.message.forward_from_chat._unfreeze()
+    update.message.forward_origin._unfreeze()
+    update.message.forward_origin.sender_user._unfreeze()
     return update
 
 
@@ -77,6 +82,11 @@ def message_entity(request):
 )
 def base_class(request):
     return request.param["class"]
+
+
+@pytest.fixture(scope="class")
+def message_origin_user():
+    return MessageOriginUser(datetime.datetime.utcnow(), User(1, "TestOther", False))
 
 
 class TestFilters:
@@ -267,11 +277,11 @@ class TestFilters:
         result = (filters.COMMAND | filters.Regex(r"linked param")).check_update(update)
         assert result is True
 
-    def test_regex_complex_merges(self, update):
+    def test_regex_complex_merges(self, update, message_origin_user):
         sre_type = type(re.match("", ""))
         update.message.text = "test it out"
         test_filter = filters.Regex("test") & (
-            (filters.StatusUpdate.ALL | filters.FORWARDED) | filters.Regex("out")
+            (filters.StatusUpdate.ALL | filters.AUDIO) | filters.Regex("out")
         )
         result = test_filter.check_update(update)
         assert result
@@ -280,7 +290,7 @@ class TestFilters:
         assert isinstance(matches, list)
         assert len(matches) == 2
         assert all(type(res) is sre_type for res in matches)
-        update.message.forward_date = datetime.datetime.utcnow()
+        update.message.audio = "test"
         result = test_filter.check_update(update)
         assert result
         assert isinstance(result, dict)
@@ -294,7 +304,7 @@ class TestFilters:
         matches = result["matches"]
         assert isinstance(matches, list)
         assert all(type(res) is sre_type for res in matches)
-        update.message.forward_date = None
+        update.message.audio = None
         result = test_filter.check_update(update)
         assert not result
         update.message.text = "test it out"
@@ -316,7 +326,7 @@ class TestFilters:
         assert not result
 
         update.message.text = "test it out"
-        update.message.forward_date = None
+        update.message.forward_origin = None
         update.message.pinned_message = None
         test_filter = (filters.Regex("test") | filters.COMMAND) & (
             filters.Regex("it") | filters.StatusUpdate.ALL
@@ -474,11 +484,11 @@ class TestFilters:
         result = (filters.COMMAND | filters.CaptionRegex(r"linked param")).check_update(update)
         assert result is True
 
-    def test_caption_regex_complex_merges(self, update):
+    def test_caption_regex_complex_merges(self, update, message_origin_user):
         sre_type = type(re.match("", ""))
         update.message.caption = "test it out"
         test_filter = filters.CaptionRegex("test") & (
-            (filters.StatusUpdate.ALL | filters.FORWARDED) | filters.CaptionRegex("out")
+            (filters.StatusUpdate.ALL | filters.AUDIO) | filters.CaptionRegex("out")
         )
         result = test_filter.check_update(update)
         assert result
@@ -487,7 +497,7 @@ class TestFilters:
         assert isinstance(matches, list)
         assert len(matches) == 2
         assert all(type(res) is sre_type for res in matches)
-        update.message.forward_date = datetime.datetime.utcnow()
+        update.message.audio = "test"
         result = test_filter.check_update(update)
         assert result
         assert isinstance(result, dict)
@@ -501,7 +511,7 @@ class TestFilters:
         matches = result["matches"]
         assert isinstance(matches, list)
         assert all(type(res) is sre_type for res in matches)
-        update.message.forward_date = None
+        update.message.audio = None
         result = test_filter.check_update(update)
         assert not result
         update.message.caption = "test it out"
@@ -523,7 +533,7 @@ class TestFilters:
         assert not result
 
         update.message.caption = "test it out"
-        update.message.forward_date = None
+        update.message.forward_origin = None
         update.message.pinned_message = None
         test_filter = (filters.CaptionRegex("test") | filters.COMMAND) & (
             filters.CaptionRegex("it") | filters.StatusUpdate.ALL
@@ -1055,20 +1065,37 @@ class TestFilters:
         assert filters.StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
         update.message.write_access_allowed = None
 
-        update.message.user_shared = "user_shared"
+        update.message._user_shared = "user_shared"
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.USER_SHARED.check_update(update)
-        update.message.user_shared = None
+        update.message._user_shared = None
+
+        update.message.users_shared = "users_shared"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.USERS_SHARED.check_update(update)
+        update.message.users_shared = None
 
         update.message.chat_shared = "user_shared"
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.CHAT_SHARED.check_update(update)
         update.message.chat_shared = None
 
-    def test_filters_forwarded(self, update):
-        assert not filters.FORWARDED.check_update(update)
-        update.message.forward_date = datetime.datetime.utcnow()
+        update.message.giveaway_created = "giveaway_created"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GIVEAWAY_CREATED.check_update(update)
+        update.message.giveaway_created = None
+
+        update.message.giveaway_completed = "giveaway_completed"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.GIVEAWAY_COMPLETED.check_update(update)
+        update.message.giveaway_completed = None
+
+    def test_filters_forwarded(self, update, message_origin_user):
         assert filters.FORWARDED.check_update(update)
+        update.message.forward_origin = MessageOriginHiddenUser(datetime.datetime.utcnow(), 1)
+        assert filters.FORWARDED.check_update(update)
+        update.message.forward_origin = None
+        assert not filters.FORWARDED.check_update(update)
 
     def test_filters_game(self, update):
         assert not filters.GAME.check_update(update)
@@ -1434,57 +1461,88 @@ class TestFilters:
         assert not filters.ForwardedFrom().check_update(update)
         assert filters.ForwardedFrom(allow_empty=True).check_update(update)
 
+        update.message.forward_origin = MessageOriginHiddenUser(date=1, sender_user_name="test")
+        assert not filters.ForwardedFrom(allow_empty=True).check_update(update)
+
     def test_filters_forwarded_from_id(self, update):
         # Test with User id-
         assert not filters.ForwardedFrom(chat_id=1).check_update(update)
-        update.message.forward_from.id = 1
+        update.message.forward_origin.sender_user.id = 1
         assert filters.ForwardedFrom(chat_id=1).check_update(update)
-        update.message.forward_from.id = 2
+        update.message.forward_origin.sender_user.id = 2
         assert filters.ForwardedFrom(chat_id=[1, 2]).check_update(update)
         assert not filters.ForwardedFrom(chat_id=[3, 4]).check_update(update)
-        update.message.forward_from = None
+        update.message.forward_origin = None
         assert not filters.ForwardedFrom(chat_id=[3, 4]).check_update(update)
 
         # Test with Chat id-
-        update.message.forward_from_chat.id = 4
+        update.message.forward_origin = MessageOriginChat(date=1, sender_chat=Chat(4, "test"))
         assert filters.ForwardedFrom(chat_id=[4]).check_update(update)
         assert filters.ForwardedFrom(chat_id=[3, 4]).check_update(update)
 
-        update.message.forward_from_chat.id = 2
+        update.message.forward_origin = MessageOriginChat(date=1, sender_chat=Chat(2, "test"))
         assert not filters.ForwardedFrom(chat_id=[3, 4]).check_update(update)
         assert filters.ForwardedFrom(chat_id=2).check_update(update)
-        update.message.forward_from_chat = None
+
+        # Test with Channel id-
+        update.message.forward_origin = MessageOriginChannel(
+            date=1, chat=Chat(4, "test"), message_id=1
+        )
+        assert filters.ForwardedFrom(chat_id=[4]).check_update(update)
+        assert filters.ForwardedFrom(chat_id=[3, 4]).check_update(update)
+
+        update.message.forward_origin = MessageOriginChannel(
+            date=1, chat=Chat(2, "test"), message_id=1
+        )
+        assert not filters.ForwardedFrom(chat_id=[3, 4]).check_update(update)
+        assert filters.ForwardedFrom(chat_id=2).check_update(update)
+        update.message.forward_origin = None
 
     def test_filters_forwarded_from_username(self, update):
         # For User username
         assert not filters.ForwardedFrom(username="chat").check_update(update)
         assert not filters.ForwardedFrom(username="Testchat").check_update(update)
-        update.message.forward_from.username = "chat@"
+        update.message.forward_origin.sender_user.username = "chat@"
         assert filters.ForwardedFrom(username="@chat@").check_update(update)
         assert filters.ForwardedFrom(username="chat@").check_update(update)
         assert filters.ForwardedFrom(username=["chat1", "chat@", "chat2"]).check_update(update)
         assert not filters.ForwardedFrom(username=["@username", "@chat_2"]).check_update(update)
-        update.message.forward_from = None
+        update.message.forward_origin = None
         assert not filters.ForwardedFrom(username=["@username", "@chat_2"]).check_update(update)
 
         # For Chat username
         assert not filters.ForwardedFrom(username="chat").check_update(update)
         assert not filters.ForwardedFrom(username="Testchat").check_update(update)
-        update.message.forward_from_chat.username = "chat@"
+        update.message.forward_origin = MessageOriginChat(
+            date=1, sender_chat=Chat(4, username="chat@", type=Chat.SUPERGROUP)
+        )
         assert filters.ForwardedFrom(username="@chat@").check_update(update)
         assert filters.ForwardedFrom(username="chat@").check_update(update)
         assert filters.ForwardedFrom(username=["chat1", "chat@", "chat2"]).check_update(update)
         assert not filters.ForwardedFrom(username=["@username", "@chat_2"]).check_update(update)
-        update.message.forward_from_chat = None
+        update.message.forward_origin = None
+        assert not filters.ForwardedFrom(username=["@username", "@chat_2"]).check_update(update)
+
+        # For Channel username
+        assert not filters.ForwardedFrom(username="chat").check_update(update)
+        assert not filters.ForwardedFrom(username="Testchat").check_update(update)
+        update.message.forward_origin = MessageOriginChannel(
+            date=1, chat=Chat(4, username="chat@", type=Chat.SUPERGROUP), message_id=1
+        )
+        assert filters.ForwardedFrom(username="@chat@").check_update(update)
+        assert filters.ForwardedFrom(username="chat@").check_update(update)
+        assert filters.ForwardedFrom(username=["chat1", "chat@", "chat2"]).check_update(update)
+        assert not filters.ForwardedFrom(username=["@username", "@chat_2"]).check_update(update)
+        update.message.forward_origin = None
         assert not filters.ForwardedFrom(username=["@username", "@chat_2"]).check_update(update)
 
     def test_filters_forwarded_from_change_id(self, update):
         f = filters.ForwardedFrom(chat_id=1)
         # For User ids-
         assert f.chat_ids == {1}
-        update.message.forward_from.id = 1
+        update.message.forward_origin.sender_user.id = 1
         assert f.check_update(update)
-        update.message.forward_from.id = 2
+        update.message.forward_origin.sender_user.id = 2
         assert not f.check_update(update)
         f.chat_ids = 2
         assert f.chat_ids == {2}
@@ -1492,11 +1550,29 @@ class TestFilters:
 
         # For Chat ids-
         f = filters.ForwardedFrom(chat_id=1)  # reset this
-        update.message.forward_from = None  # and change this to None, only one of them can be True
+        # and change this to None, only one of them can be True
+        update.message.forward_origin = None
         assert f.chat_ids == {1}
-        update.message.forward_from_chat.id = 1
+        update.message.forward_origin = MessageOriginChat(date=1, sender_chat=Chat(1, "test"))
         assert f.check_update(update)
-        update.message.forward_from_chat.id = 2
+        update.message.forward_origin = MessageOriginChat(date=1, sender_chat=Chat(2, "test"))
+        assert not f.check_update(update)
+        f.chat_ids = 2
+        assert f.chat_ids == {2}
+        assert f.check_update(update)
+
+        # For Channel ids-
+        f = filters.ForwardedFrom(chat_id=1)  # reset this
+        # and change this to None, only one of them can be True
+        update.message.forward_origin = None
+        assert f.chat_ids == {1}
+        update.message.forward_origin = MessageOriginChannel(
+            date=1, chat=Chat(1, "test"), message_id=1
+        )
+        assert f.check_update(update)
+        update.message.forward_origin = MessageOriginChannel(
+            date=1, chat=Chat(2, "test"), message_id=1
+        )
         assert not f.check_update(update)
         f.chat_ids = 2
         assert f.chat_ids == {2}
@@ -1508,19 +1584,37 @@ class TestFilters:
     def test_filters_forwarded_from_change_username(self, update):
         # For User usernames
         f = filters.ForwardedFrom(username="chat")
-        update.message.forward_from.username = "chat"
+        update.message.forward_origin.sender_user.username = "chat"
         assert f.check_update(update)
-        update.message.forward_from.username = "User"
+        update.message.forward_origin.sender_user.username = "User"
         assert not f.check_update(update)
         f.usernames = "User"
         assert f.check_update(update)
 
         # For Chat usernames
-        update.message.forward_from = None
+        update.message.forward_origin = None
         f = filters.ForwardedFrom(username="chat")
-        update.message.forward_from_chat.username = "chat"
+        update.message.forward_origin = MessageOriginChat(
+            date=1, sender_chat=Chat(1, username="chat", type=Chat.SUPERGROUP)
+        )
         assert f.check_update(update)
-        update.message.forward_from_chat.username = "User"
+        update.message.forward_origin = MessageOriginChat(
+            date=1, sender_chat=Chat(2, username="User", type=Chat.SUPERGROUP)
+        )
+        assert not f.check_update(update)
+        f.usernames = "User"
+        assert f.check_update(update)
+
+        # For Channel usernames
+        update.message.forward_origin = None
+        f = filters.ForwardedFrom(username="chat")
+        update.message.forward_origin = MessageOriginChannel(
+            date=1, chat=Chat(1, username="chat", type=Chat.SUPERGROUP), message_id=1
+        )
+        assert f.check_update(update)
+        update.message.forward_origin = MessageOriginChannel(
+            date=1, chat=Chat(2, username="User", type=Chat.SUPERGROUP), message_id=1
+        )
         assert not f.check_update(update)
         f.usernames = "User"
         assert f.check_update(update)
@@ -1534,28 +1628,50 @@ class TestFilters:
 
         # For User usernames
         for chat in chats:
-            update.message.forward_from.username = chat
+            update.message.forward_origin.sender_user.username = chat
             assert not f.check_update(update)
 
         f.add_usernames("chat_a")
         f.add_usernames(["chat_b", "chat_c"])
 
         for chat in chats:
-            update.message.forward_from.username = chat
+            update.message.forward_origin.sender_user.username = chat
             assert f.check_update(update)
 
         # For Chat usernames
-        update.message.forward_from = None
+        update.message.forward_origin = None
         f = filters.ForwardedFrom()
         for chat in chats:
-            update.message.forward_from_chat.username = chat
+            update.message.forward_origin = MessageOriginChat(
+                date=1, sender_chat=Chat(1, username=chat, type=Chat.SUPERGROUP)
+            )
             assert not f.check_update(update)
 
         f.add_usernames("chat_a")
         f.add_usernames(["chat_b", "chat_c"])
 
         for chat in chats:
-            update.message.forward_from_chat.username = chat
+            update.message.forward_origin = MessageOriginChat(
+                date=1, sender_chat=Chat(1, username=chat, type=Chat.SUPERGROUP)
+            )
+            assert f.check_update(update)
+
+        # For Channel usernames
+        update.message.forward_origin = None
+        f = filters.ForwardedFrom()
+        for chat in chats:
+            update.message.forward_origin = MessageOriginChannel(
+                date=1, chat=Chat(1, username=chat, type=Chat.SUPERGROUP), message_id=1
+            )
+            assert not f.check_update(update)
+
+        f.add_usernames("chat_a")
+        f.add_usernames(["chat_b", "chat_c"])
+
+        for chat in chats:
+            update.message.forward_origin = MessageOriginChannel(
+                date=1, chat=Chat(1, username=chat, type=Chat.SUPERGROUP), message_id=1
+            )
             assert f.check_update(update)
 
         with pytest.raises(RuntimeError, match="chat_id in conjunction"):
@@ -1567,28 +1683,50 @@ class TestFilters:
 
         # For User ids
         for chat in chats:
-            update.message.forward_from.id = chat
+            update.message.forward_origin.sender_user.id = chat
             assert not f.check_update(update)
 
         f.add_chat_ids(1)
         f.add_chat_ids([2, 3])
 
         for chat in chats:
-            update.message.forward_from.username = chat
+            update.message.forward_origin.sender_user.username = chat
             assert f.check_update(update)
 
         # For Chat ids-
-        update.message.forward_from = None
+        update.message.forward_origin = None
         f = filters.ForwardedFrom()
         for chat in chats:
-            update.message.forward_from_chat.id = chat
+            update.message.forward_origin = MessageOriginChat(
+                date=1, sender_chat=Chat(chat, "test")
+            )
             assert not f.check_update(update)
 
         f.add_chat_ids(1)
         f.add_chat_ids([2, 3])
 
         for chat in chats:
-            update.message.forward_from_chat.username = chat
+            update.message.forward_origin = MessageOriginChat(
+                date=1, sender_chat=Chat(chat, "test")
+            )
+            assert f.check_update(update)
+
+        # For Channel ids-
+        update.message.forward_origin = None
+        f = filters.ForwardedFrom()
+        for chat in chats:
+            update.message.forward_origin = MessageOriginChannel(
+                date=1, chat=Chat(chat, "test"), message_id=1
+            )
+            assert not f.check_update(update)
+
+        f.add_chat_ids(1)
+        f.add_chat_ids([2, 3])
+
+        for chat in chats:
+            update.message.forward_origin = MessageOriginChannel(
+                date=1, chat=Chat(chat, "test"), message_id=1
+            )
             assert f.check_update(update)
 
         with pytest.raises(RuntimeError, match="username in conjunction"):
@@ -1603,28 +1741,50 @@ class TestFilters:
 
         # For User usernames
         for chat in chats:
-            update.message.forward_from.username = chat
+            update.message.forward_origin.sender_user.username = chat
             assert f.check_update(update)
 
         f.remove_usernames("chat_a")
         f.remove_usernames(["chat_b", "chat_c"])
 
         for chat in chats:
-            update.message.forward_from.username = chat
+            update.message.forward_origin.sender_user.username = chat
             assert not f.check_update(update)
 
         # For Chat usernames
-        update.message.forward_from = None
+        update.message.forward_origin = None
         f = filters.ForwardedFrom(username=chats)
         for chat in chats:
-            update.message.forward_from_chat.username = chat
+            update.message.forward_origin = MessageOriginChat(
+                date=1, sender_chat=Chat(1, username=chat, type=Chat.SUPERGROUP)
+            )
             assert f.check_update(update)
 
         f.remove_usernames("chat_a")
         f.remove_usernames(["chat_b", "chat_c"])
 
         for chat in chats:
-            update.message.forward_from_chat.username = chat
+            update.message.forward_origin = MessageOriginChat(
+                date=1, sender_chat=Chat(1, username=chat, type=Chat.SUPERGROUP)
+            )
+            assert not f.check_update(update)
+
+        # For Channel usernames
+        update.message.forward_origin = None
+        f = filters.ForwardedFrom(username=chats)
+        for chat in chats:
+            update.message.forward_origin = MessageOriginChannel(
+                date=1, chat=Chat(1, username=chat, type=Chat.SUPERGROUP), message_id=1
+            )
+            assert f.check_update(update)
+
+        f.remove_usernames("chat_a")
+        f.remove_usernames(["chat_b", "chat_c"])
+
+        for chat in chats:
+            update.message.forward_origin = MessageOriginChannel(
+                date=1, chat=Chat(1, username=chat, type=Chat.SUPERGROUP), message_id=1
+            )
             assert not f.check_update(update)
 
     def test_filters_forwarded_from_remove_chat_by_id(self, update):
@@ -1636,28 +1796,50 @@ class TestFilters:
 
         # For User ids
         for chat in chats:
-            update.message.forward_from.id = chat
+            update.message.forward_origin.sender_user.id = chat
             assert f.check_update(update)
 
         f.remove_chat_ids(1)
         f.remove_chat_ids([2, 3])
 
         for chat in chats:
-            update.message.forward_from.username = chat
+            update.message.forward_origin.sender_user.username = chat
             assert not f.check_update(update)
 
         # For Chat ids
-        update.message.forward_from = None
+        update.message.forward_origin = None
         f = filters.ForwardedFrom(chat_id=chats)
         for chat in chats:
-            update.message.forward_from_chat.id = chat
+            update.message.forward_origin = MessageOriginChat(
+                date=1, sender_chat=Chat(chat, "test")
+            )
             assert f.check_update(update)
 
         f.remove_chat_ids(1)
         f.remove_chat_ids([2, 3])
 
         for chat in chats:
-            update.message.forward_from_chat.username = chat
+            update.message.forward_origin = MessageOriginChat(
+                date=1, sender_chat=Chat(chat, "test")
+            )
+            assert not f.check_update(update)
+
+        # For Channel ids
+        update.message.forward_origin = None
+        f = filters.ForwardedFrom(chat_id=chats)
+        for chat in chats:
+            update.message.forward_origin = MessageOriginChannel(
+                date=1, chat=Chat(chat, "test"), message_id=1
+            )
+            assert f.check_update(update)
+
+        f.remove_chat_ids(1)
+        f.remove_chat_ids([2, 3])
+
+        for chat in chats:
+            update.message.forward_origin = MessageOriginChannel(
+                date=1, chat=Chat(chat, "test"), message_id=1
+            )
             assert not f.check_update(update)
 
     def test_filters_forwarded_from_repr(self):
@@ -1999,18 +2181,18 @@ class TestFilters:
         update.message.from_user.language_code = "da"
         assert f.check_update(update)
 
-    def test_and_filters(self, update):
+    def test_and_filters(self, update, message_origin_user):
         update.message.text = "test"
-        update.message.forward_date = datetime.datetime.utcnow()
+        update.message.forward_origin = message_origin_user
         assert (filters.TEXT & filters.FORWARDED).check_update(update)
         update.message.text = "/test"
         assert (filters.TEXT & filters.FORWARDED).check_update(update)
         update.message.text = "test"
-        update.message.forward_date = None
+        update.message.forward_origin = None
         assert not (filters.TEXT & filters.FORWARDED).check_update(update)
 
         update.message.text = "test"
-        update.message.forward_date = datetime.datetime.utcnow()
+        update.message.forward_origin = message_origin_user
         assert (filters.TEXT & filters.FORWARDED & filters.ChatType.PRIVATE).check_update(update)
 
     def test_or_filters(self, update):
@@ -2025,9 +2207,9 @@ class TestFilters:
 
     def test_and_or_filters(self, update):
         update.message.text = "test"
-        update.message.forward_date = datetime.datetime.utcnow()
+        update.message.forward_origin = message_origin_user
         assert (filters.TEXT & (filters.StatusUpdate.ALL | filters.FORWARDED)).check_update(update)
-        update.message.forward_date = None
+        update.message.forward_origin = None
         assert not (filters.TEXT & (filters.FORWARDED | filters.StatusUpdate.ALL)).check_update(
             update
         )
@@ -2057,16 +2239,16 @@ class TestFilters:
         with pytest.raises(RuntimeError, match="Cannot set name"):
             (filters.TEXT ^ filters.User(123)).name = "foo"
 
-    def test_and_xor_filters(self, update):
+    def test_and_xor_filters(self, update, message_origin_user):
         update.message.text = "test"
-        update.message.forward_date = datetime.datetime.utcnow()
+        update.message.forward_origin = message_origin_user
         assert (filters.FORWARDED & (filters.TEXT ^ filters.User(123))).check_update(update)
         update.message.text = None
         update.effective_user.id = 123
         assert (filters.FORWARDED & (filters.TEXT ^ filters.User(123))).check_update(update)
         update.message.text = "test"
         assert not (filters.FORWARDED & (filters.TEXT ^ filters.User(123))).check_update(update)
-        update.message.forward_date = None
+        update.message.forward_origin = None
         update.message.text = None
         update.effective_user.id = 123
         assert not (filters.FORWARDED & (filters.TEXT ^ filters.User(123))).check_update(update)
@@ -2079,19 +2261,19 @@ class TestFilters:
             == "<filters.FORWARDED and <filters.TEXT xor filters.User(123)>>"
         )
 
-    def test_xor_regex_filters(self, update):
+    def test_xor_regex_filters(self, update, message_origin_user):
         sre_type = type(re.match("", ""))
         update.message.text = "test"
-        update.message.forward_date = datetime.datetime.utcnow()
+        update.message.forward_origin = message_origin_user
         assert not (filters.FORWARDED ^ filters.Regex("^test$")).check_update(update)
-        update.message.forward_date = None
+        update.message.forward_origin = None
         result = (filters.FORWARDED ^ filters.Regex("^test$")).check_update(update)
         assert result
         assert isinstance(result, dict)
         matches = result["matches"]
         assert isinstance(matches, list)
         assert type(matches[0]) is sre_type
-        update.message.forward_date = datetime.datetime.utcnow()
+        update.message.forward_origin = message_origin_user
         update.message.text = None
         assert (filters.FORWARDED ^ filters.Regex("^test$")).check_update(update) is True
 
@@ -2110,15 +2292,15 @@ class TestFilters:
         with pytest.raises(RuntimeError, match="Cannot set name"):
             (~filters.TEXT).name = "foo"
 
-    def test_inverted_and_filters(self, update):
+    def test_inverted_and_filters(self, update, message_origin_user):
         update.message.text = "/test"
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 5)]
-        update.message.forward_date = 1
+        update.message.forward_origin = message_origin_user
         assert (filters.FORWARDED & filters.COMMAND).check_update(update)
         assert not (~filters.FORWARDED & filters.COMMAND).check_update(update)
         assert not (filters.FORWARDED & ~filters.COMMAND).check_update(update)
         assert not (~(filters.FORWARDED & filters.COMMAND)).check_update(update)
-        update.message.forward_date = None
+        update.message.forward_origin = None
         assert not (filters.FORWARDED & filters.COMMAND).check_update(update)
         assert (~filters.FORWARDED & filters.COMMAND).check_update(update)
         assert not (filters.FORWARDED & ~filters.COMMAND).check_update(update)
@@ -2504,3 +2686,17 @@ class TestFilters:
         assert not filters.Mention(
             ["@test3", 123, user_no_username, user_wrong_username]
         ).check_update(update)
+
+    def test_filters_giveaway(self, update):
+        assert not filters.GIVEAWAY.check_update(update)
+
+        update.message.giveaway = "test"
+        assert filters.GIVEAWAY.check_update(update)
+        assert str(filters.GIVEAWAY) == "filters.GIVEAWAY"
+
+    def test_filters_giveaway_winners(self, update):
+        assert not filters.GIVEAWAY_WINNERS.check_update(update)
+
+        update.message.giveaway_winners = "test"
+        assert filters.GIVEAWAY_WINNERS.check_update(update)
+        assert str(filters.GIVEAWAY_WINNERS) == "filters.GIVEAWAY_WINNERS"

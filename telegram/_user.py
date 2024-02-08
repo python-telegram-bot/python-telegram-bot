@@ -41,12 +41,15 @@ if TYPE_CHECKING:
         InputMediaPhoto,
         InputMediaVideo,
         LabeledPrice,
+        LinkPreviewOptions,
         Location,
         Message,
         MessageEntity,
         MessageId,
         PhotoSize,
+        ReplyParameters,
         Sticker,
+        UserChatBoosts,
         UserProfilePhotos,
         Venue,
         Video,
@@ -391,6 +394,8 @@ class User(TelegramObject):
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -416,13 +421,79 @@ class User(TelegramObject):
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
+            link_preview_options=link_preview_options,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_message(
+        self,
+        message_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.delete_message(update.effective_user.id, *argss, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.delete_message`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return await self.get_bot().delete_message(
+            chat_id=self.id,
+            message_id=message_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_messages(
+        self,
+        message_ids: Sequence[int],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.delete_messages(update.effective_user.id, *argss, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.delete_messages`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return await self.get_bot().delete_messages(
+            chat_id=self.id,
+            message_ids=message_ids,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -443,6 +514,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -470,6 +542,7 @@ class User(TelegramObject):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -495,6 +568,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -524,6 +598,7 @@ class User(TelegramObject):
             media=media,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -553,6 +628,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -583,6 +659,7 @@ class User(TelegramObject):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -648,6 +725,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         contact: Optional["Contact"] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -676,6 +754,7 @@ class User(TelegramObject):
             last_name=last_name,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -698,6 +777,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -722,6 +802,7 @@ class User(TelegramObject):
             chat_id=self.id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -748,6 +829,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -776,6 +858,7 @@ class User(TelegramObject):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -800,6 +883,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -825,6 +909,7 @@ class User(TelegramObject):
             game_short_name=game_short_name,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -865,6 +950,7 @@ class User(TelegramObject):
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -915,6 +1001,7 @@ class User(TelegramObject):
             is_flexible=is_flexible,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             provider_data=provider_data,
             send_phone_number_to_provider=send_phone_number_to_provider,
@@ -945,6 +1032,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         location: Optional["Location"] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -972,6 +1060,7 @@ class User(TelegramObject):
             longitude=longitude,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1005,6 +1094,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1036,6 +1126,7 @@ class User(TelegramObject):
             parse_mode=parse_mode,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1061,6 +1152,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1086,6 +1178,7 @@ class User(TelegramObject):
             sticker=sticker,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1116,6 +1209,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1144,6 +1238,7 @@ class User(TelegramObject):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1179,6 +1274,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         venue: Optional["Venue"] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1209,6 +1305,7 @@ class User(TelegramObject):
             foursquare_id=foursquare_id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1236,6 +1333,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1264,6 +1362,7 @@ class User(TelegramObject):
             length=length,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1290,6 +1389,7 @@ class User(TelegramObject):
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1318,6 +1418,7 @@ class User(TelegramObject):
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1352,6 +1453,7 @@ class User(TelegramObject):
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1383,6 +1485,7 @@ class User(TelegramObject):
             is_closed=is_closed,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1412,6 +1515,7 @@ class User(TelegramObject):
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1441,6 +1545,7 @@ class User(TelegramObject):
             caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -1465,6 +1570,7 @@ class User(TelegramObject):
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
+        reply_parameters: Optional["ReplyParameters"] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1494,6 +1600,7 @@ class User(TelegramObject):
             caption_entities=caption_entities,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
+            reply_parameters=reply_parameters,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
             read_timeout=read_timeout,
@@ -1503,6 +1610,267 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+        )
+
+    async def send_copies(
+        self,
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        remove_caption: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple["MessageId", ...]:
+        """Shortcut for::
+
+             await bot.copy_messages(chat_id=update.effective_user.id, *argss, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.copy_messages`.
+
+        .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`copy_messages`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of the sent messages is returned.
+
+        """
+        return await self.get_bot().copy_messages(
+            chat_id=self.id,
+            from_chat_id=from_chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            remove_caption=remove_caption,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def copy_messages(
+        self,
+        chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        remove_caption: Optional[bool] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple["MessageId", ...]:
+        """Shortcut for::
+
+             await bot.copy_messages(from_chat_id=update.effective_user.id, *argss, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.copy_messages`.
+
+        .. seealso:: :meth:`copy_message`, :meth:`send_copy`, :meth:`send_copies`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of the sent messages is returned.
+
+        """
+        return await self.get_bot().copy_messages(
+            from_chat_id=self.id,
+            chat_id=chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            remove_caption=remove_caption,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def forward_from(
+        self,
+        from_chat_id: Union[str, int],
+        message_id: int,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.forward_message(chat_id=update.effective_user.id, *argss, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
+
+        .. seealso:: :meth:`forward_to`, :meth:`forward_messages_from`, :meth:`forward_messages_to`
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return await self.get_bot().forward_message(
+            chat_id=self.id,
+            from_chat_id=from_chat_id,
+            message_id=message_id,
+            disable_notification=disable_notification,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+        )
+
+    async def forward_to(
+        self,
+        chat_id: Union[int, str],
+        message_id: int,
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.forward_message(from_chat_id=update.effective_user.id, *argss, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
+
+        .. seealso:: :meth:`forward_from`, :meth:`forward_messages_from`,
+            :meth:`forward_messages_to`
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return await self.get_bot().forward_message(
+            from_chat_id=self.id,
+            chat_id=chat_id,
+            message_id=message_id,
+            disable_notification=disable_notification,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+        )
+
+    async def forward_messages_from(
+        self,
+        from_chat_id: Union[str, int],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple["MessageId", ...]:
+        """Shortcut for::
+
+             await bot.forward_messages(chat_id=update.effective_user.id, *argss, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.forward_messages`.
+
+        .. seealso:: :meth:`forward_to`, :meth:`forward_from`, :meth:`forward_messages_to`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of sent messages is returned.
+
+        """
+        return await self.get_bot().forward_messages(
+            chat_id=self.id,
+            from_chat_id=from_chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def forward_messages_to(
+        self,
+        chat_id: Union[int, str],
+        message_ids: Sequence[int],
+        disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: Optional[int] = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> Tuple["MessageId", ...]:
+        """Shortcut for::
+
+             await bot.forward_messages(from_chat_id=update.effective_user.id, *argss, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.forward_messages`.
+
+        .. seealso:: :meth:`forward_from`, :meth:`forward_to`, :meth:`forward_messages_from`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            Tuple[:class:`telegram.MessageId`]: On success, a tuple of :class:`~telegram.MessageId`
+            of sent messages is returned.
+
+        """
+        return await self.get_bot().forward_messages(
+            from_chat_id=self.id,
+            chat_id=chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            message_thread_id=message_thread_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def approve_join_request(
@@ -1589,7 +1957,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             await bot.set_chat_menu_button(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.set_chat_menu_button(chat_id=update.effective_user.id, *argss, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_menu_button`.
@@ -1642,6 +2010,38 @@ class User(TelegramObject):
         """
         return await self.get_bot().get_chat_menu_button(
             chat_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_chat_boosts(
+        self,
+        chat_id: Union[int, str],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> "UserChatBoosts":
+        """Shortcut for::
+
+             await bot.get_user_chat_boosts(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_user_chat_boosts`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Returns:
+            :class:`telegram.UserChatBoosts`: On success, returns the boosts applied by the user.
+        """
+        return await self.get_bot().get_user_chat_boosts(
+            chat_id=chat_id,
+            user_id=self.id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
