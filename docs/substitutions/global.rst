@@ -70,8 +70,6 @@
 
 .. |keyword_only_arg| replace:: In future versions, this argument will become a keyword-only argument.
 
-.. |mutually_exc_rp| replace:: Mutually exclusive with :paramref:`~telegram.Bot.send_message.reply_parameters`.
-
 .. |text_html| replace:: The return value of this property is a best-effort approach. Unfortunately, it can not be guaranteed that sending a message with the returned string will render in the same way as the original message produces the same :attr:`~telegram.Message.entities`/:attr:`~telegram.Message.caption_entities` as the original message. For example, Telegram recommends that entities of type :attr:`~telegram.MessageEntity.BLOCKQUOTE` and :attr:`~telegram.MessageEntity.PRE` *should* start and end on a new line, but does not enforce this and leaves rendering decisions up to the clients.
 
 .. |text_markdown| replace:: |text_html| Moreover, markdown formatting is inherently less expressive than HTML, so some edge cases may not be coverable at all. For example, markdown formatting can not specify two consecutive block quotes without a blank line in between, but HTML can.

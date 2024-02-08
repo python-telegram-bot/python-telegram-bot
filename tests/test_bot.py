@@ -52,8 +52,8 @@ from telegram import (
     InlineQueryResultsButton,
     InlineQueryResultVoice,
     InputFile,
-    InputMediaPhoto,
     InputMediaDocument,
+    InputMediaPhoto,
     InputMessageContent,
     InputTextMessageContent,
     LabeledPrice,
@@ -98,10 +98,10 @@ from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
-from tests.auxil.string_manipulation import to_camel_case
 
 from ._files.test_photo import photo_file
 from .auxil.build_messages import make_message
+
 
 @pytest.fixture()
 async def message(bot, chat_id):  # mostly used in tests for edit_message
@@ -2022,7 +2022,7 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         await default_bot.copy_message(chat_id, 1, 1, reply_parameters=ReplyParameters(**kwargs))
-    
+
     async def test_do_api_request_camel_case_conversion(self, bot, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return url.endswith("camelCase")
@@ -3981,7 +3981,7 @@ class TestBotWithRequest:
         assert await bot.set_message_reaction(
             chat_id, message.message_id, ReactionEmoji.THUMBS_DOWN, True
         )
-  
+
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     async def test_do_api_request_warning_known_method(self, bot, bot_class):
         with pytest.warns(PTBDeprecationWarning, match="Please use 'Bot.get_me'") as record:
