@@ -36,7 +36,7 @@ LINE_NUMBERS = {}
 def _git_branch() -> str:
     """Get's the current git sha if available or fall back to `master`"""
     try:
-        output = subprocess.check_output(  # skipcq: BAN-B607
+        output = subprocess.check_output(
             ["git", "describe", "--tags", "--always"], stderr=subprocess.STDOUT
         )
         return output.decode().strip()

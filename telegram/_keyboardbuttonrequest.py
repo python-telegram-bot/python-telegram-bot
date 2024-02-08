@@ -90,7 +90,7 @@ class KeyboardButtonRequestUsers(TelegramObject):
         user_is_premium: Optional[bool] = None,
         max_quantity: Optional[int] = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,  # skipcq: PYL-W0622
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -229,7 +229,7 @@ class KeyboardButtonRequestChat(TelegramObject):
         bot_administrator_rights: Optional[ChatAdministratorRights] = None,
         bot_is_member: Optional[bool] = None,
         *,
-        api_kwargs: Optional[JSONDict] = None,  # skipcq: PYL-W0622
+        api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # required

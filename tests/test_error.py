@@ -25,6 +25,7 @@ from telegram.error import (
     BadRequest,
     ChatMigrated,
     Conflict,
+    EndPointNotFound,
     Forbidden,
     InvalidToken,
     NetworkError,
@@ -113,6 +114,7 @@ class TestErrors:
             (Conflict("test message"), ["message"]),
             (PassportDecryptionError("test message"), ["message"]),
             (InvalidCallbackData("test data"), ["callback_data"]),
+            (EndPointNotFound("endPoint"), ["message"]),
         ],
     )
     def test_errors_pickling(self, exception, attributes):
@@ -138,6 +140,7 @@ class TestErrors:
             (Conflict("test message")),
             (PassportDecryptionError("test message")),
             (InvalidCallbackData("test data")),
+            (EndPointNotFound("test message")),
         ],
     )
     def test_slot_behaviour(self, inst):
@@ -170,6 +173,7 @@ class TestErrors:
                     Conflict,
                     PassportDecryptionError,
                     InvalidCallbackData,
+                    EndPointNotFound,
                 },
                 NetworkError: {BadRequest, TimedOut},
             }

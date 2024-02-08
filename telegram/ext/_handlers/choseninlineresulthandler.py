@@ -109,8 +109,8 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,  # skipcq: BAN-B301
-        application: "Application[Any, CCT, Any, Any, Any, Any]",  # skipcq: BAN-B301
+        update: Update,
+        application: "Application[Any, CCT, Any, Any, Any, Any]",
         check_result: Union[bool, Match[str]],
     ) -> None:
         """This function adds the matched regex pattern result to

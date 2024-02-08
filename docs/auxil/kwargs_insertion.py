@@ -41,7 +41,8 @@ keyword_args = [
     ),
     (
         "    api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments"
-        "        to be passed to the Telegram API."
+        "        to be passed to the Telegram API. See :meth:`~telegram.Bot.do_api_request` for"
+        "        limitations."
     ),
     "",
 ]
