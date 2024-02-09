@@ -6138,8 +6138,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     async def upload_sticker_file(
         self,
         user_id: int,
-        sticker: Optional[FileInput],
-        sticker_format: Optional[str],
+        sticker: FileInput,
+        sticker_format: str,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6180,7 +6180,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         data: JSONDict = {
             "user_id": user_id,
-            "sticker": self._parse_file_input(sticker),  # type: ignore[arg-type]
+            "sticker": self._parse_file_input(sticker),
             "sticker_format": sticker_format,
         }
         result = await self._post(
@@ -6199,7 +6199,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         user_id: int,
         name: str,
-        sticker: Optional["InputSticker"],
+        sticker: "InputSticker",
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6298,8 +6298,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         user_id: int,
         name: str,
         title: str,
-        stickers: Optional[Sequence["InputSticker"]],
-        sticker_format: Optional[str],
+        stickers: Sequence["InputSticker"],
+        sticker_format: str,
         sticker_type: Optional[str] = None,
         needs_repainting: Optional[bool] = None,
         *,
