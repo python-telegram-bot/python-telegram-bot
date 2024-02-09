@@ -57,7 +57,7 @@ collect_ignore = []
 if sys.version_info < (3, 10):
     if RUN_TEST_OFFICIAL:
         logging.warning("Skipping test_official.py since it requires Python 3.10+")
-    collect_ignore.append("test_official.py")
+    collect_ignore_glob = ["test_official/*.py"]
 
 
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
