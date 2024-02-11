@@ -33,7 +33,7 @@ jobs:
           python -W ignore -m pip install -r requirements-dev.txt
       - name: Compare to official api
         run: |
-          pytest -v tests/test_official.py --junit-xml=.test_report_official.xml
+          pytest -v tests/test_official/test_official.py --junit-xml=.test_report_official.xml
           exit $?
         env:
           TEST_OFFICIAL: "true"
