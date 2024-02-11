@@ -21,13 +21,10 @@ from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import parse_lpo_and_dwpp, parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import JSONDict, ODVInput
-from telegram._utils.warnings_transition import (
-    warn_about_deprecated_attr_in_property,
-    warn_for_link_preview_options,
-)
+from telegram._utils.warnings_transition import warn_about_deprecated_attr_in_property
 
 if TYPE_CHECKING:
     from telegram._linkpreviewoptions import LinkPreviewOptions
@@ -97,7 +94,7 @@ class InputTextMessageContent(InputMessageContent):
         self,
         message_text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
+        disable_web_page_preview: Optional[bool] = None,
         entities: Optional[Sequence[MessageEntity]] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
@@ -111,8 +108,8 @@ class InputTextMessageContent(InputMessageContent):
             # Optionals
             self.parse_mode: ODVInput[str] = parse_mode
             self.entities: Tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.link_preview_options: ODVInput["LinkPreviewOptions"] = (
-                warn_for_link_preview_options(disable_web_page_preview, link_preview_options)
+            self.link_preview_options: ODVInput["LinkPreviewOptions"] = parse_lpo_and_dwpp(
+                disable_web_page_preview, link_preview_options
             )
 
             self._id_attrs = (self.message_text,)

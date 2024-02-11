@@ -1061,12 +1061,12 @@ class TestBotWithoutRequest:
 
     async def test_send_edit_message_mutually_exclusive_link_preview(self, bot, chat_id):
         """Test that link_preview is mutually exclusive with disable_web_page_preview."""
-        with pytest.raises(ValueError, match="'disable_web_page_preview' was renamed to"):
+        with pytest.raises(ValueError, match="`link_preview_options` are mutually exclusive"):
             await bot.send_message(
                 chat_id, "text", disable_web_page_preview=True, link_preview_options="something"
             )
 
-        with pytest.raises(ValueError, match="'disable_web_page_preview' was renamed to"):
+        with pytest.raises(ValueError, match="`link_preview_options` are mutually exclusive"):
             await bot.edit_message_text(
                 "text", chat_id, 1, disable_web_page_preview=True, link_preview_options="something"
             )

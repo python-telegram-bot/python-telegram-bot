@@ -95,7 +95,7 @@ class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase)
         assert hash(a) != hash(d)
 
     def test_mutually_exclusive(self):
-        with pytest.raises(ValueError, match="'link_preview_options' in Bot API 7.0"):
+        with pytest.raises(ValueError, match="`link_preview_options` are mutually exclusive"):
             InputTextMessageContent(
                 "text", disable_web_page_preview=True, link_preview_options=LinkPreviewOptions()
             )

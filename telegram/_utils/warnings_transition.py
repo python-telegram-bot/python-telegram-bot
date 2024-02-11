@@ -25,9 +25,6 @@ inside warnings.py.
 """
 from typing import Any, Callable, Type
 
-from telegram._linkpreviewoptions import LinkPreviewOptions
-from telegram._utils.defaultvalue import DefaultValue
-from telegram._utils.types import ODVInput
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBDeprecationWarning
 
@@ -91,28 +88,6 @@ def warn_about_deprecated_arg_return_new_arg(
         return deprecated_arg
 
     return new_arg
-
-
-def warn_for_link_preview_options(
-    disable_web_page_preview: ODVInput[bool], link_preview_options: ODVInput[LinkPreviewOptions]
-) -> ODVInput[LinkPreviewOptions]:
-    """Wrapper around warn_about_deprecated_arg_return_new_arg. Takes care of converting
-    disable_web_page_preview to LinkPreviewOptions.
-    """
-    warn_about_deprecated_arg_return_new_arg(
-        deprecated_arg=disable_web_page_preview,
-        new_arg=link_preview_options,
-        deprecated_arg_name="disable_web_page_preview",
-        new_arg_name="link_preview_options",
-        bot_api_version="7.0",
-        stacklevel=2,
-    )
-
-    # Convert to LinkPreviewOptions:
-    if not isinstance(disable_web_page_preview, DefaultValue):
-        link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
-
-    return link_preview_options
 
 
 def warn_about_deprecated_attr_in_property(
