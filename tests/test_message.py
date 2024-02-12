@@ -224,9 +224,6 @@ def message(bot):
         },
         {"web_app_data": WebAppData("some_data", "some_button_text")},
         {"message_thread_id": 123},
-        # Using a `UserShared` object here doesn't work, because `to_dict` produces `user_ids`
-        # instead of `user_id` - but that's what we want to test here.
-        {"user_shared": {"request_id": 1, "user_id": 2}},
         {"users_shared": UsersShared(1, [2, 3])},
         {"chat_shared": ChatShared(3, 4)},
         {
@@ -324,7 +321,6 @@ def message(bot):
         "entities",
         "web_app_data",
         "message_thread_id",
-        "user_shared",
         "users_shared",
         "chat_shared",
         "giveaway",
@@ -551,6 +547,12 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert message_bot.forward_date.tzinfo == UTC
         assert forward_date_offset == forward_date_tz_bot_offset
 
+    def test_de_json_api_kwargs_backward_compatibility(self, bot, message_params):
+        message_dict = message_params.to_dict()
+        message_dict["user_shared"] = {"request_id": 1, "user_id": 2}
+        message = Message.de_json(message_dict, bot)
+        assert message.api_kwargs == {"user_shared": {"request_id": 1, "user_id": 2}}
+
     def test_equality(self):
         id_ = 1
         a = Message(id_, self.date, self.chat, from_user=self.from_user)
@@ -571,22 +573,6 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         assert a != e
         assert hash(a) != hash(e)
-
-    def test_user_shared_init_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'user_shared' was renamed to 'users_shared'"
-        ) as record:
-            Message(message_id=1, date=self.date, chat=self.chat, user_shared=1)
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_user_shared_property_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'user_shared' to 'users_shared'"
-        ) as record:
-            message.user_shared
-
-        assert record[0].filename == __file__, "wrong stacklevel"
 
     def test_forward_from_init_deprecation(self, message):
         with pytest.warns(

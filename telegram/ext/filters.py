@@ -2146,14 +2146,18 @@ class StatusUpdate:
         __slots__ = ()
 
         def filter(self, message: Message) -> bool:
-            return bool(message.user_shared)
+            return bool(message.api_kwargs.get("user_shared"))
 
     USER_SHARED = _UserShared(name="filters.StatusUpdate.USER_SHARED")
     """Messages that contain :attr:`telegram.Message.user_shared`.
 
     Warning:
-        This will only catch the legacy :attr:`telegram.Message.user_shared` attribute, not the
+        This will only catch the legacy ``user_shared`` field, not the
         new :attr:`telegram.Message.users_shared` attribute!
+
+    .. versionchanged:: NEXT.VERSION
+       Now relies on :attr:`TelegramObject.api_kwargs` as the native attribute
+       ``Message.user_shared`` was removed.
 
     .. versionadded:: 20.1
     .. deprecated:: 20.8

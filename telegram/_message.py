@@ -55,7 +55,7 @@ from telegram._payment.successfulpayment import SuccessfulPayment
 from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._reply import ReplyParameters
-from telegram._shared import ChatShared, UserShared, UsersShared
+from telegram._shared import ChatShared, UsersShared
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -71,10 +71,7 @@ from telegram._utils.types import (
     ReplyMarkup,
 )
 from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import (
-    build_deprecation_warning_message,
-    warn_about_deprecated_attr_in_property,
-)
+from telegram._utils.warnings_transition import warn_about_deprecated_attr_in_property
 from telegram._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -218,7 +215,9 @@ class MaybeInaccessibleMessage(TelegramObject):
         return self.date != ZERO_DATE
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaybeInaccessibleMessage"]:
+    def _de_json(
+        cls, data: Optional[JSONDict], bot: "Bot", api_kwargs: Optional[JSONDict] = None
+    ) -> Optional["MaybeInaccessibleMessage"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -240,7 +239,7 @@ class MaybeInaccessibleMessage(TelegramObject):
             data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
 
         data["chat"] = Chat.de_json(data.get("chat"), bot)
-        return super().de_json(data=data, bot=bot)
+        return super()._de_json(data=data, bot=bot)
 
 
 class InaccessibleMessage(MaybeInaccessibleMessage):
@@ -286,6 +285,9 @@ class Message(MaybeInaccessibleMessage):
 
     Note:
         In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
+
+    .. versionchanged:: NEXT.VERSION
+       Removed deprecated argument and attribute ``user_shared``.
 
     .. versionchanged:: 20.8
         * This class is now a subclass of :class:`telegram.MaybeInaccessibleMessage`.
@@ -563,12 +565,6 @@ class Message(MaybeInaccessibleMessage):
             by a spoiler animation.
 
             .. versionadded:: 20.0
-        user_shared (:class:`telegram.UserShared`, optional): Service message: a user was shared
-            with the bot.
-
-            .. versionadded:: 20.1
-            .. deprecated:: 20.8
-               Bot API 7.0 deprecates :paramref:`user_shared` in favor of :paramref:`users_shared`.
         users_shared (:class:`telegram.UsersShared`, optional): Service message: users were shared
             with the bot
 
@@ -894,7 +890,6 @@ class Message(MaybeInaccessibleMessage):
         "_forward_from_message_id",
         "_forward_sender_name",
         "_forward_signature",
-        "_user_shared",
         "animation",
         "audio",
         "author_signature",
@@ -1039,7 +1034,6 @@ class Message(MaybeInaccessibleMessage):
         general_forum_topic_unhidden: Optional[GeneralForumTopicUnhidden] = None,
         write_access_allowed: Optional[WriteAccessAllowed] = None,
         has_media_spoiler: Optional[bool] = None,
-        user_shared: Optional[UserShared] = None,
         chat_shared: Optional[ChatShared] = None,
         story: Optional[Story] = None,
         giveaway: Optional["Giveaway"] = None,
@@ -1055,18 +1049,6 @@ class Message(MaybeInaccessibleMessage):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(chat=chat, message_id=message_id, date=date, api_kwargs=api_kwargs)
-
-        if user_shared:
-            warn(
-                build_deprecation_warning_message(
-                    deprecated_name="user_shared",
-                    new_name="users_shared",
-                    object_type="parameter",
-                    bot_api_version="7.0",
-                ),
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
 
         if any(
             (
@@ -1181,7 +1163,6 @@ class Message(MaybeInaccessibleMessage):
             )
             self.write_access_allowed: Optional[WriteAccessAllowed] = write_access_allowed
             self.has_media_spoiler: Optional[bool] = has_media_spoiler
-            self._user_shared: Optional[UserShared] = user_shared
             self.users_shared: Optional[UsersShared] = users_shared
             self.chat_shared: Optional[ChatShared] = chat_shared
             self.story: Optional[Story] = story
@@ -1208,27 +1189,6 @@ class Message(MaybeInaccessibleMessage):
             :meth:`telegram.MaybeInaccessibleMessage.__bool__` is removed.
         """
         return True
-
-    @property
-    def user_shared(self) -> Optional[UserShared]:
-        """:class:`telegram.UserShared`: Optional. Service message. A user was shared with the
-        bot.
-
-        Hint:
-            In case a single user was shared, :attr:`user_shared` will be present in addition to
-            :attr:`users_shared`. If multiple users where shared, only :attr:`users_shared` will
-            be present. However, this behavior is not documented and may be changed by Telegram.
-
-        .. versionadded:: 20.1
-        .. deprecated:: 20.8
-           Bot API 7.0 deprecates :attr:`user_shared` in favor of :attr:`users_shared`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="user_shared",
-            new_attr_name="users_shared",
-            bot_api_version="7.0",
-        )
-        return self._user_shared
 
     @property
     def forward_from(self) -> Optional[User]:
@@ -1434,7 +1394,6 @@ class Message(MaybeInaccessibleMessage):
         data["write_access_allowed"] = WriteAccessAllowed.de_json(
             data.get("write_access_allowed"), bot
         )
-        data["user_shared"] = UserShared.de_json(data.get("user_shared"), bot)
         data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
 
@@ -1464,7 +1423,15 @@ class Message(MaybeInaccessibleMessage):
         data["quote"] = TextQuote.de_json(data.get("quote"), bot)
         data["forward_origin"] = MessageOrigin.de_json(data.get("forward_origin"), bot)
 
-        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if user_shared := data.get("user_shared"):
+            api_kwargs = {"user_shared": user_shared}
+
+        return super()._de_json(  # type: ignore[return-value]
+            data=data, bot=bot, api_kwargs=api_kwargs
+        )
 
     @property
     def effective_attachment(
