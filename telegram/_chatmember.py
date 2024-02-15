@@ -197,9 +197,8 @@ class ChatMemberAdministrator(ChatMember):
             is allowed to edit administrator privileges of that user.
         is_anonymous (:obj:`bool`): :obj:`True`, if the  user's
             presence in the chat is hidden.
-        can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator
-            can access the chat event log, chat statistics, message statistics in
-            channels, see channel members, see anonymous administrators in supergroups
+        can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator can access the chat event
+            log, get boost list, see hidden supergroup and channel members, report spam messages
             and ignore slow mode. Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the
             administrator can delete messages of other users.
@@ -226,15 +225,15 @@ class ChatMemberAdministrator(ChatMember):
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
         can_post_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can post
-            stories in the channel; channels only.
+            stories to the chat.
 
             .. versionadded:: 20.6
         can_edit_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can edit
-            stories posted by other users; channels only.
+            stories posted by other users.
 
             .. versionadded:: 20.6
         can_delete_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can delete
-            stories posted by other users; channels only.
+            stories posted by other users.
 
             .. versionadded:: 20.6
         can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
@@ -252,9 +251,8 @@ class ChatMemberAdministrator(ChatMember):
         is_anonymous (:obj:`bool`): :obj:`True`, if the  user's
             presence in the chat is hidden.
         can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator can access the chat event
-            log, chat statistics, boost list in channels, see channel members, report spam
-            messages, see anonymous administrators in supergroups and ignore slow mode.
-            Implied by any other administrator privilege.
+            log, get boost list, see hidden supergroup and channel members, report spam messages
+            and ignore slow mode. Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the
             administrator can delete messages of other users.
         can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
@@ -280,15 +278,15 @@ class ChatMemberAdministrator(ChatMember):
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
         can_post_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can post
-            stories in the channel; channels only.
+            stories to the chat.
 
             .. versionadded:: 20.6
         can_edit_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
-            stories posted by other users; channels only.
+            stories posted by other users.
 
             .. versionadded:: 20.6
         can_delete_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can delete
-            stories posted by other users; channels only.
+            stories posted by other users.
 
             .. versionadded:: 20.6
         can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed

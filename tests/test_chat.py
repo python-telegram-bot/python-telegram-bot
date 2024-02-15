@@ -72,6 +72,8 @@ def chat(bot):
         background_custom_emoji_id=TestChatBase.background_custom_emoji_id,
         profile_accent_color_id=TestChatBase.profile_accent_color_id,
         profile_background_custom_emoji_id=TestChatBase.profile_background_custom_emoji_id,
+        unrestrict_boost_count=TestChatBase.unrestrict_boost_count,
+        custom_emoji_sticker_set_name=TestChatBase.custom_emoji_sticker_set_name,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -115,6 +117,8 @@ class TestChatBase:
     background_custom_emoji_id = "background_custom_emoji_id"
     profile_accent_color_id = 2
     profile_background_custom_emoji_id = "profile_background_custom_emoji_id"
+    unrestrict_boost_count = 100
+    custom_emoji_sticker_set_name = "custom_emoji_sticker_set_name"
 
 
 class TestChatWithoutRequest(TestChatBase):
@@ -156,6 +160,8 @@ class TestChatWithoutRequest(TestChatBase):
             "background_custom_emoji_id": self.background_custom_emoji_id,
             "profile_accent_color_id": self.profile_accent_color_id,
             "profile_background_custom_emoji_id": self.profile_background_custom_emoji_id,
+            "unrestrict_boost_count": self.unrestrict_boost_count,
+            "custom_emoji_sticker_set_name": self.custom_emoji_sticker_set_name,
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -194,6 +200,8 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.background_custom_emoji_id == self.background_custom_emoji_id
         assert chat.profile_accent_color_id == self.profile_accent_color_id
         assert chat.profile_background_custom_emoji_id == self.profile_background_custom_emoji_id
+        assert chat.unrestrict_boost_count == self.unrestrict_boost_count
+        assert chat.custom_emoji_sticker_set_name == self.custom_emoji_sticker_set_name
 
     def test_de_json_localization(self, bot, raw_bot, tz_bot):
         json_dict = {
@@ -257,6 +265,8 @@ class TestChatWithoutRequest(TestChatBase):
             chat_dict["profile_background_custom_emoji_id"]
             == chat.profile_background_custom_emoji_id
         )
+        assert chat_dict["custom_emoji_sticker_set_name"] == chat.custom_emoji_sticker_set_name
+        assert chat_dict["unrestrict_boost_count"] == chat.unrestrict_boost_count
 
     def test_always_tuples_attributes(self):
         chat = Chat(

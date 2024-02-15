@@ -5250,10 +5250,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             user_id (:obj:`int`): Unique identifier of the target user.
             is_anonymous (:obj:`bool`, optional): Pass :obj:`True`, if the administrator's presence
                 in the chat is hidden.
-            can_manage_chat (:obj:`bool`, optional): Pass  :obj:`True`, if the administrator can
-                access the chat event log, chat statistics, boost list in channels, see channel
-                members, report spam messages, see anonymous administrators in supergroups and
-                ignore slow mode. Implied by any other administrator privilege.
+            can_manage_chat (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                access the chat event log, get boost list, see hidden supergroup and channel
+                members, report spam messages and ignore slow mode. Implied by any other
+                administrator privilege.
 
                 .. versionadded:: 13.4
 
@@ -5285,15 +5285,15 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.0
             can_post_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                post stories in the channel; channels only.
+                post stories to the chat.
 
                 .. versionadded:: 20.6
             can_edit_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                edit stories posted by other users; channels only.
+                edit stories posted by other users.
 
                 .. versionadded:: 20.6
             can_delete_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                delete stories posted by other users; channels only.
+                delete stories posted by other users.
 
                 .. versionadded:: 20.6
 
