@@ -38,7 +38,7 @@ class Story(TelegramObject):
     .. versionadded:: 20.5
 
     .. versionchanged:: NEXT.VERSION
-        Added attributes ``chat`` and ``id`` and equality based on them.
+        Added attributes :attr:`chat` and :attr:`id` and equality based on them.
 
     Args:
         chat (:class:`telegram.Chat`): Chat that posted the story.

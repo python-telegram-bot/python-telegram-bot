@@ -1705,6 +1705,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.animation`."""
     AUDIO = "audio"
     """:obj:`str`: Messages with :attr:`telegram.Message.audio`."""
+    BOOST_ADDED = "boost_added"
+    """:obj:`str`: Messages with :attr:`telegram.Message.boost_added`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     CHANNEL_CHAT_CREATED = "channel_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
     CHAT_SHARED = "chat_shared"
@@ -1802,6 +1807,16 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
     PROXIMITY_ALERT_TRIGGERED = "proximity_alert_triggered"
     """:obj:`str`: Messages with :attr:`telegram.Message.proximity_alert_triggered`."""
+    REPLY_TO_STORY = "reply_to_story"
+    """:obj:`str`: Messages with :attr:`telegram.Message.reply_to_story`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    SENDER_BOOST_COUNT = "sender_boost_count"
+    """:obj:`str`: Messages with :attr:`telegram.Message.sender_boost_count`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     STICKER = "sticker"
     """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
     STORY = "story"
@@ -1842,21 +1857,6 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.write_access_allowed`.
 
     .. versionadded:: 20.8
-    """
-    REPLY_TO_STORY = "reply_to_story"
-    """:obj:`str`: Messages with :attr:`telegram.Message.reply_to_story`.
-
-    .. versionadded:: NEXT.VERSION
-    """
-    BOOST_ADDED = "boost_added"
-    """:obj:`str`: Messages with :attr:`telegram.Message.boost_added`.
-
-    .. versionadded:: NEXT.VERSION
-    """
-    SENDER_BOOST_COUNT = "sender_boost_count"
-    """:obj:`str`: Messages with :attr:`telegram.Message.sender_boost_count`.
-
-    .. versionadded:: NEXT.VERSION
     """
 
 

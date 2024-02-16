@@ -32,25 +32,25 @@ class TestStoryBase:
     id = 0
 
 
-class TestStoryWithoutRequest:
+class TestStoryWithoutRequest(TestStoryBase):
     def test_slot_behaviour(self, story):
         for attr in story.__slots__:
             assert getattr(story, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(story)) == len(set(mro_slots(story))), "duplicate slot"
 
     def test_de_json(self, bot):
-        json_dict = {"chat": TestStoryBase.chat.to_dict(), "id": TestStoryBase.id}
+        json_dict = {"chat": self.chat.to_dict(), "id": self.id}
         story = Story.de_json(json_dict, bot)
         assert story.api_kwargs == {}
-        assert story.chat == TestStoryBase.chat
-        assert story.id == TestStoryBase.id
+        assert story.chat == self.chat
+        assert story.id == self.id
         assert isinstance(story, Story)
         assert Story.de_json(None, bot) is None
 
     def test_to_dict(self, story):
         story_dict = story.to_dict()
-        assert story_dict["chat"] == TestStoryBase.chat.to_dict()
-        assert story_dict["id"] == TestStoryBase.id
+        assert story_dict["chat"] == self.chat.to_dict()
+        assert story_dict["id"] == self.id
 
     def test_equality(self):
         a = Story(Chat(1, ""), 0)

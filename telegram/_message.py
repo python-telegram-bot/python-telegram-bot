@@ -603,14 +603,14 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 20.8
         reply_to_story (:class:`telegram.Story`, optional): For replies to a story, the original
-            message.
+            story.
 
             .. versionadded:: NEXT.VERSION
-        boost_added (:class:`telegram.ChatBoostAdded`, optional): The message is a service message
-            about a user boosting the chat.
+        boost_added (:class:`telegram.ChatBoostAdded`, optional): Service message: user boosted
+            the chat.
 
             .. versionadded:: NEXT.VERSION
-        sender_boost_count (:class:`telegram.ChatBoostAdded`, optional): If the sender of the
+        sender_boost_count (:obj:`int`, optional): If the sender of the
             message boosted the chat, the number of boosts added by the user.
 
             .. versionadded:: NEXT.VERSION
@@ -885,14 +885,14 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 20.8
         reply_to_story (:class:`telegram.Story`): Optional. For replies to a story, the original
-            message.
+            story.
 
             .. versionadded:: NEXT.VERSION
-        boost_added (:class:`telegram.ChatBoostAdded`): Optional. The message is a service message
-            about a user boosting the chat.
+        boost_added (:class:`telegram.ChatBoostAdded`): Optional. Service message: user boosted
+            the chat.
 
             .. versionadded:: NEXT.VERSION
-        sender_boost_count (:class:`telegram.ChatBoostAdded`): Optional. If the sender of the
+        sender_boost_count (:obj:`int`): Optional. If the sender of the
             message boosted the chat, the number of boosts added by the user.
 
             .. versionadded:: NEXT.VERSION
