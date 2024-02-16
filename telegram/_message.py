@@ -24,7 +24,7 @@ from html import escape
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 from telegram._chat import Chat
-from telegram._chatboostadded import ChatBoostAdded
+from telegram._chatboost import ChatBoostAdded
 from telegram._dice import Dice
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio

@@ -243,6 +243,7 @@ from ._chat import Chat
 from ._chatadministratorrights import ChatAdministratorRights
 from ._chatboost import (
     ChatBoost,
+    ChatBoostAdded,
     ChatBoostRemoved,
     ChatBoostSource,
     ChatBoostSourceGiftCode,
@@ -251,7 +252,6 @@ from ._chatboost import (
     ChatBoostUpdated,
     UserChatBoosts,
 )
-from ._chatboostadded import ChatBoostAdded
 from ._chatinvitelink import ChatInviteLink
 from ._chatjoinrequest import ChatJoinRequest
 from ._chatlocation import ChatLocation
