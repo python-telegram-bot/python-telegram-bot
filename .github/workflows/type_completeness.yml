@@ -1,11 +1,11 @@
 name: Check Type Completeness
 on:
   pull_request:
-    branches:
-      - master
+    paths:
+      - telegram/**
   push:
-    branches:
-      - master
+    paths:
+      - telegram/**
 
 jobs:
   test-type-completeness:

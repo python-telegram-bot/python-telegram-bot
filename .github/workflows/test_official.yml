@@ -1,11 +1,13 @@
 name: Bot API Tests
 on:
   pull_request:
-    branches:
-      - master
+    paths:
+      - telegram/**
+      - tests/**
   push:
-    branches:
-      - master
+    paths:
+      - telegram/**
+      - tests/**
   schedule:
     # Run monday and friday morning at 03:07 - odd time to spread load on GitHub Actions
     - cron: '7 3 * * 1,5'
