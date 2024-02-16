@@ -59,7 +59,7 @@ class InputTextMessageContent(InputMessageContent):
     Keyword Args:
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message. Convenience parameter for setting :paramref:`link_preview_options`.
-                Mutually exclusive with :paramref:`link_preview_options`.
+            Mutually exclusive with :paramref:`link_preview_options`.
 
             .. versionchanged:: 20.8
                 Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
@@ -82,8 +82,7 @@ class InputTextMessageContent(InputMessageContent):
                 * |tupleclassattrs|
                 * |alwaystuple|
         link_preview_options (:obj:`LinkPreviewOptions`): Optional. Link preview generation
-            options for the message. Mutually exclusive with
-            :attr:`disable_web_page_preview`.
+            options for the message.
 
             .. versionadded:: 20.8
 

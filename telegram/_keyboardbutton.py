@@ -80,7 +80,7 @@ class KeyboardButton(TelegramObject):
 
         request_users (:class:`KeyboardButtonRequestUsers`, optional): If specified, pressing the
             button will open a list of suitable users. Tapping on any user will send its
-            identifier to the bot in a :attr:`telegram.Message.user_shared` service message.
+            identifier to the bot in a :attr:`telegram.Message.users_shared` service message.
             Available in private chats only.
 
             .. versionadded:: 20.8
@@ -108,7 +108,7 @@ class KeyboardButton(TelegramObject):
             .. versionadded:: 20.0
         request_users (:class:`KeyboardButtonRequestUsers`): Optional. If specified, pressing the
             button will open a list of suitable users. Tapping on any user will send its
-            identifier to the bot in a :attr:`telegram.Message.user_shared` service message.
+            identifier to the bot in a :attr:`telegram.Message.users_shared` service message.
             Available in private chats only.
 
             .. versionadded:: 20.8
