@@ -82,6 +82,17 @@ Use as follows:
     $ pytest -m dev
 
 
+Debugging tests
+===============
+
+Writing tests can be challenging, and fixing failing tests can be even more so. To help with this,
+PTB has started to adopt the use of ``logging`` in the test suite. You can insert debug logging 
+statements in your tests to help you understand what's going on. To enable these logs, you can set 
+``log_level = DEBUG`` in ``setup.cfg`` or use the ``--log-level=INFO`` flag when running the tests.
+If a test is large and complicated, it is recommended to leave the debug logs for others to use as 
+well.
+
+
 Bots used in tests
 ==================
 
