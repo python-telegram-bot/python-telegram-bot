@@ -333,9 +333,9 @@ class ChatMemberAdministrator(ChatMember):
         can_pin_messages: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
         custom_title: Optional[str] = None,
-        can_post_stories: Optional[bool] = None,
-        can_edit_stories: Optional[bool] = None,
-        can_delete_stories: Optional[bool] = None,
+        can_post_stories: bool = None,  # type: ignore # noqa: RUF013
+        can_edit_stories: bool = None,  # type: ignore # noqa: RUF013
+        can_delete_stories: bool = None,  # type: ignore # noqa: RUF013
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -350,14 +350,21 @@ class ChatMemberAdministrator(ChatMember):
             self.can_promote_members: bool = can_promote_members
             self.can_change_info: bool = can_change_info
             self.can_invite_users: bool = can_invite_users
+            # Not actually optionals but because of backwards compatability we pretend they are
+            if can_post_stories is None or can_edit_stories is None or can_delete_stories is None:
+                raise TypeError(
+                    "As of NEXT.VERSION can_post_stories, can_edit_stories and can_delete_stories "
+                    "must be set in order to create this object."
+                )
+            self.can_post_stories: bool = can_post_stories
+            self.can_edit_stories: bool = can_edit_stories
+            self.can_delete_stories: bool = can_delete_stories
+            # Optionals
             self.can_post_messages: Optional[bool] = can_post_messages
             self.can_edit_messages: Optional[bool] = can_edit_messages
             self.can_pin_messages: Optional[bool] = can_pin_messages
             self.can_manage_topics: Optional[bool] = can_manage_topics
             self.custom_title: Optional[str] = custom_title
-            self.can_post_stories: Optional[bool] = can_post_stories
-            self.can_edit_stories: Optional[bool] = can_edit_stories
-            self.can_delete_stories: Optional[bool] = can_delete_stories
 
 
 class ChatMemberMember(ChatMember):
