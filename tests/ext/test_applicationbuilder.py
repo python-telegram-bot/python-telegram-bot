@@ -76,6 +76,9 @@ class TestApplicationBuilder:
         for argument in arguments:
             if argument == "self":
                 continue
+            if argument == "media_write_timeout" and get_updates:
+                # get_updates never makes media requests
+                continue
             assert hasattr(builder, prefix + argument), f"missing method {prefix}{argument}"
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
