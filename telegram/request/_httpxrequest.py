@@ -112,6 +112,12 @@ class HTTPXRequest(BaseRequest):
             .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
 
             .. versionadded:: 20.7
+        media_write_timeout (:obj:`float` | :obj:`None`, optional): Like :paramref:`write_timeout`,
+            but used only for requests that upload media/files. This value is used unless a
+            different value is passed to :paramref:`do_request.write_timeout` of
+            :meth:`do_request`. Defaults to ``20`` seconds.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -128,6 +134,7 @@ class HTTPXRequest(BaseRequest):
         http_version: HTTPVersion = "1.1",
         socket_options: Optional[Collection[SocketOpt]] = None,
         proxy: Optional[Union[str, httpx.Proxy, httpx.URL]] = None,
+        media_write_timeout: Optional[float] = 20.0,
     ):
         if proxy_url is not None and proxy is not None:
             raise ValueError("The parameters `proxy_url` and `proxy` are mutually exclusive.")
@@ -142,6 +149,7 @@ class HTTPXRequest(BaseRequest):
             )
 
         self._http_version = http_version
+        self._media_write_timeout = media_write_timeout
         timeout = httpx.Timeout(
             connect=connect_timeout,
             read=read_timeout,
@@ -251,11 +259,7 @@ class HTTPXRequest(BaseRequest):
             pool_timeout = self._client.timeout.pool
 
         if isinstance(write_timeout, DefaultValue):
-            # Making the networking backend decide on the proper timeout values instead of doing
-            # it via the default values of the Bot methods was introduced in version 20.7.
-            # We hard-code the value here for now until we add additional parameters to this
-            # class to control the media_write_timeout separately.
-            write_timeout = self._client.timeout.write if not files else 20
+            write_timeout = self._client.timeout.write if not files else self._media_write_timeout
 
         timeout = httpx.Timeout(
             connect=connect_timeout,
