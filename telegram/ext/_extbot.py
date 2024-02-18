@@ -750,7 +750,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         return await super().stop_poll(
             chat_id=chat_id,
             message_id=message_id,
-            reply_markup=self._replace_keyboard(reply_markup),
+            reply_markup=cast(
+                Optional["InlineKeyboardMarkup"], self._replace_keyboard(reply_markup)
+            ),
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
