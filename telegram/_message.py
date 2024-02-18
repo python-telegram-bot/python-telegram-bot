@@ -2835,7 +2835,7 @@ class Message(MaybeInaccessibleMessage):
             do_quote, quote, reply_to_message_id, reply_parameters
         )
         return await self.get_bot().send_game(
-            chat_id=chat_id,
+            chat_id=int(chat_id),
             game_short_name=game_short_name,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,

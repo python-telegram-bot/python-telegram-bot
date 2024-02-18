@@ -1167,7 +1167,7 @@ class Chat(TelegramObject):
         """
         return await self.get_bot().set_chat_administrator_custom_title(
             chat_id=self.id,
-            user_id=user_id,
+            user_id=int(user_id),
             custom_title=custom_title,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
