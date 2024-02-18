@@ -140,6 +140,20 @@ if TYPE_CHECKING:
 BT = TypeVar("BT", bound="Bot")
 
 
+def _log(func: "Callable[LP, Coroutine[Any, Any, LR]]") -> "Callable[LP, Coroutine[Any, Any, LR]]":
+    @functools.wraps(func)
+    async def decorator(*args: "LP.args", **kwargs: "LP.kwargs") -> "LR":
+        self = cast("Bot", args[0])  # the first argument is always self, the bot
+        # pylint: disable=protected-access
+        self._LOGGER.debug("Entering: %s", func.__name__)
+        result = await func(*args, **kwargs)
+        self._LOGGER.debug(result)
+        self._LOGGER.debug("Exiting: %s", func.__name__)
+        return result
+
+    return decorator
+
+
 class Bot(TelegramObject, AsyncContextManager["Bot"]):
     """This object represents a Telegram Bot.
 
@@ -318,7 +332,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 )
             self._private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
-            ) # type: ignore[assignment]
+            )  # type: ignore[assignment]
 
         self._freeze()
 
@@ -542,22 +556,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         for ExtBot to add 1 level to all warning calls.
         """
         warn(message=message, category=category, stacklevel=stacklevel + 1)
-
-    @staticmethod
-    def _log(
-        func: "Callable[LP, Coroutine[Any, Any, LR]]",
-    ) -> "Callable[LP, Coroutine[Any, Any, LR]]":
-        @functools.wraps(func)
-        async def decorator(*args: "LP.args", **kwargs: "LP.kwargs") -> "LR":
-            self = cast("Bot", args[0]) # the first argument is always self, the bot
-            # pylint: disable=protected-access
-            self._LOGGER.debug("Entering: %s", func.__name__)
-            result = await func(*args, **kwargs)
-            self._LOGGER.debug(result)
-            self._LOGGER.debug("Exiting: %s", func.__name__)
-            return result
-
-        return decorator
 
     def _parse_file_input(
         self,
