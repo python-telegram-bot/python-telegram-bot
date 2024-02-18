@@ -318,7 +318,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 )
             self._private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
-            )
+            ) # type: ignore[assignment]
 
         self._freeze()
 
