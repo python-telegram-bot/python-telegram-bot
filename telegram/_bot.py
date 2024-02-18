@@ -110,6 +110,7 @@ from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 
 if TYPE_CHECKING:
     import sys
+    from typing import Coroutine
 
     from telegram import (
         InlineKeyboardMarkup,
@@ -542,12 +543,16 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         warn(message=message, category=category, stacklevel=stacklevel + 1)
 
-    def _log(func: "Callable[LP, LR]") -> "Callable[LP, LR]":
+    @staticmethod
+    def _log(
+        func: "Callable[LP, Coroutine[Any, Any, LR]]",
+    ) -> "Callable[LP, Coroutine[Any, Any, LR]]":
         @functools.wraps(func)
-        async def decorator(self: "Bot", *args: "LP.args", **kwargs: "LP.kwargs") -> "LR":
+        async def decorator(*args: "LP.args", **kwargs: "LP.kwargs") -> "LR":
+            self = cast("Bot", args[0]) # the first argument is always self, the bot
             # pylint: disable=protected-access
             self._LOGGER.debug("Entering: %s", func.__name__)
-            result = await func(self, *args, **kwargs)
+            result = await func(*args, **kwargs)
             self._LOGGER.debug(result)
             self._LOGGER.debug("Exiting: %s", func.__name__)
             return result
