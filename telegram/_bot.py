@@ -109,6 +109,8 @@ from telegram.request._requestparameter import RequestParameter
 from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 
 if TYPE_CHECKING:
+    import sys
+
     from telegram import (
         InlineKeyboardMarkup,
         InlineQueryResult,
@@ -124,6 +126,15 @@ if TYPE_CHECKING:
         PassportElementError,
         ShippingOption,
     )
+
+    if sys.version_info >= (3, 10):
+        from typing import ParamSpec
+    else:
+        from typing_extensions import ParamSpec
+
+    LP = ParamSpec("LP")
+    LR = TypeVar("LR")
+
 
 BT = TypeVar("BT", bound="Bot")
 
@@ -531,11 +542,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         warn(message=message, category=category, stacklevel=stacklevel + 1)
 
-    # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
-    # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
-    def _log(func: Any):  # type: ignore[no-untyped-def] # skipcq: PY-D0003
+    def _log(func: "Callable[LP, LR]") -> "Callable[LP, LR]":
         @functools.wraps(func)
-        async def decorator(self: "Bot", *args: Any, **kwargs: Any) -> Any:
+        async def decorator(self: "Bot", *args: "LP.args", **kwargs: "LP.kwargs") -> "LR":
             # pylint: disable=protected-access
             self._LOGGER.debug("Entering: %s", func.__name__)
             result = await func(self, *args, **kwargs)
