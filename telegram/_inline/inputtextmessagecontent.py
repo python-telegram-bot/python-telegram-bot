@@ -67,7 +67,7 @@ class InputTextMessageContent(InputMessageContent):
                 for advanced options, please use :paramref:`link_preview_options` directly.
 
             .. versionchanged:: NEXT.VERSION
-                This parameter is now a keyword only parameter.
+                |keyword_only_arg|
 
     Attributes:
         message_text (:obj:`str`): Text of the message to be sent,

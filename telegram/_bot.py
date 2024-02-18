@@ -998,7 +998,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     for advanced options, please use :paramref:`link_preview_options` directly.
 
                 .. versionchanged:: NEXT.VERSION
-                    This parameter is now a keyword only parameter.
+                    |keyword_only_arg|
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
@@ -3853,7 +3853,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     for advanced options, please use :paramref:`link_preview_options` directly.
 
                 .. versionchanged:: NEXT.VERSION
-                    This parameter is now a keyword only parameter.
+                    |keyword_only_arg|
 
 
         Returns:
