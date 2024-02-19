@@ -3,12 +3,12 @@ Upstream-Name: telegram
 Source: https://github.com/python-telegram-bot/python-telegram-bot
 
 Files: *
-Copyright: 2024 Leandro Toledo
-           2024 see AUTHORS file
+Copyright: 2019 Leandro Toledo
+           2019 see AUTHORS file
 License: LGPLv3
 
 Files: debian/*
-Copyright: 2024 Marco Marinello <me@marcomarinello.it>
+Copyright: 2019 Marco Marinello <me@marcomarinello.it>
 License: GPL-3.0+
 
 License: GPL-3.0+
