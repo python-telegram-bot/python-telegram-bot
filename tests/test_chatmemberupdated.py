@@ -64,6 +64,9 @@ def new_chat_member(user):
         True,
         True,
         True,
+        can_post_stories=True,
+        can_edit_stories=True,
+        can_delete_stories=True,
     )
 
 
@@ -264,10 +267,19 @@ class TestChatMemberUpdatedWithoutRequest(TestChatMemberUpdatedBase):
     @pytest.mark.parametrize(
         "optional_attribute",
         # This gives the names of all optional arguments of ChatMember
+        # skipping stories names because they aren't optional even though we pretend they are
         [
             name
             for name, param in inspect.signature(ChatMemberAdministrator).parameters.items()
-            if name not in ["self", "api_kwargs"] and param.default != inspect.Parameter.empty
+            if name
+            not in [
+                "self",
+                "api_kwargs",
+                "can_delete_stories",
+                "can_post_stories",
+                "can_edit_stories",
+            ]
+            and param.default != inspect.Parameter.empty
         ],
     )
     def test_difference_optionals(self, optional_attribute, user, chat):
@@ -276,8 +288,22 @@ class TestChatMemberUpdatedWithoutRequest(TestChatMemberUpdatedBase):
         old_value = "old_value"
         new_value = "new_value"
         trues = tuple(True for _ in range(9))
-        old_chat_member = ChatMemberAdministrator(user, *trues, **{optional_attribute: old_value})
-        new_chat_member = ChatMemberAdministrator(user, *trues, **{optional_attribute: new_value})
+        old_chat_member = ChatMemberAdministrator(
+            user,
+            *trues,
+            **{optional_attribute: old_value},
+            can_delete_stories=True,
+            can_edit_stories=True,
+            can_post_stories=True,
+        )
+        new_chat_member = ChatMemberAdministrator(
+            user,
+            *trues,
+            **{optional_attribute: new_value},
+            can_delete_stories=True,
+            can_edit_stories=True,
+            can_post_stories=True,
+        )
         chat_member_updated = ChatMemberUpdated(
             chat, user, datetime.datetime.utcnow(), old_chat_member, new_chat_member
         )
