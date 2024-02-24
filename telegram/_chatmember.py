@@ -228,14 +228,20 @@ class ChatMemberAdministrator(ChatMember):
             stories to the chat.
 
             .. versionadded:: 20.6
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
         can_edit_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can edit
             stories posted by other users.
 
             .. versionadded:: 20.6
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
         can_delete_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can delete
             stories posted by other users.
 
             .. versionadded:: 20.6
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
         can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
@@ -281,14 +287,20 @@ class ChatMemberAdministrator(ChatMember):
             stories to the chat.
 
             .. versionadded:: 20.6
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
         can_edit_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
             stories posted by other users.
 
             .. versionadded:: 20.6
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
         can_delete_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can delete
             stories posted by other users.
 
             .. versionadded:: 20.6
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
         can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only
 
@@ -333,9 +345,9 @@ class ChatMemberAdministrator(ChatMember):
         can_pin_messages: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
         custom_title: Optional[str] = None,
-        can_post_stories: bool = None,  # type: ignore # noqa: RUF013
-        can_edit_stories: bool = None,  # type: ignore # noqa: RUF013
-        can_delete_stories: bool = None,  # type: ignore # noqa: RUF013
+        can_post_stories: Optional[bool] = None,
+        can_edit_stories: Optional[bool] = None,
+        can_delete_stories: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):

@@ -210,7 +210,6 @@ class TestChatMemberTypesWithoutRequest:
         assert cls.de_json({}, bot) is None
 
         json_dict = make_json_dict(chat_member_type)
-        print(chat_member_type)
         const_chat_member = ChatMember.de_json(json_dict, bot)
         assert const_chat_member.api_kwargs == {}
 

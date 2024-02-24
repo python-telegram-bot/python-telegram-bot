@@ -1,15 +1,9 @@
 name: Test Documentation Build
 on:
   pull_request:
-    branches:
-      - doc-fixes
     paths:
       - telegram/**
-  push:
-    branches:
-      - doc-fixes
-    paths:
-      - telegram/**
+      - docs/**
 
 jobs:
   test-sphinx-build:
