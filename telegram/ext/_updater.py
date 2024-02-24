@@ -883,6 +883,7 @@ class Updater(AsyncContextManager["Updater"]):
                 # after start_polling(), but lets better be safe than sorry ...
 
             self.__polling_task = None
+            self.__polling_task_stop_event.clear()
 
             if self.__polling_cleanup_cb:
                 await self.__polling_cleanup_cb()
