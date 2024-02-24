@@ -102,6 +102,7 @@ class Updater(AsyncContextManager["Updater"]):
 
     __slots__ = (
         "__lock",
+        "__polling_cleanup_cb",
         "__polling_task",
         "_httpd",
         "_initialized",
