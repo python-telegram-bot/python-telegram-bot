@@ -32,7 +32,7 @@ class UsersShared(TelegramObject):
     considered equal, if their :attr:`request_id` and :attr:`user_ids` are equal.
 
     .. versionadded:: 20.8
-       Bot API 7.0 replaces :class:`UserShared` with this class. The only difference is that now
+       Bot API 7.0 replaces ``UserShared`` with this class. The only difference is that now
        the :attr:`user_ids` is a sequence instead of a single integer.
 
     Args:

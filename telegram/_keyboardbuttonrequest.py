@@ -39,7 +39,7 @@ class KeyboardButtonRequestUsers(TelegramObject):
         <https://core.telegram.org/bots/features#chat-and-user-selection>`_
 
     .. versionadded:: 20.8
-        This class was previously named :class:`KeyboardButtonRequestUser`.
+        This class was previously named ``KeyboardButtonRequestUser``.
 
     Args:
         request_id (:obj:`int`): Signed 32-bit identifier of the request, which will be received
