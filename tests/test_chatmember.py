@@ -304,7 +304,7 @@ class TestChatMemberTypesWithoutRequest:
         assert c != e
         assert hash(c) != hash(e)
 
-    def test_depreciation_typeerror(self, chat_member_type):
+    def test_deprecation_typeerror(self, chat_member_type):
         with pytest.raises(TypeError, match="must be set in order"):
             ChatMemberAdministrator(
                 *(False,) * 12,
