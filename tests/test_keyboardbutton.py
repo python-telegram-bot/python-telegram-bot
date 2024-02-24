@@ -80,7 +80,8 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
         assert keyboard_button_dict["request_chat"] == keyboard_button.request_chat.to_dict()
         assert keyboard_button_dict["request_users"] == keyboard_button.request_users.to_dict()
 
-    def test_de_json(self, bot):
+    @pytest.mark.parametrize("request_user", [True, False])
+    def test_de_json(self, bot, request_user):
         json_dict = {
             "text": self.text,
             "request_location": self.request_location,
@@ -89,11 +90,16 @@ class TestKeyboardButtonWithoutRequest(TestKeyboardButtonBase):
             "web_app": self.web_app.to_dict(),
             "request_chat": self.request_chat.to_dict(),
             "request_users": self.request_users.to_dict(),
-            "request_user": {"request_id": 2},
         }
+        if request_user:
+            json_dict["request_user"] = {"request_id": 2}
 
         keyboard_button = KeyboardButton.de_json(json_dict, None)
-        assert keyboard_button.api_kwargs == {"request_user": {"request_id": 2}}
+        if request_user:
+            assert keyboard_button.api_kwargs == {"request_user": {"request_id": 2}}
+        else:
+            assert keyboard_button.api_kwargs == {}
+
         assert keyboard_button.text == self.text
         assert keyboard_button.request_location == self.request_location
         assert keyboard_button.request_contact == self.request_contact

@@ -74,7 +74,6 @@ Available Types
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat
-    telegram.keyboardbuttonrequestuser
     telegram.keyboardbuttonrequestusers
     telegram.linkpreviewoptions
     telegram.location
@@ -116,7 +115,6 @@ Available Types
     telegram.user
     telegram.userchatboosts
     telegram.userprofilephotos
-    telegram.usershared
     telegram.usersshared
     telegram.venue
     telegram.video
