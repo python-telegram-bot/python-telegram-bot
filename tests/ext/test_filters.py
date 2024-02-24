@@ -2700,3 +2700,24 @@ class TestFilters:
         update.message.giveaway_winners = "test"
         assert filters.GIVEAWAY_WINNERS.check_update(update)
         assert str(filters.GIVEAWAY_WINNERS) == "filters.GIVEAWAY_WINNERS"
+
+    def test_filters_reply_to_story(self, update):
+        assert not filters.REPLY_TO_STORY.check_update(update)
+
+        update.message.reply_to_story = "test"
+        assert filters.REPLY_TO_STORY.check_update(update)
+        assert str(filters.REPLY_TO_STORY) == "filters.REPLY_TO_STORY"
+
+    def test_filters_boost_added(self, update):
+        assert not filters.BOOST_ADDED.check_update(update)
+
+        update.message.boost_added = "test"
+        assert filters.BOOST_ADDED.check_update(update)
+        assert str(filters.BOOST_ADDED) == "filters.BOOST_ADDED"
+
+    def test_filters_sender_boost_count(self, update):
+        assert not filters.SENDER_BOOST_COUNT.check_update(update)
+
+        update.message.sender_boost_count = "test"
+        assert filters.SENDER_BOOST_COUNT.check_update(update)
+        assert str(filters.SENDER_BOOST_COUNT) == "filters.SENDER_BOOST_COUNT"
