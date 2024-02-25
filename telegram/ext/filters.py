@@ -1364,7 +1364,7 @@ FORWARDED = _Forwarded(name="filters.FORWARDED")
 
 .. versionchanged:: 20.8
    Now based on :attr:`telegram.Message.forward_origin` instead of
-   :attr:`telegram.Message.forward_date`.
+   ``telegram.Message.forward_date``.
 """
 
 
@@ -1379,8 +1379,8 @@ class ForwardedFrom(_ChatUserBaseFilter):
     .. versionadded:: 13.5
 
     .. versionchanged:: 20.8
-       Was previously based on :attr:`telegram.Message.forward_from` and
-         :attr:`telegram.Message.forward_from_chat`.
+       Was previously based on ``telegram.Message.forward_from`` and
+         ``telegram.Message.forward_from_chat``.
 
     Examples:
         ``MessageHandler(filters.ForwardedFrom(chat_id=1234), callback_method)``
@@ -2146,14 +2146,18 @@ class StatusUpdate:
         __slots__ = ()
 
         def filter(self, message: Message) -> bool:
-            return bool(message.user_shared)
+            return bool(message.api_kwargs.get("user_shared"))
 
     USER_SHARED = _UserShared(name="filters.StatusUpdate.USER_SHARED")
-    """Messages that contain :attr:`telegram.Message.user_shared`.
+    """Messages that contain ``"user_shared"`` in :attr:`telegram.TelegramObject.api_kwargs`.
 
     Warning:
-        This will only catch the legacy :attr:`telegram.Message.user_shared` attribute, not the
+        This will only catch the legacy ``user_shared`` field, not the
         new :attr:`telegram.Message.users_shared` attribute!
+
+    .. versionchanged:: NEXT.VERSION
+       Now relies on :attr:`telegram.TelegramObject.api_kwargs` as the native attribute
+       ``Message.user_shared`` was removed.
 
     .. versionadded:: 20.1
     .. deprecated:: 20.8

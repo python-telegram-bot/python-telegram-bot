@@ -98,12 +98,6 @@ def message(bot):
 
 @pytest.fixture(
     params=[
-        {"forward_from": User(99, "forward_user", False), "forward_date": datetime.utcnow()},
-        {
-            "forward_from_chat": Chat(-23, "channel"),
-            "forward_from_message_id": 101,
-            "forward_date": datetime.utcnow(),
-        },
         {
             "reply_to_message": Message(
                 50, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
@@ -165,7 +159,6 @@ def message(bot):
             )
         },
         {"connected_website": "http://example.com/"},
-        {"forward_signature": "some_forward_sign"},
         {"author_signature": "some_author_sign"},
         {
             "photo": [PhotoSize("photo_id", "unique_id", 50, 50)],
@@ -224,9 +217,6 @@ def message(bot):
         },
         {"web_app_data": WebAppData("some_data", "some_button_text")},
         {"message_thread_id": 123},
-        # Using a `UserShared` object here doesn't work, because `to_dict` produces `user_ids`
-        # instead of `user_id` - but that's what we want to test here.
-        {"user_shared": {"request_id": 1, "user_id": 2}},
         {"users_shared": UsersShared(1, [2, 3])},
         {"chat_shared": ChatShared(3, 4)},
         {
@@ -271,8 +261,6 @@ def message(bot):
         {"forward_origin": MessageOriginChat(datetime.utcnow(), Chat(1, Chat.PRIVATE))},
     ],
     ids=[
-        "forwarded_user",
-        "forwarded_channel",
         "reply",
         "edited",
         "text",
@@ -305,7 +293,6 @@ def message(bot):
         "invoice",
         "successful_payment",
         "connected_website",
-        "forward_signature",
         "author_signature",
         "photo_from_media_group",
         "passport_data",
@@ -324,7 +311,6 @@ def message(bot):
         "entities",
         "web_app_data",
         "message_thread_id",
-        "user_shared",
         "users_shared",
         "chat_shared",
         "giveaway",
@@ -518,7 +504,6 @@ class TestMessageWithoutRequest(TestMessageBase):
             "date": int(datetime.now().timestamp()),
             "chat": None,
             "edit_date": int(datetime.now().timestamp()),
-            "forward_date": int(datetime.now().timestamp()),
         }
 
         message_raw = Message.de_json(json_dict, raw_bot)
@@ -534,11 +519,6 @@ class TestMessageWithoutRequest(TestMessageBase):
             message_tz.edit_date.replace(tzinfo=None)
         )
 
-        forward_date_offset = message_tz.forward_date.utcoffset()
-        forward_date_tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            message_tz.forward_date.replace(tzinfo=None)
-        )
-
         assert message_raw.date.tzinfo == UTC
         assert message_bot.date.tzinfo == UTC
         assert date_offset == date_tz_bot_offset
@@ -547,9 +527,21 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert message_bot.edit_date.tzinfo == UTC
         assert edit_date_offset == edit_date_tz_bot_offset
 
-        assert message_raw.forward_date.tzinfo == UTC
-        assert message_bot.forward_date.tzinfo == UTC
-        assert forward_date_offset == forward_date_tz_bot_offset
+    def test_de_json_api_kwargs_backward_compatibility(self, bot, message_params):
+        message_dict = message_params.to_dict()
+        keys = (
+            "user_shared",
+            "forward_from",
+            "forward_from_chat",
+            "forward_from_message_id",
+            "forward_signature",
+            "forward_sender_name",
+            "forward_date",
+        )
+        for key in keys:
+            message_dict[key] = key
+        message = Message.de_json(message_dict, bot)
+        assert message.api_kwargs == {key: key for key in keys}
 
     def test_equality(self):
         id_ = 1
@@ -571,124 +563,6 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         assert a != e
         assert hash(a) != hash(e)
-
-    def test_user_shared_init_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'user_shared' was renamed to 'users_shared'"
-        ) as record:
-            Message(message_id=1, date=self.date, chat=self.chat, user_shared=1)
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_user_shared_property_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'user_shared' to 'users_shared'"
-        ) as record:
-            message.user_shared
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_from_init_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'forward_from' was transferred to 'forward_origin'"
-        ) as record:
-            Message(
-                message_id=1, date=self.date, chat=self.chat, forward_from=User(1, "user", False)
-            )
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_from_property_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'forward_from' to 'forward_origin'"
-        ) as record:
-            message.forward_from
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_from_chat_init_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'forward_from_chat' was transferred to 'forward_origin'"
-        ) as record:
-            Message(
-                message_id=1, date=self.date, chat=self.chat, forward_from_chat=Chat(1, "private")
-            )
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_from_chat_property_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'forward_from_chat' to 'forward_origin'"
-        ) as record:
-            message.forward_from_chat
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_from_message_id_init_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning,
-            match="'forward_from_message_id' was transferred to 'forward_origin'",
-        ) as record:
-            Message(message_id=1, date=self.date, chat=self.chat, forward_from_message_id=1)
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_from_message_id_property_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'forward_from_message_id' to 'forward_origin'"
-        ) as record:
-            message.forward_from_message_id
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_signature_init_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'forward_signature' was transferred to 'forward_origin'"
-        ) as record:
-            Message(message_id=1, date=self.date, chat=self.chat, forward_signature="signature")
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_signature_property_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'forward_signature' to 'forward_origin'"
-        ) as record:
-            message.forward_signature
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_sender_name_init_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning,
-            match="'forward_sender_name' was transferred to 'forward_origin'",
-        ) as record:
-            Message(message_id=1, date=self.date, chat=self.chat, forward_sender_name="name")
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_sender_name_property_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'forward_sender_name' to 'forward_origin'"
-        ) as record:
-            message.forward_sender_name
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_date_init_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'forward_date' was transferred to 'forward_origin'"
-        ) as record:
-            Message(message_id=1, date=self.date, chat=self.chat, forward_date=datetime.utcnow())
-
-        assert record[0].filename == __file__, "wrong stacklevel"
-
-    def test_forward_date_property_deprecation(self, message):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'forward_date' to 'forward_origin'"
-        ) as record:
-            message.forward_date
-
-        assert record[0].filename == __file__, "wrong stacklevel"
 
     def test_bool(self, message, recwarn):
         # Relevant as long as we override MaybeInaccessibleMessage.__bool__

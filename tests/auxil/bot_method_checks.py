@@ -549,11 +549,9 @@ async def check_defaults_handling(
     }
     # We tested this for a long time, but Bot API 7.0 deprecated it in favor of
     # reply_parameters. In the transition phase, both exist in a mutually exclusive
-    # way. Testing both cases would require a lot of additional code, so we just
-    # ignore this parameter here until it is removed.
-    # Same for disable_web_page_preview
+    # way. Testing both cases would require a lot of additional code, so we for now are content
+    # with the explicit tests that we have inplace for allow_sending_without_reply
     kwargs_need_default.discard("allow_sending_without_reply")
-    kwargs_need_default.discard("disable_web_page_preview")
 
     if method.__name__.endswith("_media_group"):
         # the parse_mode is applied to the first media item, and we test this elsewhere

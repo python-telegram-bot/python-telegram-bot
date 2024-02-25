@@ -68,7 +68,7 @@
 
 .. |rtm_aswr_deprecated| replace:: replacing this argument. PTB will automatically convert this argument to that one, but you should update your code to use the new argument.
 
-.. |keyword_only_arg| replace:: In future versions, this argument will become a keyword-only argument.
+.. |keyword_only_arg| replace:: This argument is now a keyword-only argument.
 
 .. |text_html| replace:: The return value of this property is a best-effort approach. Unfortunately, it can not be guaranteed that sending a message with the returned string will render in the same way as the original message produces the same :attr:`~telegram.Message.entities`/:attr:`~telegram.Message.caption_entities` as the original message. For example, Telegram recommends that entities of type :attr:`~telegram.MessageEntity.BLOCKQUOTE` and :attr:`~telegram.MessageEntity.PRE` *should* start and end on a new line, but does not enforce this and leaves rendering decisions up to the clients.
 
