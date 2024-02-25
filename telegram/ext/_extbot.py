@@ -113,6 +113,7 @@ if TYPE_CHECKING:
     from telegram.ext import BaseRateLimiter, Defaults
 
 HandledTypes = TypeVar("HandledTypes", bound=Union[Message, CallbackQuery, Chat])
+KT = TypeVar("KT", bound=ReplyMarkup)
 
 
 class ExtBot(Bot, Generic[RLARGS]):
@@ -485,7 +486,9 @@ class ExtBot(Bot, Generic[RLARGS]):
 
                 data[key] = new_value
 
-    def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
+    def _replace_keyboard(
+        self, reply_markup: Optional[KT]
+    ) -> Optional[Union[KT, InlineKeyboardMarkup]]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
         # CallbackDataCache build a new keyboard with the data replaced. Otherwise return the input
         if isinstance(reply_markup, InlineKeyboardMarkup) and self.callback_data_cache is not None:
@@ -750,9 +753,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         return await super().stop_poll(
             chat_id=chat_id,
             message_id=message_id,
-            reply_markup=cast(
-                Optional["InlineKeyboardMarkup"], self._replace_keyboard(reply_markup)
-            ),
+            reply_markup=self._replace_keyboard(reply_markup),
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
