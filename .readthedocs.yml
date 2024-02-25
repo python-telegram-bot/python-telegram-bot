@@ -35,7 +35,7 @@ build:
       - echo "#furo-readthedocs-versions{display:none}" >> _readthedocs/html/_static/styles/furo-extensions.css
       - cd _readthedocs ; zip --recurse-path --symlinks htmlzip/$READTHEDOCS_PROJECT.zip $READTHEDOCS_PROJECT
       # Undo the workaround so that the actual website is not affected
-      - sed -i '$ d' _readthedocs/html/_static/styles/furo-extensions.css
+      - head -n -1 _readthedocs/html/_static/styles/furo-extensions.css > _readthedocs/html/_static/styles/furo-extensions.css
 
 search:
   ranking: # bump up rank of commonly searched pages: (default: 0, values range from -10 to 10)
