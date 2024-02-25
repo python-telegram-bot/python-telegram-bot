@@ -120,7 +120,7 @@ def get_setup_kwargs(raw: bool = False) -> Dict[str, Any]:
 def main() -> None:
     # If we're building, build ptb-raw as well
     if set(sys.argv[1:]) in [{"bdist_wheel"}, {"sdist"}, {"sdist", "bdist_wheel"}]:
-        args = ["python", "setup-raw.py"]
+        args = ["python", "setup_raw.py"]
         args.extend(sys.argv[1:])
         subprocess.run(args, check=True, capture_output=True)
 

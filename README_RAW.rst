@@ -108,12 +108,12 @@ You can also install ``python-telegram-bot-raw`` from source, though this is usu
 
     $ git clone https://github.com/python-telegram-bot/python-telegram-bot
     $ cd python-telegram-bot
-    $ python setup-raw.py install
+    $ python setup_raw.py install
 
 Note
 ----
 
-Installing the ``.tar.gz`` archive available on PyPi directly via ``pip`` will *not* work as expected, as ``pip`` does not recognize that it should use ``setup-raw.py`` instead of ``setup.py``.
+Installing the ``.tar.gz`` archive available on PyPi directly via ``pip`` will *not* work as expected, as ``pip`` does not recognize that it should use ``setup_raw.py`` instead of ``setup.py``.
 
 Verifying Releases
 ------------------
