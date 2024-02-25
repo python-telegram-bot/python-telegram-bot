@@ -32,10 +32,11 @@ build:
       - cp --recursive _readthedocs/html _readthedocs/$READTHEDOCS_PROJECT
       # Hide the "other versions" dropdown. This is a workaround for those versions being shown,
       # but not being accessible, as they are not built. Also, they hide the actual sidebar menu.
+      - cp _readthedocs/html/_static/styles/furo-extensions.css _readthedocs/html/_static/styles/furo-extensions.css.bak
       - echo "#furo-readthedocs-versions{display:none}" >> _readthedocs/html/_static/styles/furo-extensions.css
       - cd _readthedocs ; zip --recurse-path --symlinks htmlzip/$READTHEDOCS_PROJECT.zip $READTHEDOCS_PROJECT
       # Undo the workaround so that the actual website is not affected
-      - head -n -1 _readthedocs/html/_static/styles/furo-extensions.css > _readthedocs/html/_static/styles/furo-extensions.css
+      - mv _readthedocs/html/_static/styles/furo-extensions.css.bak _readthedocs/html/_static/styles/furo-extensions.css
 
 search:
   ranking: # bump up rank of commonly searched pages: (default: 0, values range from -10 to 10)
