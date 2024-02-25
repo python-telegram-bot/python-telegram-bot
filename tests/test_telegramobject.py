@@ -358,6 +358,55 @@ class TestTelegramObject:
         chat.id = 7
         assert chat.id == 7
 
+    def test_pickle_handle_properties(self):
+        # Very hard to properly test, can't use a pickle file since newer versions of the library
+        # will stop having the property.
+        # The code below uses exec statements to simulate library changes. There is no other way
+        # to test this.
+        # Original class:
+        v1 = """
+class PicklePropertyTest(TelegramObject):
+    __slots__ = ("forward_from", "to_be_removed")
+    def __init__(self, forward_from=None, api_kwargs=None):
+        super().__init__(api_kwargs=api_kwargs)
+        self.forward_from = forward_from
+        self.to_be_removed = "to_be_removed"
+"""
+        exec(v1, globals(), None)
+        old = PicklePropertyTest("old_val")  # noqa: F821
+        pickled_v1 = pickle.dumps(old)
+
+        # After some API changes:
+        v2 = """
+class PicklePropertyTest(TelegramObject):
+    __slots__ = ("_forward_from",)
+    def __init__(self, forward_from=None, api_kwargs=None):
+        super().__init__(api_kwargs=api_kwargs)
+        self._forward_from = forward_from
+
+    @property
+    def forward_from(self):
+        return self._forward_from
+        """
+        exec(v2, globals(), None)
+        v2_unpickle = pickle.loads(pickled_v1)
+        assert v2_unpickle.forward_from == "old_val" == v2_unpickle._forward_from
+        assert not hasattr(v2_unpickle, "to_be_removed")
+        assert v2_unpickle.api_kwargs == {"to_be_removed": "to_be_removed"}
+        pickled_v2 = pickle.dumps(v2_unpickle)
+
+        # After PTB removes the property and the attribute:
+        v3 = """
+class PicklePropertyTest(TelegramObject):
+    __slots__ = ()
+    def __init__(self, api_kwargs=None):
+        super().__init__(api_kwargs=api_kwargs)
+"""
+        exec(v3, globals(), None)
+        v3_unpickle = pickle.loads(pickled_v2)
+        assert v3_unpickle.api_kwargs == {"to_be_removed": "to_be_removed"}
+        assert not hasattr(v3_unpickle, "_forward_from")
+
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, "first_name", False)
