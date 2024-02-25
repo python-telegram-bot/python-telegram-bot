@@ -1061,12 +1061,12 @@ class TestBotWithoutRequest:
 
     async def test_send_edit_message_mutually_exclusive_link_preview(self, bot, chat_id):
         """Test that link_preview is mutually exclusive with disable_web_page_preview."""
-        with pytest.raises(ValueError, match="'disable_web_page_preview' was renamed to"):
+        with pytest.raises(ValueError, match="`link_preview_options` are mutually exclusive"):
             await bot.send_message(
                 chat_id, "text", disable_web_page_preview=True, link_preview_options="something"
             )
 
-        with pytest.raises(ValueError, match="'disable_web_page_preview' was renamed to"):
+        with pytest.raises(ValueError, match="`link_preview_options` are mutually exclusive"):
             await bot.edit_message_text(
                 "text", chat_id, 1, disable_web_page_preview=True, link_preview_options="something"
             )
@@ -2120,8 +2120,8 @@ class TestBotWithRequest:
         )
 
         assert forward_message.text == message.text
-        assert forward_message.forward_from.username == message.from_user.username
-        assert isinstance(forward_message.forward_date, dtm.datetime)
+        assert forward_message.forward_origin.sender_user == message.from_user
+        assert isinstance(forward_message.forward_origin.date, dtm.datetime)
 
     async def test_forward_protected_message(self, bot, chat_id):
         tasks = asyncio.gather(
@@ -2155,7 +2155,7 @@ class TestBotWithRequest:
         msg1, msg2 = await tasks
 
         forward_messages = await bot.forward_messages(
-            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
+            chat_id, from_chat_id=chat_id, message_ids=sorted((msg1.message_id, msg2.message_id))
         )
 
         assert isinstance(forward_messages, tuple)
@@ -2174,12 +2174,12 @@ class TestBotWithRequest:
         forward_msg2 = temp_msg2.reply_to_message
 
         assert forward_msg1.text == msg1.text
-        assert forward_msg1.forward_from.username == msg1.from_user.username
-        assert isinstance(forward_msg1.forward_date, dtm.datetime)
+        assert forward_msg1.forward_origin.sender_user == msg1.from_user
+        assert isinstance(forward_msg1.forward_origin.date, dtm.datetime)
 
         assert forward_msg2.text == msg2.text
-        assert forward_msg2.forward_from.username == msg2.from_user.username
-        assert isinstance(forward_msg2.forward_date, dtm.datetime)
+        assert forward_msg2.forward_origin.sender_user == msg2.from_user
+        assert isinstance(forward_msg2.forward_origin.date, dtm.datetime)
 
     async def test_delete_message(self, bot, chat_id):
         message = await bot.send_message(chat_id, text="will be deleted")

@@ -22,9 +22,6 @@ from typing import TYPE_CHECKING, Optional
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import build_deprecation_warning_message
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -42,7 +39,7 @@ class KeyboardButtonRequestUsers(TelegramObject):
         <https://core.telegram.org/bots/features#chat-and-user-selection>`_
 
     .. versionadded:: 20.8
-        This class was previously named :class:`KeyboardButtonRequestUser`.
+        This class was previously named ``KeyboardButtonRequestUser``.
 
     Args:
         request_id (:obj:`int`): Signed 32-bit identifier of the request, which will be received
@@ -102,49 +99,6 @@ class KeyboardButtonRequestUsers(TelegramObject):
         self.max_quantity: Optional[int] = max_quantity
 
         self._id_attrs = (self.request_id,)
-
-        self._freeze()
-
-
-class KeyboardButtonRequestUser(KeyboardButtonRequestUsers):
-    """Alias for :class:`KeyboardButtonRequestUsers`, kept for backward compatibility.
-
-    .. versionadded:: 20.1
-
-    .. deprecated:: 20.8
-        Use :class:`KeyboardButtonRequestUsers` instead.
-
-    """
-
-    __slots__ = ()
-
-    def __init__(
-        self,
-        request_id: int,
-        user_is_bot: Optional[bool] = None,
-        user_is_premium: Optional[bool] = None,
-        max_quantity: Optional[int] = None,
-        *,
-        api_kwargs: Optional[JSONDict] = None,  # skipcq: PYL-W0622
-    ):
-        super().__init__(
-            request_id=request_id,
-            user_is_bot=user_is_bot,
-            user_is_premium=user_is_premium,
-            max_quantity=max_quantity,
-            api_kwargs=api_kwargs,
-        )
-
-        warn(
-            build_deprecation_warning_message(
-                deprecated_name="KeyboardButtonRequestUser",
-                new_name="KeyboardButtonRequestUsers",
-                object_type="class",
-                bot_api_version="7.0",
-            ),
-            PTBDeprecationWarning,
-            stacklevel=2,
-        )
 
         self._freeze()
 

@@ -130,7 +130,6 @@ __all__ = (
     "KeyboardButton",
     "KeyboardButtonPollType",
     "KeyboardButtonRequestChat",
-    "KeyboardButtonRequestUser",
     "KeyboardButtonRequestUsers",
     "LabeledPrice",
     "LinkPreviewOptions",
@@ -198,7 +197,6 @@ __all__ = (
     "User",
     "UserChatBoosts",
     "UserProfilePhotos",
-    "UserShared",
     "UsersShared",
     "Venue",
     "Video",
@@ -338,11 +336,7 @@ from ._inline.inputtextmessagecontent import InputTextMessageContent
 from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
-from ._keyboardbuttonrequest import (
-    KeyboardButtonRequestChat,
-    KeyboardButtonRequestUser,
-    KeyboardButtonRequestUsers,
-)
+from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonRequestUsers
 from ._linkpreviewoptions import LinkPreviewOptions
 from ._loginurl import LoginUrl
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
@@ -397,7 +391,7 @@ from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage
-from ._shared import ChatShared, UserShared, UsersShared
+from ._shared import ChatShared, UsersShared
 from ._story import Story
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject

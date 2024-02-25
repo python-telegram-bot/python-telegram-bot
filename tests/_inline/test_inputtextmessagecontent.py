@@ -20,7 +20,6 @@ import pytest
 
 from telegram import InputTextMessageContent, LinkPreviewOptions, MessageEntity
 from telegram.constants import ParseMode
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -52,7 +51,6 @@ class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase)
     def test_expected_values(self, input_text_message_content):
         assert input_text_message_content.parse_mode == self.parse_mode
         assert input_text_message_content.message_text == self.message_text
-        assert input_text_message_content.disable_web_page_preview == self.disable_web_page_preview
         assert input_text_message_content.entities == tuple(self.entities)
         assert input_text_message_content.link_preview_options == self.link_preview_options
 
@@ -95,13 +93,11 @@ class TestInputTextMessageContentWithoutRequest(TestInputTextMessageContentBase)
         assert hash(a) != hash(d)
 
     def test_mutually_exclusive(self):
-        with pytest.raises(ValueError, match="'link_preview_options' in Bot API 7.0"):
+        with pytest.raises(ValueError, match="`link_preview_options` are mutually exclusive"):
             InputTextMessageContent(
                 "text", disable_web_page_preview=True, link_preview_options=LinkPreviewOptions()
             )
 
-    def test_disable_web_page_preview_deprecated(self):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'disable_web_page_preview' to 'link_preview_options'"
-        ):
-            InputTextMessageContent("text", disable_web_page_preview=True).disable_web_page_preview
+    def test_disable_web_page_preview_deprecation(self):
+        itmc = InputTextMessageContent("text", disable_web_page_preview=True)
+        assert itmc.link_preview_options.is_disabled is True

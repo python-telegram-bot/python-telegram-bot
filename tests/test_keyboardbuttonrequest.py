@@ -16,17 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
-import inspect
 
 import pytest
 
-from telegram import (
-    ChatAdministratorRights,
-    KeyboardButtonRequestChat,
-    KeyboardButtonRequestUser,
-    KeyboardButtonRequestUsers,
-)
-from telegram.warnings import PTBDeprecationWarning
+from telegram import ChatAdministratorRights, KeyboardButtonRequestChat, KeyboardButtonRequestUsers
 from tests.auxil.slots import mro_slots
 
 
@@ -90,28 +83,6 @@ class TestKeyboardButtonRequestUsersWithoutRequest(TestKeyboardButtonRequestUser
 
         assert a != c
         assert hash(a) != hash(c)
-
-
-class TestKeyboardButtonRequestUserWithoutRequest:
-    def test_slot_behaviour(self):
-        inst = KeyboardButtonRequestUser(1)
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
-    def test_signature(self):
-        assert inspect.signature(KeyboardButtonRequestUser) == inspect.signature(
-            KeyboardButtonRequestUsers
-        )
-
-    def test_deprecation_warning(self):
-        with pytest.warns(
-            PTBDeprecationWarning,
-            match="'KeyboardButtonRequestUser' was renamed to 'KeyboardButtonRequestUsers'",
-        ) as record:
-            KeyboardButtonRequestUser(request_id=1)
-
-        assert record[0].filename == __file__, "wrong stacklevel"
 
 
 @pytest.fixture(scope="class")
