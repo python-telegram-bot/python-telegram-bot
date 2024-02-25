@@ -42,7 +42,7 @@ def get_optional_requirements(raw: bool = False) -> Dict[str, List[str]]:
     with Path("requirements-opts.txt").open(encoding="utf-8") as reqs:
         for line in reqs:
             effective_line = line.strip()
-            if not line or effective_line.startswith("#"):
+            if not effective_line or effective_line.startswith("#"):
                 continue
             dependency, names = effective_line.split("#")
             dependency = dependency.strip()
