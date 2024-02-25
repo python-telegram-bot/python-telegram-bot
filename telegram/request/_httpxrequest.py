@@ -64,6 +64,10 @@ class HTTPXRequest(BaseRequest):
             a network socket; i.e. POSTing a request or uploading a file).
             This value is used unless a different value is passed to :meth:`do_request`.
             Defaults to ``5``.
+
+            Hint:
+                This timeout is used for all requests except for those that upload media/files.
+                For the latter, :paramref:`media_write_timeout` is used.
         connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
             maximum amount of time (in seconds) to wait for a connection attempt to a server
             to succeed. This value is used unless a different value is passed to
@@ -121,7 +125,7 @@ class HTTPXRequest(BaseRequest):
 
     """
 
-    __slots__ = ("_client", "_client_kwargs", "_http_version")
+    __slots__ = ("_client", "_client_kwargs", "_http_version", "_media_write_timeout")
 
     def __init__(
         self,
