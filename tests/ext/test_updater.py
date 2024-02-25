@@ -615,7 +615,6 @@ class TestUpdater:
                 updater._running = False
                 second_update_event.set()
                 await asyncio.sleep(1)
-                # await third_update_event.wait()
 
                 assert caplog.records
                 assert any(

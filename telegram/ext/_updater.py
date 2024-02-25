@@ -104,6 +104,7 @@ class Updater(AsyncContextManager["Updater"]):
         "__lock",
         "__polling_cleanup_cb",
         "__polling_task",
+        "__polling_task_stop_event",
         "_httpd",
         "_initialized",
         "_last_update_id",
@@ -710,7 +711,7 @@ class Updater(AsyncContextManager["Updater"]):
             interval (:obj:`float` | :obj:`int`): Interval to sleep between each call to
                 `action_cb`.
             stop_event (:class:`asyncio.Event` | :obj:`None`): Event to wait on for stopping the
-                loop. Setting the event will make the loop exit even if action_cb is currently
+                loop. Setting the event will make the loop exit even if `action_cb` is currently
                 running.
 
         """
