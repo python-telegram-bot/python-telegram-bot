@@ -418,6 +418,7 @@ class PicklePropertyTest(TelegramObject):
         v3_unpickle = pickle.loads(pickled_v2)
         assert v3_unpickle.api_kwargs == {"to_be_removed": "to_be_removed"}
         assert not hasattr(v3_unpickle, "_forward_from")
+        assert not hasattr(v3_unpickle, "_new_attr")
 
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)

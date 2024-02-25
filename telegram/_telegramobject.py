@@ -319,8 +319,10 @@ class TelegramObject:
                     # It is, so let's try to set the "private attribute" instead
                     try:
                         setattr(self, f"_{key}", val)
-                    except AttributeError:  # guess we've completely removed it
-                        api_kwargs[key] = val  # add it to api_kwargs as fallback
+                    # If this fails as well, guess we've completely removed it. Let's add it to
+                    # api_kwargs as fallback
+                    except AttributeError:
+                        api_kwargs[key] = val
 
                 # 2) The attribute is a private attribute, i.e. it went through case 1) in the past
                 elif key.startswith("_"):
@@ -504,6 +506,7 @@ class TelegramObject:
         for key in list(api_kwargs.keys()):
             # property attributes are not settable, so we need to set the private attribute
             if isinstance(getattr(self.__class__, key, None), property):
+                # if setattr fails, we'll just leave the value in api_kwargs:
                 with contextlib.suppress(AttributeError):
                     setattr(self, f"_{key}", api_kwargs.pop(key))
             elif getattr(self, key, True) is None:
