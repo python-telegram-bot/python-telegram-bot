@@ -431,7 +431,9 @@ class TestBotWithoutRequest:
     @bot_methods(include_do_api_request=True)
     def test_coroutine_functions(self, bot_class, bot_method_name, bot_method):
         """Check that all bot methods are defined as async def  ..."""
-        assert inspect.iscoroutinefunction(bot_method), f"{bot_method_name} must be a coroutine function"
+        assert inspect.iscoroutinefunction(
+            bot_method
+        ), f"{bot_method_name} must be a coroutine function"
 
     @bot_methods(include_do_api_request=True)
     def test_api_kwargs_and_timeouts_present(self, bot_class, bot_method_name, bot_method):
