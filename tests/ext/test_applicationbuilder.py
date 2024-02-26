@@ -76,6 +76,9 @@ class TestApplicationBuilder:
         for argument in arguments:
             if argument == "self":
                 continue
+            if argument == "media_write_timeout" and get_updates:
+                # get_updates never makes media requests
+                continue
             assert hasattr(builder, prefix + argument), f"missing method {prefix}{argument}"
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
@@ -202,6 +205,7 @@ class TestApplicationBuilder:
             "pool_timeout",
             "read_timeout",
             "write_timeout",
+            "media_write_timeout",
             "proxy",
             "proxy_url",
             "socket_options",
@@ -272,6 +276,7 @@ class TestApplicationBuilder:
             "pool_timeout",
             "read_timeout",
             "write_timeout",
+            "media_write_timeout",
             "proxy",
             "proxy_url",
             "socket_options",
@@ -316,6 +321,7 @@ class TestApplicationBuilder:
             "pool_timeout",
             "read_timeout",
             "write_timeout",
+            "media_write_timeout",
             "proxy",
             "proxy_url",
             "socket_options",
@@ -384,12 +390,20 @@ class TestApplicationBuilder:
             http2: object
             transport: object = None
 
+        original_init = HTTPXRequest.__init__
+        media_write_timeout = []
+
+        def init_httpx_request(self_, *args, **kwargs):
+            media_write_timeout.append(kwargs.get("media_write_timeout"))
+            original_init(self_, *args, **kwargs)
+
         monkeypatch.setattr(httpx, "AsyncClient", Client)
+        monkeypatch.setattr(HTTPXRequest, "__init__", init_httpx_request)
 
         builder = ApplicationBuilder().token(bot.token)
         builder.connection_pool_size(1).connect_timeout(2).pool_timeout(3).read_timeout(
             4
-        ).write_timeout(5).http_version("1.1")
+        ).write_timeout(5).media_write_timeout(6).http_version("1.1")
         getattr(builder, proxy_method)("proxy")
         app = builder.build()
         client = app.bot.request._client
@@ -399,7 +413,9 @@ class TestApplicationBuilder:
         assert client.proxy == "proxy"
         assert client.http1 is True
         assert client.http2 is False
+        assert media_write_timeout == [6, None]
 
+        media_write_timeout.clear()
         builder = ApplicationBuilder().token(bot.token)
         builder.get_updates_connection_pool_size(1).get_updates_connect_timeout(
             2
@@ -417,6 +433,7 @@ class TestApplicationBuilder:
         assert client.proxy == "get_updates_proxy"
         assert client.http1 is True
         assert client.http2 is False
+        assert media_write_timeout == [None, None]
 
     def test_custom_socket_options(self, builder, monkeypatch, bot):
         httpx_request_kwargs = []

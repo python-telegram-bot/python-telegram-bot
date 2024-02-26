@@ -78,6 +78,7 @@ _BOT_CHECKS = [
     ("connect_timeout", "connect_timeout"),
     ("read_timeout", "read_timeout"),
     ("write_timeout", "write_timeout"),
+    ("media_write_timeout", "media_write_timeout"),
     ("http_version", "http_version"),
     ("get_updates_connection_pool_size", "get_updates_connection_pool_size"),
     ("get_updates_proxy", "get_updates_proxy"),
@@ -152,6 +153,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_http_version",
         "_job_queue",
         "_local_mode",
+        "_media_write_timeout",
         "_persistence",
         "_pool_timeout",
         "_post_init",
@@ -181,6 +183,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._connect_timeout: ODVInput[float] = DEFAULT_NONE
         self._read_timeout: ODVInput[float] = DEFAULT_NONE
         self._write_timeout: ODVInput[float] = DEFAULT_NONE
+        self._media_write_timeout: ODVInput[float] = DEFAULT_NONE
         self._pool_timeout: ODVInput[float] = DEFAULT_NONE
         self._request: DVInput[BaseRequest] = DEFAULT_NONE
         self._get_updates_connection_pool_size: DVInput[int] = DEFAULT_NONE
@@ -243,6 +246,10 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             "write_timeout": getattr(self, f"{prefix}write_timeout"),
             "pool_timeout": getattr(self, f"{prefix}pool_timeout"),
         }
+
+        if not get_updates:
+            timeouts["media_write_timeout"] = self._media_write_timeout
+
         # Get timeouts that were actually set-
         effective_timeouts = {
             key: value for key, value in timeouts.items() if not isinstance(value, DefaultValue)
@@ -424,9 +431,13 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         prefix = "get_updates_" if get_updates else ""
         name = prefix + "request"
 
+        timeouts = ["connect_timeout", "read_timeout", "write_timeout", "pool_timeout"]
+        if not get_updates:
+            timeouts.append("media_write_timeout")
+
         # Code below tests if it's okay to set a Request object. Only okay if no other request args
         # or instances containing a Request were set previously
-        for attr in ("connect_timeout", "read_timeout", "write_timeout", "pool_timeout"):
+        for attr in timeouts:
             if not isinstance(getattr(self, f"_{prefix}{attr}"), DefaultValue):
                 raise RuntimeError(_TWO_ARGS_REQ.format(name, attr))
 
@@ -615,6 +626,26 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         self._request_param_check(name="write_timeout", get_updates=False)
         self._write_timeout = write_timeout
+        return self
+
+    def media_write_timeout(
+        self: BuilderType, media_write_timeout: Optional[float]
+    ) -> BuilderType:
+        """Sets the media write operation timeout for the
+        :paramref:`~telegram.request.HTTPXRequest.media_write_timeout` parameter of
+        :attr:`telegram.Bot.request`. Defaults to ``20``.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            media_write_timeout (:obj:`float`): See
+                :paramref:`telegram.request.HTTPXRequest.media_write_timeout` for more information.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        self._request_param_check(name="media_write_timeout", get_updates=False)
+        self._media_write_timeout = media_write_timeout
         return self
 
     def pool_timeout(self: BuilderType, pool_timeout: Optional[float]) -> BuilderType:
