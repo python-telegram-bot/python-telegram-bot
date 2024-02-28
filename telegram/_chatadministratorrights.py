@@ -192,7 +192,7 @@ class ChatAdministratorRights(TelegramObject):
         # Not actually optionals but because of backwards compatability we pretend they are
         if can_post_stories is None or can_edit_stories is None or can_delete_stories is None:
             raise TypeError(
-                "As of NEXT.VERSION can_post_stories, can_edit_stories and can_delete_stories must"
+                "As of vNEXT.VERSION can_post_stories, can_edit_stories and can_delete_stories must"
                 " be set in order to create this object."
             )
         self.can_post_stories: bool = can_post_stories
