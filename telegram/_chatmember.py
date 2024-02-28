@@ -224,19 +224,19 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
-        can_post_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can post
+        can_post_stories (:obj:`bool`): :obj:`True`, if the administrator can post
             stories to the chat.
 
             .. versionadded:: 20.6
             .. versionchanged:: NEXT.VERSION
                 |non_optional_story_argument|
-        can_edit_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can edit
+        can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit
             stories posted by other users.
 
             .. versionadded:: 20.6
             .. versionchanged:: NEXT.VERSION
                 |non_optional_story_argument|
-        can_delete_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can delete
+        can_delete_stories (:obj:`bool`): :obj:`True`, if the administrator can delete
             stories posted by other users.
 
             .. versionadded:: 20.6
@@ -283,19 +283,19 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
-        can_post_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can post
+        can_post_stories (:obj:`bool`): :obj:`True`, if the administrator can post
             stories to the chat.
 
             .. versionadded:: 20.6
             .. versionchanged:: NEXT.VERSION
                 |non_optional_story_argument|
-        can_edit_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
+        can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit
             stories posted by other users.
 
             .. versionadded:: 20.6
             .. versionchanged:: NEXT.VERSION
                 |non_optional_story_argument|
-        can_delete_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can delete
+        can_delete_stories (:obj:`bool`): :obj:`True`, if the administrator can delete
             stories posted by other users.
 
             .. versionadded:: 20.6
