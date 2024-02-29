@@ -67,9 +67,9 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
                     return True
                 break
 
-    if name == "filter" and obj.__module__ == "telegram.ext.filters":
-        if not included_in_obj:
-            return True  # return True to exclude from docs.
+    if name == "filter" and obj.__module__ == "telegram.ext.filters" and not included_in_obj:
+        return True  # return True to exclude from docs.
+    return None
 
 
 def autodoc_process_docstring(
@@ -118,7 +118,7 @@ def autodoc_process_docstring(
             ):
                 effective_insert: list[str] = media_write_timeout_deprecation
             elif get_updates and to_insert.lstrip().startswith("read_timeout"):
-                effective_insert = [to_insert] + get_updates_read_timeout_addition
+                effective_insert = [to_insert, *get_updates_read_timeout_addition]
             else:
                 effective_insert = [to_insert]
 
@@ -166,11 +166,11 @@ def autodoc_process_docstring(
         autodoc_process_docstring(app, "method", f"{name}.__init__", obj.__init__, options, lines)
 
 
-def autodoc_process_bases(app, name, obj, option, bases: list):
+def autodoc_process_bases(app, name, obj, option, bases: list) -> None:
     """Here we fine tune how the base class's classes are displayed."""
-    for idx, base in enumerate(bases):
+    for idx, raw_base in enumerate(bases):
         # let's use a string representation of the object
-        base = str(base)
+        base = str(raw_base)
 
         # Special case for abstract context managers which are wrongly resoled for some reason
         if base.startswith("typing.AbstractAsyncContextManager"):

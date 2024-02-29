@@ -25,6 +25,9 @@ Warning:
 """
 from typing import Optional, Sequence, Tuple, TypeVar
 
+from telegram._linkpreviewoptions import LinkPreviewOptions
+from telegram._utils.types import ODVInput
+
 T = TypeVar("T")
 
 
@@ -38,3 +41,21 @@ def parse_sequence_arg(arg: Optional[Sequence[T]]) -> Tuple[T, ...]:
         :obj:`Tuple`: The sequence converted to a tuple or an empty tuple.
     """
     return tuple(arg) if arg else ()
+
+
+def parse_lpo_and_dwpp(
+    disable_web_page_preview: Optional[bool], link_preview_options: ODVInput[LinkPreviewOptions]
+) -> ODVInput[LinkPreviewOptions]:
+    """Wrapper around warn_about_deprecated_arg_return_new_arg. Takes care of converting
+    disable_web_page_preview to LinkPreviewOptions.
+    """
+    if disable_web_page_preview and link_preview_options:
+        raise ValueError(
+            "Parameters `disable_web_page_preview` and `link_preview_options` are mutually "
+            "exclusive."
+        )
+
+    if disable_web_page_preview is not None:
+        link_preview_options = LinkPreviewOptions(is_disabled=disable_web_page_preview)
+
+    return link_preview_options

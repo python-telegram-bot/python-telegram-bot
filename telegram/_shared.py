@@ -21,12 +21,6 @@ from typing import Optional, Sequence, Tuple
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import (
-    build_deprecation_warning_message,
-    warn_about_deprecated_attr_in_property,
-)
-from telegram.warnings import PTBDeprecationWarning
 
 
 class UsersShared(TelegramObject):
@@ -38,7 +32,7 @@ class UsersShared(TelegramObject):
     considered equal, if their :attr:`request_id` and :attr:`user_ids` are equal.
 
     .. versionadded:: 20.8
-       Bot API 7.0 replaces :class:`UserShared` with this class. The only difference is that now
+       Bot API 7.0 replaces ``UserShared`` with this class. The only difference is that now
        the :attr:`user_ids` is a sequence instead of a single integer.
 
     Args:
@@ -76,55 +70,6 @@ class UsersShared(TelegramObject):
         self._id_attrs = (self.request_id, self.user_ids)
 
         self._freeze()
-
-
-class UserShared(UsersShared):
-    """Alias for :class:`UsersShared`, kept for backward compatibility.
-
-    .. versionadded:: 20.1
-
-    .. deprecated:: 20.8
-        Use :class:`UsersShared` instead.
-
-    """
-
-    __slots__ = ()
-
-    def __init__(
-        self,
-        request_id: int,
-        user_id: int,
-        *,
-        api_kwargs: Optional[JSONDict] = None,
-    ):
-        super().__init__(request_id, (user_id,), api_kwargs=api_kwargs)
-
-        warn(
-            build_deprecation_warning_message(
-                deprecated_name="UserShared",
-                new_name="UsersShared",
-                object_type="class",
-                bot_api_version="7.0",
-            ),
-            PTBDeprecationWarning,
-            stacklevel=2,
-        )
-
-        self._freeze()
-
-    @property
-    def user_id(self) -> int:
-        """Alias for the first entry of :attr:`UsersShared.user_ids`.
-
-        .. deprecated:: 20.8
-           Bot API 7.0 deprecates this attribute in favor of :attr:`UsersShared.user_ids`.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="user_id",
-            new_attr_name="user_ids",
-            bot_api_version="7.0",
-        )
-        return self.user_ids[0]
 
 
 class ChatShared(TelegramObject):
