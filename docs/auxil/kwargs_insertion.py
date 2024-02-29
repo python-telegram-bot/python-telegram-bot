@@ -16,6 +16,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 import inspect
+from typing import List
 
 keyword_args = [
     "Keyword Arguments:",
@@ -84,13 +85,12 @@ get_updates_read_timeout_addition = [
 ]
 
 
-def find_insert_pos_for_kwargs(lines: list[str]) -> int:
+def find_insert_pos_for_kwargs(lines: List[str]) -> int:
     """Finds the correct position to insert the keyword arguments and returns the index."""
     for idx, value in reversed(list(enumerate(lines))):  # reversed since :returns: is at the end
         if value.startswith("Returns"):
             return idx
-    else:
-        return False
+    return False
 
 
 def check_timeout_and_api_kwargs_presence(obj: object) -> int:
