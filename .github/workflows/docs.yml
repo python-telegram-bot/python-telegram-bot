@@ -4,6 +4,9 @@ on:
     paths:
       - telegram/**
       - docs/**
+  push:
+    branches:
+      - master
 
 jobs:
   test-sphinx-build:

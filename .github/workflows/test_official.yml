@@ -4,6 +4,9 @@ on:
     paths:
       - telegram/**
       - tests/**
+  push:
+    branches:
+      - master
   schedule:
     # Run monday and friday morning at 03:07 - odd time to spread load on GitHub Actions
     - cron: '7 3 * * 1,5'
