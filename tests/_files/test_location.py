@@ -237,7 +237,7 @@ class TestLocationWithRequest:
     async def test_send_live_location(self, bot, chat_id):
         message = await bot.send_location(
             chat_id=chat_id,
-            latitude=52.223880,
+            latitude=52.323880,
             longitude=5.166146,
             live_period=80,
             horizontal_accuracy=50,
@@ -246,7 +246,7 @@ class TestLocationWithRequest:
             protect_content=True,
         )
         assert message.location
-        assert pytest.approx(message.location.latitude, rel=1e-5) == 52.223880
+        assert pytest.approx(message.location.latitude, rel=1e-5) == 52.323880
         assert pytest.approx(message.location.longitude, rel=1e-5) == 5.166146
         assert message.location.live_period == 80
         assert message.location.horizontal_accuracy == 50
@@ -257,14 +257,14 @@ class TestLocationWithRequest:
         message2 = await bot.edit_message_live_location(
             message.chat_id,
             message.message_id,
-            latitude=52.223098,
+            latitude=52.323098,
             longitude=5.164306,
             horizontal_accuracy=30,
             heading=10,
             proximity_alert_radius=500,
         )
 
-        assert pytest.approx(message2.location.latitude, rel=1e-5) == 52.223098
+        assert pytest.approx(message2.location.latitude, rel=1e-5) == 52.323098
         assert pytest.approx(message2.location.longitude, rel=1e-5) == 5.164306
         assert message2.location.horizontal_accuracy == 30
         assert message2.location.heading == 10
@@ -273,5 +273,5 @@ class TestLocationWithRequest:
         await bot.stop_message_live_location(message.chat_id, message.message_id)
         with pytest.raises(BadRequest, match="Message can't be edited"):
             await bot.edit_message_live_location(
-                message.chat_id, message.message_id, latitude=52.223880, longitude=5.164306
+                message.chat_id, message.message_id, latitude=52.323880, longitude=5.164306
             )
