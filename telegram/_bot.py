@@ -4116,10 +4116,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
                 Specify an empty sequence to receive all updates except
-                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
-                setting will be used. Please note that this parameter doesn't affect updates
-                created before the call to the get_updates, so unwanted updates may be received for
-                a short period of time.
+                :attr:`telegram.Update.chat_member`, :attr:`telegram.Update.message_reaction` and
+                :attr:`telegram.Update.message_reaction_count` (default). If not specified, the
+                previous setting will be used. Please note that this parameter doesn't affect
+                updates created before the call to the get_updates, so unwanted updates may be
+                received for a short period of time.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
@@ -4257,10 +4258,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
                 Specify an empty sequence to receive all updates except
-                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
-                setting will be used. Please note that this parameter doesn't affect updates
-                created before the call to the set_webhook, so unwanted updates may be received for
-                a short period of time.
+                :attr:`telegram.Update.chat_member`,
+                :attr:`telegram.Update.message_reaction`
+                and :attr:`telegram.Update.message_reaction_count` (default). If not
+                specified, the previous setting will be used. Please note that this
+                parameter doesn't affect
+                updates created before the call to the set_webhook, so unwanted update
+                may be received for a short period of time.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
