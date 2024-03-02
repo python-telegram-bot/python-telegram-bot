@@ -22,6 +22,7 @@ Available Types
     telegram.chat
     telegram.chatadministratorrights
     telegram.chatboost
+    telegram.chatboostadded
     telegram.chatboostremoved
     telegram.chatboostsource
     telegram.chatboostsourcegiftcode

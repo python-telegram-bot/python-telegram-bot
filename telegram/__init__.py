@@ -40,6 +40,7 @@ __all__ = (
     "Chat",
     "ChatAdministratorRights",
     "ChatBoost",
+    "ChatBoostAdded",
     "ChatBoostRemoved",
     "ChatBoostSource",
     "ChatBoostSourceGiftCode",
@@ -242,6 +243,7 @@ from ._chat import Chat
 from ._chatadministratorrights import ChatAdministratorRights
 from ._chatboost import (
     ChatBoost,
+    ChatBoostAdded,
     ChatBoostRemoved,
     ChatBoostSource,
     ChatBoostSourceGiftCode,
