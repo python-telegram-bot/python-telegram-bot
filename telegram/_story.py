@@ -18,24 +18,65 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object related to a Telegram Story."""
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
+from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class Story(TelegramObject):
     """
-    This object represents a message about a forwarded story in the chat. Currently holds no
-    information.
+    This object represents a story.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`chat` and :attr:`id` are equal.
 
     .. versionadded:: 20.5
 
+    .. versionchanged:: NEXT.VERSION
+        Added attributes :attr:`chat` and :attr:`id` and equality based on them.
+
+    Args:
+        chat (:class:`telegram.Chat`): Chat that posted the story.
+        id (:obj:`int`): Unique identifier for the story in the chat.
+
+    Attributes:
+        chat (:class:`telegram.Chat`): Chat that posted the story.
+        id (:obj:`int`): Unique identifier for the story in the chat.
+
     """
 
-    __slots__ = ()
+    __slots__ = (
+        "chat",
+        "id",
+    )
 
-    def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
+    def __init__(
+        self,
+        chat: Chat,
+        id: int,  # pylint: disable=redefined-builtin
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> None:
         super().__init__(api_kwargs=api_kwargs)
+        self.chat: Chat = chat
+        self.id: int = id
+
+        self._id_attrs = (self.chat, self.id)
 
         self._freeze()
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Story"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["chat"] = Chat.de_json(data.get("chat", {}), bot)
+        return super().de_json(data=data, bot=bot)
