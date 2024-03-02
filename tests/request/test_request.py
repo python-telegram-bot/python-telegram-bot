@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -733,6 +733,39 @@ class TestHTTPXRequestWithoutRequest:
         # Now also ensure that the default timeout for media requests is 20 seconds
         await httpx_request.post("url", request_data)
         assert self.test_flag == httpx.Timeout(read=5, connect=5, write=20 if media else 5, pool=1)
+
+        # Just for double-checking, since warnings are issued for implementations of BaseRequest
+        # other than HTTPXRequest
+        assert len(recwarn) == 0
+
+    @pytest.mark.parametrize("init", [True, False])
+    async def test_setting_media_write_timeout(
+        self, monkeypatch, init, input_media_photo, recwarn  # noqa: F811
+    ):
+        httpx_request = HTTPXRequest(media_write_timeout=42) if init else HTTPXRequest()
+
+        async def request(_, **kwargs):
+            self.test_flag = kwargs["timeout"].write
+            return httpx.Response(HTTPStatus.OK, content=b'{"ok": "True", "result": {}}')
+
+        monkeypatch.setattr(httpx.AsyncClient, "request", request)
+
+        data = {"string": "string", "int": 1, "float": 1.0, "media": input_media_photo}
+        request_data = RequestData(
+            parameters=[RequestParameter.from_input(key, value) for key, value in data.items()],
+        )
+
+        # First make sure that custom timeouts are always respected
+        await httpx_request.post(
+            "url",
+            request_data,
+            write_timeout=43,
+        )
+        assert self.test_flag == 43
+
+        # Now also ensure that the init value is respected
+        await httpx_request.post("url", request_data)
+        assert self.test_flag == 42 if init else 20
 
         # Just for double-checking, since warnings are issued for implementations of BaseRequest
         # other than HTTPXRequest

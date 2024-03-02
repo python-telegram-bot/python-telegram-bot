@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -102,6 +102,7 @@ class Updater(AsyncContextManager["Updater"]):
 
     __slots__ = (
         "__lock",
+        "__polling_cleanup_cb",
         "__polling_task",
         "_httpd",
         "_initialized",

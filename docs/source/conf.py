@@ -1,4 +1,3 @@
-import os
 import re
 import sys
 from pathlib import Path
@@ -8,12 +7,12 @@ from pathlib import Path
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 from sphinx.application import Sphinx
 
-sys.path.insert(0, os.path.abspath("../.."))
+sys.path.insert(0, str(Path("../..").resolve().absolute()))
 
 # -- General configuration ------------------------------------------------
 # General information about the project.
 project = "python-telegram-bot"
-copyright = "2015-2023, Leandro Toledo"
+copyright = "2015-2024, Leandro Toledo"
 author = "Leandro Toledo"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -310,13 +309,13 @@ texinfo_documents = [
 # Due to Sphinx behaviour, these imports only work when imported here, not at top of module.
 
 # Not used but must be imported for the linkcode extension to find it
-from docs.auxil.link_code import linkcode_resolve
-from docs.auxil.sphinx_hooks import (
+from docs.auxil.link_code import linkcode_resolve  # noqa: E402, F401
+from docs.auxil.sphinx_hooks import (  # noqa: E402
     autodoc_process_bases,
     autodoc_process_docstring,
     autodoc_skip_member,
 )
-from docs.auxil.tg_const_role import CONSTANTS_ROLE, TGConstXRefRole
+from docs.auxil.tg_const_role import CONSTANTS_ROLE, TGConstXRefRole  # noqa: E402
 
 
 def setup(app: Sphinx):

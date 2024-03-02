@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -41,6 +41,7 @@ __all__ = (
     "ANIMATION",
     "ATTACHMENT",
     "AUDIO",
+    "BOOST_ADDED",
     "CAPTION",
     "CHAT",
     "COMMAND",
@@ -60,6 +61,8 @@ __all__ = (
     "POLL",
     "PREMIUM_USER",
     "REPLY",
+    "REPLY_TO_STORY",
+    "SENDER_BOOST_COUNT",
     "STORY",
     "SUCCESSFUL_PAYMENT",
     "TEXT",
@@ -1364,7 +1367,7 @@ FORWARDED = _Forwarded(name="filters.FORWARDED")
 
 .. versionchanged:: 20.8
    Now based on :attr:`telegram.Message.forward_origin` instead of
-   :attr:`telegram.Message.forward_date`.
+   ``telegram.Message.forward_date``.
 """
 
 
@@ -1379,8 +1382,8 @@ class ForwardedFrom(_ChatUserBaseFilter):
     .. versionadded:: 13.5
 
     .. versionchanged:: 20.8
-       Was previously based on :attr:`telegram.Message.forward_from` and
-         :attr:`telegram.Message.forward_from_chat`.
+       Was previously based on ``telegram.Message.forward_from`` and
+         ``telegram.Message.forward_from_chat``.
 
     Examples:
         ``MessageHandler(filters.ForwardedFrom(chat_id=1234), callback_method)``
@@ -2146,14 +2149,18 @@ class StatusUpdate:
         __slots__ = ()
 
         def filter(self, message: Message) -> bool:
-            return bool(message.user_shared)
+            return bool(message.api_kwargs.get("user_shared"))
 
     USER_SHARED = _UserShared(name="filters.StatusUpdate.USER_SHARED")
-    """Messages that contain :attr:`telegram.Message.user_shared`.
+    """Messages that contain ``"user_shared"`` in :attr:`telegram.TelegramObject.api_kwargs`.
 
     Warning:
-        This will only catch the legacy :attr:`telegram.Message.user_shared` attribute, not the
+        This will only catch the legacy ``user_shared`` field, not the
         new :attr:`telegram.Message.users_shared` attribute!
+
+    .. versionchanged:: NEXT.VERSION
+       Now relies on :attr:`telegram.TelegramObject.api_kwargs` as the native attribute
+       ``Message.user_shared`` was removed.
 
     .. versionadded:: 20.1
     .. deprecated:: 20.8
@@ -2785,3 +2792,36 @@ class _Voice(MessageFilter):
 
 VOICE = _Voice("filters.VOICE")
 """Messages that contain :attr:`telegram.Message.voice`."""
+
+
+class _ReplyToStory(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.reply_to_story)
+
+
+REPLY_TO_STORY = _ReplyToStory(name="filters.REPLY_TO_STORY")
+"""Messages that contain :attr:`telegram.Message.reply_to_story`."""
+
+
+class _BoostAdded(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.boost_added)
+
+
+BOOST_ADDED = _BoostAdded(name="filters.BOOST_ADDED")
+"""Messages that contain :attr:`telegram.Message.boost_added`."""
+
+
+class _SenderBoostCount(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.sender_boost_count)
+
+
+SENDER_BOOST_COUNT = _SenderBoostCount(name="filters.SENDER_BOOST_COUNT")
+"""Messages that contain :attr:`telegram.Message.sender_boost_count`."""
