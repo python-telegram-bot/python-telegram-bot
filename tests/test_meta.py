@@ -40,4 +40,4 @@ def test_build():
 
 @skip_disabled
 def test_build_raw():
-    assert os.system("python setup-raw.py bdist_dumb") == 0  # pragma: no cover
+    assert os.system("python setup_raw.py bdist_dumb") == 0  # pragma: no cover

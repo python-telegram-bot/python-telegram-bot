@@ -10,7 +10,6 @@ repos:
     hooks:
     -   id: ruff
         name: ruff
-        files: ^(telegram|examples|tests)/.*\.py$
         additional_dependencies:
           - httpx~=0.27.0
           - tornado~=6.4
@@ -32,7 +31,7 @@ repos:
     rev: v3.0.3
     hooks:
     -   id: pylint
-        files: ^(telegram|examples)/.*\.py$
+        files: ^(?!(tests|docs)).*\.py$
         additional_dependencies:
           - httpx~=0.27.0
           - tornado~=6.4
@@ -45,7 +44,7 @@ repos:
     hooks:
     -   id: mypy
         name: mypy-ptb
-        files: ^telegram/.*\.py$
+        files: ^(?!(tests|examples|docs)).*\.py$
         additional_dependencies:
           - types-pytz
           - types-cryptography
@@ -71,7 +70,6 @@ repos:
     rev: v3.15.0
     hooks:
     -   id: pyupgrade
-        files: ^(telegram|examples|tests|docs)/.*\.py$
         args:
           - --py38-plus
 -   repo: https://github.com/pycqa/isort
