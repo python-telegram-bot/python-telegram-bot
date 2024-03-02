@@ -26,6 +26,7 @@ from telegram import (
     Audio,
     Bot,
     Chat,
+    ChatBoostAdded,
     ChatShared,
     Contact,
     Dice,
@@ -129,7 +130,7 @@ def message(bot):
         },
         {"photo": [PhotoSize("photo_id", "unique_id", 50, 50)], "caption": "photo_file"},
         {"sticker": Sticker("sticker_id", "unique_id", 50, 50, True, False, Sticker.REGULAR)},
-        {"story": Story()},
+        {"story": Story(Chat(1, Chat.PRIVATE), 0)},
         {"video": Video("video_id", "unique_id", 12, 12, 12), "caption": "video_file"},
         {"voice": Voice("voice_id", "unique_id", 5)},
         {"video_note": VideoNote("video_note_id", "unique_id", 20, 12)},
@@ -259,6 +260,9 @@ def message(bot):
         },
         {"quote": TextQuote("a text quote", 1)},
         {"forward_origin": MessageOriginChat(datetime.utcnow(), Chat(1, Chat.PRIVATE))},
+        {"reply_to_story": Story(Chat(1, Chat.PRIVATE), 0)},
+        {"boost_added": ChatBoostAdded(100)},
+        {"sender_boost_count": 1},
     ],
     ids=[
         "reply",
@@ -321,6 +325,9 @@ def message(bot):
         "external_reply",
         "quote",
         "forward_origin",
+        "reply_to_story",
+        "boost_added",
+        "sender_boost_count",
     ],
 )
 def message_params(bot, request):

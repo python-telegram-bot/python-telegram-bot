@@ -34,6 +34,39 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
+class ChatBoostAdded(TelegramObject):
+    """
+    This object represents a service message about a user boosting a chat.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their
+    :attr:`boost_count` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        boost_count (:obj:`int`): Number of boosts added by the user.
+
+    Attributes:
+        boost_count (:obj:`int`): Number of boosts added by the user.
+
+    """
+
+    __slots__ = ("boost_count",)
+
+    def __init__(
+        self,
+        boost_count: int,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> None:
+        super().__init__(api_kwargs=api_kwargs)
+        self.boost_count: int = boost_count
+        self._id_attrs = (self.boost_count,)
+
+        self._freeze()
+
+
 class ChatBoostSource(TelegramObject):
     """
     Base class for Telegram ChatBoostSource objects. It can be one of:

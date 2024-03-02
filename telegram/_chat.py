@@ -219,6 +219,16 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        unrestrict_boost_count (:obj:`int`, optional): For supergroups, the minimum number of
+            boosts that a non-administrator user needs to add in order to ignore slow mode and chat
+            permissions. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        custom_emoji_sticker_set_name (:obj:`str`, optional): For supergroups, the name of the
+            group's custom emoji sticker set. Custom emoji from this set can be used by all users
+            and bots in the group. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -352,6 +362,16 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        unrestrict_boost_count (:obj:`int`): Optional. For supergroups, the minimum number of
+            boosts that a non-administrator user needs to add in order to ignore slow mode and chat
+            permissions. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        custom_emoji_sticker_set_name (:obj:`str`): Optional. For supergroups, the name of the
+            group's custom emoji sticker set. Custom emoji from this set can be used by all users
+            and bots in the group. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
 
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
@@ -364,6 +384,7 @@ class Chat(TelegramObject):
         "background_custom_emoji_id",
         "bio",
         "can_set_sticker_set",
+        "custom_emoji_sticker_set_name",
         "description",
         "emoji_status_custom_emoji_id",
         "emoji_status_expiration_date",
@@ -392,6 +413,7 @@ class Chat(TelegramObject):
         "sticker_set_name",
         "title",
         "type",
+        "unrestrict_boost_count",
         "username",
     )
 
@@ -446,6 +468,8 @@ class Chat(TelegramObject):
         profile_accent_color_id: Optional[int] = None,
         profile_background_custom_emoji_id: Optional[str] = None,
         has_visible_history: Optional[bool] = None,
+        unrestrict_boost_count: Optional[int] = None,
+        custom_emoji_sticker_set_name: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -493,6 +517,8 @@ class Chat(TelegramObject):
         self.background_custom_emoji_id: Optional[str] = background_custom_emoji_id
         self.profile_accent_color_id: Optional[int] = profile_accent_color_id
         self.profile_background_custom_emoji_id: Optional[str] = profile_background_custom_emoji_id
+        self.unrestrict_boost_count: Optional[int] = unrestrict_boost_count
+        self.custom_emoji_sticker_set_name: Optional[str] = custom_emoji_sticker_set_name
 
         self._id_attrs = (self.id,)
 

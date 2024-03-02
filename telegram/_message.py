@@ -24,6 +24,7 @@ from html import escape
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 from telegram._chat import Chat
+from telegram._chatboost import ChatBoostAdded
 from telegram._dice import Dice
 from telegram._files.animation import Animation
 from telegram._files.audio import Audio
@@ -521,6 +522,18 @@ class Message(MaybeInaccessibleMessage):
             message for forwarded messages
 
             .. versionadded:: 20.8
+        reply_to_story (:class:`telegram.Story`, optional): For replies to a story, the original
+            story.
+
+            .. versionadded:: NEXT.VERSION
+        boost_added (:class:`telegram.ChatBoostAdded`, optional): Service message: user boosted
+            the chat.
+
+            .. versionadded:: NEXT.VERSION
+        sender_boost_count (:obj:`int`, optional): If the sender of the
+            message boosted the chat, the number of boosts added by the user.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -787,10 +800,22 @@ class Message(MaybeInaccessibleMessage):
             message, the quoted part of the message.
 
             .. versionadded:: 20.8
-        forward_origin (:class:`telegram.MessageOrigin`, optional): Information about the original
+        forward_origin (:class:`telegram.MessageOrigin`): Optional. Information about the original
             message for forwarded messages
 
             .. versionadded:: 20.8
+        reply_to_story (:class:`telegram.Story`): Optional. For replies to a story, the original
+            story.
+
+            .. versionadded:: NEXT.VERSION
+        boost_added (:class:`telegram.ChatBoostAdded`): Optional. Service message: user boosted
+            the chat.
+
+            .. versionadded:: NEXT.VERSION
+        sender_boost_count (:obj:`int`): Optional. If the sender of the
+            message boosted the chat, the number of boosts added by the user.
+
+            .. versionadded:: NEXT.VERSION
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -807,6 +832,7 @@ class Message(MaybeInaccessibleMessage):
         "animation",
         "audio",
         "author_signature",
+        "boost_added",
         "caption",
         "caption_entities",
         "channel_chat_created",
@@ -857,6 +883,8 @@ class Message(MaybeInaccessibleMessage):
         "quote",
         "reply_markup",
         "reply_to_message",
+        "reply_to_story",
+        "sender_boost_count",
         "sender_chat",
         "sticker",
         "story",
@@ -953,6 +981,9 @@ class Message(MaybeInaccessibleMessage):
         external_reply: Optional["ExternalReplyInfo"] = None,
         quote: Optional["TextQuote"] = None,
         forward_origin: Optional["MessageOrigin"] = None,
+        reply_to_story: Optional[Story] = None,
+        boost_added: Optional[ChatBoostAdded] = None,
+        sender_boost_count: Optional[int] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1045,6 +1076,9 @@ class Message(MaybeInaccessibleMessage):
             self.external_reply: Optional[ExternalReplyInfo] = external_reply
             self.quote: Optional[TextQuote] = quote
             self.forward_origin: Optional[MessageOrigin] = forward_origin
+            self.reply_to_story: Optional[Story] = reply_to_story
+            self.boost_added: Optional[ChatBoostAdded] = boost_added
+            self.sender_boost_count: Optional[int] = sender_boost_count
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1185,6 +1219,8 @@ class Message(MaybeInaccessibleMessage):
         data["external_reply"] = ExternalReplyInfo.de_json(data.get("external_reply"), bot)
         data["quote"] = TextQuote.de_json(data.get("quote"), bot)
         data["forward_origin"] = MessageOrigin.de_json(data.get("forward_origin"), bot)
+        data["reply_to_story"] = Story.de_json(data.get("reply_to_story"), bot)
+        data["boost_added"] = ChatBoostAdded.de_json(data.get("boost_added"), bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
