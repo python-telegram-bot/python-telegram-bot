@@ -18,28 +18,55 @@
 
 import pytest
 
-from telegram import Story
+from telegram import Chat, Story
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
 def story():
-    return Story()
+    return Story(TestStoryBase.chat, TestStoryBase.id)
 
 
-class TestStoryWithoutRequest:
-    def test_slot_behaviour(self):
-        story = Story()
+class TestStoryBase:
+    chat = Chat(1, "")
+    id = 0
+
+
+class TestStoryWithoutRequest(TestStoryBase):
+    def test_slot_behaviour(self, story):
         for attr in story.__slots__:
             assert getattr(story, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(story)) == len(set(mro_slots(story))), "duplicate slot"
 
-    def test_de_json(self):
-        story = Story.de_json({}, None)
+    def test_de_json(self, bot):
+        json_dict = {"chat": self.chat.to_dict(), "id": self.id}
+        story = Story.de_json(json_dict, bot)
         assert story.api_kwargs == {}
+        assert story.chat == self.chat
+        assert story.id == self.id
         assert isinstance(story, Story)
+        assert Story.de_json(None, bot) is None
 
-    def test_to_dict(self):
-        story = Story()
+    def test_to_dict(self, story):
         story_dict = story.to_dict()
-        assert story_dict == {}
+        assert story_dict["chat"] == self.chat.to_dict()
+        assert story_dict["id"] == self.id
+
+    def test_equality(self):
+        a = Story(Chat(1, ""), 0)
+        b = Story(Chat(1, ""), 0)
+        c = Story(Chat(1, ""), 1)
+        d = Story(Chat(2, ""), 0)
+        e = Chat(1, "")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
