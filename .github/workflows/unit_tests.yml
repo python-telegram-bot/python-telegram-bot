@@ -4,6 +4,8 @@ on:
     paths:
       - telegram/**
       - tests/**
+      - requirements.txt
+      - requirements-opts.txt
   push:
     branches:
       - master
