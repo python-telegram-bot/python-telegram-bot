@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
+import contextlib
 import datetime
 import inspect
 import json
@@ -312,7 +313,20 @@ class TelegramObject:
             try:
                 setattr(self, key, val)
             except AttributeError:
-                # catch cases when old attributes are removed from new versions
+                # So an attribute was deprecated and removed from the class. Let's handle this:
+                # 1) Is the attribute now a property with no setter? Let's check that:
+                if isinstance(getattr(self.__class__, key, None), property):
+                    # It is, so let's try to set the "private attribute" instead
+                    try:
+                        setattr(self, f"_{key}", val)
+                    # If this fails as well, guess we've completely removed it. Let's add it to
+                    # api_kwargs as fallback
+                    except AttributeError:
+                        api_kwargs[key] = val
+
+                # 2) The attribute is a private attribute, i.e. it went through case 1) in the past
+                elif key.startswith("_"):
+                    continue  # skip adding this to api_kwargs, the attribute is lost forever.
                 api_kwargs[key] = val  # add it to api_kwargs as fallback
 
         # For api_kwargs we first apply any kwargs that are already attributes of the object
@@ -490,7 +504,12 @@ class TelegramObject:
         """
         # we convert to list to ensure that the list doesn't change length while we loop
         for key in list(api_kwargs.keys()):
-            if getattr(self, key, True) is None:
+            # property attributes are not settable, so we need to set the private attribute
+            if isinstance(getattr(self.__class__, key, None), property):
+                # if setattr fails, we'll just leave the value in api_kwargs:
+                with contextlib.suppress(AttributeError):
+                    setattr(self, f"_{key}", api_kwargs.pop(key))
+            elif getattr(self, key, True) is None:
                 setattr(self, key, api_kwargs.pop(key))
 
     def _get_attrs_names(self, include_private: bool) -> Iterator[str]:
