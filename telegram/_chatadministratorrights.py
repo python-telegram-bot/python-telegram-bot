@@ -60,15 +60,15 @@ class ChatAdministratorRights(TelegramObject):
             that they have promoted, directly or indirectly (promoted by administrators that
             were appointed by the user).
         can_change_info (:obj:`bool`): :obj:`True`, if the user is allowed to change the chat title
-            ,photo and other settings.
+            , photo and other settings.
         can_invite_users (:obj:`bool`): :obj:`True`, if the user is allowed to invite new users to
             the chat.
         can_post_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can post
-            messages in the channel, or access channel statistics; channels only.
+            messages in the channel, or access channel statistics; for channels only.
         can_edit_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can edit
-            messages of other users.
+            messages of other users and can pin messages; for channels only.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
-            messages; groups and supergroups only.
+            messages; for groups and supergroups only.
         can_post_stories (:obj:`bool`): :obj:`True`, if the administrator can post
             stories to the chat.
 
@@ -88,7 +88,7 @@ class ChatAdministratorRights(TelegramObject):
             .. versionchanged:: NEXT.VERSION
                 |non_optional_story_argument|
         can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
-            to create, rename, close, and reopen forum topics; supergroups only.
+            to create, rename, close, and reopen forum topics; for supergroups only.
 
             .. versionadded:: 20.0
 
@@ -112,11 +112,11 @@ class ChatAdministratorRights(TelegramObject):
         can_invite_users (:obj:`bool`): :obj:`True`, if the user is allowed to invite new users to
             the chat.
         can_post_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can post
-            messages in the channel, or access channel statistics; channels only.
+            messages in the channel, or access channel statistics; for channels only.
         can_edit_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
-            messages of other users.
+            messages of other users and can pin messages; for channels only.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
-            messages; groups and supergroups only.
+            messages; for groups and supergroups only.
         can_post_stories (:obj:`bool`): :obj:`True`, if the administrator can post
             stories to the chat.
 
@@ -136,7 +136,7 @@ class ChatAdministratorRights(TelegramObject):
             .. versionchanged:: NEXT.VERSION
                 |non_optional_story_argument|
         can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
-            to create, rename, close, and reopen forum topics; supergroups only.
+            to create, rename, close, and reopen forum topics; for supergroups only.
 
             .. versionadded:: 20.0
     """
