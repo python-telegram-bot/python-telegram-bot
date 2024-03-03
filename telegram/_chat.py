@@ -2583,7 +2583,7 @@ class Chat(TelegramObject):
         .. seealso:: :meth:`send_copy`, :meth:`send_copies`, :meth:`copy_messages`.
 
         Returns:
-            :class:`telegram.Message`: On success, instance representing the message posted.
+            :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
         """
         return await self.get_bot().copy_message(

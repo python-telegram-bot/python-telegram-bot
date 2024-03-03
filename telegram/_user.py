@@ -1588,7 +1588,7 @@ class User(TelegramObject):
             |user_chat_id_note|
 
         Returns:
-            :class:`telegram.Message`: On success, instance representing the message posted.
+            :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
         """
         return await self.get_bot().copy_message(
