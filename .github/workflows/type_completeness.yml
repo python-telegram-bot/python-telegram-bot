@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - telegram/**
+      - requirements.txt
+      - requirements-opts.txt
   push:
     branches:
       - master
