@@ -29,12 +29,11 @@ build:
       # See https://github.com/readthedocs/readthedocs.org/issues/3242#issuecomment-1410321534
       # This provides a HTML zip file for download, with the same structure as the hosted website
       - mkdir --parents $READTHEDOCS_OUTPUT/htmlzip
-      - mkdir --parents $READTHEDOCS_PROJECT
-      - cp --recursive $READTHEDOCS_OUTPUT/html $READTHEDOCS_PROJECT
+      - cp --recursive $READTHEDOCS_OUTPUT/html $READTHEDOCS_OUTPUT/$READTHEDOCS_PROJECT
       # Hide the "other versions" dropdown. This is a workaround for those versions being shown,
       # but not being accessible, as they are not built. Also, they hide the actual sidebar menu.
-      - echo "#furo-readthedocs-versions{display:none}" >> $READTHEDOCS_PROJECT/_static/styles/furo-extensions.css
-      - zip --recurse-path --symlinks -j $READTHEDOCS_OUTPUT/htmlzip/$READTHEDOCS_PROJECT.zip $READTHEDOCS_PROJECT
+      - echo "#furo-readthedocs-versions{display:none}" >> $READTHEDOCS_OUTPUT/$READTHEDOCS_PROJECT/_static/styles/furo-extensions.css
+      - cd $READTHEDOCS_OUTPUT ; zip --recurse-path --symlinks htmlzip/$READTHEDOCS_PROJECT.zip $READTHEDOCS_OUTPUT
 
 search:
   ranking: # bump up rank of commonly searched pages: (default: 0, values range from -10 to 10)
