@@ -20,6 +20,8 @@ to link to the correct files & lines on github. Can be simplified once
 https://github.com/sphinx-doc/sphinx/issues/1556 is closed
 """
 import subprocess
+from pathlib import Path
+from typing import Dict, Tuple
 
 from sphinx.util import logging
 
@@ -30,7 +32,7 @@ sphinx_logger = logging.getLogger(__name__)
 
 # must be a module-level variable so that it can be written to by the `autodoc-process-docstring`
 # event handler in `sphinx_hooks.py`
-LINE_NUMBERS = {}
+LINE_NUMBERS: Dict[str, Tuple[Path, int, int]] = {}
 
 
 def _git_branch() -> str:
@@ -52,7 +54,7 @@ git_branch = _git_branch()
 base_url = "https://github.com/python-telegram-bot/python-telegram-bot/blob/"
 
 
-def linkcode_resolve(_, info):
+def linkcode_resolve(_, info) -> str:
     """See www.sphinx-doc.org/en/master/usage/extensions/linkcode.html"""
     combined = ".".join((info["module"], info["fullname"]))
     # special casing for ExtBot which is due to the special structure of extbot.rst
@@ -71,7 +73,7 @@ def linkcode_resolve(_, info):
         line_info = LINE_NUMBERS.get(info["module"])
 
     if not line_info:
-        return
+        return None
 
     file, start_line, end_line = line_info
     return f"{base_url}{git_branch}/{file}#L{start_line}-L{end_line}"

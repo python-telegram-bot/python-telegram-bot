@@ -1,13 +1,14 @@
 name: Unit Tests
 on:
   pull_request:
-    branches:
-      - master
-
+    paths:
+      - telegram/**
+      - tests/**
+      - requirements.txt
+      - requirements-opts.txt
   push:
     branches:
       - master
-
   schedule:
     # Run monday and friday morning at 03:07 - odd time to spread load on GitHub Actions
     - cron: '7 3 * * 1,5'
@@ -81,7 +82,7 @@ jobs:
 
       - name: Test Summary
         id: test_summary
-        uses: test-summary/action@v2.2
+        uses: test-summary/action@v2.3
         if: always()  # always run, even if tests fail
         with:
           paths: |

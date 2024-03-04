@@ -47,9 +47,8 @@ class ChatAdministratorRights(TelegramObject):
     Args:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
         can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator can access the chat event
-            log, chat statistics, boost list in channels, see channel members, report spam
-            messages, see anonymous administrators in supergroups and ignore slow mode.
-            Implied by any other administrator privilege.
+            log, get boost list, see hidden supergroup and channel members, report spam messages
+            and ignore slow mode. Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the administrator can delete messages of
             other users.
         can_manage_video_chats (:obj:`bool`): :obj:`True`, if the administrator can manage video
@@ -70,18 +69,24 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
-        can_post_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can post
-            stories in the channel; channels only.
+        can_post_stories (:obj:`bool`): :obj:`True`, if the administrator can post
+            stories to the chat.
 
             .. versionadded:: 20.6
-        can_edit_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can edit
-            stories posted by other users; channels only.
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
+        can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit
+            stories posted by other users.
 
             .. versionadded:: 20.6
-        can_delete_stories (:obj:`bool`, optional): :obj:`True`, if the administrator can delete
-            stories posted by other users; channels only.
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
+        can_delete_stories (:obj:`bool`): :obj:`True`, if the administrator can delete
+            stories posted by other users.
 
             .. versionadded:: 20.6
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
         can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
@@ -90,9 +95,8 @@ class ChatAdministratorRights(TelegramObject):
     Attributes:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
         can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator can access the chat event
-            log, chat statistics, boost list in channels, see channel members, report spam
-            messages, see anonymous administrators in supergroups and ignore slow mode.
-            Implied by any other administrator privilege.
+            log, get boost list, see hidden supergroup and channel members, report spam messages
+            and ignore slow mode. Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the administrator can delete messages of
             other users.
         can_manage_video_chats (:obj:`bool`): :obj:`True`, if the administrator can manage video
@@ -113,18 +117,24 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
-        can_post_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can post
-            stories in the channel; channels only.
+        can_post_stories (:obj:`bool`): :obj:`True`, if the administrator can post
+            stories to the chat.
 
             .. versionadded:: 20.6
-        can_edit_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
-            stories posted by other users; channels only.
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
+        can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit
+            stories posted by other users.
 
             .. versionadded:: 20.6
-        can_delete_stories (:obj:`bool`): Optional. :obj:`True`, if the administrator can delete
-            stories posted by other users; channels only.
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
+        can_delete_stories (:obj:`bool`): :obj:`True`, if the administrator can delete
+            stories posted by other users.
 
             .. versionadded:: 20.6
+            .. versionchanged:: NEXT.VERSION
+                |non_optional_story_argument|
         can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
@@ -179,13 +189,19 @@ class ChatAdministratorRights(TelegramObject):
         self.can_promote_members: bool = can_promote_members
         self.can_change_info: bool = can_change_info
         self.can_invite_users: bool = can_invite_users
+        # Not actually optionals but because of backwards compatability we pretend they are
+        if can_post_stories is None or can_edit_stories is None or can_delete_stories is None:
+            raise TypeError(
+                "As of vNEXT.VERSION can_post_stories, can_edit_stories and can_delete_stories"
+                " must be set in order to create this object."
+            )
+        self.can_post_stories: bool = can_post_stories
+        self.can_edit_stories: bool = can_edit_stories
+        self.can_delete_stories: bool = can_delete_stories
         # Optionals
         self.can_post_messages: Optional[bool] = can_post_messages
         self.can_edit_messages: Optional[bool] = can_edit_messages
         self.can_pin_messages: Optional[bool] = can_pin_messages
-        self.can_post_stories: Optional[bool] = can_post_stories
-        self.can_edit_stories: Optional[bool] = can_edit_stories
-        self.can_delete_stories: Optional[bool] = can_delete_stories
         self.can_manage_topics: Optional[bool] = can_manage_topics
 
         self._id_attrs = (

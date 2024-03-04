@@ -358,6 +358,68 @@ class TestTelegramObject:
         chat.id = 7
         assert chat.id == 7
 
+    def test_pickle_handle_properties(self):
+        # Very hard to properly test, can't use a pickle file since newer versions of the library
+        # will stop having the property.
+        # The code below uses exec statements to simulate library changes. There is no other way
+        # to test this.
+        # Original class:
+        v1 = """
+class PicklePropertyTest(TelegramObject):
+    __slots__ = ("forward_from", "to_be_removed", "forward_date")
+    def __init__(self, forward_from=None, forward_date=None, api_kwargs=None):
+        super().__init__(api_kwargs=api_kwargs)
+        self.forward_from = forward_from
+        self.forward_date = forward_date
+        self.to_be_removed = "to_be_removed"
+"""
+        exec(v1, globals(), None)
+        old = PicklePropertyTest("old_val", "date", api_kwargs={"new_attr": 1})  # noqa: F821
+        pickled_v1 = pickle.dumps(old)
+
+        # After some API changes:
+        v2 = """
+class PicklePropertyTest(TelegramObject):
+    __slots__ = ("_forward_from", "_date", "_new_attr")
+    def __init__(self, forward_from=None, f_date=None, new_attr=None, api_kwargs=None):
+        super().__init__(api_kwargs=api_kwargs)
+        self._forward_from = forward_from
+        self.f_date = f_date
+        self._new_attr = new_attr
+    @property
+    def forward_from(self):
+        return self._forward_from
+    @property
+    def forward_date(self):
+        return self.f_date
+    @property
+    def new_attr(self):
+        return self._new_attr
+        """
+        exec(v2, globals(), None)
+        v2_unpickle = pickle.loads(pickled_v1)
+        assert v2_unpickle.forward_from == "old_val" == v2_unpickle._forward_from
+        with pytest.raises(AttributeError):
+            # New attribute should not be available either as is always the case for pickle
+            v2_unpickle.forward_date
+        assert v2_unpickle.new_attr == 1 == v2_unpickle._new_attr
+        assert not hasattr(v2_unpickle, "to_be_removed")
+        assert v2_unpickle.api_kwargs == {"to_be_removed": "to_be_removed"}
+        pickled_v2 = pickle.dumps(v2_unpickle)
+
+        # After PTB removes the property and the attribute:
+        v3 = """
+class PicklePropertyTest(TelegramObject):
+    __slots__ = ()
+    def __init__(self, api_kwargs=None):
+        super().__init__(api_kwargs=api_kwargs)
+"""
+        exec(v3, globals(), None)
+        v3_unpickle = pickle.loads(pickled_v2)
+        assert v3_unpickle.api_kwargs == {"to_be_removed": "to_be_removed"}
+        assert not hasattr(v3_unpickle, "_forward_from")
+        assert not hasattr(v3_unpickle, "_new_attr")
+
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, "first_name", False)

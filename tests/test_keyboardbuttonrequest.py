@@ -106,10 +106,30 @@ class TestKeyboardButtonRequestChatBase:
     chat_has_username = True
     chat_is_created = False
     user_administrator_rights = ChatAdministratorRights(
-        True, False, True, False, True, False, True, False
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        can_post_stories=False,
+        can_edit_stories=False,
+        can_delete_stories=False,
     )
     bot_administrator_rights = ChatAdministratorRights(
-        True, False, True, False, True, False, True, False
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        can_post_stories=False,
+        can_edit_stories=False,
+        can_delete_stories=False,
     )
     bot_is_member = True
 

@@ -234,7 +234,7 @@ class TestUpdater:
                 updates.task_done()
                 return [next_update]
 
-            await asyncio.sleep(0)
+            await asyncio.sleep(0.1)
             return []
 
         orig_del_webhook = updater.bot.delete_webhook
@@ -520,10 +520,13 @@ class TestUpdater:
     ):
         raise_exception = True
         get_updates_event = asyncio.Event()
+        second_get_updates_event = asyncio.Event()
 
         async def get_updates(*args, **kwargs):
             # So that the main task has a chance to be called
             await asyncio.sleep(0)
+            if get_updates_event.is_set():
+                second_get_updates_event.set()
 
             if not raise_exception:
                 return []
@@ -548,6 +551,9 @@ class TestUpdater:
 
                 # Also makes sure that the error handler was called
                 await get_updates_event.wait()
+                # wait for get_updates to be called a second time - only now we can expect that
+                # all error handling for the previous call has finished
+                await second_get_updates_event.wait()
 
                 if callback_should_be_called:
                     # Make sure that the error handler was called
@@ -588,17 +594,14 @@ class TestUpdater:
     async def test_start_polling_unexpected_shutdown(self, updater, monkeypatch, caplog):
         update_queue = asyncio.Queue()
         await update_queue.put(Update(update_id=1))
-        await update_queue.put(Update(update_id=2))
         first_update_event = asyncio.Event()
         second_update_event = asyncio.Event()
 
         async def get_updates(*args, **kwargs):
             self.message_count = kwargs.get("offset")
             update = await update_queue.get()
-            if update.update_id == 1:
-                first_update_event.set()
-            else:
-                await second_update_event.wait()
+            first_update_event.set()
+            await second_update_event.wait()
             return [update]
 
         monkeypatch.setattr(updater.bot, "get_updates", get_updates)
@@ -611,8 +614,8 @@ class TestUpdater:
                 # Unfortunately we need to use the private attribute here to produce the problem
                 updater._running = False
                 second_update_event.set()
+                await asyncio.sleep(1)
 
-                await asyncio.sleep(0.1)
                 assert caplog.records
                 assert any(
                     "Updater stopped unexpectedly." in record.getMessage()
@@ -621,7 +624,7 @@ class TestUpdater:
                 )
 
         # Make sure that the update_id offset wasn't increased
-        assert self.message_count == 2
+        assert self.message_count < 1
 
     async def test_start_polling_not_running_after_failure(self, updater, monkeypatch):
         # Unfortunately we have to use some internal logic to trigger an exception

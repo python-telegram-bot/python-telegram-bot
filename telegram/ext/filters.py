@@ -41,6 +41,7 @@ __all__ = (
     "ANIMATION",
     "ATTACHMENT",
     "AUDIO",
+    "BOOST_ADDED",
     "CAPTION",
     "CHAT",
     "COMMAND",
@@ -60,6 +61,8 @@ __all__ = (
     "POLL",
     "PREMIUM_USER",
     "REPLY",
+    "REPLY_TO_STORY",
+    "SENDER_BOOST_COUNT",
     "STORY",
     "SUCCESSFUL_PAYMENT",
     "TEXT",
@@ -2789,3 +2792,36 @@ class _Voice(MessageFilter):
 
 VOICE = _Voice("filters.VOICE")
 """Messages that contain :attr:`telegram.Message.voice`."""
+
+
+class _ReplyToStory(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.reply_to_story)
+
+
+REPLY_TO_STORY = _ReplyToStory(name="filters.REPLY_TO_STORY")
+"""Messages that contain :attr:`telegram.Message.reply_to_story`."""
+
+
+class _BoostAdded(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.boost_added)
+
+
+BOOST_ADDED = _BoostAdded(name="filters.BOOST_ADDED")
+"""Messages that contain :attr:`telegram.Message.boost_added`."""
+
+
+class _SenderBoostCount(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.sender_boost_count)
+
+
+SENDER_BOOST_COUNT = _SenderBoostCount(name="filters.SENDER_BOOST_COUNT")
+"""Messages that contain :attr:`telegram.Message.sender_boost_count`."""

@@ -81,11 +81,12 @@ class TGConstXRefRole(PyXRefRole):
             ):
                 return repr(value), target
             sphinx_logger.warning(
-                f"%s:%d: WARNING: Did not convert reference %s. :{CONSTANTS_ROLE}: is not supposed"
+                "%s:%d: WARNING: Did not convert reference %s. :%s: is not supposed"
                 " to be used with this type of target.",
                 refnode.source,
                 refnode.line,
                 refnode.rawsource,
+                CONSTANTS_ROLE,
             )
             return title, target
         except Exception as exc:

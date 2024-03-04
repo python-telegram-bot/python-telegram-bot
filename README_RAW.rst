@@ -14,7 +14,7 @@
    :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-7.0-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-7.1-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -89,7 +89,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **7.0** are supported.
+All types and methods of the Telegram Bot API **7.1** are supported.
 
 Installing
 ==========
@@ -108,12 +108,12 @@ You can also install ``python-telegram-bot-raw`` from source, though this is usu
 
     $ git clone https://github.com/python-telegram-bot/python-telegram-bot
     $ cd python-telegram-bot
-    $ python setup-raw.py install
+    $ python setup_raw.py install
 
 Note
 ----
 
-Installing the ``.tar.gz`` archive available on PyPi directly via ``pip`` will *not* work as expected, as ``pip`` does not recognize that it should use ``setup-raw.py`` instead of ``setup.py``.
+Installing the ``.tar.gz`` archive available on PyPi directly via ``pip`` will *not* work as expected, as ``pip`` does not recognize that it should use ``setup_raw.py`` instead of ``setup.py``.
 
 Verifying Releases
 ------------------

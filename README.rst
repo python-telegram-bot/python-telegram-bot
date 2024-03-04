@@ -14,7 +14,7 @@
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-7.0-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-7.1-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -93,7 +93,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **7.0** are supported.
+All types and methods of the Telegram Bot API **7.1** are supported.
 
 Installing
 ==========
@@ -153,7 +153,7 @@ PTB can be installed with optional dependencies:
 * ``pip install "python-telegram-bot[http2]"`` installs `httpx[http2] <https://www.python-httpx.org/#dependencies>`_. Use this, if you want to use HTTP/2.
 * ``pip install "python-telegram-bot[rate-limiter]"`` installs `aiolimiter~=1.1.0 <https://aiolimiter.readthedocs.io/en/stable/>`_. Use this, if you want to use ``telegram.ext.AIORateLimiter``.
 * ``pip install "python-telegram-bot[webhooks]"`` installs the `tornado~=6.4 <https://www.tornadoweb.org/en/stable/>`_ library. Use this, if you want to use ``telegram.ext.Updater.start_webhook``/``telegram.ext.Application.run_webhook``.
-* ``pip install "python-telegram-bot[callback-data]"`` installs the `cachetools~=5.3.2 <https://cachetools.readthedocs.io/en/latest/>`_ library. Use this, if you want to use `arbitrary callback_data <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_.
+* ``pip install "python-telegram-bot[callback-data]"`` installs the `cachetools~=5.3.3 <https://cachetools.readthedocs.io/en/latest/>`_ library. Use this, if you want to use `arbitrary callback_data <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_.
 * ``pip install "python-telegram-bot[job-queue]"`` installs the `APScheduler~=3.10.4 <https://apscheduler.readthedocs.io/en/3.x/>`_ library and enforces `pytz>=2018.6 <https://pypi.org/project/pytz/>`_, where ``pytz`` is a dependency of ``APScheduler``. Use this, if you want to use the ``telegram.ext.JobQueue``.
 
 To install multiple optional dependencies, separate them by commas, e.g. ``pip install "python-telegram-bot[socks,webhooks]"``.
