@@ -32,7 +32,7 @@ build:
       - cp --recursive $READTHEDOCS_OUTPUT/html $READTHEDOCS_OUTPUT/$READTHEDOCS_PROJECT
       - ls
       - ls -l $READTHEDOCS_OUTPUT
-      - cd $READTHEDOCS_OUTPUT
+      - cd "$READTHEDOCS_OUTPUT"
       - ls
       - ls -l $READTHEDOCS_PROJECT
       # Hide the "other versions" dropdown. This is a workaround for those versions being shown,
