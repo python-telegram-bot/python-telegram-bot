@@ -26,7 +26,7 @@ def get_packages_requirements(raw: bool = False) -> Tuple[List[str], List[str]]:
     """Build the package & requirements list for this project"""
     reqs = get_requirements()
 
-    exclude = ["tests*"]
+    exclude = ["tests*", "docs*"]
     if raw:
         exclude.append("telegram.ext*")
 
