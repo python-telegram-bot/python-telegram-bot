@@ -4,6 +4,19 @@
 Changelog
 =========
 
+Version 21.0.1
+==============
+
+*Released 2024-03-06*
+
+This is the technical changelog for version 21.0.1. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
+
+Bug Fixes
+---------
+
+-  Remove ``docs`` from Package (:pr:`4150`)
+
+
 Version 21.0
 ============
 
