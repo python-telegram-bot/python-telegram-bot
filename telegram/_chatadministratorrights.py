@@ -73,19 +73,19 @@ class ChatAdministratorRights(TelegramObject):
             stories to the chat.
 
             .. versionadded:: 20.6
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.0
                 |non_optional_story_argument|
         can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit
             stories posted by other users.
 
             .. versionadded:: 20.6
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.0
                 |non_optional_story_argument|
         can_delete_stories (:obj:`bool`): :obj:`True`, if the administrator can delete
             stories posted by other users.
 
             .. versionadded:: 20.6
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.0
                 |non_optional_story_argument|
         can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; for supergroups only.
@@ -121,19 +121,19 @@ class ChatAdministratorRights(TelegramObject):
             stories to the chat.
 
             .. versionadded:: 20.6
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.0
                 |non_optional_story_argument|
         can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit
             stories posted by other users.
 
             .. versionadded:: 20.6
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.0
                 |non_optional_story_argument|
         can_delete_stories (:obj:`bool`): :obj:`True`, if the administrator can delete
             stories posted by other users.
 
             .. versionadded:: 20.6
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.0
                 |non_optional_story_argument|
         can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; for supergroups only.
@@ -192,7 +192,7 @@ class ChatAdministratorRights(TelegramObject):
         # Not actually optionals but because of backwards compatability we pretend they are
         if can_post_stories is None or can_edit_stories is None or can_delete_stories is None:
             raise TypeError(
-                "As of vNEXT.VERSION can_post_stories, can_edit_stories and can_delete_stories"
+                "As of v21.0 can_post_stories, can_edit_stories and can_delete_stories"
                 " must be set in order to create this object."
             )
         self.can_post_stories: bool = can_post_stories

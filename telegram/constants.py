@@ -1708,7 +1708,7 @@ class MessageType(StringEnum):
     BOOST_ADDED = "boost_added"
     """:obj:`str`: Messages with :attr:`telegram.Message.boost_added`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.0
     """
     CHANNEL_CHAT_CREATED = "channel_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
@@ -1810,12 +1810,12 @@ class MessageType(StringEnum):
     REPLY_TO_STORY = "reply_to_story"
     """:obj:`str`: Messages with :attr:`telegram.Message.reply_to_story`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.0
     """
     SENDER_BOOST_COUNT = "sender_boost_count"
     """:obj:`str`: Messages with :attr:`telegram.Message.sender_boost_count`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.0
     """
     STICKER = "sticker"
     """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""

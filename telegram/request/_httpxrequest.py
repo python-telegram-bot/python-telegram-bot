@@ -121,7 +121,7 @@ class HTTPXRequest(BaseRequest):
             different value is passed to :paramref:`do_request.write_timeout` of
             :meth:`do_request`. Defaults to ``20`` seconds.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
 
     """
 

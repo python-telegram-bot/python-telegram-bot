@@ -635,7 +635,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         :paramref:`~telegram.request.HTTPXRequest.media_write_timeout` parameter of
         :attr:`telegram.Bot.request`. Defaults to ``20``.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.0
 
         Args:
             media_write_timeout (:obj:`float`): See

@@ -121,7 +121,7 @@ class MaybeInaccessibleMessage(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_id` and :attr:`chat` are equal
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.0
        ``__bool__`` is no longer overriden and defaults to Pythons standard implementation.
 
     .. versionadded:: 20.8
@@ -244,7 +244,7 @@ class Message(MaybeInaccessibleMessage):
     Note:
         In Python :keyword:`from` is a reserved word. Use :paramref:`from_user` instead.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.0
        Removed deprecated arguments and attributes ``user_shared``, ``forward_from``,
        ``forward_from_chat``, ``forward_from_message_id``, ``forward_signature``,
        ``forward_sender_name`` and ``forward_date``.
@@ -525,15 +525,15 @@ class Message(MaybeInaccessibleMessage):
         reply_to_story (:class:`telegram.Story`, optional): For replies to a story, the original
             story.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
         boost_added (:class:`telegram.ChatBoostAdded`, optional): Service message: user boosted
             the chat.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
         sender_boost_count (:obj:`int`, optional): If the sender of the
             message boosted the chat, the number of boosts added by the user.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -807,15 +807,15 @@ class Message(MaybeInaccessibleMessage):
         reply_to_story (:class:`telegram.Story`): Optional. For replies to a story, the original
             story.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
         boost_added (:class:`telegram.ChatBoostAdded`): Optional. Service message: user boosted
             the chat.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
         sender_boost_count (:obj:`int`): Optional. If the sender of the
             message boosted the chat, the number of boosts added by the user.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a

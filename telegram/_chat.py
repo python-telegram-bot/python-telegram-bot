@@ -223,12 +223,12 @@ class Chat(TelegramObject):
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
             permissions. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
         custom_emoji_sticker_set_name (:obj:`str`, optional): For supergroups, the name of the
             group's custom emoji sticker set. Custom emoji from this set can be used by all users
             and bots in the group. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -366,12 +366,12 @@ class Chat(TelegramObject):
             boosts that a non-administrator user needs to add in order to ignore slow mode and chat
             permissions. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
         custom_emoji_sticker_set_name (:obj:`str`): Optional. For supergroups, the name of the
             group's custom emoji sticker set. Custom emoji from this set can be used by all users
             and bots in the group. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.0
 
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors

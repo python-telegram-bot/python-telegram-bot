@@ -37,7 +37,7 @@ class Story(TelegramObject):
 
     .. versionadded:: 20.5
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.0
         Added attributes :attr:`chat` and :attr:`id` and equality based on them.
 
     Args:

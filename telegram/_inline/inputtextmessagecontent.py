@@ -66,7 +66,7 @@ class InputTextMessageContent(InputMessageContent):
                 argument. PTB will automatically convert this argument to that one, but
                 for advanced options, please use :paramref:`link_preview_options` directly.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.0
                 |keyword_only_arg|
 
     Attributes:

@@ -4,6 +4,54 @@
 Changelog
 =========
 
+Version 21.0
+============
+
+*Released 2024-03-06*
+
+This is the technical changelog for version 21.0. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
+
+Major Changes
+-------------
+
+-  Remove Functionality Deprecated in API 7.0 (:pr:`4114` closes :issue:`4099`)
+-  API 7.1 (:pr:`4118`)
+
+New Features
+------------
+
+-  Add Parameter ``media_write_timeout`` to ``HTTPXRequest`` and Method ``ApplicationBuilder.media_write_timeout`` (:pr:`4120` closes :issue:`3864`)
+-  Handle Properties in ``TelegramObject.__setstate__`` (:pr:`4134` closes :issue:`4111`)
+
+Bug Fixes
+---------
+
+-  Add Missing Slot to ``Updater`` (:pr:`4130` closes :issue:`4127`)
+
+Documentation Improvements
+--------------------------
+
+-  Improve HTML Download of Documentation (:pr:`4146` closes :issue:`4050`)
+-  Documentation Improvements (:pr:`4109`, :issue:`4116`)
+-  Update Copyright to 2024 (:pr:`4121` by `@aelkheir <https://github.com/aelkheir>`__ closes :issue:`4041`)
+
+Internal Changes
+----------------
+
+-  Apply ``pre-commit`` Checks More Widely (:pr:`4135`)
+-  Refactor and Overhaul ``test_official`` (:pr:`4087` closes :issue:`3874`)
+-  Run Unit Tests in PRs on Requirements Changes (:pr:`4144`)
+-  Make ``Updater.stop`` Independent of ``CancelledError`` (:pr:`4126`)
+
+Dependency Updates
+------------------
+
+-  Relax Upper Bound for ``httpx`` Dependency (:pr:`4148`)
+-  Bump ``test-summary/action`` from 2.2 to 2.3 (:pr:`4142`)
+-  Update ``cachetools`` requirement from ~=5.3.2 to ~=5.3.3 (:pr:`4141`)
+-  Update ``httpx`` requirement from ~=0.26.0 to ~=0.27.0 (:pr:`4131`)
+
+
 Version 20.8
 ============
 

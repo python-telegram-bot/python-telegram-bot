@@ -52,7 +52,7 @@ class KeyboardButton(TelegramObject):
           versions released after 3 February, 2023. Older clients will display unsupported
           message.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.0
        Removed deprecated argument and attribute ``request_user``.
     .. versionchanged:: 20.0
        :attr:`web_app` is considered as well when comparing objects of this type in terms of

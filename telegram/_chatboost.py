@@ -42,7 +42,7 @@ class ChatBoostAdded(TelegramObject):
     Two objects of this class are considered equal, if their
     :attr:`boost_count` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.0
 
     Args:
         boost_count (:obj:`int`): Number of boosts added by the user.

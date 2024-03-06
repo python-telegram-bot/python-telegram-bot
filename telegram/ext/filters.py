@@ -2158,7 +2158,7 @@ class StatusUpdate:
         This will only catch the legacy ``user_shared`` field, not the
         new :attr:`telegram.Message.users_shared` attribute!
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.0
        Now relies on :attr:`telegram.TelegramObject.api_kwargs` as the native attribute
        ``Message.user_shared`` was removed.
 
