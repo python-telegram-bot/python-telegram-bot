@@ -11,7 +11,7 @@ repos:
     -   id: ruff
         name: ruff
         additional_dependencies:
-          - httpx~=0.27.0
+          - httpx~=0.27
           - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.3
@@ -33,7 +33,7 @@ repos:
     -   id: pylint
         files: ^(?!(tests|docs)).*\.py$
         additional_dependencies:
-          - httpx~=0.27.0
+          - httpx~=0.27
           - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.3
@@ -49,7 +49,7 @@ repos:
           - types-pytz
           - types-cryptography
           - types-cachetools
-          - httpx~=0.27.0
+          - httpx~=0.27
           - tornado~=6.4
           - APScheduler~=3.10.4
           - cachetools~=5.3.3
