@@ -217,13 +217,13 @@ class ChatMemberAdministrator(ChatMember):
         can_invite_users (:obj:`bool`): :obj:`True`, if the user can invite
             new users to the chat.
         can_post_messages (:obj:`bool`, optional): :obj:`True`, if the
-            administrator can post messages in the channel, or access channel statistics; channels
-            only.
+            administrator can post messages in the channel, or access channel statistics;
+            for channels only.
         can_edit_messages (:obj:`bool`, optional): :obj:`True`, if the
             administrator can edit messages of other users and can pin
-            messages; channels only.
+            messages; for channels only.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
-            to pin messages; groups and supergroups only.
+            to pin messages; for groups and supergroups only.
         can_post_stories (:obj:`bool`): :obj:`True`, if the administrator can post
             stories to the chat.
 
@@ -243,7 +243,7 @@ class ChatMemberAdministrator(ChatMember):
             .. versionchanged:: NEXT.VERSION
                 |non_optional_story_argument|
         can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
-            to create, rename, close, and reopen forum topics; supergroups only.
+            to create, rename, close, and reopen forum topics; for supergroups only.
 
             .. versionadded:: 20.0
         custom_title (:obj:`str`, optional): Custom title for this user.
@@ -277,12 +277,12 @@ class ChatMemberAdministrator(ChatMember):
             new users to the chat.
         can_post_messages (:obj:`bool`): Optional. :obj:`True`, if the
             administrator can post messages in the channel or access channel statistics;
-            channels only.
+            for channels only.
         can_edit_messages (:obj:`bool`): Optional. :obj:`True`, if the
             administrator can edit messages of other users and can pin
-            messages; channels only.
+            messages; for channels only.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
-            to pin messages; groups and supergroups only.
+            to pin messages; for groups and supergroups only.
         can_post_stories (:obj:`bool`): :obj:`True`, if the administrator can post
             stories to the chat.
 
@@ -302,7 +302,7 @@ class ChatMemberAdministrator(ChatMember):
             .. versionchanged:: NEXT.VERSION
                 |non_optional_story_argument|
         can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
-            to create, rename, close, and reopen forum topics; supergroups only
+            to create, rename, close, and reopen forum topics; for supergroups only
 
             .. versionadded:: 20.0
         custom_title (:obj:`str`): Optional. Custom title for this user.

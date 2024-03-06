@@ -20,7 +20,13 @@ bot.
 
 import logging
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, helpers
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    LinkPreviewOptions,
+    Update,
+    helpers,
+)
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, filters
 
@@ -70,7 +76,9 @@ async def deep_linked_level_2(update: Update, context: ContextTypes.DEFAULT_TYPE
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, USING_ENTITIES)
     text = f'You can also mask the deep-linked URLs as links: <a href="{url}">▶️ CLICK HERE</a>.'
-    await update.message.reply_text(text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+    await update.message.reply_text(
+        text, parse_mode=ParseMode.HTML, link_preview_options=LinkPreviewOptions(is_disabled=True)
+    )
 
 
 async def deep_linked_level_3(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

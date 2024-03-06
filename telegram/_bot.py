@@ -1110,10 +1110,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            message_ids (Sequence[:obj:`int`]): Identifiers of
+            message_ids (Sequence[:obj:`int`]): A list of
                 :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT`-
-                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` messages to delete.
-                See :meth:`delete_message` for limitations on which messages can be deleted.
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` identifiers of messages
+                to delete. See :meth:`delete_message` for limitations on which messages can be
+                deleted.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -1225,11 +1226,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
-            message_ids (Sequence[:obj:`int`]): Identifiers of
+            message_ids (Sequence[:obj:`int`]): A list of
                 :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT`-
-                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` messages in the chat
-                :paramref:`from_chat_id` to forward. The identifiers must be specified in a
-                strictly increasing order.
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` identifiers of messages
+                in the chat :paramref:`from_chat_id` to forward. The identifiers must be specified
+                in a strictly increasing order.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
@@ -4127,10 +4128,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
                 Specify an empty sequence to receive all updates except
-                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
-                setting will be used. Please note that this parameter doesn't affect updates
-                created before the call to the get_updates, so unwanted updates may be received for
-                a short period of time.
+                :attr:`telegram.Update.chat_member`, :attr:`telegram.Update.message_reaction` and
+                :attr:`telegram.Update.message_reaction_count` (default). If not specified, the
+                previous setting will be used. Please note that this parameter doesn't affect
+                updates created before the call to the get_updates, so unwanted updates may be
+                received for a short period of time.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
@@ -4268,10 +4270,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
                 Specify an empty sequence to receive all updates except
-                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
-                setting will be used. Please note that this parameter doesn't affect updates
-                created before the call to the set_webhook, so unwanted updates may be received for
-                a short period of time.
+                :attr:`telegram.Update.chat_member`,
+                :attr:`telegram.Update.message_reaction`
+                and :attr:`telegram.Update.message_reaction_count` (default). If not
+                specified, the previous setting will be used. Please note that this
+                parameter doesn't affect
+                updates created before the call to the set_webhook, so unwanted update
+                may be received for a short period of time.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
@@ -5265,9 +5270,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
             can_post_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                post messages in the channel, or access channel statistics; channels only.
+                post messages in the channel, or access channel statistics; for channels only.
             can_edit_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                edit messages of other users and can pin messages, channels only.
+                edit messages of other users and can pin messages, for channels only.
             can_delete_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 delete messages of other users.
             can_invite_users (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -5275,13 +5280,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             can_restrict_members (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
                 can restrict, ban or unban chat members, or access supergroup statistics.
             can_pin_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                pin messages, supergroups only.
+                pin messages, for supergroups only.
             can_promote_members (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 add new administrators with a subset of their own privileges or demote
                 administrators that they have promoted, directly or indirectly
                 (promoted by administrators that were appointed by the user).
             can_manage_topics (:obj:`bool`, optional): Pass :obj:`True`, if the user is
-                allowed to create, rename, close, and reopen forum topics; supergroups only.
+                allowed to create, rename, close, and reopen forum topics; for supergroups only.
 
                 .. versionadded:: 20.0
             can_post_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -7577,11 +7582,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
-            message_ids (Sequence[:obj:`int`]): Identifiers of
+            message_ids (Sequence[:obj:`int`]): A list of
                 :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT` -
-                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` messages in the chat.
-                :paramref:`from_chat_id` to copy. The identifiers must be specified in a strictly
-                increasing order.
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` identifiers of messages
+                in the chat :paramref:`from_chat_id` to copy. The identifiers must be
+                specified in a strictly increasing order.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
@@ -8731,7 +8736,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 media group, the reaction is set to the first non-deleted message in the group
                 instead.
             reaction (Sequence[:class:`telegram.ReactionType` | :obj:`str`] | \
-                :class:`telegram.ReactionType` | :obj:`str`, optional): New list of reaction
+                :class:`telegram.ReactionType` | :obj:`str`, optional): A list of reaction
                 types to set on the message. Currently, as non-premium users, bots can set up to
                 one reaction per message. A custom emoji reaction can be used if it is either
                 already present on the message or explicitly allowed by chat administrators.
