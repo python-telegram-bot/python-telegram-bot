@@ -48,7 +48,7 @@ exclude-protected = ["_unfrozen"]
 # PYTEST:
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--no-success-flaky-report -rsxX"
+addopts = "--no-success-flaky-report -rX"
 filterwarnings = [
     "error",
     "ignore::DeprecationWarning",

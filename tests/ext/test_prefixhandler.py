@@ -25,7 +25,7 @@ from tests.ext.test_commandhandler import BaseTest, is_match
 
 
 def combinations(prefixes, commands):
-    return (prefix + command for prefix in prefixes for command in commands)
+    return [prefix + command for prefix in prefixes for command in commands]
 
 
 class TestPrefixHandler(BaseTest):
@@ -94,12 +94,12 @@ class TestPrefixHandler(BaseTest):
         assert isinstance(handler.commands, frozenset)
         assert handler.commands == {"#cmd", "#bmd"}
 
-    def test_single_multi_prefixes_commands(self, prefixes, commands, prefix_message_update):
+    def test_single_multi_prefixes_commands(self, prefix_message_update):
         """Test various combinations of prefixes and commands"""
         handler = self.make_default_handler()
         result = is_match(handler, prefix_message_update)
-        expected = prefix_message_update.message.text in combinations(prefixes, commands)
-        return result == expected
+        expected = prefix_message_update.message.text in self.COMBINATIONS
+        assert result == expected
 
     def test_edited(self, prefix_message):
         handler_edited = self.make_default_handler()
