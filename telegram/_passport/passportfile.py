@@ -203,5 +203,6 @@ class PassportFile(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        file.set_credentials(self._credentials)
+        if self._credentials:
+            file.set_credentials(self._credentials)
         return file
