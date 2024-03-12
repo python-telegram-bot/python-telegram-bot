@@ -671,11 +671,22 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         _LOGGER.info("Application is stopping. This might take a moment.")
 
         # Stop listening for new updates and handle all pending ones
-        await self.update_queue.put(_STOP_SIGNAL)
-        _LOGGER.debug("Waiting for update_queue to join")
-        await self.update_queue.join()
         if self.__update_fetcher_task:
-            await self.__update_fetcher_task
+            if self.__update_fetcher_task.done():
+                try:
+                    self.__update_fetcher_task.result()
+                except BaseException as exc:
+                    _LOGGER.critical(
+                        "Fetching updates was aborted due to %s. Suppressing "
+                        "exception to ensure graceful shutdown.",
+                        exc,
+                        exc_info=True,
+                    )
+            else:
+                await self.update_queue.put(_STOP_SIGNAL)
+                _LOGGER.debug("Waiting for update_queue to join")
+                await self.update_queue.join()
+                await self.__update_fetcher_task
         _LOGGER.debug("Application stopped fetching of updates.")
 
         if self._job_queue:
@@ -1207,10 +1218,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     "Fetching updates got a asyncio.CancelledError. Ignoring as this task may only"
                     "be closed via `Application.stop`."
                 )
+            finally:
+                while not self.update_queue.empty():
+                    self.update_queue.get_nowait()
+                    self.update_queue.task_done()
 
     async def __process_update_wrapper(self, update: object) -> None:
-        await self._update_processor.process_update(update, self.process_update(update))
-        self.update_queue.task_done()
+        try:
+            await self._update_processor.process_update(update, self.process_update(update))
+        finally:
+            self.update_queue.task_done()
 
     async def process_update(self, update: object) -> None:
         """Processes a single update and marks the update to be updated by the persistence later.
