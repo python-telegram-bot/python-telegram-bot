@@ -25,6 +25,7 @@ from pathlib import Path
 from random import randrange
 
 import pytest
+from tornado.netutil import bind_unix_socket
 
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -692,7 +693,7 @@ class TestUpdater:
     @pytest.mark.parametrize("ext_bot", [True, False])
     @pytest.mark.parametrize("drop_pending_updates", [True, False])
     @pytest.mark.parametrize("secret_token", ["SecretToken", None])
-    @pytest.mark.parametrize("unix", [None, True])
+    @pytest.mark.parametrize("unix", [None, 1, 2])
     async def test_webhook_basic(
         self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token, unix, file_path
     ):
@@ -723,11 +724,12 @@ class TestUpdater:
 
         async with updater:
             if unix:
+                socket = file_path if unix == 1 else bind_unix_socket(file_path)
                 return_value = await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
                     secret_token=secret_token,
                     url_path="TOKEN",
-                    unix=file_path,
+                    unix=socket,
                     webhook_url="string",
                 )
             else:
@@ -815,10 +817,11 @@ class TestUpdater:
 
             # We call the same logic twice to make sure that restarting the updater works as well
             if unix:
+                socket = file_path if unix == 1 else bind_unix_socket(file_path)
                 await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
                     secret_token=secret_token,
-                    unix=file_path,
+                    unix=socket,
                     webhook_url="string",
                 )
             else:
