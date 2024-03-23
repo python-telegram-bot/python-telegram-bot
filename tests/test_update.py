@@ -51,7 +51,14 @@ from telegram._utils.datetime import from_timestamp
 from telegram.warnings import PTBUserWarning
 from tests.auxil.slots import mro_slots
 
-message = Message(1, datetime.utcnow(), Chat(1, ""), from_user=User(1, "", False), text="Text")
+message = Message(
+    1,
+    datetime.utcnow(),
+    Chat(1, ""),
+    from_user=User(1, "", False),
+    text="Text",
+    sender_chat=Chat(1, ""),
+)
 chat_member_updated = ChatMemberUpdated(
     Chat(1, "chat"),
     User(1, "", False),
@@ -93,6 +100,7 @@ message_reaction = MessageReactionUpdated(
     old_reaction=(ReactionTypeEmoji("👍"),),
     new_reaction=(ReactionTypeEmoji("👍"),),
     user=User(1, "name", False),
+    actor_chat=Chat(1, ""),
 )
 
 
@@ -260,6 +268,47 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             assert user.id == 1
         else:
             assert user is None
+
+    def test_effective_sender(self, update):
+        # Test that it's sometimes None per docstring
+        sender = update.effective_sender
+        if not (
+            update.channel_post is not None
+            or update.edited_channel_post is not None
+            or update.poll is not None
+            or update.chat_boost is not None
+            or update.removed_chat_boost is not None
+            or update.message_reaction_count is not None
+        ):
+            assert sender.id == 1
+        else:
+            assert sender is None
+
+    def test_effective_sender_anonymous(self, update):
+        # remove none anonymous user
+        if message := (update.message or update.edited_message):
+            message._unfreeze()
+            message.from_user = None
+        elif reaction := (update.message_reaction):
+            reaction._unfreeze()
+            reaction.user = None
+        elif answer := (update.poll_answer):
+            answer._unfreeze()
+            answer.user = None
+
+        # Test that it's sometimes None per docstring
+        sender = update.effective_sender
+        if not (
+            update.channel_post is not None
+            or update.edited_channel_post is not None
+            or update.poll is not None
+            or update.chat_boost is not None
+            or update.removed_chat_boost is not None
+            or update.message_reaction_count is not None
+        ):
+            assert sender.id == 1
+        else:
+            assert sender is None
 
     def test_effective_message(self, update):
         # Test that it's sometimes None per docstring
