@@ -793,7 +793,7 @@ class Updater(AsyncContextManager["Updater"]):
             if drop_pending_updates:
                 _LOGGER.debug("Dropping pending updates from Telegram server")
             await self.bot.set_webhook(
-                url=webhook_url,
+                url=webhook_url,  # type: ignore[arg-type]
                 certificate=cert,
                 allowed_updates=allowed_updates,
                 ip_address=ip_address,
