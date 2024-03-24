@@ -38,8 +38,15 @@ from tests.auxil.networking import send_webhook_message
 from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.slots import mro_slots
 
+UNIX_AVAILABLE = False
+
 if TEST_WITH_OPT_DEPS:
-    from tornado.netutil import bind_unix_socket
+    try:
+        from tornado.netutil import bind_unix_socket
+
+        UNIX_AVAILABLE = True
+    except ImportError:
+        UNIX_AVAILABLE = False
 
     from telegram.ext._utils.webhookhandler import WebhookServer
 
@@ -699,8 +706,8 @@ class TestUpdater:
         self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token, unix, file_path
     ):
         # Skipping unix test on windows since they fail
-        if unix and platform.system() == "Windows":
-            pytest.skip("Windows doesn't support unix bind")
+        if unix and not UNIX_AVAILABLE:
+            pytest.skip("Unix not available")
         # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
         # that depends on this distinction works
         if ext_bot and not isinstance(updater.bot, ExtBot):
@@ -724,7 +731,7 @@ class TestUpdater:
         port = randrange(1024, 49152)  # Select random port
 
         async with updater:
-            if unix:
+            if unix and UNIX_AVAILABLE:
                 socket = file_path if unix == "file_path" else bind_unix_socket(file_path)
                 return_value = await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
@@ -817,7 +824,7 @@ class TestUpdater:
                 assert self.message_count == 0
 
             # We call the same logic twice to make sure that restarting the updater works as well
-            if unix:
+            if unix and UNIX_AVAILABLE:
                 socket = file_path if unix == "file_path" else bind_unix_socket(file_path)
                 await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
