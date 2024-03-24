@@ -21,7 +21,6 @@
 import asyncio
 import contextlib
 import copy
-import functools
 import pickle
 from datetime import datetime
 from types import TracebackType
@@ -531,20 +530,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         warn(message=message, category=category, stacklevel=stacklevel + 1)
 
-    # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
-    # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
-    def _log(func: Any):  # type: ignore[no-untyped-def] # skipcq: PY-D0003
-        @functools.wraps(func)
-        async def decorator(self: "Bot", *args: Any, **kwargs: Any) -> Any:
-            # pylint: disable=protected-access
-            self._LOGGER.debug("Entering: %s", func.__name__)
-            result = await func(self, *args, **kwargs)
-            self._LOGGER.debug(result)
-            self._LOGGER.debug("Exiting: %s", func.__name__)
-            return result
-
-        return decorator
-
     def _parse_file_input(
         self,
         file_input: Union[FileInput, "TelegramObject"],
@@ -654,7 +639,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         request = self._request[0] if endpoint == "getUpdates" else self._request[1]
 
-        return await request.post(
+        self._LOGGER.debug("Calling Bot API endpoint `%s` with parameters `%s`", endpoint, data)
+        result = await request.post(
             url=f"{self._base_url}/{endpoint}",
             request_data=request_data,
             read_timeout=read_timeout,
@@ -662,6 +648,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
         )
+        self._LOGGER.debug(
+            "Call to Bot API endpoint `%s` finished with return value `%s`", endpoint, result
+        )
+
+        return result
 
     async def _send_message(
         self,
@@ -784,7 +775,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())
         self._initialized = False
 
-    @_log
     async def do_api_request(
         self,
         endpoint: str,
@@ -843,7 +833,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     f"'Bot.do_api_request(\"{endpoint}\", ...)'"
                 ),
                 PTBDeprecationWarning,
-                stacklevel=3,
+                stacklevel=2,
             )
 
         camel_case_endpoint = to_camel_case(endpoint)
@@ -879,7 +869,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             return return_type.de_list(result, self)
         return return_type.de_json(result, self)
 
-    @_log
     async def get_me(
         self,
         *,
@@ -910,7 +899,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self._bot_user = User.de_json(result, self)
         return self._bot_user  # type: ignore[return-value]
 
-    @_log
     async def send_message(
         self,
         chat_id: Union[int, str],
@@ -1031,7 +1019,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_message(
         self,
         chat_id: Union[str, int],
@@ -1090,7 +1077,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_messages(
         self,
         chat_id: Union[int, str],
@@ -1133,7 +1119,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def forward_message(
         self,
         chat_id: Union[int, str],
@@ -1199,7 +1184,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def forward_messages(
         self,
         chat_id: Union[int, str],
@@ -1262,7 +1246,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         return MessageId.de_list(result, self)
 
-    @_log
     async def send_photo(
         self,
         chat_id: Union[int, str],
@@ -1395,7 +1378,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_audio(
         self,
         chat_id: Union[int, str],
@@ -1543,7 +1525,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_document(
         self,
         chat_id: Union[int, str],
@@ -1684,7 +1665,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_sticker(
         self,
         chat_id: Union[int, str],
@@ -1793,7 +1773,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_video(
         self,
         chat_id: Union[int, str],
@@ -1953,7 +1932,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_video_note(
         self,
         chat_id: Union[int, str],
@@ -2086,7 +2064,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_animation(
         self,
         chat_id: Union[int, str],
@@ -2238,7 +2215,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_voice(
         self,
         chat_id: Union[int, str],
@@ -2375,7 +2351,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_media_group(
         self,
         chat_id: Union[int, str],
@@ -2539,7 +2514,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return Message.de_list(result, self)
 
-    @_log
     async def send_location(
         self,
         chat_id: Union[int, str],
@@ -2675,7 +2649,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_message_live_location(
         self,
         chat_id: Optional[Union[str, int]] = None,
@@ -2770,7 +2743,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def stop_message_live_location(
         self,
         chat_id: Optional[Union[str, int]] = None,
@@ -2818,7 +2790,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_venue(
         self,
         chat_id: Union[int, str],
@@ -2965,7 +2936,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_contact(
         self,
         chat_id: Union[int, str],
@@ -3089,7 +3059,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_game(
         self,
         chat_id: int,
@@ -3175,7 +3144,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_chat_action(
         self,
         chat_id: Union[str, int],
@@ -3319,7 +3287,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return res
 
-    @_log
     async def answer_inline_query(
         self,
         inline_query_id: str,
@@ -3417,7 +3384,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_user_profile_photos(
         self,
         user_id: int,
@@ -3462,7 +3428,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def get_file(
         self,
         file_id: Union[
@@ -3528,7 +3493,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return File.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def ban_chat_member(
         self,
         chat_id: Union[str, int],
@@ -3592,7 +3556,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def ban_chat_sender_chat(
         self,
         chat_id: Union[str, int],
@@ -3636,7 +3599,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unban_chat_member(
         self,
         chat_id: Union[str, int],
@@ -3681,7 +3643,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unban_chat_sender_chat(
         self,
         chat_id: Union[str, int],
@@ -3722,7 +3683,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def answer_callback_query(
         self,
         callback_query_id: str,
@@ -3788,7 +3748,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_message_text(
         self,
         text: str,
@@ -3890,7 +3849,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_message_caption(
         self,
         chat_id: Optional[Union[str, int]] = None,
@@ -3960,7 +3918,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_message_media(
         self,
         media: "InputMedia",
@@ -4024,7 +3981,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_message_reply_markup(
         self,
         chat_id: Optional[Union[str, int]] = None,
@@ -4080,7 +4036,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_updates(
         self,
         offset: Optional[int] = None,
@@ -4164,7 +4119,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     "the property `read_timeout`. Overriding this property will be mandatory in "
                     "future versions. Using 2 seconds as fallback.",
                     PTBDeprecationWarning,
-                    stacklevel=3,
+                    stacklevel=2,
                 )
 
         # Ideally we'd use an aggressive read timeout for the polling. However,
@@ -4192,7 +4147,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return Update.de_list(result, self)
 
-    @_log
     async def set_webhook(
         self,
         url: str,
@@ -4320,7 +4274,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_webhook(
         self,
         drop_pending_updates: Optional[bool] = None,
@@ -4358,7 +4311,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def leave_chat(
         self,
         chat_id: Union[str, int],
@@ -4393,7 +4345,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_chat(
         self,
         chat_id: Union[str, int],
@@ -4432,7 +4383,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return Chat.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def get_chat_administrators(
         self,
         chat_id: Union[str, int],
@@ -4474,7 +4424,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         return ChatMember.de_list(result, self)
 
-    @_log
     async def get_chat_member_count(
         self,
         chat_id: Union[str, int],
@@ -4510,7 +4459,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_chat_member(
         self,
         chat_id: Union[str, int],
@@ -4548,7 +4496,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         return ChatMember.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def set_chat_sticker_set(
         self,
         chat_id: Union[str, int],
@@ -4584,7 +4531,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_chat_sticker_set(
         self,
         chat_id: Union[str, int],
@@ -4617,7 +4563,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_webhook_info(
         self,
         *,
@@ -4646,7 +4591,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         return WebhookInfo.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def set_game_score(
         self,
         user_id: int,
@@ -4711,7 +4655,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_game_high_scores(
         self,
         user_id: int,
@@ -4772,7 +4715,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return GameHighScore.de_list(result, self)
 
-    @_log
     async def send_invoice(
         self,
         chat_id: Union[int, str],
@@ -4977,7 +4919,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def answer_shipping_query(
         self,
         shipping_query_id: str,
@@ -5036,7 +4977,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def answer_pre_checkout_query(
         self,
         pre_checkout_query_id: str,
@@ -5093,7 +5033,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def answer_web_app_query(
         self,
         web_app_query_id: str,
@@ -5140,7 +5079,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return SentWebAppMessage.de_json(api_result, self)  # type: ignore[return-value]
 
-    @_log
     async def restrict_chat_member(
         self,
         chat_id: Union[str, int],
@@ -5214,7 +5152,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def promote_chat_member(
         self,
         chat_id: Union[str, int],
@@ -5339,7 +5276,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_chat_permissions(
         self,
         chat_id: Union[str, int],
@@ -5398,7 +5334,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_chat_administrator_custom_title(
         self,
         chat_id: Union[int, str],
@@ -5441,7 +5376,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def export_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -5485,7 +5419,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def create_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -5563,7 +5496,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def edit_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -5645,7 +5577,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def revoke_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -5693,7 +5624,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def approve_chat_join_request(
         self,
         chat_id: Union[str, int],
@@ -5734,7 +5664,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def decline_chat_join_request(
         self,
         chat_id: Union[str, int],
@@ -5775,7 +5704,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_chat_photo(
         self,
         chat_id: Union[str, int],
@@ -5822,7 +5750,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_chat_photo(
         self,
         chat_id: Union[str, int],
@@ -5859,7 +5786,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_chat_title(
         self,
         chat_id: Union[str, int],
@@ -5900,7 +5826,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_chat_description(
         self,
         chat_id: Union[str, int],
@@ -5942,7 +5867,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def pin_chat_message(
         self,
         chat_id: Union[str, int],
@@ -5992,7 +5916,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unpin_chat_message(
         self,
         chat_id: Union[str, int],
@@ -6035,7 +5958,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unpin_all_chat_messages(
         self,
         chat_id: Union[str, int],
@@ -6074,7 +5996,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_sticker_set(
         self,
         name: str,
@@ -6109,7 +6030,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         return StickerSet.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def get_custom_emoji_stickers(
         self,
         custom_emoji_ids: Sequence[str],
@@ -6153,7 +6073,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return Sticker.de_list(result, self)
 
-    @_log
     async def upload_sticker_file(
         self,
         user_id: int,
@@ -6213,7 +6132,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return File.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def add_sticker_to_set(
         self,
         user_id: int,
@@ -6275,7 +6193,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_position_in_set(
         self,
         sticker: str,
@@ -6311,7 +6228,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def create_new_sticker_set(
         self,
         user_id: int,
@@ -6410,7 +6326,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_sticker_from_set(
         self,
         sticker: str,
@@ -6444,7 +6359,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_sticker_set(
         self,
         name: str,
@@ -6481,7 +6395,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_set_thumbnail(
         self,
         name: str,
@@ -6546,7 +6459,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_set_title(
         self,
         name: str,
@@ -6587,7 +6499,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_emoji_list(
         self,
         sticker: str,
@@ -6629,7 +6540,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_keywords(
         self,
         sticker: str,
@@ -6671,7 +6581,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_mask_position(
         self,
         sticker: str,
@@ -6712,7 +6621,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_custom_emoji_sticker_set_thumbnail(
         self,
         name: str,
@@ -6754,7 +6662,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_passport_data_errors(
         self,
         user_id: int,
@@ -6801,7 +6708,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_poll(
         self,
         chat_id: Union[int, str],
@@ -6958,7 +6864,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def stop_poll(
         self,
         chat_id: Union[int, str],
@@ -7004,7 +6909,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return Poll.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def send_dice(
         self,
         chat_id: Union[int, str],
@@ -7105,7 +7009,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_my_default_administrator_rights(
         self,
         for_channels: Optional[bool] = None,
@@ -7147,7 +7050,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         return ChatAdministratorRights.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def set_my_default_administrator_rights(
         self,
         rights: Optional[ChatAdministratorRights] = None,
@@ -7193,7 +7095,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_my_commands(
         self,
         scope: Optional[BotCommandScope] = None,
@@ -7247,7 +7148,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         return BotCommand.de_list(result, self)
 
-    @_log
     async def set_my_commands(
         self,
         commands: Sequence[Union[BotCommand, Tuple[str, str]]],
@@ -7312,7 +7212,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_my_commands(
         self,
         scope: Optional[BotCommandScope] = None,
@@ -7360,7 +7259,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def log_out(
         self,
         *,
@@ -7393,7 +7291,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def close(
         self,
         *,
@@ -7425,7 +7322,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def copy_message(
         self,
         chat_id: Union[int, str],
@@ -7551,7 +7447,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return MessageId.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def copy_messages(
         self,
         chat_id: Union[int, str],
@@ -7622,7 +7517,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return MessageId.de_list(result, self)
 
-    @_log
     async def set_chat_menu_button(
         self,
         chat_id: Optional[int] = None,
@@ -7664,7 +7558,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_chat_menu_button(
         self,
         chat_id: Optional[int] = None,
@@ -7704,7 +7597,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return MenuButton.de_json(result, bot=self)  # type: ignore[return-value]
 
-    @_log
     async def create_invoice_link(
         self,
         title: str,
@@ -7833,7 +7725,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_forum_topic_icon_stickers(
         self,
         *,
@@ -7865,7 +7756,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return Sticker.de_list(result, self)
 
-    @_log
     async def create_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -7925,7 +7815,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return ForumTopic.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def edit_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -7982,7 +7871,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def close_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8027,7 +7915,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def reopen_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8072,7 +7959,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8116,7 +8002,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unpin_all_forum_topic_messages(
         self,
         chat_id: Union[str, int],
@@ -8161,7 +8046,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unpin_all_general_forum_topic_messages(
         self,
         chat_id: Union[str, int],
@@ -8201,7 +8085,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8245,7 +8128,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def close_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8285,7 +8167,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def reopen_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8326,7 +8207,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def hide_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8367,7 +8247,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unhide_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8407,7 +8286,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_my_description(
         self,
         description: Optional[str] = None,
@@ -8453,7 +8331,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_my_short_description(
         self,
         short_description: Optional[str] = None,
@@ -8499,7 +8376,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_my_description(
         self,
         language_code: Optional[str] = None,
@@ -8538,7 +8414,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
-    @_log
     async def get_my_short_description(
         self,
         language_code: Optional[str] = None,
@@ -8578,7 +8453,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
-    @_log
     async def set_my_name(
         self,
         name: Optional[str] = None,
@@ -8627,7 +8501,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_my_name(
         self,
         language_code: Optional[str] = None,
@@ -8666,7 +8539,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
-    @_log
     async def get_user_chat_boosts(
         self,
         chat_id: Union[str, int],
@@ -8709,7 +8581,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
-    @_log
     async def set_message_reaction(
         self,
         chat_id: Union[str, int],
