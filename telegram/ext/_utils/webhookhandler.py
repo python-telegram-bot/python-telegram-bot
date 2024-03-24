@@ -76,18 +76,18 @@ class WebhookServer:
         self.listen = listen
         self.port = port
         self.is_running = False
-        self.unix = unix
+        self.unix = None
+        if unix and isinstance(unix, socket):
+            self.unix = unix
+        elif unix:
+            self.unix = bind_unix_socket(str(unix))
         self._server_lock = asyncio.Lock()
         self._shutdown_lock = asyncio.Lock()
 
     async def serve_forever(self, ready: Optional[asyncio.Event] = None) -> None:
         async with self._server_lock:
             if self.unix:
-                if isinstance(self.unix, socket):
-                    tornado_socket = self.unix
-                else:
-                    tornado_socket = bind_unix_socket(str(self.unix))
-                self._http_server.add_socket(tornado_socket)
+                self._http_server.add_socket(self.unix)
             else:
                 self._http_server.listen(self.port, address=self.listen)
 
