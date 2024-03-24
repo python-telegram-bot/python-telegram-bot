@@ -140,12 +140,6 @@ html_theme_options = {
         "admonition-title-font-size": "0.95rem",
         "admonition-font-size": "0.92rem",
     },
-    "announcement": (
-        "PTB has undergone significant changes in v20. Please read the documentation "
-        "carefully and also check out the transition guide in the "
-        '<a href="https://github.com/python-telegram-bot/python-telegram-bot/wiki/'
-        'Transition-guide-to-Version-20.0">wiki</a>.'
-    ),
     "footer_icons": [
         {
             # Telegram channel logo
