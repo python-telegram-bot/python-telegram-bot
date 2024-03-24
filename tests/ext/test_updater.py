@@ -25,7 +25,6 @@ from pathlib import Path
 from random import randrange
 
 import pytest
-from tornado.netutil import bind_unix_socket
 
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -40,6 +39,8 @@ from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.slots import mro_slots
 
 if TEST_WITH_OPT_DEPS:
+    from tornado.netutil import bind_unix_socket
+
     from telegram.ext._utils.webhookhandler import WebhookServer
 
 
