@@ -546,14 +546,14 @@ class Updater(AsyncContextManager["Updater"]):
             unix (:class:`pathlib.Path` | :obj:`str` | :class:`socket.socket`, optional): Can be
                 either:
 
-                * the path to the unix socket file as :class:`pathlib.Path` or :obj:`str`, which
+                * the path to the unix socket file as :class:`pathlib.Path` or :obj:`str`. This
                   will be passed to `tornado.netutil.bind_unix_socket <https://www.tornadoweb.org/
-                  en/stable/netutil.html#tornado.netutil.bind_unix_socket>`_ to create the socket
-                  (Path does not need to exist, in which case the file will be created)
+                  en/stable/netutil.html#tornado.netutil.bind_unix_socket>`_ to create the socket.
+                  If the Path does not exist, the file will be created.
 
-                * or the socket itself. This allows you to e.g. restrict the permissions of the
-                  socket for improved security, however you need to pass the correct family, type
-                  and socket options yourself.
+                * or the socket itself. This option allows you to e.g. restrict the permissions of
+                  the socket for improved security. Note that you need to pass the correct family,
+                  type and socket options yourself.
 
                 Caution:
                     This parameter is a replacement for the default TCP bind. Therefore, it is
