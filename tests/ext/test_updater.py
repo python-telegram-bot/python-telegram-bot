@@ -38,7 +38,16 @@ from tests.auxil.networking import send_webhook_message
 from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.slots import mro_slots
 
+UNIX_AVAILABLE = False
+
 if TEST_WITH_OPT_DEPS:
+    try:
+        from tornado.netutil import bind_unix_socket
+
+        UNIX_AVAILABLE = True
+    except ImportError:
+        UNIX_AVAILABLE = False
+
     from telegram.ext._utils.webhookhandler import WebhookServer
 
 
@@ -692,13 +701,12 @@ class TestUpdater:
     @pytest.mark.parametrize("ext_bot", [True, False])
     @pytest.mark.parametrize("drop_pending_updates", [True, False])
     @pytest.mark.parametrize("secret_token", ["SecretToken", None])
-    @pytest.mark.parametrize("unix", [None, True])
+    @pytest.mark.parametrize(
+        "unix", [None, "file_path", "socket_object"] if UNIX_AVAILABLE else [None]
+    )
     async def test_webhook_basic(
         self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token, unix, file_path
     ):
-        # Skipping unix test on windows since they fail
-        if unix and platform.system() == "Windows":
-            pytest.skip("Windows doesn't support unix bind")
         # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
         # that depends on this distinction works
         if ext_bot and not isinstance(updater.bot, ExtBot):
@@ -723,11 +731,12 @@ class TestUpdater:
 
         async with updater:
             if unix:
+                socket = file_path if unix == "file_path" else bind_unix_socket(file_path)
                 return_value = await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
                     secret_token=secret_token,
                     url_path="TOKEN",
-                    unix=file_path,
+                    unix=socket,
                     webhook_url="string",
                 )
             else:
@@ -815,10 +824,11 @@ class TestUpdater:
 
             # We call the same logic twice to make sure that restarting the updater works as well
             if unix:
+                socket = file_path if unix == "file_path" else bind_unix_socket(file_path)
                 await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
                     secret_token=secret_token,
-                    unix=file_path,
+                    unix=socket,
                     webhook_url="string",
                 )
             else:
