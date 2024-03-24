@@ -113,6 +113,7 @@ if TYPE_CHECKING:
     from telegram.ext import BaseRateLimiter, Defaults
 
 HandledTypes = TypeVar("HandledTypes", bound=Union[Message, CallbackQuery, Chat])
+KT = TypeVar("KT", bound=ReplyMarkup)
 
 
 class ExtBot(Bot, Generic[RLARGS]):
@@ -485,11 +486,14 @@ class ExtBot(Bot, Generic[RLARGS]):
 
                 data[key] = new_value
 
-    def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
+    def _replace_keyboard(self, reply_markup: Optional[KT]) -> Optional[KT]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
         # CallbackDataCache build a new keyboard with the data replaced. Otherwise return the input
         if isinstance(reply_markup, InlineKeyboardMarkup) and self.callback_data_cache is not None:
-            return self.callback_data_cache.process_keyboard(reply_markup)
+            # for some reason mypy doesn't understand that IKB is a subtype of Optional[KT]
+            return self.callback_data_cache.process_keyboard(  # type: ignore[return-value]
+                reply_markup
+            )
 
         return reply_markup
 
