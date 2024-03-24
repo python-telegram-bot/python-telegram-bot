@@ -694,7 +694,7 @@ class TestUpdater:
     @pytest.mark.parametrize("ext_bot", [True, False])
     @pytest.mark.parametrize("drop_pending_updates", [True, False])
     @pytest.mark.parametrize("secret_token", ["SecretToken", None])
-    @pytest.mark.parametrize("unix", [None, 1, 2])
+    @pytest.mark.parametrize("unix", [None, "file_path", "socket_object"])
     async def test_webhook_basic(
         self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token, unix, file_path
     ):
@@ -725,7 +725,7 @@ class TestUpdater:
 
         async with updater:
             if unix:
-                socket = file_path if unix == 1 else bind_unix_socket(file_path)
+                socket = file_path if unix == "file_path" else bind_unix_socket(file_path)
                 return_value = await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
                     secret_token=secret_token,
@@ -818,7 +818,7 @@ class TestUpdater:
 
             # We call the same logic twice to make sure that restarting the updater works as well
             if unix:
-                socket = file_path if unix == 1 else bind_unix_socket(file_path)
+                socket = file_path if unix == "file_path" else bind_unix_socket(file_path)
                 await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
                     secret_token=secret_token,
