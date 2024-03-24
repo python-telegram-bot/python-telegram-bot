@@ -701,13 +701,12 @@ class TestUpdater:
     @pytest.mark.parametrize("ext_bot", [True, False])
     @pytest.mark.parametrize("drop_pending_updates", [True, False])
     @pytest.mark.parametrize("secret_token", ["SecretToken", None])
-    @pytest.mark.parametrize("unix", [None, "file_path", "socket_object"])
+    @pytest.mark.parametrize(
+        "unix", [None, "file_path", "socket_object"] if UNIX_AVAILABLE else [None]
+    )
     async def test_webhook_basic(
         self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token, unix, file_path
     ):
-        # Skipping unix test on windows since they fail
-        if unix and not UNIX_AVAILABLE:
-            pytest.skip("Unix not available")
         # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
         # that depends on this distinction works
         if ext_bot and not isinstance(updater.bot, ExtBot):
@@ -731,7 +730,7 @@ class TestUpdater:
         port = randrange(1024, 49152)  # Select random port
 
         async with updater:
-            if unix and UNIX_AVAILABLE:
+            if unix:
                 socket = file_path if unix == "file_path" else bind_unix_socket(file_path)
                 return_value = await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
@@ -824,7 +823,7 @@ class TestUpdater:
                 assert self.message_count == 0
 
             # We call the same logic twice to make sure that restarting the updater works as well
-            if unix and UNIX_AVAILABLE:
+            if unix:
                 socket = file_path if unix == "file_path" else bind_unix_socket(file_path)
                 await updater.start_webhook(
                     drop_pending_updates=drop_pending_updates,
