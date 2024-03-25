@@ -453,14 +453,12 @@ class Update(TelegramObject):
         no matter what kind of update this is.
 
         Note:
-            * When the user is anonymous this is either :class:`telegram.Chat` or :obj:`None`.
-            * If the user is not anonymous it's either :class:`telegram.User` or :obj:`None`.
+            * Depending on the type of update and the user's 'Remain anonymous' setting, this
+              could either be :class:`telegram.User`, :class:`telegram.Chat` or :obj:`None`.
 
         If no user whatsoever is associated with this update, this gives :obj:`None`. This
         is the case if any of
 
-        * :attr:`channel_post`
-        * :attr:`edited_channel_post`
         * :attr:`poll`
         * :attr:`chat_boost`
         * :attr:`removed_chat_boost`
@@ -473,6 +471,8 @@ class Update(TelegramObject):
               :attr:`telegram.Message.from_user` or :attr:`telegram.Message.sender_chat`.
             * If :attr:`poll_answer` is present, this will give either
               :attr:`telegram.PollAnswer.user` or :attr:`telegram.PollAnswer.voter_chat`.
+            * If :attr:`channel_post` is present, this will give
+              :attr:`telegram.Message.sender_chat`.
 
         .. versionadded:: NEXT.VERSION
         """
@@ -481,7 +481,9 @@ class Update(TelegramObject):
 
         sender: Optional[Union["User", "Chat"]] = None
 
-        if message := (self.message or self.edited_message):
+        if message := (
+            self.message or self.edited_message or self.channel_post or self.edited_channel_post
+        ):
             sender = message.sender_chat
 
         elif self.poll_answer:
