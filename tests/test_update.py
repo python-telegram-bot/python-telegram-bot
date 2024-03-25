@@ -59,6 +59,13 @@ message = Message(
     text="Text",
     sender_chat=Chat(1, ""),
 )
+channel_post = Message(
+    1,
+    datetime.utcnow(),
+    Chat(1, ""),
+    text="Text",
+    sender_chat=Chat(1, ""),
+)
 chat_member_updated = ChatMemberUpdated(
     Chat(1, "chat"),
     User(1, "", False),
@@ -116,8 +123,8 @@ params = [
     {"message": message},
     {"edited_message": message},
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat", message=message)},
-    {"channel_post": message},
-    {"edited_channel_post": message},
+    {"channel_post": channel_post},
+    {"edited_channel_post": channel_post},
     {"inline_query": InlineQuery(1, User(1, "", False), "", "")},
     {"chosen_inline_result": ChosenInlineResult("id", User(1, "", False), "")},
     {"shipping_query": ShippingQuery("id", User(1, "", False), "", None)},
@@ -269,23 +276,36 @@ class TestUpdateWithoutRequest(TestUpdateBase):
         else:
             assert user is None
 
-    def test_effective_sender(self, update):
+    def test_effective_sender_non_anonymous(self, update):
+        # Simulate 'Remain anonymous' being turned off
+        if message := (update.message or update.edited_message):
+            message._unfreeze()
+            message.sender_chat = None
+        elif reaction := (update.message_reaction):
+            reaction._unfreeze()
+            reaction.actor_chat = None
+        elif answer := (update.poll_answer):
+            answer._unfreeze()
+            answer.voter_chat = None
+
         # Test that it's sometimes None per docstring
         sender = update.effective_sender
         if not (
-            update.channel_post is not None
-            or update.edited_channel_post is not None
-            or update.poll is not None
+            update.poll is not None
             or update.chat_boost is not None
             or update.removed_chat_boost is not None
             or update.message_reaction_count is not None
         ):
-            assert sender.id == 1
+            if update.channel_post or update.edited_channel_post:
+                assert isinstance(sender, Chat)
+            else:
+                assert isinstance(sender, User)
+
         else:
             assert sender is None
 
     def test_effective_sender_anonymous(self, update):
-        # remove none anonymous user
+        # Simulate 'Remain anonymous' being turned on
         if message := (update.message or update.edited_message):
             message._unfreeze()
             message.from_user = None
@@ -299,14 +319,22 @@ class TestUpdateWithoutRequest(TestUpdateBase):
         # Test that it's sometimes None per docstring
         sender = update.effective_sender
         if not (
-            update.channel_post is not None
-            or update.edited_channel_post is not None
-            or update.poll is not None
+            update.poll is not None
             or update.chat_boost is not None
             or update.removed_chat_boost is not None
             or update.message_reaction_count is not None
         ):
-            assert sender.id == 1
+            if (
+                update.message
+                or update.edited_message
+                or update.channel_post
+                or update.edited_channel_post
+                or update.message_reaction
+                or update.poll_answer
+            ):
+                assert isinstance(sender, Chat)
+            else:
+                assert isinstance(sender, User)
         else:
             assert sender is None
 
