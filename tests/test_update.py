@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import time
+from copy import deepcopy
 from datetime import datetime
 
 import pytest
@@ -277,6 +278,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             assert user is None
 
     def test_effective_sender_non_anonymous(self, update):
+        update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned off
         if message := (update.message or update.edited_message):
             message._unfreeze()
@@ -305,6 +307,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             assert sender is None
 
     def test_effective_sender_anonymous(self, update):
+        update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned on
         if message := (update.message or update.edited_message):
             message._unfreeze()
