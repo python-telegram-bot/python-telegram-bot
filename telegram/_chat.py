@@ -1169,7 +1169,7 @@ class Chat(TelegramObject):
 
     async def set_administrator_custom_title(
         self,
-        user_id: Union[int, str],
+        user_id: int,
         custom_title: str,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

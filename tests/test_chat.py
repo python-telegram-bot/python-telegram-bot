@@ -576,6 +576,19 @@ class TestChatWithoutRequest(TestChatBase):
             custom_title = kwargs["custom_title"] == "custom_title"
             return chat_id and user_id and custom_title
 
+        assert check_shortcut_signature(
+            Chat.set_administrator_custom_title,
+            Bot.set_chat_administrator_custom_title,
+            ["chat_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            chat.set_administrator_custom_title,
+            chat.get_bot(),
+            "set_chat_administrator_custom_title",
+        )
+        assert await check_defaults_handling(chat.set_administrator_custom_title, chat.get_bot())
+
         monkeypatch.setattr("telegram.Bot.set_chat_administrator_custom_title", make_assertion)
         assert await chat.set_administrator_custom_title(user_id=42, custom_title="custom_title")
 

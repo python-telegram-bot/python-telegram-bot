@@ -21,6 +21,7 @@ import asyncio
 import json
 from http import HTTPStatus
 from pathlib import Path
+from socket import socket
 from ssl import SSLContext
 from types import TracebackType
 from typing import TYPE_CHECKING, Optional, Type, Union
@@ -67,7 +68,7 @@ class WebhookServer:
         port: int,
         webhook_app: "WebhookAppClass",
         ssl_ctx: Optional[SSLContext],
-        unix: Optional[Union[str, Path]] = None,
+        unix: Optional[Union[str, Path, socket]] = None,
     ):
         if unix and not UNIX_AVAILABLE:
             raise RuntimeError("This OS does not support binding unix sockets.")
@@ -75,15 +76,18 @@ class WebhookServer:
         self.listen = listen
         self.port = port
         self.is_running = False
-        self.unix = unix
+        self.unix = None
+        if unix and isinstance(unix, socket):
+            self.unix = unix
+        elif unix:
+            self.unix = bind_unix_socket(str(unix))
         self._server_lock = asyncio.Lock()
         self._shutdown_lock = asyncio.Lock()
 
     async def serve_forever(self, ready: Optional[asyncio.Event] = None) -> None:
         async with self._server_lock:
             if self.unix:
-                socket = bind_unix_socket(str(self.unix))
-                self._http_server.add_socket(socket)
+                self._http_server.add_socket(self.unix)
             else:
                 self._http_server.listen(self.port, address=self.listen)
 
