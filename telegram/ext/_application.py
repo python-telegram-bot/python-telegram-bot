@@ -1057,6 +1057,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         finally:
             # We arrive here either by catching the exceptions above or if the loop gets stopped
             try:
+                # In we never got to await the coroutine, it's cleaner to close it here
+                # This can be the case e.g. if post_init raises SystemExit
+                updater_coroutine.close()
                 # Mypy doesn't know that we already check if updater is None
                 if self.updater.running:  # type: ignore[union-attr]
                     loop.run_until_complete(self.updater.stop())  # type: ignore[union-attr]
