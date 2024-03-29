@@ -67,7 +67,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # Global substitutions
-rst_prolog = (Path.cwd() / "../substitutions/global.rst").read_text(encoding="utf-8")
+rst_prolog = ""
+for file in Path.cwd().glob("../substitutions/*.rst"):
+    rst_prolog += "\n" + file.read_text(encoding="utf-8")
 
 # -- Extension settings ------------------------------------------------
 napoleon_use_admonition_for_examples = True

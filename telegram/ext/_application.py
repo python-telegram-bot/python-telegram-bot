@@ -677,7 +677,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     self.__update_fetcher_task.result()
                 except BaseException as exc:
                     _LOGGER.critical(
-                        "Fetching updates was aborted due to %s. Suppressing "
+                        "Fetching updates was aborted due to %r. Suppressing "
                         "exception to ensure graceful shutdown.",
                         exc,
                         exc_info=True,
@@ -742,9 +742,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling` and
         a graceful shutdown of the app on exit.
 
-        The app will shut down when :exc:`KeyboardInterrupt` or :exc:`SystemExit` is raised.
-        On unix, the app will also shut down on receiving the signals specified by
-        :paramref:`stop_signals`.
+        |app_run_shutdown|  :paramref:`stop_signals`.
 
         The order of execution by :meth:`run_polling` is roughly as follows:
 
@@ -883,9 +881,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         listening for updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
         a graceful shutdown of the app on exit.
 
-        The app will shut down when :exc:`KeyboardInterrupt` or :exc:`SystemExit` is raised.
-        On unix, the app will also shut down on receiving the signals specified by
-        :paramref:`stop_signals`.
+        |app_run_shutdown| :paramref:`stop_signals`.
 
         If :paramref:`cert`
         and :paramref:`key` are not provided, the webhook will be started directly on
@@ -1183,44 +1179,40 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         finally:
             self._mark_for_persistence_update(update=update)
 
-    async def _update_fetcher(self) -> None:
+    async def __update_fetcher(self) -> None:
         # Continuously fetch updates from the queue. Exit only once the signal object is found.
         while True:
-            try:
-                update = await self.update_queue.get()
+            update = await self.update_queue.get()
 
-                if update is _STOP_SIGNAL:
-                    _LOGGER.debug("Dropping pending updates")
-                    while not self.update_queue.empty():
-                        self.update_queue.task_done()
+            if update is _STOP_SIGNAL:
+                # For the _STOP_SIGNAL
+                self.update_queue.task_done()
+                return
 
-                    # For the _STOP_SIGNAL
-                    self.update_queue.task_done()
-                    return
+            _LOGGER.debug("Processing update %s", update)
 
-                _LOGGER.debug("Processing update %s", update)
-
-                if self._update_processor.max_concurrent_updates > 1:
-                    # We don't await the below because it has to be run concurrently
-                    self.create_task(
-                        self.__process_update_wrapper(update),
-                        update=update,
-                        name=f"Application:{self.bot.id}:process_concurrent_update",
-                    )
-                else:
-                    await self.__process_update_wrapper(update)
-
-            except asyncio.CancelledError:
-                # This may happen if the application is manually run via application.start() and
-                # then a KeyboardInterrupt is sent. We must prevent this loop to die since
-                # application.stop() will wait for it's clean shutdown.
-                _LOGGER.warning(
-                    "Fetching updates got a asyncio.CancelledError. Ignoring as this task may only"
-                    "be closed via `Application.stop`."
+            if self._update_processor.max_concurrent_updates > 1:
+                # We don't await the below because it has to be run concurrently
+                self.create_task(
+                    self.__process_update_wrapper(update),
+                    update=update,
+                    name=f"Application:{self.bot.id}:process_concurrent_update",
                 )
-            finally:
-                while not self.update_queue.empty():
-                    self.update_queue.get_nowait()
+            else:
+                await self.__process_update_wrapper(update)
+
+    async def _update_fetcher(self) -> None:
+        try:
+            await self.__update_fetcher()
+        finally:
+            while not self.update_queue.empty():
+                _LOGGER.debug("Dropping pending updates")
+                update = self.update_queue.get_nowait()
+                if update is _STOP_SIGNAL:
+                    update = "_STOP_SIGNAL"
+                with contextlib.suppress(ValueError):
+                    # Since we're shutting down here, it's not too bad if we call task_done
+                    # on an empty queue
                     self.update_queue.task_done()
 
     async def __process_update_wrapper(self, update: object) -> None:
