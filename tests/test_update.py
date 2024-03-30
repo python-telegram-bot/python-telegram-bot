@@ -306,6 +306,9 @@ class TestUpdateWithoutRequest(TestUpdateBase):
         else:
             assert sender is None
 
+        cached = update.effective_sender
+        assert cached is sender
+
     def test_effective_sender_anonymous(self, update):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned on
@@ -340,6 +343,9 @@ class TestUpdateWithoutRequest(TestUpdateBase):
                 assert isinstance(sender, User)
         else:
             assert sender is None
+
+        cached = update.effective_sender
+        assert cached is sender
 
     def test_effective_message(self, update):
         # Test that it's sometimes None per docstring
