@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from typing import TYPE_CHECKING, Final, List, Optional
+from typing import TYPE_CHECKING, Final, List, Optional, Union
 
 from telegram import constants
 from telegram._callbackquery import CallbackQuery
@@ -224,6 +224,7 @@ class Update(TelegramObject):
     __slots__ = (
         "_effective_chat",
         "_effective_message",
+        "_effective_sender",
         "_effective_user",
         "callback_query",
         "channel_post",
@@ -371,6 +372,7 @@ class Update(TelegramObject):
         self.message_reaction_count: Optional[MessageReactionCountUpdated] = message_reaction_count
 
         self._effective_user: Optional[User] = None
+        self._effective_sender: Optional[Union["User", "Chat"]] = None
         self._effective_chat: Optional[Chat] = None
         self._effective_message: Optional[Message] = None
 
@@ -443,6 +445,58 @@ class Update(TelegramObject):
 
         self._effective_user = user
         return user
+
+    @property
+    def effective_sender(self) -> Optional[Union["User", "Chat"]]:
+        """
+        :class:`telegram.User` or :class:`telegram.Chat`: The user or chat that sent this update,
+        no matter what kind of update this is.
+
+        Note:
+            * Depending on the type of update and the user's 'Remain anonymous' setting, this
+              could either be :class:`telegram.User`, :class:`telegram.Chat` or :obj:`None`.
+
+        If no user whatsoever is associated with this update, this gives :obj:`None`. This
+        is the case if any of
+
+        * :attr:`poll`
+        * :attr:`chat_boost`
+        * :attr:`removed_chat_boost`
+        * :attr:`message_reaction_count`
+
+        is present.
+
+        Example:
+            * If :attr:`message` is present, this will give either
+              :attr:`telegram.Message.from_user` or :attr:`telegram.Message.sender_chat`.
+            * If :attr:`poll_answer` is present, this will give either
+              :attr:`telegram.PollAnswer.user` or :attr:`telegram.PollAnswer.voter_chat`.
+            * If :attr:`channel_post` is present, this will give
+              :attr:`telegram.Message.sender_chat`.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        if self._effective_sender:
+            return self._effective_sender
+
+        sender: Optional[Union["User", "Chat"]] = None
+
+        if message := (
+            self.message or self.edited_message or self.channel_post or self.edited_channel_post
+        ):
+            sender = message.sender_chat
+
+        elif self.poll_answer:
+            sender = self.poll_answer.voter_chat
+
+        elif self.message_reaction:
+            sender = self.message_reaction.actor_chat
+
+        if sender is None:
+            sender = self.effective_user
+
+        self._effective_sender = sender
+        return sender
 
     @property
     def effective_chat(self) -> Optional["Chat"]:
