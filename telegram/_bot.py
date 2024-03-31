@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=no-self-argument, not-callable, no-member, too-many-arguments
+# pylint: disable=too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2024
@@ -1539,6 +1539,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=business_connection_id,
         )
 
     async def send_document(
