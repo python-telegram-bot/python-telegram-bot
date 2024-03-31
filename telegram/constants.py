@@ -1710,6 +1710,11 @@ class MessageType(StringEnum):
 
     .. versionadded:: 21.0
     """
+    BUSINESS_CONNECTION_ID = "business_connection_id"
+    """:obj:`str`: Messages with :attr:`telegram.Message.business_connection_id`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     CHANNEL_CHAT_CREATED = "channel_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
     CHAT_SHARED = "chat_shared"
@@ -1816,6 +1821,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.sender_boost_count`.
 
     .. versionadded:: 21.0
+    """
+    SENDER_BUSINESS_BOT = "sender_business_bot"
+    """:obj:`str`: Messages with :attr:`telegram.Message.sender_business_bot`.
+
+    .. versionadded:: NEXT.VERSION
     """
     STICKER = "sticker"
     """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""

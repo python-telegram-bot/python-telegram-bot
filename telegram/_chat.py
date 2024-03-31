@@ -1444,6 +1444,7 @@ class Chat(TelegramObject):
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1483,6 +1484,7 @@ class Chat(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=business_connection_id,
         )
 
     async def delete_message(
@@ -1558,6 +1560,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1598,12 +1601,14 @@ class Chat(TelegramObject):
             parse_mode=parse_mode,
             caption_entities=caption_entities,
             reply_parameters=reply_parameters,
+            business_connection_id=business_connection_id,
         )
 
     async def send_chat_action(
         self,
         action: str,
         message_thread_id: Optional[int] = None,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1630,6 +1635,7 @@ class Chat(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=business_connection_id,
         )
 
     send_action = send_chat_action
@@ -1647,6 +1653,7 @@ class Chat(TelegramObject):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1687,6 +1694,7 @@ class Chat(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             has_spoiler=has_spoiler,
+            business_connection_id=business_connection_id,
         )
 
     async def send_contact(
@@ -1700,6 +1708,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1739,6 +1748,7 @@ class Chat(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_audio(
@@ -1756,6 +1766,7 @@ class Chat(TelegramObject):
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1799,6 +1810,7 @@ class Chat(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             thumbnail=thumbnail,
+            business_connection_id=business_connection_id,
         )
 
     async def send_document(
@@ -1814,6 +1826,7 @@ class Chat(TelegramObject):
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1855,6 +1868,7 @@ class Chat(TelegramObject):
             caption_entities=caption_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_dice(
@@ -1865,6 +1879,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1899,6 +1914,7 @@ class Chat(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_game(
@@ -1909,6 +1925,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1943,6 +1960,7 @@ class Chat(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_invoice(
@@ -2052,6 +2070,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2093,6 +2112,7 @@ class Chat(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_animation(
@@ -2111,6 +2131,7 @@ class Chat(TelegramObject):
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2155,6 +2176,7 @@ class Chat(TelegramObject):
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
+            business_connection_id=business_connection_id,
         )
 
     async def send_sticker(
@@ -2166,6 +2188,7 @@ class Chat(TelegramObject):
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2201,6 +2224,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             emoji=emoji,
+            business_connection_id=business_connection_id,
         )
 
     async def send_venue(
@@ -2218,6 +2242,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2261,6 +2286,7 @@ class Chat(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_video(
@@ -2280,6 +2306,7 @@ class Chat(TelegramObject):
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2325,6 +2352,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
+            business_connection_id=business_connection_id,
         )
 
     async def send_video_note(
@@ -2338,6 +2366,7 @@ class Chat(TelegramObject):
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2377,6 +2406,7 @@ class Chat(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_voice(
@@ -2391,6 +2421,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2431,6 +2462,7 @@ class Chat(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_poll(
@@ -2452,6 +2484,7 @@ class Chat(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2497,6 +2530,7 @@ class Chat(TelegramObject):
             explanation_entities=explanation_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_copy(

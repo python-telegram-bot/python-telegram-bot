@@ -263,6 +263,8 @@ def message(bot):
         {"reply_to_story": Story(Chat(1, Chat.PRIVATE), 0)},
         {"boost_added": ChatBoostAdded(100)},
         {"sender_boost_count": 1},
+        {"sender_business_bot": User(1, "BusinessBot", True)},
+        {"business_connection_id": "123456789"},
     ],
     ids=[
         "reply",
@@ -328,6 +330,8 @@ def message(bot):
         "reply_to_story",
         "boost_added",
         "sender_boost_count",
+        "sender_business_bot",
+        "business_connection_id",
     ],
 )
 def message_params(bot, request):
