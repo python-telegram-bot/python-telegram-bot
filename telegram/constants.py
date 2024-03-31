@@ -1,5 +1,5 @@
 # python-telegram-bot - a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # by the python-telegram-bot contributors <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ those classes.
     * Most of the constants in this module are grouped into enums.
 """
 # TODO: Remove this when https://github.com/PyCQA/pylint/issues/6887 is resolved.
-# pylint: disable=invalid-enum-extension,invalid-slots
+# pylint: disable=invalid-enum-extension
 
 __all__ = [
     "BOT_API_VERSION",
@@ -142,7 +142,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=0)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=1)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1705,6 +1705,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.animation`."""
     AUDIO = "audio"
     """:obj:`str`: Messages with :attr:`telegram.Message.audio`."""
+    BOOST_ADDED = "boost_added"
+    """:obj:`str`: Messages with :attr:`telegram.Message.boost_added`.
+
+    .. versionadded:: 21.0
+    """
     CHANNEL_CHAT_CREATED = "channel_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
     CHAT_SHARED = "chat_shared"
@@ -1802,6 +1807,16 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
     PROXIMITY_ALERT_TRIGGERED = "proximity_alert_triggered"
     """:obj:`str`: Messages with :attr:`telegram.Message.proximity_alert_triggered`."""
+    REPLY_TO_STORY = "reply_to_story"
+    """:obj:`str`: Messages with :attr:`telegram.Message.reply_to_story`.
+
+    .. versionadded:: 21.0
+    """
+    SENDER_BOOST_COUNT = "sender_boost_count"
+    """:obj:`str`: Messages with :attr:`telegram.Message.sender_boost_count`.
+
+    .. versionadded:: 21.0
+    """
     STICKER = "sticker"
     """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
     STORY = "story"

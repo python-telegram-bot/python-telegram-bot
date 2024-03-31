@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -1432,6 +1432,7 @@ class TestApplication:
     )
     def test_run_polling_basic(self, app, monkeypatch, caplog):
         exception_event = threading.Event()
+        exception_testing_done = threading.Event()
         update_event = threading.Event()
         exception = TelegramError("This is a test error")
         assertions = {}
@@ -1439,8 +1440,14 @@ class TestApplication:
         async def get_updates(*args, **kwargs):
             if exception_event.is_set():
                 raise exception
+
             # This makes sure that other coroutines have a chance of running as well
-            await asyncio.sleep(0)
+            if exception_testing_done.is_set() and app.updater.running:
+                # the longer sleep makes sure that we can exit also while get_updates is running
+                await asyncio.sleep(20)
+            else:
+                await asyncio.sleep(0.01)
+
             update_event.set()
             return [self.message_update]
 
@@ -1466,10 +1473,12 @@ class TestApplication:
             exception_event.set()
             time.sleep(0.05)
             assertions["exception_handling"] = self.received == exception.message
+            exception_testing_done.set()
 
             # So that the get_updates call on shutdown doesn't fail
             exception_event.clear()
 
+            time.sleep(1)
             os.kill(os.getpid(), signal.SIGINT)
             time.sleep(0.1)
 

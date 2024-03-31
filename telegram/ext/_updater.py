@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -49,6 +49,8 @@ except ImportError:
     WEBHOOKS_AVAILABLE = False
 
 if TYPE_CHECKING:
+    from socket import socket
+
     from telegram import Bot
 
 
@@ -102,7 +104,9 @@ class Updater(AsyncContextManager["Updater"]):
 
     __slots__ = (
         "__lock",
+        "__polling_cleanup_cb",
         "__polling_task",
+        "__polling_task_stop_event",
         "_httpd",
         "_initialized",
         "_last_update_id",
@@ -125,6 +129,7 @@ class Updater(AsyncContextManager["Updater"]):
         self._httpd: Optional[WebhookServer] = None
         self.__lock = asyncio.Lock()
         self.__polling_task: Optional[asyncio.Task] = None
+        self.__polling_task_stop_event: asyncio.Event = asyncio.Event()
         self.__polling_cleanup_cb: Optional[Callable[[], Coroutine[Any, Any, None]]] = None
 
     async def __aenter__(self: _UpdaterType) -> _UpdaterType:  # noqa: PYI019
@@ -416,6 +421,7 @@ class Updater(AsyncContextManager["Updater"]):
                 on_err_cb=error_callback or default_error_callback,
                 description="getting Updates",
                 interval=poll_interval,
+                stop_event=self.__polling_task_stop_event,
             ),
             name="Updater:start_polling:polling_task",
         )
@@ -468,7 +474,7 @@ class Updater(AsyncContextManager["Updater"]):
         ip_address: Optional[str] = None,
         max_connections: int = 40,
         secret_token: Optional[str] = None,
-        unix: Optional[Union[str, Path]] = None,
+        unix: Optional[Union[str, Path, "socket"]] = None,
     ) -> "asyncio.Queue[object]":
         """
         Starts a small http server to listen for updates via webhook. If :paramref:`cert`
@@ -537,8 +543,17 @@ class Updater(AsyncContextManager["Updater"]):
                 header isn't set or it is set to a wrong token.
 
                 .. versionadded:: 20.0
-            unix (:class:`pathlib.Path` | :obj:`str`, optional): Path to the unix socket file. Path
-                does not need to exist, in which case the file will be created.
+            unix (:class:`pathlib.Path` | :obj:`str` | :class:`socket.socket`, optional): Can be
+                either:
+
+                * the path to the unix socket file as :class:`pathlib.Path` or :obj:`str`. This
+                  will be passed to `tornado.netutil.bind_unix_socket <https://www.tornadoweb.org/
+                  en/stable/netutil.html#tornado.netutil.bind_unix_socket>`_ to create the socket.
+                  If the Path does not exist, the file will be created.
+
+                * or the socket itself. This option allows you to e.g. restrict the permissions of
+                  the socket for improved security. Note that you need to pass the correct family,
+                  type and socket options yourself.
 
                 Caution:
                     This parameter is a replacement for the default TCP bind. Therefore, it is
@@ -547,6 +562,8 @@ class Updater(AsyncContextManager["Updater"]):
                     appropriate :paramref:`webhook_url`.
 
                 .. versionadded:: 20.8
+                .. versionchanged:: NEXT.VERSION
+                    Added support to pass a socket instance itself.
         Returns:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.
 
@@ -628,7 +645,7 @@ class Updater(AsyncContextManager["Updater"]):
         ip_address: Optional[str] = None,
         max_connections: int = 40,
         secret_token: Optional[str] = None,
-        unix: Optional[Union[str, Path]] = None,
+        unix: Optional[Union[str, Path, "socket"]] = None,
     ) -> None:
         _LOGGER.debug("Updater thread started (webhook)")
 
@@ -692,6 +709,7 @@ class Updater(AsyncContextManager["Updater"]):
         on_err_cb: Callable[[TelegramError], None],
         description: str,
         interval: float,
+        stop_event: Optional[asyncio.Event],
     ) -> None:
         """Perform a loop calling `action_cb`, retrying after network errors.
 
@@ -705,39 +723,58 @@ class Updater(AsyncContextManager["Updater"]):
             description (:obj:`str`): Description text to use for logs and exception raised.
             interval (:obj:`float` | :obj:`int`): Interval to sleep between each call to
                 `action_cb`.
+            stop_event (:class:`asyncio.Event` | :obj:`None`): Event to wait on for stopping the
+                loop. Setting the event will make the loop exit even if `action_cb` is currently
+                running.
 
         """
+
+        async def do_action() -> bool:
+            if not stop_event:
+                return await action_cb()
+
+            action_cb_task = asyncio.create_task(action_cb())
+            stop_task = asyncio.create_task(stop_event.wait())
+            done, pending = await asyncio.wait(
+                (action_cb_task, stop_task), return_when=asyncio.FIRST_COMPLETED
+            )
+            with contextlib.suppress(asyncio.CancelledError):
+                for task in pending:
+                    task.cancel()
+
+            if stop_task in done:
+                _LOGGER.debug("Network loop retry %s was cancelled", description)
+                return False
+
+            return action_cb_task.result()
+
         _LOGGER.debug("Start network loop retry %s", description)
         cur_interval = interval
-        try:
-            while self.running:
-                try:
-                    if not await action_cb():
-                        break
-                except RetryAfter as exc:
-                    _LOGGER.info("%s", exc)
-                    cur_interval = 0.5 + exc.retry_after
-                except TimedOut as toe:
-                    _LOGGER.debug("Timed out %s: %s", description, toe)
-                    # If failure is due to timeout, we should retry asap.
-                    cur_interval = 0
-                except InvalidToken as pex:
-                    _LOGGER.error("Invalid token; aborting")
-                    raise pex
-                except TelegramError as telegram_exc:
-                    _LOGGER.error("Error while %s: %s", description, telegram_exc)
-                    on_err_cb(telegram_exc)
+        while self.running:
+            try:
+                if not await do_action():
+                    break
+            except RetryAfter as exc:
+                _LOGGER.info("%s", exc)
+                cur_interval = 0.5 + exc.retry_after
+            except TimedOut as toe:
+                _LOGGER.debug("Timed out %s: %s", description, toe)
+                # If failure is due to timeout, we should retry asap.
+                cur_interval = 0
+            except InvalidToken as pex:
+                _LOGGER.error("Invalid token; aborting")
+                raise pex
+            except TelegramError as telegram_exc:
+                _LOGGER.error("Error while %s: %s", description, telegram_exc)
+                on_err_cb(telegram_exc)
 
-                    # increase waiting times on subsequent errors up to 30secs
-                    cur_interval = 1 if cur_interval == 0 else min(30, 1.5 * cur_interval)
-                else:
-                    cur_interval = interval
+                # increase waiting times on subsequent errors up to 30secs
+                cur_interval = 1 if cur_interval == 0 else min(30, 1.5 * cur_interval)
+            else:
+                cur_interval = interval
 
-                if cur_interval:
-                    await asyncio.sleep(cur_interval)
-
-        except asyncio.CancelledError:
-            _LOGGER.debug("Network loop retry %s was cancelled", description)
+            if cur_interval:
+                await asyncio.sleep(cur_interval)
 
     async def _bootstrap(
         self,
@@ -769,7 +806,7 @@ class Updater(AsyncContextManager["Updater"]):
             if drop_pending_updates:
                 _LOGGER.debug("Dropping pending updates from Telegram server")
             await self.bot.set_webhook(
-                url=webhook_url,
+                url=webhook_url,  # type: ignore[arg-type]
                 certificate=cert,
                 allowed_updates=allowed_updates,
                 ip_address=ip_address,
@@ -803,6 +840,7 @@ class Updater(AsyncContextManager["Updater"]):
                 bootstrap_on_err_cb,
                 "bootstrap del webhook",
                 bootstrap_interval,
+                stop_event=None,
             )
 
             # Reset the retries counter for the next _network_loop_retry call
@@ -816,6 +854,7 @@ class Updater(AsyncContextManager["Updater"]):
                 bootstrap_on_err_cb,
                 "bootstrap set webhook",
                 bootstrap_interval,
+                stop_event=None,
             )
 
     async def stop(self) -> None:
@@ -851,7 +890,7 @@ class Updater(AsyncContextManager["Updater"]):
         """Stops the polling task by awaiting it."""
         if self.__polling_task:
             _LOGGER.debug("Waiting background polling task to finish up.")
-            self.__polling_task.cancel()
+            self.__polling_task_stop_event.set()
 
             with contextlib.suppress(asyncio.CancelledError):
                 await self.__polling_task
@@ -859,6 +898,7 @@ class Updater(AsyncContextManager["Updater"]):
                 # after start_polling(), but lets better be safe than sorry ...
 
             self.__polling_task = None
+            self.__polling_task_stop_event.clear()
 
             if self.__polling_cleanup_cb:
                 await self.__polling_cleanup_cb()

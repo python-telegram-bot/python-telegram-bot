@@ -1,8 +1,9 @@
 name: Bot API Tests
 on:
   pull_request:
-    branches:
-      - master
+    paths:
+      - telegram/**
+      - tests/**
   push:
     branches:
       - master
@@ -41,7 +42,7 @@ jobs:
 
       - name: Test Summary
         id: test_summary
-        uses: test-summary/action@v2.2
+        uses: test-summary/action@v2.3
         if: always()  # always run, even if tests fail
         with:
           paths: .test_report_official.xml

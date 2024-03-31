@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@ class Version(NamedTuple):
 
 
 __version_info__: Final[Version] = Version(
-    major=20, minor=8, micro=0, releaselevel="final", serial=0
+    major=21, minor=0, micro=1, releaselevel="final", serial=0
 )
 __version__: Final[str] = str(__version_info__)
 

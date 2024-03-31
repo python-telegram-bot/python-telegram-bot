@@ -2,7 +2,7 @@
 # pylint: disable=no-self-argument, not-callable, no-member, too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@
 import asyncio
 import contextlib
 import copy
-import functools
 import pickle
 from datetime import datetime
 from types import TracebackType
@@ -92,7 +91,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._update import Update
 from telegram._user import User
 from telegram._userprofilephotos import UserProfilePhotos
-from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.argumentparsing import parse_lpo_and_dwpp, parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.logging import get_logger
@@ -100,7 +99,6 @@ from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.strings import to_camel_case
 from telegram._utils.types import CorrectOptionID, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import warn_for_link_preview_options
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit, ReactionEmoji
 from telegram.error import EndPointNotFound, InvalidToken
@@ -532,20 +530,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         warn(message=message, category=category, stacklevel=stacklevel + 1)
 
-    # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
-    # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
-    def _log(func: Any):  # type: ignore[no-untyped-def] # skipcq: PY-D0003
-        @functools.wraps(func)
-        async def decorator(self: "Bot", *args: Any, **kwargs: Any) -> Any:
-            # pylint: disable=protected-access
-            self._LOGGER.debug("Entering: %s", func.__name__)
-            result = await func(self, *args, **kwargs)
-            self._LOGGER.debug(result)
-            self._LOGGER.debug("Exiting: %s", func.__name__)
-            return result
-
-        return decorator
-
     def _parse_file_input(
         self,
         file_input: Union[FileInput, "TelegramObject"],
@@ -655,7 +639,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         request = self._request[0] if endpoint == "getUpdates" else self._request[1]
 
-        return await request.post(
+        self._LOGGER.debug("Calling Bot API endpoint `%s` with parameters `%s`", endpoint, data)
+        result = await request.post(
             url=f"{self._base_url}/{endpoint}",
             request_data=request_data,
             read_timeout=read_timeout,
@@ -663,15 +648,18 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
         )
+        self._LOGGER.debug(
+            "Call to Bot API endpoint `%s` finished with return value `%s`", endpoint, result
+        )
+
+        return result
 
     async def _send_message(
         self,
         endpoint: str,
         data: JSONDict,
-        reply_to_message_id: Optional[int] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         caption: Optional[str] = None,
@@ -680,6 +668,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         link_preview_options: ODVInput["LinkPreviewOptions"] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -785,7 +775,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())
         self._initialized = False
 
-    @_log
     async def do_api_request(
         self,
         endpoint: str,
@@ -844,7 +833,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     f"'Bot.do_api_request(\"{endpoint}\", ...)'"
                 ),
                 PTBDeprecationWarning,
-                stacklevel=3,
+                stacklevel=2,
             )
 
         camel_case_endpoint = to_camel_case(endpoint)
@@ -880,7 +869,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             return return_type.de_list(result, self)
         return return_type.de_json(result, self)
 
-    @_log
     async def get_me(
         self,
         *,
@@ -911,26 +899,22 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         self._bot_user = User.de_json(result, self)
         return self._bot_user  # type: ignore[return-value]
 
-    @_log
     async def send_message(
         self,
         chat_id: Union[int, str],
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         entities: Optional[Sequence["MessageEntity"]] = None,
-        # Deprecated since Bot API 7.0 (to be made keyword arg):
-        # ---
-        disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        # ---
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
+        disable_web_page_preview: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -957,38 +941,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.8
 
-            disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
-                this message. Mutually exclusive with :paramref:`link_preview_options`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
-                    argument. PTB will automatically convert this argument to that one, but
-                    for advanced options, please use :paramref:`link_preview_options` directly.
-
-                .. deprecated:: 20.8
-                    In future versions, this argument will become a keyword-only argument.
-
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -1001,6 +957,37 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.8
 
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
+                this message. Convenience parameter for setting :paramref:`link_preview_options`.
+                Mutually exclusive with :paramref:`link_preview_options`.
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
+                    argument. PTB will automatically convert this argument to that one, but
+                    for advanced options, please use :paramref:`link_preview_options` directly.
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
 
@@ -1011,9 +998,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         """
         data: JSONDict = {"chat_id": chat_id, "text": text, "entities": entities}
-        link_preview_options = warn_for_link_preview_options(
-            disable_web_page_preview, link_preview_options
-        )
+        link_preview_options = parse_lpo_and_dwpp(disable_web_page_preview, link_preview_options)
 
         return await self._send_message(
             "sendMessage",
@@ -1034,7 +1019,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_message(
         self,
         chat_id: Union[str, int],
@@ -1093,7 +1077,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_messages(
         self,
         chat_id: Union[int, str],
@@ -1113,10 +1096,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            message_ids (Sequence[:obj:`int`]): Identifiers of
+            message_ids (Sequence[:obj:`int`]): A list of
                 :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT`-
-                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` messages to delete.
-                See :meth:`delete_message` for limitations on which messages can be deleted.
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` identifiers of messages
+                to delete. See :meth:`delete_message` for limitations on which messages can be
+                deleted.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -1135,7 +1119,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def forward_message(
         self,
         chat_id: Union[int, str],
@@ -1201,7 +1184,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def forward_messages(
         self,
         chat_id: Union[int, str],
@@ -1228,11 +1210,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
-            message_ids (Sequence[:obj:`int`]): Identifiers of
+            message_ids (Sequence[:obj:`int`]): A list of
                 :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT`-
-                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` messages in the chat
-                :paramref:`from_chat_id` to forward. The identifiers must be specified in a
-                strictly increasing order.
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` identifiers of messages
+                in the chat :paramref:`from_chat_id` to forward. The identifiers must be specified
+                in a strictly increasing order.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
@@ -1264,23 +1246,22 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         return MessageId.de_list(result, self)
 
-    @_log
     async def send_photo(
         self,
         chat_id: Union[int, str],
         photo: Union[FileInput, "PhotoSize"],
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1326,23 +1307,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -1357,6 +1321,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             filename (:obj:`str`, optional): Custom file name for the photo, when uploading a
                 new file. Convenience parameter, useful e.g. when sending files generated by the
                 :obj:`tempfile` module.
@@ -1396,7 +1378,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_audio(
         self,
         chat_id: Union[int, str],
@@ -1406,16 +1387,16 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         title: Optional[str] = None,
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1470,23 +1451,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -1501,6 +1465,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             filename (:obj:`str`, optional): Custom file name for the audio, when uploading a
                 new file. Convenience parameter, useful e.g. when sending files generated by the
                 :obj:`tempfile` module.
@@ -1543,24 +1525,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_document(
         self,
         chat_id: Union[int, str],
         document: Union[FileInput, "Document"],
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_content_type_detection: Optional[bool] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1614,23 +1595,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -1645,6 +1609,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             filename (:obj:`str`, optional): Custom file name for the document, when uploading a
                 new file. Convenience parameter, useful e.g. when sending files generated by the
                 :obj:`tempfile` module.
@@ -1683,20 +1665,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_sticker(
         self,
         chat_id: Union[int, str],
         sticker: Union[FileInput, "Sticker"],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1734,23 +1715,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -1759,6 +1723,26 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
                 .. versionadded:: 20.8
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1789,7 +1773,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_video(
         self,
         chat_id: Union[int, str],
@@ -1797,13 +1780,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         duration: Optional[int] = None,
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         supports_streaming: Optional[bool] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -1811,6 +1792,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1870,24 +1853,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.0
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1905,6 +1870,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             filename (:obj:`str`, optional): Custom file name for the video, when uploading a
                 new file. Convenience parameter, useful e.g. when sending files generated by the
                 :obj:`tempfile` module.
@@ -1949,7 +1932,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_video_note(
         self,
         chat_id: Union[int, str],
@@ -1957,14 +1939,14 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         duration: Optional[int] = None,
         length: Optional[int] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2012,23 +1994,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -2043,6 +2008,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             filename (:obj:`str`, optional): Custom file name for the video note, when uploading a
                 new file. Convenience parameter, useful e.g. when sending files generated by the
                 :obj:`tempfile` module.
@@ -2081,7 +2064,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_animation(
         self,
         chat_id: Union[int, str],
@@ -2092,9 +2074,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
@@ -2102,6 +2082,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2155,24 +2137,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.0
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -2190,6 +2154,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             filename (:obj:`str`, optional): Custom file name for the animation, when uploading a
                 new file. Convenience parameter, useful e.g. when sending files generated by the
                 :obj:`tempfile` module.
@@ -2233,7 +2215,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_voice(
         self,
         chat_id: Union[int, str],
@@ -2241,15 +2222,15 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         duration: Optional[int] = None,
         caption: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         filename: Optional[str] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2303,23 +2284,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -2330,6 +2294,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             filename (:obj:`str`, optional): Custom file name for the voice, when uploading a
                 new file. Convenience parameter, useful e.g. when sending files generated by the
                 :obj:`tempfile` module.
@@ -2369,7 +2351,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_media_group(
         self,
         chat_id: Union[int, str],
@@ -2377,12 +2358,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2423,29 +2404,30 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             caption (:obj:`str`, optional): Caption that will be added to the
                 first element of :paramref:`media`, so that it will be used as caption for the
                 whole media group.
@@ -2532,24 +2514,23 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return Message.de_list(result, self)
 
-    @_log
     async def send_location(
         self,
         chat_id: Union[int, str],
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         live_period: Optional[int] = None,
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2590,23 +2571,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -2617,6 +2581,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             location (:class:`telegram.Location`, optional): The location to send.
 
         Returns:
@@ -2667,7 +2649,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_message_live_location(
         self,
         chat_id: Optional[Union[str, int]] = None,
@@ -2762,7 +2743,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def stop_message_live_location(
         self,
         chat_id: Optional[Union[str, int]] = None,
@@ -2810,7 +2790,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_venue(
         self,
         chat_id: Union[int, str],
@@ -2820,16 +2799,16 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         address: Optional[str] = None,
         foursquare_id: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         foursquare_type: Optional[str] = None,
         google_place_id: Optional[str] = None,
         google_place_type: Optional[str] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         venue: Optional[Venue] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2868,23 +2847,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -2895,6 +2857,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             venue (:class:`telegram.Venue`, optional): The venue to send.
 
         Returns:
@@ -2956,7 +2936,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_contact(
         self,
         chat_id: Union[int, str],
@@ -2964,14 +2943,14 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         first_name: Optional[str] = None,
         last_name: Optional[str] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         vcard: Optional[str] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         contact: Optional[Contact] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3000,23 +2979,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -3027,6 +2989,24 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
 
         Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
             contact (:class:`telegram.Contact`, optional): The contact to send.
 
         Returns:
@@ -3079,19 +3059,18 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_game(
         self,
         chat_id: int,
         game_short_name: str,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3111,22 +3090,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard. If empty, one "Play game_title" button will be
@@ -3134,6 +3097,26 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
                 .. versionadded:: 20.8
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -3161,7 +3144,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_chat_action(
         self,
         chat_id: Union[str, int],
@@ -3305,7 +3287,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return res
 
-    @_log
     async def answer_inline_query(
         self,
         inline_query_id: str,
@@ -3403,7 +3384,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_user_profile_photos(
         self,
         user_id: int,
@@ -3448,7 +3428,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def get_file(
         self,
         file_id: Union[
@@ -3514,7 +3493,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return File.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def ban_chat_member(
         self,
         chat_id: Union[str, int],
@@ -3578,7 +3556,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def ban_chat_sender_chat(
         self,
         chat_id: Union[str, int],
@@ -3622,7 +3599,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unban_chat_member(
         self,
         chat_id: Union[str, int],
@@ -3667,7 +3643,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unban_chat_sender_chat(
         self,
         chat_id: Union[str, int],
@@ -3708,7 +3683,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def answer_callback_query(
         self,
         callback_query_id: str,
@@ -3774,7 +3748,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_message_text(
         self,
         text: str,
@@ -3782,14 +3755,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_id: Optional[int] = None,
         inline_message_id: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        # Deprecated since Bot API 7.0 (to be keyword only):
-        # ---
-        disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        # ---
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         *,
+        disable_web_page_preview: Optional[bool] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3829,19 +3799,22 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.8
 
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
+                inline keyboard.
+
+        Keyword Args:
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
-                this message. Mutually exclusive with :paramref:`link_preview_options`.
+                this message. Convenience parameter for setting :paramref:`link_preview_options`.
+                Mutually exclusive with :paramref:`link_preview_options`.
 
                 .. versionchanged:: 20.8
                     Bot API 7.0 introduced :paramref:`link_preview_options` replacing this
                     argument. PTB will automatically convert this argument to that one, but
                     for advanced options, please use :paramref:`link_preview_options` directly.
 
-                .. deprecated:: 20.8
-                    In future versions, this argument will become keyword only.
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
 
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
-                inline keyboard.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -3861,9 +3834,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "entities": entities,
         }
 
-        link_preview_options = warn_for_link_preview_options(
-            disable_web_page_preview, link_preview_options
-        )
+        link_preview_options = parse_lpo_and_dwpp(disable_web_page_preview, link_preview_options)
 
         return await self._send_message(
             "editMessageText",
@@ -3878,7 +3849,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_message_caption(
         self,
         chat_id: Optional[Union[str, int]] = None,
@@ -3948,7 +3918,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_message_media(
         self,
         media: "InputMedia",
@@ -4012,7 +3981,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_message_reply_markup(
         self,
         chat_id: Optional[Union[str, int]] = None,
@@ -4068,7 +4036,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_updates(
         self,
         offset: Optional[int] = None,
@@ -4116,10 +4083,11 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
                 Specify an empty sequence to receive all updates except
-                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
-                setting will be used. Please note that this parameter doesn't affect updates
-                created before the call to the get_updates, so unwanted updates may be received for
-                a short period of time.
+                :attr:`telegram.Update.chat_member`, :attr:`telegram.Update.message_reaction` and
+                :attr:`telegram.Update.message_reaction_count` (default). If not specified, the
+                previous setting will be used. Please note that this parameter doesn't affect
+                updates created before the call to the get_updates, so unwanted updates may be
+                received for a short period of time.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
@@ -4151,7 +4119,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     "the property `read_timeout`. Overriding this property will be mandatory in "
                     "future versions. Using 2 seconds as fallback.",
                     PTBDeprecationWarning,
-                    stacklevel=3,
+                    stacklevel=2,
                 )
 
         # Ideally we'd use an aggressive read timeout for the polling. However,
@@ -4179,7 +4147,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return Update.de_list(result, self)
 
-    @_log
     async def set_webhook(
         self,
         url: str,
@@ -4257,10 +4224,13 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
                 Specify an empty sequence to receive all updates except
-                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
-                setting will be used. Please note that this parameter doesn't affect updates
-                created before the call to the set_webhook, so unwanted updates may be received for
-                a short period of time.
+                :attr:`telegram.Update.chat_member`,
+                :attr:`telegram.Update.message_reaction`
+                and :attr:`telegram.Update.message_reaction_count` (default). If not
+                specified, the previous setting will be used. Please note that this
+                parameter doesn't affect
+                updates created before the call to the set_webhook, so unwanted update
+                may be received for a short period of time.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
@@ -4304,7 +4274,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_webhook(
         self,
         drop_pending_updates: Optional[bool] = None,
@@ -4342,7 +4311,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def leave_chat(
         self,
         chat_id: Union[str, int],
@@ -4377,7 +4345,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_chat(
         self,
         chat_id: Union[str, int],
@@ -4416,7 +4383,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return Chat.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def get_chat_administrators(
         self,
         chat_id: Union[str, int],
@@ -4458,7 +4424,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         return ChatMember.de_list(result, self)
 
-    @_log
     async def get_chat_member_count(
         self,
         chat_id: Union[str, int],
@@ -4494,7 +4459,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_chat_member(
         self,
         chat_id: Union[str, int],
@@ -4532,7 +4496,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         return ChatMember.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def set_chat_sticker_set(
         self,
         chat_id: Union[str, int],
@@ -4568,7 +4531,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_chat_sticker_set(
         self,
         chat_id: Union[str, int],
@@ -4601,7 +4563,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_webhook_info(
         self,
         *,
@@ -4630,7 +4591,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         return WebhookInfo.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def set_game_score(
         self,
         user_id: int,
@@ -4695,7 +4655,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_game_high_scores(
         self,
         user_id: int,
@@ -4756,7 +4715,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return GameHighScore.de_list(result, self)
 
-    @_log
     async def send_invoice(
         self,
         chat_id: Union[int, str],
@@ -4777,18 +4735,18 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         need_shipping_address: Optional[bool] = None,
         is_flexible: Optional[bool] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         provider_data: Optional[Union[str, object]] = None,
         send_phone_number_to_provider: Optional[bool] = None,
         send_email_to_provider: Optional[bool] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         max_tip_amount: Optional[int] = None,
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4884,23 +4842,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard. If empty, one 'Pay total price' button will be
@@ -4908,6 +4849,26 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
                 .. versionadded:: 20.8
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -4958,7 +4919,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def answer_shipping_query(
         self,
         shipping_query_id: str,
@@ -5017,7 +4977,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def answer_pre_checkout_query(
         self,
         pre_checkout_query_id: str,
@@ -5074,7 +5033,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def answer_web_app_query(
         self,
         web_app_query_id: str,
@@ -5121,7 +5079,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return SentWebAppMessage.de_json(api_result, self)  # type: ignore[return-value]
 
-    @_log
     async def restrict_chat_member(
         self,
         chat_id: Union[str, int],
@@ -5195,7 +5152,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def promote_chat_member(
         self,
         chat_id: Union[str, int],
@@ -5236,10 +5192,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             user_id (:obj:`int`): Unique identifier of the target user.
             is_anonymous (:obj:`bool`, optional): Pass :obj:`True`, if the administrator's presence
                 in the chat is hidden.
-            can_manage_chat (:obj:`bool`, optional): Pass  :obj:`True`, if the administrator can
-                access the chat event log, chat statistics, boost list in channels, see channel
-                members, report spam messages, see anonymous administrators in supergroups and
-                ignore slow mode. Implied by any other administrator privilege.
+            can_manage_chat (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
+                access the chat event log, get boost list, see hidden supergroup and channel
+                members, report spam messages and ignore slow mode. Implied by any other
+                administrator privilege.
 
                 .. versionadded:: 13.4
 
@@ -5251,9 +5207,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
             can_post_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                post messages in the channel, or access channel statistics; channels only.
+                post messages in the channel, or access channel statistics; for channels only.
             can_edit_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                edit messages of other users and can pin messages, channels only.
+                edit messages of other users and can pin messages, for channels only.
             can_delete_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 delete messages of other users.
             can_invite_users (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -5261,25 +5217,25 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             can_restrict_members (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
                 can restrict, ban or unban chat members, or access supergroup statistics.
             can_pin_messages (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                pin messages, supergroups only.
+                pin messages, for supergroups only.
             can_promote_members (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 add new administrators with a subset of their own privileges or demote
                 administrators that they have promoted, directly or indirectly
                 (promoted by administrators that were appointed by the user).
             can_manage_topics (:obj:`bool`, optional): Pass :obj:`True`, if the user is
-                allowed to create, rename, close, and reopen forum topics; supergroups only.
+                allowed to create, rename, close, and reopen forum topics; for supergroups only.
 
                 .. versionadded:: 20.0
             can_post_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                post stories in the channel; channels only.
+                post stories to the chat.
 
                 .. versionadded:: 20.6
             can_edit_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                edit stories posted by other users; channels only.
+                edit stories posted by other users.
 
                 .. versionadded:: 20.6
             can_delete_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                delete stories posted by other users; channels only.
+                delete stories posted by other users.
 
                 .. versionadded:: 20.6
 
@@ -5320,7 +5276,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_chat_permissions(
         self,
         chat_id: Union[str, int],
@@ -5379,7 +5334,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_chat_administrator_custom_title(
         self,
         chat_id: Union[int, str],
@@ -5422,7 +5376,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def export_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -5466,7 +5419,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def create_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -5544,7 +5496,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def edit_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -5626,7 +5577,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def revoke_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -5674,7 +5624,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def approve_chat_join_request(
         self,
         chat_id: Union[str, int],
@@ -5715,7 +5664,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def decline_chat_join_request(
         self,
         chat_id: Union[str, int],
@@ -5756,7 +5704,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_chat_photo(
         self,
         chat_id: Union[str, int],
@@ -5803,7 +5750,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_chat_photo(
         self,
         chat_id: Union[str, int],
@@ -5840,7 +5786,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_chat_title(
         self,
         chat_id: Union[str, int],
@@ -5881,7 +5826,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_chat_description(
         self,
         chat_id: Union[str, int],
@@ -5923,7 +5867,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def pin_chat_message(
         self,
         chat_id: Union[str, int],
@@ -5973,7 +5916,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unpin_chat_message(
         self,
         chat_id: Union[str, int],
@@ -6016,7 +5958,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unpin_all_chat_messages(
         self,
         chat_id: Union[str, int],
@@ -6055,7 +5996,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_sticker_set(
         self,
         name: str,
@@ -6090,7 +6030,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         )
         return StickerSet.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def get_custom_emoji_stickers(
         self,
         custom_emoji_ids: Sequence[str],
@@ -6134,7 +6073,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return Sticker.de_list(result, self)
 
-    @_log
     async def upload_sticker_file(
         self,
         user_id: int,
@@ -6194,7 +6132,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return File.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def add_sticker_to_set(
         self,
         user_id: int,
@@ -6256,7 +6193,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_position_in_set(
         self,
         sticker: str,
@@ -6292,7 +6228,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def create_new_sticker_set(
         self,
         user_id: int,
@@ -6391,7 +6326,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_sticker_from_set(
         self,
         sticker: str,
@@ -6425,7 +6359,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_sticker_set(
         self,
         name: str,
@@ -6462,7 +6395,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_set_thumbnail(
         self,
         name: str,
@@ -6527,7 +6459,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_set_title(
         self,
         name: str,
@@ -6568,7 +6499,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_emoji_list(
         self,
         sticker: str,
@@ -6610,7 +6540,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_keywords(
         self,
         sticker: str,
@@ -6652,7 +6581,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_sticker_mask_position(
         self,
         sticker: str,
@@ -6693,7 +6621,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_custom_emoji_sticker_set_thumbnail(
         self,
         name: str,
@@ -6735,7 +6662,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_passport_data_errors(
         self,
         user_id: int,
@@ -6782,7 +6708,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def send_poll(
         self,
         chat_id: Union[int, str],
@@ -6794,18 +6719,18 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         correct_option_id: Optional[CorrectOptionID] = None,
         is_closed: Optional[bool] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         explanation: Optional[str] = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: Optional[int] = None,
         close_date: Optional[Union[int, datetime]] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6870,22 +6795,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
 
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
@@ -6894,6 +6803,26 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
                 .. versionadded:: 20.8
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -6935,7 +6864,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def stop_poll(
         self,
         chat_id: Union[int, str],
@@ -6981,19 +6909,18 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return Poll.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def send_dice(
         self,
         chat_id: Union[int, str],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
         reply_markup: Optional[ReplyMarkup] = None,
         emoji: Optional[str] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7006,15 +6933,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             disable_notification (:obj:`bool`, optional): |disable_notification|
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -7034,15 +6952,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionchanged:: 13.4
                    Added the :tg-const:`telegram.Dice.BOWLING` emoji.
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
@@ -7052,6 +6961,27 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
                 .. versionadded:: 20.8
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -7079,7 +7009,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_my_default_administrator_rights(
         self,
         for_channels: Optional[bool] = None,
@@ -7121,7 +7050,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         return ChatAdministratorRights.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def set_my_default_administrator_rights(
         self,
         rights: Optional[ChatAdministratorRights] = None,
@@ -7167,7 +7095,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_my_commands(
         self,
         scope: Optional[BotCommandScope] = None,
@@ -7221,7 +7148,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         return BotCommand.de_list(result, self)
 
-    @_log
     async def set_my_commands(
         self,
         commands: Sequence[Union[BotCommand, Tuple[str, str]]],
@@ -7286,7 +7212,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_my_commands(
         self,
         scope: Optional[BotCommandScope] = None,
@@ -7334,7 +7259,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def log_out(
         self,
         *,
@@ -7367,7 +7291,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def close(
         self,
         *,
@@ -7399,7 +7322,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def copy_message(
         self,
         chat_id: Union[int, str],
@@ -7409,13 +7331,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        reply_to_message_id: Optional[int] = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        reply_to_message_id: Optional[int] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7449,24 +7371,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionadded:: 20.0
 
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-                Mutually exclusive with :paramref:`reply_parameters`.
-
-                .. versionchanged:: 20.8
-                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
-
-                .. deprecated:: 20.8
-                    |keyword_only_arg|
-
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -7474,6 +7378,26 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
                 .. versionadded:: 20.8
+
+        Keyword Args:
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+                Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience
+                parameter for
+
+                .. versionchanged:: 20.8
+                    Bot API 7.0 introduced :paramref:`reply_parameters` |rtm_aswr_deprecated|
+
+                .. versionchanged:: 21.0
+                    |keyword_only_arg|
 
         Returns:
             :class:`telegram.MessageId`: On success
@@ -7523,7 +7447,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return MessageId.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def copy_messages(
         self,
         chat_id: Union[int, str],
@@ -7554,11 +7477,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
-            message_ids (Sequence[:obj:`int`]): Identifiers of
+            message_ids (Sequence[:obj:`int`]): A list of
                 :tg-const:`telegram.constants.BulkRequestLimit.MIN_LIMIT` -
-                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` messages in the chat.
-                :paramref:`from_chat_id` to copy. The identifiers must be specified in a strictly
-                increasing order.
+                :tg-const:`telegram.constants.BulkRequestLimit.MAX_LIMIT` identifiers of messages
+                in the chat :paramref:`from_chat_id` to copy. The identifiers must be
+                specified in a strictly increasing order.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
@@ -7594,7 +7517,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return MessageId.de_list(result, self)
 
-    @_log
     async def set_chat_menu_button(
         self,
         chat_id: Optional[int] = None,
@@ -7636,7 +7558,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_chat_menu_button(
         self,
         chat_id: Optional[int] = None,
@@ -7676,7 +7597,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return MenuButton.de_json(result, bot=self)  # type: ignore[return-value]
 
-    @_log
     async def create_invoice_link(
         self,
         title: str,
@@ -7805,7 +7725,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_forum_topic_icon_stickers(
         self,
         *,
@@ -7837,7 +7756,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return Sticker.de_list(result, self)
 
-    @_log
     async def create_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -7897,7 +7815,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         )
         return ForumTopic.de_json(result, self)  # type: ignore[return-value]
 
-    @_log
     async def edit_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -7954,7 +7871,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def close_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -7999,7 +7915,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def reopen_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8044,7 +7959,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def delete_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8088,7 +8002,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unpin_all_forum_topic_messages(
         self,
         chat_id: Union[str, int],
@@ -8133,7 +8046,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unpin_all_general_forum_topic_messages(
         self,
         chat_id: Union[str, int],
@@ -8173,7 +8085,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def edit_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8217,7 +8128,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def close_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8257,7 +8167,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def reopen_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8298,7 +8207,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def hide_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8339,7 +8247,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def unhide_general_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8379,7 +8286,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_my_description(
         self,
         description: Optional[str] = None,
@@ -8425,7 +8331,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def set_my_short_description(
         self,
         short_description: Optional[str] = None,
@@ -8471,7 +8376,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_my_description(
         self,
         language_code: Optional[str] = None,
@@ -8510,7 +8414,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
-    @_log
     async def get_my_short_description(
         self,
         language_code: Optional[str] = None,
@@ -8550,7 +8453,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
-    @_log
     async def set_my_name(
         self,
         name: Optional[str] = None,
@@ -8599,7 +8501,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    @_log
     async def get_my_name(
         self,
         language_code: Optional[str] = None,
@@ -8638,7 +8539,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
-    @_log
     async def get_user_chat_boosts(
         self,
         chat_id: Union[str, int],
@@ -8681,7 +8581,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
-    @_log
     async def set_message_reaction(
         self,
         chat_id: Union[str, int],
@@ -8708,7 +8607,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 media group, the reaction is set to the first non-deleted message in the group
                 instead.
             reaction (Sequence[:class:`telegram.ReactionType` | :obj:`str`] | \
-                :class:`telegram.ReactionType` | :obj:`str`, optional): New list of reaction
+                :class:`telegram.ReactionType` | :obj:`str`, optional): A list of reaction
                 types to set on the message. Currently, as non-premium users, bots can set up to
                 one reaction per message. A custom emoji reaction can be used if it is either
                 already present on the message or explicitly allowed by chat administrators.

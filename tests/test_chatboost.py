@@ -24,6 +24,7 @@ import pytest
 from telegram import (
     Chat,
     ChatBoost,
+    ChatBoostAdded,
     ChatBoostRemoved,
     ChatBoostSource,
     ChatBoostSourceGiftCode,
@@ -542,3 +543,42 @@ class TestUserChatBoostsWithRequest(ChatBoostDefaults):
     async def test_get_user_chat_boosts(self, bot, channel_id, chat_id):
         chat_boosts = await bot.get_user_chat_boosts(channel_id, chat_id)
         assert isinstance(chat_boosts, UserChatBoosts)
+
+
+class TestChatBoostAddedWithoutRequest:
+    boost_count = 100
+
+    def test_slot_behaviour(self):
+        action = ChatBoostAdded(8)
+        for attr in action.__slots__:
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+
+    def test_de_json(self):
+        json_dict = {"boost_count": self.boost_count}
+        chat_boost_added = ChatBoostAdded.de_json(json_dict, None)
+        assert chat_boost_added.api_kwargs == {}
+
+        assert chat_boost_added.boost_count == self.boost_count
+
+    def test_to_dict(self):
+        chat_boost_added = ChatBoostAdded(self.boost_count)
+        chat_boost_added_dict = chat_boost_added.to_dict()
+
+        assert isinstance(chat_boost_added_dict, dict)
+        assert chat_boost_added_dict["boost_count"] == self.boost_count
+
+    def test_equality(self):
+        a = ChatBoostAdded(100)
+        b = ChatBoostAdded(100)
+        c = ChatBoostAdded(50)
+        d = Chat(1, "")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

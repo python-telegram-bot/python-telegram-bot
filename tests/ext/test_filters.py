@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -1065,10 +1065,10 @@ class TestFilters:
         assert filters.StatusUpdate.WRITE_ACCESS_ALLOWED.check_update(update)
         update.message.write_access_allowed = None
 
-        update.message._user_shared = "user_shared"
+        update.message.api_kwargs = {"user_shared": "user_shared"}
         assert filters.StatusUpdate.ALL.check_update(update)
         assert filters.StatusUpdate.USER_SHARED.check_update(update)
-        update.message._user_shared = None
+        update.message.api_kwargs = {}
 
         update.message.users_shared = "users_shared"
         assert filters.StatusUpdate.ALL.check_update(update)
@@ -2700,3 +2700,24 @@ class TestFilters:
         update.message.giveaway_winners = "test"
         assert filters.GIVEAWAY_WINNERS.check_update(update)
         assert str(filters.GIVEAWAY_WINNERS) == "filters.GIVEAWAY_WINNERS"
+
+    def test_filters_reply_to_story(self, update):
+        assert not filters.REPLY_TO_STORY.check_update(update)
+
+        update.message.reply_to_story = "test"
+        assert filters.REPLY_TO_STORY.check_update(update)
+        assert str(filters.REPLY_TO_STORY) == "filters.REPLY_TO_STORY"
+
+    def test_filters_boost_added(self, update):
+        assert not filters.BOOST_ADDED.check_update(update)
+
+        update.message.boost_added = "test"
+        assert filters.BOOST_ADDED.check_update(update)
+        assert str(filters.BOOST_ADDED) == "filters.BOOST_ADDED"
+
+    def test_filters_sender_boost_count(self, update):
+        assert not filters.SENDER_BOOST_COUNT.check_update(update)
+
+        update.message.sender_boost_count = "test"
+        assert filters.SENDER_BOOST_COUNT.check_update(update)
+        assert str(filters.SENDER_BOOST_COUNT) == "filters.SENDER_BOOST_COUNT"

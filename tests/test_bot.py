@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,6 @@ import datetime as dtm
 import inspect
 import logging
 import pickle
-import re
 import socket
 import time
 from collections import defaultdict
@@ -388,22 +387,10 @@ class TestBotWithoutRequest:
         with pytest.raises(TypeError, match="Bot objects cannot be deepcopied"):
             copy.deepcopy(bot)
 
-    @bot_methods(ext_bot=False)
-    def test_api_methods_have_log_decorator(self, bot_class, bot_method_name, bot_method):
-        """Check that all bot methods have the log decorator ..."""
-        # not islower() skips the camelcase aliases
-        if not bot_method_name.islower():
-            return
-        source = inspect.getsource(bot_method)
-        assert (
-            # Use re.match to only match at *the beginning* of the string
-            re.match(rf"\s*\@\_log\s*async def {bot_method_name}", source)
-        ), f"{bot_method_name} is missing the @_log decorator"
-
     @pytest.mark.parametrize(
         ("cls", "logger_name"), [(Bot, "telegram.Bot"), (ExtBot, "telegram.ext.ExtBot")]
     )
-    async def test_log_decorator(self, bot: PytestExtBot, cls, logger_name, caplog):
+    async def test_bot_method_logging(self, bot: PytestExtBot, cls, logger_name, caplog):
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
             await cls(bot.token).get_me()
@@ -415,11 +402,19 @@ class TestBotWithoutRequest:
                         caplog.records.pop(idx)
                     if record.getMessage().startswith("Task exception was never retrieved"):
                         caplog.records.pop(idx)
-            assert len(caplog.records) == 3
+            assert len(caplog.records) == 2
 
             assert all(caplog.records[i].name == logger_name for i in [-1, 0])
-            assert caplog.records[0].getMessage().startswith("Entering: get_me")
-            assert caplog.records[-1].getMessage().startswith("Exiting: get_me")
+            assert (
+                caplog.records[0]
+                .getMessage()
+                .startswith("Calling Bot API endpoint `getMe` with parameters `{}`")
+            )
+            assert (
+                caplog.records[-1]
+                .getMessage()
+                .startswith("Call to Bot API endpoint `getMe` finished with return value")
+            )
 
     @bot_methods()
     def test_camel_case_aliases(self, bot_class, bot_method_name, bot_method):
@@ -1061,12 +1056,12 @@ class TestBotWithoutRequest:
 
     async def test_send_edit_message_mutually_exclusive_link_preview(self, bot, chat_id):
         """Test that link_preview is mutually exclusive with disable_web_page_preview."""
-        with pytest.raises(ValueError, match="'disable_web_page_preview' was renamed to"):
+        with pytest.raises(ValueError, match="`link_preview_options` are mutually exclusive"):
             await bot.send_message(
                 chat_id, "text", disable_web_page_preview=True, link_preview_options="something"
             )
 
-        with pytest.raises(ValueError, match="'disable_web_page_preview' was renamed to"):
+        with pytest.raises(ValueError, match="`link_preview_options` are mutually exclusive"):
             await bot.edit_message_text(
                 "text", chat_id, 1, disable_web_page_preview=True, link_preview_options="something"
             )
@@ -2120,8 +2115,8 @@ class TestBotWithRequest:
         )
 
         assert forward_message.text == message.text
-        assert forward_message.forward_from.username == message.from_user.username
-        assert isinstance(forward_message.forward_date, dtm.datetime)
+        assert forward_message.forward_origin.sender_user == message.from_user
+        assert isinstance(forward_message.forward_origin.date, dtm.datetime)
 
     async def test_forward_protected_message(self, bot, chat_id):
         tasks = asyncio.gather(
@@ -2155,7 +2150,7 @@ class TestBotWithRequest:
         msg1, msg2 = await tasks
 
         forward_messages = await bot.forward_messages(
-            chat_id, from_chat_id=chat_id, message_ids=(msg1.message_id, msg2.message_id)
+            chat_id, from_chat_id=chat_id, message_ids=sorted((msg1.message_id, msg2.message_id))
         )
 
         assert isinstance(forward_messages, tuple)
@@ -2174,12 +2169,12 @@ class TestBotWithRequest:
         forward_msg2 = temp_msg2.reply_to_message
 
         assert forward_msg1.text == msg1.text
-        assert forward_msg1.forward_from.username == msg1.from_user.username
-        assert isinstance(forward_msg1.forward_date, dtm.datetime)
+        assert forward_msg1.forward_origin.sender_user == msg1.from_user
+        assert isinstance(forward_msg1.forward_origin.date, dtm.datetime)
 
         assert forward_msg2.text == msg2.text
-        assert forward_msg2.forward_from.username == msg2.from_user.username
-        assert isinstance(forward_msg2.forward_date, dtm.datetime)
+        assert forward_msg2.forward_origin.sender_user == msg2.from_user
+        assert isinstance(forward_msg2.forward_origin.date, dtm.datetime)
 
     async def test_delete_message(self, bot, chat_id):
         message = await bot.send_message(chat_id, text="will be deleted")

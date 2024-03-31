@@ -1,6 +1,6 @@
 #
 #  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2023
+#  Copyright (C) 2015-2024
 #  Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -81,11 +81,12 @@ class TGConstXRefRole(PyXRefRole):
             ):
                 return repr(value), target
             sphinx_logger.warning(
-                f"%s:%d: WARNING: Did not convert reference %s. :{CONSTANTS_ROLE}: is not supposed"
+                "%s:%d: WARNING: Did not convert reference %s. :%s: is not supposed"
                 " to be used with this type of target.",
                 refnode.source,
                 refnode.line,
                 refnode.rawsource,
+                CONSTANTS_ROLE,
             )
             return title, target
         except Exception as exc:

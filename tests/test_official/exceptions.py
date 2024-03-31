@@ -94,6 +94,13 @@ class ParamTypeCheckingExceptions:
 PTB_EXTRA_PARAMS = {
     "send_contact": {"contact"},
     "send_location": {"location"},
+    "(send_message|edit_message_text)": {  # convenience parameters
+        "disable_web_page_preview",
+    },
+    r"(send|copy)_\w+": {  # convenience parameters
+        "reply_to_message_id",
+        "allow_sending_without_reply",
+    },
     "edit_message_live_location": {"location"},
     "send_venue": {"venue"},
     "answer_inline_query": {"current_offset"},
@@ -125,6 +132,9 @@ def ptb_extra_params(object_name: str) -> set[str]:
 # Mostly due to the value being fixed anyway
 PTB_IGNORED_PARAMS = {
     r"InlineQueryResult\w+": {"type"},
+    # TODO: Remove this in v21.0 (API 7.1) when this can stop being optional
+    r"ChatAdministratorRights": {"can_post_stories", "can_edit_stories", "can_delete_stories"},
+    r"ChatMemberAdministrator": {"can_post_stories", "can_edit_stories", "can_delete_stories"},
     r"ChatMember\w+": {"status"},
     r"PassportElementError\w+": {"source"},
     "ForceReply": {"force_reply"},
@@ -160,23 +170,9 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 # Arguments that are optional arguments for now for backwards compatibility
 BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
-    # Deprecated by Bot API 7.0, kept for now for bw compat:
-    "KeyboardButton": {"request_user"},
-    "Message": {
-        "forward_from",
-        "forward_signature",
-        "forward_sender_name",
-        "forward_date",
-        "forward_from_chat",
-        "forward_from_message_id",
-        "user_shared",
-    },
-    "(send_message|edit_message_text)": {
-        "disable_web_page_preview",
-        "reply_to_message_id",
-        "allow_sending_without_reply",
-    },
-    r"copy_message|send_\w+": {"allow_sending_without_reply", "reply_to_message_id"},
+    # TODO: Remove this in v21.0 (API 7.1) when this can stop being optional
+    r"ChatAdministratorRights": {"can_post_stories", "can_edit_stories", "can_delete_stories"},
+    r"ChatMemberAdministrator": {"can_post_stories", "can_edit_stories", "can_delete_stories"},
 }
 
 

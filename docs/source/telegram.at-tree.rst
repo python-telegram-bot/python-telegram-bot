@@ -22,6 +22,7 @@ Available Types
     telegram.chat
     telegram.chatadministratorrights
     telegram.chatboost
+    telegram.chatboostadded
     telegram.chatboostremoved
     telegram.chatboostsource
     telegram.chatboostsourcegiftcode
@@ -73,7 +74,6 @@ Available Types
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype
     telegram.keyboardbuttonrequestchat
-    telegram.keyboardbuttonrequestuser
     telegram.keyboardbuttonrequestusers
     telegram.linkpreviewoptions
     telegram.location
@@ -115,7 +115,6 @@ Available Types
     telegram.user
     telegram.userchatboosts
     telegram.userprofilephotos
-    telegram.usershared
     telegram.usersshared
     telegram.venue
     telegram.video

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -60,7 +60,7 @@ class StringEnum(str, _enum.Enum):
 
 
 # Apply the __repr__ modification and __str__ fix to IntEnum
-class IntEnum(_enum.IntEnum):  # pylint: disable=invalid-slots
+class IntEnum(_enum.IntEnum):
     """Helper class for int enums where ``str(member)`` prints the value, but ``repr(member)``
     gives ``EnumName.MEMBER_NAME``.
     """

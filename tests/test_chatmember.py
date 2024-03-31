@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2023
+# Copyright (C) 2015-2024
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -150,8 +150,13 @@ def make_json_dict(instance: ChatMember, include_optional_args: bool = False) ->
                 val = val.to_dict()
             json_dict[param.name] = val
 
-        # If we want to test all args (for de_json)-
-        elif param.default is not inspect.Parameter.empty and include_optional_args:
+        # If we want to test all args (for de_json)
+        # or if the param is optional but for backwards compatability
+        elif (
+            param.default is not inspect.Parameter.empty
+            and include_optional_args
+            or param.name in ["can_delete_stories", "can_post_stories", "can_edit_stories"]
+        ):
             json_dict[param.name] = val
     return json_dict
 
@@ -297,3 +302,19 @@ class TestChatMemberTypesWithoutRequest:
 
         assert c != e
         assert hash(c) != hash(e)
+
+    def test_deprecation_typeerror(self, chat_member_type):
+        with pytest.raises(TypeError, match="must be set in order"):
+            ChatMemberAdministrator(
+                *(False,) * 12,
+            )
+        with pytest.raises(TypeError, match="must be set in order"):
+            ChatMemberAdministrator(*(False,) * 12, can_edit_stories=True)
+        with pytest.raises(TypeError, match="must be set in order"):
+            ChatMemberAdministrator(*(False,) * 12, can_post_stories=True)
+        with pytest.raises(TypeError, match="must be set in order"):
+            ChatMemberAdministrator(*(False,) * 12, can_delete_stories=True)
+        with pytest.raises(TypeError, match="must be set in order"):
+            ChatMemberAdministrator(*(False,) * 12, can_edit_stories=True, can_post_stories=True)
+        with pytest.raises(TypeError, match="must be set in order"):
+            ChatMemberAdministrator(*(False,) * 12, can_delete_stories=True, can_post_stories=True)
