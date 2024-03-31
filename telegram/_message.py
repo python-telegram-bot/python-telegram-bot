@@ -542,9 +542,9 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: NEXT.VERSION
 
-        sender_business_bot (:obj:`str`, optional): The bot that actually sent the message on
-            behalf of the business account. Available only for outgoing messages sent on behalf of
-            the connected business account.
+        sender_business_bot (:obj:`telegram.User`, optional): The bot that actually sent the
+            message on behalf of the business account. Available only for outgoing messages sent
+            on behalf of the connected business account.
 
             .. versionadded:: NEXT.VERSION
 
@@ -837,9 +837,9 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: NEXT.VERSION
 
-        sender_business_bot (:obj:`str`): Optional. The bot that actually sent the message on
-            behalf of the business account. Available only for outgoing messages sent on behalf of
-            the connected business account.
+        sender_business_bot (:obj:`telegram.User`): Optional. The bot that actually sent the
+            message on behalf of the business account. Available only for outgoing messages sent
+            on behalf of the connected business account.
 
             .. versionadded:: NEXT.VERSION
 
