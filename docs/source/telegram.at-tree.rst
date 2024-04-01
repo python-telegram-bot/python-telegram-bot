@@ -19,6 +19,7 @@ Available Types
     telegram.botname
     telegram.botshortdescription
     telegram.businessconnection
+    telegram.businessintro
     telegram.businessmessagesdeleted
     telegram.callbackquery
     telegram.chat
