@@ -48,6 +48,7 @@ from telegram import (
     BotDescription,
     BotName,
     BotShortDescription,
+    BusinessConnection,
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
@@ -4038,6 +4039,26 @@ class ExtBot(Bot, Generic[RLARGS]):
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
+    async def get_business_connection(
+        self,
+        business_connection_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+        rate_limit_args: Optional[RLARGS] = None,
+    ) -> BusinessConnection:
+        return await super().get_business_connection(
+            business_connection_id=business_connection_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
     # updated camelCase aliases
     getMe = get_me
     sendMessage = send_message
@@ -4157,3 +4178,4 @@ class ExtBot(Bot, Generic[RLARGS]):
     unpinAllGeneralForumTopicMessages = unpin_all_general_forum_topic_messages
     getUserChatBoosts = get_user_chat_boosts
     setMessageReaction = set_message_reaction
+    getBusinessConnection = get_business_connection
