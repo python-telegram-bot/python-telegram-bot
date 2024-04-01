@@ -2881,6 +2881,11 @@ class TestBotWithRequest:
         assert info.ip_address is None
         assert info.has_custom_certificate is False
 
+    async def test_get_business_connection(self, bot):
+        # TODO: Get a business connection and test this properly
+        pass
+        # assert await bot.get_business_connection("TEST") is None
+
     async def test_leave_chat(self, bot):
         with pytest.raises(BadRequest, match="Chat not found"):
             await bot.leave_chat(-123456)

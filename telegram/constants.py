@@ -2514,6 +2514,26 @@ class UpdateType(StringEnum):
 
     .. versionadded:: 20.8
     """
+    BUSINESS_CONNECTION = "business_connection"
+    """:obj:`str`: Updates with :attr:`telegram.Update.business_connection`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    BUSINESS_MESSAGE = "business_message"
+    """:obj:`str`: Updates with :attr:`telegram.Update.business_message`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    EDITED_BUSINESS_MESSAGE = "edited_business_message"
+    """:obj:`str`: Updates with :attr:`telegram.Update.edited_business_message`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    DELETED_BUSINESS_MESSAGES = "deleted_business_messages"
+    """:obj:`str`: Updates with :attr:`telegram.Update.deleted_business_messages`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class InvoiceLimit(IntEnum):

@@ -23,6 +23,8 @@ from datetime import datetime
 import pytest
 
 from telegram import (
+    BusinessConnection,
+    BusinessMessagesDeleted,
     CallbackQuery,
     Chat,
     ChatBoost,
@@ -119,6 +121,21 @@ message_reaction_count = MessageReactionCountUpdated(
     reactions=(ReactionCount(ReactionTypeEmoji("👍"), 1),),
 )
 
+business_connection = BusinessConnection(
+    "1",
+    User(1, "name", False),
+    1,
+    from_timestamp(int(time.time())),
+    True,
+    True,
+)
+
+deleted_business_messages = BusinessMessagesDeleted(
+    "1",
+    Chat(1, ""),
+    (1, 2),
+)
+
 
 params = [
     {"message": message},
@@ -150,6 +167,8 @@ params = [
     {"removed_chat_boost": removed_chat_boost},
     {"message_reaction": message_reaction},
     {"message_reaction_count": message_reaction_count},
+    {"business_connection": business_connection},
+    {"deleted_business_messages": deleted_business_messages},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -173,6 +192,8 @@ all_types = (
     "removed_chat_boost",
     "message_reaction",
     "message_reaction_count",
+    "business_connection",
+    "deleted_business_messages",
 )
 
 ids = (*all_types, "callback_query_without_message")
@@ -257,6 +278,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.pre_checkout_query is not None
             or update.poll is not None
             or update.poll_answer is not None
+            or update.business_connection is not None
         ):
             assert chat.id == 1
         else:
@@ -272,6 +294,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.chat_boost is not None
             or update.removed_chat_boost is not None
             or update.message_reaction_count is not None
+            or update.deleted_business_messages is not None
         ):
             assert user.id == 1
         else:
@@ -297,6 +320,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.chat_boost is not None
             or update.removed_chat_boost is not None
             or update.message_reaction_count is not None
+            or update.deleted_business_messages is not None
         ):
             if update.channel_post or update.edited_channel_post:
                 assert isinstance(sender, Chat)
@@ -329,6 +353,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.chat_boost is not None
             or update.removed_chat_boost is not None
             or update.message_reaction_count is not None
+            or update.deleted_business_messages is not None
         ):
             if (
                 update.message
@@ -365,6 +390,8 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.removed_chat_boost is not None
             or update.message_reaction is not None
             or update.message_reaction_count is not None
+            or update.deleted_business_messages is not None
+            or update.business_connection is not None
         ):
             assert eff_message.message_id == message.message_id
         else:
