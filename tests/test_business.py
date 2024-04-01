@@ -20,7 +20,14 @@ from datetime import datetime
 
 import pytest
 
-from telegram import BusinessConnection, BusinessMessagesDeleted, Chat, User
+from telegram import (
+    BusinessConnection,
+    BusinessIntro,
+    BusinessMessagesDeleted,
+    Chat,
+    Sticker,
+    User,
+)
 from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.slots import mro_slots
 
@@ -35,6 +42,9 @@ class TestBusinessBase:
     message_ids = (123, 321)
     business_connection_id = "123"
     chat = Chat(123, "test_chat")
+    title = "Business Title"
+    message = "Business description"
+    sticker = Sticker("sticker_id", "unique_id", 50, 50, True, False, Sticker.REGULAR)
 
 
 @pytest.fixture(scope="module")
@@ -55,6 +65,15 @@ def business_messages_deleted():
         TestBusinessBase.business_connection_id,
         TestBusinessBase.chat,
         TestBusinessBase.message_ids,
+    )
+
+
+@pytest.fixture(scope="module")
+def business_intro():
+    return BusinessIntro(
+        TestBusinessBase.title,
+        TestBusinessBase.message,
+        TestBusinessBase.sticker,
     )
 
 
@@ -170,3 +189,43 @@ class TestBusinessMessagesDeleted(TestBusinessBase):
 
         assert bmd1 != bmd3
         assert hash(bmd1) != hash(bmd3)
+
+
+class TestBusinessIntro(TestBusinessBase):
+    def test_slots(self, business_intro):
+        intro = business_intro
+        for attr in intro.__slots__:
+            assert getattr(intro, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(intro)) == len(set(mro_slots(intro))), "duplicate slot"
+
+    def test_to_dict(self, business_intro):
+        intro_dict = business_intro.to_dict()
+        assert isinstance(intro_dict, dict)
+        assert intro_dict["title"] == self.title
+        assert intro_dict["message"] == self.message
+        assert intro_dict["sticker"] == self.sticker.to_dict()
+
+    def test_de_json(self):
+        json_dict = {
+            "title": self.title,
+            "message": self.message,
+            "sticker": self.sticker.to_dict(),
+        }
+        intro = BusinessIntro.de_json(json_dict, None)
+        assert intro.title == self.title
+        assert intro.message == self.message
+        assert intro.sticker == self.sticker
+        assert intro.api_kwargs == {}
+        assert isinstance(intro, BusinessIntro)
+
+    def test_equality(self):
+        intro1 = BusinessIntro(self.title, self.message, self.sticker)
+        intro2 = BusinessIntro(self.title, self.message, self.sticker)
+        intro3 = BusinessIntro("Other Business", self.message, self.sticker)
+
+        assert intro1 == intro2
+        assert hash(intro1) == hash(intro2)
+        assert intro1 is not intro2
+
+        assert intro1 != intro3
+        assert hash(intro1) != hash(intro3)
