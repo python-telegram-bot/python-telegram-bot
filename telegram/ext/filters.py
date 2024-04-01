@@ -278,14 +278,17 @@ class BaseFilter:
         Returns:
             :obj:`bool`: :obj:`True` if the update contains one of
             :attr:`~telegram.Update.channel_post`, :attr:`~telegram.Update.message`,
-            :attr:`~telegram.Update.edited_channel_post` or
-            :attr:`~telegram.Update.edited_message`, :obj:`False` otherwise.
+            :attr:`~telegram.Update.edited_channel_post`,
+            :attr:`~telegram.Update.edited_message`, :attr:`telegram.Update.business_message`,
+            :attr:`telegram.Update.edited_business_message`, or :obj:`False` otherwise.
         """
         if (  # Only message updates should be handled.
-            update.channel_post
+            update.channel_post  # pylint: disable=too-many-boolean-expressions
             or update.message
             or update.edited_channel_post
             or update.edited_message
+            or update.business_message
+            or update.edited_business_message
         ):
             return True
         return False
@@ -2488,13 +2491,21 @@ class UpdateType:
         __slots__ = ()
 
         def filter(self, update: Update) -> bool:
-            return update.edited_message is not None or update.edited_channel_post is not None
+            return (
+                update.edited_message is not None
+                or update.edited_channel_post is not None
+                or update.edited_business_message is not None
+            )
 
     EDITED = _Edited(name="filters.UpdateType.EDITED")
-    """Updates with either :attr:`telegram.Update.edited_message` or
-    :attr:`telegram.Update.edited_channel_post`.
+    """Updates with :attr:`telegram.Update.edited_message`,
+    :attr:`telegram.Update.edited_channel_post`, or
+    :attr:`telegram.Update.edited_business_message`.
 
     .. versionadded:: 20.0
+
+    .. versionchanged:: NEXT.VERSION
+        Added :attr:`telegram.Update.edited_business_message` to the filter.
     """
 
     class _EditedChannelPost(UpdateFilter):
@@ -2532,7 +2543,48 @@ class UpdateType:
 
     MESSAGES = _Messages(name="filters.UpdateType.MESSAGES")
     """Updates with either :attr:`telegram.Update.message` or
-    :attr:`telegram.Update.edited_message`."""
+    :attr:`telegram.Update.edited_message`.
+    """
+
+    class _BusinessMessage(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.business_message is not None
+
+    BUSINESS_MESSAGE = _BusinessMessage(name="filters.UpdateType.BUSINESS_MESSAGE")
+    """Updates with :attr:`telegram.Update.business_message`.
+
+    .. versionadded:: NEXT.VERSION"""
+
+    class _EditedBusinessMessage(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.edited_business_message is not None
+
+    EDITED_BUSINESS_MESSAGE = _EditedBusinessMessage(
+        name="filters.UpdateType.EDITED_BUSINESS_MESSAGE"
+    )
+    """Updates with :attr:`telegram.Update.edited_business_message`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _BusinessMessages(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return (
+                update.business_message is not None or update.edited_business_message is not None
+            )
+
+    BUSINESS_MESSAGES = _BusinessMessages(name="filters.UpdateType.BUSINESS_MESSAGES")
+    """Updates with either :attr:`telegram.Update.business_message` or
+    :attr:`telegram.Update.edited_business_message`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class User(_ChatUserBaseFilter):
@@ -2677,6 +2729,8 @@ class ViaBot(_ChatUserBaseFilter):
     Examples:
         ``MessageHandler(filters.ViaBot(1234), callback_method)``
 
+    .. seealso:: :attr:`filters.VIA_BOT`
+
     Args:
         bot_id(:obj:`int` | Collection[:obj:`int`], optional): Which bot ID(s) to
             allow through.
@@ -2758,7 +2812,9 @@ class _ViaBot(MessageFilter):
 
 
 VIA_BOT = _ViaBot(name="filters.VIA_BOT")
-"""This filter filters for message that were sent via *any* bot."""
+"""This filter filters for message that were sent via *any* bot.
+
+.. seealso:: :attr:`filters.ViaBot`"""
 
 
 class _Video(MessageFilter):

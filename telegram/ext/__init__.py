@@ -27,6 +27,8 @@ __all__ = (
     "BasePersistence",
     "BaseRateLimiter",
     "BaseUpdateProcessor",
+    "BusinessConnectionHandler",
+    "BusinessMessagesDeletedHandler",
     "CallbackContext",
     "CallbackDataCache",
     "CallbackQueryHandler",
@@ -75,6 +77,8 @@ from ._defaults import Defaults
 from ._dictpersistence import DictPersistence
 from ._extbot import ExtBot
 from ._handlers.basehandler import BaseHandler
+from ._handlers.businessconnectionhandler import BusinessConnectionHandler
+from ._handlers.businessmessagesdeletedhandler import BusinessMessagesDeletedHandler
 from ._handlers.callbackqueryhandler import CallbackQueryHandler
 from ._handlers.chatboosthandler import ChatBoostHandler
 from ._handlers.chatjoinrequesthandler import ChatJoinRequestHandler

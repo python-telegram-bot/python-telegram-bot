@@ -5,6 +5,8 @@ Handlers
     :titlesonly:
 
     telegram.ext.basehandler
+    telegram.ext.businessconnectionhandler
+    telegram.ext.businessmessagesdeleted
     telegram.ext.callbackqueryhandler
     telegram.ext.chatboosthandler
     telegram.ext.chatjoinrequesthandler
