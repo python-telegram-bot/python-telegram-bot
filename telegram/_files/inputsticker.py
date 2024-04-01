@@ -52,6 +52,11 @@ class InputSticker(TelegramObject):
             :tg-const:`telegram.constants.StickerLimit.MAX_KEYWORD_LENGTH` characters. For
             ":tg-const:`telegram.constants.StickerType.REGULAR`" and
             ":tg-const:`telegram.constants.StickerType.CUSTOM_EMOJI`" stickers only.
+        format (:obj:`str`, optional): Format of the added sticker, must be one of
+            :tg-const:`telegram.constants.StickerFormat.STATIC` for a
+            ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
+            for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a WEBM
+            video.
 
     Attributes:
         sticker (:obj:`str` | :class:`telegram.InputFile`): The added sticker.
@@ -67,10 +72,15 @@ class InputSticker(TelegramObject):
             :tg-const:`telegram.constants.StickerLimit.MAX_KEYWORD_LENGTH` characters. For
             ":tg-const:`telegram.constants.StickerType.REGULAR`" and
             ":tg-const:`telegram.constants.StickerType.CUSTOM_EMOJI`" stickers only.
-
+            ":tg-const:`telegram.constants.StickerType.CUSTOM_EMOJI`" stickers only.
+        format (:obj:`str`): Optional. Format of the added sticker, must be one of
+            :tg-const:`telegram.constants.StickerFormat.STATIC` for a
+            ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
+            for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a WEBM
+            video.
     """
 
-    __slots__ = ("emoji_list", "keywords", "mask_position", "sticker")
+    __slots__ = ("emoji_list", "format", "keywords", "mask_position", "sticker")
 
     def __init__(
         self,
@@ -78,6 +88,7 @@ class InputSticker(TelegramObject):
         emoji_list: Sequence[str],
         mask_position: Optional[MaskPosition] = None,
         keywords: Optional[Sequence[str]] = None,
+        format: Optional[str] = None,  # pylint: disable=redefined-builtin
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -93,5 +104,6 @@ class InputSticker(TelegramObject):
         self.emoji_list: Tuple[str, ...] = parse_sequence_arg(emoji_list)
         self.mask_position: Optional[MaskPosition] = mask_position
         self.keywords: Tuple[str, ...] = parse_sequence_arg(keywords)
+        self.format: Optional[str] = format
 
         self._freeze()

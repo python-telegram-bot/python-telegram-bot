@@ -227,16 +227,16 @@ class StickerSet(TelegramObject):
     .. versionchanged:: 20.0
         The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
 
+
+    .. versionchanged:: NEXT.VERSION
+        The parameter ``is_video`` and ``is_animated`` has been removed.
+
     .. versionchanged:: 20.5
        |removed_thumb_note|
 
     Args:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
-        is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
-
-            .. versionadded:: 13.11
         stickers (Sequence[:class:`telegram.Sticker`]): List of all set stickers.
 
             .. versionchanged:: 20.0
@@ -255,10 +255,6 @@ class StickerSet(TelegramObject):
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
-        is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
-
-            .. versionadded:: 13.11
         stickers (Tuple[:class:`telegram.Sticker`]): List of all set stickers.
 
             .. versionchanged:: 20.0
@@ -276,8 +272,6 @@ class StickerSet(TelegramObject):
     """
 
     __slots__ = (
-        "is_animated",
-        "is_video",
         "name",
         "sticker_type",
         "stickers",
@@ -289,9 +283,7 @@ class StickerSet(TelegramObject):
         self,
         name: str,
         title: str,
-        is_animated: bool,
         stickers: Sequence[Sticker],
-        is_video: bool,
         sticker_type: str,
         thumbnail: Optional[PhotoSize] = None,
         *,
@@ -300,8 +292,6 @@ class StickerSet(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.name: str = name
         self.title: str = title
-        self.is_animated: bool = is_animated
-        self.is_video: bool = is_video
         self.stickers: Tuple[Sticker, ...] = parse_sequence_arg(stickers)
         self.sticker_type: str = sticker_type
         # Optional

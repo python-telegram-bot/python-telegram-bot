@@ -1717,8 +1717,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Sticker`): Sticker to send.
-                |fileinput| Video stickers can only be sent by a ``file_id``. Animated stickers
-                can't be sent via an HTTP URL.
+                |fileinput| Video stickers can only be sent by a ``file_id``. Video and animated
+                stickers can't be sent via an HTTP URL.
 
                 Lastly you can pass an existing :class:`telegram.Sticker` object to send.
 
@@ -6225,9 +6225,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to add a new sticker to a set created by the bot. The format of the added
         sticker must match the format of the other stickers in the set. Emoji sticker sets can have
-        up to :tg-const:`telegram.constants.StickerSetLimit.MAX_EMOJI_STICKERS` stickers. Animated
-        and video sticker sets can have up to
-        :tg-const:`telegram.constants.StickerSetLimit.MAX_ANIMATED_STICKERS` stickers. Static
+        up to :tg-const:`telegram.constants.StickerSetLimit.MAX_EMOJI_STICKERS` stickers. Other
         sticker sets can have up to
         :tg-const:`telegram.constants.StickerSetLimit.MAX_STATIC_STICKERS` stickers.
 
@@ -6312,7 +6310,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         name: str,
         title: str,
         stickers: Sequence["InputSticker"],
-        sticker_format: str,
+        sticker_format: Optional[str] = None,
         sticker_type: Optional[str] = None,
         needs_repainting: Optional[bool] = None,
         *,
@@ -6365,6 +6363,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionadded:: 20.2
 
+                .. deprecated:: NEXT.VERSION
+                    Use :paramref:`telegram.InputSticker.format` instead.
+
             sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
                 :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`, or
                 :attr:`telegram.Sticker.CUSTOM_EMOJI`. By default, a regular sticker set is created
@@ -6384,6 +6385,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
+        if sticker_format is not None:
+            warn(
+                "The parameter 'sticker_format' is deprecated. Use the parameter"
+                " `InputSticker.format` in the parameter `stickers` instead.",
+                stacklevel=2,
+                category=PTBDeprecationWarning,
+            )
+
         data: JSONDict = {
             "user_id": user_id,
             "name": name,
@@ -6477,6 +6486,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         name: str,
         user_id: int,
+        format: str,  # pylint: disable=redefined-builtin
         thumbnail: Optional[FileInput] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6490,9 +6500,21 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         .. versionadded:: 20.2
 
+        .. versionchanged:: NEXT.VERSION
+            As per Bot API 7.2, the new argument :paramref:`format` will be required, and thus the
+            order of the arguments had to be changed.
+
         Args:
             name (:obj:`str`): Sticker set name
             user_id (:obj:`int`): User identifier of created sticker set owner.
+            format (:obj:`str`): Format of the added sticker, must be one of
+                :tg-const:`telegram.constants.StickerFormat.STATIC` for a
+                ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
+                for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a
+                WEBM video.
+
+                .. versionadded:: NEXT.VERSION
+
             thumbnail (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): A **.WEBP** or **.PNG** image with the thumbnail, must
                 be up to :tg-const:`telegram.constants.StickerSetLimit.MAX_STATIC_THUMBNAIL_SIZE`
@@ -6525,6 +6547,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "name": name,
             "user_id": user_id,
             "thumbnail": self._parse_file_input(thumbnail) if thumbnail else None,
+            "format": format,
         }
 
         return await self._post(

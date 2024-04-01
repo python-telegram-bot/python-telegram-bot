@@ -2322,6 +2322,9 @@ class StickerSetLimit(IntEnum):
     MAX_ANIMATED_STICKERS = 50
     """:obj:`int`: Maximum number of stickers allowed in an animated or video sticker set, as given
     in :meth:`telegram.Bot.add_sticker_to_set`.
+
+    .. deprecated:: NEXT.VERSION
+        The animated sticker limit is now 120, the same as :attr:`MAX_STATIC_STICKERS`.
     """
     MAX_STATIC_STICKERS = 120
     """:obj:`int`: Maximum number of stickers allowed in a static sticker set, as given in
