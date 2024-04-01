@@ -2539,6 +2539,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_voice(
             chat_id=chat_id,
             voice=voice,
