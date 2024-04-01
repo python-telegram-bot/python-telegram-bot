@@ -3050,7 +3050,7 @@ class Message(MaybeInaccessibleMessage):
         )
         message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_game(
-            chat_id=chat_id,
+            chat_id=chat_id,  # type: ignore[arg-type]
             game_short_name=game_short_name,
             disable_notification=disable_notification,
             reply_parameters=effective_reply_parameters,

@@ -22,7 +22,6 @@ import datetime as dtm
 import inspect
 import logging
 import pickle
-import re
 import socket
 import time
 from collections import defaultdict
@@ -388,22 +387,10 @@ class TestBotWithoutRequest:
         with pytest.raises(TypeError, match="Bot objects cannot be deepcopied"):
             copy.deepcopy(bot)
 
-    @bot_methods(ext_bot=False)
-    def test_api_methods_have_log_decorator(self, bot_class, bot_method_name, bot_method):
-        """Check that all bot methods have the log decorator ..."""
-        # not islower() skips the camelcase aliases
-        if not bot_method_name.islower():
-            return
-        source = inspect.getsource(bot_method)
-        assert (
-            # Use re.match to only match at *the beginning* of the string
-            re.match(rf"\s*\@\_log\s*async def {bot_method_name}", source)
-        ), f"{bot_method_name} is missing the @_log decorator"
-
     @pytest.mark.parametrize(
         ("cls", "logger_name"), [(Bot, "telegram.Bot"), (ExtBot, "telegram.ext.ExtBot")]
     )
-    async def test_log_decorator(self, bot: PytestExtBot, cls, logger_name, caplog):
+    async def test_bot_method_logging(self, bot: PytestExtBot, cls, logger_name, caplog):
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
             await cls(bot.token).get_me()
@@ -415,11 +402,19 @@ class TestBotWithoutRequest:
                         caplog.records.pop(idx)
                     if record.getMessage().startswith("Task exception was never retrieved"):
                         caplog.records.pop(idx)
-            assert len(caplog.records) == 3
+            assert len(caplog.records) == 2
 
             assert all(caplog.records[i].name == logger_name for i in [-1, 0])
-            assert caplog.records[0].getMessage().startswith("Entering: get_me")
-            assert caplog.records[-1].getMessage().startswith("Exiting: get_me")
+            assert (
+                caplog.records[0]
+                .getMessage()
+                .startswith("Calling Bot API endpoint `getMe` with parameters `{}`")
+            )
+            assert (
+                caplog.records[-1]
+                .getMessage()
+                .startswith("Call to Bot API endpoint `getMe` finished with return value")
+            )
 
     @bot_methods()
     def test_camel_case_aliases(self, bot_class, bot_method_name, bot_method):

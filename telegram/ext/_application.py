@@ -75,6 +75,8 @@ from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, RT, UD, ConversationK
 from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
+    from socket import socket
+
     from telegram import Message
     from telegram.ext import ConversationHandler, JobQueue
     from telegram.ext._applicationbuilder import InitApplicationBuilder
@@ -866,7 +868,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         close_loop: bool = True,
         stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
         secret_token: Optional[str] = None,
-        unix: Optional[Union[str, Path]] = None,
+        unix: Optional[Union[str, Path, "socket"]] = None,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         listening for updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
@@ -959,8 +961,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 header isn't set or it is set to a wrong token.
 
                 .. versionadded:: 20.0
-            unix (:class:`pathlib.Path` | :obj:`str`, optional): Path to the unix socket file. Path
-                does not need to exist, in which case the file will be created.
+            unix (:class:`pathlib.Path` | :obj:`str` | :class:`socket.socket`, optional): Can be
+                either:
+
+                * the path to the unix socket file as :class:`pathlib.Path` or :obj:`str`. This
+                  will be passed to `tornado.netutil.bind_unix_socket <https://www.tornadoweb.org/
+                  en/stable/netutil.html#tornado.netutil.bind_unix_socket>`_ to create the socket.
+                  If the Path does not exist, the file will be created.
+
+                * or the socket itself. This option allows you to e.g. restrict the permissions of
+                  the socket for improved security. Note that you need to pass the correct family,
+                  type and socket options yourself.
 
                 Caution:
                     This parameter is a replacement for the default TCP bind. Therefore, it is
@@ -969,6 +980,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     appropriate :paramref:`webhook_url`.
 
                 .. versionadded:: 20.8
+                .. versionchanged:: NEXT.VERSION
+                    Added support to pass a socket instance itself.
         """
         if not self.updater:
             raise RuntimeError(
