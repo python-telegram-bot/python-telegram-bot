@@ -23,6 +23,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._chat import Chat
+from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -181,5 +182,61 @@ class BusinessMessagesDeleted(TelegramObject):
             return None
 
         data["chat"] = Chat.de_json(data.get("chat"), bot)
+
+        return super().de_json(data=data, bot=bot)
+
+
+class BusinessIntro(TelegramObject):
+    """
+    This object represents the intro of a business account.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their
+    :attr:`title`, :attr:`message` and :attr:`sticker` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        title (:obj:`str`): Optional. Title text of the business intro.
+        message (:obj:`str`): Optional. Message text of the business intro.
+        sticker (:class:`telegram.Sticker`): Optional. Sticker of the business intro.
+
+    Attributes:
+        title (:obj:`str`): Optional. Title text of the business intro.
+        message (:obj:`str`): Optional. Message text of the business intro.
+        sticker (:class:`telegram.Sticker`): Optional. Sticker of the business intro.
+
+    """
+
+    __slots__ = (
+        "message",
+        "sticker",
+        "title",
+    )
+
+    def __init__(
+        self,
+        title: Optional[str] = None,
+        message: Optional[str] = None,
+        sticker: Optional[Sticker] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.title: Optional[str] = title
+        self.message: Optional[str] = message
+        self.sticker: Optional[Sticker] = sticker
+
+        self._id_attrs = (self.title, self.message, self.sticker)
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BusinessIntro"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
 
         return super().de_json(data=data, bot=bot)

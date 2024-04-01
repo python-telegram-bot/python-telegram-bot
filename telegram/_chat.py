@@ -44,6 +44,7 @@ if TYPE_CHECKING:
         Animation,
         Audio,
         Bot,
+        BusinessIntro,
         ChatInviteLink,
         ChatMember,
         Contact,
@@ -169,6 +170,11 @@ class Chat(TelegramObject):
             only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        business_intro (:class:`telegram.BusinessIntro`):  Optional. For private chats with
+            business accounts, the intro of the business. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         available_reactions (Sequence[:class:`telegram.ReactionType`], optional): List of available
             reactions allowed in the chat. If omitted, then all of
             :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
@@ -312,6 +318,11 @@ class Chat(TelegramObject):
             obtained via :meth:`~telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        business_intro (:class:`telegram.BusinessIntro`):  Optional. For private chats with
+            business accounts, the intro of the business. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         available_reactions (Tuple[:class:`telegram.ReactionType`]): Optional. List of available
             reactions allowed in the chat. If omitted, then all of
             :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
@@ -383,6 +394,7 @@ class Chat(TelegramObject):
         "available_reactions",
         "background_custom_emoji_id",
         "bio",
+        "business_intro",
         "can_set_sticker_set",
         "custom_emoji_sticker_set_name",
         "description",
@@ -470,6 +482,7 @@ class Chat(TelegramObject):
         has_visible_history: Optional[bool] = None,
         unrestrict_boost_count: Optional[int] = None,
         custom_emoji_sticker_set_name: Optional[str] = None,
+        business_intro: Optional["BusinessIntro"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -519,6 +532,7 @@ class Chat(TelegramObject):
         self.profile_background_custom_emoji_id: Optional[str] = profile_background_custom_emoji_id
         self.unrestrict_boost_count: Optional[int] = unrestrict_boost_count
         self.custom_emoji_sticker_set_name: Optional[str] = custom_emoji_sticker_set_name
+        self.business_intro: Optional["BusinessIntro"] = business_intro
 
         self._id_attrs = (self.id,)
 
@@ -587,6 +601,9 @@ class Chat(TelegramObject):
         data["permissions"] = ChatPermissions.de_json(data.get("permissions"), bot)
         data["location"] = ChatLocation.de_json(data.get("location"), bot)
         data["available_reactions"] = ReactionType.de_list(data.get("available_reactions"), bot)
+        from telegram import BusinessIntro  # pylint: disable=import-outside-toplevel
+
+        data["business_intro"] = BusinessIntro.de_json(data.get("business_intro"), bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
