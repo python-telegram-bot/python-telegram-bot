@@ -204,14 +204,14 @@ class TestBusinessMessagesDeleted(TestBusinessBase):
 
 
 class TestBusinessIntro(TestBusinessBase):
-    def test_slots(self, business_location):
-        intro = business_location
+    def test_slots(self, business_intro):
+        intro = business_intro
         for attr in intro.__slots__:
             assert getattr(intro, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(intro)) == len(set(mro_slots(intro))), "duplicate slot"
 
-    def test_to_dict(self, business_location):
-        intro_dict = business_location.to_dict()
+    def test_to_dict(self, business_intro):
+        intro_dict = business_intro.to_dict()
         assert isinstance(intro_dict, dict)
         assert intro_dict["title"] == self.title
         assert intro_dict["message"] == self.message
