@@ -20,6 +20,7 @@ Available Types
     telegram.botshortdescription
     telegram.businessconnection
     telegram.businessintro
+    telegram.businesslocation
     telegram.businessmessagesdeleted
     telegram.callbackquery
     telegram.chat
