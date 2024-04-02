@@ -107,7 +107,5 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
                 return True
             if update.chat_join_request.chat.id in self._chat_ids:
                 return True
-            if update.chat_join_request.from_user.username in self._usernames:
-                return True
-            return False
+            return update.chat_join_request.from_user.username in self._usernames
         return False
