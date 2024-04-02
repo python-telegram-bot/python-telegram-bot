@@ -946,7 +946,7 @@ class TestStickerSetWithRequest:
     async def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
         await asyncio.sleep(1)
         assert await bot.set_sticker_set_thumbnail(
-            f"test_by_{bot.username}", chat_id, sticker_set_thumb_file, format="static"
+            f"test_by_{bot.username}", chat_id, format="static", thumbnail=sticker_set_thumb_file
         )
 
     async def test_bot_methods_3_tgs(
@@ -957,9 +957,12 @@ class TestStickerSetWithRequest:
         file_id = animated_sticker_set.stickers[-1].file_id
         tasks = asyncio.gather(
             bot.set_sticker_set_thumbnail(
-                animated_test, chat_id, animated_sticker_file, format="animated"
+                animated_test,
+                chat_id,
+                "animated",
+                thumbnail=animated_sticker_file,
             ),
-            bot.set_sticker_set_thumbnail(animated_test, chat_id, file_id, format="animated"),
+            bot.set_sticker_set_thumbnail(animated_test, chat_id, "animated", thumbnail=file_id),
         )
         assert all(await tasks)
 
