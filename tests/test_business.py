@@ -23,8 +23,10 @@ import pytest
 from telegram import (
     BusinessConnection,
     BusinessIntro,
+    BusinessLocation,
     BusinessMessagesDeleted,
     Chat,
+    Location,
     Sticker,
     User,
 )
@@ -45,6 +47,8 @@ class TestBusinessBase:
     title = "Business Title"
     message = "Business description"
     sticker = Sticker("sticker_id", "unique_id", 50, 50, True, False, Sticker.REGULAR)
+    address = "address"
+    location = Location(-23.691288, 46.788279)
 
 
 @pytest.fixture(scope="module")
@@ -74,6 +78,14 @@ def business_intro():
         TestBusinessBase.title,
         TestBusinessBase.message,
         TestBusinessBase.sticker,
+    )
+
+
+@pytest.fixture(scope="module")
+def business_location():
+    return BusinessLocation(
+        TestBusinessBase.address,
+        TestBusinessBase.location,
     )
 
 
@@ -192,14 +204,14 @@ class TestBusinessMessagesDeleted(TestBusinessBase):
 
 
 class TestBusinessIntro(TestBusinessBase):
-    def test_slots(self, business_intro):
-        intro = business_intro
+    def test_slots(self, business_location):
+        intro = business_location
         for attr in intro.__slots__:
             assert getattr(intro, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(intro)) == len(set(mro_slots(intro))), "duplicate slot"
 
-    def test_to_dict(self, business_intro):
-        intro_dict = business_intro.to_dict()
+    def test_to_dict(self, business_location):
+        intro_dict = business_location.to_dict()
         assert isinstance(intro_dict, dict)
         assert intro_dict["title"] == self.title
         assert intro_dict["message"] == self.message
@@ -229,3 +241,40 @@ class TestBusinessIntro(TestBusinessBase):
 
         assert intro1 != intro3
         assert hash(intro1) != hash(intro3)
+
+
+class TestBusinessLocation(TestBusinessBase):
+    def test_slots(self, business_location):
+        inst = business_location
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_to_dict(self, business_location):
+        blc_dict = business_location.to_dict()
+        assert isinstance(blc_dict, dict)
+        assert blc_dict["address"] == self.address
+        assert blc_dict["location"] == self.location.to_dict()
+
+    def test_de_json(self):
+        json_dict = {
+            "address": self.address,
+            "location": self.location.to_dict(),
+        }
+        blc = BusinessLocation.de_json(json_dict, None)
+        assert blc.address == self.address
+        assert blc.location == self.location
+        assert blc.api_kwargs == {}
+        assert isinstance(blc, BusinessLocation)
+
+    def test_equality(self):
+        blc1 = BusinessLocation(self.address, self.location)
+        blc2 = BusinessLocation(self.address, self.location)
+        blc3 = BusinessLocation("Other Address", self.location)
+
+        assert blc1 == blc2
+        assert hash(blc1) == hash(blc2)
+        assert blc1 is not blc2
+
+        assert blc1 != blc3
+        assert hash(blc1) != hash(blc3)
