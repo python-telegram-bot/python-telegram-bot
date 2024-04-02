@@ -6387,7 +6387,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         if sticker_format is not None:
             warn(
-                "The parameter 'sticker_format' is deprecated. Use the parameter"
+                "The parameter `sticker_format` is deprecated. Use the parameter"
                 " `InputSticker.format` in the parameter `stickers` instead.",
                 stacklevel=2,
                 category=PTBDeprecationWarning,
