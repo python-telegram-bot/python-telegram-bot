@@ -153,7 +153,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
             :obj:`bool`: Whether the args are valid for this handler.
         """
         # pylint: disable=too-many-boolean-expressions
-        return (
+        return bool(
             (self.has_args is None)
             or (self.has_args is True and args)
             or (self.has_args is False and not args)
