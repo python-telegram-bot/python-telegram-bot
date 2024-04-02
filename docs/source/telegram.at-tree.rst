@@ -21,6 +21,8 @@ Available Types
     telegram.businessconnection
     telegram.businessintro
     telegram.businesslocation
+    telegram.businessopeninghours
+    telegram.businessopeninghoursinterval
     telegram.businessmessagesdeleted
     telegram.callbackquery
     telegram.chat
