@@ -20,7 +20,7 @@
 """This module contains the Telegram Business related classes."""
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._chat import Chat
 from telegram._files.location import Location
@@ -206,7 +206,6 @@ class BusinessIntro(TelegramObject):
         title (:obj:`str`): Optional. Title text of the business intro.
         message (:obj:`str`): Optional. Message text of the business intro.
         sticker (:class:`telegram.Sticker`): Optional. Sticker of the business intro.
-
     """
 
     __slots__ = (
@@ -262,7 +261,6 @@ class BusinessLocation(TelegramObject):
     Attributes:
         address (:obj:`str`): Address of the business.
         location (:class:`telegram.Location`): Optional. Location of the business.
-
     """
 
     __slots__ = (
@@ -294,5 +292,103 @@ class BusinessLocation(TelegramObject):
             return None
 
         data["location"] = Location.de_json(data.get("location"), bot)
+
+        return super().de_json(data=data, bot=bot)
+
+
+class BusinessOpeningHoursInterval(TelegramObject):
+    """
+    This object represents the time intervals describing business opening hours.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their
+    :attr:`opening_minute` and :attr:`closing_minute` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        opening_minute (:obj:`int`): The minute's sequence number in a week, starting on Monday,
+            marking the start of the time interval during which the business is open; 0 - 7 24 60.
+        closing_minute (:obj:`int`): The minute's
+            sequence number in a week, starting on Monday, marking the end of the time interval
+            during which the business is open; 0 - 8 24 60
+
+    Attributes:
+        opening_minute (:obj:`int`): The minute's sequence number in a week, starting on Monday,
+            marking the start of the time interval during which the business is open; 0 - 7 24 60.
+        closing_minute (:obj:`int`): The minute's
+            sequence number in a week, starting on Monday, marking the end of the time interval
+            during which the business is open; 0 - 8 24 60
+    """
+
+    __slots__ = ("closing_minute", "opening_minute")
+
+    def __init__(
+        self,
+        opening_minute: int,
+        closing_minute: int,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.opening_minute: int = opening_minute
+        self.closing_minute: int = closing_minute
+
+        self._id_attrs = (self.opening_minute, self.closing_minute)
+
+        self._freeze()
+
+
+class BusinessOpeningHours(TelegramObject):
+    """
+    This object represents the opening hours of a business account.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their
+    :attr:`time_zone_name` and :attr:`opening_hours` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        time_zone_name (:obj:`str`): Unique name of the time zone for which the opening
+            hours are defined.
+        opening_hours (Sequence[:class:`telegram.BusinessOpeningHoursInterval`]): List of
+            time intervals describing business opening hours.
+
+    Attributes:
+        time_zone_name (:obj:`str`): Unique name of the time zone for which the opening
+            hours are defined.
+        opening_hours (Sequence[:class:`telegram.BusinessOpeningHoursInterval`]): List of
+            time intervals describing business opening hours.
+    """
+
+    __slots__ = ("opening_hours", "time_zone_name")
+
+    def __init__(
+        self,
+        time_zone_name: str,
+        opening_hours: Sequence[BusinessOpeningHoursInterval],
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.time_zone_name: str = time_zone_name
+        self.opening_hours: Tuple[BusinessOpeningHoursInterval, ...] = tuple(opening_hours)
+
+        self._id_attrs = (self.time_zone_name, self.opening_hours)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BusinessOpeningHours"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["opening_hours"] = BusinessOpeningHoursInterval.de_list(
+            data.get("opening_hours"), bot
+        )
 
         return super().de_json(data=data, bot=bot)
