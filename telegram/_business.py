@@ -230,6 +230,8 @@ class BusinessIntro(TelegramObject):
 
         self._id_attrs = (self.title, self.message, self.sticker)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BusinessIntro"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -280,6 +282,8 @@ class BusinessLocation(TelegramObject):
         self.location: Optional[Location] = location
 
         self._id_attrs = (self.address, self.location)
+
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BusinessLocation"]:
