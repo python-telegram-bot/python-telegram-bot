@@ -2729,7 +2729,7 @@ class ViaBot(_ChatUserBaseFilter):
     Examples:
         ``MessageHandler(filters.ViaBot(1234), callback_method)``
 
-    .. seealso:: :attr:`filters.VIA_BOT`
+    .. seealso:: :attr:`~telegram.ext.filters.VIA_BOT`
 
     Args:
         bot_id(:obj:`int` | Collection[:obj:`int`], optional): Which bot ID(s) to
@@ -2814,7 +2814,7 @@ class _ViaBot(MessageFilter):
 VIA_BOT = _ViaBot(name="filters.VIA_BOT")
 """This filter filters for message that were sent via *any* bot.
 
-.. seealso:: :attr:`filters.ViaBot`"""
+.. seealso:: :class:`~telegram.ext.filters.ViaBot`"""
 
 
 class _Video(MessageFilter):

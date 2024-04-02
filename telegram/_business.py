@@ -86,12 +86,12 @@ class BusinessConnection(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.id = id
-        self.user = user
-        self.user_chat_id = user_chat_id
-        self.date = date
-        self.can_reply = can_reply
-        self.is_enabled = is_enabled
+        self.id: str = id
+        self.user: User = user
+        self.user_chat_id: int = user_chat_id
+        self.date: datetime = date
+        self.can_reply: bool = can_reply
+        self.is_enabled: bool = is_enabled
 
         self._id_attrs = (
             self.id,
@@ -161,9 +161,9 @@ class BusinessMessagesDeleted(TelegramObject):
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.business_connection_id = business_connection_id
-        self.chat = chat
-        self.message_ids = parse_sequence_arg(message_ids)
+        self.business_connection_id: str = business_connection_id
+        self.chat: Chat = chat
+        self.message_ids: Sequence[int] = parse_sequence_arg(message_ids)
 
         self._id_attrs = (
             self.business_connection_id,

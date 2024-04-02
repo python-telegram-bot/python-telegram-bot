@@ -39,6 +39,7 @@ from telegram import (
 from telegram.constants import ParseMode, StickerFormat, StickerType
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -574,8 +575,6 @@ def sticker_set_thumb_file():
 
 class TestStickerSetBase:
     title = "Test stickers"
-    is_animated = True
-    is_video = True
     stickers = [Sticker("file_id", "file_un_id", 512, 512, True, True, Sticker.REGULAR)]
     name = "NOTAREALNAME"
     sticker_type = Sticker.REGULAR
@@ -584,7 +583,7 @@ class TestStickerSetBase:
 
 class TestStickerSetWithoutRequest(TestStickerSetBase):
     def test_slot_behaviour(self):
-        inst = StickerSet("this", "is", True, self.stickers, True, "not")
+        inst = StickerSet("this", "is", self.stickers, "not")
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -594,8 +593,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         json_dict = {
             "name": name,
             "title": self.title,
-            "is_animated": self.is_animated,
-            "is_video": self.is_video,
             "stickers": [x.to_dict() for x in self.stickers],
             "thumbnail": sticker.thumbnail.to_dict(),
             "sticker_type": self.sticker_type,
@@ -605,8 +602,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
 
         assert sticker_set.name == name
         assert sticker_set.title == self.title
-        assert sticker_set.is_animated == self.is_animated
-        assert sticker_set.is_video == self.is_video
         assert sticker_set.stickers == tuple(self.stickers)
         assert sticker_set.thumbnail == sticker.thumbnail
         assert sticker_set.sticker_type == self.sticker_type
@@ -618,8 +613,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert isinstance(sticker_set_dict, dict)
         assert sticker_set_dict["name"] == sticker_set.name
         assert sticker_set_dict["title"] == sticker_set.title
-        assert sticker_set_dict["is_animated"] == sticker_set.is_animated
-        assert sticker_set_dict["is_video"] == sticker_set.is_video
         assert sticker_set_dict["stickers"][0] == sticker_set.stickers[0].to_dict()
         assert sticker_set_dict["thumbnail"] == sticker_set.thumbnail.to_dict()
         assert sticker_set_dict["sticker_type"] == sticker_set.sticker_type
@@ -628,26 +621,20 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         a = StickerSet(
             self.name,
             self.title,
-            self.is_animated,
             self.stickers,
-            self.is_video,
             self.sticker_type,
         )
         b = StickerSet(
             self.name,
             self.title,
-            self.is_animated,
             self.stickers,
-            self.is_video,
             self.sticker_type,
         )
-        c = StickerSet(self.name, "title", False, [], True, Sticker.CUSTOM_EMOJI)
+        c = StickerSet(self.name, "title", [], Sticker.CUSTOM_EMOJI)
         d = StickerSet(
             "blah",
             self.title,
-            self.is_animated,
             self.stickers,
-            self.is_video,
             self.sticker_type,
         )
         e = Audio(self.name, "", 0, None, None)
@@ -778,7 +765,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
                     test_flag = isinstance(data.get("thumbnail"), InputFile)
 
             monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.set_sticker_set_thumbnail("name", chat_id, thumbnail=file)
+            await bot.set_sticker_set_thumbnail("name", chat_id, thumbnail=file, format="static")
             assert test_flag
         finally:
             bot._local_mode = False
@@ -793,6 +780,22 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
 
         monkeypatch.setattr(sticker.get_bot(), "get_file", make_assertion)
         assert await sticker.get_file()
+
+    async def test_create_new_sticker_set_format_arg_depr(
+        self, bot, chat_id, sticker_file, monkeypatch
+    ):
+        async def make_assertion(*_, **kwargs):
+            pass
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+        with pytest.warns(PTBDeprecationWarning, match="`sticker_format` is deprecated"):
+            await bot.create_new_sticker_set(
+                chat_id,
+                "name",
+                "title",
+                stickers=sticker_file,
+                sticker_format="static",
+            )
 
 
 @pytest.mark.xdist_group("stickerset")
@@ -943,7 +946,7 @@ class TestStickerSetWithRequest:
     async def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
         await asyncio.sleep(1)
         assert await bot.set_sticker_set_thumbnail(
-            f"test_by_{bot.username}", chat_id, sticker_set_thumb_file
+            f"test_by_{bot.username}", chat_id, format="static", thumbnail=sticker_set_thumb_file
         )
 
     async def test_bot_methods_3_tgs(
@@ -953,8 +956,13 @@ class TestStickerSetWithRequest:
         animated_test = f"animated_test_by_{bot.username}"
         file_id = animated_sticker_set.stickers[-1].file_id
         tasks = asyncio.gather(
-            bot.set_sticker_set_thumbnail(animated_test, chat_id, animated_sticker_file),
-            bot.set_sticker_set_thumbnail(animated_test, chat_id, file_id),
+            bot.set_sticker_set_thumbnail(
+                animated_test,
+                chat_id,
+                "animated",
+                thumbnail=animated_sticker_file,
+            ),
+            bot.set_sticker_set_thumbnail(animated_test, chat_id, "animated", thumbnail=file_id),
         )
         assert all(await tasks)
 
