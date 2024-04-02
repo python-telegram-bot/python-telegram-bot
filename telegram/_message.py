@@ -302,6 +302,9 @@ class Message(MaybeInaccessibleMessage):
             forwarded.
 
             .. versionadded:: 13.9
+        is_from_offline (:obj:`bool`, optional): :obj:`True`, if the message was sent
+            by an implicit action, for example, as an away or a greeting business message,
+            or as a scheduled message.
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
@@ -581,6 +584,9 @@ class Message(MaybeInaccessibleMessage):
             forwarded.
 
             .. versionadded:: 13.9
+        is_from_offline (:obj:`bool`): Optional. :obj:`True`, if the message was sent
+            by an implicit action, for example, as an away or a greeting business message,
+            or as a scheduled message.
         media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
@@ -888,6 +894,7 @@ class Message(MaybeInaccessibleMessage):
         "group_chat_created",
         "has_media_spoiler",
         "has_protected_content",
+        "is_from_offline",
         "invoice",
         "is_automatic_forward",
         "is_topic_message",
@@ -1014,6 +1021,7 @@ class Message(MaybeInaccessibleMessage):
         sender_boost_count: Optional[int] = None,
         business_connection_id: Optional[str] = None,
         sender_business_bot: Optional[User] = None,
+        is_from_offline: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1111,6 +1119,7 @@ class Message(MaybeInaccessibleMessage):
             self.sender_boost_count: Optional[int] = sender_boost_count
             self.business_connection_id: Optional[str] = business_connection_id
             self.sender_business_bot: Optional[User] = sender_business_bot
+            self.is_from_offline: Optional[bool] = is_from_offline
 
             self._effective_attachment = DEFAULT_NONE
 
