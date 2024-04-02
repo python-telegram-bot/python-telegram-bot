@@ -1,0 +1,16 @@
+import telebot
+
+# استبدل 'YOUR_TOKEN' بالتوكن الجديد
+TOKEN = '6977771182:AAEI9_q_sVkV4m_bL3oS_jQR-wUCTHFAHno'
+
+bot = telebot.TeleBot(TOKEN)
+
+@bot.message_handler(commands=['start', 'help'])
+def send_welcome(message):
+    bot.reply_to(message, "مرحبًا، أنا بوت تجريبي.")
+
+@bot.message_handler(func=lambda message: True)
+def echo_all(message):
+    bot.reply_to(message, message.text)
+
+bot.polling()
