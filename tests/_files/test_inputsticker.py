@@ -33,6 +33,7 @@ def input_sticker():
         emoji_list=TestInputStickerBase.emoji_list,
         mask_position=TestInputStickerBase.mask_position,
         keywords=TestInputStickerBase.keywords,
+        format=TestInputStickerBase.format,
     )
 
 
@@ -41,6 +42,7 @@ class TestInputStickerBase:
     emoji_list = ("👍", "👎")
     mask_position = MaskPosition("forehead", 0.5, 0.5, 0.5)
     keywords = ("thumbsup", "thumbsdown")
+    format = "static"
 
 
 class TestInputStickerNoRequest(TestInputStickerBase):
@@ -56,6 +58,7 @@ class TestInputStickerNoRequest(TestInputStickerBase):
         assert input_sticker.emoji_list == self.emoji_list
         assert input_sticker.mask_position == self.mask_position
         assert input_sticker.keywords == self.keywords
+        assert input_sticker.format == self.format
 
     def test_attributes_tuple(self, input_sticker):
         assert isinstance(input_sticker.keywords, tuple)
@@ -72,6 +75,7 @@ class TestInputStickerNoRequest(TestInputStickerBase):
         assert input_sticker_dict["emoji_list"] == list(input_sticker.emoji_list)
         assert input_sticker_dict["mask_position"] == input_sticker.mask_position.to_dict()
         assert input_sticker_dict["keywords"] == list(input_sticker.keywords)
+        assert input_sticker_dict["format"] == input_sticker.format
 
     def test_with_sticker_input_types(self, video_sticker_file):  # noqa: F811
         sticker = InputSticker(sticker=video_sticker_file, emoji_list=["👍"])
