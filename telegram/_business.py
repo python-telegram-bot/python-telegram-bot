@@ -23,6 +23,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._chat import Chat
+from telegram._files.location import Location
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -238,5 +239,56 @@ class BusinessIntro(TelegramObject):
             return None
 
         data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
+
+        return super().de_json(data=data, bot=bot)
+
+
+class BusinessLocation(TelegramObject):
+    """
+    This object represents the location of a business account.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their
+    :attr:`address` and :attr:`location` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        address (:obj:`str`): Address of the business.
+        location (:class:`telegram.Location`): Optional. Location of the business.
+
+    Attributes:
+        address (:obj:`str`): Address of the business.
+        location (:class:`telegram.Location`): Optional. Location of the business.
+
+    """
+
+    __slots__ = (
+        "address",
+        "location",
+    )
+
+    def __init__(
+        self,
+        address: str,
+        location: Optional[Location] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.address: str = address
+        self.location: Optional[Location] = location
+
+        self._id_attrs = (self.address, self.location)
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BusinessLocation"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["location"] = Location.de_json(data.get("location"), bot)
 
         return super().de_json(data=data, bot=bot)
