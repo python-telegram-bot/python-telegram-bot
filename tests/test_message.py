@@ -489,10 +489,10 @@ class TestMessageWithoutRequest(TestMessageBase):
         """Used in testing reply_* below. Makes sure that meassage_thread_id is parsed
         correctly."""
 
-        async def make_assertion(*args, **kwargs):
+        async def extract_message_thread_id(*args, **kwargs):
             return kwargs.get("message_thread_id")
 
-        monkeypatch.setattr(message.get_bot(), bot_method_name, make_assertion)
+        monkeypatch.setattr(message.get_bot(), bot_method_name, extract_message_thread_id)
 
         message.message_thread_id = None
         message_thread_id = await method(*args)
@@ -505,22 +505,24 @@ class TestMessageWithoutRequest(TestMessageBase):
         message_thread_id = await method(*args, message_thread_id=50)
         assert message_thread_id == 50
 
-        if bot_method_name != "send_chat_action":
-            message_thread_id = await method(
-                *args,
-                do_quote=message.build_reply_arguments(
-                    target_chat_id=123,
-                ),
-            )
-            assert message_thread_id is None
+        if bot_method_name == "send_chat_action":
+            return
 
-            message_thread_id = await method(
-                *args,
-                do_quote=message.build_reply_arguments(
-                    target_chat_id=3,
-                ),
-            )
-            assert message_thread_id == 99
+        message_thread_id = await method(
+            *args,
+            do_quote=message.build_reply_arguments(
+                target_chat_id=123,
+            ),
+        )
+        assert message_thread_id is None
+
+        message_thread_id = await method(
+            *args,
+            do_quote=message.build_reply_arguments(
+                target_chat_id=message.chat_id,
+            ),
+        )
+        assert message_thread_id == message.message_thread_id
 
     def test_slot_behaviour(self):
         message = Message(
