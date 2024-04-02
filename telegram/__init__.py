@@ -22,6 +22,7 @@ __author__ = "devs@python-telegram-bot.org"
 __all__ = (
     "Animation",
     "Audio",
+    "Birthdate",
     "Bot",
     "BotCommand",
     "BotCommandScope",
@@ -226,6 +227,7 @@ __all__ = (
 
 
 from . import _version, constants, error, helpers, request, warnings
+from ._birthdate import Birthdate
 from ._bot import Bot
 from ._botcommand import BotCommand
 from ._botcommandscope import (
