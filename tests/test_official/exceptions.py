@@ -173,6 +173,7 @@ BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
     # TODO: Remove this in v21.0 (API 7.1) when this can stop being optional
     r"ChatAdministratorRights": {"can_post_stories", "can_edit_stories", "can_delete_stories"},
     r"ChatMemberAdministrator": {"can_post_stories", "can_edit_stories", "can_delete_stories"},
+    "create_new_sticker_set": {"sticker_format"},  # removed by bot api 7.2
 }
 
 
