@@ -78,11 +78,11 @@ class User(TelegramObject):
         username (:obj:`str`, optional): User's or bot's username.
         language_code (:obj:`str`, optional): IETF language tag of the user's language.
         can_join_groups (:obj:`str`, optional): :obj:`True`, if the bot can be invited to groups.
-            Returned only in :attr:`telegram.Bot.get_me` requests.
+            Returned only in :meth:`telegram.Bot.get_me`.
         can_read_all_group_messages (:obj:`str`, optional): :obj:`True`, if privacy mode is
-            disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
+            disabled for the bot. Returned only in :meth:`telegram.Bot.get_me`.
         supports_inline_queries (:obj:`str`, optional): :obj:`True`, if the bot supports inline
-            queries. Returned only in :attr:`telegram.Bot.get_me` requests.
+            queries. Returned only in :meth:`telegram.Bot.get_me`.
 
         is_premium (:obj:`bool`, optional): :obj:`True`, if this user is a Telegram Premium user.
 
@@ -91,6 +91,12 @@ class User(TelegramObject):
             the bot to the attachment menu.
 
             .. versionadded:: 20.0
+        can_connect_to_business (:obj:`bool`, optional): :obj:`True`,  if the bot can be connected
+            to a Telegram Business account to receive its messages. Returned only in
+            :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
         is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.
@@ -112,6 +118,11 @@ class User(TelegramObject):
             the bot to the attachment menu.
 
             .. versionadded:: 20.0
+        can_connect_to_business (:obj:`bool`): Optional. :obj:`True`,  if the bot can be connected
+            to a Telegram Business account to receive its messages. Returned only in
+            :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
         case so far, but Telegram does not guarantee that this stays this way.
@@ -119,6 +130,7 @@ class User(TelegramObject):
 
     __slots__ = (
         "added_to_attachment_menu",
+        "can_connect_to_business",
         "can_join_groups",
         "can_read_all_group_messages",
         "first_name",
@@ -144,6 +156,7 @@ class User(TelegramObject):
         supports_inline_queries: Optional[bool] = None,
         is_premium: Optional[bool] = None,
         added_to_attachment_menu: Optional[bool] = None,
+        can_connect_to_business: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -161,6 +174,7 @@ class User(TelegramObject):
         self.supports_inline_queries: Optional[bool] = supports_inline_queries
         self.is_premium: Optional[bool] = is_premium
         self.added_to_attachment_menu: Optional[bool] = added_to_attachment_menu
+        self.can_connect_to_business: Optional[bool] = can_connect_to_business
 
         self._id_attrs = (self.id,)
 

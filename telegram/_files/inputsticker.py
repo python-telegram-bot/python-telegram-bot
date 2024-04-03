@@ -36,6 +36,10 @@ class InputSticker(TelegramObject):
 
     .. versionadded:: 20.2
 
+    .. versionchanged:: NEXT.VERSION
+        As of Bot API 7.2, the new argument :paramref:`format` is a required argument, and thus the
+        order of the arguments has changed.
+
     Args:
         sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`): The
             added sticker. |uploadinputnopath| Animated and video stickers can't be uploaded via
@@ -52,11 +56,13 @@ class InputSticker(TelegramObject):
             :tg-const:`telegram.constants.StickerLimit.MAX_KEYWORD_LENGTH` characters. For
             ":tg-const:`telegram.constants.StickerType.REGULAR`" and
             ":tg-const:`telegram.constants.StickerType.CUSTOM_EMOJI`" stickers only.
-        format (:obj:`str`, optional): Format of the added sticker, must be one of
+        format (:obj:`str`): Format of the added sticker, must be one of
             :tg-const:`telegram.constants.StickerFormat.STATIC` for a
             ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
             for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a WEBM
             video.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         sticker (:obj:`str` | :class:`telegram.InputFile`): The added sticker.
@@ -73,11 +79,13 @@ class InputSticker(TelegramObject):
             ":tg-const:`telegram.constants.StickerType.REGULAR`" and
             ":tg-const:`telegram.constants.StickerType.CUSTOM_EMOJI`" stickers only.
             ":tg-const:`telegram.constants.StickerType.CUSTOM_EMOJI`" stickers only.
-        format (:obj:`str`): Optional. Format of the added sticker, must be one of
+        format (:obj:`str`): Format of the added sticker, must be one of
             :tg-const:`telegram.constants.StickerFormat.STATIC` for a
             ``.WEBP`` or ``.PNG`` image, :tg-const:`telegram.constants.StickerFormat.ANIMATED`
             for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a WEBM
             video.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = ("emoji_list", "format", "keywords", "mask_position", "sticker")
@@ -86,9 +94,9 @@ class InputSticker(TelegramObject):
         self,
         sticker: FileInput,
         emoji_list: Sequence[str],
+        format: str,  # pylint: disable=redefined-builtin
         mask_position: Optional[MaskPosition] = None,
         keywords: Optional[Sequence[str]] = None,
-        format: Optional[str] = None,  # pylint: disable=redefined-builtin
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -102,8 +110,8 @@ class InputSticker(TelegramObject):
             attach=True,
         )
         self.emoji_list: Tuple[str, ...] = parse_sequence_arg(emoji_list)
+        self.format: str = format
         self.mask_position: Optional[MaskPosition] = mask_position
         self.keywords: Tuple[str, ...] = parse_sequence_arg(keywords)
-        self.format: Optional[str] = format
 
         self._freeze()

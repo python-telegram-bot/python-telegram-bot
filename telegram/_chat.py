@@ -23,6 +23,7 @@ from html import escape
 from typing import TYPE_CHECKING, Final, Optional, Sequence, Tuple, Union
 
 from telegram import constants
+from telegram._birthdate import Birthdate
 from telegram._chatlocation import ChatLocation
 from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
@@ -247,6 +248,14 @@ class Chat(TelegramObject):
             and bots in the group. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 21.0
+        birthdate (:obj:`telegram.Birthdate`, optional): For private chats,
+            the date of birth of the user. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        personal_chat (:obj:`telegram.Chat`, optional): For private chats, the personal channel of
+            the user. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -405,6 +414,14 @@ class Chat(TelegramObject):
             and bots in the group. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 21.0
+        birthdate (:obj:`telegram.Birthdate`): Optional. For private chats,
+            the date of birth of the user. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        personal_chat (:obj:`telegram.Chat`): Optional. For private chats, the personal channel of
+            the user. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
 
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
@@ -416,6 +433,7 @@ class Chat(TelegramObject):
         "available_reactions",
         "background_custom_emoji_id",
         "bio",
+        "birthdate",
         "business_intro",
         "business_location",
         "business_opening_hours",
@@ -441,6 +459,7 @@ class Chat(TelegramObject):
         "location",
         "message_auto_delete_time",
         "permissions",
+        "personal_chat",
         "photo",
         "pinned_message",
         "profile_accent_color_id",
@@ -506,6 +525,8 @@ class Chat(TelegramObject):
         has_visible_history: Optional[bool] = None,
         unrestrict_boost_count: Optional[int] = None,
         custom_emoji_sticker_set_name: Optional[str] = None,
+        birthdate: Optional[Birthdate] = None,
+        personal_chat: Optional["Chat"] = None,
         business_intro: Optional["BusinessIntro"] = None,
         business_location: Optional["BusinessLocation"] = None,
         business_opening_hours: Optional["BusinessOpeningHours"] = None,
@@ -558,6 +579,8 @@ class Chat(TelegramObject):
         self.profile_background_custom_emoji_id: Optional[str] = profile_background_custom_emoji_id
         self.unrestrict_boost_count: Optional[int] = unrestrict_boost_count
         self.custom_emoji_sticker_set_name: Optional[str] = custom_emoji_sticker_set_name
+        self.birthdate: Optional[Birthdate] = birthdate
+        self.personal_chat: Optional["Chat"] = personal_chat
         self.business_intro: Optional["BusinessIntro"] = business_intro
         self.business_location: Optional["BusinessLocation"] = business_location
         self.business_opening_hours: Optional["BusinessOpeningHours"] = business_opening_hours
@@ -634,7 +657,8 @@ class Chat(TelegramObject):
         data["permissions"] = ChatPermissions.de_json(data.get("permissions"), bot)
         data["location"] = ChatLocation.de_json(data.get("location"), bot)
         data["available_reactions"] = ReactionType.de_list(data.get("available_reactions"), bot)
-
+        data["birthdate"] = Birthdate.de_json(data.get("birthdate"), bot)
+        data["personal_chat"] = cls.de_json(data.get("personal_chat"), bot)
         data["business_intro"] = BusinessIntro.de_json(data.get("business_intro"), bot)
         data["business_location"] = BusinessLocation.de_json(data.get("business_location"), bot)
         data["business_opening_hours"] = BusinessOpeningHours.de_json(

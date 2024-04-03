@@ -45,7 +45,7 @@ class TestInputStickerBase:
     format = "static"
 
 
-class TestInputStickerNoRequest(TestInputStickerBase):
+class TestInputStickerWithoutRequest(TestInputStickerBase):
     def test_slot_behaviour(self, input_sticker):
         inst = input_sticker
         for attr in inst.__slots__:
@@ -63,7 +63,7 @@ class TestInputStickerNoRequest(TestInputStickerBase):
     def test_attributes_tuple(self, input_sticker):
         assert isinstance(input_sticker.keywords, tuple)
         assert isinstance(input_sticker.emoji_list, tuple)
-        a = InputSticker("sticker", ["emoji"])
+        a = InputSticker("sticker", ["emoji"], "static")
         assert isinstance(a.emoji_list, tuple)
         assert a.keywords == ()
 
@@ -78,7 +78,7 @@ class TestInputStickerNoRequest(TestInputStickerBase):
         assert input_sticker_dict["format"] == input_sticker.format
 
     def test_with_sticker_input_types(self, video_sticker_file):  # noqa: F811
-        sticker = InputSticker(sticker=video_sticker_file, emoji_list=["👍"])
+        sticker = InputSticker(sticker=video_sticker_file, emoji_list=["👍"], format="video")
         assert isinstance(sticker.sticker, InputFile)
-        sticker = InputSticker(data_file("telegram_video_sticker.webm"), ["👍"])
+        sticker = InputSticker(data_file("telegram_video_sticker.webm"), ["👍"], "video")
         assert sticker.sticker == data_file("telegram_video_sticker.webm").as_uri()

@@ -2087,6 +2087,15 @@ class TestBotWithoutRequest:
             api_kwargs={"chat_id": 2, "user_id": 32, "until_date": until_timestamp},
         )
 
+    async def test_business_connection_id_argument(self, bot, monkeypatch):
+        """We can't connect to a business acc, so we just test that the correct data is passed."""
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters.get("business_connection_id") == 42
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_chat_action(1, "typing", business_connection_id=42)
+
 
 class TestBotWithRequest:
     """
@@ -3378,8 +3387,8 @@ class TestBotWithRequest:
         assert await bot.unpin_all_chat_messages(super_group_id, read_timeout=10)
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
-    # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers
-    # are tested in the test_sticker module.
+    # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers,
+    # replace_sticker_in_set are tested in the test_sticker module.
 
     # get_forum_topic_icon_stickers, edit_forum_topic, general_forum etc...
     # are tested in the test_forum module.
