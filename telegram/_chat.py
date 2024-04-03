@@ -234,6 +234,10 @@ class Chat(TelegramObject):
             the date of birth of the user. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: NEXT.VERSION
+        personal_chat (:obj:`telegram.Chat`, optional): For private chats, the personal channel of
+            the user. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -381,6 +385,10 @@ class Chat(TelegramObject):
             the date of birth of the user. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: NEXT.VERSION
+        personal_chat (:obj:`telegram.Chat`): Optional. For private chats, the personal channel of
+            the user. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
 
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors
@@ -415,6 +423,7 @@ class Chat(TelegramObject):
         "location",
         "message_auto_delete_time",
         "permissions",
+        "personal_chat",
         "photo",
         "pinned_message",
         "profile_accent_color_id",
@@ -481,6 +490,7 @@ class Chat(TelegramObject):
         unrestrict_boost_count: Optional[int] = None,
         custom_emoji_sticker_set_name: Optional[str] = None,
         birthdate: Optional[Birthdate] = None,
+        personal_chat: Optional["Chat"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -531,6 +541,7 @@ class Chat(TelegramObject):
         self.unrestrict_boost_count: Optional[int] = unrestrict_boost_count
         self.custom_emoji_sticker_set_name: Optional[str] = custom_emoji_sticker_set_name
         self.birthdate: Optional[Birthdate] = birthdate
+        self.personal_chat: Optional["Chat"] = personal_chat
 
         self._id_attrs = (self.id,)
 
@@ -600,6 +611,7 @@ class Chat(TelegramObject):
         data["location"] = ChatLocation.de_json(data.get("location"), bot)
         data["available_reactions"] = ReactionType.de_list(data.get("available_reactions"), bot)
         data["birthdate"] = Birthdate.de_json(data.get("birthdate"), bot)
+        data["personal_chat"] = cls.de_json(data.get("personal_chat"), bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility

@@ -76,6 +76,7 @@ def chat(bot):
         unrestrict_boost_count=TestChatBase.unrestrict_boost_count,
         custom_emoji_sticker_set_name=TestChatBase.custom_emoji_sticker_set_name,
         birthdate=Birthdate(1, 1),
+        personal_chat=TestChatBase.personal_chat,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -122,6 +123,7 @@ class TestChatBase:
     unrestrict_boost_count = 100
     custom_emoji_sticker_set_name = "custom_emoji_sticker_set_name"
     birthdate = Birthdate(1, 1)
+    personal_chat = Chat(3, "private", "private")
 
 
 class TestChatWithoutRequest(TestChatBase):
@@ -166,6 +168,7 @@ class TestChatWithoutRequest(TestChatBase):
             "unrestrict_boost_count": self.unrestrict_boost_count,
             "custom_emoji_sticker_set_name": self.custom_emoji_sticker_set_name,
             "birthdate": self.birthdate.to_dict(),
+            "personal_chat": self.personal_chat.to_dict(),
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -207,6 +210,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.unrestrict_boost_count == self.unrestrict_boost_count
         assert chat.custom_emoji_sticker_set_name == self.custom_emoji_sticker_set_name
         assert chat.birthdate == self.birthdate
+        assert chat.personal_chat == self.personal_chat
 
     def test_de_json_localization(self, bot, raw_bot, tz_bot):
         json_dict = {
@@ -273,6 +277,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_dict["custom_emoji_sticker_set_name"] == chat.custom_emoji_sticker_set_name
         assert chat_dict["unrestrict_boost_count"] == chat.unrestrict_boost_count
         assert chat_dict["birthdate"] == chat.birthdate.to_dict()
+        assert chat_dict["personal_chat"] == chat.personal_chat.to_dict()
 
     def test_always_tuples_attributes(self):
         chat = Chat(
