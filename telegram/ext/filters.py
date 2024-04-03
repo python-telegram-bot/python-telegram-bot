@@ -54,6 +54,7 @@ __all__ = (
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
     "IS_AUTOMATIC_FORWARD",
+    "IS_FROM_OFFLINE",
     "IS_TOPIC_MESSAGE",
     "LOCATION",
     "PASSPORT_DATA",
@@ -1556,6 +1557,20 @@ IS_TOPIC_MESSAGE = _IsTopicMessage(name="filters.IS_TOPIC_MESSAGE")
 """Messages that contain :attr:`telegram.Message.is_topic_message`.
 
     .. versionadded:: 20.0
+"""
+
+
+class _IsFromOffline(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.is_from_offline)
+
+
+IS_FROM_OFFLINE = _IsFromOffline(name="filters.IS_FROM_OFFLINE")
+"""Messages that contain :attr:`telegram.Message.is_from_offline`.
+
+    .. versionadded:: NEXT.VERSION
 """
 
 

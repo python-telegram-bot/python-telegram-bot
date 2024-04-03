@@ -2035,6 +2035,11 @@ class TestFilters:
         update.message.is_automatic_forward = True
         assert filters.IS_AUTOMATIC_FORWARD.check_update(update)
 
+    def test_filters_is_from_offline(self, update):
+        assert not filters.IS_FROM_OFFLINE.check_update(update)
+        update.message.is_from_offline = True
+        assert filters.IS_FROM_OFFLINE.check_update(update)
+
     def test_filters_is_topic_message(self, update):
         assert not filters.IS_TOPIC_MESSAGE.check_update(update)
         update.message.is_topic_message = True
