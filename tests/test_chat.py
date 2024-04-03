@@ -23,6 +23,9 @@ import pytest
 from telegram import (
     Bot,
     BusinessIntro,
+    BusinessLocation,
+    BusinessOpeningHours,
+    BusinessOpeningHoursInterval,
     Chat,
     ChatLocation,
     ChatPermissions,
@@ -76,6 +79,8 @@ def chat(bot):
         unrestrict_boost_count=TestChatBase.unrestrict_boost_count,
         custom_emoji_sticker_set_name=TestChatBase.custom_emoji_sticker_set_name,
         business_intro=TestChatBase.business_intro,
+        business_location=TestChatBase.business_location,
+        business_opening_hours=TestChatBase.business_opening_hours,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -116,6 +121,11 @@ class TestChatBase:
         ReactionTypeCustomEmoji("custom_emoji_id"),
     ]
     business_intro = BusinessIntro("Title", "Description", None)
+    business_location = BusinessLocation("Address", Location(123, 456))
+    business_opening_hours = BusinessOpeningHours(
+        "Country/City",
+        [BusinessOpeningHoursInterval(opening, opening + 60) for opening in (0, 24 * 60)],
+    )
     accent_color_id = 1
     background_custom_emoji_id = "background_custom_emoji_id"
     profile_accent_color_id = 2
@@ -143,6 +153,8 @@ class TestChatWithoutRequest(TestChatBase):
             "slow_mode_delay": self.slow_mode_delay,
             "bio": self.bio,
             "business_intro": self.business_intro.to_dict(),
+            "business_location": self.business_location.to_dict(),
+            "business_opening_hours": self.business_opening_hours.to_dict(),
             "has_protected_content": self.has_protected_content,
             "has_visible_history": self.has_visible_history,
             "has_private_forwards": self.has_private_forwards,
@@ -179,6 +191,8 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.slow_mode_delay == self.slow_mode_delay
         assert chat.bio == self.bio
         assert chat.business_intro == self.business_intro
+        assert chat.business_location == self.business_location
+        assert chat.business_opening_hours == self.business_opening_hours
         assert chat.has_protected_content == self.has_protected_content
         assert chat.has_visible_history == self.has_visible_history
         assert chat.has_private_forwards == self.has_private_forwards
@@ -240,6 +254,8 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_dict["slow_mode_delay"] == chat.slow_mode_delay
         assert chat_dict["bio"] == chat.bio
         assert chat_dict["business_intro"] == chat.business_intro.to_dict()
+        assert chat_dict["business_location"] == chat.business_location.to_dict()
+        assert chat_dict["business_opening_hours"] == chat.business_opening_hours.to_dict()
         assert chat_dict["has_private_forwards"] == chat.has_private_forwards
         assert chat_dict["has_protected_content"] == chat.has_protected_content
         assert chat_dict["has_visible_history"] == chat.has_visible_history
