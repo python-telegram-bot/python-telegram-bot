@@ -136,6 +136,13 @@ deleted_business_messages = BusinessMessagesDeleted(
     (1, 2),
 )
 
+business_message = Message(
+    1,
+    datetime.utcnow(),
+    Chat(1, ""),
+    User(1, "", False),
+)
+
 
 params = [
     {"message": message},
@@ -169,6 +176,8 @@ params = [
     {"message_reaction_count": message_reaction_count},
     {"business_connection": business_connection},
     {"deleted_business_messages": deleted_business_messages},
+    {"business_message": business_message},
+    {"edited_business_message": business_message},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -194,6 +203,8 @@ all_types = (
     "message_reaction_count",
     "business_connection",
     "deleted_business_messages",
+    "business_message",
+    "edited_business_message",
 )
 
 ids = (*all_types, "callback_query_without_message")

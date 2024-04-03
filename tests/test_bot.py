@@ -2087,6 +2087,15 @@ class TestBotWithoutRequest:
             api_kwargs={"chat_id": 2, "user_id": 32, "until_date": until_timestamp},
         )
 
+    async def test_business_connection_id_argument(self, bot, monkeypatch):
+        """We can't connect to a business acc, so we just test that the correct data is passed."""
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters.get("business_connection_id") == 42
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_chat_action(1, "typing", business_connection_id=42)
+
 
 class TestBotWithRequest:
     """
