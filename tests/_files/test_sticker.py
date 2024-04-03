@@ -1045,6 +1045,18 @@ class TestStickerSetWithRequest:
         file_id = video_sticker_set.stickers[-1].file_id
         assert await bot.set_sticker_keywords(file_id, ["test", "test2"])
 
+    async def test_bot_methods_8_png(self, bot, sticker_set, sticker_file):
+        file_id = sticker_set.stickers[-1].file_id
+        assert await bot.replace_sticker_in_set(
+            bot.id,
+            f"test_by_{bot.username}",
+            file_id,
+            sticker=InputSticker(
+                sticker=sticker_file,
+                emoji_list=["😄"],
+            ),
+        )
+
 
 @pytest.fixture(scope="module")
 def mask_position():

@@ -8815,6 +8815,56 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             bot=self,
         )
 
+    async def replace_sticker_in_set(
+        self,
+        user_id: int,
+        name: str,
+        old_sticker: str,
+        sticker: "InputSticker",
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: Optional[JSONDict] = None,
+    ) -> bool:
+        """Use this method to replace an existing sticker in a sticker set with a new one.
+        The method is equivalent to calling :meth:`delete_sticker_from_set`,
+        then :meth:`add_sticker_to_set`, then :meth:`set_sticker_position_in_set`.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            user_id (:obj:`int`): User identifier of the sticker set owner.
+            name (:obj:`str`): Sticker set name.
+            old_sticker (:obj:`str`): File identifier of the replaced sticker.
+            sticker (:obj:`telegram.InputSticker`): An object with information about the added
+                sticker. If exactly the same sticker had already been added to the set, then the
+                set remains unchanged.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "user_id": user_id,
+            "name": name,
+            "old_sticker": old_sticker,
+            "sticker": sticker,
+        }
+
+        return await self._post(
+            "replaceStickerInSet",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -9063,3 +9113,5 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`set_message_reaction`"""
     getBusinessConnection = get_business_connection
     """Alias for :meth:`get_business_connection`"""
+    replaceStickerInSet = replace_sticker_in_set
+    """Alias for :meth:`replace_sticker_in_set`"""

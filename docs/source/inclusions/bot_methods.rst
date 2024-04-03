@@ -239,6 +239,8 @@
       - Used for setting a sticker set of a chat
     * - :meth:`~telegram.Bot.delete_chat_sticker_set`
       - Used for deleting the set sticker set of a chat
+    * - :meth:`~telegram.Bot.replace_sticker_in_set`
+      - Used for replacing a sticker in a set
     * - :meth:`~telegram.Bot.set_sticker_position_in_set`
       - Used for moving a sticker's position in the set
     * - :meth:`~telegram.Bot.set_sticker_set_title`

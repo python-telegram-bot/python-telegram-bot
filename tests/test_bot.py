@@ -3378,8 +3378,8 @@ class TestBotWithRequest:
         assert await bot.unpin_all_chat_messages(super_group_id, read_timeout=10)
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
-    # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers
-    # are tested in the test_sticker module.
+    # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers,
+    # replace_sticker_in_set are tested in the test_sticker module.
 
     # get_forum_topic_icon_stickers, edit_forum_topic, general_forum etc...
     # are tested in the test_forum module.
