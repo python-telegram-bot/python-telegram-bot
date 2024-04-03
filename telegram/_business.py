@@ -20,7 +20,7 @@
 """This module contains the Telegram Business related classes."""
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._chat import Chat
 from telegram._files.location import Location
@@ -198,9 +198,9 @@ class BusinessIntro(TelegramObject):
     .. versionadded:: NEXT.VERSION
 
     Args:
-        title (:obj:`str`): Optional. Title text of the business intro.
-        message (:obj:`str`): Optional. Message text of the business intro.
-        sticker (:class:`telegram.Sticker`): Optional. Sticker of the business intro.
+        title (:obj:`str`, optional): Title text of the business intro.
+        message (:obj:`str`, optional): Message text of the business intro.
+        sticker (:class:`telegram.Sticker`, optional): Sticker of the business intro.
 
     Attributes:
         title (:obj:`str`): Optional. Title text of the business intro.
@@ -250,13 +250,13 @@ class BusinessLocation(TelegramObject):
 
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if their
-    :attr:`address` and :attr:`location` are equal.
+    :attr:`address` is equal.
 
     .. versionadded:: NEXT.VERSION
 
     Args:
         address (:obj:`str`): Address of the business.
-        location (:class:`telegram.Location`): Optional. Location of the business.
+        location (:class:`telegram.Location`, optional): Location of the business.
 
     Attributes:
         address (:obj:`str`): Address of the business.
@@ -279,7 +279,7 @@ class BusinessLocation(TelegramObject):
         self.address: str = address
         self.location: Optional[Location] = location
 
-        self._id_attrs = (self.address, self.location)
+        self._id_attrs = (self.address,)
 
         self._freeze()
 
@@ -306,19 +306,33 @@ class BusinessOpeningHoursInterval(TelegramObject):
 
     .. versionadded:: NEXT.VERSION
 
+    Examples:
+        A day has (24 * 60 =) 1440 minutes, a week has (7 * 1440 =) 10080 minutes.
+        Starting the the minute's sequence from Monday, example values of
+        :attr:`opening_minute`, :attr:`closing_minute` will map to the following day times:
+
+        * 0 is Monday 12:00 AM
+        * 60 is Monday 01:00 AM
+        * 1440 is Tuesday 12:00 AM
+        * An opening at Monday from 09:00 AM till 05:00 PM, has (9 * 60 =) 540 - (17 * 60 =) 1020
+          as opening and closing hours respectively
+
+
     Args:
         opening_minute (:obj:`int`): The minute's sequence number in a week, starting on Monday,
-            marking the start of the time interval during which the business is open; 0 - 7 24 60.
+            marking the start of the time interval during which the business is open;
+            0 - 7 * 24 * 60.
         closing_minute (:obj:`int`): The minute's
             sequence number in a week, starting on Monday, marking the end of the time interval
-            during which the business is open; 0 - 8 24 60
+            during which the business is open; 0 - 8 * 24 * 60
 
     Attributes:
         opening_minute (:obj:`int`): The minute's sequence number in a week, starting on Monday,
-            marking the start of the time interval during which the business is open; 0 - 7 24 60.
+            marking the start of the time interval during which the business is open;
+            0 - 7 * 24 * 60.
         closing_minute (:obj:`int`): The minute's
             sequence number in a week, starting on Monday, marking the end of the time interval
-            during which the business is open; 0 - 8 24 60
+            during which the business is open; 0 - 8 * 24 * 60
     """
 
     __slots__ = ("closing_minute", "opening_minute")
@@ -373,7 +387,9 @@ class BusinessOpeningHours(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.time_zone_name: str = time_zone_name
-        self.opening_hours: Tuple[BusinessOpeningHoursInterval, ...] = tuple(opening_hours)
+        self.opening_hours: Sequence[BusinessOpeningHoursInterval] = parse_sequence_arg(
+            opening_hours
+        )
 
         self._id_attrs = (self.time_zone_name, self.opening_hours)
 

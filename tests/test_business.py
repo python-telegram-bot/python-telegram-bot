@@ -227,8 +227,8 @@ class TestBusinessMessagesDeleted(TestBusinessBase):
         assert hash(bmd1) != hash(bmd3)
 
 
-class TestBusinessIntro(TestBusinessBase):
-    def test_slots(self, business_intro):
+class TestBusinessIntroWithoutRequest(TestBusinessBase):
+    def test_slot_behaviour(self, business_intro):
         intro = business_intro
         for attr in intro.__slots__:
             assert getattr(intro, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -267,8 +267,8 @@ class TestBusinessIntro(TestBusinessBase):
         assert hash(intro1) != hash(intro3)
 
 
-class TestBusinessLocation(TestBusinessBase):
-    def test_slots(self, business_location):
+class TestBusinessLocationWithoutRequest(TestBusinessBase):
+    def test_slot_behaviour(self, business_location):
         inst = business_location
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -304,8 +304,8 @@ class TestBusinessLocation(TestBusinessBase):
         assert hash(blc1) != hash(blc3)
 
 
-class TestBusinessOpeningHoursInterval(TestBusinessBase):
-    def test_slots(self, business_opening_hours_interval):
+class TestBusinessOpeningHoursIntervalWithoutRequest(TestBusinessBase):
+    def test_slot_behaviour(self, business_opening_hours_interval):
         inst = business_opening_hours_interval
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -341,8 +341,8 @@ class TestBusinessOpeningHoursInterval(TestBusinessBase):
         assert hash(bohi1) != hash(bohi3)
 
 
-class TestBusinessOpeningHours(TestBusinessBase):
-    def test_slots(self, business_opening_hours):
+class TestBusinessOpeningHoursWithoutRequest(TestBusinessBase):
+    def test_slot_behaviour(self, business_opening_hours):
         inst = business_opening_hours
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"

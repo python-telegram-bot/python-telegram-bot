@@ -172,17 +172,17 @@ class Chat(TelegramObject):
             only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
-        business_intro (:class:`telegram.BusinessIntro`):  Optional. For private chats with
+        business_intro (:class:`telegram.BusinessIntro`, optional): For private chats with
             business accounts, the intro of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: NEXT.VERSION
-        business_location (:class:`telegram.BusinessLocation`):  Optional. For private chats with
+        business_location (:class:`telegram.BusinessLocation`, optional): For private chats with
             business accounts, the location of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: NEXT.VERSION
-        business_opening_hours (:class:`telegram.BusinessOpeningHours`):  Optional. For private
+        business_opening_hours (:class:`telegram.BusinessOpeningHours`, optional): For private
             chats with business accounts, the opening hours of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
@@ -330,17 +330,17 @@ class Chat(TelegramObject):
             obtained via :meth:`~telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
-        business_intro (:class:`telegram.BusinessIntro`):  Optional. For private chats with
+        business_intro (:class:`telegram.BusinessIntro`): Optional. For private chats with
             business accounts, the intro of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: NEXT.VERSION
-        business_location (:class:`telegram.BusinessLocation`):  Optional. For private chats with
+        business_location (:class:`telegram.BusinessLocation`): Optional. For private chats with
             business accounts, the location of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: NEXT.VERSION
-        business_opening_hours (:class:`telegram.BusinessOpeningHours`):  Optional. For private
+        business_opening_hours (:class:`telegram.BusinessOpeningHours`): Optional. For private
             chats with business accounts, the opening hours of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
