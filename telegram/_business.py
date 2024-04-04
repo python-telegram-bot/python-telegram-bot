@@ -311,12 +311,15 @@ class BusinessOpeningHoursInterval(TelegramObject):
         Starting the the minute's sequence from Monday, example values of
         :attr:`opening_minute`, :attr:`closing_minute` will map to the following day times:
 
-        * 0 is Monday 12:00 AM
-        * 60 is Monday 01:00 AM
-        * 1440 is Tuesday 12:00 AM
-        * An opening at Monday from 09:00 AM till 05:00 PM, has (9 * 60 =) 540 - (17 * 60 =) 1020
-          as opening and closing hours respectively
-
+        * Monday - 8am to 8:30pm:
+            - ``opening_minute = 480`` :guilabel:`8 * 60`
+            - ``closing_minute = 1230`` :guilabel:`20 * 60 + 30`
+        * Tuesday - 24 hours:
+            - ``opening_minute = 1440`` :guilabel:`24 * 60`
+            - ``closing_minute = 2879`` :guilabel:`2 * 24 * 60 - 1`
+        * Sunday - 12am - 11:58pm:
+            - ``opening_minute = 8640`` :guilabel:`6 * 24 * 60`
+            - ``closing_minute = 10078`` :guilabel:`7 * 24 * 60 - 2`
 
     Args:
         opening_minute (:obj:`int`): The minute's sequence number in a week, starting on Monday,
