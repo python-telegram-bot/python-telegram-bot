@@ -42,10 +42,10 @@ class BusinessMessagesDeletedHandler(BaseHandler[Update, CCT]):
 
                 async def callback(update: Update, context: CallbackContext)
         chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters requests to allow only
-            those which are asking to join the specified chat ID(s).
+            those which are from the specified chat ID(s).
 
         username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
-            those which are asking to join the specified username(s).
+            those which are from the specified username(s).
 
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
