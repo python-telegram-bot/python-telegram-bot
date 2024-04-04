@@ -132,9 +132,6 @@ def ptb_extra_params(object_name: str) -> set[str]:
 # Mostly due to the value being fixed anyway
 PTB_IGNORED_PARAMS = {
     r"InlineQueryResult\w+": {"type"},
-    # TODO: Remove this in v21.0 (API 7.1) when this can stop being optional
-    r"ChatAdministratorRights": {"can_post_stories", "can_edit_stories", "can_delete_stories"},
-    r"ChatMemberAdministrator": {"can_post_stories", "can_edit_stories", "can_delete_stories"},
     r"ChatMember\w+": {"status"},
     r"PassportElementError\w+": {"source"},
     "ForceReply": {"force_reply"},
@@ -169,11 +166,7 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 
 # Arguments that are optional arguments for now for backwards compatibility
-BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
-    # TODO: Remove this in v21.0 (API 7.1) when this can stop being optional
-    r"ChatAdministratorRights": {"can_post_stories", "can_edit_stories", "can_delete_stories"},
-    r"ChatMemberAdministrator": {"can_post_stories", "can_edit_stories", "can_delete_stories"},
-}
+BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {}
 
 
 def backwards_compat_kwargs(object_name: str) -> set[str]:

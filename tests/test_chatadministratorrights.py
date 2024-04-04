@@ -98,38 +98,23 @@ class TestChatAdministratorRightsWithoutRequest:
         a = ChatAdministratorRights(
             True,
             *((False,) * 11),
-            can_post_stories=False,
-            can_edit_stories=False,
-            can_delete_stories=False,
         )
         b = ChatAdministratorRights(
             True,
             *((False,) * 11),
-            can_post_stories=False,
-            can_edit_stories=False,
-            can_delete_stories=False,
         )
         c = ChatAdministratorRights(
             *(False,) * 12,
-            can_post_stories=False,
-            can_edit_stories=False,
-            can_delete_stories=False,
         )
         d = ChatAdministratorRights(
             True,
             True,
             *((False,) * 10),
-            can_post_stories=False,
-            can_edit_stories=False,
-            can_delete_stories=False,
         )
         e = ChatAdministratorRights(
             True,
             True,
             *((False,) * 10),
-            can_post_stories=False,
-            can_edit_stories=False,
-            can_delete_stories=False,
         )
 
         assert a == b
@@ -156,9 +141,8 @@ class TestChatAdministratorRightsWithoutRequest:
             True,
             True,
             True,
-            can_post_stories=True,
-            can_edit_stories=True,
-            can_delete_stories=True,
+            True,
+            True,
         )
         t = ChatAdministratorRights.all_rights()
         # if the dirs are the same, the attributes will all be there
@@ -181,9 +165,9 @@ class TestChatAdministratorRightsWithoutRequest:
             False,
             False,
             False,
-            can_post_stories=False,
-            can_edit_stories=False,
-            can_delete_stories=False,
+            False,
+            False,
+            False,
         )
         t = ChatAdministratorRights.no_rights()
         # if the dirs are the same, the attributes will all be there
@@ -194,19 +178,3 @@ class TestChatAdministratorRightsWithoutRequest:
             assert t[key] is False
         # and as a finisher, make sure the default is different.
         assert f != t
-
-    def test_depreciation_typeerror(self):
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatAdministratorRights(
-                *(False,) * 12,
-            )
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatAdministratorRights(*(False,) * 12, can_edit_stories=True)
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatAdministratorRights(*(False,) * 12, can_post_stories=True)
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatAdministratorRights(*(False,) * 12, can_delete_stories=True)
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatAdministratorRights(*(False,) * 12, can_edit_stories=True, can_post_stories=True)
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatAdministratorRights(*(False,) * 12, can_delete_stories=True, can_post_stories=True)
