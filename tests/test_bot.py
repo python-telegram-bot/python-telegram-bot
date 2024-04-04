@@ -2094,7 +2094,7 @@ class TestBotWithoutRequest:
             return request_data.parameters.get("business_connection_id") == 42
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
-        assert await bot.send_chat_action(1, "typing", business_connection_id=42)
+        assert await bot.send_message(2, "text", business_connection_id=42)
 
 
 class TestBotWithRequest:
