@@ -6,7 +6,7 @@ ci:
 
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.2.1'
+    rev: 'v0.3.5'
     hooks:
     -   id: ruff
         name: ruff
@@ -17,7 +17,7 @@ repos:
           - cachetools~=5.3.3
           - aiolimiter~=1.1.0
 -   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 24.1.1
+    rev: 24.3.0
     hooks:
     -   id: black
         args:
@@ -28,7 +28,7 @@ repos:
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.0.3
+    rev: v3.1.0
     hooks:
     -   id: pylint
         files: ^(?!(tests|docs)).*\.py$
@@ -40,7 +40,7 @@ repos:
           - aiolimiter~=1.1.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+    rev: v1.9.0
     hooks:
     -   id: mypy
         name: mypy-ptb
@@ -67,7 +67,7 @@ repos:
         - cachetools~=5.3.3
         - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
+    rev: v3.15.2
     hooks:
     -   id: pyupgrade
         args:

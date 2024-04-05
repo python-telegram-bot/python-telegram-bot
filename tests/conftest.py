@@ -73,9 +73,7 @@ def no_rerun_after_xfail_or_flood(error, name, test: pytest.Function, plugin):
     if getattr(error[1], "msg", "") is None:
         raise error[1]
     did_we_flood = "flood" in getattr(error[1], "msg", "")  # _pytest.outcomes.XFailed has 'msg'
-    if xfail_present or did_we_flood:
-        return False
-    return True
+    return not (xfail_present or did_we_flood)
 
 
 def pytest_collection_modifyitems(items: List[pytest.Item]):
