@@ -20,7 +20,7 @@
 """This module contains the Telegram Business related classes."""
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._chat import Chat
 from telegram._files.location import Location
@@ -338,7 +338,7 @@ class BusinessOpeningHoursInterval(TelegramObject):
             during which the business is open; 0 - 8 * 24 * 60
     """
 
-    __slots__ = ("closing_minute", "opening_minute")
+    __slots__ = ("_closing_time", "_opening_time", "closing_minute", "opening_minute")
 
     def __init__(
         self,
@@ -351,9 +351,41 @@ class BusinessOpeningHoursInterval(TelegramObject):
         self.opening_minute: int = opening_minute
         self.closing_minute: int = closing_minute
 
+        self._opening_time: Optional[Tuple[int, int, int]] = None
+        self._closing_time: Optional[Tuple[int, int, int]] = None
+
         self._id_attrs = (self.opening_minute, self.closing_minute)
 
         self._freeze()
+
+    def _parse_minute(self, minute: int) -> Tuple[int, int, int]:
+        return (minute // 1440, minute % 1440 // 60, minute % 1440 % 60)
+
+    @property
+    def opening_time(self) -> Tuple[int, int, int]:
+        """Convenience attribute. A :obj:`tuple` parsed from :attr:`opening_minute`. It contains
+        the `weekday`, `hour` and `minute` in the same ranges as :attr:`datetime.datetime.weekday`,
+        :attr:`datetime.datetime.hour` and :attr:`datetime.datetime.minute`
+
+        Returns:
+            Tuple[:obj:`int`, :obj:`int`, :obj:`int`]:
+        """
+        if self._opening_time is None:
+            self._opening_time = self._parse_minute(self.opening_minute)
+        return self._opening_time
+
+    @property
+    def closing_time(self) -> Tuple[int, int, int]:
+        """Convenience attribute. A :obj:`tuple` parsed from :attr:`closing_minute`. It contains
+        the `weekday`, `hour` and `minute` in the same ranges as :attr:`datetime.datetime.weekday`,
+        :attr:`datetime.datetime.hour` and :attr:`datetime.datetime.minute`
+
+        Returns:
+            Tuple[:obj:`int`, :obj:`int`, :obj:`int`]:
+        """
+        if self._closing_time is None:
+            self._closing_time = self._parse_minute(self.closing_minute)
+        return self._closing_time
 
 
 class BusinessOpeningHours(TelegramObject):

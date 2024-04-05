@@ -340,6 +340,40 @@ class TestBusinessOpeningHoursIntervalWithoutRequest(TestBusinessBase):
         assert bohi1 != bohi3
         assert hash(bohi1) != hash(bohi3)
 
+    @pytest.mark.parametrize(
+        ("opening_minute", "expected"),
+        [  # openings per docstring
+            (8 * 60, (0, 8, 0)),
+            (24 * 60, (1, 0, 0)),
+            (6 * 24 * 60, (6, 0, 0)),
+        ],
+    )
+    def test_opening_time(self, opening_minute, expected):
+        bohi = BusinessOpeningHoursInterval(opening_minute, -0)
+
+        opening_time = bohi.opening_time
+        assert opening_time == expected
+
+        cached = bohi.opening_time
+        assert cached is opening_time
+
+    @pytest.mark.parametrize(
+        ("closing_minute", "expected"),
+        [  # closings per docstring
+            (20 * 60 + 30, (0, 20, 30)),
+            (2 * 24 * 60 - 1, (1, 23, 59)),
+            (7 * 24 * 60 - 2, (6, 23, 58)),
+        ],
+    )
+    def test_closing_time(self, closing_minute, expected):
+        bohi = BusinessOpeningHoursInterval(-0, closing_minute)
+
+        closing_time = bohi.closing_time
+        assert closing_time == expected
+
+        cached = bohi.closing_time
+        assert cached is closing_time
+
 
 class TestBusinessOpeningHoursWithoutRequest(TestBusinessBase):
     def test_slot_behaviour(self, business_opening_hours):
