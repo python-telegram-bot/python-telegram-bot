@@ -482,6 +482,48 @@ class TestMessageWithoutRequest(TestMessageBase):
         if reply_parameters is None or reply_parameters.message_id != 42:
             pytest.fail(f"reply_parameters is {reply_parameters} but should be 42")
 
+    @staticmethod
+    async def check_thread_id_parsing(
+        message: Message, method, bot_method_name: str, args, monkeypatch
+    ):
+        """Used in testing reply_* below. Makes sure that meassage_thread_id is parsed
+        correctly."""
+
+        async def extract_message_thread_id(*args, **kwargs):
+            return kwargs.get("message_thread_id")
+
+        monkeypatch.setattr(message.get_bot(), bot_method_name, extract_message_thread_id)
+
+        message.message_thread_id = None
+        message_thread_id = await method(*args)
+        assert message_thread_id is None
+
+        message.message_thread_id = 99
+        message_thread_id = await method(*args)
+        assert message_thread_id == 99
+
+        message_thread_id = await method(*args, message_thread_id=50)
+        assert message_thread_id == 50
+
+        if bot_method_name == "send_chat_action":
+            return
+
+        message_thread_id = await method(
+            *args,
+            do_quote=message.build_reply_arguments(
+                target_chat_id=123,
+            ),
+        )
+        assert message_thread_id is None
+
+        message_thread_id = await method(
+            *args,
+            do_quote=message.build_reply_arguments(
+                target_chat_id=message.chat_id,
+            ),
+        )
+        assert message_thread_id == message.message_thread_id
+
     def test_slot_behaviour(self):
         message = Message(
             message_id=TestMessageBase.id_,
@@ -1361,6 +1403,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             message, message.reply_text, "send_message", ["test"], monkeypatch
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_text, "send_message", ["test"], monkeypatch
+        )
+
     async def test_reply_markdown(self, monkeypatch, message):
         test_md_string = (
             r"Test for <*bold*, _ita_\__lic_, `code`, "
@@ -1394,6 +1440,10 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
         assert await message.reply_markdown(self.test_message.text_markdown)
+
+        await self.check_thread_id_parsing(
+            message, message.reply_markdown, "send_message", ["test"], monkeypatch
+        )
 
     async def test_reply_markdown_v2(self, monkeypatch, message):
         test_md_string = (
@@ -1434,6 +1484,10 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert await message.reply_markdown_v2(self.test_message_v2.text_markdown_v2)
         await self.check_quote_parsing(
             message, message.reply_markdown_v2, "send_message", [test_md_string], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
+            message, message.reply_markdown_v2, "send_message", ["test"], monkeypatch
         )
 
     async def test_reply_html(self, monkeypatch, message):
@@ -1479,6 +1533,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             message, message.reply_html, "send_message", [test_html_string], monkeypatch
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_html, "send_message", ["test"], monkeypatch
+        )
+
     async def test_reply_media_group(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -1502,6 +1560,14 @@ class TestMessageWithoutRequest(TestMessageBase):
         monkeypatch.setattr(message.get_bot(), "send_media_group", make_assertion)
         assert await message.reply_media_group(media="reply_media_group")
         await self.check_quote_parsing(
+            message,
+            message.reply_media_group,
+            "send_media_group",
+            ["reply_media_group"],
+            monkeypatch,
+        )
+
+        await self.check_thread_id_parsing(
             message,
             message.reply_media_group,
             "send_media_group",
@@ -1535,6 +1601,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             message, message.reply_photo, "send_photo", ["test_photo"], monkeypatch
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_photo, "send_photo", ["test_photo"], monkeypatch
+        )
+
     async def test_reply_audio(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -1558,6 +1628,10 @@ class TestMessageWithoutRequest(TestMessageBase):
         monkeypatch.setattr(message.get_bot(), "send_audio", make_assertion)
         assert await message.reply_audio(audio="test_audio")
         await self.check_quote_parsing(
+            message, message.reply_audio, "send_audio", ["test_audio"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_audio, "send_audio", ["test_audio"], monkeypatch
         )
 
@@ -1587,6 +1661,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             message, message.reply_document, "send_document", ["test_document"], monkeypatch
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_document, "send_document", ["test_document"], monkeypatch
+        )
+
     async def test_reply_animation(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -1610,6 +1688,10 @@ class TestMessageWithoutRequest(TestMessageBase):
         monkeypatch.setattr(message.get_bot(), "send_animation", make_assertion)
         assert await message.reply_animation(animation="test_animation")
         await self.check_quote_parsing(
+            message, message.reply_animation, "send_animation", ["test_animation"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_animation, "send_animation", ["test_animation"], monkeypatch
         )
 
@@ -1639,6 +1721,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             message, message.reply_sticker, "send_sticker", ["test_sticker"], monkeypatch
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_sticker, "send_sticker", ["test_sticker"], monkeypatch
+        )
+
     async def test_reply_video(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -1662,6 +1748,10 @@ class TestMessageWithoutRequest(TestMessageBase):
         monkeypatch.setattr(message.get_bot(), "send_video", make_assertion)
         assert await message.reply_video(video="test_video")
         await self.check_quote_parsing(
+            message, message.reply_video, "send_video", ["test_video"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_video, "send_video", ["test_video"], monkeypatch
         )
 
@@ -1691,6 +1781,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             message, message.reply_video_note, "send_video_note", ["test_video_note"], monkeypatch
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_video_note, "send_video_note", ["test_video_note"], monkeypatch
+        )
+
     async def test_reply_voice(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -1714,6 +1808,10 @@ class TestMessageWithoutRequest(TestMessageBase):
         monkeypatch.setattr(message.get_bot(), "send_voice", make_assertion)
         assert await message.reply_voice(voice="test_voice")
         await self.check_quote_parsing(
+            message, message.reply_voice, "send_voice", ["test_voice"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_voice, "send_voice", ["test_voice"], monkeypatch
         )
 
@@ -1743,6 +1841,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             message, message.reply_location, "send_location", ["test_location"], monkeypatch
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_location, "send_location", ["test_location"], monkeypatch
+        )
+
     async def test_reply_venue(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -1766,6 +1868,10 @@ class TestMessageWithoutRequest(TestMessageBase):
         monkeypatch.setattr(message.get_bot(), "send_venue", make_assertion)
         assert await message.reply_venue(venue="test_venue")
         await self.check_quote_parsing(
+            message, message.reply_venue, "send_venue", ["test_venue"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_venue, "send_venue", ["test_venue"], monkeypatch
         )
 
@@ -1795,6 +1901,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             message, message.reply_contact, "send_contact", ["test_contact"], monkeypatch
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_contact, "send_contact", ["test_contact"], monkeypatch
+        )
+
     async def test_reply_poll(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -1816,6 +1926,10 @@ class TestMessageWithoutRequest(TestMessageBase):
         monkeypatch.setattr(message.get_bot(), "send_poll", make_assertion)
         assert await message.reply_poll(question="test_poll", options=["1", "2", "3"])
         await self.check_quote_parsing(
+            message, message.reply_poll, "send_poll", ["test_poll", ["1", "2", "3"]], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_poll, "send_poll", ["test_poll", ["1", "2", "3"]], monkeypatch
         )
 
@@ -1846,6 +1960,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             monkeypatch,
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_dice, "send_dice", [], monkeypatch
+        )
+
     async def test_reply_action(self, monkeypatch, message: Message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -1862,6 +1980,14 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_chat_action", make_assertion)
         assert await message.reply_chat_action(action=ChatAction.TYPING)
+
+        await self.check_thread_id_parsing(
+            message,
+            message.reply_chat_action,
+            "send_chat_action",
+            [ChatAction.TYPING],
+            monkeypatch,
+        )
 
     async def test_reply_game(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
@@ -1884,6 +2010,14 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert await message.reply_game(game_short_name="test_game")
         await self.check_quote_parsing(
             message, message.reply_game, "send_game", ["test_game"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
+            message,
+            message.reply_game,
+            "send_game",
+            ["test_game"],
+            monkeypatch,
         )
 
     async def test_reply_invoice(self, monkeypatch, message):
@@ -1921,6 +2055,14 @@ class TestMessageWithoutRequest(TestMessageBase):
             "prices",
         )
         await self.check_quote_parsing(
+            message,
+            message.reply_invoice,
+            "send_invoice",
+            ["title", "description", "payload", "provider_token", "currency", "prices"],
+            monkeypatch,
+        )
+
+        await self.check_thread_id_parsing(
             message,
             message.reply_invoice,
             "send_invoice",
@@ -2035,6 +2177,14 @@ class TestMessageWithoutRequest(TestMessageBase):
             protect_content=protected,
         )
         await self.check_quote_parsing(
+            message,
+            message.reply_copy,
+            "copy_message",
+            [123456, 456789],
+            monkeypatch,
+        )
+
+        await self.check_thread_id_parsing(
             message,
             message.reply_copy,
             "copy_message",
