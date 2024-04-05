@@ -281,14 +281,12 @@ class BaseFilter:
             :attr:`~telegram.Update.edited_channel_post` or
             :attr:`~telegram.Update.edited_message`, :obj:`False` otherwise.
         """
-        if (  # Only message updates should be handled.
+        return bool(  # Only message updates should be handled.
             update.channel_post
             or update.message
             or update.edited_channel_post
             or update.edited_message
-        ):
-            return True
-        return False
+        )
 
 
 class MessageFilter(BaseFilter):
