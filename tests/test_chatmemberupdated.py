@@ -54,7 +54,6 @@ def old_chat_member(user):
 def new_chat_member(user):
     return ChatMemberAdministrator(
         user,
-        TestChatMemberUpdatedBase.new_status,
         True,
         True,
         True,
@@ -64,9 +63,10 @@ def new_chat_member(user):
         True,
         True,
         True,
-        can_post_stories=True,
-        can_edit_stories=True,
-        can_delete_stories=True,
+        True,
+        True,
+        True,
+        custom_title=TestChatMemberUpdatedBase.new_status,
     )
 
 

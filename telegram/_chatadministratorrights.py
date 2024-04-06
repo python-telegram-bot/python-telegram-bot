@@ -44,6 +44,11 @@ class ChatAdministratorRights(TelegramObject):
         :attr:`can_post_stories`, :attr:`can_edit_stories`, and :attr:`can_delete_stories` are
         considered as well when comparing objects of this type in terms of equality.
 
+    .. versionchanged:: NEXT.VERSION
+        As of this version, :attr:`can_post_stories`, :attr:`can_edit_stories`,
+        and :attr:`can_delete_stories` is now required. Thus, the order of arguments had to be
+        changed.
+
     Args:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
         can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator can access the chat event
@@ -169,13 +174,13 @@ class ChatAdministratorRights(TelegramObject):
         can_promote_members: bool,
         can_change_info: bool,
         can_invite_users: bool,
+        can_post_stories: bool,
+        can_edit_stories: bool,
+        can_delete_stories: bool,
         can_post_messages: Optional[bool] = None,
         can_edit_messages: Optional[bool] = None,
         can_pin_messages: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
-        can_post_stories: Optional[bool] = None,
-        can_edit_stories: Optional[bool] = None,
-        can_delete_stories: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ) -> None:
@@ -189,12 +194,6 @@ class ChatAdministratorRights(TelegramObject):
         self.can_promote_members: bool = can_promote_members
         self.can_change_info: bool = can_change_info
         self.can_invite_users: bool = can_invite_users
-        # Not actually optionals but because of backwards compatability we pretend they are
-        if can_post_stories is None or can_edit_stories is None or can_delete_stories is None:
-            raise TypeError(
-                "As of v21.0 can_post_stories, can_edit_stories and can_delete_stories"
-                " must be set in order to create this object."
-            )
         self.can_post_stories: bool = can_post_stories
         self.can_edit_stories: bool = can_edit_stories
         self.can_delete_stories: bool = can_delete_stories

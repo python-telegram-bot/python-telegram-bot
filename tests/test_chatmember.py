@@ -89,14 +89,14 @@ def chat_member_administrator():
         CMDefaults.can_promote_members,
         CMDefaults.can_change_info,
         CMDefaults.can_invite_users,
+        CMDefaults.can_post_stories,
+        CMDefaults.can_edit_stories,
+        CMDefaults.can_delete_stories,
         CMDefaults.can_post_messages,
         CMDefaults.can_edit_messages,
         CMDefaults.can_pin_messages,
         CMDefaults.can_manage_topics,
         CMDefaults.custom_title,
-        CMDefaults.can_post_stories,
-        CMDefaults.can_edit_stories,
-        CMDefaults.can_delete_stories,
     )
 
 
@@ -302,19 +302,3 @@ class TestChatMemberTypesWithoutRequest:
 
         assert c != e
         assert hash(c) != hash(e)
-
-    def test_deprecation_typeerror(self, chat_member_type):
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatMemberAdministrator(
-                *(False,) * 12,
-            )
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatMemberAdministrator(*(False,) * 12, can_edit_stories=True)
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatMemberAdministrator(*(False,) * 12, can_post_stories=True)
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatMemberAdministrator(*(False,) * 12, can_delete_stories=True)
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatMemberAdministrator(*(False,) * 12, can_edit_stories=True, can_post_stories=True)
-        with pytest.raises(TypeError, match="must be set in order"):
-            ChatMemberAdministrator(*(False,) * 12, can_delete_stories=True, can_post_stories=True)
