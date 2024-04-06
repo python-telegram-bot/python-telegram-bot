@@ -20,7 +20,18 @@ from datetime import datetime
 
 import pytest
 
-from telegram import BusinessConnection, BusinessMessagesDeleted, Chat, User
+from telegram import (
+    BusinessConnection,
+    BusinessIntro,
+    BusinessLocation,
+    BusinessMessagesDeleted,
+    BusinessOpeningHours,
+    BusinessOpeningHoursInterval,
+    Chat,
+    Location,
+    Sticker,
+    User,
+)
 from telegram._utils.datetime import UTC, to_timestamp
 from tests.auxil.slots import mro_slots
 
@@ -35,6 +46,17 @@ class TestBusinessBase:
     message_ids = (123, 321)
     business_connection_id = "123"
     chat = Chat(123, "test_chat")
+    title = "Business Title"
+    message = "Business description"
+    sticker = Sticker("sticker_id", "unique_id", 50, 50, True, False, Sticker.REGULAR)
+    address = "address"
+    location = Location(-23.691288, 46.788279)
+    opening_minute = 0
+    closing_minute = 60
+    time_zone_name = "Country/City"
+    opening_hours = [
+        BusinessOpeningHoursInterval(opening, opening + 60) for opening in (0, 24 * 60)
+    ]
 
 
 @pytest.fixture(scope="module")
@@ -55,6 +77,39 @@ def business_messages_deleted():
         TestBusinessBase.business_connection_id,
         TestBusinessBase.chat,
         TestBusinessBase.message_ids,
+    )
+
+
+@pytest.fixture(scope="module")
+def business_intro():
+    return BusinessIntro(
+        TestBusinessBase.title,
+        TestBusinessBase.message,
+        TestBusinessBase.sticker,
+    )
+
+
+@pytest.fixture(scope="module")
+def business_location():
+    return BusinessLocation(
+        TestBusinessBase.address,
+        TestBusinessBase.location,
+    )
+
+
+@pytest.fixture(scope="module")
+def business_opening_hours_interval():
+    return BusinessOpeningHoursInterval(
+        TestBusinessBase.opening_minute,
+        TestBusinessBase.closing_minute,
+    )
+
+
+@pytest.fixture(scope="module")
+def business_opening_hours():
+    return BusinessOpeningHours(
+        TestBusinessBase.time_zone_name,
+        TestBusinessBase.opening_hours,
     )
 
 
@@ -170,3 +225,188 @@ class TestBusinessMessagesDeleted(TestBusinessBase):
 
         assert bmd1 != bmd3
         assert hash(bmd1) != hash(bmd3)
+
+
+class TestBusinessIntroWithoutRequest(TestBusinessBase):
+    def test_slot_behaviour(self, business_intro):
+        intro = business_intro
+        for attr in intro.__slots__:
+            assert getattr(intro, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(intro)) == len(set(mro_slots(intro))), "duplicate slot"
+
+    def test_to_dict(self, business_intro):
+        intro_dict = business_intro.to_dict()
+        assert isinstance(intro_dict, dict)
+        assert intro_dict["title"] == self.title
+        assert intro_dict["message"] == self.message
+        assert intro_dict["sticker"] == self.sticker.to_dict()
+
+    def test_de_json(self):
+        json_dict = {
+            "title": self.title,
+            "message": self.message,
+            "sticker": self.sticker.to_dict(),
+        }
+        intro = BusinessIntro.de_json(json_dict, None)
+        assert intro.title == self.title
+        assert intro.message == self.message
+        assert intro.sticker == self.sticker
+        assert intro.api_kwargs == {}
+        assert isinstance(intro, BusinessIntro)
+
+    def test_equality(self):
+        intro1 = BusinessIntro(self.title, self.message, self.sticker)
+        intro2 = BusinessIntro(self.title, self.message, self.sticker)
+        intro3 = BusinessIntro("Other Business", self.message, self.sticker)
+
+        assert intro1 == intro2
+        assert hash(intro1) == hash(intro2)
+        assert intro1 is not intro2
+
+        assert intro1 != intro3
+        assert hash(intro1) != hash(intro3)
+
+
+class TestBusinessLocationWithoutRequest(TestBusinessBase):
+    def test_slot_behaviour(self, business_location):
+        inst = business_location
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_to_dict(self, business_location):
+        blc_dict = business_location.to_dict()
+        assert isinstance(blc_dict, dict)
+        assert blc_dict["address"] == self.address
+        assert blc_dict["location"] == self.location.to_dict()
+
+    def test_de_json(self):
+        json_dict = {
+            "address": self.address,
+            "location": self.location.to_dict(),
+        }
+        blc = BusinessLocation.de_json(json_dict, None)
+        assert blc.address == self.address
+        assert blc.location == self.location
+        assert blc.api_kwargs == {}
+        assert isinstance(blc, BusinessLocation)
+
+    def test_equality(self):
+        blc1 = BusinessLocation(self.address, self.location)
+        blc2 = BusinessLocation(self.address, self.location)
+        blc3 = BusinessLocation("Other Address", self.location)
+
+        assert blc1 == blc2
+        assert hash(blc1) == hash(blc2)
+        assert blc1 is not blc2
+
+        assert blc1 != blc3
+        assert hash(blc1) != hash(blc3)
+
+
+class TestBusinessOpeningHoursIntervalWithoutRequest(TestBusinessBase):
+    def test_slot_behaviour(self, business_opening_hours_interval):
+        inst = business_opening_hours_interval
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_to_dict(self, business_opening_hours_interval):
+        bohi_dict = business_opening_hours_interval.to_dict()
+        assert isinstance(bohi_dict, dict)
+        assert bohi_dict["opening_minute"] == self.opening_minute
+        assert bohi_dict["closing_minute"] == self.closing_minute
+
+    def test_de_json(self):
+        json_dict = {
+            "opening_minute": self.opening_minute,
+            "closing_minute": self.closing_minute,
+        }
+        bohi = BusinessOpeningHoursInterval.de_json(json_dict, None)
+        assert bohi.opening_minute == self.opening_minute
+        assert bohi.closing_minute == self.closing_minute
+        assert bohi.api_kwargs == {}
+        assert isinstance(bohi, BusinessOpeningHoursInterval)
+
+    def test_equality(self):
+        bohi1 = BusinessOpeningHoursInterval(self.opening_minute, self.closing_minute)
+        bohi2 = BusinessOpeningHoursInterval(self.opening_minute, self.closing_minute)
+        bohi3 = BusinessOpeningHoursInterval(61, 100)
+
+        assert bohi1 == bohi2
+        assert hash(bohi1) == hash(bohi2)
+        assert bohi1 is not bohi2
+
+        assert bohi1 != bohi3
+        assert hash(bohi1) != hash(bohi3)
+
+    @pytest.mark.parametrize(
+        ("opening_minute", "expected"),
+        [  # openings per docstring
+            (8 * 60, (0, 8, 0)),
+            (24 * 60, (1, 0, 0)),
+            (6 * 24 * 60, (6, 0, 0)),
+        ],
+    )
+    def test_opening_time(self, opening_minute, expected):
+        bohi = BusinessOpeningHoursInterval(opening_minute, -0)
+
+        opening_time = bohi.opening_time
+        assert opening_time == expected
+
+        cached = bohi.opening_time
+        assert cached is opening_time
+
+    @pytest.mark.parametrize(
+        ("closing_minute", "expected"),
+        [  # closings per docstring
+            (20 * 60 + 30, (0, 20, 30)),
+            (2 * 24 * 60 - 1, (1, 23, 59)),
+            (7 * 24 * 60 - 2, (6, 23, 58)),
+        ],
+    )
+    def test_closing_time(self, closing_minute, expected):
+        bohi = BusinessOpeningHoursInterval(-0, closing_minute)
+
+        closing_time = bohi.closing_time
+        assert closing_time == expected
+
+        cached = bohi.closing_time
+        assert cached is closing_time
+
+
+class TestBusinessOpeningHoursWithoutRequest(TestBusinessBase):
+    def test_slot_behaviour(self, business_opening_hours):
+        inst = business_opening_hours
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_to_dict(self, business_opening_hours):
+        boh_dict = business_opening_hours.to_dict()
+        assert isinstance(boh_dict, dict)
+        assert boh_dict["time_zone_name"] == self.time_zone_name
+        assert boh_dict["opening_hours"] == [opening.to_dict() for opening in self.opening_hours]
+
+    def test_de_json(self):
+        json_dict = {
+            "time_zone_name": self.time_zone_name,
+            "opening_hours": [opening.to_dict() for opening in self.opening_hours],
+        }
+        boh = BusinessOpeningHours.de_json(json_dict, None)
+        assert boh.time_zone_name == self.time_zone_name
+        assert boh.opening_hours == tuple(self.opening_hours)
+        assert boh.api_kwargs == {}
+        assert isinstance(boh, BusinessOpeningHours)
+
+    def test_equality(self):
+        boh1 = BusinessOpeningHours(self.time_zone_name, self.opening_hours)
+        boh2 = BusinessOpeningHours(self.time_zone_name, self.opening_hours)
+        boh3 = BusinessOpeningHours("Other/Timezone", self.opening_hours)
+
+        assert boh1 == boh2
+        assert hash(boh1) == hash(boh2)
+        assert boh1 is not boh2
+
+        assert boh1 != boh3
+        assert hash(boh1) != hash(boh3)

@@ -20,6 +20,10 @@ Available Types
     telegram.botname
     telegram.botshortdescription
     telegram.businessconnection
+    telegram.businessintro
+    telegram.businesslocation
+    telegram.businessopeninghours
+    telegram.businessopeninghoursinterval
     telegram.businessmessagesdeleted
     telegram.callbackquery
     telegram.chat

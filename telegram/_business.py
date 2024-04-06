@@ -20,9 +20,11 @@
 """This module contains the Telegram Business related classes."""
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from telegram._chat import Chat
+from telegram._files.location import Location
+from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
@@ -181,5 +183,263 @@ class BusinessMessagesDeleted(TelegramObject):
             return None
 
         data["chat"] = Chat.de_json(data.get("chat"), bot)
+
+        return super().de_json(data=data, bot=bot)
+
+
+class BusinessIntro(TelegramObject):
+    """
+    This object represents the intro of a business account.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their
+    :attr:`title`, :attr:`message` and :attr:`sticker` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        title (:obj:`str`, optional): Title text of the business intro.
+        message (:obj:`str`, optional): Message text of the business intro.
+        sticker (:class:`telegram.Sticker`, optional): Sticker of the business intro.
+
+    Attributes:
+        title (:obj:`str`): Optional. Title text of the business intro.
+        message (:obj:`str`): Optional. Message text of the business intro.
+        sticker (:class:`telegram.Sticker`): Optional. Sticker of the business intro.
+    """
+
+    __slots__ = (
+        "message",
+        "sticker",
+        "title",
+    )
+
+    def __init__(
+        self,
+        title: Optional[str] = None,
+        message: Optional[str] = None,
+        sticker: Optional[Sticker] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.title: Optional[str] = title
+        self.message: Optional[str] = message
+        self.sticker: Optional[Sticker] = sticker
+
+        self._id_attrs = (self.title, self.message, self.sticker)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BusinessIntro"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
+
+        return super().de_json(data=data, bot=bot)
+
+
+class BusinessLocation(TelegramObject):
+    """
+    This object represents the location of a business account.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their
+    :attr:`address` is equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        address (:obj:`str`): Address of the business.
+        location (:class:`telegram.Location`, optional): Location of the business.
+
+    Attributes:
+        address (:obj:`str`): Address of the business.
+        location (:class:`telegram.Location`): Optional. Location of the business.
+    """
+
+    __slots__ = (
+        "address",
+        "location",
+    )
+
+    def __init__(
+        self,
+        address: str,
+        location: Optional[Location] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.address: str = address
+        self.location: Optional[Location] = location
+
+        self._id_attrs = (self.address,)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BusinessLocation"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["location"] = Location.de_json(data.get("location"), bot)
+
+        return super().de_json(data=data, bot=bot)
+
+
+class BusinessOpeningHoursInterval(TelegramObject):
+    """
+    This object represents the time intervals describing business opening hours.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their
+    :attr:`opening_minute` and :attr:`closing_minute` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Examples:
+        A day has (24 * 60 =) 1440 minutes, a week has (7 * 1440 =) 10080 minutes.
+        Starting the the minute's sequence from Monday, example values of
+        :attr:`opening_minute`, :attr:`closing_minute` will map to the following day times:
+
+        * Monday - 8am to 8:30pm:
+            - ``opening_minute = 480`` :guilabel:`8 * 60`
+            - ``closing_minute = 1230`` :guilabel:`20 * 60 + 30`
+        * Tuesday - 24 hours:
+            - ``opening_minute = 1440`` :guilabel:`24 * 60`
+            - ``closing_minute = 2879`` :guilabel:`2 * 24 * 60 - 1`
+        * Sunday - 12am - 11:58pm:
+            - ``opening_minute = 8640`` :guilabel:`6 * 24 * 60`
+            - ``closing_minute = 10078`` :guilabel:`7 * 24 * 60 - 2`
+
+    Args:
+        opening_minute (:obj:`int`): The minute's sequence number in a week, starting on Monday,
+            marking the start of the time interval during which the business is open;
+            0 - 7 * 24 * 60.
+        closing_minute (:obj:`int`): The minute's
+            sequence number in a week, starting on Monday, marking the end of the time interval
+            during which the business is open; 0 - 8 * 24 * 60
+
+    Attributes:
+        opening_minute (:obj:`int`): The minute's sequence number in a week, starting on Monday,
+            marking the start of the time interval during which the business is open;
+            0 - 7 * 24 * 60.
+        closing_minute (:obj:`int`): The minute's
+            sequence number in a week, starting on Monday, marking the end of the time interval
+            during which the business is open; 0 - 8 * 24 * 60
+    """
+
+    __slots__ = ("_closing_time", "_opening_time", "closing_minute", "opening_minute")
+
+    def __init__(
+        self,
+        opening_minute: int,
+        closing_minute: int,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.opening_minute: int = opening_minute
+        self.closing_minute: int = closing_minute
+
+        self._opening_time: Optional[Tuple[int, int, int]] = None
+        self._closing_time: Optional[Tuple[int, int, int]] = None
+
+        self._id_attrs = (self.opening_minute, self.closing_minute)
+
+        self._freeze()
+
+    def _parse_minute(self, minute: int) -> Tuple[int, int, int]:
+        return (minute // 1440, minute % 1440 // 60, minute % 1440 % 60)
+
+    @property
+    def opening_time(self) -> Tuple[int, int, int]:
+        """Convenience attribute. A :obj:`tuple` parsed from :attr:`opening_minute`. It contains
+        the `weekday`, `hour` and `minute` in the same ranges as :attr:`datetime.datetime.weekday`,
+        :attr:`datetime.datetime.hour` and :attr:`datetime.datetime.minute`
+
+        Returns:
+            Tuple[:obj:`int`, :obj:`int`, :obj:`int`]:
+        """
+        if self._opening_time is None:
+            self._opening_time = self._parse_minute(self.opening_minute)
+        return self._opening_time
+
+    @property
+    def closing_time(self) -> Tuple[int, int, int]:
+        """Convenience attribute. A :obj:`tuple` parsed from :attr:`closing_minute`. It contains
+        the `weekday`, `hour` and `minute` in the same ranges as :attr:`datetime.datetime.weekday`,
+        :attr:`datetime.datetime.hour` and :attr:`datetime.datetime.minute`
+
+        Returns:
+            Tuple[:obj:`int`, :obj:`int`, :obj:`int`]:
+        """
+        if self._closing_time is None:
+            self._closing_time = self._parse_minute(self.closing_minute)
+        return self._closing_time
+
+
+class BusinessOpeningHours(TelegramObject):
+    """
+    This object represents the opening hours of a business account.
+
+    Objects of this class are comparable in terms of equality.
+    Two objects of this class are considered equal, if their
+    :attr:`time_zone_name` and :attr:`opening_hours` are equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        time_zone_name (:obj:`str`): Unique name of the time zone for which the opening
+            hours are defined.
+        opening_hours (Sequence[:class:`telegram.BusinessOpeningHoursInterval`]): List of
+            time intervals describing business opening hours.
+
+    Attributes:
+        time_zone_name (:obj:`str`): Unique name of the time zone for which the opening
+            hours are defined.
+        opening_hours (Sequence[:class:`telegram.BusinessOpeningHoursInterval`]): List of
+            time intervals describing business opening hours.
+    """
+
+    __slots__ = ("opening_hours", "time_zone_name")
+
+    def __init__(
+        self,
+        time_zone_name: str,
+        opening_hours: Sequence[BusinessOpeningHoursInterval],
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.time_zone_name: str = time_zone_name
+        self.opening_hours: Sequence[BusinessOpeningHoursInterval] = parse_sequence_arg(
+            opening_hours
+        )
+
+        self._id_attrs = (self.time_zone_name, self.opening_hours)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BusinessOpeningHours"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["opening_hours"] = BusinessOpeningHoursInterval.de_list(
+            data.get("opening_hours"), bot
+        )
 
         return super().de_json(data=data, bot=bot)

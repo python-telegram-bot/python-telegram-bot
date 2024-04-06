@@ -37,7 +37,11 @@ __all__ = (
     "BotName",
     "BotShortDescription",
     "BusinessConnection",
+    "BusinessIntro",
+    "BusinessLocation",
     "BusinessMessagesDeleted",
+    "BusinessOpeningHours",
+    "BusinessOpeningHoursInterval",
     "CallbackGame",
     "CallbackQuery",
     "Chat",
@@ -242,7 +246,14 @@ from ._botcommandscope import (
 )
 from ._botdescription import BotDescription, BotShortDescription
 from ._botname import BotName
-from ._business import BusinessConnection, BusinessMessagesDeleted
+from ._business import (
+    BusinessConnection,
+    BusinessIntro,
+    BusinessLocation,
+    BusinessMessagesDeleted,
+    BusinessOpeningHours,
+    BusinessOpeningHoursInterval,
+)
 from ._callbackquery import CallbackQuery
 from ._chat import Chat
 from ._chatadministratorrights import ChatAdministratorRights

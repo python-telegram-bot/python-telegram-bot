@@ -45,6 +45,9 @@ if TYPE_CHECKING:
         Animation,
         Audio,
         Bot,
+        BusinessIntro,
+        BusinessLocation,
+        BusinessOpeningHours,
         ChatInviteLink,
         ChatMember,
         Contact,
@@ -170,6 +173,21 @@ class Chat(TelegramObject):
             only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        business_intro (:class:`telegram.BusinessIntro`, optional): For private chats with
+            business accounts, the intro of the business. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        business_location (:class:`telegram.BusinessLocation`, optional): For private chats with
+            business accounts, the location of the business. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        business_opening_hours (:class:`telegram.BusinessOpeningHours`, optional): For private
+            chats with business accounts, the opening hours of the business. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         available_reactions (Sequence[:class:`telegram.ReactionType`], optional): List of available
             reactions allowed in the chat. If omitted, then all of
             :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
@@ -321,6 +339,21 @@ class Chat(TelegramObject):
             obtained via :meth:`~telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        business_intro (:class:`telegram.BusinessIntro`): Optional. For private chats with
+            business accounts, the intro of the business. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        business_location (:class:`telegram.BusinessLocation`): Optional. For private chats with
+            business accounts, the location of the business. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
+        business_opening_hours (:class:`telegram.BusinessOpeningHours`): Optional. For private
+            chats with business accounts, the opening hours of the business. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: NEXT.VERSION
         available_reactions (Tuple[:class:`telegram.ReactionType`]): Optional. List of available
             reactions allowed in the chat. If omitted, then all of
             :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
@@ -401,6 +434,9 @@ class Chat(TelegramObject):
         "background_custom_emoji_id",
         "bio",
         "birthdate",
+        "business_intro",
+        "business_location",
+        "business_opening_hours",
         "can_set_sticker_set",
         "custom_emoji_sticker_set_name",
         "description",
@@ -491,6 +527,9 @@ class Chat(TelegramObject):
         custom_emoji_sticker_set_name: Optional[str] = None,
         birthdate: Optional[Birthdate] = None,
         personal_chat: Optional["Chat"] = None,
+        business_intro: Optional["BusinessIntro"] = None,
+        business_location: Optional["BusinessLocation"] = None,
+        business_opening_hours: Optional["BusinessOpeningHours"] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -542,6 +581,9 @@ class Chat(TelegramObject):
         self.custom_emoji_sticker_set_name: Optional[str] = custom_emoji_sticker_set_name
         self.birthdate: Optional[Birthdate] = birthdate
         self.personal_chat: Optional["Chat"] = personal_chat
+        self.business_intro: Optional["BusinessIntro"] = business_intro
+        self.business_location: Optional["BusinessLocation"] = business_location
+        self.business_opening_hours: Optional["BusinessOpeningHours"] = business_opening_hours
 
         self._id_attrs = (self.id,)
 
@@ -604,7 +646,12 @@ class Chat(TelegramObject):
         )
 
         data["photo"] = ChatPhoto.de_json(data.get("photo"), bot)
-        from telegram import Message  # pylint: disable=import-outside-toplevel
+        from telegram import (  # pylint: disable=import-outside-toplevel
+            BusinessIntro,
+            BusinessLocation,
+            BusinessOpeningHours,
+            Message,
+        )
 
         data["pinned_message"] = Message.de_json(data.get("pinned_message"), bot)
         data["permissions"] = ChatPermissions.de_json(data.get("permissions"), bot)
@@ -612,6 +659,11 @@ class Chat(TelegramObject):
         data["available_reactions"] = ReactionType.de_list(data.get("available_reactions"), bot)
         data["birthdate"] = Birthdate.de_json(data.get("birthdate"), bot)
         data["personal_chat"] = cls.de_json(data.get("personal_chat"), bot)
+        data["business_intro"] = BusinessIntro.de_json(data.get("business_intro"), bot)
+        data["business_location"] = BusinessLocation.de_json(data.get("business_location"), bot)
+        data["business_opening_hours"] = BusinessOpeningHours.de_json(
+            data.get("business_opening_hours"), bot
+        )
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
