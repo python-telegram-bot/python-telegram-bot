@@ -305,6 +305,8 @@ class Message(MaybeInaccessibleMessage):
         is_from_offline (:obj:`bool`, optional): :obj:`True`, if the message was sent
             by an implicit action, for example, as an away or a greeting business message,
             or as a scheduled message.
+
+            .. versionadded:: NEXT.VERSION
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
@@ -587,6 +589,8 @@ class Message(MaybeInaccessibleMessage):
         is_from_offline (:obj:`bool`): Optional. :obj:`True`, if the message was sent
             by an implicit action, for example, as an away or a greeting business message,
             or as a scheduled message.
+
+            .. versionadded:: NEXT.VERSION
         media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
@@ -1600,7 +1604,6 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1618,6 +1621,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_message(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -1663,7 +1667,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_markdown(
@@ -1676,7 +1680,6 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1695,6 +1698,7 @@ class Message(MaybeInaccessibleMessage):
                 update.effective_message.chat_id,
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.MARKDOWN,
+                business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
             )
@@ -1745,7 +1749,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_markdown_v2(
@@ -1758,7 +1762,6 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1777,6 +1780,7 @@ class Message(MaybeInaccessibleMessage):
                 update.effective_message.chat_id,
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.MARKDOWN_V2,
+                business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
             )
@@ -1823,7 +1827,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_html(
@@ -1836,7 +1840,6 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1855,6 +1858,7 @@ class Message(MaybeInaccessibleMessage):
                 update.effective_message.chat_id,
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.HTML,
+                business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
             )
@@ -1901,7 +1905,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_media_group(
@@ -1913,7 +1917,6 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1933,6 +1936,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_media_group(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -1978,7 +1982,7 @@ class Message(MaybeInaccessibleMessage):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_photo(
@@ -1993,7 +1997,6 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2011,6 +2014,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_photo(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2057,7 +2061,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             has_spoiler=has_spoiler,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_audio(
@@ -2075,7 +2079,6 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2093,6 +2096,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_audio(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2142,7 +2146,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             thumbnail=thumbnail,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_document(
@@ -2158,7 +2162,6 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2176,6 +2179,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_document(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2223,7 +2227,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             thumbnail=thumbnail,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_animation(
@@ -2242,7 +2246,6 @@ class Message(MaybeInaccessibleMessage):
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2260,6 +2263,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_animation(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2310,7 +2314,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_sticker(
@@ -2322,7 +2326,6 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2339,6 +2342,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_sticker(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2381,7 +2385,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             emoji=emoji,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_video(
@@ -2401,7 +2405,6 @@ class Message(MaybeInaccessibleMessage):
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2419,6 +2422,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_video(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2470,7 +2474,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_video_note(
@@ -2484,7 +2488,6 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2502,6 +2505,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_video_note(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2547,7 +2551,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             thumbnail=thumbnail,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_voice(
@@ -2562,7 +2566,6 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2580,6 +2583,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_voice(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2626,7 +2630,7 @@ class Message(MaybeInaccessibleMessage):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_location(
@@ -2642,7 +2646,6 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2660,6 +2663,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_location(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2707,7 +2711,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_venue(
@@ -2725,7 +2729,6 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2743,6 +2746,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_venue(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2792,7 +2796,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_contact(
@@ -2806,7 +2810,6 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2824,6 +2827,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_contact(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2869,7 +2873,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_poll(
@@ -2891,7 +2895,6 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2908,6 +2911,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_poll(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -2960,7 +2964,7 @@ class Message(MaybeInaccessibleMessage):
             explanation_entities=explanation_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_dice(
@@ -2971,7 +2975,6 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2988,6 +2991,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_dice(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -3029,14 +3033,13 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_chat_action(
         self,
         action: str,
         message_thread_id: Optional[int] = None,
-        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3049,6 +3052,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_chat_action(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -3073,7 +3077,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_game(
@@ -3084,7 +3088,6 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
-        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3101,6 +3104,7 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_game(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
@@ -3144,7 +3148,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
-            business_connection_id=business_connection_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_invoice(

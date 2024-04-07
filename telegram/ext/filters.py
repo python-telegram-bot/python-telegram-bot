@@ -273,6 +273,11 @@ class BaseFilter:
     def check_update(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
         """Checks if the specified update should be handled by this filter.
 
+        .. versionchanged:: NEXT.VERSION
+            This filter now also returns :obj:`True` if the update contains
+            :attr:`~telegram.Update.business_message`
+            or :attr:`~telegram.Update.edited_business_message`.
+
         Args:
             update (:class:`telegram.Update`): The update to check.
 

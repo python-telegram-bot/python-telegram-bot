@@ -39,6 +39,7 @@ from telegram import (
     BotDescription,
     BotName,
     BotShortDescription,
+    BusinessConnection,
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
@@ -2088,13 +2089,35 @@ class TestBotWithoutRequest:
         )
 
     async def test_business_connection_id_argument(self, bot, monkeypatch):
-        """We can't connect to a business acc, so we just test that the correct data is passed."""
+        """We can't connect to a business acc, so we just test that the correct data is passed.
+        We also can't test every single method easily, so we just test one. Our linting will catch
+        any unused args with the others."""
 
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters.get("business_connection_id") == 42
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_message(2, "text", business_connection_id=42)
+
+    async def test_get_business_connection(self, bot, monkeypatch):
+        bci = "42"
+        user = User(1, "first", False)
+        user_chat_id = 1
+        date = dtm.datetime.utcnow()
+        can_reply = True
+        is_enabled = True
+        bc = BusinessConnection(bci, user, user_chat_id, date, can_reply, is_enabled).to_json()
+
+        async def do_request(*args, **kwargs):
+            data = kwargs.get("request_data")
+            obj = data.parameters.get("business_connection_id")
+            if obj == bci:
+                return 200, f'{{"ok": true, "result": {bc}}}'.encode()
+            return 400, b'{"ok": false, "result": []}'
+
+        monkeypatch.setattr(bot.request, "do_request", do_request)
+        obj = await bot.get_business_connection(business_connection_id=bci)
+        assert isinstance(obj, BusinessConnection)
 
 
 class TestBotWithRequest:
@@ -2889,11 +2912,6 @@ class TestBotWithRequest:
         assert not info.url
         assert info.ip_address is None
         assert info.has_custom_certificate is False
-
-    async def test_get_business_connection(self, bot):
-        # TODO: Get a business connection and test this properly
-        pass
-        # assert await bot.get_business_connection("TEST") is None
 
     async def test_leave_chat(self, bot):
         with pytest.raises(BadRequest, match="Chat not found"):

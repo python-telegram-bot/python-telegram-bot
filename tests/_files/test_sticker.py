@@ -800,6 +800,11 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
                 sticker_format="static",
             )
 
+    async def test_deprecation_creation_args(self, recwarn):
+        with pytest.warns(PTBDeprecationWarning, match="The parameters `is_animated` and ") as w:
+            StickerSet("name", "title", [], "static", is_animated=True)
+            assert w[0].filename == __file__, "wrong stacklevel!"
+
 
 @pytest.mark.xdist_group("stickerset")
 class TestStickerSetWithRequest:

@@ -964,6 +964,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
+                .. versionadded:: NEXT.VERSION
+
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
                 Mutually exclusive with :paramref:`reply_parameters`, which this is a convenience

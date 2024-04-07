@@ -91,7 +91,5 @@ class BusinessMessagesDeletedHandler(BaseHandler[Update, CCT]):
                 return True
             if update.deleted_business_messages.chat.id in self._chat_ids:
                 return True
-            if update.deleted_business_messages.chat.username in self._usernames:
-                return True
-            return False
+            return update.deleted_business_messages.chat.username in self._usernames
         return False

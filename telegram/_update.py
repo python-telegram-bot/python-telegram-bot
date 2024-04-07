@@ -471,6 +471,10 @@ class Update(TelegramObject):
 
         is present.
 
+        .. versionchanged:: NEXT.VERSION
+            This property now also considers :attr:`business_connection`, :attr:`business_message`
+            and :attr:`edited_business_message`.
+
         Example:
             * If :attr:`message` is present, this will give
               :attr:`telegram.Message.from_user`.
@@ -599,6 +603,10 @@ class Update(TelegramObject):
         :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll`,
         :attr:`poll_answer`, or :attr:`business_connection` is present.
 
+        .. versionchanged:: NEXT.VERSION
+            This property now also considers :attr:`business_message`,
+            :attr:`edited_business_message`, and :attr:`deleted_business_messages`.
+
         Example:
             If :attr:`message` is present, this will give :attr:`telegram.Message.chat`.
 
@@ -664,6 +672,10 @@ class Update(TelegramObject):
             :attr:`edited_message`, :attr:`channel_post`, :attr:`edited_channel_post` or
             :attr:`callback_query` (i.e. :attr:`telegram.CallbackQuery.message`) or :obj:`None`, if
             none of those are present.
+
+        .. versionchanged:: NEXT.VERSION
+            This property now also considers :attr:`business_message`, and
+            :attr:`edited_business_message`.
 
         Tip:
             This property will only ever return objects of type :class:`telegram.Message` or

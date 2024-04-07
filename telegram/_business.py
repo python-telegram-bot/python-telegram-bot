@@ -143,7 +143,7 @@ class BusinessMessagesDeleted(TelegramObject):
         business_connection_id (:obj:`str`): Unique identifier of the business connection.
         chat (:class:`telegram.Chat`): Information about a chat in the business account. The bot
             may not have access to the chat or the corresponding user.
-        message_ids (Sequence[:obj:`int`]): A list of identifiers of the deleted messages in the
+        message_ids (Tuple[:obj:`int`]): A list of identifiers of the deleted messages in the
             chat of the business account.
     """
 
@@ -164,7 +164,7 @@ class BusinessMessagesDeleted(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.business_connection_id: str = business_connection_id
         self.chat: Chat = chat
-        self.message_ids: Sequence[int] = parse_sequence_arg(message_ids)
+        self.message_ids: Tuple[int, ...] = parse_sequence_arg(message_ids)
 
         self._id_attrs = (
             self.business_connection_id,

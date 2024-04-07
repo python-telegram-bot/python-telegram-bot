@@ -42,7 +42,7 @@ class BusinessConnectionHandler(BaseHandler[Update, CCT]):
 
                 async def callback(update: Update, context: CallbackContext)
         user_id (:obj:`int` | Collection[:obj:`int`], optional): Filters requests to allow only
-            those are from the specified user ID(s).
+            those which are from the specified user ID(s).
 
         username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
             those which are from the specified username(s).
@@ -91,7 +91,5 @@ class BusinessConnectionHandler(BaseHandler[Update, CCT]):
                 return True
             if update.business_connection.user.id in self._user_ids:
                 return True
-            if update.business_connection.user.username in self._usernames:
-                return True
-            return False
+            return update.business_connection.user.username in self._usernames
         return False
