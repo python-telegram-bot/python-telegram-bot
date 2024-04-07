@@ -191,6 +191,7 @@ __all__ = (
     "SecureData",
     "SecureValue",
     "SentWebAppMessage",
+    "SharedUser",
     "ShippingAddress",
     "ShippingOption",
     "ShippingQuery",
@@ -409,7 +410,7 @@ from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage
-from ._shared import ChatShared, UsersShared
+from ._shared import ChatShared, SharedUser, UsersShared
 from ._story import Story
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject

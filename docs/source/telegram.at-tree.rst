@@ -114,6 +114,7 @@ Available Types
     telegram.replykeyboardremove
     telegram.replyparameters
     telegram.sentwebappmessage
+    telegram.shareduser
     telegram.story
     telegram.switchinlinequerychosenchat
     telegram.telegramobject
