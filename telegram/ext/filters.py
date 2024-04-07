@@ -283,16 +283,14 @@ class BaseFilter:
             :attr:`~telegram.Update.edited_message`, :attr:`telegram.Update.business_message`,
             :attr:`telegram.Update.edited_business_message`, or :obj:`False` otherwise.
         """
-        if (  # Only message updates should be handled.
+        return bool(  # Only message updates should be handled.
             update.channel_post  # pylint: disable=too-many-boolean-expressions
             or update.message
             or update.edited_channel_post
             or update.edited_message
             or update.business_message
             or update.edited_business_message
-        ):
-            return True
-        return False
+        )
 
 
 class MessageFilter(BaseFilter):

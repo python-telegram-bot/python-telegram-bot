@@ -149,7 +149,7 @@ class TestConstantsWithoutRequest:
 
         if any(re.match(pattern, name) for pattern in patters):
             return False
-        if name in {
+        return name not in {
             "author_signature",
             "api_kwargs",
             "caption",
@@ -177,10 +177,7 @@ class TestConstantsWithoutRequest:
             "user_shared",
             "via_bot",
             "is_from_offline",
-        }:
-            return False
-
-        return True
+        }
 
     @pytest.mark.parametrize(
         "attribute",
