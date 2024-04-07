@@ -19,6 +19,7 @@
 """The integration of persistence into the application is tested in test_basepersistence.
 """
 import asyncio
+import functools
 import inspect
 import logging
 import os
@@ -2311,7 +2312,43 @@ class TestApplication:
 
         assert len(caplog.records) == 1
         assert caplog.records[-1].name == "telegram.ext.Application"
-        assert caplog.records[-1].getMessage().endswith("stop_running() does nothing.")
+        assert caplog.records[-1].getMessage().endswith("`stop_running()` likely has no effect.")
+
+    def test_stop_running_post_init(self, app, monkeypatch, caplog, one_time_bot):
+        async def post_init(app):
+            app.stop_running()
+
+        called_callbacks = []
+
+        async def callback(*args, **kwargs):
+            called_callbacks.append(kwargs["name"])
+
+        monkeypatch.setattr(Application, "start", functools.partial(callback, name="start"))
+        monkeypatch.setattr(
+            Updater, "start_polling", functools.partial(callback, name="start_polling")
+        )
+
+        app = (
+            ApplicationBuilder()
+            .bot(one_time_bot)
+            .post_init(post_init)
+            .post_stop(functools.partial(callback, name="post_stop"))
+            .post_shutdown(functools.partial(callback, name="post_shutdown"))
+            .build()
+        )
+
+        with caplog.at_level(logging.INFO):
+            app.run_polling(close_loop=False)
+
+        # The important part here is that start(_polling) are *not* called!
+        assert called_callbacks == ["post_stop", "post_shutdown"]
+
+        assert len(caplog.records) == 1
+        assert caplog.records[-1].name == "telegram.ext.Application"
+        assert (
+            "Application received stop signal via `stop_running`"
+            in caplog.records[-1].getMessage()
+        )
 
     @pytest.mark.parametrize("method", ["polling", "webhook"])
     def test_stop_running(self, one_time_bot, monkeypatch, method):
