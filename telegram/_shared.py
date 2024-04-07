@@ -17,19 +17,21 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects used for request chats/users service messages."""
-from typing import Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
-from telegram._bot import Bot
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 from telegram._utils.warnings_transition import (
-    warn_about_deprecated_attr_in_property,
     build_deprecation_warning_message,
+    warn_about_deprecated_attr_in_property,
 )
 from telegram.warnings import PTBDeprecationWarning
+
+if TYPE_CHECKING:
+    from telegram._bot import Bot
 
 
 class UsersShared(TelegramObject):
@@ -50,13 +52,13 @@ class UsersShared(TelegramObject):
             bot. Mutually exclusive with :paramref:`user_ids`.
 
             .. versionadded:: NEXT.VERSION
-        user_ids (Sequence[:obj:`int`], optional): Identifiers of the shared users. These numbers may have
-            more than 32 significant bits and some programming languages may have difficulty/silent
-            defects in interpreting them. But they have at most 52 significant bits, so 64-bit
-            integers or double-precision float types are safe for storing these identifiers. The
-            bot may not have access to the users and could be unable to use these identifiers,
-            unless the users are already known to the bot by some other means. Mutually exclusive
-            with :paramref:`users`.
+        user_ids (Sequence[:obj:`int`], optional): Identifiers of the shared users. These numbers
+            may have more than 32 significant bits and some programming languages may have
+            difficulty/silent defects in interpreting them. But they have at most 52 significant
+            bits, so 64-bit integers or double-precision float types are safe for storing these
+            identifiers. The bot may not have access to the users and could be unable to use
+            these identifiers, unless the users are already known to the bot by some other means.
+            Mutually exclusive with :paramref:`users`.
 
             .. versionchanged:: NEXT.VERSION
                 Bot API 7.2 introduced :paramref:`users` replacing this argument. PTB will
@@ -68,7 +70,7 @@ class UsersShared(TelegramObject):
 
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
-        users (Sequence[:class:`telegram.SharedUser`]): Information about users shared with the
+        users (Tuple[:class:`telegram.SharedUser`]): Information about users shared with the
             bot. Mutually exclusive with :attr:`user_ids`.
 
             .. versionadded:: NEXT.VERSION
@@ -79,16 +81,17 @@ class UsersShared(TelegramObject):
     def __init__(
         self,
         request_id: int,
-        users: Sequence[SharedUser],
+        users: Sequence["SharedUser"],
         user_ids: Optional[Sequence[int]] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.request_id: int = request_id
-        self.users: Tuple[SharedUser, ...] = users
-        self.user_ids: Optional[Tuple[int, ...]] = user_ids
-
+        self.users: Tuple[SharedUser, ...] = parse_sequence_arg(users)
+        self.user_ids: Optional[Tuple[int, ...]] = parse_sequence_arg(  # type: ignore[misc]
+            user_ids
+        )
         if user_ids is not None and users:
             raise ValueError("`users` and `user_ids` are mutually exclusive")
 
@@ -176,7 +179,7 @@ class ChatShared(TelegramObject):
             .. versionadded:: NEXT.VERSION
     """
 
-    __slots__ = ("chat_id", "request_id", "title", "username", "photo")
+    __slots__ = ("chat_id", "photo", "request_id", "title", "username")
 
     def __init__(
         self,
@@ -226,33 +229,39 @@ class SharedUser(TelegramObject):
             bits and some programming languages may have difficulty/silent defects in interpreting
             it. But it has atmost 52 significant bits, so 64-bit integers or double-precision
             float types are safe for storing these identifiers. The bot may not have access to the
-            user and could be unable to use this identifier, unless the user is already known to the
-            bot by some other means.
-        first_name (:obj:`str`, optional): First name of the user, if the name was requested by the bot.
-        last_name (:obj:`str`, optional): Last name of the user, if the name was requested by the bot.
-        username (:obj:`str`, optional): Username of the user, if the username was requested by the bot.
-        photo (Sequence[:class:`telegram.PhotoSize`], optional): Available sizes of the chat photo, if
-            the photo was requested by the bot.
+            user and could be unable to use this identifier, unless the user is already known to
+            the bot by some other means.
+        first_name (:obj:`str`, optional): First name of the user, if the name was requested by the
+            bot.
+        last_name (:obj:`str`, optional): Last name of the user, if the name was requested by the
+            bot.
+        username (:obj:`str`, optional): Username of the user, if the username was requested by the
+            bot.
+        photo (Sequence[:class:`telegram.PhotoSize`], optional): Available sizes of the chat photo,
+            if the photo was requested by the bot.
 
     Attributes:
         user_id (:obj:`int`): Identifier of the shared user. This number may have 32 significant
             bits and some programming languages may have difficulty/silent defects in interpreting
             it. But it has atmost 52 significant bits, so 64-bit integers or double-precision
             float types are safe for storing these identifiers. The bot may not have access to the
-            user and could be unable to use this identifier, unless the user is already known to the
-            bot by some other means.
-        first_name (:obj:`str`): Optional. First name of the user, if the name was requested by the bot.
-        last_name (:obj:`str`): Optional. Last name of the user, if the name was requested by the bot.
-        username (:obj:`str`): Optional. Username of the user, if the username was requested by the bot.
+            user and could be unable to use this identifier, unless the user is already known to
+            the bot by some other means.
+        first_name (:obj:`str`): Optional. First name of the user, if the name was requested by the
+            bot.
+        last_name (:obj:`str`): Optional. Last name of the user, if the name was requested by the
+            bot.
+        username (:obj:`str`): Optional. Username of the user, if the username was requested by the
+            bot.
         photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Available sizes of the chat photo, if
             the photo was requested by the bot.
     """
 
-    __slots__ = ("user_id", "first_name", "last_name", "username", "photo")
+    __slots__ = ("first_name", "last_name", "photo", "user_id", "username")
 
     def __init__(
         self,
-        ruser_id: int,
+        user_id: int,
         first_name: Optional[str] = None,
         last_name: Optional[str] = None,
         username: Optional[str] = None,
@@ -263,11 +272,11 @@ class SharedUser(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.user_id: int = user_id
         self.first_name: Optional[str] = first_name
-        self.last_name: Optional[str] = title
+        self.last_name: Optional[str] = last_name
         self.username: Optional[str] = username
         self.photo: Optional[Tuple[PhotoSize, ...]] = parse_sequence_arg(photo)
 
-        self._id_attrs = self.user_id
+        self._id_attrs = (self.user_id,)
 
         self._freeze()
 

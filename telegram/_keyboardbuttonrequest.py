@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects to request chats/users."""
+
 from typing import TYPE_CHECKING, Optional
 
 from telegram._chatadministratorrights import ChatAdministratorRights
@@ -56,7 +57,8 @@ class KeyboardButtonRequestUsers(TelegramObject):
             .
 
             .. versionadded:: 20.8
-        request_name (:obj:`bool`, optional): Pass :obj:`True` to request the users' first and last name.
+        request_name (:obj:`bool`, optional): Pass :obj:`True` to request the users' first and last
+            name.
 
             .. versionadded:: NEXT.VERSION
         request_username (:obj:`bool`, optional): Pass :obj:`True` to request the users' username.
@@ -80,7 +82,8 @@ class KeyboardButtonRequestUsers(TelegramObject):
             .
 
             .. versionadded:: 20.8
-        request_name (:obj:`bool`): Optional. Pass :obj:`True` to request the users' first and last name.
+        request_name (:obj:`bool`): Optional. Pass :obj:`True` to request the users' first and last
+            name.
 
             .. versionadded:: NEXT.VERSION
         request_username (:obj:`bool`): Optional. Pass :obj:`True` to request the users' username.
@@ -95,11 +98,11 @@ class KeyboardButtonRequestUsers(TelegramObject):
     __slots__ = (
         "max_quantity",
         "request_id",
+        "request_name",
+        "request_photo",
+        "request_username",
         "user_is_bot",
         "user_is_premium",
-        "request_name",
-        "request_username",
-        "request_photo",
     )
 
     def __init__(
@@ -108,9 +111,9 @@ class KeyboardButtonRequestUsers(TelegramObject):
         user_is_bot: Optional[bool] = None,
         user_is_premium: Optional[bool] = None,
         max_quantity: Optional[int] = None,
-        request_name: Optional[bool]= None,
-        request_username: Optional[bool]= None,
-        request_photo: Optional[bool]= None,
+        request_name: Optional[bool] = None,
+        request_username: Optional[bool] = None,
+        request_photo: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -215,10 +218,10 @@ class KeyboardButtonRequestChat(TelegramObject):
         "chat_is_created",
         "chat_is_forum",
         "request_id",
-        "user_administrator_rights",
+        "request_photo",
         "request_title",
         "request_username",
-        "request_photo",
+        "user_administrator_rights",
     )
 
     def __init__(
