@@ -471,6 +471,7 @@ class TestStickerWithRequest(TestStickerBase):
         assert protected.has_protected_content
         assert not unprotected.has_protected_content
 
+    @pytest.mark.xfail(reason="API 7.2 incompatibility, see #4181")
     async def test_premium_animation(self, bot):
         # testing animation sucks a bit since we can't create a premium sticker. What we can do is
         # get a sticker set which includes a premium sticker and check that specific one.
@@ -488,6 +489,7 @@ class TestStickerWithRequest(TestStickerBase):
         }
         assert premium_sticker.premium_animation.to_dict() == premium_sticker_dict
 
+    @pytest.mark.xfail(reason="API 7.2 incompatibility, see #4181")
     async def test_custom_emoji(self, bot):
         # testing custom emoji stickers is as much of an annoyance as the premium animation, see
         # in test_premium_animation
@@ -526,6 +528,7 @@ class TestStickerWithRequest(TestStickerBase):
 
 @pytest.fixture()
 async def sticker_set(bot):
+    pytest.xfail(reason="API 7.2 incompatibility, see #4181")
     ss = await bot.get_sticker_set(f"test_by_{bot.username}")
     if len(ss.stickers) > 100:
         try:
@@ -540,6 +543,7 @@ async def sticker_set(bot):
 
 @pytest.fixture()
 async def animated_sticker_set(bot):
+    pytest.xfail(reason="API 7.2 incompatibility, see #4181")
     ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
     if len(ss.stickers) > 100:
         try:
@@ -796,6 +800,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
 
 
 @pytest.mark.xdist_group("stickerset")
+@pytest.mark.xfail(reason="API 7.2 incompatibility, see #4181")
 class TestStickerSetWithRequest:
     async def test_create_sticker_set(
         self, bot, chat_id, sticker_file, animated_sticker_file, video_sticker_file
@@ -1107,6 +1112,7 @@ class TestMaskPositionWithoutRequest(TestMaskPositionBase):
         assert hash(a) != hash(e)
 
 
+@pytest.mark.xfail(reason="API 7.2 incompatibility, see #4181")
 class TestMaskPositionWithRequest(TestMaskPositionBase):
     async def test_create_new_mask_sticker_set(self, bot, chat_id, sticker_file, mask_position):
         name = f"masks_by_{bot.username}"
