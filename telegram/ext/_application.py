@@ -365,6 +365,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         self.__update_persistence_event = asyncio.Event()
         self.__update_persistence_lock = asyncio.Lock()
         self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
+        self.__stop_running_marker = asyncio.Event()
 
     async def __aenter__(self: _AppType) -> _AppType:  # noqa: PYI019
         """|async_context_manager| :meth:`initializes <initialize>` the App.
@@ -516,6 +517,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 await self._add_ch_to_persistence(handler)
 
         self._initialized = True
+        self.__stop_running_marker.clear()
 
     async def _add_ch_to_persistence(self, handler: "ConversationHandler") -> None:
         self._conversation_handler_conversations.update(
@@ -670,6 +672,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             raise RuntimeError("This Application is not running!")
 
         self._running = False
+        self.__stop_running_marker.clear()
         _LOGGER.info("Application is stopping. This might take a moment.")
 
         # Stop listening for new updates and handle all pending ones
@@ -714,17 +717,30 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         shutdown of the application, i.e. the methods listed in :attr:`run_polling` and
         :attr:`run_webhook` will still be executed.
 
+        This method can also be called within :meth:`post_init`. This allows for a graceful,
+        early shutdown of the application if some condition is met (e.g., a database connection
+        could not be established).
+
         Note:
-            If the application is not running, this method does nothing.
+            If the application is neither running via :meth:`run_polling` or meth:`run_webhook`
+            nor called within :meth:`post_init`, this method does nothing.
 
         .. versionadded:: 20.5
+
+        .. versionchanged:: NEXT.VERSION
+            Added support for calling within :meth:`post_init`.
         """
         if self.running:
             # This works because `__run` is using `loop.run_forever()`. If that changes, this
             # method needs to be adapted.
             asyncio.get_running_loop().stop()
         else:
-            _LOGGER.debug("Application is not running, stop_running() does nothing.")
+            self.__stop_running_marker.set()
+            if not self._initialized:
+                _LOGGER.debug(
+                    "Application is not running and not initialized. `stop_running()` likely has "
+                    "no effect."
+                )
 
     def run_polling(
         self,
@@ -1045,6 +1061,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             loop.run_until_complete(self.initialize())
             if self.post_init:
                 loop.run_until_complete(self.post_init(self))
+            if self.__stop_running_marker.is_set():
+                _LOGGER.info("Application received stop signal via `stop_running`. Shutting down.")
+                return
             loop.run_until_complete(updater_coroutine)  # one of updater.start_webhook/polling
             loop.run_until_complete(self.start())
             loop.run_forever()
