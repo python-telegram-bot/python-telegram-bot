@@ -121,7 +121,14 @@ class UsersShared(TelegramObject):
             return None
 
         data["users"] = SharedUser.de_list(data.get("users"), bot)
-        return super().de_json(data=data, bot=bot)
+
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if user_ids := data.get("user_ids"):
+            api_kwargs = {"user_ids": user_ids}
+
+        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
     @property
     def user_ids(self) -> Tuple[int, ...]:

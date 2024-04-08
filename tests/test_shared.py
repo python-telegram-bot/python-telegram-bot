@@ -52,9 +52,10 @@ class TestUsersSharedWithoutRequest(TestUsersSharedBase):
         json_dict = {
             "request_id": self.request_id,
             "users": [user.to_dict() for user in self.users],
+            "user_ids": self.user_ids,
         }
         users_shared = UsersShared.de_json(json_dict, bot)
-        assert users_shared.api_kwargs == {}
+        assert users_shared.api_kwargs == {"user_ids": self.user_ids}
 
         assert users_shared.request_id == self.request_id
         assert users_shared.users == self.users
