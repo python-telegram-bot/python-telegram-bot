@@ -238,7 +238,7 @@ class ChatShared(TelegramObject):
 class SharedUser(TelegramObject):
     """
     This object contains information about a user that was shared with the bot using a
-    :class:`telegram.KeyboardButtonRequestUser` button.
+    :class:`telegram.KeyboardButtonRequestUsers` button.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user_id` is equal.
@@ -274,8 +274,8 @@ class SharedUser(TelegramObject):
             bot.
         username (:obj:`str`): Optional. Username of the user, if the username was requested by the
             bot.
-        photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Available sizes of the chat photo, if
-            the photo was requested by the bot.
+        photo (Tuple[:class:`telegram.PhotoSize`]): Available sizes of the chat photo, if
+            the photo was requested by the bot. This list is empty if the photo was not requsted.
     """
 
     __slots__ = ("first_name", "last_name", "photo", "user_id", "username")
