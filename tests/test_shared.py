@@ -19,19 +19,20 @@
 
 import pytest
 
-from telegram import ChatShared, UsersShared
+from telegram import ChatShared, SharedUser, UsersShared
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
 def users_shared():
-    return UsersShared(TestUsersSharedBase.request_id, TestUsersSharedBase.user_ids)
+    return UsersShared(TestUsersSharedBase.request_id, users=TestUsersSharedBase.users)
 
 
 class TestUsersSharedBase:
     request_id = 789
-    user_id = 101112
-    user_ids = (user_id, 101113)
+    user_ids = (101112, 101113)
+    users = (SharedUser(101112, "user1"), SharedUser(101113, "user2"))
 
 
 class TestUsersSharedWithoutRequest(TestUsersSharedBase):
@@ -45,24 +46,41 @@ class TestUsersSharedWithoutRequest(TestUsersSharedBase):
 
         assert isinstance(users_shared_dict, dict)
         assert users_shared_dict["request_id"] == self.request_id
-        assert users_shared_dict["user_ids"] == list(self.user_ids)
+        assert users_shared_dict["users"] == [user.to_dict() for user in self.users]
 
     def test_de_json(self, bot):
         json_dict = {
             "request_id": self.request_id,
-            "user_ids": self.user_ids,
+            "users": [user.to_dict() for user in self.users],
         }
         users_shared = UsersShared.de_json(json_dict, bot)
         assert users_shared.api_kwargs == {}
 
         assert users_shared.request_id == self.request_id
+        assert users_shared.users == self.users
         assert users_shared.user_ids == tuple(self.user_ids)
 
+        assert UsersShared.de_json({}, bot) is None
+
+    def test_users_is_required_argument(self):
+        with pytest.raises(TypeError, match="`users` is a required argument"):
+            UsersShared(self.request_id, user_ids=self.user_ids)
+
+    def test_user_ids_deprecation_warning(self):
+        with pytest.warns(
+            PTBDeprecationWarning, match="'user_ids' was renamed to 'users' in Bot API 7.2"
+        ):
+            users_shared = UsersShared(self.request_id, user_ids=self.user_ids, users=self.users)
+        with pytest.warns(
+            PTBDeprecationWarning, match="renamed the attribute 'user_ids' to 'users'"
+        ):
+            users_shared.user_ids
+
     def test_equality(self):
-        a = UsersShared(self.request_id, self.user_ids)
-        b = UsersShared(self.request_id, self.user_ids)
-        c = UsersShared(1, self.user_ids)
-        d = UsersShared(self.request_id, [1, 2])
+        a = UsersShared(self.request_id, users=self.users)
+        b = UsersShared(self.request_id, users=self.users)
+        c = UsersShared(1, users=self.users)
+        d = UsersShared(self.request_id, users=(SharedUser(1, "user1"), SharedUser(1, "user2")))
 
         assert a == b
         assert hash(a) == hash(b)

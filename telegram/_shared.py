@@ -40,38 +40,40 @@ class UsersShared(TelegramObject):
     using a :class:`telegram.KeyboardButtonRequestUsers` button.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`request_id` and :attr:`user_ids` are equal.
+    considered equal, if their :attr:`request_id` and :attr:`users` are equal.
 
     .. versionadded:: 20.8
        Bot API 7.0 replaces ``UserShared`` with this class. The only difference is that now
        the :attr:`user_ids` is a sequence instead of a single integer.
 
+    .. versionchanged:: NEXT.VERSION
+       The argument :attr:`users` is now considered for the equality comparison instead of
+       :attr:`user_ids`.
+
     Args:
         request_id (:obj:`int`): Identifier of the request.
         users (Sequence[:class:`telegram.SharedUser`]): Information about users shared with the
-            bot. Mutually exclusive with :paramref:`user_ids`.
+            bot.
 
             .. versionadded:: NEXT.VERSION
+
+            .. deprecated:: NEXT.VERSION
+                In future versions, this argument will become keyword only.
         user_ids (Sequence[:obj:`int`], optional): Identifiers of the shared users. These numbers
             may have more than 32 significant bits and some programming languages may have
             difficulty/silent defects in interpreting them. But they have at most 52 significant
             bits, so 64-bit integers or double-precision float types are safe for storing these
             identifiers. The bot may not have access to the users and could be unable to use
             these identifiers, unless the users are already known to the bot by some other means.
-            Mutually exclusive with :paramref:`users`.
-
-            .. versionchanged:: NEXT.VERSION
-                Bot API 7.2 introduced :paramref:`users` replacing this argument. PTB will
-                automatically convert this to that one, but for advanced options, please use
-                :paramref:`users` directly.
 
             .. deprecated:: NEXT.VERSION
-                In future versions, this argument will become keyword only.
+               Bot API 7.2 introduced by :paramref:`users`, replacing this argument. Hence, this
+               argument is now optional and will be removed in future versions.
 
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
         users (Tuple[:class:`telegram.SharedUser`]): Information about users shared with the
-            bot. Mutually exclusive with :attr:`user_ids`.
+            bot.
 
             .. versionadded:: NEXT.VERSION
     """
@@ -81,19 +83,18 @@ class UsersShared(TelegramObject):
     def __init__(
         self,
         request_id: int,
-        users: Sequence["SharedUser"],
         user_ids: Optional[Sequence[int]] = None,
+        users: Optional[Sequence["SharedUser"]] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.request_id: int = request_id
+
+        if users is None:
+            raise TypeError("`users` is a required argument since Bot API 7.2")
+
         self.users: Tuple[SharedUser, ...] = parse_sequence_arg(users)
-        self.user_ids: Optional[Tuple[int, ...]] = parse_sequence_arg(  # type: ignore[misc]
-            user_ids
-        )
-        if user_ids is not None and users:
-            raise ValueError("`users` and `user_ids` are mutually exclusive")
 
         if user_ids is not None:
             warn(
@@ -111,10 +112,21 @@ class UsersShared(TelegramObject):
 
         self._freeze()
 
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["UsersShared"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["users"] = SharedUser.de_list(data.get("users"), bot)
+        return super().de_json(data=data, bot=bot)
+
     @property
-    def user_ids(self) -> Optional[Tuple[int, ...]]:
+    def user_ids(self) -> Tuple[int, ...]:
         """
-        Optional[Tuple[:obj:`int`]]:  Identifiers of the shared users. These numbers may have
+        Tuple[:obj:`int`]: Identifiers of the shared users. These numbers may have
         more than 32 significant bits and some programming languages may have difficulty/silent
         defects in interpreting them. But they have at most 52 significant bits, so 64-bit
         integers or double-precision float types are safe for storing these identifiers. The
@@ -122,6 +134,8 @@ class UsersShared(TelegramObject):
         unless the users are already known to the bot by some other means.
 
         .. deprecated:: NEXT.VERSION
+            As Bot API 7.2 replaces this attribute with :attr:`users`, this attribute will be
+            removed in future versions.
         """
         warn_about_deprecated_attr_in_property(
             deprecated_attr_name="user_ids",
