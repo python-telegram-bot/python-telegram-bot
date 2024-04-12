@@ -1049,7 +1049,7 @@ class TestUpdater:
             assert updater.running is False
 
     async def test_webhook_ssl_just_for_telegram(self, monkeypatch, updater):
-        """Here we just test that the SSL info is pased to Telegram, but __not__ to the the
+        """Here we just test that the SSL info is pased to Telegram, but __not__ to the
         webhook server"""
 
         async def set_webhook(**kwargs):

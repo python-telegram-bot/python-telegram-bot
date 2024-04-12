@@ -1690,8 +1690,12 @@ class MessageOriginType(StringEnum):
 
 
 class MessageType(StringEnum):
-    """This enum contains the available types of :class:`telegram.Message`. The enum
-    members of this enumeration are instances of :class:`str` and can be treated as such.
+    """This enum contains the available types of :class:`telegram.Message`. Here, a "type" means
+    a kind of message that is visually distinct from other kinds of messages in the Telegram app.
+    In particular, auxiliary attributes that can be present for multiple types of messages are
+    not considered in this enumeration.
+
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
 
     .. versionadded:: 20.0
     """
