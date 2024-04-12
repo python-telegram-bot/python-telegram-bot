@@ -191,6 +191,11 @@ class ChatMemberAdministrator(ChatMember):
        * The argument :paramref:`can_manage_topics` was added, which changes the position of the
          optional argument :paramref:`custom_title`.
 
+    .. versionchanged:: NEXT.VERSION
+        As of this version, :attr:`can_post_stories`, :attr:`can_edit_stories`,
+        and :attr:`can_delete_stories` is now required. Thus, the order of arguments had to be
+        changed.
+
     Args:
         user (:class:`telegram.User`): Information about the user.
         can_be_edited (:obj:`bool`): :obj:`True`, if the bot
@@ -340,14 +345,14 @@ class ChatMemberAdministrator(ChatMember):
         can_promote_members: bool,
         can_change_info: bool,
         can_invite_users: bool,
+        can_post_stories: bool,
+        can_edit_stories: bool,
+        can_delete_stories: bool,
         can_post_messages: Optional[bool] = None,
         can_edit_messages: Optional[bool] = None,
         can_pin_messages: Optional[bool] = None,
         can_manage_topics: Optional[bool] = None,
         custom_title: Optional[str] = None,
-        can_post_stories: Optional[bool] = None,
-        can_edit_stories: Optional[bool] = None,
-        can_delete_stories: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -362,12 +367,6 @@ class ChatMemberAdministrator(ChatMember):
             self.can_promote_members: bool = can_promote_members
             self.can_change_info: bool = can_change_info
             self.can_invite_users: bool = can_invite_users
-            # Not actually optionals but because of backwards compatability we pretend they are
-            if can_post_stories is None or can_edit_stories is None or can_delete_stories is None:
-                raise TypeError(
-                    "As of 21.0 can_post_stories, can_edit_stories and can_delete_stories "
-                    "must be set in order to create this object."
-                )
             self.can_post_stories: bool = can_post_stories
             self.can_edit_stories: bool = can_edit_stories
             self.can_delete_stories: bool = can_delete_stories

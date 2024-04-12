@@ -113,6 +113,10 @@
     :align: left
     :widths: 1 4
 
+    * - :meth:`~telegram.Bot.approve_chat_join_request`
+      - Used for approving a chat join request
+    * - :meth:`~telegram.Bot.decline_chat_join_request`
+      - Used for declining a chat join request
     * - :meth:`~telegram.Bot.ban_chat_member`
       - Used for banning a member from the chat
     * - :meth:`~telegram.Bot.unban_chat_member`
@@ -137,10 +141,6 @@
       - Used for editing a non-primary invite link
     * - :meth:`~telegram.Bot.revoke_chat_invite_link`
       - Used for revoking an invite link created by the bot
-    * - :meth:`~telegram.Bot.approve_chat_join_request`
-      - Used for approving a chat join request
-    * - :meth:`~telegram.Bot.decline_chat_join_request`
-      - Used for declining a chat join request
     * - :meth:`~telegram.Bot.set_chat_photo`
       - Used for setting a photo to a chat
     * - :meth:`~telegram.Bot.delete_chat_photo`
@@ -155,6 +155,8 @@
       - Used for unpinning a message
     * - :meth:`~telegram.Bot.unpin_all_chat_messages`
       - Used for unpinning all pinned chat messages
+    * - :meth:`~telegram.Bot.get_business_connection`
+      - Used for getting information about the business account.
     * - :meth:`~telegram.Bot.get_user_profile_photos`
       - Used for obtaining user's profile pictures
     * - :meth:`~telegram.Bot.get_chat`
@@ -237,6 +239,8 @@
       - Used for setting a sticker set of a chat
     * - :meth:`~telegram.Bot.delete_chat_sticker_set`
       - Used for deleting the set sticker set of a chat
+    * - :meth:`~telegram.Bot.replace_sticker_in_set`
+      - Used for replacing a sticker in a set
     * - :meth:`~telegram.Bot.set_sticker_position_in_set`
       - Used for moving a sticker's position in the set
     * - :meth:`~telegram.Bot.set_sticker_set_title`

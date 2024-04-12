@@ -50,6 +50,7 @@ from telegram import (
     PollOption,
     ProximityAlertTriggered,
     ReplyParameters,
+    SharedUser,
     Sticker,
     Story,
     SuccessfulPayment,
@@ -89,6 +90,7 @@ def message(bot):
         date=TestMessageBase.date,
         chat=copy(TestMessageBase.chat),
         from_user=copy(TestMessageBase.from_user),
+        business_connection_id="123456789",
     )
     message.set_bot(bot)
     message._unfreeze()
@@ -218,7 +220,7 @@ def message(bot):
         },
         {"web_app_data": WebAppData("some_data", "some_button_text")},
         {"message_thread_id": 123},
-        {"users_shared": UsersShared(1, [2, 3])},
+        {"users_shared": UsersShared(1, users=[SharedUser(2, "user2"), SharedUser(3, "user3")])},
         {"chat_shared": ChatShared(3, 4)},
         {
             "giveaway": Giveaway(
@@ -263,6 +265,9 @@ def message(bot):
         {"reply_to_story": Story(Chat(1, Chat.PRIVATE), 0)},
         {"boost_added": ChatBoostAdded(100)},
         {"sender_boost_count": 1},
+        {"is_from_offline": True},
+        {"sender_business_bot": User(1, "BusinessBot", True)},
+        {"business_connection_id": "123456789"},
     ],
     ids=[
         "reply",
@@ -328,6 +333,9 @@ def message(bot):
         "reply_to_story",
         "boost_added",
         "sender_boost_count",
+        "sender_business_bot",
+        "business_connection_id",
+        "is_from_offline",
     ],
 )
 def message_params(bot, request):
@@ -481,6 +489,48 @@ class TestMessageWithoutRequest(TestMessageBase):
             pytest.fail(f"chat_id is {chat_id} but should be {message.chat.id}")
         if reply_parameters is None or reply_parameters.message_id != 42:
             pytest.fail(f"reply_parameters is {reply_parameters} but should be 42")
+
+    @staticmethod
+    async def check_thread_id_parsing(
+        message: Message, method, bot_method_name: str, args, monkeypatch
+    ):
+        """Used in testing reply_* below. Makes sure that meassage_thread_id is parsed
+        correctly."""
+
+        async def extract_message_thread_id(*args, **kwargs):
+            return kwargs.get("message_thread_id")
+
+        monkeypatch.setattr(message.get_bot(), bot_method_name, extract_message_thread_id)
+
+        message.message_thread_id = None
+        message_thread_id = await method(*args)
+        assert message_thread_id is None
+
+        message.message_thread_id = 99
+        message_thread_id = await method(*args)
+        assert message_thread_id == 99
+
+        message_thread_id = await method(*args, message_thread_id=50)
+        assert message_thread_id == 50
+
+        if bot_method_name == "send_chat_action":
+            return
+
+        message_thread_id = await method(
+            *args,
+            do_quote=message.build_reply_arguments(
+                target_chat_id=123,
+            ),
+        )
+        assert message_thread_id is None
+
+        message_thread_id = await method(
+            *args,
+            do_quote=message.build_reply_arguments(
+                target_chat_id=message.chat_id,
+            ),
+        )
+        assert message_thread_id == message.message_thread_id
 
     def test_slot_behaviour(self):
         message = Message(
@@ -1344,7 +1394,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_text,
             Bot.send_message,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1352,12 +1402,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
         assert await message.reply_text("test")
         await self.check_quote_parsing(
+            message, message.reply_text, "send_message", ["test"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_text, "send_message", ["test"], monkeypatch
         )
 
@@ -1378,7 +1433,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_markdown,
             Bot.send_message,
-            ["chat_id", "parse_mode", "reply_to_message_id"],
+            ["chat_id", "parse_mode", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1386,6 +1441,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
@@ -1394,6 +1450,10 @@ class TestMessageWithoutRequest(TestMessageBase):
 
         monkeypatch.setattr(message.get_bot(), "send_message", make_assertion)
         assert await message.reply_markdown(self.test_message.text_markdown)
+
+        await self.check_thread_id_parsing(
+            message, message.reply_markdown, "send_message", ["test"], monkeypatch
+        )
 
     async def test_reply_markdown_v2(self, monkeypatch, message):
         test_md_string = (
@@ -1416,7 +1476,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_markdown_v2,
             Bot.send_message,
-            ["chat_id", "parse_mode", "reply_to_message_id"],
+            ["chat_id", "parse_mode", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1424,6 +1484,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
@@ -1434,6 +1495,10 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert await message.reply_markdown_v2(self.test_message_v2.text_markdown_v2)
         await self.check_quote_parsing(
             message, message.reply_markdown_v2, "send_message", [test_md_string], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
+            message, message.reply_markdown_v2, "send_message", ["test"], monkeypatch
         )
 
     async def test_reply_html(self, monkeypatch, message):
@@ -1459,7 +1524,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_html,
             Bot.send_message,
-            ["chat_id", "parse_mode", "reply_to_message_id"],
+            ["chat_id", "parse_mode", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1467,6 +1532,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
@@ -1479,6 +1545,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             message, message.reply_html, "send_message", [test_html_string], monkeypatch
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_html, "send_message", ["test"], monkeypatch
+        )
+
     async def test_reply_media_group(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -1488,7 +1558,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_media_group,
             Bot.send_media_group,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1496,12 +1566,21 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_media_group",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_media_group, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_media_group", make_assertion)
         assert await message.reply_media_group(media="reply_media_group")
         await self.check_quote_parsing(
+            message,
+            message.reply_media_group,
+            "send_media_group",
+            ["reply_media_group"],
+            monkeypatch,
+        )
+
+        await self.check_thread_id_parsing(
             message,
             message.reply_media_group,
             "send_media_group",
@@ -1518,7 +1597,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_photo,
             Bot.send_photo,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1526,12 +1605,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_photo",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_photo, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_photo", make_assertion)
         assert await message.reply_photo(photo="test_photo")
         await self.check_quote_parsing(
+            message, message.reply_photo, "send_photo", ["test_photo"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_photo, "send_photo", ["test_photo"], monkeypatch
         )
 
@@ -1544,7 +1628,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_audio,
             Bot.send_audio,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1552,12 +1636,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_audio",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_audio, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_audio", make_assertion)
         assert await message.reply_audio(audio="test_audio")
         await self.check_quote_parsing(
+            message, message.reply_audio, "send_audio", ["test_audio"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_audio, "send_audio", ["test_audio"], monkeypatch
         )
 
@@ -1570,7 +1659,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_document,
             Bot.send_document,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1578,12 +1667,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_document",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_document, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_document", make_assertion)
         assert await message.reply_document(document="test_document")
         await self.check_quote_parsing(
+            message, message.reply_document, "send_document", ["test_document"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_document, "send_document", ["test_document"], monkeypatch
         )
 
@@ -1596,7 +1690,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_animation,
             Bot.send_animation,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1604,12 +1698,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_animation",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_animation, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_animation", make_assertion)
         assert await message.reply_animation(animation="test_animation")
         await self.check_quote_parsing(
+            message, message.reply_animation, "send_animation", ["test_animation"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_animation, "send_animation", ["test_animation"], monkeypatch
         )
 
@@ -1622,7 +1721,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_sticker,
             Bot.send_sticker,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1630,12 +1729,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_sticker",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_sticker, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_sticker", make_assertion)
         assert await message.reply_sticker(sticker="test_sticker")
         await self.check_quote_parsing(
+            message, message.reply_sticker, "send_sticker", ["test_sticker"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_sticker, "send_sticker", ["test_sticker"], monkeypatch
         )
 
@@ -1648,7 +1752,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_video,
             Bot.send_video,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1656,12 +1760,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_video",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_video, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_video", make_assertion)
         assert await message.reply_video(video="test_video")
         await self.check_quote_parsing(
+            message, message.reply_video, "send_video", ["test_video"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_video, "send_video", ["test_video"], monkeypatch
         )
 
@@ -1674,7 +1783,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_video_note,
             Bot.send_video_note,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1682,12 +1791,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_video_note",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_video_note, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_video_note", make_assertion)
         assert await message.reply_video_note(video_note="test_video_note")
         await self.check_quote_parsing(
+            message, message.reply_video_note, "send_video_note", ["test_video_note"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_video_note, "send_video_note", ["test_video_note"], monkeypatch
         )
 
@@ -1700,7 +1814,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_voice,
             Bot.send_voice,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1708,12 +1822,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_voice",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_voice, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_voice", make_assertion)
         assert await message.reply_voice(voice="test_voice")
         await self.check_quote_parsing(
+            message, message.reply_voice, "send_voice", ["test_voice"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_voice, "send_voice", ["test_voice"], monkeypatch
         )
 
@@ -1726,7 +1845,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_location,
             Bot.send_location,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1734,12 +1853,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_location",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_location, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_location", make_assertion)
         assert await message.reply_location(location="test_location")
         await self.check_quote_parsing(
+            message, message.reply_location, "send_location", ["test_location"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_location, "send_location", ["test_location"], monkeypatch
         )
 
@@ -1752,7 +1876,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_venue,
             Bot.send_venue,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1760,12 +1884,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_venue",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_venue, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_venue", make_assertion)
         assert await message.reply_venue(venue="test_venue")
         await self.check_quote_parsing(
+            message, message.reply_venue, "send_venue", ["test_venue"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_venue, "send_venue", ["test_venue"], monkeypatch
         )
 
@@ -1778,7 +1907,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_contact,
             Bot.send_contact,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1786,12 +1915,17 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_contact",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_contact, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_contact", make_assertion)
         assert await message.reply_contact(contact="test_contact")
         await self.check_quote_parsing(
+            message, message.reply_contact, "send_contact", ["test_contact"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_contact, "send_contact", ["test_contact"], monkeypatch
         )
 
@@ -1805,17 +1939,25 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_poll,
             Bot.send_poll,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
-            message.reply_poll, message.get_bot(), "send_poll", skip_params=["reply_to_message_id"]
+            message.reply_poll,
+            message.get_bot(),
+            "send_poll",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_poll, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_poll", make_assertion)
         assert await message.reply_poll(question="test_poll", options=["1", "2", "3"])
         await self.check_quote_parsing(
+            message, message.reply_poll, "send_poll", ["test_poll", ["1", "2", "3"]], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
             message, message.reply_poll, "send_poll", ["test_poll", ["1", "2", "3"]], monkeypatch
         )
 
@@ -1828,11 +1970,15 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_dice,
             Bot.send_dice,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
-            message.reply_dice, message.get_bot(), "send_dice", skip_params=["reply_to_message_id"]
+            message.reply_dice,
+            message.get_bot(),
+            "send_dice",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_dice, message.get_bot())
 
@@ -1846,6 +1992,10 @@ class TestMessageWithoutRequest(TestMessageBase):
             monkeypatch,
         )
 
+        await self.check_thread_id_parsing(
+            message, message.reply_dice, "send_dice", [], monkeypatch
+        )
+
     async def test_reply_action(self, monkeypatch, message: Message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs["chat_id"] == message.chat_id
@@ -1853,15 +2003,29 @@ class TestMessageWithoutRequest(TestMessageBase):
             return id_ and action
 
         assert check_shortcut_signature(
-            Message.reply_chat_action, Bot.send_chat_action, ["chat_id", "reply_to_message_id"], []
+            Message.reply_chat_action,
+            Bot.send_chat_action,
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [],
         )
         assert await check_shortcut_call(
-            message.reply_chat_action, message.get_bot(), "send_chat_action"
+            message.reply_chat_action,
+            message.get_bot(),
+            "send_chat_action",
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_chat_action, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "send_chat_action", make_assertion)
         assert await message.reply_chat_action(action=ChatAction.TYPING)
+
+        await self.check_thread_id_parsing(
+            message,
+            message.reply_chat_action,
+            "send_chat_action",
+            [ChatAction.TYPING],
+            monkeypatch,
+        )
 
     async def test_reply_game(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
@@ -1872,11 +2036,15 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_game,
             Bot.send_game,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
-            message.reply_game, message.get_bot(), "send_game", skip_params=["reply_to_message_id"]
+            message.reply_game,
+            message.get_bot(),
+            "send_game",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_game, message.get_bot())
 
@@ -1884,6 +2052,14 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert await message.reply_game(game_short_name="test_game")
         await self.check_quote_parsing(
             message, message.reply_game, "send_game", ["test_game"], monkeypatch
+        )
+
+        await self.check_thread_id_parsing(
+            message,
+            message.reply_game,
+            "send_game",
+            ["test_game"],
+            monkeypatch,
         )
 
     async def test_reply_invoice(self, monkeypatch, message):
@@ -1900,7 +2076,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_invoice,
             Bot.send_invoice,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1908,6 +2084,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_invoice",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_invoice, message.get_bot())
 
@@ -1921,6 +2098,14 @@ class TestMessageWithoutRequest(TestMessageBase):
             "prices",
         )
         await self.check_quote_parsing(
+            message,
+            message.reply_invoice,
+            "send_invoice",
+            ["title", "description", "payload", "provider_token", "currency", "prices"],
+            monkeypatch,
+        )
+
+        await self.check_thread_id_parsing(
             message,
             message.reply_invoice,
             "send_invoice",
@@ -2017,7 +2202,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_copy,
             Bot.copy_message,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(message.copy, message.get_bot(), "copy_message")
@@ -2035,6 +2220,14 @@ class TestMessageWithoutRequest(TestMessageBase):
             protect_content=protected,
         )
         await self.check_quote_parsing(
+            message,
+            message.reply_copy,
+            "copy_message",
+            [123456, 456789],
+            monkeypatch,
+        )
+
+        await self.check_thread_id_parsing(
             message,
             message.reply_copy,
             "copy_message",

@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
+
 import datetime
 import re
 from html import escape
@@ -301,6 +302,11 @@ class Message(MaybeInaccessibleMessage):
             forwarded.
 
             .. versionadded:: 13.9
+        is_from_offline (:obj:`bool`, optional): :obj:`True`, if the message was sent
+            by an implicit action, for example, as an away or a greeting business message,
+            or as a scheduled message.
+
+            .. versionadded:: NEXT.VERSION
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
@@ -534,6 +540,18 @@ class Message(MaybeInaccessibleMessage):
             message boosted the chat, the number of boosts added by the user.
 
             .. versionadded:: 21.0
+        business_connection_id (:obj:`str`, optional): Unique identifier of the business connection
+            from which the message was received. If non-empty, the message belongs to a chat of the
+            corresponding business account that is independent from any potential bot chat which
+            might share the same identifier.
+
+            .. versionadded:: NEXT.VERSION
+
+        sender_business_bot (:obj:`telegram.User`, optional): The bot that actually sent the
+            message on behalf of the business account. Available only for outgoing messages sent
+            on behalf of the connected business account.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -568,6 +586,11 @@ class Message(MaybeInaccessibleMessage):
             forwarded.
 
             .. versionadded:: 13.9
+        is_from_offline (:obj:`bool`): Optional. :obj:`True`, if the message was sent
+            by an implicit action, for example, as an away or a greeting business message,
+            or as a scheduled message.
+
+            .. versionadded:: NEXT.VERSION
         media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
@@ -817,6 +840,19 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.0
 
+        business_connection_id (:obj:`str`): Optional. Unique identifier of the business connection
+            from which the message was received. If non-empty, the message belongs to a chat of the
+            corresponding business account that is independent from any potential bot chat which
+            might share the same identifier.
+
+            .. versionadded:: NEXT.VERSION
+
+        sender_business_bot (:obj:`telegram.User`): Optional. The bot that actually sent the
+            message on behalf of the business account. Available only for outgoing messages sent
+            on behalf of the connected business account.
+
+            .. versionadded:: NEXT.VERSION
+
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
        :exc:`ValueError` when encountering a custom emoji.
@@ -824,6 +860,9 @@ class Message(MaybeInaccessibleMessage):
     .. |blockquote_no_md1_support| replace:: Since block quotation entities are not supported
        by :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
        :exc:`ValueError` when encountering a block quotation.
+
+    .. |reply_same_thread| replace:: If :paramref:`message_thread_id` is not provided,
+       this will reply to the same thread (topic) of the original message.
     """
 
     # fmt: on
@@ -833,6 +872,7 @@ class Message(MaybeInaccessibleMessage):
         "audio",
         "author_signature",
         "boost_added",
+        "business_connection_id",
         "caption",
         "caption_entities",
         "channel_chat_created",
@@ -863,6 +903,7 @@ class Message(MaybeInaccessibleMessage):
         "has_protected_content",
         "invoice",
         "is_automatic_forward",
+        "is_from_offline",
         "is_topic_message",
         "left_chat_member",
         "link_preview_options",
@@ -885,6 +926,7 @@ class Message(MaybeInaccessibleMessage):
         "reply_to_message",
         "reply_to_story",
         "sender_boost_count",
+        "sender_business_bot",
         "sender_chat",
         "sticker",
         "story",
@@ -984,6 +1026,9 @@ class Message(MaybeInaccessibleMessage):
         reply_to_story: Optional[Story] = None,
         boost_added: Optional[ChatBoostAdded] = None,
         sender_boost_count: Optional[int] = None,
+        business_connection_id: Optional[str] = None,
+        sender_business_bot: Optional[User] = None,
+        is_from_offline: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1079,6 +1124,9 @@ class Message(MaybeInaccessibleMessage):
             self.reply_to_story: Optional[Story] = reply_to_story
             self.boost_added: Optional[ChatBoostAdded] = boost_added
             self.sender_boost_count: Optional[int] = sender_boost_count
+            self.business_connection_id: Optional[str] = business_connection_id
+            self.sender_business_bot: Optional[User] = sender_business_bot
+            self.is_from_offline: Optional[bool] = is_from_offline
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1221,6 +1269,7 @@ class Message(MaybeInaccessibleMessage):
         data["forward_origin"] = MessageOrigin.de_json(data.get("forward_origin"), bot)
         data["reply_to_story"] = Story.de_json(data.get("reply_to_story"), bot)
         data["boost_added"] = ChatBoostAdded.de_json(data.get("boost_added"), bot)
+        data["sender_business_bot"] = User.de_json(data.get("sender_business_bot"), bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -1535,6 +1584,15 @@ class Message(MaybeInaccessibleMessage):
 
         return chat_id, effective_reply_parameters
 
+    def _parse_message_thread_id(
+        self,
+        chat_id: Union[str, int],
+        message_thread_id: Optional[int] = None,
+    ) -> Optional[int]:
+        return message_thread_id or (
+            self.message_thread_id if chat_id in {self.chat_id, self.chat.username} else None
+        )
+
     async def reply_text(
         self,
         text: str,
@@ -1560,9 +1618,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_message(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_message(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -1581,6 +1648,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
             chat_id=chat_id,
             text=text,
@@ -1599,6 +1667,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_markdown(
@@ -1627,7 +1696,9 @@ class Message(MaybeInaccessibleMessage):
 
             await bot.send_message(
                 update.effective_message.chat_id,
+                message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.MARKDOWN,
+                business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
             )
@@ -1635,6 +1706,9 @@ class Message(MaybeInaccessibleMessage):
         Sends a message with Markdown version 1 formatting.
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Note:
             :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
@@ -1656,6 +1730,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
             chat_id=chat_id,
             text=text,
@@ -1674,6 +1749,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_markdown_v2(
@@ -1702,7 +1778,9 @@ class Message(MaybeInaccessibleMessage):
 
             await bot.send_message(
                 update.effective_message.chat_id,
+                message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.MARKDOWN_V2,
+                business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
             )
@@ -1710,6 +1788,9 @@ class Message(MaybeInaccessibleMessage):
         Sends a message with markdown version 2 formatting.
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -1727,6 +1808,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
             chat_id=chat_id,
             text=text,
@@ -1745,6 +1827,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_html(
@@ -1773,7 +1856,9 @@ class Message(MaybeInaccessibleMessage):
 
             await bot.send_message(
                 update.effective_message.chat_id,
+                message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.HTML,
+                business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
             )
@@ -1781,6 +1866,9 @@ class Message(MaybeInaccessibleMessage):
         Sends a message with HTML formatting.
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -1798,6 +1886,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_message(
             chat_id=chat_id,
             text=text,
@@ -1816,6 +1905,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_media_group(
@@ -1843,9 +1933,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> Tuple["Message", ...]:
         """Shortcut for::
 
-             await bot.send_media_group(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_media_group(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -1866,6 +1965,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_media_group(
             chat_id=chat_id,
             media=media,
@@ -1882,6 +1982,7 @@ class Message(MaybeInaccessibleMessage):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_photo(
@@ -1910,9 +2011,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_photo(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_photo(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -1931,6 +2041,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_photo(
             chat_id=chat_id,
             photo=photo,
@@ -1950,6 +2061,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             has_spoiler=has_spoiler,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_audio(
@@ -1981,9 +2093,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_audio(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_audio(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2002,6 +2123,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_audio(
             chat_id=chat_id,
             audio=audio,
@@ -2024,6 +2146,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             thumbnail=thumbnail,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_document(
@@ -2053,9 +2176,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_document(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_document(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2074,6 +2206,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_document(
             chat_id=chat_id,
             document=document,
@@ -2094,6 +2227,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             thumbnail=thumbnail,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_animation(
@@ -2126,9 +2260,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_animation(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_animation(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2147,6 +2290,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_animation(
             chat_id=chat_id,
             animation=animation,
@@ -2170,6 +2314,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_sticker(
@@ -2194,9 +2339,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_sticker(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_sticker(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2215,6 +2369,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_sticker(
             chat_id=chat_id,
             sticker=sticker,
@@ -2230,6 +2385,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             emoji=emoji,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_video(
@@ -2263,9 +2419,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_video(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_video(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2284,6 +2449,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_video(
             chat_id=chat_id,
             video=video,
@@ -2308,6 +2474,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_video_note(
@@ -2335,9 +2502,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_video_note(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_video_note(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2356,6 +2532,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_video_note(
             chat_id=chat_id,
             video_note=video_note,
@@ -2374,6 +2551,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             thumbnail=thumbnail,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_voice(
@@ -2402,9 +2580,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_voice(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_voice(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2423,6 +2610,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_voice(
             chat_id=chat_id,
             voice=voice,
@@ -2442,6 +2630,7 @@ class Message(MaybeInaccessibleMessage):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_location(
@@ -2471,9 +2660,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_location(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_location(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2492,6 +2690,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_location(
             chat_id=chat_id,
             latitude=latitude,
@@ -2512,6 +2711,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_venue(
@@ -2543,9 +2743,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_venue(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_venue(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2564,6 +2773,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_venue(
             chat_id=chat_id,
             latitude=latitude,
@@ -2586,6 +2796,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_contact(
@@ -2613,9 +2824,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_contact(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_contact(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2634,6 +2854,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_contact(
             chat_id=chat_id,
             phone_number=phone_number,
@@ -2652,6 +2873,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_poll(
@@ -2686,9 +2908,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_poll(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_poll(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2707,6 +2938,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_poll(
             chat_id=chat_id,
             question=question,
@@ -2732,6 +2964,7 @@ class Message(MaybeInaccessibleMessage):
             explanation_entities=explanation_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_dice(
@@ -2755,9 +2988,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_dice(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_dice(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2776,6 +3018,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_dice(
             chat_id=chat_id,
             disable_notification=disable_notification,
@@ -2790,6 +3033,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_chat_action(
@@ -2805,9 +3049,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> bool:
         """Shortcut for::
 
-             await bot.send_chat_action(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_chat_action(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         .. versionadded:: 13.2
 
@@ -2817,13 +3070,14 @@ class Message(MaybeInaccessibleMessage):
         """
         return await self.get_bot().send_chat_action(
             chat_id=self.chat_id,
-            message_thread_id=message_thread_id,
+            message_thread_id=self._parse_message_thread_id(self.chat_id, message_thread_id),
             action=action,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_game(
@@ -2847,9 +3101,18 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_game(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_game(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -2870,6 +3133,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_game(
             chat_id=chat_id,  # type: ignore[arg-type]
             game_short_name=game_short_name,
@@ -2884,6 +3148,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_invoice(
@@ -2927,9 +3192,17 @@ class Message(MaybeInaccessibleMessage):
     ) -> "Message":
         """Shortcut for::
 
-             await bot.send_invoice(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_invoice(
+                 update.effective_message.chat_id,
+                 message_thread_id=update.effective_message.message_thread_id,
+                 *args,
+                 **kwargs,
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Warning:
             As of API 5.2 :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>`
@@ -2960,6 +3233,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().send_invoice(
             chat_id=chat_id,
             title=title,
@@ -3130,12 +3404,16 @@ class Message(MaybeInaccessibleMessage):
 
              await bot.copy_message(
                  chat_id=message.chat.id,
+                 message_thread_id=update.effective_message.message_thread_id,
                  message_id=message_id,
                  *args,
                  **kwargs
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
+
+        .. versionchanged:: NEXT.VERSION
+                |reply_same_thread|
 
         Keyword Args:
             quote (:obj:`bool`, optional): |reply_quote|
@@ -3155,6 +3433,7 @@ class Message(MaybeInaccessibleMessage):
         chat_id, effective_reply_parameters = await self._parse_quote_arguments(
             do_quote, quote, reply_to_message_id, reply_parameters
         )
+        message_thread_id = self._parse_message_thread_id(chat_id, message_thread_id)
         return await self.get_bot().copy_message(
             chat_id=chat_id,
             from_chat_id=from_chat_id,

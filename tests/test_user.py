@@ -42,6 +42,7 @@ def json_dict():
         "supports_inline_queries": TestUserBase.supports_inline_queries,
         "is_premium": TestUserBase.is_premium,
         "added_to_attachment_menu": TestUserBase.added_to_attachment_menu,
+        "can_connect_to_business": TestUserBase.can_connect_to_business,
     }
 
 
@@ -59,6 +60,7 @@ def user(bot):
         supports_inline_queries=TestUserBase.supports_inline_queries,
         is_premium=TestUserBase.is_premium,
         added_to_attachment_menu=TestUserBase.added_to_attachment_menu,
+        can_connect_to_business=TestUserBase.can_connect_to_business,
     )
     user.set_bot(bot)
     user._unfreeze()
@@ -77,6 +79,7 @@ class TestUserBase:
     supports_inline_queries = False
     is_premium = True
     added_to_attachment_menu = False
+    can_connect_to_business = True
 
 
 class TestUserWithoutRequest(TestUserBase):
@@ -100,6 +103,7 @@ class TestUserWithoutRequest(TestUserBase):
         assert user.supports_inline_queries == self.supports_inline_queries
         assert user.is_premium == self.is_premium
         assert user.added_to_attachment_menu == self.added_to_attachment_menu
+        assert user.can_connect_to_business == self.can_connect_to_business
 
     def test_to_dict(self, user):
         user_dict = user.to_dict()
@@ -116,6 +120,7 @@ class TestUserWithoutRequest(TestUserBase):
         assert user_dict["supports_inline_queries"] == user.supports_inline_queries
         assert user_dict["is_premium"] == user.is_premium
         assert user_dict["added_to_attachment_menu"] == user.added_to_attachment_menu
+        assert user_dict["can_connect_to_business"] == user.can_connect_to_business
 
     def test_equality(self):
         a = User(self.id_, self.first_name, self.is_bot, self.last_name)

@@ -78,11 +78,11 @@ class User(TelegramObject):
         username (:obj:`str`, optional): User's or bot's username.
         language_code (:obj:`str`, optional): IETF language tag of the user's language.
         can_join_groups (:obj:`str`, optional): :obj:`True`, if the bot can be invited to groups.
-            Returned only in :attr:`telegram.Bot.get_me` requests.
+            Returned only in :meth:`telegram.Bot.get_me`.
         can_read_all_group_messages (:obj:`str`, optional): :obj:`True`, if privacy mode is
-            disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
+            disabled for the bot. Returned only in :meth:`telegram.Bot.get_me`.
         supports_inline_queries (:obj:`str`, optional): :obj:`True`, if the bot supports inline
-            queries. Returned only in :attr:`telegram.Bot.get_me` requests.
+            queries. Returned only in :meth:`telegram.Bot.get_me`.
 
         is_premium (:obj:`bool`, optional): :obj:`True`, if this user is a Telegram Premium user.
 
@@ -91,6 +91,12 @@ class User(TelegramObject):
             the bot to the attachment menu.
 
             .. versionadded:: 20.0
+        can_connect_to_business (:obj:`bool`, optional): :obj:`True`,  if the bot can be connected
+            to a Telegram Business account to receive its messages. Returned only in
+            :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
         is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.
@@ -112,6 +118,11 @@ class User(TelegramObject):
             the bot to the attachment menu.
 
             .. versionadded:: 20.0
+        can_connect_to_business (:obj:`bool`): Optional. :obj:`True`,  if the bot can be connected
+            to a Telegram Business account to receive its messages. Returned only in
+            :meth:`telegram.Bot.get_me`.
+
+            .. versionadded:: NEXT.VERSION
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
         case so far, but Telegram does not guarantee that this stays this way.
@@ -119,6 +130,7 @@ class User(TelegramObject):
 
     __slots__ = (
         "added_to_attachment_menu",
+        "can_connect_to_business",
         "can_join_groups",
         "can_read_all_group_messages",
         "first_name",
@@ -144,6 +156,7 @@ class User(TelegramObject):
         supports_inline_queries: Optional[bool] = None,
         is_premium: Optional[bool] = None,
         added_to_attachment_menu: Optional[bool] = None,
+        can_connect_to_business: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -161,6 +174,7 @@ class User(TelegramObject):
         self.supports_inline_queries: Optional[bool] = supports_inline_queries
         self.is_premium: Optional[bool] = is_premium
         self.added_to_attachment_menu: Optional[bool] = added_to_attachment_menu
+        self.can_connect_to_business: Optional[bool] = can_connect_to_business
 
         self._id_attrs = (self.id,)
 
@@ -393,6 +407,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         disable_web_page_preview: Optional[bool] = None,
@@ -435,6 +450,7 @@ class User(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=business_connection_id,
         )
 
     async def delete_message(
@@ -513,6 +529,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -556,6 +573,7 @@ class User(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             has_spoiler=has_spoiler,
+            business_connection_id=business_connection_id,
         )
 
     async def send_media_group(
@@ -567,6 +585,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -610,6 +629,7 @@ class User(TelegramObject):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            business_connection_id=business_connection_id,
         )
 
     async def send_audio(
@@ -627,6 +647,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -673,12 +694,14 @@ class User(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             thumbnail=thumbnail,
+            business_connection_id=business_connection_id,
         )
 
     async def send_chat_action(
         self,
         action: str,
         message_thread_id: Optional[int] = None,
+        business_connection_id: Optional[str] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -708,6 +731,7 @@ class User(TelegramObject):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=business_connection_id,
         )
 
     send_action = send_chat_action
@@ -724,6 +748,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -766,6 +791,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_dice(
@@ -776,6 +802,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -813,6 +840,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_document(
@@ -828,6 +856,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -872,6 +901,7 @@ class User(TelegramObject):
             caption_entities=caption_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_game(
@@ -882,6 +912,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -919,6 +950,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_invoice(
@@ -1031,6 +1063,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1075,6 +1108,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_animation(
@@ -1093,6 +1127,7 @@ class User(TelegramObject):
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1140,6 +1175,7 @@ class User(TelegramObject):
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
+            business_connection_id=business_connection_id,
         )
 
     async def send_sticker(
@@ -1151,6 +1187,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         emoji: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1189,6 +1226,7 @@ class User(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             emoji=emoji,
+            business_connection_id=business_connection_id,
         )
 
     async def send_video(
@@ -1208,6 +1246,7 @@ class User(TelegramObject):
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1256,6 +1295,7 @@ class User(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
+            business_connection_id=business_connection_id,
         )
 
     async def send_venue(
@@ -1273,6 +1313,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1319,6 +1360,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_video_note(
@@ -1332,6 +1374,7 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1374,6 +1417,7 @@ class User(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             thumbnail=thumbnail,
+            business_connection_id=business_connection_id,
         )
 
     async def send_voice(
@@ -1388,6 +1432,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1431,6 +1476,7 @@ class User(TelegramObject):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_poll(
@@ -1452,6 +1498,7 @@ class User(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        business_connection_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1500,6 +1547,7 @@ class User(TelegramObject):
             explanation_entities=explanation_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=business_connection_id,
         )
 
     async def send_copy(

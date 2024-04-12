@@ -149,7 +149,7 @@ class TestConstantsWithoutRequest:
 
         if any(re.match(pattern, name) for pattern in patters):
             return False
-        if name in {
+        return name not in {
             "author_signature",
             "api_kwargs",
             "caption",
@@ -176,10 +176,8 @@ class TestConstantsWithoutRequest:
             # attribute is deprecated, no need to add it to MessageType
             "user_shared",
             "via_bot",
-        }:
-            return False
-
-        return True
+            "is_from_offline",
+        }
 
     @pytest.mark.parametrize(
         "attribute",

@@ -16,35 +16,24 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the ChatJoinRequestHandler class."""
-
-from typing import Optional
+"""This module contains the BusinessConnectionHandler class."""
+from typing import Optional, TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import RT, SCT, DVType
+from telegram._utils.types import SCT, DVType
 from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import CCT, HandlerCallback
 
+RT = TypeVar("RT")
 
-class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
-    """Handler class to handle Telegram updates that contain
-    :attr:`telegram.Update.chat_join_request`.
 
-    Note:
-        If neither of :paramref:`username` and the :paramref:`chat_id` are passed, this handler
-        accepts *any* join request. Otherwise, this handler accepts all requests to join chats
-        for which the chat ID is listed in :paramref:`chat_id` or the username is listed in
-        :paramref:`username`, or both.
+class BusinessConnectionHandler(BaseHandler[Update, CCT]):
+    """Handler class to handle Telegram
+    :attr:`Business Connections <telegram.Update.business_connection>`.
 
-        .. versionadded:: 20.0
-
-    Warning:
-        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
-        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
-
-    .. versionadded:: 13.8
+    .. versionadded:: NEXT.VERSION
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -52,44 +41,39 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
             this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
+        user_id (:obj:`int` | Collection[:obj:`int`], optional): Filters requests to allow only
+            those which are from the specified user ID(s).
 
-            The return value of the callback is usually ignored except for the special case of
-            :class:`telegram.ext.ConversationHandler`.
-        chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters requests to allow only
-            those which are asking to join the specified chat ID(s).
-
-            .. versionadded:: 20.0
         username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
-            those which are asking to join the specified username(s).
+            those which are from the specified username(s).
 
-            .. versionadded:: 20.0
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
-
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
-        block (:obj:`bool`): Determines whether the callback will run in a blocking way..
-
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
     """
 
     __slots__ = (
-        "_chat_ids",
+        "_user_ids",
         "_usernames",
     )
 
     def __init__(
         self,
         callback: HandlerCallback[Update, CCT, RT],
-        chat_id: Optional[SCT[int]] = None,
+        user_id: Optional[SCT[int]] = None,
         username: Optional[SCT[str]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
 
-        self._chat_ids = parse_chat_id(chat_id)
+        self._user_ids = parse_chat_id(user_id)
         self._usernames = parse_username(username)
 
     def check_update(self, update: object) -> bool:
@@ -102,10 +86,10 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
-        if isinstance(update, Update) and update.chat_join_request:
-            if not self._chat_ids and not self._usernames:
+        if isinstance(update, Update) and update.business_connection:
+            if not self._user_ids and not self._usernames:
                 return True
-            if update.chat_join_request.chat.id in self._chat_ids:
+            if update.business_connection.user.id in self._user_ids:
                 return True
-            return update.chat_join_request.from_user.username in self._usernames
+            return update.business_connection.user.username in self._usernames
         return False

@@ -17,11 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import time
+from copy import deepcopy
 from datetime import datetime
 
 import pytest
 
 from telegram import (
+    BusinessConnection,
+    BusinessMessagesDeleted,
     CallbackQuery,
     Chat,
     ChatBoost,
@@ -51,7 +54,21 @@ from telegram._utils.datetime import from_timestamp
 from telegram.warnings import PTBUserWarning
 from tests.auxil.slots import mro_slots
 
-message = Message(1, datetime.utcnow(), Chat(1, ""), from_user=User(1, "", False), text="Text")
+message = Message(
+    1,
+    datetime.utcnow(),
+    Chat(1, ""),
+    from_user=User(1, "", False),
+    text="Text",
+    sender_chat=Chat(1, ""),
+)
+channel_post = Message(
+    1,
+    datetime.utcnow(),
+    Chat(1, ""),
+    text="Text",
+    sender_chat=Chat(1, ""),
+)
 chat_member_updated = ChatMemberUpdated(
     Chat(1, "chat"),
     User(1, "", False),
@@ -93,6 +110,7 @@ message_reaction = MessageReactionUpdated(
     old_reaction=(ReactionTypeEmoji("👍"),),
     new_reaction=(ReactionTypeEmoji("👍"),),
     user=User(1, "name", False),
+    actor_chat=Chat(1, ""),
 )
 
 
@@ -103,13 +121,35 @@ message_reaction_count = MessageReactionCountUpdated(
     reactions=(ReactionCount(ReactionTypeEmoji("👍"), 1),),
 )
 
+business_connection = BusinessConnection(
+    "1",
+    User(1, "name", False),
+    1,
+    from_timestamp(int(time.time())),
+    True,
+    True,
+)
+
+deleted_business_messages = BusinessMessagesDeleted(
+    "1",
+    Chat(1, ""),
+    (1, 2),
+)
+
+business_message = Message(
+    1,
+    datetime.utcnow(),
+    Chat(1, ""),
+    User(1, "", False),
+)
+
 
 params = [
     {"message": message},
     {"edited_message": message},
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat", message=message)},
-    {"channel_post": message},
-    {"edited_channel_post": message},
+    {"channel_post": channel_post},
+    {"edited_channel_post": channel_post},
     {"inline_query": InlineQuery(1, User(1, "", False), "", "")},
     {"chosen_inline_result": ChosenInlineResult("id", User(1, "", False), "")},
     {"shipping_query": ShippingQuery("id", User(1, "", False), "", None)},
@@ -134,6 +174,10 @@ params = [
     {"removed_chat_boost": removed_chat_boost},
     {"message_reaction": message_reaction},
     {"message_reaction_count": message_reaction_count},
+    {"business_connection": business_connection},
+    {"deleted_business_messages": deleted_business_messages},
+    {"business_message": business_message},
+    {"edited_business_message": business_message},
     # Must be last to conform with `ids` below!
     {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
@@ -157,6 +201,10 @@ all_types = (
     "removed_chat_boost",
     "message_reaction",
     "message_reaction_count",
+    "business_connection",
+    "deleted_business_messages",
+    "business_message",
+    "edited_business_message",
 )
 
 ids = (*all_types, "callback_query_without_message")
@@ -241,6 +289,7 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.pre_checkout_query is not None
             or update.poll is not None
             or update.poll_answer is not None
+            or update.business_connection is not None
         ):
             assert chat.id == 1
         else:
@@ -256,10 +305,83 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.chat_boost is not None
             or update.removed_chat_boost is not None
             or update.message_reaction_count is not None
+            or update.deleted_business_messages is not None
         ):
             assert user.id == 1
         else:
             assert user is None
+
+    def test_effective_sender_non_anonymous(self, update):
+        update = deepcopy(update)
+        # Simulate 'Remain anonymous' being turned off
+        if message := (update.message or update.edited_message):
+            message._unfreeze()
+            message.sender_chat = None
+        elif reaction := (update.message_reaction):
+            reaction._unfreeze()
+            reaction.actor_chat = None
+        elif answer := (update.poll_answer):
+            answer._unfreeze()
+            answer.voter_chat = None
+
+        # Test that it's sometimes None per docstring
+        sender = update.effective_sender
+        if not (
+            update.poll is not None
+            or update.chat_boost is not None
+            or update.removed_chat_boost is not None
+            or update.message_reaction_count is not None
+            or update.deleted_business_messages is not None
+        ):
+            if update.channel_post or update.edited_channel_post:
+                assert isinstance(sender, Chat)
+            else:
+                assert isinstance(sender, User)
+
+        else:
+            assert sender is None
+
+        cached = update.effective_sender
+        assert cached is sender
+
+    def test_effective_sender_anonymous(self, update):
+        update = deepcopy(update)
+        # Simulate 'Remain anonymous' being turned on
+        if message := (update.message or update.edited_message):
+            message._unfreeze()
+            message.from_user = None
+        elif reaction := (update.message_reaction):
+            reaction._unfreeze()
+            reaction.user = None
+        elif answer := (update.poll_answer):
+            answer._unfreeze()
+            answer.user = None
+
+        # Test that it's sometimes None per docstring
+        sender = update.effective_sender
+        if not (
+            update.poll is not None
+            or update.chat_boost is not None
+            or update.removed_chat_boost is not None
+            or update.message_reaction_count is not None
+            or update.deleted_business_messages is not None
+        ):
+            if (
+                update.message
+                or update.edited_message
+                or update.channel_post
+                or update.edited_channel_post
+                or update.message_reaction
+                or update.poll_answer
+            ):
+                assert isinstance(sender, Chat)
+            else:
+                assert isinstance(sender, User)
+        else:
+            assert sender is None
+
+        cached = update.effective_sender
+        assert cached is sender
 
     def test_effective_message(self, update):
         # Test that it's sometimes None per docstring
@@ -279,6 +401,8 @@ class TestUpdateWithoutRequest(TestUpdateBase):
             or update.removed_chat_boost is not None
             or update.message_reaction is not None
             or update.message_reaction_count is not None
+            or update.deleted_business_messages is not None
+            or update.business_connection is not None
         ):
             assert eff_message.message_id == message.message_id
         else:

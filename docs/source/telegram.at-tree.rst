@@ -6,6 +6,7 @@ Available Types
 
     telegram.animation
     telegram.audio
+    telegram.birthdate
     telegram.botcommand
     telegram.botcommandscope
     telegram.botcommandscopeallchatadministrators
@@ -18,6 +19,12 @@ Available Types
     telegram.botdescription
     telegram.botname
     telegram.botshortdescription
+    telegram.businessconnection
+    telegram.businessintro
+    telegram.businesslocation
+    telegram.businessopeninghours
+    telegram.businessopeninghoursinterval
+    telegram.businessmessagesdeleted
     telegram.callbackquery
     telegram.chat
     telegram.chatadministratorrights
@@ -107,6 +114,7 @@ Available Types
     telegram.replykeyboardremove
     telegram.replyparameters
     telegram.sentwebappmessage
+    telegram.shareduser
     telegram.story
     telegram.switchinlinequerychosenchat
     telegram.telegramobject

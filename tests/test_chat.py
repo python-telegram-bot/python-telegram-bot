@@ -21,7 +21,12 @@ import datetime
 import pytest
 
 from telegram import (
+    Birthdate,
     Bot,
+    BusinessIntro,
+    BusinessLocation,
+    BusinessOpeningHours,
+    BusinessOpeningHoursInterval,
     Chat,
     ChatLocation,
     ChatPermissions,
@@ -74,6 +79,11 @@ def chat(bot):
         profile_background_custom_emoji_id=TestChatBase.profile_background_custom_emoji_id,
         unrestrict_boost_count=TestChatBase.unrestrict_boost_count,
         custom_emoji_sticker_set_name=TestChatBase.custom_emoji_sticker_set_name,
+        business_intro=TestChatBase.business_intro,
+        business_location=TestChatBase.business_location,
+        business_opening_hours=TestChatBase.business_opening_hours,
+        birthdate=Birthdate(1, 1),
+        personal_chat=TestChatBase.personal_chat,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -113,12 +123,20 @@ class TestChatBase:
         ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN),
         ReactionTypeCustomEmoji("custom_emoji_id"),
     ]
+    business_intro = BusinessIntro("Title", "Description", None)
+    business_location = BusinessLocation("Address", Location(123, 456))
+    business_opening_hours = BusinessOpeningHours(
+        "Country/City",
+        [BusinessOpeningHoursInterval(opening, opening + 60) for opening in (0, 24 * 60)],
+    )
     accent_color_id = 1
     background_custom_emoji_id = "background_custom_emoji_id"
     profile_accent_color_id = 2
     profile_background_custom_emoji_id = "profile_background_custom_emoji_id"
     unrestrict_boost_count = 100
     custom_emoji_sticker_set_name = "custom_emoji_sticker_set_name"
+    birthdate = Birthdate(1, 1)
+    personal_chat = Chat(3, "private", "private")
 
 
 class TestChatWithoutRequest(TestChatBase):
@@ -139,6 +157,9 @@ class TestChatWithoutRequest(TestChatBase):
             "permissions": self.permissions.to_dict(),
             "slow_mode_delay": self.slow_mode_delay,
             "bio": self.bio,
+            "business_intro": self.business_intro.to_dict(),
+            "business_location": self.business_location.to_dict(),
+            "business_opening_hours": self.business_opening_hours.to_dict(),
             "has_protected_content": self.has_protected_content,
             "has_visible_history": self.has_visible_history,
             "has_private_forwards": self.has_private_forwards,
@@ -162,6 +183,8 @@ class TestChatWithoutRequest(TestChatBase):
             "profile_background_custom_emoji_id": self.profile_background_custom_emoji_id,
             "unrestrict_boost_count": self.unrestrict_boost_count,
             "custom_emoji_sticker_set_name": self.custom_emoji_sticker_set_name,
+            "birthdate": self.birthdate.to_dict(),
+            "personal_chat": self.personal_chat.to_dict(),
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -174,6 +197,9 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.permissions == self.permissions
         assert chat.slow_mode_delay == self.slow_mode_delay
         assert chat.bio == self.bio
+        assert chat.business_intro == self.business_intro
+        assert chat.business_location == self.business_location
+        assert chat.business_opening_hours == self.business_opening_hours
         assert chat.has_protected_content == self.has_protected_content
         assert chat.has_visible_history == self.has_visible_history
         assert chat.has_private_forwards == self.has_private_forwards
@@ -202,6 +228,8 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.profile_background_custom_emoji_id == self.profile_background_custom_emoji_id
         assert chat.unrestrict_boost_count == self.unrestrict_boost_count
         assert chat.custom_emoji_sticker_set_name == self.custom_emoji_sticker_set_name
+        assert chat.birthdate == self.birthdate
+        assert chat.personal_chat == self.personal_chat
 
     def test_de_json_localization(self, bot, raw_bot, tz_bot):
         json_dict = {
@@ -234,6 +262,9 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_dict["permissions"] == chat.permissions.to_dict()
         assert chat_dict["slow_mode_delay"] == chat.slow_mode_delay
         assert chat_dict["bio"] == chat.bio
+        assert chat_dict["business_intro"] == chat.business_intro.to_dict()
+        assert chat_dict["business_location"] == chat.business_location.to_dict()
+        assert chat_dict["business_opening_hours"] == chat.business_opening_hours.to_dict()
         assert chat_dict["has_private_forwards"] == chat.has_private_forwards
         assert chat_dict["has_protected_content"] == chat.has_protected_content
         assert chat_dict["has_visible_history"] == chat.has_visible_history
@@ -267,6 +298,8 @@ class TestChatWithoutRequest(TestChatBase):
         )
         assert chat_dict["custom_emoji_sticker_set_name"] == chat.custom_emoji_sticker_set_name
         assert chat_dict["unrestrict_boost_count"] == chat.unrestrict_boost_count
+        assert chat_dict["birthdate"] == chat.birthdate.to_dict()
+        assert chat_dict["personal_chat"] == chat.personal_chat.to_dict()
 
     def test_always_tuples_attributes(self):
         chat = Chat(

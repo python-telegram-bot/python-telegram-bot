@@ -16,35 +16,24 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the ChatJoinRequestHandler class."""
-
-from typing import Optional
+"""This module contains the BusinessMessagesDeletedHandler class."""
+from typing import Optional, TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import RT, SCT, DVType
+from telegram._utils.types import SCT, DVType
 from telegram.ext._handlers.basehandler import BaseHandler
 from telegram.ext._utils._update_parsing import parse_chat_id, parse_username
 from telegram.ext._utils.types import CCT, HandlerCallback
 
+RT = TypeVar("RT")
 
-class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
-    """Handler class to handle Telegram updates that contain
-    :attr:`telegram.Update.chat_join_request`.
 
-    Note:
-        If neither of :paramref:`username` and the :paramref:`chat_id` are passed, this handler
-        accepts *any* join request. Otherwise, this handler accepts all requests to join chats
-        for which the chat ID is listed in :paramref:`chat_id` or the username is listed in
-        :paramref:`username`, or both.
+class BusinessMessagesDeletedHandler(BaseHandler[Update, CCT]):
+    """Handler class to handle
+    :attr:`deleted Telegram Business messages <telegram.Update.deleted_business_messages>`.
 
-        .. versionadded:: 20.0
-
-    Warning:
-        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
-        attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
-
-    .. versionadded:: 13.8
+    .. versionadded:: NEXT.VERSION
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -52,27 +41,22 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
             this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
-
-            The return value of the callback is usually ignored except for the special case of
-            :class:`telegram.ext.ConversationHandler`.
         chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters requests to allow only
-            those which are asking to join the specified chat ID(s).
+            those which are from the specified chat ID(s).
 
-            .. versionadded:: 20.0
         username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
-            those which are asking to join the specified username(s).
+            those which are from the specified username(s).
 
-            .. versionadded:: 20.0
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
-
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
-        block (:obj:`bool`): Determines whether the callback will run in a blocking way..
-
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
     """
 
     __slots__ = (
@@ -102,10 +86,10 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
-        if isinstance(update, Update) and update.chat_join_request:
+        if isinstance(update, Update) and update.deleted_business_messages:
             if not self._chat_ids and not self._usernames:
                 return True
-            if update.chat_join_request.chat.id in self._chat_ids:
+            if update.deleted_business_messages.chat.id in self._chat_ids:
                 return True
-            return update.chat_join_request.from_user.username in self._usernames
+            return update.deleted_business_messages.chat.username in self._usernames
         return False

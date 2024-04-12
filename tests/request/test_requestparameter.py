@@ -163,7 +163,7 @@ class TestRequestParameterWithoutRequest:
         assert request_parameter.input_files == [input_media.media, input_media.thumbnail]
 
     def test_from_input_inputsticker(self):
-        input_sticker = InputSticker(data_file("telegram.png").read_bytes(), ["emoji"])
+        input_sticker = InputSticker(data_file("telegram.png").read_bytes(), ["emoji"], "static")
         expected = input_sticker.to_dict()
         expected.update({"sticker": input_sticker.sticker.attach_uri})
         request_parameter = RequestParameter.from_input("key", input_sticker)

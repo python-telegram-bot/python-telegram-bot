@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects to request chats/users."""
+
 from typing import TYPE_CHECKING, Optional
 
 from telegram._chatadministratorrights import ChatAdministratorRights
@@ -56,6 +57,16 @@ class KeyboardButtonRequestUsers(TelegramObject):
             .
 
             .. versionadded:: 20.8
+        request_name (:obj:`bool`, optional): Pass :obj:`True` to request the users' first and last
+            name.
+
+            .. versionadded:: NEXT.VERSION
+        request_username (:obj:`bool`, optional): Pass :obj:`True` to request the users' username.
+
+            .. versionadded:: NEXT.VERSION
+        request_photo (:obj:`bool`, optional): Pass :obj:`True` to request the users' photo.
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
@@ -71,11 +82,25 @@ class KeyboardButtonRequestUsers(TelegramObject):
             .
 
             .. versionadded:: 20.8
+        request_name (:obj:`bool`): Optional. Pass :obj:`True` to request the users' first and last
+            name.
+
+            .. versionadded:: NEXT.VERSION
+        request_username (:obj:`bool`): Optional. Pass :obj:`True` to request the users' username.
+
+            .. versionadded:: NEXT.VERSION
+        request_photo (:obj:`bool`): Optional. Pass :obj:`True` to request the users' photo.
+
+            .. versionadded:: NEXT.VERSION
+
     """
 
     __slots__ = (
         "max_quantity",
         "request_id",
+        "request_name",
+        "request_photo",
+        "request_username",
         "user_is_bot",
         "user_is_premium",
     )
@@ -86,6 +111,9 @@ class KeyboardButtonRequestUsers(TelegramObject):
         user_is_bot: Optional[bool] = None,
         user_is_premium: Optional[bool] = None,
         max_quantity: Optional[int] = None,
+        request_name: Optional[bool] = None,
+        request_username: Optional[bool] = None,
+        request_photo: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -97,6 +125,9 @@ class KeyboardButtonRequestUsers(TelegramObject):
         self.user_is_bot: Optional[bool] = user_is_bot
         self.user_is_premium: Optional[bool] = user_is_premium
         self.max_quantity: Optional[int] = max_quantity
+        self.request_name: Optional[bool] = request_name
+        self.request_username: Optional[bool] = request_username
+        self.request_photo: Optional[bool] = request_photo
 
         self._id_attrs = (self.request_id,)
 
@@ -138,6 +169,15 @@ class KeyboardButtonRequestChat(TelegramObject):
             applied.
         bot_is_member (:obj:`bool`, optional): Pass :obj:`True` to request a chat with the bot
             as a member. Otherwise, no additional restrictions are applied.
+        request_title (:obj:`bool`, optional): Pass :obj:`True` to request the chat's title.
+
+            .. versionadded:: NEXT.VERSION
+        request_username (:obj:`bool`, optional): Pass :obj:`True` to request the chat's username.
+
+            .. versionadded:: NEXT.VERSION
+        request_photo (:obj:`bool`, optional): Pass :obj:`True` to request the chat's photo.
+
+            .. versionadded:: NEXT.VERSION
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
         chat_is_channel (:obj:`bool`): Pass :obj:`True` to request a channel chat, pass
@@ -145,7 +185,7 @@ class KeyboardButtonRequestChat(TelegramObject):
         chat_is_forum (:obj:`bool`): Optional. Pass :obj:`True` to request a forum supergroup, pass
             :obj:`False` to request a non-forum chat. If not specified, no additional
             restrictions are applied.
-        chat_has_username (:obj:`bool`, optional): Pass :obj:`True` to request a supergroup or a
+        chat_has_username (:obj:`bool`): Optional. Pass :obj:`True` to request a supergroup or a
             channel with a username, pass :obj:`False` to request a chat without a username. If
             not specified, no additional restrictions are applied.
         chat_is_created (:obj:`bool`) Optional. Pass :obj:`True` to request a chat owned by the
@@ -159,6 +199,15 @@ class KeyboardButtonRequestChat(TelegramObject):
             applied.
         bot_is_member (:obj:`bool`) Optional. Pass :obj:`True` to request a chat with the bot
             as a member. Otherwise, no additional restrictions are applied.
+        request_title (:obj:`bool`): Optional. Pass :obj:`True` to request the chat's title.
+
+            .. versionadded:: NEXT.VERSION
+        request_username (:obj:`bool`): Optional. Pass :obj:`True` to request the chat's username.
+
+            .. versionadded:: NEXT.VERSION
+        request_photo (:obj:`bool`): Optional. Pass :obj:`True` to request the chat's photo.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -169,6 +218,9 @@ class KeyboardButtonRequestChat(TelegramObject):
         "chat_is_created",
         "chat_is_forum",
         "request_id",
+        "request_photo",
+        "request_title",
+        "request_username",
         "user_administrator_rights",
     )
 
@@ -182,6 +234,9 @@ class KeyboardButtonRequestChat(TelegramObject):
         user_administrator_rights: Optional[ChatAdministratorRights] = None,
         bot_administrator_rights: Optional[ChatAdministratorRights] = None,
         bot_is_member: Optional[bool] = None,
+        request_title: Optional[bool] = None,
+        request_username: Optional[bool] = None,
+        request_photo: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -199,6 +254,9 @@ class KeyboardButtonRequestChat(TelegramObject):
         )
         self.bot_administrator_rights: Optional[ChatAdministratorRights] = bot_administrator_rights
         self.bot_is_member: Optional[bool] = bot_is_member
+        self.request_title: Optional[bool] = request_title
+        self.request_username: Optional[bool] = request_username
+        self.request_photo: Optional[bool] = request_photo
 
         self._id_attrs = (self.request_id,)
 
