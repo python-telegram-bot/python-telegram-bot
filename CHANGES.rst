@@ -4,6 +4,48 @@
 Changelog
 =========
 
+Version 21.1
+==============
+
+*Released 2024-04-12*
+
+This is the technical changelog for version 21.1. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
+
+Major Changes
+-------------
+
+-  API 7.2 (:pr:`4180` closes :issue:`4179` and :issue:`4181`, :issue:`4181`)
+-  Make ``ChatAdministratorRights/ChatMemberAdministrator.can_*_stories`` Required (API 7.1) (:pr:`4192`)
+
+Minor Changes
+-------------
+
+-  Refactor Debug logging in ``Bot`` to Improve Type Hinting (:pr:`4151` closes :issue:`4010`)
+
+New Features
+------------
+
+-  Make ``Message.reply_*`` Reply in the Same Topic by Default (:pr:`4170` by `@aelkheir <https://github.com/aelkheir>`__ closes :issue:`4139`)
+-  Accept Socket Objects for Webhooks (:pr:`4161` closes :issue:`4078`)
+-  Add ``Update.effective_sender`` (:pr:`4168` by `@aelkheir <https://github.com/aelkheir>`__ closes :issue:`4085`)
+
+Documentation Improvements
+--------------------------
+
+-  Documentation Improvements (:pr:`4171`, :pr:`4158` by `@teslaedison <https://github.com/teslaedison>`__)
+
+Internal Changes
+----------------
+
+-  Temporarily Mark Tests with ``get_sticker_set`` as XFAIL due to API 7.2 Update (:pr:`4190`)
+
+Dependency Updates
+------------------
+
+-  ``pre-commit`` autoupdate (:pr:`4184`)
+-  Bump ``dependabot/fetch-metadata`` from 1.6.0 to 2.0.0 (:pr:`4185`)
+
+
 Version 21.0.1
 ==============
 

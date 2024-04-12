@@ -964,7 +964,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1332,7 +1332,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1481,7 +1481,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1630,7 +1630,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1751,7 +1751,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1901,7 +1901,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2044,7 +2044,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2195,7 +2195,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2340,7 +2340,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2461,7 +2461,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2637,7 +2637,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2918,7 +2918,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3055,7 +3055,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3170,7 +3170,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3248,7 +3248,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.0
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Returns:
             :obj:`bool`:  On success, :obj:`True` is returned.
@@ -6365,7 +6365,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionadded:: 20.2
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 21.1
                     Use :paramref:`telegram.InputSticker.format` instead.
 
             sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
@@ -6502,7 +6502,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         .. versionadded:: 20.2
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
             As per Bot API 7.2, the new argument :paramref:`format` will be required, and thus the
             order of the arguments had to be changed.
 
@@ -6515,7 +6515,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a
                 WEBM video.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
             thumbnail (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): A **.WEBP** or **.PNG** image with the thumbnail, must
@@ -6909,7 +6909,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7072,7 +7072,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 20.8
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.1
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -8791,7 +8791,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to get information about the connection of the bot with a business account.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.1
 
         Args:
             business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -8834,7 +8834,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         The method is equivalent to calling :meth:`delete_sticker_from_set`,
         then :meth:`add_sticker_to_set`, then :meth:`set_sticker_position_in_set`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.1
 
         Args:
             user_id (:obj:`int`): User identifier of the sticker set owner.

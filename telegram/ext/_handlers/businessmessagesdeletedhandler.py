@@ -33,7 +33,7 @@ class BusinessMessagesDeletedHandler(BaseHandler[Update, CCT]):
     """Handler class to handle
     :attr:`deleted Telegram Business messages <telegram.Update.deleted_business_messages>`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

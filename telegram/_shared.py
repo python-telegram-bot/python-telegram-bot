@@ -46,7 +46,7 @@ class UsersShared(TelegramObject):
        Bot API 7.0 replaces ``UserShared`` with this class. The only difference is that now
        the :attr:`user_ids` is a sequence instead of a single integer.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.1
        The argument :attr:`users` is now considered for the equality comparison instead of
        :attr:`user_ids`.
 
@@ -55,9 +55,9 @@ class UsersShared(TelegramObject):
         users (Sequence[:class:`telegram.SharedUser`]): Information about users shared with the
             bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.1
                 In future versions, this argument will become keyword only.
         user_ids (Sequence[:obj:`int`], optional): Identifiers of the shared users. These numbers
             may have more than 32 significant bits and some programming languages may have
@@ -66,7 +66,7 @@ class UsersShared(TelegramObject):
             identifiers. The bot may not have access to the users and could be unable to use
             these identifiers, unless the users are already known to the bot by some other means.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.1
                Bot API 7.2 introduced by :paramref:`users`, replacing this argument. Hence, this
                argument is now optional and will be removed in future versions.
 
@@ -75,7 +75,7 @@ class UsersShared(TelegramObject):
         users (Tuple[:class:`telegram.SharedUser`]): Information about users shared with the
             bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
     """
 
     __slots__ = ("request_id", "users")
@@ -140,7 +140,7 @@ class UsersShared(TelegramObject):
         bot may not have access to the users and could be unable to use these identifiers,
         unless the users are already known to the bot by some other means.
 
-        .. deprecated:: NEXT.VERSION
+        .. deprecated:: 21.1
             As Bot API 7.2 replaces this attribute with :attr:`users`, this attribute will be
             removed in future versions.
         """
@@ -171,15 +171,15 @@ class ChatShared(TelegramObject):
             float type are safe for storing this identifier.
         title (:obj:`str`, optional): Title of the chat, if the title was requested by the bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         username (:obj:`str`, optional): Username of the chat, if the username was requested by
             the bot and available.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         photo (Sequence[:class:`telegram.PhotoSize`], optional): Available sizes of the chat photo,
             if the photo was requested by the bot
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
@@ -189,15 +189,15 @@ class ChatShared(TelegramObject):
             float type are safe for storing this identifier.
         title (:obj:`str`): Optional. Title of the chat, if the title was requested by the bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         username (:obj:`str`): Optional. Username of the chat, if the username was requested by
             the bot and available.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Available sizes of the chat photo,
             if the photo was requested by the bot
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
     """
 
     __slots__ = ("chat_id", "photo", "request_id", "title", "username")
@@ -243,7 +243,7 @@ class SharedUser(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user_id` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 
     Args:
         user_id (:obj:`int`): Identifier of the shared user. This number may have 32 significant

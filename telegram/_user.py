@@ -95,7 +95,7 @@ class User(TelegramObject):
             to a Telegram Business account to receive its messages. Returned only in
             :meth:`telegram.Bot.get_me`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -122,7 +122,7 @@ class User(TelegramObject):
             to a Telegram Business account to receive its messages. Returned only in
             :meth:`telegram.Bot.get_me`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
     .. |user_chat_id_note| replace:: This shortcuts build on the assumption that :attr:`User.id`
         coincides with the :attr:`Chat.id` of the private chat with the user. This has been the
         case so far, but Telegram does not guarantee that this stays this way.

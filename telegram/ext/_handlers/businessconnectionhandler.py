@@ -33,7 +33,7 @@ class BusinessConnectionHandler(BaseHandler[Update, CCT]):
     """Handler class to handle Telegram
     :attr:`Business Connections <telegram.Update.business_connection>`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

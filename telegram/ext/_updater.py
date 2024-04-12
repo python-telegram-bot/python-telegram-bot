@@ -562,7 +562,7 @@ class Updater(AsyncContextManager["Updater"]):
                     appropriate :paramref:`webhook_url`.
 
                 .. versionadded:: 20.8
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.1
                     Added support to pass a socket instance itself.
         Returns:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.

@@ -139,22 +139,22 @@ class Update(TelegramObject):
             to or disconnected from a business account, or a user edited an existing connection
             with the bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
         business_message (:class:`telegram.Message`, optional): New non-service message
             from a connected business account.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
         edited_business_message (:class:`telegram.Message`, optional): New version of a message
             from a connected business account.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
         deleted_business_messages (:class:`telegram.BusinessMessagesDeleted`, optional): Messages
             were deleted from a connected business account.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
 
     Attributes:
@@ -247,22 +247,22 @@ class Update(TelegramObject):
             to or disconnected from a business account, or a user edited an existing connection
             with the bot.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
         business_message (:class:`telegram.Message`): Optional. New non-service message
             from a connected business account.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
         edited_business_message (:class:`telegram.Message`): Optional. New version of a message
             from a connected business account.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
         deleted_business_messages (:class:`telegram.BusinessMessagesDeleted`): Optional. Messages
             were deleted from a connected business account.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
     """
 
     __slots__ = (
@@ -370,19 +370,19 @@ class Update(TelegramObject):
     BUSINESS_CONNECTION: Final[str] = constants.UpdateType.BUSINESS_CONNECTION
     """:const:`telegram.constants.UpdateType.BUSINESS_CONNECTION`
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: 21.1"""
     BUSINESS_MESSAGE: Final[str] = constants.UpdateType.BUSINESS_MESSAGE
     """:const:`telegram.constants.UpdateType.BUSINESS_MESSAGE`
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: 21.1"""
     EDITED_BUSINESS_MESSAGE: Final[str] = constants.UpdateType.EDITED_BUSINESS_MESSAGE
     """:const:`telegram.constants.UpdateType.EDITED_BUSINESS_MESSAGE`
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: 21.1"""
     DELETED_BUSINESS_MESSAGES: Final[str] = constants.UpdateType.DELETED_BUSINESS_MESSAGES
     """:const:`telegram.constants.UpdateType.DELETED_BUSINESS_MESSAGES`
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: 21.1"""
     ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
     """List[:obj:`str`]: A list of all available update types.
 
@@ -471,7 +471,7 @@ class Update(TelegramObject):
 
         is present.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
             This property now also considers :attr:`business_connection`, :attr:`business_message`
             and :attr:`edited_business_message`.
 
@@ -563,7 +563,7 @@ class Update(TelegramObject):
             * If :attr:`channel_post` is present, this will give
               :attr:`telegram.Message.sender_chat`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.1
         """
         if self._effective_sender:
             return self._effective_sender
@@ -603,7 +603,7 @@ class Update(TelegramObject):
         :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll`,
         :attr:`poll_answer`, or :attr:`business_connection` is present.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
             This property now also considers :attr:`business_message`,
             :attr:`edited_business_message`, and :attr:`deleted_business_messages`.
 
@@ -673,7 +673,7 @@ class Update(TelegramObject):
             :attr:`callback_query` (i.e. :attr:`telegram.CallbackQuery.message`) or :obj:`None`, if
             none of those are present.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
             This property now also considers :attr:`business_message`, and
             :attr:`edited_business_message`.
 

@@ -1717,7 +1717,7 @@ class MessageType(StringEnum):
     BUSINESS_CONNECTION_ID = "business_connection_id"
     """:obj:`str`: Messages with :attr:`telegram.Message.business_connection_id`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
     """
     CHANNEL_CHAT_CREATED = "channel_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
@@ -1829,7 +1829,7 @@ class MessageType(StringEnum):
     SENDER_BUSINESS_BOT = "sender_business_bot"
     """:obj:`str`: Messages with :attr:`telegram.Message.sender_business_bot`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
     """
     STICKER = "sticker"
     """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
@@ -2327,7 +2327,7 @@ class StickerSetLimit(IntEnum):
     """:obj:`int`: Maximum number of stickers allowed in an animated or video sticker set, as given
     in :meth:`telegram.Bot.add_sticker_to_set`.
 
-    .. deprecated:: NEXT.VERSION
+    .. deprecated:: 21.1
         The animated sticker limit is now 120, the same as :attr:`MAX_STATIC_STICKERS`.
     """
     MAX_STATIC_STICKERS = 120
@@ -2524,22 +2524,22 @@ class UpdateType(StringEnum):
     BUSINESS_CONNECTION = "business_connection"
     """:obj:`str`: Updates with :attr:`telegram.Update.business_connection`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
     """
     BUSINESS_MESSAGE = "business_message"
     """:obj:`str`: Updates with :attr:`telegram.Update.business_message`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
     """
     EDITED_BUSINESS_MESSAGE = "edited_business_message"
     """:obj:`str`: Updates with :attr:`telegram.Update.edited_business_message`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
     """
     DELETED_BUSINESS_MESSAGES = "deleted_business_messages"
     """:obj:`str`: Updates with :attr:`telegram.Update.deleted_business_messages`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
     """
 
 

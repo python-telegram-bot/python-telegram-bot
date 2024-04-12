@@ -306,7 +306,7 @@ class Message(MaybeInaccessibleMessage):
             by an implicit action, for example, as an away or a greeting business message,
             or as a scheduled message.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
@@ -545,13 +545,13 @@ class Message(MaybeInaccessibleMessage):
             corresponding business account that is independent from any potential bot chat which
             might share the same identifier.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
         sender_business_bot (:obj:`telegram.User`, optional): The bot that actually sent the
             message on behalf of the business account. Available only for outgoing messages sent
             on behalf of the connected business account.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -590,7 +590,7 @@ class Message(MaybeInaccessibleMessage):
             by an implicit action, for example, as an away or a greeting business message,
             or as a scheduled message.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
@@ -845,13 +845,13 @@ class Message(MaybeInaccessibleMessage):
             corresponding business account that is independent from any potential bot chat which
             might share the same identifier.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
         sender_business_bot (:obj:`telegram.User`): Optional. The bot that actually sent the
             message on behalf of the business account. Available only for outgoing messages sent
             on behalf of the connected business account.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
@@ -1628,7 +1628,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -1707,7 +1707,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Note:
@@ -1789,7 +1789,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -1867,7 +1867,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -1943,7 +1943,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2021,7 +2021,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2103,7 +2103,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2186,7 +2186,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2270,7 +2270,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2349,7 +2349,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2429,7 +2429,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2512,7 +2512,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2590,7 +2590,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2670,7 +2670,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2753,7 +2753,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2834,7 +2834,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2918,7 +2918,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2998,7 +2998,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -3059,7 +3059,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         .. versionadded:: 13.2
@@ -3111,7 +3111,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -3201,7 +3201,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Warning:
@@ -3412,7 +3412,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
