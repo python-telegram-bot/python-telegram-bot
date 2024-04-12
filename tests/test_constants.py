@@ -176,6 +176,7 @@ class TestConstantsWithoutRequest:
             # attribute is deprecated, no need to add it to MessageType
             "user_shared",
             "via_bot",
+            "is_from_offline",
         }
 
     @pytest.mark.parametrize(

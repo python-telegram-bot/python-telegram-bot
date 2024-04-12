@@ -60,8 +60,8 @@ class EncryptedPassportElement(TelegramObject):
         email (:obj:`str`, optional): User's verified email address; available only for "email"
             type.
         files (Sequence[:class:`telegram.PassportFile`], optional): Array of encrypted/decrypted
-            files with documents provided by the user; available only for "utility_bill", 
-            "bank_statement", "rental_agreement", "passport_registration" and 
+            files with documents provided by the user; available only for "utility_bill",
+            "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
 
             .. versionchanged:: 20.0
@@ -74,12 +74,12 @@ class EncryptedPassportElement(TelegramObject):
             reverse side of the document, provided by the user; Available only for
             "driver_license" and "identity_card".
         selfie (:class:`telegram.PassportFile`, optional): Encrypted/decrypted file with the
-            selfie of the user holding a document, provided by the user; available if requested for 
+            selfie of the user holding a document, provided by the user; available if requested for
             "passport", "driver_license", "identity_card" and "internal_passport".
         translation (Sequence[:class:`telegram.PassportFile`], optional): Array of
-            encrypted/decrypted files with translated versions of documents provided by the user; 
-            available if requested requested for "passport", "driver_license", "identity_card", 
-            "internal_passport", "utility_bill", "bank_statement", "rental_agreement", 
+            encrypted/decrypted files with translated versions of documents provided by the user;
+            available if requested requested for "passport", "driver_license", "identity_card",
+            "internal_passport", "utility_bill", "bank_statement", "rental_agreement",
             "passport_registration" and "temporary_registration" types.
 
             .. versionchanged:: 20.0
@@ -101,8 +101,8 @@ class EncryptedPassportElement(TelegramObject):
         email (:obj:`str`): Optional. User's verified email address; available only for "email"
             type.
         files (Tuple[:class:`telegram.PassportFile`]): Optional. Array of encrypted/decrypted
-            files with documents provided by the user; available only for "utility_bill", 
-            "bank_statement", "rental_agreement", "passport_registration" and 
+            files with documents provided by the user; available only for "utility_bill",
+            "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
 
             .. versionchanged:: 20.0

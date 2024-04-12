@@ -54,6 +54,7 @@ __all__ = (
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
     "IS_AUTOMATIC_FORWARD",
+    "IS_FROM_OFFLINE",
     "IS_TOPIC_MESSAGE",
     "LOCATION",
     "PASSPORT_DATA",
@@ -272,20 +273,28 @@ class BaseFilter:
     def check_update(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
         """Checks if the specified update should be handled by this filter.
 
+        .. versionchanged:: NEXT.VERSION
+            This filter now also returns :obj:`True` if the update contains
+            :attr:`~telegram.Update.business_message`
+            or :attr:`~telegram.Update.edited_business_message`.
+
         Args:
             update (:class:`telegram.Update`): The update to check.
 
         Returns:
             :obj:`bool`: :obj:`True` if the update contains one of
             :attr:`~telegram.Update.channel_post`, :attr:`~telegram.Update.message`,
-            :attr:`~telegram.Update.edited_channel_post` or
-            :attr:`~telegram.Update.edited_message`, :obj:`False` otherwise.
+            :attr:`~telegram.Update.edited_channel_post`,
+            :attr:`~telegram.Update.edited_message`, :attr:`telegram.Update.business_message`,
+            :attr:`telegram.Update.edited_business_message`, or :obj:`False` otherwise.
         """
         return bool(  # Only message updates should be handled.
-            update.channel_post
+            update.channel_post  # pylint: disable=too-many-boolean-expressions
             or update.message
             or update.edited_channel_post
             or update.edited_message
+            or update.business_message
+            or update.edited_business_message
         )
 
 
@@ -1554,6 +1563,20 @@ IS_TOPIC_MESSAGE = _IsTopicMessage(name="filters.IS_TOPIC_MESSAGE")
 """
 
 
+class _IsFromOffline(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.is_from_offline)
+
+
+IS_FROM_OFFLINE = _IsFromOffline(name="filters.IS_FROM_OFFLINE")
+"""Messages that contain :attr:`telegram.Message.is_from_offline`.
+
+    .. versionadded:: NEXT.VERSION
+"""
+
+
 class Language(MessageFilter):
     """Filters messages to only allow those which are from users with a certain language code.
 
@@ -2486,13 +2509,21 @@ class UpdateType:
         __slots__ = ()
 
         def filter(self, update: Update) -> bool:
-            return update.edited_message is not None or update.edited_channel_post is not None
+            return (
+                update.edited_message is not None
+                or update.edited_channel_post is not None
+                or update.edited_business_message is not None
+            )
 
     EDITED = _Edited(name="filters.UpdateType.EDITED")
-    """Updates with either :attr:`telegram.Update.edited_message` or
-    :attr:`telegram.Update.edited_channel_post`.
+    """Updates with :attr:`telegram.Update.edited_message`,
+    :attr:`telegram.Update.edited_channel_post`, or
+    :attr:`telegram.Update.edited_business_message`.
 
     .. versionadded:: 20.0
+
+    .. versionchanged:: NEXT.VERSION
+        Added :attr:`telegram.Update.edited_business_message` to the filter.
     """
 
     class _EditedChannelPost(UpdateFilter):
@@ -2530,7 +2561,48 @@ class UpdateType:
 
     MESSAGES = _Messages(name="filters.UpdateType.MESSAGES")
     """Updates with either :attr:`telegram.Update.message` or
-    :attr:`telegram.Update.edited_message`."""
+    :attr:`telegram.Update.edited_message`.
+    """
+
+    class _BusinessMessage(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.business_message is not None
+
+    BUSINESS_MESSAGE = _BusinessMessage(name="filters.UpdateType.BUSINESS_MESSAGE")
+    """Updates with :attr:`telegram.Update.business_message`.
+
+    .. versionadded:: NEXT.VERSION"""
+
+    class _EditedBusinessMessage(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.edited_business_message is not None
+
+    EDITED_BUSINESS_MESSAGE = _EditedBusinessMessage(
+        name="filters.UpdateType.EDITED_BUSINESS_MESSAGE"
+    )
+    """Updates with :attr:`telegram.Update.edited_business_message`.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    class _BusinessMessages(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return (
+                update.business_message is not None or update.edited_business_message is not None
+            )
+
+    BUSINESS_MESSAGES = _BusinessMessages(name="filters.UpdateType.BUSINESS_MESSAGES")
+    """Updates with either :attr:`telegram.Update.business_message` or
+    :attr:`telegram.Update.edited_business_message`.
+
+    .. versionadded:: NEXT.VERSION
+    """
 
 
 class User(_ChatUserBaseFilter):
@@ -2675,6 +2747,8 @@ class ViaBot(_ChatUserBaseFilter):
     Examples:
         ``MessageHandler(filters.ViaBot(1234), callback_method)``
 
+    .. seealso:: :attr:`~telegram.ext.filters.VIA_BOT`
+
     Args:
         bot_id(:obj:`int` | Collection[:obj:`int`], optional): Which bot ID(s) to
             allow through.
@@ -2756,7 +2830,9 @@ class _ViaBot(MessageFilter):
 
 
 VIA_BOT = _ViaBot(name="filters.VIA_BOT")
-"""This filter filters for message that were sent via *any* bot."""
+"""This filter filters for message that were sent via *any* bot.
+
+.. seealso:: :class:`~telegram.ext.filters.ViaBot`"""
 
 
 class _Video(MessageFilter):

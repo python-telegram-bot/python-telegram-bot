@@ -21,6 +21,7 @@
 from typing import TYPE_CHECKING, Final, List, Optional, Union
 
 from telegram import constants
+from telegram._business import BusinessConnection, BusinessMessagesDeleted
 from telegram._callbackquery import CallbackQuery
 from telegram._chatboost import ChatBoostRemoved, ChatBoostUpdated
 from telegram._chatjoinrequest import ChatJoinRequest
@@ -134,6 +135,28 @@ class Update(TelegramObject):
 
             .. versionadded:: 20.8
 
+        business_connection (:class:`telegram.BusinessConnection`, optional): The bot was connected
+            to or disconnected from a business account, or a user edited an existing connection
+            with the bot.
+
+            .. versionadded:: NEXT.VERSION
+
+        business_message (:class:`telegram.Message`, optional): New non-service message
+            from a connected business account.
+
+            .. versionadded:: NEXT.VERSION
+
+        edited_business_message (:class:`telegram.Message`, optional): New version of a message
+            from a connected business account.
+
+            .. versionadded:: NEXT.VERSION
+
+        deleted_business_messages (:class:`telegram.BusinessMessagesDeleted`, optional): Messages
+            were deleted from a connected business account.
+
+            .. versionadded:: NEXT.VERSION
+
+
     Attributes:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
             certain positive number and increase sequentially. This ID becomes especially handy if
@@ -219,6 +242,27 @@ class Update(TelegramObject):
             with delay up to a few minutes.
 
             .. versionadded:: 20.8
+
+        business_connection (:class:`telegram.BusinessConnection`): Optional. The bot was connected
+            to or disconnected from a business account, or a user edited an existing connection
+            with the bot.
+
+            .. versionadded:: NEXT.VERSION
+
+        business_message (:class:`telegram.Message`): Optional. New non-service message
+            from a connected business account.
+
+            .. versionadded:: NEXT.VERSION
+
+        edited_business_message (:class:`telegram.Message`): Optional. New version of a message
+            from a connected business account.
+
+            .. versionadded:: NEXT.VERSION
+
+        deleted_business_messages (:class:`telegram.BusinessMessagesDeleted`): Optional. Messages
+            were deleted from a connected business account.
+
+            .. versionadded:: NEXT.VERSION
     """
 
     __slots__ = (
@@ -226,12 +270,16 @@ class Update(TelegramObject):
         "_effective_message",
         "_effective_sender",
         "_effective_user",
+        "business_connection",
+        "business_message",
         "callback_query",
         "channel_post",
         "chat_boost",
         "chat_join_request",
         "chat_member",
         "chosen_inline_result",
+        "deleted_business_messages",
+        "edited_business_message",
         "edited_channel_post",
         "edited_message",
         "inline_query",
@@ -319,6 +367,22 @@ class Update(TelegramObject):
     """:const:`telegram.constants.UpdateType.MESSAGE_REACTION_COUNT`
 
     .. versionadded:: 20.8"""
+    BUSINESS_CONNECTION: Final[str] = constants.UpdateType.BUSINESS_CONNECTION
+    """:const:`telegram.constants.UpdateType.BUSINESS_CONNECTION`
+
+    .. versionadded:: NEXT.VERSION"""
+    BUSINESS_MESSAGE: Final[str] = constants.UpdateType.BUSINESS_MESSAGE
+    """:const:`telegram.constants.UpdateType.BUSINESS_MESSAGE`
+
+    .. versionadded:: NEXT.VERSION"""
+    EDITED_BUSINESS_MESSAGE: Final[str] = constants.UpdateType.EDITED_BUSINESS_MESSAGE
+    """:const:`telegram.constants.UpdateType.EDITED_BUSINESS_MESSAGE`
+
+    .. versionadded:: NEXT.VERSION"""
+    DELETED_BUSINESS_MESSAGES: Final[str] = constants.UpdateType.DELETED_BUSINESS_MESSAGES
+    """:const:`telegram.constants.UpdateType.DELETED_BUSINESS_MESSAGES`
+
+    .. versionadded:: NEXT.VERSION"""
     ALL_TYPES: Final[List[str]] = list(constants.UpdateType)
     """List[:obj:`str`]: A list of all available update types.
 
@@ -345,6 +409,10 @@ class Update(TelegramObject):
         removed_chat_boost: Optional[ChatBoostRemoved] = None,
         message_reaction: Optional[MessageReactionUpdated] = None,
         message_reaction_count: Optional[MessageReactionCountUpdated] = None,
+        business_connection: Optional[BusinessConnection] = None,
+        business_message: Optional[Message] = None,
+        edited_business_message: Optional[Message] = None,
+        deleted_business_messages: Optional[BusinessMessagesDeleted] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -370,6 +438,12 @@ class Update(TelegramObject):
         self.removed_chat_boost: Optional[ChatBoostRemoved] = removed_chat_boost
         self.message_reaction: Optional[MessageReactionUpdated] = message_reaction
         self.message_reaction_count: Optional[MessageReactionCountUpdated] = message_reaction_count
+        self.business_connection: Optional[BusinessConnection] = business_connection
+        self.business_message: Optional[Message] = business_message
+        self.edited_business_message: Optional[Message] = edited_business_message
+        self.deleted_business_messages: Optional[BusinessMessagesDeleted] = (
+            deleted_business_messages
+        )
 
         self._effective_user: Optional[User] = None
         self._effective_sender: Optional[Union["User", "Chat"]] = None
@@ -393,8 +467,13 @@ class Update(TelegramObject):
         * :attr:`chat_boost`
         * :attr:`removed_chat_boost`
         * :attr:`message_reaction_count`
+        * :attr:`deleted_business_messages`
 
         is present.
+
+        .. versionchanged:: NEXT.VERSION
+            This property now also considers :attr:`business_connection`, :attr:`business_message`
+            and :attr:`edited_business_message`.
 
         Example:
             * If :attr:`message` is present, this will give
@@ -443,6 +522,15 @@ class Update(TelegramObject):
         elif self.message_reaction:
             user = self.message_reaction.user
 
+        elif self.business_message:
+            user = self.business_message.from_user
+
+        elif self.edited_business_message:
+            user = self.edited_business_message.from_user
+
+        elif self.business_connection:
+            user = self.business_connection.user
+
         self._effective_user = user
         return user
 
@@ -463,6 +551,7 @@ class Update(TelegramObject):
         * :attr:`chat_boost`
         * :attr:`removed_chat_boost`
         * :attr:`message_reaction_count`
+        * :attr:`deleted_business_messages`
 
         is present.
 
@@ -482,7 +571,12 @@ class Update(TelegramObject):
         sender: Optional[Union["User", "Chat"]] = None
 
         if message := (
-            self.message or self.edited_message or self.channel_post or self.edited_channel_post
+            self.message
+            or self.edited_message
+            or self.channel_post
+            or self.edited_channel_post
+            or self.business_message
+            or self.edited_business_message
         ):
             sender = message.sender_chat
 
@@ -506,8 +600,12 @@ class Update(TelegramObject):
         If no chat is associated with this update, this gives :obj:`None`.
         This is the case, if :attr:`inline_query`,
         :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
-        :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll` or
-        :attr:`poll_answer` is present.
+        :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll`,
+        :attr:`poll_answer`, or :attr:`business_connection` is present.
+
+        .. versionchanged:: NEXT.VERSION
+            This property now also considers :attr:`business_message`,
+            :attr:`edited_business_message`, and :attr:`deleted_business_messages`.
 
         Example:
             If :attr:`message` is present, this will give :attr:`telegram.Message.chat`.
@@ -554,6 +652,15 @@ class Update(TelegramObject):
         elif self.message_reaction_count:
             chat = self.message_reaction_count.chat
 
+        elif self.business_message:
+            chat = self.business_message.chat
+
+        elif self.edited_business_message:
+            chat = self.edited_business_message.chat
+
+        elif self.deleted_business_messages:
+            chat = self.deleted_business_messages.chat
+
         self._effective_chat = chat
         return chat
 
@@ -565,6 +672,10 @@ class Update(TelegramObject):
             :attr:`edited_message`, :attr:`channel_post`, :attr:`edited_channel_post` or
             :attr:`callback_query` (i.e. :attr:`telegram.CallbackQuery.message`) or :obj:`None`, if
             none of those are present.
+
+        .. versionchanged:: NEXT.VERSION
+            This property now also considers :attr:`business_message`, and
+            :attr:`edited_business_message`.
 
         Tip:
             This property will only ever return objects of type :class:`telegram.Message` or
@@ -608,6 +719,12 @@ class Update(TelegramObject):
         elif self.edited_channel_post:
             message = self.edited_channel_post
 
+        elif self.business_message:
+            message = self.business_message
+
+        elif self.edited_business_message:
+            message = self.edited_business_message
+
         self._effective_message = message
         return message
 
@@ -642,6 +759,14 @@ class Update(TelegramObject):
         )
         data["message_reaction_count"] = MessageReactionCountUpdated.de_json(
             data.get("message_reaction_count"), bot
+        )
+        data["business_connection"] = BusinessConnection.de_json(
+            data.get("business_connection"), bot
+        )
+        data["business_message"] = Message.de_json(data.get("business_message"), bot)
+        data["edited_business_message"] = Message.de_json(data.get("edited_business_message"), bot)
+        data["deleted_business_messages"] = BusinessMessagesDeleted.de_json(
+            data.get("deleted_business_messages"), bot
         )
 
         return super().de_json(data=data, bot=bot)

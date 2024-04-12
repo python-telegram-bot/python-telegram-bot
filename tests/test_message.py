@@ -50,6 +50,7 @@ from telegram import (
     PollOption,
     ProximityAlertTriggered,
     ReplyParameters,
+    SharedUser,
     Sticker,
     Story,
     SuccessfulPayment,
@@ -89,6 +90,7 @@ def message(bot):
         date=TestMessageBase.date,
         chat=copy(TestMessageBase.chat),
         from_user=copy(TestMessageBase.from_user),
+        business_connection_id="123456789",
     )
     message.set_bot(bot)
     message._unfreeze()
@@ -218,7 +220,7 @@ def message(bot):
         },
         {"web_app_data": WebAppData("some_data", "some_button_text")},
         {"message_thread_id": 123},
-        {"users_shared": UsersShared(1, [2, 3])},
+        {"users_shared": UsersShared(1, users=[SharedUser(2, "user2"), SharedUser(3, "user3")])},
         {"chat_shared": ChatShared(3, 4)},
         {
             "giveaway": Giveaway(
@@ -263,6 +265,9 @@ def message(bot):
         {"reply_to_story": Story(Chat(1, Chat.PRIVATE), 0)},
         {"boost_added": ChatBoostAdded(100)},
         {"sender_boost_count": 1},
+        {"is_from_offline": True},
+        {"sender_business_bot": User(1, "BusinessBot", True)},
+        {"business_connection_id": "123456789"},
     ],
     ids=[
         "reply",
@@ -328,6 +333,9 @@ def message(bot):
         "reply_to_story",
         "boost_added",
         "sender_boost_count",
+        "sender_business_bot",
+        "business_connection_id",
+        "is_from_offline",
     ],
 )
 def message_params(bot, request):
@@ -1386,7 +1394,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_text,
             Bot.send_message,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1394,6 +1402,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
@@ -1424,7 +1433,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_markdown,
             Bot.send_message,
-            ["chat_id", "parse_mode", "reply_to_message_id"],
+            ["chat_id", "parse_mode", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1432,6 +1441,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
@@ -1466,7 +1476,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_markdown_v2,
             Bot.send_message,
-            ["chat_id", "parse_mode", "reply_to_message_id"],
+            ["chat_id", "parse_mode", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1474,6 +1484,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
@@ -1513,7 +1524,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_html,
             Bot.send_message,
-            ["chat_id", "parse_mode", "reply_to_message_id"],
+            ["chat_id", "parse_mode", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1521,6 +1532,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_message",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_text, message.get_bot())
 
@@ -1546,7 +1558,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_media_group,
             Bot.send_media_group,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1554,6 +1566,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_media_group",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_media_group, message.get_bot())
 
@@ -1584,7 +1597,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_photo,
             Bot.send_photo,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1592,6 +1605,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_photo",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_photo, message.get_bot())
 
@@ -1614,7 +1628,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_audio,
             Bot.send_audio,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1622,6 +1636,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_audio",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_audio, message.get_bot())
 
@@ -1644,7 +1659,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_document,
             Bot.send_document,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1652,6 +1667,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_document",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_document, message.get_bot())
 
@@ -1674,7 +1690,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_animation,
             Bot.send_animation,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1682,6 +1698,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_animation",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_animation, message.get_bot())
 
@@ -1704,7 +1721,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_sticker,
             Bot.send_sticker,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1712,6 +1729,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_sticker",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_sticker, message.get_bot())
 
@@ -1734,7 +1752,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_video,
             Bot.send_video,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1742,6 +1760,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_video",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_video, message.get_bot())
 
@@ -1764,7 +1783,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_video_note,
             Bot.send_video_note,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1772,6 +1791,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_video_note",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_video_note, message.get_bot())
 
@@ -1794,7 +1814,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_voice,
             Bot.send_voice,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1802,6 +1822,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_voice",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_voice, message.get_bot())
 
@@ -1824,7 +1845,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_location,
             Bot.send_location,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1832,6 +1853,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_location",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_location, message.get_bot())
 
@@ -1854,7 +1876,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_venue,
             Bot.send_venue,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1862,6 +1884,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_venue",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_venue, message.get_bot())
 
@@ -1884,7 +1907,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_contact,
             Bot.send_contact,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -1892,6 +1915,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_contact",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_contact, message.get_bot())
 
@@ -1915,11 +1939,15 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_poll,
             Bot.send_poll,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
-            message.reply_poll, message.get_bot(), "send_poll", skip_params=["reply_to_message_id"]
+            message.reply_poll,
+            message.get_bot(),
+            "send_poll",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_poll, message.get_bot())
 
@@ -1942,11 +1970,15 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_dice,
             Bot.send_dice,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
-            message.reply_dice, message.get_bot(), "send_dice", skip_params=["reply_to_message_id"]
+            message.reply_dice,
+            message.get_bot(),
+            "send_dice",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_dice, message.get_bot())
 
@@ -1971,10 +2003,16 @@ class TestMessageWithoutRequest(TestMessageBase):
             return id_ and action
 
         assert check_shortcut_signature(
-            Message.reply_chat_action, Bot.send_chat_action, ["chat_id", "reply_to_message_id"], []
+            Message.reply_chat_action,
+            Bot.send_chat_action,
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
+            [],
         )
         assert await check_shortcut_call(
-            message.reply_chat_action, message.get_bot(), "send_chat_action"
+            message.reply_chat_action,
+            message.get_bot(),
+            "send_chat_action",
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_chat_action, message.get_bot())
 
@@ -1998,11 +2036,15 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_game,
             Bot.send_game,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
-            message.reply_game, message.get_bot(), "send_game", skip_params=["reply_to_message_id"]
+            message.reply_game,
+            message.get_bot(),
+            "send_game",
+            skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_game, message.get_bot())
 
@@ -2034,7 +2076,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_invoice,
             Bot.send_invoice,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(
@@ -2042,6 +2084,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.get_bot(),
             "send_invoice",
             skip_params=["reply_to_message_id"],
+            shortcut_kwargs=["business_connection_id"],
         )
         assert await check_defaults_handling(message.reply_invoice, message.get_bot())
 
@@ -2159,7 +2202,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert check_shortcut_signature(
             Message.reply_copy,
             Bot.copy_message,
-            ["chat_id", "reply_to_message_id"],
+            ["chat_id", "reply_to_message_id", "business_connection_id"],
             ["quote", "do_quote", "reply_to_message_id"],
         )
         assert await check_shortcut_call(message.copy, message.get_bot(), "copy_message")

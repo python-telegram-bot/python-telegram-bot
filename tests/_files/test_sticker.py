@@ -39,6 +39,7 @@ from telegram import (
 from telegram.constants import ParseMode, StickerFormat, StickerType
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -471,7 +472,6 @@ class TestStickerWithRequest(TestStickerBase):
         assert protected.has_protected_content
         assert not unprotected.has_protected_content
 
-    @pytest.mark.xfail(reason="API 7.2 incompatibility, see #4181")
     async def test_premium_animation(self, bot):
         # testing animation sucks a bit since we can't create a premium sticker. What we can do is
         # get a sticker set which includes a premium sticker and check that specific one.
@@ -489,7 +489,6 @@ class TestStickerWithRequest(TestStickerBase):
         }
         assert premium_sticker.premium_animation.to_dict() == premium_sticker_dict
 
-    @pytest.mark.xfail(reason="API 7.2 incompatibility, see #4181")
     async def test_custom_emoji(self, bot):
         # testing custom emoji stickers is as much of an annoyance as the premium animation, see
         # in test_premium_animation
@@ -528,7 +527,6 @@ class TestStickerWithRequest(TestStickerBase):
 
 @pytest.fixture()
 async def sticker_set(bot):
-    pytest.xfail(reason="API 7.2 incompatibility, see #4181")
     ss = await bot.get_sticker_set(f"test_by_{bot.username}")
     if len(ss.stickers) > 100:
         try:
@@ -543,7 +541,6 @@ async def sticker_set(bot):
 
 @pytest.fixture()
 async def animated_sticker_set(bot):
-    pytest.xfail(reason="API 7.2 incompatibility, see #4181")
     ss = await bot.get_sticker_set(f"animated_test_by_{bot.username}")
     if len(ss.stickers) > 100:
         try:
@@ -578,8 +575,6 @@ def sticker_set_thumb_file():
 
 class TestStickerSetBase:
     title = "Test stickers"
-    is_animated = True
-    is_video = True
     stickers = [Sticker("file_id", "file_un_id", 512, 512, True, True, Sticker.REGULAR)]
     name = "NOTAREALNAME"
     sticker_type = Sticker.REGULAR
@@ -588,7 +583,7 @@ class TestStickerSetBase:
 
 class TestStickerSetWithoutRequest(TestStickerSetBase):
     def test_slot_behaviour(self):
-        inst = StickerSet("this", "is", True, self.stickers, True, "not")
+        inst = StickerSet("this", "is", self.stickers, "not")
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -598,8 +593,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         json_dict = {
             "name": name,
             "title": self.title,
-            "is_animated": self.is_animated,
-            "is_video": self.is_video,
             "stickers": [x.to_dict() for x in self.stickers],
             "thumbnail": sticker.thumbnail.to_dict(),
             "sticker_type": self.sticker_type,
@@ -609,8 +602,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
 
         assert sticker_set.name == name
         assert sticker_set.title == self.title
-        assert sticker_set.is_animated == self.is_animated
-        assert sticker_set.is_video == self.is_video
         assert sticker_set.stickers == tuple(self.stickers)
         assert sticker_set.thumbnail == sticker.thumbnail
         assert sticker_set.sticker_type == self.sticker_type
@@ -622,8 +613,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         assert isinstance(sticker_set_dict, dict)
         assert sticker_set_dict["name"] == sticker_set.name
         assert sticker_set_dict["title"] == sticker_set.title
-        assert sticker_set_dict["is_animated"] == sticker_set.is_animated
-        assert sticker_set_dict["is_video"] == sticker_set.is_video
         assert sticker_set_dict["stickers"][0] == sticker_set.stickers[0].to_dict()
         assert sticker_set_dict["thumbnail"] == sticker_set.thumbnail.to_dict()
         assert sticker_set_dict["sticker_type"] == sticker_set.sticker_type
@@ -632,26 +621,20 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         a = StickerSet(
             self.name,
             self.title,
-            self.is_animated,
             self.stickers,
-            self.is_video,
             self.sticker_type,
         )
         b = StickerSet(
             self.name,
             self.title,
-            self.is_animated,
             self.stickers,
-            self.is_video,
             self.sticker_type,
         )
-        c = StickerSet(self.name, "title", False, [], True, Sticker.CUSTOM_EMOJI)
+        c = StickerSet(self.name, "title", [], Sticker.CUSTOM_EMOJI)
         d = StickerSet(
             "blah",
             self.title,
-            self.is_animated,
             self.stickers,
-            self.is_video,
             self.sticker_type,
         )
         e = Audio(self.name, "", 0, None, None)
@@ -689,7 +672,9 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
                 )
 
             monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.upload_sticker_file(chat_id, sticker=file, sticker_format="static")
+            await bot.upload_sticker_file(
+                chat_id, sticker=file, sticker_format=StickerFormat.STATIC
+            )
             assert test_flag
         finally:
             bot._local_mode = False
@@ -719,8 +704,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             chat_id,
             "name",
             "title",
-            stickers=[InputSticker(file, emoji_list=["emoji"])],
-            sticker_format=StickerFormat.STATIC,
+            stickers=[InputSticker(file, emoji_list=["emoji"], format=StickerFormat.STATIC)],
         )
         assert test_flag
 
@@ -759,7 +743,9 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
 
         monkeypatch.setattr(bot, "_post", make_assertion)
         await bot.add_sticker_to_set(
-            chat_id, "name", sticker=InputSticker(sticker=file, emoji_list=["this"])
+            chat_id,
+            "name",
+            sticker=InputSticker(sticker=file, emoji_list=["this"], format="static"),
         )
         assert test_flag
 
@@ -782,7 +768,7 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
                     test_flag = isinstance(data.get("thumbnail"), InputFile)
 
             monkeypatch.setattr(bot, "_post", make_assertion)
-            await bot.set_sticker_set_thumbnail("name", chat_id, thumbnail=file)
+            await bot.set_sticker_set_thumbnail("name", chat_id, thumbnail=file, format="static")
             assert test_flag
         finally:
             bot._local_mode = False
@@ -798,9 +784,29 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
         monkeypatch.setattr(sticker.get_bot(), "get_file", make_assertion)
         assert await sticker.get_file()
 
+    async def test_create_new_sticker_set_format_arg_depr(
+        self, bot, chat_id, sticker_file, monkeypatch
+    ):
+        async def make_assertion(*_, **kwargs):
+            pass
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+        with pytest.warns(PTBDeprecationWarning, match="`sticker_format` is deprecated"):
+            await bot.create_new_sticker_set(
+                chat_id,
+                "name",
+                "title",
+                stickers=sticker_file,
+                sticker_format="static",
+            )
+
+    async def test_deprecation_creation_args(self, recwarn):
+        with pytest.warns(PTBDeprecationWarning, match="The parameters `is_animated` and ") as w:
+            StickerSet("name", "title", [], "static", is_animated=True)
+            assert w[0].filename == __file__, "wrong stacklevel!"
+
 
 @pytest.mark.xdist_group("stickerset")
-@pytest.mark.xfail(reason="API 7.2 incompatibility, see #4181")
 class TestStickerSetWithRequest:
     async def test_create_sticker_set(
         self, bot, chat_id, sticker_file, animated_sticker_file, video_sticker_file
@@ -822,8 +828,11 @@ class TestStickerSetWithRequest:
                         chat_id,
                         name=sticker_set,
                         title="Sticker Test",
-                        stickers=[InputSticker(sticker_file, emoji_list=["😄"])],
-                        sticker_format=StickerFormat.STATIC,
+                        stickers=[
+                            InputSticker(
+                                sticker_file, emoji_list=["😄"], format=StickerFormat.STATIC
+                            )
+                        ],
                     )
                     assert s
                 elif sticker_set.startswith("animated"):
@@ -831,8 +840,13 @@ class TestStickerSetWithRequest:
                         chat_id,
                         name=sticker_set,
                         title="Animated Test",
-                        stickers=[InputSticker(animated_sticker_file, emoji_list=["😄"])],
-                        sticker_format=StickerFormat.ANIMATED,
+                        stickers=[
+                            InputSticker(
+                                animated_sticker_file,
+                                emoji_list=["😄"],
+                                format=StickerFormat.ANIMATED,
+                            )
+                        ],
                     )
                     assert a
                 elif sticker_set.startswith("video"):
@@ -840,8 +854,11 @@ class TestStickerSetWithRequest:
                         chat_id,
                         name=sticker_set,
                         title="Video Test",
-                        stickers=[InputSticker(video_sticker_file, emoji_list=["😄"])],
-                        sticker_format=StickerFormat.VIDEO,
+                        stickers=[
+                            InputSticker(
+                                video_sticker_file, emoji_list=["😄"], format=StickerFormat.VIDEO
+                            )
+                        ],
                     )
                     assert v
 
@@ -855,8 +872,7 @@ class TestStickerSetWithRequest:
             chat_id,
             name=name,
             title="Stickerset delete Test",
-            stickers=[InputSticker(sticker_file, emoji_list=["😄"])],
-            sticker_format=StickerFormat.STATIC,
+            stickers=[InputSticker(sticker_file, emoji_list=["😄"], format="static")],
         )
         # this prevents a second issue when calling delete too soon after creating the set leads
         # to it failing as well
@@ -875,8 +891,11 @@ class TestStickerSetWithRequest:
                 chat_id,
                 name=ss_name,
                 title="Custom Emoji Sticker Set",
-                stickers=[InputSticker(animated_sticker_file, emoji_list=["😄"])],
-                sticker_format=StickerFormat.ANIMATED,
+                stickers=[
+                    InputSticker(
+                        animated_sticker_file, emoji_list=["😄"], format=StickerFormat.ANIMATED
+                    )
+                ],
                 sticker_type=Sticker.CUSTOM_EMOJI,
             )
         assert await bot.set_custom_emoji_sticker_set_thumbnail(ss_name, "")
@@ -895,7 +914,9 @@ class TestStickerSetWithRequest:
             bot.add_sticker_to_set(
                 chat_id,
                 f"test_by_{bot.username}",
-                sticker=InputSticker(sticker=file.file_id, emoji_list=["😄"]),
+                sticker=InputSticker(
+                    sticker=file.file_id, emoji_list=["😄"], format=StickerFormat.STATIC
+                ),
             ),
             bot.add_sticker_to_set(  # Also test with file input and mask
                 chat_id,
@@ -904,6 +925,7 @@ class TestStickerSetWithRequest:
                     sticker=sticker_file,
                     emoji_list=["😄"],
                     mask_position=MaskPosition(MaskPosition.EYES, -1, 1, 2),
+                    format=StickerFormat.STATIC,
                 ),
             ),
         )
@@ -915,7 +937,9 @@ class TestStickerSetWithRequest:
             chat_id,
             f"animated_test_by_{bot.username}",
             sticker=InputSticker(
-                sticker=data_file("telegram_animated_sticker.tgs").open("rb"), emoji_list=["😄"]
+                sticker=data_file("telegram_animated_sticker.tgs").open("rb"),
+                emoji_list=["😄"],
+                format=StickerFormat.ANIMATED,
             ),
         )
 
@@ -925,7 +949,7 @@ class TestStickerSetWithRequest:
             assert await bot.add_sticker_to_set(
                 chat_id,
                 f"video_test_by_{bot.username}",
-                sticker=InputSticker(sticker=f, emoji_list=["🤔"]),
+                sticker=InputSticker(sticker=f, emoji_list=["🤔"], format=StickerFormat.VIDEO),
             )
 
     # Test set_sticker_position_in_set
@@ -948,7 +972,7 @@ class TestStickerSetWithRequest:
     async def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
         await asyncio.sleep(1)
         assert await bot.set_sticker_set_thumbnail(
-            f"test_by_{bot.username}", chat_id, sticker_set_thumb_file
+            f"test_by_{bot.username}", chat_id, format="static", thumbnail=sticker_set_thumb_file
         )
 
     async def test_bot_methods_3_tgs(
@@ -958,8 +982,13 @@ class TestStickerSetWithRequest:
         animated_test = f"animated_test_by_{bot.username}"
         file_id = animated_sticker_set.stickers[-1].file_id
         tasks = asyncio.gather(
-            bot.set_sticker_set_thumbnail(animated_test, chat_id, animated_sticker_file),
-            bot.set_sticker_set_thumbnail(animated_test, chat_id, file_id),
+            bot.set_sticker_set_thumbnail(
+                animated_test,
+                chat_id,
+                "animated",
+                thumbnail=animated_sticker_file,
+            ),
+            bot.set_sticker_set_thumbnail(animated_test, chat_id, "animated", thumbnail=file_id),
         )
         assert all(await tasks)
 
@@ -1042,6 +1071,19 @@ class TestStickerSetWithRequest:
         file_id = video_sticker_set.stickers[-1].file_id
         assert await bot.set_sticker_keywords(file_id, ["test", "test2"])
 
+    async def test_bot_methods_8_png(self, bot, sticker_set, sticker_file):
+        file_id = sticker_set.stickers[-1].file_id
+        assert await bot.replace_sticker_in_set(
+            bot.id,
+            f"test_by_{bot.username}",
+            file_id,
+            sticker=InputSticker(
+                sticker=sticker_file,
+                emoji_list=["😄"],
+                format=StickerFormat.STATIC,
+            ),
+        )
+
 
 @pytest.fixture(scope="module")
 def mask_position():
@@ -1112,7 +1154,6 @@ class TestMaskPositionWithoutRequest(TestMaskPositionBase):
         assert hash(a) != hash(e)
 
 
-@pytest.mark.xfail(reason="API 7.2 incompatibility, see #4181")
 class TestMaskPositionWithRequest(TestMaskPositionBase):
     async def test_create_new_mask_sticker_set(self, bot, chat_id, sticker_file, mask_position):
         name = f"masks_by_{bot.username}"
@@ -1132,9 +1173,9 @@ class TestMaskPositionWithRequest(TestMaskPositionBase):
                         emoji_list=["😔"],
                         mask_position=mask_position,
                         keywords=["sad"],
+                        format=StickerFormat.STATIC,
                     )
                 ],
-                sticker_format=StickerFormat.STATIC,
                 sticker_type=Sticker.MASK,
             )
             assert sticker_set
