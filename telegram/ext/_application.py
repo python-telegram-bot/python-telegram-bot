@@ -1250,8 +1250,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         for handlers in self.handlers.values():
             try:
-                for handler in handlers:
-                    check = handler.check_update(update)  # Should the handler handle this update?
+                for handler in handlers:                    
+                    if asyncio.iscoroutinefunction(handler.check_update):
+                        check = await handler.check_update(update)
+                    else:
+                        check = handler.check_update(update)
                     if not (check is None or check is False):  # if yes,
                         if not context:  # build a context if not already built
                             context = self.context_types.context.from_update(update, self)
