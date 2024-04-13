@@ -153,15 +153,15 @@ class EncryptedCredentials(TelegramObject):
 
         self._id_attrs = (self.data, self.hash, self.secret)
 
-        self._decrypted_secret: Optional[str] = None
+        self._decrypted_secret: Optional[bytes] = None
         self._decrypted_data: Optional[Credentials] = None
 
         self._freeze()
 
     @property
-    def decrypted_secret(self) -> str:
+    def decrypted_secret(self) -> bytes:
         """
-        :obj:`str`: Lazily decrypt and return secret.
+        :obj:`bytes`: Lazily decrypt and return secret.
 
         Raises:
             telegram.error.PassportDecryptionError: Decryption failed. Usually due to bad
