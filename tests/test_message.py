@@ -518,6 +518,9 @@ class TestMessageWithoutRequest(TestMessageBase):
             message_thread_id = await method(*args, message_thread_id=50)
             assert message_thread_id == 50
 
+            message_thread_id = await method(*args, message_thread_id=None)
+            assert message_thread_id is None
+
             if bot_method_name == "send_chat_action":
                 return
 
