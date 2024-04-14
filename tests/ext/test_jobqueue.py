@@ -26,7 +26,6 @@ import time
 import pytest
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Defaults, Job, JobQueue
-from telegram.warnings import PTBUserWarning
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots

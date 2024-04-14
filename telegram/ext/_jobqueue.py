@@ -33,7 +33,6 @@ except ImportError:
 
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
 from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import CCT, JobCallback
 
