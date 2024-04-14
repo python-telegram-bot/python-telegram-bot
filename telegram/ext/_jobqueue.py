@@ -587,13 +587,6 @@ class JobQueue(Generic[CCT]):
             queue.
 
         """
-        # TODO: After v20.0, we should remove this warning.
-        if days != tuple(range(7)):  # checks if user passed a custom value
-            warn(
-                "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday "
-                "scheme. We recommend double checking if the passed value is correct.",
-                stacklevel=2,
-            )
         if not job_kwargs:
             job_kwargs = {}
 
