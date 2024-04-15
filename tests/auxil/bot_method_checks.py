@@ -21,7 +21,7 @@ import datetime
 import functools
 import inspect
 import re
-from typing import Any, Callable, Dict, Iterable, List, Optional
+from typing import Any, Callable, Collection, Dict, Iterable, List, Optional, Tuple
 
 import pytest
 
@@ -59,6 +59,7 @@ def check_shortcut_signature(
     bot_method: Callable,
     shortcut_kwargs: List[str],
     additional_kwargs: List[str],
+    annotation_overrides: Optional[Dict[str, Tuple[Any, Any]]] = None,
 ) -> bool:
     """
     Checks that the signature of a shortcut matches the signature of the underlying bot method.
@@ -69,10 +70,14 @@ def check_shortcut_signature(
         shortcut_kwargs: The kwargs passed by the shortcut directly, e.g. ``chat_id``
         additional_kwargs: Additional kwargs of the shortcut that the bot method doesn't have, e.g.
             ``quote``.
+        annotation_overrides: A dictionary of exceptions for the annotation comparison. The key is
+            the name of the argument, the value is a tuple of the expected annotation and
+            the default value. E.g. ``{'parse_mode': (str, 'None')}``.
 
     Returns:
         :obj:`bool`: Whether or not the signature matches.
     """
+    annotation_overrides = annotation_overrides or {}
 
     def resolve_class(class_name: str) -> Optional[type]:
         """Attempts to resolve a PTB class (telegram module only) from a ForwardRef.
@@ -117,6 +122,14 @@ def check_shortcut_signature(
         if shortcut_sig.parameters[kwarg].kind != expected_kind:
             raise Exception(f"Argument {kwarg} must be of kind {expected_kind}.")
 
+        if kwarg in annotation_overrides:
+            if shortcut_sig.parameters[kwarg].annotation != annotation_overrides[kwarg][0]:
+                raise Exception(
+                    f"For argument {kwarg} I expected {annotation_overrides[kwarg]}, "
+                    f"but got {shortcut_sig.parameters[kwarg].annotation}"
+                )
+            continue
+
         if bot_sig.parameters[kwarg].annotation != shortcut_sig.parameters[kwarg].annotation:
             if FORWARD_REF_PATTERN.search(str(shortcut_sig.parameters[kwarg])):
                 # If a shortcut signature contains a ForwardRef, the simple comparison of
@@ -155,6 +168,13 @@ def check_shortcut_signature(
     bot_method_sig = inspect.signature(bot_method)
     shortcut_sig = inspect.signature(shortcut)
     for arg in expected_args:
+        if arg in annotation_overrides:
+            if shortcut_sig.parameters[arg].default == annotation_overrides[arg][1]:
+                continue
+            raise Exception(
+                f"For argument {arg} I expected default {annotation_overrides[arg][1]}, "
+                f"but got {shortcut_sig.parameters[arg].default}"
+            )
         if not shortcut_sig.parameters[arg].default == bot_method_sig.parameters[arg].default:
             raise Exception(
                 f"Default for argument {arg} does not match the default of the Bot method."
@@ -525,6 +545,7 @@ async def check_defaults_handling(
     method: Callable,
     bot: Bot,
     return_value=None,
+    no_default_kwargs: Collection[str] = frozenset(),
 ) -> bool:
     """
     Checks that tg.ext.Defaults are handled correctly.
@@ -536,6 +557,8 @@ async def check_defaults_handling(
         return_value: Optional. The return value of Bot._post that the method expects. Defaults to
             None. get_file is automatically handled. If this is a `TelegramObject`, Bot._post will
             return the `to_dict` representation of it.
+        no_default_kwargs: Optional. A collection of keyword arguments that should not have default
+            values. Defaults to an empty frozenset.
 
     """
     raw_bot = not isinstance(bot, ExtBot)
@@ -545,7 +568,9 @@ async def check_defaults_handling(
     kwargs_need_default = {
         kwarg
         for kwarg, value in shortcut_signature.parameters.items()
-        if isinstance(value.default, DefaultValue) and not kwarg.endswith("_timeout")
+        if isinstance(value.default, DefaultValue)
+        and not kwarg.endswith("_timeout")
+        and kwarg not in no_default_kwargs
     }
     # We tested this for a long time, but Bot API 7.0 deprecated it in favor of
     # reply_parameters. In the transition phase, both exist in a mutually exclusive

@@ -1462,7 +1462,7 @@ class Message(MaybeInaccessibleMessage):
         quote_index: Optional[int] = None,
         target_chat_id: Optional[Union[int, str]] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
     ) -> _ReplyKwargs:
         """
         Builds a dictionary with the keys ``chat_id`` and ``reply_parameters``. This dictionary can
@@ -1587,11 +1587,22 @@ class Message(MaybeInaccessibleMessage):
     def _parse_message_thread_id(
         self,
         chat_id: Union[str, int],
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
     ) -> Optional[int]:
-        return message_thread_id or (
-            self.message_thread_id if chat_id in {self.chat_id, self.chat.username} else None
-        )
+        # values set by user have the highest priority
+        if not isinstance(message_thread_id, DefaultValue):
+            return message_thread_id
+
+        # self.message_thread_id can be used for send_*.param.message_thread_id only if the
+        # thread is a forum topic. It does not work if the thread is a chain of replies to a
+        # message in a normal group. In that case, self.message_thread_id is just the message_id
+        # of the first message in the chain.
+        if not self.is_topic_message:
+            return None
+
+        # Setting message_thread_id=self.message_thread_id only makes sense if we're replying in
+        # the same chat.
+        return self.message_thread_id if chat_id in {self.chat_id, self.chat.username} else None
 
     async def reply_text(
         self,
@@ -1601,7 +1612,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -1677,7 +1688,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -1759,7 +1770,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -1837,7 +1848,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -1915,7 +1926,7 @@ class Message(MaybeInaccessibleMessage):
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1994,7 +2005,7 @@ class Message(MaybeInaccessibleMessage):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -2076,7 +2087,7 @@ class Message(MaybeInaccessibleMessage):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -2159,7 +2170,7 @@ class Message(MaybeInaccessibleMessage):
         disable_content_type_detection: Optional[bool] = None,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -2242,7 +2253,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
@@ -2323,7 +2334,7 @@ class Message(MaybeInaccessibleMessage):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         emoji: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -2401,7 +2412,7 @@ class Message(MaybeInaccessibleMessage):
         supports_streaming: Optional[bool] = None,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
@@ -2485,7 +2496,7 @@ class Message(MaybeInaccessibleMessage):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -2564,7 +2575,7 @@ class Message(MaybeInaccessibleMessage):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2644,7 +2655,7 @@ class Message(MaybeInaccessibleMessage):
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2727,7 +2738,7 @@ class Message(MaybeInaccessibleMessage):
         google_place_id: Optional[str] = None,
         google_place_type: Optional[str] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2808,7 +2819,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         vcard: Optional[str] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2893,7 +2904,7 @@ class Message(MaybeInaccessibleMessage):
         close_date: Optional[Union[int, datetime.datetime]] = None,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2973,7 +2984,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         emoji: Optional[str] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -3039,7 +3050,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_chat_action(
         self,
         action: str,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3086,7 +3097,7 @@ class Message(MaybeInaccessibleMessage):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -3177,7 +3188,7 @@ class Message(MaybeInaccessibleMessage):
         max_tip_amount: Optional[int] = None,
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -3387,7 +3398,7 @@ class Message(MaybeInaccessibleMessage):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
