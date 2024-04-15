@@ -31,7 +31,7 @@ class Birthdate(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`day`, and :attr:`month` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 
     Args:
         day (:obj:`int`): Day of the user's birth; 1-31.

@@ -177,17 +177,17 @@ class Chat(TelegramObject):
             business accounts, the intro of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         business_location (:class:`telegram.BusinessLocation`, optional): For private chats with
             business accounts, the location of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         business_opening_hours (:class:`telegram.BusinessOpeningHours`, optional): For private
             chats with business accounts, the opening hours of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         available_reactions (Sequence[:class:`telegram.ReactionType`], optional): List of available
             reactions allowed in the chat. If omitted, then all of
             :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
@@ -251,11 +251,11 @@ class Chat(TelegramObject):
         birthdate (:obj:`telegram.Birthdate`, optional): For private chats,
             the date of birth of the user. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         personal_chat (:obj:`telegram.Chat`, optional): For private chats, the personal channel of
             the user. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -343,17 +343,17 @@ class Chat(TelegramObject):
             business accounts, the intro of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         business_location (:class:`telegram.BusinessLocation`): Optional. For private chats with
             business accounts, the location of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         business_opening_hours (:class:`telegram.BusinessOpeningHours`): Optional. For private
             chats with business accounts, the opening hours of the business. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         available_reactions (Tuple[:class:`telegram.ReactionType`]): Optional. List of available
             reactions allowed in the chat. If omitted, then all of
             :const:`telegram.constants.ReactionEmoji` are allowed. Returned only in
@@ -417,11 +417,11 @@ class Chat(TelegramObject):
         birthdate (:obj:`telegram.Birthdate`): Optional. For private chats,
             the date of birth of the user. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         personal_chat (:obj:`telegram.Chat`): Optional. For private chats, the personal channel of
             the user. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     .. _accent colors: https://core.telegram.org/bots/api#accent-colors

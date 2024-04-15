@@ -191,7 +191,7 @@ class ChatMemberAdministrator(ChatMember):
        * The argument :paramref:`can_manage_topics` was added, which changes the position of the
          optional argument :paramref:`custom_title`.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.1
         As of this version, :attr:`can_post_stories`, :attr:`can_edit_stories`,
         and :attr:`can_delete_stories` is now required. Thus, the order of arguments had to be
         changed.

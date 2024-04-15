@@ -60,13 +60,13 @@ class KeyboardButtonRequestUsers(TelegramObject):
         request_name (:obj:`bool`, optional): Pass :obj:`True` to request the users' first and last
             name.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         request_username (:obj:`bool`, optional): Pass :obj:`True` to request the users' username.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         request_photo (:obj:`bool`, optional): Pass :obj:`True` to request the users' photo.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
@@ -85,13 +85,13 @@ class KeyboardButtonRequestUsers(TelegramObject):
         request_name (:obj:`bool`): Optional. Pass :obj:`True` to request the users' first and last
             name.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         request_username (:obj:`bool`): Optional. Pass :obj:`True` to request the users' username.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         request_photo (:obj:`bool`): Optional. Pass :obj:`True` to request the users' photo.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
     """
 
@@ -171,13 +171,13 @@ class KeyboardButtonRequestChat(TelegramObject):
             as a member. Otherwise, no additional restrictions are applied.
         request_title (:obj:`bool`, optional): Pass :obj:`True` to request the chat's title.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         request_username (:obj:`bool`, optional): Pass :obj:`True` to request the chat's username.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         request_photo (:obj:`bool`, optional): Pass :obj:`True` to request the chat's photo.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
         chat_is_channel (:obj:`bool`): Pass :obj:`True` to request a channel chat, pass
@@ -201,13 +201,13 @@ class KeyboardButtonRequestChat(TelegramObject):
             as a member. Otherwise, no additional restrictions are applied.
         request_title (:obj:`bool`): Optional. Pass :obj:`True` to request the chat's title.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         request_username (:obj:`bool`): Optional. Pass :obj:`True` to request the chat's username.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
         request_photo (:obj:`bool`): Optional. Pass :obj:`True` to request the chat's photo.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
     """
 
     __slots__ = (

@@ -44,7 +44,7 @@ class ChatAdministratorRights(TelegramObject):
         :attr:`can_post_stories`, :attr:`can_edit_stories`, and :attr:`can_delete_stories` are
         considered as well when comparing objects of this type in terms of equality.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.1
         As of this version, :attr:`can_post_stories`, :attr:`can_edit_stories`,
         and :attr:`can_delete_stories` is now required. Thus, the order of arguments had to be
         changed.

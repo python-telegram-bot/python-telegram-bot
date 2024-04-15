@@ -980,7 +980,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     appropriate :paramref:`webhook_url`.
 
                 .. versionadded:: 20.8
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.1
                     Added support to pass a socket instance itself.
         """
         if not self.updater:

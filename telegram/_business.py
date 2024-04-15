@@ -43,7 +43,7 @@ class BusinessConnection(TelegramObject):
     considered equal if their :attr:`id`, :attr:`user`, :attr:`user_chat_id`, :attr:`date`,
     :attr:`can_reply`, and :attr:`is_enabled` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 
     Args:
         id (:obj:`str`): Unique identifier of the business connection.
@@ -130,7 +130,7 @@ class BusinessMessagesDeleted(TelegramObject):
     considered equal if their :attr:`business_connection_id`, :attr:`message_ids`, and
     :attr:`chat` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 
     Args:
         business_connection_id (:obj:`str`): Unique identifier of the business connection.
@@ -195,7 +195,7 @@ class BusinessIntro(TelegramObject):
     Two objects of this class are considered equal, if their
     :attr:`title`, :attr:`message` and :attr:`sticker` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 
     Args:
         title (:obj:`str`, optional): Title text of the business intro.
@@ -252,7 +252,7 @@ class BusinessLocation(TelegramObject):
     Two objects of this class are considered equal, if their
     :attr:`address` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 
     Args:
         address (:obj:`str`): Address of the business.
@@ -304,7 +304,7 @@ class BusinessOpeningHoursInterval(TelegramObject):
     Two objects of this class are considered equal, if their
     :attr:`opening_minute` and :attr:`closing_minute` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 
     Examples:
         A day has (24 * 60 =) 1440 minutes, a week has (7 * 1440 =) 10080 minutes.
@@ -396,7 +396,7 @@ class BusinessOpeningHours(TelegramObject):
     Two objects of this class are considered equal, if their
     :attr:`time_zone_name` and :attr:`opening_hours` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 
     Args:
         time_zone_name (:obj:`str`): Unique name of the time zone for which the opening

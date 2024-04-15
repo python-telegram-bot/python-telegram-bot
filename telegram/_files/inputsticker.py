@@ -36,7 +36,7 @@ class InputSticker(TelegramObject):
 
     .. versionadded:: 20.2
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.1
         As of Bot API 7.2, the new argument :paramref:`format` is a required argument, and thus the
         order of the arguments has changed.
 
@@ -62,7 +62,7 @@ class InputSticker(TelegramObject):
             for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a WEBM
             video.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
 
     Attributes:
         sticker (:obj:`str` | :class:`telegram.InputFile`): The added sticker.
@@ -85,7 +85,7 @@ class InputSticker(TelegramObject):
             for a ``.TGS`` animation, :tg-const:`telegram.constants.StickerFormat.VIDEO` for a WEBM
             video.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.1
     """
 
     __slots__ = ("emoji_list", "format", "keywords", "mask_position", "sticker")

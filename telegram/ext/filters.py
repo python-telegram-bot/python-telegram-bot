@@ -273,7 +273,7 @@ class BaseFilter:
     def check_update(self, update: Update) -> Optional[Union[bool, FilterDataDict]]:
         """Checks if the specified update should be handled by this filter.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
             This filter now also returns :obj:`True` if the update contains
             :attr:`~telegram.Update.business_message`
             or :attr:`~telegram.Update.edited_business_message`.
@@ -1573,7 +1573,7 @@ class _IsFromOffline(MessageFilter):
 IS_FROM_OFFLINE = _IsFromOffline(name="filters.IS_FROM_OFFLINE")
 """Messages that contain :attr:`telegram.Message.is_from_offline`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
 """
 
 
@@ -2522,7 +2522,7 @@ class UpdateType:
 
     .. versionadded:: 20.0
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.1
         Added :attr:`telegram.Update.edited_business_message` to the filter.
     """
 
@@ -2573,7 +2573,7 @@ class UpdateType:
     BUSINESS_MESSAGE = _BusinessMessage(name="filters.UpdateType.BUSINESS_MESSAGE")
     """Updates with :attr:`telegram.Update.business_message`.
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: 21.1"""
 
     class _EditedBusinessMessage(UpdateFilter):
         __slots__ = ()
@@ -2586,7 +2586,7 @@ class UpdateType:
     )
     """Updates with :attr:`telegram.Update.edited_business_message`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
     """
 
     class _BusinessMessages(UpdateFilter):
@@ -2601,7 +2601,7 @@ class UpdateType:
     """Updates with either :attr:`telegram.Update.business_message` or
     :attr:`telegram.Update.edited_business_message`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.1
     """
 
 

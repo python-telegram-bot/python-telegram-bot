@@ -230,7 +230,7 @@ class StickerSet(TelegramObject):
         The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
 
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.1
         The parameters ``is_video`` and ``is_animated`` are deprecated and now made optional. Thus,
         the order of the arguments had to be changed.
 
@@ -242,13 +242,13 @@ class StickerSet(TelegramObject):
         title (:obj:`str`): Sticker set title.
         is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.1
                 Bot API 7.2 deprecated this field. This parameter will be removed in a future
                 version of the library.
         is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
             .. versionadded:: 13.11
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.1
                 Bot API 7.2 deprecated this field. This parameter will be removed in a future
                 version of the library.
         stickers (Sequence[:class:`telegram.Sticker`]): List of all set stickers.
@@ -271,13 +271,13 @@ class StickerSet(TelegramObject):
         title (:obj:`str`): Sticker set title.
         is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.1
                 Bot API 7.2 deprecated this field. This parameter will be removed in a future
                 version of the library.
         is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
             .. versionadded:: 13.11
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.1
                 Bot API 7.2 deprecated this field. This parameter will be removed in a future
                 version of the library.
         stickers (Tuple[:class:`telegram.Sticker`]): List of all set stickers.
