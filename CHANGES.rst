@@ -4,6 +4,25 @@
 Changelog
 =========
 
+Version 21.1.1
+==============
+
+*Released 2024-04-15*
+
+This is the technical changelog for version 21.1.1. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`__.
+
+Bug Fixes
+---------
+
+-  Fix Bug With Parameter ``message_thread_id`` of ``Message.reply_*`` (:pr:`4207` closes :issue:`4205`)
+
+Minor Changes
+-------------
+
+-  Remove Deprecation Warning in ``JobQueue.run_daily`` (:pr:`4206` by `@Konano <https://github.com/Konano>`__)
+-  Fix Annotation of ``EncryptedCredentials.decrypted_secret`` (:pr:`4199` by `@marinelay <https://github.com/marinelay>`__ closes :issue:`4198`)
+
+
 Version 21.1
 ==============
 

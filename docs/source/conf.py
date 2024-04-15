@@ -20,9 +20,9 @@ author = "Leandro Toledo"
 # built documents.
 #
 # The short X.Y version.
-version = "21.1"  # telegram.__version__[:3]
+version = "21.1.1"  # telegram.__version__[:3]
 # The full version, including alpha/beta/rc tags.
-release = "21.1"  # telegram.__version__
+release = "21.1.1"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "6.1.3"
