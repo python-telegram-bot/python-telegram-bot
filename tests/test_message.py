@@ -532,12 +532,13 @@ class TestMessageWithoutRequest(TestMessageBase):
             )
             assert message_thread_id is None
 
-            message_thread_id = await method(
-                *args,
-                do_quote=message.build_reply_arguments(
-                    target_chat_id=message.chat_id,
-                ),
-            )
+            for target_chat_id in (message.chat_id, message.chat.username):
+                message_thread_id = await method(
+                    *args,
+                    do_quote=message.build_reply_arguments(
+                        target_chat_id=target_chat_id,
+                    ),
+                )
             assert message_thread_id == (message.message_thread_id if is_topic_message else None)
 
     def test_slot_behaviour(self):
