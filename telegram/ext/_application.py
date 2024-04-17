@@ -1247,10 +1247,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             await self.__update_fetcher()
         finally:
             while not self.update_queue.empty():
-                _LOGGER.debug("Dropping pending updates")
-                update = self.update_queue.get_nowait()
-                if update is _STOP_SIGNAL:
-                    update = "_STOP_SIGNAL"
+                _LOGGER.debug("Dropping pending update: %s", self.update_queue.get_nowait())
                 with contextlib.suppress(ValueError):
                     # Since we're shutting down here, it's not too bad if we call task_done
                     # on an empty queue
