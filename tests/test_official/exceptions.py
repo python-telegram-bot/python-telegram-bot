@@ -166,7 +166,11 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 
 # Arguments that are optional arguments for now for backwards compatibility
-BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {}
+BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
+    "create_new_sticker_set": {"sticker_format"},  # removed by bot api 7.2
+    "StickerSet": {"is_animated", "is_video"},  # removed by bot api 7.2
+    "UsersShared": {"user_ids", "users"},  # removed/added by bot api 7.2
+}
 
 
 def backwards_compat_kwargs(object_name: str) -> set[str]:

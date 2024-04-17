@@ -20,9 +20,9 @@ author = "Leandro Toledo"
 # built documents.
 #
 # The short X.Y version.
-version = "21.0.1"  # telegram.__version__[:3]
+version = "21.1.1"  # telegram.__version__[:3]
 # The full version, including alpha/beta/rc tags.
-release = "21.0.1"  # telegram.__version__
+release = "21.1.1"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "6.1.3"
@@ -142,12 +142,6 @@ html_theme_options = {
         "admonition-title-font-size": "0.95rem",
         "admonition-font-size": "0.92rem",
     },
-    "announcement": (
-        "PTB has undergone significant changes in v20. Please read the documentation "
-        "carefully and also check out the transition guide in the "
-        '<a href="https://github.com/python-telegram-bot/python-telegram-bot/wiki/'
-        'Transition-guide-to-Version-20.0">wiki</a>.'
-    ),
     "footer_icons": [
         {
             # Telegram channel logo

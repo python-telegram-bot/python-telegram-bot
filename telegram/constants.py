@@ -142,7 +142,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=1)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=2)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1690,8 +1690,12 @@ class MessageOriginType(StringEnum):
 
 
 class MessageType(StringEnum):
-    """This enum contains the available types of :class:`telegram.Message`. The enum
-    members of this enumeration are instances of :class:`str` and can be treated as such.
+    """This enum contains the available types of :class:`telegram.Message`. Here, a "type" means
+    a kind of message that is visually distinct from other kinds of messages in the Telegram app.
+    In particular, auxiliary attributes that can be present for multiple types of messages are
+    not considered in this enumeration.
+
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
 
     .. versionadded:: 20.0
     """
@@ -1709,6 +1713,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.boost_added`.
 
     .. versionadded:: 21.0
+    """
+    BUSINESS_CONNECTION_ID = "business_connection_id"
+    """:obj:`str`: Messages with :attr:`telegram.Message.business_connection_id`.
+
+    .. versionadded:: 21.1
     """
     CHANNEL_CHAT_CREATED = "channel_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
@@ -1816,6 +1825,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.sender_boost_count`.
 
     .. versionadded:: 21.0
+    """
+    SENDER_BUSINESS_BOT = "sender_business_bot"
+    """:obj:`str`: Messages with :attr:`telegram.Message.sender_business_bot`.
+
+    .. versionadded:: 21.1
     """
     STICKER = "sticker"
     """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
@@ -2312,6 +2326,9 @@ class StickerSetLimit(IntEnum):
     MAX_ANIMATED_STICKERS = 50
     """:obj:`int`: Maximum number of stickers allowed in an animated or video sticker set, as given
     in :meth:`telegram.Bot.add_sticker_to_set`.
+
+    .. deprecated:: 21.1
+        The animated sticker limit is now 120, the same as :attr:`MAX_STATIC_STICKERS`.
     """
     MAX_STATIC_STICKERS = 120
     """:obj:`int`: Maximum number of stickers allowed in a static sticker set, as given in
@@ -2503,6 +2520,26 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.message_reaction_count`.
 
     .. versionadded:: 20.8
+    """
+    BUSINESS_CONNECTION = "business_connection"
+    """:obj:`str`: Updates with :attr:`telegram.Update.business_connection`.
+
+    .. versionadded:: 21.1
+    """
+    BUSINESS_MESSAGE = "business_message"
+    """:obj:`str`: Updates with :attr:`telegram.Update.business_message`.
+
+    .. versionadded:: 21.1
+    """
+    EDITED_BUSINESS_MESSAGE = "edited_business_message"
+    """:obj:`str`: Updates with :attr:`telegram.Update.edited_business_message`.
+
+    .. versionadded:: 21.1
+    """
+    DELETED_BUSINESS_MESSAGES = "deleted_business_messages"
+    """:obj:`str`: Updates with :attr:`telegram.Update.deleted_business_messages`.
+
+    .. versionadded:: 21.1
     """
 
 

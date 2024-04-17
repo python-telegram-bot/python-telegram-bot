@@ -22,6 +22,7 @@ __author__ = "devs@python-telegram-bot.org"
 __all__ = (
     "Animation",
     "Audio",
+    "Birthdate",
     "Bot",
     "BotCommand",
     "BotCommandScope",
@@ -35,6 +36,12 @@ __all__ = (
     "BotDescription",
     "BotName",
     "BotShortDescription",
+    "BusinessConnection",
+    "BusinessIntro",
+    "BusinessLocation",
+    "BusinessMessagesDeleted",
+    "BusinessOpeningHours",
+    "BusinessOpeningHoursInterval",
     "CallbackGame",
     "CallbackQuery",
     "Chat",
@@ -184,6 +191,7 @@ __all__ = (
     "SecureData",
     "SecureValue",
     "SentWebAppMessage",
+    "SharedUser",
     "ShippingAddress",
     "ShippingOption",
     "ShippingQuery",
@@ -224,6 +232,7 @@ __all__ = (
 
 
 from . import _version, constants, error, helpers, request, warnings
+from ._birthdate import Birthdate
 from ._bot import Bot
 from ._botcommand import BotCommand
 from ._botcommandscope import (
@@ -238,6 +247,14 @@ from ._botcommandscope import (
 )
 from ._botdescription import BotDescription, BotShortDescription
 from ._botname import BotName
+from ._business import (
+    BusinessConnection,
+    BusinessIntro,
+    BusinessLocation,
+    BusinessMessagesDeleted,
+    BusinessOpeningHours,
+    BusinessOpeningHoursInterval,
+)
 from ._callbackquery import CallbackQuery
 from ._chat import Chat
 from ._chatadministratorrights import ChatAdministratorRights
@@ -393,7 +410,7 @@ from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage
-from ._shared import ChatShared, UsersShared
+from ._shared import ChatShared, SharedUser, UsersShared
 from ._story import Story
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject

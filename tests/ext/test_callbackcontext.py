@@ -32,6 +32,7 @@ from telegram import (
 from telegram.error import TelegramError
 from telegram.ext import ApplicationBuilder, CallbackContext, Job
 from telegram.warnings import PTBUserWarning
+from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
 
 """
@@ -211,8 +212,9 @@ class TestCallbackContext:
         finally:
             app.bot = bot
 
-    async def test_drop_callback_data(self, bot, monkeypatch, chat_id):
-        app = ApplicationBuilder().token(bot.token).arbitrary_callback_data(True).build()
+    async def test_drop_callback_data(self, bot, chat_id):
+        new_bot = make_bot(token=bot.token, arbitrary_callback_data=True)
+        app = ApplicationBuilder().bot(new_bot).build()
 
         update = Update(
             0, message=Message(0, None, Chat(1, "chat"), from_user=User(1, "user", False))

@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
+
 import datetime
 import re
 from html import escape
@@ -301,6 +302,11 @@ class Message(MaybeInaccessibleMessage):
             forwarded.
 
             .. versionadded:: 13.9
+        is_from_offline (:obj:`bool`, optional): :obj:`True`, if the message was sent
+            by an implicit action, for example, as an away or a greeting business message,
+            or as a scheduled message.
+
+            .. versionadded:: 21.1
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
@@ -534,6 +540,18 @@ class Message(MaybeInaccessibleMessage):
             message boosted the chat, the number of boosts added by the user.
 
             .. versionadded:: 21.0
+        business_connection_id (:obj:`str`, optional): Unique identifier of the business connection
+            from which the message was received. If non-empty, the message belongs to a chat of the
+            corresponding business account that is independent from any potential bot chat which
+            might share the same identifier.
+
+            .. versionadded:: 21.1
+
+        sender_business_bot (:obj:`telegram.User`, optional): The bot that actually sent the
+            message on behalf of the business account. Available only for outgoing messages sent
+            on behalf of the connected business account.
+
+            .. versionadded:: 21.1
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -568,6 +586,11 @@ class Message(MaybeInaccessibleMessage):
             forwarded.
 
             .. versionadded:: 13.9
+        is_from_offline (:obj:`bool`): Optional. :obj:`True`, if the message was sent
+            by an implicit action, for example, as an away or a greeting business message,
+            or as a scheduled message.
+
+            .. versionadded:: 21.1
         media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
@@ -817,6 +840,19 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.0
 
+        business_connection_id (:obj:`str`): Optional. Unique identifier of the business connection
+            from which the message was received. If non-empty, the message belongs to a chat of the
+            corresponding business account that is independent from any potential bot chat which
+            might share the same identifier.
+
+            .. versionadded:: 21.1
+
+        sender_business_bot (:obj:`telegram.User`): Optional. The bot that actually sent the
+            message on behalf of the business account. Available only for outgoing messages sent
+            on behalf of the connected business account.
+
+            .. versionadded:: 21.1
+
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
        :exc:`ValueError` when encountering a custom emoji.
@@ -836,6 +872,7 @@ class Message(MaybeInaccessibleMessage):
         "audio",
         "author_signature",
         "boost_added",
+        "business_connection_id",
         "caption",
         "caption_entities",
         "channel_chat_created",
@@ -866,6 +903,7 @@ class Message(MaybeInaccessibleMessage):
         "has_protected_content",
         "invoice",
         "is_automatic_forward",
+        "is_from_offline",
         "is_topic_message",
         "left_chat_member",
         "link_preview_options",
@@ -888,6 +926,7 @@ class Message(MaybeInaccessibleMessage):
         "reply_to_message",
         "reply_to_story",
         "sender_boost_count",
+        "sender_business_bot",
         "sender_chat",
         "sticker",
         "story",
@@ -987,6 +1026,9 @@ class Message(MaybeInaccessibleMessage):
         reply_to_story: Optional[Story] = None,
         boost_added: Optional[ChatBoostAdded] = None,
         sender_boost_count: Optional[int] = None,
+        business_connection_id: Optional[str] = None,
+        sender_business_bot: Optional[User] = None,
+        is_from_offline: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1082,6 +1124,9 @@ class Message(MaybeInaccessibleMessage):
             self.reply_to_story: Optional[Story] = reply_to_story
             self.boost_added: Optional[ChatBoostAdded] = boost_added
             self.sender_boost_count: Optional[int] = sender_boost_count
+            self.business_connection_id: Optional[str] = business_connection_id
+            self.sender_business_bot: Optional[User] = sender_business_bot
+            self.is_from_offline: Optional[bool] = is_from_offline
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1224,6 +1269,7 @@ class Message(MaybeInaccessibleMessage):
         data["forward_origin"] = MessageOrigin.de_json(data.get("forward_origin"), bot)
         data["reply_to_story"] = Story.de_json(data.get("reply_to_story"), bot)
         data["boost_added"] = ChatBoostAdded.de_json(data.get("boost_added"), bot)
+        data["sender_business_bot"] = User.de_json(data.get("sender_business_bot"), bot)
 
         api_kwargs = {}
         # This is a deprecated field that TG still returns for backwards compatibility
@@ -1416,7 +1462,7 @@ class Message(MaybeInaccessibleMessage):
         quote_index: Optional[int] = None,
         target_chat_id: Optional[Union[int, str]] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
     ) -> _ReplyKwargs:
         """
         Builds a dictionary with the keys ``chat_id`` and ``reply_parameters``. This dictionary can
@@ -1541,11 +1587,22 @@ class Message(MaybeInaccessibleMessage):
     def _parse_message_thread_id(
         self,
         chat_id: Union[str, int],
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
     ) -> Optional[int]:
-        return message_thread_id or (
-            self.message_thread_id if chat_id in {self.chat_id, self.chat.username} else None
-        )
+        # values set by user have the highest priority
+        if not isinstance(message_thread_id, DefaultValue):
+            return message_thread_id
+
+        # self.message_thread_id can be used for send_*.param.message_thread_id only if the
+        # thread is a forum topic. It does not work if the thread is a chain of replies to a
+        # message in a normal group. In that case, self.message_thread_id is just the message_id
+        # of the first message in the chain.
+        if not self.is_topic_message:
+            return None
+
+        # Setting message_thread_id=self.message_thread_id only makes sense if we're replying in
+        # the same chat.
+        return self.message_thread_id if chat_id in {self.chat_id, self.chat.username} else None
 
     async def reply_text(
         self,
@@ -1555,7 +1612,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -1575,13 +1632,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_message(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -1620,6 +1678,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_markdown(
@@ -1629,7 +1688,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -1650,6 +1709,7 @@ class Message(MaybeInaccessibleMessage):
                 update.effective_message.chat_id,
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.MARKDOWN,
+                business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
             )
@@ -1658,7 +1718,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Note:
@@ -1700,6 +1760,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_markdown_v2(
@@ -1709,7 +1770,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -1730,6 +1791,7 @@ class Message(MaybeInaccessibleMessage):
                 update.effective_message.chat_id,
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.MARKDOWN_V2,
+                business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
             )
@@ -1738,7 +1800,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -1776,6 +1838,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_html(
@@ -1785,7 +1848,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -1806,6 +1869,7 @@ class Message(MaybeInaccessibleMessage):
                 update.effective_message.chat_id,
                 message_thread_id=update.effective_message.message_thread_id,
                 parse_mode=ParseMode.HTML,
+                business_connection_id=self.business_connection_id,
                 *args,
                 **kwargs,
             )
@@ -1814,7 +1878,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -1852,6 +1916,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_media_group(
@@ -1861,7 +1926,7 @@ class Message(MaybeInaccessibleMessage):
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -1882,13 +1947,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_media_group(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -1927,6 +1993,7 @@ class Message(MaybeInaccessibleMessage):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_photo(
@@ -1938,7 +2005,7 @@ class Message(MaybeInaccessibleMessage):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -1958,13 +2025,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_photo(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2004,6 +2072,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             has_spoiler=has_spoiler,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_audio(
@@ -2018,7 +2087,7 @@ class Message(MaybeInaccessibleMessage):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -2038,13 +2107,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_audio(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2087,6 +2157,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             thumbnail=thumbnail,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_document(
@@ -2099,7 +2170,7 @@ class Message(MaybeInaccessibleMessage):
         disable_content_type_detection: Optional[bool] = None,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -2119,13 +2190,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_document(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2166,6 +2238,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             thumbnail=thumbnail,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_animation(
@@ -2180,7 +2253,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
@@ -2201,13 +2274,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_animation(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2251,6 +2325,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_sticker(
@@ -2259,7 +2334,7 @@ class Message(MaybeInaccessibleMessage):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         emoji: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -2278,13 +2353,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_sticker(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2320,6 +2396,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             emoji=emoji,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_video(
@@ -2335,7 +2412,7 @@ class Message(MaybeInaccessibleMessage):
         supports_streaming: Optional[bool] = None,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
@@ -2356,13 +2433,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_video(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2407,6 +2485,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_video_note(
@@ -2417,7 +2496,7 @@ class Message(MaybeInaccessibleMessage):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
@@ -2437,13 +2516,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_video_note(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2482,6 +2562,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             thumbnail=thumbnail,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_voice(
@@ -2494,7 +2575,7 @@ class Message(MaybeInaccessibleMessage):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2513,13 +2594,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_voice(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2559,6 +2641,7 @@ class Message(MaybeInaccessibleMessage):
             filename=filename,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_location(
@@ -2572,7 +2655,7 @@ class Message(MaybeInaccessibleMessage):
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2591,13 +2674,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_location(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2638,6 +2722,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_venue(
@@ -2653,7 +2738,7 @@ class Message(MaybeInaccessibleMessage):
         google_place_id: Optional[str] = None,
         google_place_type: Optional[str] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2672,13 +2757,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_venue(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2721,6 +2807,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_contact(
@@ -2732,7 +2819,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         vcard: Optional[str] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2751,13 +2838,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_contact(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2796,6 +2884,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_poll(
@@ -2815,7 +2904,7 @@ class Message(MaybeInaccessibleMessage):
         close_date: Optional[Union[int, datetime.datetime]] = None,
         explanation_entities: Optional[Sequence["MessageEntity"]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2833,13 +2922,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_poll(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2885,6 +2975,7 @@ class Message(MaybeInaccessibleMessage):
             explanation_entities=explanation_entities,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_dice(
@@ -2893,7 +2984,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional[ReplyMarkup] = None,
         emoji: Optional[str] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -2911,13 +3002,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_dice(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -2952,12 +3044,13 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_chat_action(
         self,
         action: str,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2970,13 +3063,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_chat_action(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         .. versionadded:: 13.2
@@ -2994,6 +3088,7 @@ class Message(MaybeInaccessibleMessage):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_game(
@@ -3002,7 +3097,7 @@ class Message(MaybeInaccessibleMessage):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -3020,13 +3115,14 @@ class Message(MaybeInaccessibleMessage):
              await bot.send_game(
                  update.effective_message.chat_id,
                  message_thread_id=update.effective_message.message_thread_id,
+                 business_connection_id=self.business_connection_id,
                  *args,
                  **kwargs,
              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
@@ -3063,6 +3159,7 @@ class Message(MaybeInaccessibleMessage):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            business_connection_id=self.business_connection_id,
         )
 
     async def reply_invoice(
@@ -3091,7 +3188,7 @@ class Message(MaybeInaccessibleMessage):
         max_tip_amount: Optional[int] = None,
         suggested_tip_amounts: Optional[Sequence[int]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -3115,7 +3212,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Warning:
@@ -3301,7 +3398,7 @@ class Message(MaybeInaccessibleMessage):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: Optional[ReplyMarkup] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-        message_thread_id: Optional[int] = None,
+        message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         *,
         reply_to_message_id: Optional[int] = None,
@@ -3326,7 +3423,7 @@ class Message(MaybeInaccessibleMessage):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.1
                 |reply_same_thread|
 
         Keyword Args:
