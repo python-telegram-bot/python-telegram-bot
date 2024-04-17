@@ -722,8 +722,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         could not be established).
 
         Note:
-            If the application is neither running via :meth:`run_polling` or meth:`run_webhook`
-            nor called within :meth:`post_init`, this method does nothing.
+            If the application is not running and this method is not called within
+            :meth:`post_init`, this method does nothing.
+
+        Warning:
+            This method is designed to for use in combination with :meth:`run_polling` or
+            :meth:`run_webhook`. Using this method in combination with a custom logic for starting
+            and stopping the application is not guaranteed to work as expected. Use at your own
+            risk.
 
         .. versionadded:: 20.5
 
