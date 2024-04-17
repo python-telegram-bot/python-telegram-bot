@@ -1334,7 +1334,13 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Tip:
             This can be used for custom stop logic that requires to await coroutines, e.g.
-            sending message to a chat before shutting down the bot
+            sending message to a chat before shutting down the bot.
+
+        Hint:
+            The callback will be called only, if :meth:`Application.stop` was indeed called
+            successfully. For example, if the application is stopped early by calling
+            :meth:`Application.stop_running` within :meth:`post_init`, then the set callback will
+            *not* be called.
 
         Example:
             .. code::
