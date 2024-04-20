@@ -6,6 +6,7 @@ on:
       - tests/**
       - requirements.txt
       - requirements-opts.txt
+      - requirements-dev.txt
   push:
     branches:
       - master
