@@ -157,7 +157,7 @@ Check-list for PRs
 This checklist is a non-exhaustive reminder of things that should be done before a PR is merged, both for you as contributor and for the maintainers.
 Feel free to copy (parts of) the checklist to the PR description to remind you or the maintainers of open points or if you have questions on anything.
 
-- Added ``.. versionadded:: NEXT.VERSION``, ``.. versionchanged:: NEXT.VERSION`` or ``.. deprecated:: NEXT.VERSION`` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
+- Added ``.. versionadded:: NEXT.VERSION``, ``.. versionchanged:: NEXT.VERSION``, ``.. deprecated:: NEXT.VERSION`` or ``.. versionremoved:: NEXT.VERSION`` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
 - Created new or adapted existing unit tests
 - Documented code changes according to the `CSI standard <https://standards.mousepawmedia.com/en/stable/csi.html>`__
 - Added myself alphabetically to ``AUTHORS.rst`` (optional)
