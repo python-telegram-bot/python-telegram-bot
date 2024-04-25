@@ -1248,13 +1248,24 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         context = None
         any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
-        for handlers in self.handlers.values():
+        for handlers in self.handlers.values():  # pylint: disable=too-many-nested-blocks
             try:
                 for handler in handlers:
                     check = handler.check_update(update)  # Should the handler handle this update?
                     if not (check is None or check is False):  # if yes,
                         if not context:  # build a context if not already built
-                            context = self.context_types.context.from_update(update, self)
+                            try:
+                                context = self.context_types.context.from_update(update, self)
+                            except Exception as exc:
+                                _LOGGER.critical(
+                                    (
+                                        "Error while building CallbackContext for update %s. "
+                                        "Update will not be processed."
+                                    ),
+                                    update,
+                                    exc_info=exc,
+                                )
+                                return
                             await context.refresh_data()
                         coroutine: Coroutine = handler.handle_update(update, self, check, context)
 
@@ -1809,13 +1820,25 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                 callback,
                 block,
             ) in self.error_handlers.items():
-                context = self.context_types.context.from_error(
-                    update=update,
-                    error=error,
-                    application=self,
-                    job=job,
-                    coroutine=coroutine,
-                )
+                try:
+                    context = self.context_types.context.from_error(
+                        update=update,
+                        error=error,
+                        application=self,
+                        job=job,
+                        coroutine=coroutine,
+                    )
+                except Exception as exc:
+                    _LOGGER.critical(
+                        (
+                            "Error while building CallbackContext for exception %s. "
+                            "Exception will not be processed by error handlers."
+                        ),
+                        error,
+                        exc_info=exc,
+                    )
+                    return False
+
                 if not block or (  # If error handler has `block=False`, create a Task to run cb
                     block is DEFAULT_TRUE
                     and isinstance(self.bot, ExtBot)
