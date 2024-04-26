@@ -289,7 +289,7 @@ class BaseFilter:
             :attr:`telegram.Update.edited_business_message`, or :obj:`False` otherwise.
         """
         return bool(  # Only message updates should be handled.
-            update.channel_post  # pylint: disable=too-many-boolean-expressions
+            update.channel_post
             or update.message
             or update.edited_channel_post
             or update.edited_message
