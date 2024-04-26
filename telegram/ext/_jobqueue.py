@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 
 
 _ALL_DAYS = tuple(range(7))
-_LOGGER = get_logger(__name__)
+_LOGGER = get_logger(__name__, class_name="JobQueue")
 
 
 class JobQueue(Generic[CCT]):
