@@ -65,7 +65,7 @@ class IntEnum(_enum.IntEnum):
     gives ``EnumName.MEMBER_NAME``.
     """
 
-    __slots__ = ()
+    __slots__ = ()  # pylint: disable=invalid-slots
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}.{self.name}>"
