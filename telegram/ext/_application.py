@@ -1248,45 +1248,47 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         context = None
         any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
-        for handlers in self.handlers.values():  # pylint: disable=too-many-nested-blocks
+        for handlers in self.handlers.values():
             try:
                 for handler in handlers:
                     check = handler.check_update(update)  # Should the handler handle this update?
-                    if not (check is None or check is False):  # if yes,
-                        if not context:  # build a context if not already built
-                            try:
-                                context = self.context_types.context.from_update(update, self)
-                            except Exception as exc:
-                                _LOGGER.critical(
-                                    (
-                                        "Error while building CallbackContext for update %s. "
-                                        "Update will not be processed."
-                                    ),
-                                    update,
-                                    exc_info=exc,
-                                )
-                                return
-                            await context.refresh_data()
-                        coroutine: Coroutine = handler.handle_update(update, self, check, context)
+                    if check is None or check is False:
+                        continue
 
-                        if not handler.block or (  # if handler is running with block=False,
-                            handler.block is DEFAULT_TRUE
-                            and isinstance(self.bot, ExtBot)
-                            and self.bot.defaults
-                            and not self.bot.defaults.block
-                        ):
-                            self.create_task(
-                                coroutine,
-                                update=update,
-                                name=(
-                                    f"Application:{self.bot.id}:process_update_non_blocking"
-                                    f":{handler}"
+                    if not context:  # build a context if not already built
+                        try:
+                            context = self.context_types.context.from_update(update, self)
+                        except Exception as exc:
+                            _LOGGER.critical(
+                                (
+                                    "Error while building CallbackContext for update %s. "
+                                    "Update will not be processed."
                                 ),
+                                update,
+                                exc_info=exc,
                             )
-                        else:
-                            any_blocking = True
-                            await coroutine
-                        break  # Only a max of 1 handler per group is handled
+                            return
+                        await context.refresh_data()
+                    coroutine: Coroutine = handler.handle_update(update, self, check, context)
+
+                    if not handler.block or (  # if handler is running with block=False,
+                        handler.block is DEFAULT_TRUE
+                        and isinstance(self.bot, ExtBot)
+                        and self.bot.defaults
+                        and not self.bot.defaults.block
+                    ):
+                        self.create_task(
+                            coroutine,
+                            update=update,
+                            name=(
+                                f"Application:{self.bot.id}:process_update_non_blocking"
+                                f":{handler}"
+                            ),
+                        )
+                    else:
+                        any_blocking = True
+                        await coroutine
+                    break  # Only a max of 1 handler per group is handled
 
             # Stop processing with any other handler.
             except ApplicationHandlerStop:
