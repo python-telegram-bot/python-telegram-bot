@@ -25,7 +25,7 @@ from tests.ext.test_commandhandler import BaseTest, is_match
 
 
 def combinations(prefixes, commands):
-    return (prefix + command for prefix in prefixes for command in commands)
+    return [prefix + command for prefix in prefixes for command in commands]
 
 
 class TestPrefixHandler(BaseTest):
@@ -40,31 +40,31 @@ class TestPrefixHandler(BaseTest):
             assert getattr(handler, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
-    @pytest.fixture(scope="class", params=PREFIXES)
+    @pytest.fixture(params=PREFIXES)
     def prefix(self, request):
         return request.param
 
-    @pytest.fixture(scope="class", params=[1, 2], ids=["single prefix", "multiple prefixes"])
+    @pytest.fixture(params=[1, 2], ids=["single prefix", "multiple prefixes"])
     def prefixes(self, request):
         return TestPrefixHandler.PREFIXES[: request.param]
 
-    @pytest.fixture(scope="class", params=COMMANDS)
+    @pytest.fixture(params=COMMANDS)
     def command(self, request):
         return request.param
 
-    @pytest.fixture(scope="class", params=[1, 2], ids=["single command", "multiple commands"])
+    @pytest.fixture(params=[1, 2], ids=["single command", "multiple commands"])
     def commands(self, request):
         return TestPrefixHandler.COMMANDS[: request.param]
 
-    @pytest.fixture(scope="class")
+    @pytest.fixture()
     def prefix_message_text(self, prefix, command):
         return prefix + command
 
-    @pytest.fixture(scope="class")
+    @pytest.fixture()
     def prefix_message(self, prefix_message_text):
         return make_message(prefix_message_text)
 
-    @pytest.fixture(scope="class")
+    @pytest.fixture()
     def prefix_message_update(self, prefix_message):
         return make_message_update(prefix_message)
 
@@ -94,12 +94,12 @@ class TestPrefixHandler(BaseTest):
         assert isinstance(handler.commands, frozenset)
         assert handler.commands == {"#cmd", "#bmd"}
 
-    def test_single_multi_prefixes_commands(self, prefixes, commands, prefix_message_update):
+    def test_single_multi_prefixes_commands(self, prefix_message_update):
         """Test various combinations of prefixes and commands"""
         handler = self.make_default_handler()
         result = is_match(handler, prefix_message_update)
-        expected = prefix_message_update.message.text in combinations(prefixes, commands)
-        return result == expected
+        expected = prefix_message_update.message.text in self.COMBINATIONS
+        assert result == expected
 
     def test_edited(self, prefix_message):
         handler_edited = self.make_default_handler()
