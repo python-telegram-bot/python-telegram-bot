@@ -2297,7 +2297,7 @@ class TestApplication:
             assert received_signals == [signal.SIGINT, signal.SIGTERM, signal.SIGABRT]
 
         received_signals.clear()
-        loop.call_later(0.6, abort_app)
+        loop.call_later(0.8, abort_app)
         app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
 
         if platform.system() == "Windows":
