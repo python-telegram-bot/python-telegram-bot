@@ -276,7 +276,7 @@ This gives us the flexibility to re-order arguments and more importantly
 to add new required arguments. It's also more explicit and easier to read.
 
 
-.. _`Code of Conduct`: https://www.python.org/psf/conduct/
+.. _`Code of Conduct`: https://policies.python.org/python.org/code-of-conduct/
 .. _`issue tracker`: https://github.com/python-telegram-bot/python-telegram-bot/issues
 .. _`Telegram group`: https://telegram.me/pythontelegrambotgroup
 .. _`PEP 8 Style Guide`: https://peps.python.org/pep-0008/
