@@ -287,7 +287,7 @@ class TestVideoNoteWithRequest(TestVideoNoteBase):
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="Message to reply not found"):
+            with pytest.raises(BadRequest, match="Message to be replied not found"):
                 await default_bot.send_video_note(
                     chat_id, video_note, reply_to_message_id=reply_to_message.message_id
                 )
