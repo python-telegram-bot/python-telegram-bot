@@ -312,7 +312,7 @@ class TestInvoiceWithRequest(TestInvoiceBase):
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="Message to reply not found"):
+            with pytest.raises(BadRequest, match="Message to be replied not found"):
                 await default_bot.send_invoice(
                     chat_id,
                     self.title,

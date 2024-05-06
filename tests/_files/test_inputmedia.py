@@ -873,7 +873,7 @@ class TestSendMediaGroupWithRequest:
             )
             assert [m.reply_to_message is None for m in messages]
         else:
-            with pytest.raises(BadRequest, match="Message to reply not found"):
+            with pytest.raises(BadRequest, match="Message to be replied not found"):
                 await default_bot.send_media_group(
                     chat_id, media_group, reply_to_message_id=reply_to_message.message_id
                 )
