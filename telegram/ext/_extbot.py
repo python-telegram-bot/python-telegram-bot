@@ -50,8 +50,8 @@ from telegram import (
     BotShortDescription,
     BusinessConnection,
     CallbackQuery,
-    Chat,
     ChatAdministratorRights,
+    ChatFullInfo,
     ChatInviteLink,
     ChatMember,
     ChatPermissions,
@@ -113,7 +113,7 @@ if TYPE_CHECKING:
     )
     from telegram.ext import BaseRateLimiter, Defaults
 
-HandledTypes = TypeVar("HandledTypes", bound=Union[Message, CallbackQuery, Chat])
+HandledTypes = TypeVar("HandledTypes", bound=Union[Message, CallbackQuery, ChatFullInfo])
 KT = TypeVar("KT", bound=ReplyMarkup)
 
 
@@ -554,7 +554,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             self.callback_data_cache.process_message(message=obj)
             return obj  # type: ignore[return-value]
 
-        if isinstance(obj, Chat) and obj.pinned_message:
+        if isinstance(obj, ChatFullInfo) and obj.pinned_message:
             self.callback_data_cache.process_message(obj.pinned_message)
 
         return obj
@@ -853,7 +853,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
         rate_limit_args: Optional[RLARGS] = None,
-    ) -> Chat:
+    ) -> ChatFullInfo:
         # We override this method to call self._insert_callback_data
         result = await super().get_chat(
             chat_id=chat_id,

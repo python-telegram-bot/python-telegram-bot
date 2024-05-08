@@ -43,6 +43,7 @@ from telegram import (
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
+    ChatFullInfo,
     ChatPermissions,
     Dice,
     InlineKeyboardButton,
@@ -2921,10 +2922,10 @@ class TestBotWithRequest:
             await bot.leave_chat(-123456)
 
     async def test_get_chat(self, bot, super_group_id):
-        chat = await bot.get_chat(super_group_id)
-        assert chat.type == "supergroup"
-        assert chat.title == f">>> telegram.Bot(test) @{bot.username}"
-        assert chat.id == int(super_group_id)
+        cfi = await bot.get_chat(super_group_id)
+        assert cfi.type == "supergroup"
+        assert cfi.title == f">>> telegram.Bot(test) @{bot.username}"
+        assert cfi.id == int(super_group_id)
 
     async def test_get_chat_administrators(self, bot, channel_id):
         admins = await bot.get_chat_administrators(channel_id)
@@ -3900,9 +3901,9 @@ class TestBotWithRequest:
             )
             assert data == "callback_data"
 
-            chat = await bot.get_chat(channel_id)
-            assert chat.pinned_message == message
-            assert chat.pinned_message.reply_markup == reply_markup
+            cfi = await bot.get_chat(channel_id)
+            assert cfi.pinned_message == message
+            assert cfi.pinned_message.reply_markup == reply_markup
             assert await message.unpin()  # (not placed in finally block since msg can be unbound)
         finally:
             bot.callback_data_cache.clear_callback_data()
@@ -3915,11 +3916,11 @@ class TestBotWithRequest:
         await bot.unpin_all_chat_messages(super_group_id)
 
         try:
-            chat = await bot.get_chat(super_group_id)
+            cfi = await bot.get_chat(super_group_id)
 
-            assert isinstance(chat, Chat)
-            assert int(chat.id) == int(super_group_id)
-            assert chat.pinned_message is None
+            assert isinstance(cfi, ChatFullInfo)
+            assert int(cfi.id) == int(super_group_id)
+            assert cfi.pinned_message is None
         finally:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
