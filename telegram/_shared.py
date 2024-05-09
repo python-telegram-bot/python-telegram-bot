@@ -38,11 +38,11 @@ class UsersShared(TelegramObject):
 
     .. versionadded:: 20.8
        Bot API 7.0 replaces ``UserShared`` with this class. The only difference is that now
-       the :attr:`user_ids` is a sequence instead of a single integer.
+       the ``user_ids`` is a sequence instead of a single integer.
 
     .. versionchanged:: 21.1
        The argument :attr:`users` is now considered for the equality comparison instead of
-       :attr:`user_ids`.
+       ``user_ids``.
 
     .. versionremoved:: NEXT.VERSION
        Removed the deprecated argument and attribute ``user_ids``.
