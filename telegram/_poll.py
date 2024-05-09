@@ -51,8 +51,8 @@ class InputPollOption(TelegramObject):
         text_parse_mode (:obj:`str`, optional): |parse_mode|
             Currently, only custom emoji entities are allowed.
         text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities
-            that appear in the option :param:`text`. It can be specified instead of
-            :param:`text_parse_mode`.
+            that appear in the option :paramref:`text`. It can be specified instead of
+            :paramref:`text_parse_mode`.
             Currently, only custom emoji entities are allowed.
             This list is empty if the text does not contain entities.
 
@@ -63,8 +63,8 @@ class InputPollOption(TelegramObject):
         text_parse_mode (:obj:`str`): Optional. |parse_mode|
             Currently, only custom emoji entities are allowed.
         text_entities (Sequence[:class:`telegram.MessageEntity`]): Special entities
-            that appear in the option :param:`text`. It can be specified instead of
-            :param:`text_parse_mode`.
+            that appear in the option :paramref:`text`. It can be specified instead of
+            :paramref:`text_parse_mode`.
             Currently, only custom emoji entities are allowed.
             This list is empty if the text does not contain entities.
     """

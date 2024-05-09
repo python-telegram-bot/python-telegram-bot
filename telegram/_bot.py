@@ -6848,7 +6848,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
                 :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
-            options (Sequence[:obj:`str` | :class:`telegram.InputPollOption]): Sequence of
+            options (Sequence[:obj:`str` | :class:`telegram.InputPollOption`]): Sequence of
                 :tg-const:`telegram.Poll.MIN_OPTION_NUMBER`-
                 :tg-const:`telegram.Poll.MAX_OPTION_NUMBER` answer options. Each option may either
                 be a string with
