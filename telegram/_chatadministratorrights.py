@@ -80,8 +80,9 @@ class ChatAdministratorRights(TelegramObject):
             .. versionadded:: 20.6
             .. versionchanged:: 21.0
                 |non_optional_story_argument|
-        can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit
-            stories posted by other users.
+        can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit stories posted
+            by other users, post stories to the chat page, pin chat stories, and access the chat's
+            story archive
 
             .. versionadded:: 20.6
             .. versionchanged:: 21.0
@@ -128,8 +129,9 @@ class ChatAdministratorRights(TelegramObject):
             .. versionadded:: 20.6
             .. versionchanged:: 21.0
                 |non_optional_story_argument|
-        can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit
-            stories posted by other users.
+        can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit stories posted
+            by other users, post stories to the chat page, pin chat stories, and access the chat's
+            story archive
 
             .. versionadded:: 20.6
             .. versionchanged:: 21.0
