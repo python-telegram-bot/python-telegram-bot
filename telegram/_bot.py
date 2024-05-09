@@ -6947,7 +6947,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         data: JSONDict = {
             "chat_id": chat_id,
             "question": question,
-            "options": [option if isinstance(option, str) else option for option in options],
+            "options": [
+                InputPollOption(option) if isinstance(option, str) else option
+                for option in options
+            ],
             "explanation_parse_mode": explanation_parse_mode,
             "is_anonymous": is_anonymous,
             "type": type,

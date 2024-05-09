@@ -28,7 +28,8 @@ from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
-from telegram._utils.types import JSONDict
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -73,14 +74,14 @@ class InputPollOption(TelegramObject):
     def __init__(
         self,
         text: str,
-        text_parse_mode: Optional[str] = None,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
         text_entities: Optional[Sequence[MessageEntity]] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.text: str = text
-        self.text_parse_mode: Optional[str] = text_parse_mode
+        self.text_parse_mode: ODVInput[str] = text_parse_mode
         self.text_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
 
         self._id_attrs = (self.text,)

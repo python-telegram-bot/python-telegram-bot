@@ -265,6 +265,19 @@ class Defaults:
         )
 
     @property
+    def text_parse_mode(self) -> Optional[str]:
+        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
+        the corresponding parameter of :meth:`telegram.InputPollOption`.
+        """
+        return self._parse_mode
+
+    @text_parse_mode.setter
+    def text_parse_mode(self, value: object) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to text_parse_mode after initialization."
+        )
+
+    @property
     def disable_notification(self) -> Optional[bool]:
         """:obj:`bool`: Optional. Sends the message silently. Users will
         receive a notification with no sound.

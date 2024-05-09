@@ -76,6 +76,11 @@ class TestInputPollOptionWithoutRequest(TestInputPollOptionBase):
             e.to_dict() for e in input_poll_option.text_entities
         ]
 
+        # Test that the default-value parameter is handled correctly
+        input_poll_option = InputPollOption("text")
+        input_poll_option_dict = input_poll_option.to_dict()
+        assert "text_parse_mode" not in input_poll_option_dict
+
     def test_equality(self):
         a = InputPollOption("text")
         b = InputPollOption("text", self.text_parse_mode)
