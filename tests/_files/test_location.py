@@ -124,7 +124,8 @@ class TestLocationWithoutRequest(TestLocationBase):
             ha = data["horizontal_accuracy"] == "50"
             heading = data["heading"] == "90"
             prox_alert = data["proximity_alert_radius"] == "1000"
-            return lat and lon and id_ and ha and heading and prox_alert
+            live = data["live_period"] == "900"
+            return lat and lon and id_ and ha and heading and prox_alert and live
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.edit_message_live_location(
@@ -133,6 +134,7 @@ class TestLocationWithoutRequest(TestLocationBase):
             horizontal_accuracy=50,
             heading=90,
             proximity_alert_radius=1000,
+            live_period=900,
         )
 
     # TODO: Needs improvement with in inline sent live location.
@@ -262,6 +264,7 @@ class TestLocationWithRequest:
             horizontal_accuracy=30,
             heading=10,
             proximity_alert_radius=500,
+            live_period=200,
         )
 
         assert pytest.approx(message2.location.latitude, rel=1e-5) == 52.223098
@@ -269,6 +272,7 @@ class TestLocationWithRequest:
         assert message2.location.horizontal_accuracy == 30
         assert message2.location.heading == 10
         assert message2.location.proximity_alert_radius == 500
+        assert message2.location.live_period == 200
 
         await bot.stop_message_live_location(message.chat_id, message.message_id)
         with pytest.raises(BadRequest, match="Message can't be edited"):

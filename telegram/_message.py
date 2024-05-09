@@ -3653,6 +3653,7 @@ class Message(MaybeInaccessibleMessage):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
+        live_period: Optional[int] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3694,6 +3695,7 @@ class Message(MaybeInaccessibleMessage):
             horizontal_accuracy=horizontal_accuracy,
             heading=heading,
             proximity_alert_radius=proximity_alert_radius,
+            live_period=live_period,
             inline_message_id=None,
         )
 

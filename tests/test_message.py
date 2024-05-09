@@ -2414,7 +2414,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             message_id = kwargs["message_id"] == message.message_id
             latitude = kwargs["latitude"] == 1
             longitude = kwargs["longitude"] == 2
-            return chat_id and message_id and longitude and latitude
+            live = kwargs["live_period"] == 900
+            return chat_id and message_id and longitude and latitude and live
 
         assert check_shortcut_signature(
             Message.edit_live_location,
@@ -2432,7 +2433,7 @@ class TestMessageWithoutRequest(TestMessageBase):
         assert await check_defaults_handling(message.edit_live_location, message.get_bot())
 
         monkeypatch.setattr(message.get_bot(), "edit_message_live_location", make_assertion)
-        assert await message.edit_live_location(latitude=1, longitude=2)
+        assert await message.edit_live_location(latitude=1, longitude=2, live_period=900)
 
     async def test_stop_live_location(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
