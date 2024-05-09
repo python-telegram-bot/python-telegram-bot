@@ -27,8 +27,6 @@ from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -237,20 +235,12 @@ class StickerSet(TelegramObject):
     .. versionchanged:: 20.5
        |removed_thumb_note|
 
+    .. versionremoved:: NEXT.VERSION
+       Removed the deprecated arguments and attributes ``is_animated`` and ``is_video``.
+
     Args:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
-
-            .. deprecated:: 21.1
-                Bot API 7.2 deprecated this field. This parameter will be removed in a future
-                version of the library.
-        is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
-            .. versionadded:: 13.11
-
-            .. deprecated:: 21.1
-                Bot API 7.2 deprecated this field. This parameter will be removed in a future
-                version of the library.
         stickers (Sequence[:class:`telegram.Sticker`]): List of all set stickers.
 
             .. versionchanged:: 20.0
@@ -269,17 +259,6 @@ class StickerSet(TelegramObject):
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
-
-            .. deprecated:: 21.1
-                Bot API 7.2 deprecated this field. This parameter will be removed in a future
-                version of the library.
-        is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
-            .. versionadded:: 13.11
-
-            .. deprecated:: 21.1
-                Bot API 7.2 deprecated this field. This parameter will be removed in a future
-                version of the library.
         stickers (Tuple[:class:`telegram.Sticker`]): List of all set stickers.
 
             .. versionchanged:: 20.0
@@ -297,8 +276,6 @@ class StickerSet(TelegramObject):
     """
 
     __slots__ = (
-        "is_animated",
-        "is_video",
         "name",
         "sticker_type",
         "stickers",
@@ -312,8 +289,6 @@ class StickerSet(TelegramObject):
         title: str,
         stickers: Sequence[Sticker],
         sticker_type: str,
-        is_animated: Optional[bool] = None,
-        is_video: Optional[bool] = None,
         thumbnail: Optional[PhotoSize] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
@@ -325,15 +300,6 @@ class StickerSet(TelegramObject):
         self.sticker_type: str = sticker_type
         # Optional
         self.thumbnail: Optional[PhotoSize] = thumbnail
-        if is_animated is not None or is_video is not None:
-            warn(
-                "The parameters `is_animated` and `is_video` are deprecated and will be removed "
-                "in a future version.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-        self.is_animated: Optional[bool] = is_animated
-        self.is_video: Optional[bool] = is_video
         self._id_attrs = (self.name,)
 
         self._freeze()
@@ -350,7 +316,7 @@ class StickerSet(TelegramObject):
         api_kwargs = {}
         # These are deprecated fields that TG still returns for backwards compatibility
         # Let's filter them out to speed up the de-json process
-        for deprecated_field in ("contains_masks", "thumb"):
+        for deprecated_field in ("contains_masks", "thumb", "is_animated", "is_video"):
             if deprecated_field in data:
                 api_kwargs[deprecated_field] = data.pop(deprecated_field)
 

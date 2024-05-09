@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import ChatShared, PhotoSize, SharedUser, UsersShared
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.slots import mro_slots
 
 
@@ -59,23 +58,8 @@ class TestUsersSharedWithoutRequest(TestUsersSharedBase):
 
         assert users_shared.request_id == self.request_id
         assert users_shared.users == self.users
-        assert users_shared.user_ids == tuple(self.user_ids)
 
         assert UsersShared.de_json({}, bot) is None
-
-    def test_users_is_required_argument(self):
-        with pytest.raises(TypeError, match="`users` is a required argument"):
-            UsersShared(self.request_id, user_ids=self.user_ids)
-
-    def test_user_ids_deprecation_warning(self):
-        with pytest.warns(
-            PTBDeprecationWarning, match="'user_ids' was renamed to 'users' in Bot API 7.2"
-        ):
-            users_shared = UsersShared(self.request_id, user_ids=self.user_ids, users=self.users)
-        with pytest.warns(
-            PTBDeprecationWarning, match="renamed the attribute 'user_ids' to 'users'"
-        ):
-            users_shared.user_ids
 
     def test_equality(self):
         a = UsersShared(self.request_id, users=self.users)
