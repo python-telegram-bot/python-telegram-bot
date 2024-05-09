@@ -24,8 +24,10 @@ import pytest
 from telegram import (
     Animation,
     Audio,
+    BackgroundTypeChatTheme,
     Bot,
     Chat,
+    ChatBackground,
     ChatBoostAdded,
     ChatShared,
     Contact,
@@ -270,6 +272,7 @@ def message(bot):
         {"is_from_offline": True},
         {"sender_business_bot": User(1, "BusinessBot", True)},
         {"business_connection_id": "123456789"},
+        {"chat_background_set": ChatBackground(type=BackgroundTypeChatTheme("ice"))},
     ],
     ids=[
         "reply",
@@ -338,6 +341,7 @@ def message(bot):
         "sender_business_bot",
         "business_connection_id",
         "is_from_offline",
+        "chat_background_set",
     ],
 )
 def message_params(bot, request):

@@ -37,6 +37,8 @@ __all__ = [
     "SUPPORTED_WEBHOOK_PORTS",
     "ZERO_DATE",
     "AccentColor",
+    "BackgroundFill",
+    "BackgroundType",
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
@@ -1726,6 +1728,11 @@ class MessageType(StringEnum):
 
     .. versionadded:: 20.8
     """
+    CHAT_BACKGROUND_SET = "chat_background_set"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_background_set`.
+
+    .. versionadded:: NEXT.VERSION
+    """
     CONNECTED_WEBSITE = "connected_website"
     """:obj:`str`: Messages with :attr:`telegram.Message.connected_website`."""
     CONTACT = "contact"
@@ -2878,3 +2885,39 @@ class ReactionEmoji(StringEnum):
     """:obj:`str`: Woman Shrugging"""
     POUTING_FACE = "😡"
     """:obj:`str`: Pouting face"""
+
+
+class BackgroundType(StringEnum):
+    """This enum contains the available types of :class:`telegram.BackgroundType`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    FILL = "fill"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with fill background."""
+    WALLPAPER = "wallpaper"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with wallpaper background."""
+    PATTERN = "pattern"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with pattern background."""
+    CHAT_THEME = "chat_theme"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with chat_theme background."""
+
+
+class BackgroundFill(StringEnum):
+    """This enum contains the available types of :class:`telegram.BackgroundFill`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    SOLID = "solid"
+    """:obj:`str`: A :class:`telegram.BackgroundFill` with solid fill."""
+    GRADIENT = "gradient"
+    """:obj:`str`: A :class:`telegram.BackgroundFill` with gradient fill."""
+    FREEFORM_GRADIENT = "freeform_gradient"
+    """:obj:`str`: A :class:`telegram.BackgroundFill` with freeform_gradient fill."""
