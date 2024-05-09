@@ -64,6 +64,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
     InputMedia,
+    InputPollOption,
     LinkPreviewOptions,
     Location,
     MaskPosition,
@@ -2917,7 +2918,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         question: str,
-        options: Sequence[str],
+        options: Sequence[Union[str, InputPollOption]],
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
