@@ -77,6 +77,7 @@ Available Types
     telegram.inputmediadocument
     telegram.inputmediaphoto
     telegram.inputmediavideo
+    telegram.inputpolloption
     telegram.inputsticker
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype

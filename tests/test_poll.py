@@ -19,10 +19,81 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from telegram import Chat, MessageEntity, Poll, PollAnswer, PollOption, User
+from telegram import Chat, InputPollOption, MessageEntity, Poll, PollAnswer, PollOption, User
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
 from tests.auxil.slots import mro_slots
+
+
+@pytest.fixture(scope="module")
+def input_poll_option():
+    out = InputPollOption(
+        text=TestInputPollOptionBase.text,
+        text_parse_mode=TestInputPollOptionBase.text_parse_mode,
+        text_entities=TestInputPollOptionBase.text_entities,
+    )
+    out._unfreeze()
+    return out
+
+
+class TestInputPollOptionBase:
+    text = "test option"
+    text_parse_mode = "MarkdownV2"
+    text_entities = [
+        MessageEntity(0, 4, MessageEntity.BOLD),
+        MessageEntity(5, 7, MessageEntity.ITALIC),
+    ]
+
+
+class TestInputPollOptionWithoutRequest(TestInputPollOptionBase):
+    def test_slot_behaviour(self, input_poll_option):
+        for attr in input_poll_option.__slots__:
+            assert getattr(input_poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(input_poll_option)) == len(
+            set(mro_slots(input_poll_option))
+        ), "duplicate slot"
+
+    def test_de_json(self):
+        json_dict = {
+            "text": self.text,
+            "text_parse_mode": self.text_parse_mode,
+            "text_entities": [e.to_dict() for e in self.text_entities],
+        }
+        input_poll_option = InputPollOption.de_json(json_dict, None)
+        assert input_poll_option.api_kwargs == {}
+
+        assert input_poll_option.text == self.text
+        assert input_poll_option.text_parse_mode == self.text_parse_mode
+        assert input_poll_option.text_entities == tuple(self.text_entities)
+
+    def test_to_dict(self, input_poll_option):
+        input_poll_option_dict = input_poll_option.to_dict()
+
+        assert isinstance(input_poll_option_dict, dict)
+        assert input_poll_option_dict["text"] == input_poll_option.text
+        assert input_poll_option_dict["text_parse_mode"] == input_poll_option.text_parse_mode
+        assert input_poll_option_dict["text_entities"] == [
+            e.to_dict() for e in input_poll_option.text_entities
+        ]
+
+    def test_equality(self):
+        a = InputPollOption("text")
+        b = InputPollOption("text", self.text_parse_mode)
+        c = InputPollOption("text", text_entities=self.text_entities)
+        d = InputPollOption("different_text")
+        e = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
 
 
 @pytest.fixture(scope="module")
