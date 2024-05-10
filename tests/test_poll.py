@@ -54,6 +54,8 @@ class TestInputPollOptionWithoutRequest(TestInputPollOptionBase):
         ), "duplicate slot"
 
     def test_de_json(self):
+        assert InputPollOption.de_json({}, None) is None
+
         json_dict = {
             "text": self.text,
             "text_parse_mode": self.text_parse_mode,
