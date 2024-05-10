@@ -38,7 +38,7 @@ class ChatFullInfo(Chat):
     This object contains full information about a chat.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`id` is equal.
+    considered equal, if their :attr:`~telegram.Chat.id` is equal.
 
     .. versionadded:: NEXT.VERSION
 
