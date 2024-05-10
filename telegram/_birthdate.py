@@ -73,7 +73,7 @@ class Birthdate(TelegramObject):
     def to_date(self, year: Optional[int] = None) -> date:
         """Return the birthdate as a datetime object.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionchanged:: NEXT.VERSION
            Now returns a :obj:`datetime.date` object instead of a :obj:`datetime.datetime` object,
            as was originally intended.
 
