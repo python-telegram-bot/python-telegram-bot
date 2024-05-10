@@ -246,7 +246,7 @@ class BusinessIntro(TelegramObject):
 
 class BusinessLocation(TelegramObject):
     """
-    This object represents the location of a business account.
+    This object Contains information about the location of a Telegram Business account.
 
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if their
