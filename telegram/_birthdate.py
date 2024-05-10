@@ -82,7 +82,7 @@ class Birthdate(TelegramObject):
                 present.
 
         Returns:
-            :obj:`datetime.date`: The birthdate as a datetime object.
+            :obj:`datetime.date`: The birthdate as a date object.
         """
         if self.year is None and year is None:
             raise ValueError(
