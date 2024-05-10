@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import warnings
 
 import pytest
 
@@ -33,10 +34,10 @@ from telegram import (
     Location,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
-    User,
 )
+from telegram._chat import _deprecated_attrs
 from telegram._utils.datetime import UTC, to_timestamp
-from telegram.constants import ChatType, ReactionEmoji
+from telegram.constants import ReactionEmoji
 from tests.auxil.slots import mro_slots
 
 
@@ -185,217 +186,18 @@ class TestChatWithoutRequest(TestChatInfoBase):
             "personal_chat": self.personal_chat.to_dict(),
         }
         cfi = ChatFullInfo.de_json(json_dict, bot)
-
-        assert cfi.id == self.id_
-        assert cfi.title == self.title
-        assert cfi.type == self.type_
-        assert cfi.accent_color_id == self.accent_color_id
         assert cfi.max_reaction_count == self.max_reaction_count
-        assert cfi.username == self.username
-        assert cfi.sticker_set_name == self.sticker_set_name
-        assert cfi.can_set_sticker_set == self.can_set_sticker_set
-        assert cfi.permissions == self.permissions
-        assert cfi.slow_mode_delay == self.slow_mode_delay
-        assert cfi.bio == self.bio
-        assert cfi.business_intro == self.business_intro
-        assert cfi.business_location == self.business_location
-        assert cfi.business_opening_hours == self.business_opening_hours
-        assert cfi.has_protected_content == self.has_protected_content
-        assert cfi.has_visible_history == self.has_visible_history
-        assert cfi.has_private_forwards == self.has_private_forwards
-        assert cfi.linked_chat_id == self.linked_chat_id
-        assert cfi.location.location == self.location.location
-        assert cfi.location.address == self.location.address
-        assert cfi.join_to_send_messages == self.join_to_send_messages
-        assert cfi.join_by_request == self.join_by_request
-        assert (
-            cfi.has_restricted_voice_and_video_messages
-            == self.has_restricted_voice_and_video_messages
-        )
-        assert cfi.api_kwargs == {
-            "all_members_are_administrators": self.all_members_are_administrators
-        }
-        assert cfi.is_forum == self.is_forum
-        assert cfi.active_usernames == tuple(self.active_usernames)
-        assert cfi.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
-        assert cfi.emoji_status_expiration_date == (self.emoji_status_expiration_date)
-        assert cfi.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
-        assert cfi.has_hidden_members == self.has_hidden_members
-        assert cfi.available_reactions == tuple(self.available_reactions)
-        assert cfi.background_custom_emoji_id == self.background_custom_emoji_id
-        assert cfi.profile_accent_color_id == self.profile_accent_color_id
-        assert cfi.profile_background_custom_emoji_id == self.profile_background_custom_emoji_id
-        assert cfi.unrestrict_boost_count == self.unrestrict_boost_count
-        assert cfi.custom_emoji_sticker_set_name == self.custom_emoji_sticker_set_name
-        assert cfi.birthdate == self.birthdate
-        assert cfi.personal_chat == self.personal_chat
-
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
-        json_dict = {
-            "id": self.id_,
-            "type": self.type_,
-            "accent_color_id": self.accent_color_id,
-            "max_reaction_count": self.max_reaction_count,
-            "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
-        }
-        chat_bot = ChatFullInfo.de_json(json_dict, bot)
-        chat_bot_raw = ChatFullInfo.de_json(json_dict, raw_bot)
-        chat_bot_tz = ChatFullInfo.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing tzinfo objects is not reliable
-        emoji_expire_offset = chat_bot_tz.emoji_status_expiration_date.utcoffset()
-        emoji_expire_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
-            chat_bot_tz.emoji_status_expiration_date.replace(tzinfo=None)
-        )
-
-        assert chat_bot.emoji_status_expiration_date.tzinfo == UTC
-        assert chat_bot_raw.emoji_status_expiration_date.tzinfo == UTC
-        assert emoji_expire_offset_tz == emoji_expire_offset
 
     def test_to_dict(self, chat_full_info):
         cfi = chat_full_info
         cfi_dict = cfi.to_dict()
 
         assert isinstance(cfi_dict, dict)
-        assert cfi_dict["id"] == cfi.id
-        assert cfi_dict["title"] == cfi.title
-        assert cfi_dict["type"] == cfi.type
-        assert cfi_dict["accent_color_id"] == cfi.accent_color_id
         assert cfi_dict["max_reaction_count"] == cfi.max_reaction_count
-        assert cfi_dict["username"] == cfi.username
-        assert cfi_dict["permissions"] == cfi.permissions.to_dict()
-        assert cfi_dict["slow_mode_delay"] == cfi.slow_mode_delay
-        assert cfi_dict["bio"] == cfi.bio
-        assert cfi_dict["business_intro"] == cfi.business_intro.to_dict()
-        assert cfi_dict["business_location"] == cfi.business_location.to_dict()
-        assert cfi_dict["business_opening_hours"] == cfi.business_opening_hours.to_dict()
-        assert cfi_dict["has_private_forwards"] == cfi.has_private_forwards
-        assert cfi_dict["has_protected_content"] == cfi.has_protected_content
-        assert cfi_dict["has_visible_history"] == cfi.has_visible_history
-        assert cfi_dict["linked_chat_id"] == cfi.linked_chat_id
-        assert cfi_dict["location"] == cfi.location.to_dict()
-        assert cfi_dict["join_to_send_messages"] == cfi.join_to_send_messages
-        assert cfi_dict["join_by_request"] == cfi.join_by_request
-        assert (
-            cfi_dict["has_restricted_voice_and_video_messages"]
-            == cfi.has_restricted_voice_and_video_messages
-        )
-        assert cfi_dict["is_forum"] == cfi.is_forum
-        assert cfi_dict["active_usernames"] == list(cfi.active_usernames)
-        assert cfi_dict["emoji_status_custom_emoji_id"] == cfi.emoji_status_custom_emoji_id
-        assert cfi_dict["emoji_status_expiration_date"] == to_timestamp(
-            cfi.emoji_status_expiration_date
-        )
-        assert cfi_dict["has_aggressive_anti_spam_enabled"] == cfi.has_aggressive_anti_spam_enabled
-        assert cfi_dict["has_hidden_members"] == cfi.has_hidden_members
-        assert cfi_dict["available_reactions"] == [
-            reaction.to_dict() for reaction in cfi.available_reactions
-        ]
-        assert cfi_dict["background_custom_emoji_id"] == cfi.background_custom_emoji_id
-        assert cfi_dict["profile_accent_color_id"] == cfi.profile_accent_color_id
-        assert (
-            cfi_dict["profile_background_custom_emoji_id"]
-            == cfi.profile_background_custom_emoji_id
-        )
-        assert cfi_dict["custom_emoji_sticker_set_name"] == cfi.custom_emoji_sticker_set_name
-        assert cfi_dict["unrestrict_boost_count"] == cfi.unrestrict_boost_count
-        assert cfi_dict["birthdate"] == cfi.birthdate.to_dict()
-        assert cfi_dict["personal_chat"] == cfi.personal_chat.to_dict()
 
-    def test_always_tuples_attributes(self):
-        cfi = ChatFullInfo(
-            id=123,
-            title="title",
-            type=ChatFullInfo.PRIVATE,
-            accent_color_id=1,
-            max_reaction_count=2,
-        )
-        assert isinstance(cfi.active_usernames, tuple)
-        assert cfi.active_usernames == ()
-
-    def test_enum_init(self):
-        cfi = ChatFullInfo(1, "foo", 1, 2)
-        assert cfi.type == "foo"
-        cfi = ChatFullInfo(1, "private", 1, 2)
-        assert cfi.type is ChatType.PRIVATE
-
-    def test_equality(self):
-        a = ChatFullInfo(self.id_, self.type_, accent_color_id=1, max_reaction_count=2)
-        b = ChatFullInfo(self.id_, self.type_, accent_color_id=1, max_reaction_count=2)
-        c = ChatFullInfo(self.id_, "", accent_color_id=1, max_reaction_count=2)
-        d = ChatFullInfo(0, self.type_, accent_color_id=1, max_reaction_count=2)
-        e = User(self.id_, "", False)
-
-        assert a == b
-        assert hash(a) == hash(b)
-        assert a is not b
-
-        assert a == c
-        assert hash(a) == hash(c)
-
-        assert a != d
-        assert hash(a) != hash(d)
-
-        assert a != e
-        assert hash(a) != hash(e)
-
-    def test_link(self, chat_full_info):
+    def test_attr_access_no_warning(self, chat_full_info):
         cfi = chat_full_info
-        assert cfi.link == f"https://t.me/{cfi.username}"
-        cfi.username = None
-        assert cfi.link is None
-
-    def test_full_name(self):
-        cfi = ChatFullInfo(
-            id=1,
-            type=ChatFullInfo.PRIVATE,
-            first_name="first\u2022name",
-            last_name="last\u2022name",
-            accent_color_id=1,
-            max_reaction_count=2,
-        )
-        assert cfi.full_name == "first\u2022name last\u2022name"
-        cfi = ChatFullInfo(
-            id=1,
-            type=ChatFullInfo.PRIVATE,
-            first_name="first\u2022name",
-            accent_color_id=1,
-            max_reaction_count=2,
-        )
-        assert cfi.full_name == "first\u2022name"
-        cfi = ChatFullInfo(
-            id=1,
-            type=ChatFullInfo.PRIVATE,
-            accent_color_id=1,
-            max_reaction_count=2,
-        )
-        assert cfi.full_name is None
-
-    def test_effective_name(self):
-        cfi = ChatFullInfo(
-            id=1,
-            type=ChatFullInfo.PRIVATE,
-            first_name="first\u2022name",
-            accent_color_id=1,
-            max_reaction_count=2,
-        )
-        assert cfi.effective_name == "first\u2022name"
-        cfi = ChatFullInfo(
-            id=1,
-            type=ChatFullInfo.GROUP,
-            title="group",
-            accent_color_id=1,
-            max_reaction_count=2,
-        )
-        assert cfi.effective_name == "group"
-        cfi = ChatFullInfo(
-            id=1,
-            type=ChatFullInfo.GROUP,
-            first_name="first\u2022name",
-            title="group",
-            accent_color_id=1,
-            max_reaction_count=2,
-        )
-        assert cfi.effective_name == "group"
-        cfi = ChatFullInfo(id=1, type=ChatFullInfo.GROUP, accent_color_id=1, max_reaction_count=2)
-        assert cfi.effective_name is None
+        for depr_attr in _deprecated_attrs:
+            with warnings.catch_warnings():  # No warning should be raised
+                warnings.simplefilter("error")
+                getattr(cfi, depr_attr)
