@@ -21,6 +21,7 @@ from datetime import date
 import pytest
 
 from telegram import Birthdate
+from telegram._utils.datetime import DTM_UTC
 from tests.auxil.slots import mro_slots
 
 
