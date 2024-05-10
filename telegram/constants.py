@@ -37,9 +37,9 @@ __all__ = [
     "SUPPORTED_WEBHOOK_PORTS",
     "ZERO_DATE",
     "AccentColor",
-    "BackgroundFill",
+    "BackgroundFillType",
     "BackgroundFillLimit",
-    "BackgroundType",
+    "BackgroundTypeType",
     "BackgroundTypeLimit",
     "BotCommandLimit",
     "BotCommandScopeType",
@@ -2961,7 +2961,7 @@ class ReactionEmoji(StringEnum):
     """:obj:`str`: Pouting face"""
 
 
-class BackgroundType(StringEnum):
+class BackgroundTypeType(StringEnum):
     """This enum contains the available types of :class:`telegram.BackgroundType`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -2980,7 +2980,7 @@ class BackgroundType(StringEnum):
     """:obj:`str`: A :class:`telegram.BackgroundType` with chat_theme background."""
 
 
-class BackgroundFill(StringEnum):
+class BackgroundFillType(StringEnum):
     """This enum contains the available types of :class:`telegram.BackgroundFill`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 

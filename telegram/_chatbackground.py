@@ -55,12 +55,14 @@ class BackgroundFill(TelegramObject):
 
     __slots__ = ("type",)
 
-    SOLID: Final[constants.BackgroundFill] = constants.BackgroundFill.SOLID
-    """:const:`telegram.constants.BackgroundFill.SOLID`"""
-    GRADIENT: Final[constants.BackgroundFill] = constants.BackgroundFill.GRADIENT
-    """:const:`telegram.constants.BackgroundFill.GRADIENT`"""
-    FREEFORM_GRADIENT: Final[constants.BackgroundFill] = constants.BackgroundFill.FREEFORM_GRADIENT
-    """:const:`telegram.constants.BackgroundFill.FREEFORM_GRADIENT`"""
+    SOLID: Final[constants.BackgroundFillType] = constants.BackgroundFillType.SOLID
+    """:const:`telegram.constants.BackgroundFillType.SOLID`"""
+    GRADIENT: Final[constants.BackgroundFillType] = constants.BackgroundFillType.GRADIENT
+    """:const:`telegram.constants.BackgroundFillType.GRADIENT`"""
+    FREEFORM_GRADIENT: Final[constants.BackgroundFillType] = (
+        constants.BackgroundFillType.FREEFORM_GRADIENT
+    )
+    """:const:`telegram.constants.BackgroundFillType.FREEFORM_GRADIENT`"""
 
     def __init__(
         self,
@@ -70,7 +72,7 @@ class BackgroundFill(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
-        self.type: str = enum.get_member(constants.BackgroundFill, type, type)
+        self.type: str = enum.get_member(constants.BackgroundFillType, type, type)
 
         self._id_attrs = (self.type,)
         self._freeze()
@@ -228,14 +230,14 @@ class BackgroundType(TelegramObject):
 
     __slots__ = ("type",)
 
-    FILL: Final[constants.BackgroundType] = constants.BackgroundType.FILL
-    """:const:`telegram.constants.BackgroundType.FILL`"""
-    WALLPAPER: Final[constants.BackgroundType] = constants.BackgroundType.WALLPAPER
-    """:const:`telegram.constants.BackgroundType.WALLPAPER`"""
-    PATTERN: Final[constants.BackgroundType] = constants.BackgroundType.PATTERN
-    """:const:`telegram.constants.BackgroundType.PATTERN`"""
-    CHAT_THEME: Final[constants.BackgroundType] = constants.BackgroundType.CHAT_THEME
-    """:const:`telegram.constants.BackgroundType.CHAT_THEME`"""
+    FILL: Final[constants.BackgroundTypeType] = constants.BackgroundTypeType.FILL
+    """:const:`telegram.constants.BackgroundTypeType.FILL`"""
+    WALLPAPER: Final[constants.BackgroundTypeType] = constants.BackgroundTypeType.WALLPAPER
+    """:const:`telegram.constants.BackgroundTypeType.WALLPAPER`"""
+    PATTERN: Final[constants.BackgroundTypeType] = constants.BackgroundTypeType.PATTERN
+    """:const:`telegram.constants.BackgroundTypeType.PATTERN`"""
+    CHAT_THEME: Final[constants.BackgroundTypeType] = constants.BackgroundTypeType.CHAT_THEME
+    """:const:`telegram.constants.BackgroundTypeType.CHAT_THEME`"""
 
     def __init__(
         self,
@@ -245,7 +247,7 @@ class BackgroundType(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
-        self.type: str = enum.get_member(constants.BackgroundType, type, type)
+        self.type: str = enum.get_member(constants.BackgroundTypeType, type, type)
 
         self._id_attrs = (self.type,)
         self._freeze()
