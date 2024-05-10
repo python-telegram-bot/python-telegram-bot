@@ -170,6 +170,43 @@ BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
     "create_new_sticker_set": {"sticker_format"},  # removed by bot api 7.2
     "StickerSet": {"is_animated", "is_video"},  # removed by bot api 7.2
     "UsersShared": {"user_ids", "users"},  # removed/added by bot api 7.2
+    "Chat": {
+        "background_custom_emoji_id",
+        "has_private_forwards",
+        "invite_link",
+        "has_hidden_members",
+        "permissions",
+        "custom_emoji_sticker_set_name",
+        "pinned_message",
+        "birthdate",
+        "emoji_status_custom_emoji_id",
+        "join_by_request",
+        "business_intro",
+        "business_opening_hours",
+        "description",
+        "has_protected_content",
+        "available_reactions",
+        "has_aggressive_anti_spam_enabled",
+        "slow_mode_delay",
+        "profile_background_custom_emoji_id",
+        "linked_chat_id",
+        "bio",
+        "accent_color_id",
+        "unrestrict_boost_count",
+        "can_set_sticker_set",
+        "has_restricted_voice_and_video_messages",
+        "emoji_status_expiration_date",
+        "photo",
+        "join_to_send_messages",
+        "message_auto_delete_time",
+        "location",
+        "active_usernames",
+        "profile_accent_color_id",
+        "sticker_set_name",
+        "has_visible_history",
+        "business_location",
+        "personal_chat",
+    },  # removed by bot api 7.3
 }
 
 
