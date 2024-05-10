@@ -16,7 +16,7 @@
 
 .. image:: https://img.shields.io/badge/Bot%20API-7.3-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
-   :alt: Supported Bot API version
+   :alt: Supported Bot API versions
 
 .. image:: https://img.shields.io/pypi/dm/python-telegram-bot-raw
    :target: https://pypistats.org/packages/python-telegram-bot-raw
