@@ -99,6 +99,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPollOption,
         LabeledPrice,
         MessageId,
         MessageOrigin,
@@ -2890,7 +2891,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_poll(
         self,
         question: str,
-        options: Sequence[str],
+        options: Sequence[Union[str, "InputPollOption"]],
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
