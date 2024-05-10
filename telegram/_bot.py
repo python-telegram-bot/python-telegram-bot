@@ -2760,7 +2760,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard.
             live_period (:obj:`int`, optional): New period in seconds during which the location
-                can be updated, starting from the message send date. If `0x7FFFFFFF` is specified,
+                can be updated, starting from the message send date. If
+                :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` is specified,
                 then the location can be updated forever. Otherwise, the new value must not exceed
                 the current live_period by more than a day, and the live location expiration date
                 must remain within the next 90 days. If not specified, then `live_period`

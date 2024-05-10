@@ -1,5 +1,5 @@
 BackgroundFill
-=======================
+==============
 
 .. versionadded:: NEXT.VERSION
 
