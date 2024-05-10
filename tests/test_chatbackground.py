@@ -226,6 +226,11 @@ class TestBackgroundTypeWithoutRequest:
         c = background_type
         d = deepcopy(background_type)
         e = Dice(4, "emoji")
+        sig = inspect.signature(background_type.__class__.__init__)
+        params = [
+            "random" for param in sig.parameters.values() if param.name not in [*ignored, "type"]
+        ]
+        f = background_type.__class__(*params)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -244,6 +249,9 @@ class TestBackgroundTypeWithoutRequest:
 
         assert c != e
         assert hash(c) != hash(e)
+
+        assert f != c
+        assert hash(f) != hash(c)
 
 
 @pytest.fixture()
@@ -325,6 +333,11 @@ class TestBackgroundFillWithoutRequest:
         c = background_fill
         d = deepcopy(background_fill)
         e = Dice(4, "emoji")
+        sig = inspect.signature(background_fill.__class__.__init__)
+        params = [
+            "random" for param in sig.parameters.values() if param.name not in [*ignored, "type"]
+        ]
+        f = background_fill.__class__(*params)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -343,3 +356,6 @@ class TestBackgroundFillWithoutRequest:
 
         assert c != e
         assert hash(c) != hash(e)
+
+        assert f != c
+        assert hash(f) != hash(c)

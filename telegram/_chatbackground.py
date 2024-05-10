@@ -103,6 +103,9 @@ class BackgroundFillSolid(BackgroundFill):
 
     .. versionadded:: NEXT.VERSION
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`color` is equal.
+
     Args:
         color (:obj:`int`): The color of the background fill in the `RGB24` format.
 
@@ -125,12 +128,18 @@ class BackgroundFillSolid(BackgroundFill):
         with self._unfrozen():
             self.color: int = color
 
+            self._id_attrs = (self.color,)
+
 
 class BackgroundFillGradient(BackgroundFill):
     """
     The background is a gradient fill.
 
     .. versionadded:: NEXT.VERSION
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`top_color`, :attr:`bottom_color`
+    and :attr:`rotation_angle` are equal.
 
     Args:
         top_color (:obj:`int`): Top color of the gradient in the `RGB24` format.
@@ -169,12 +178,17 @@ class BackgroundFillGradient(BackgroundFill):
             self.bottom_color: int = bottom_color
             self.rotation_angle: int = rotation_angle
 
+            self._id_attrs = (self.top_color, self.bottom_color, self.rotation_angle)
+
 
 class BackgroundFillFreeformGradient(BackgroundFill):
     """
     The background is a freeform gradient that rotates after every message in the chat.
 
     .. versionadded:: NEXT.VERSION
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`colors` is equal.
 
     Args:
         colors (Sequence[:obj:`int`]): A list of the 3 or 4 base colors that are used to
@@ -199,6 +213,8 @@ class BackgroundFillFreeformGradient(BackgroundFill):
 
         with self._unfrozen():
             self.colors: Tuple[int] = parse_sequence_arg(colors)
+
+            self._id_attrs = (self.colors,)
 
 
 class BackgroundType(TelegramObject):
@@ -285,6 +301,9 @@ class BackgroundTypeFill(BackgroundType):
 
     .. versionadded:: NEXT.VERSION
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`fill` and :attr:`dark_theme_dimming` are equal.
+
     Args:
         fill (:obj:`telegram.BackgroundFill`): The background fill.
         dark_theme_dimming (:obj:`int`): Dimming of the background in dark themes, as a
@@ -317,12 +336,17 @@ class BackgroundTypeFill(BackgroundType):
             self.fill: BackgroundFill = fill
             self.dark_theme_dimming: int = dark_theme_dimming
 
+            self._id_attrs = (self.fill, self.dark_theme_dimming)
+
 
 class BackgroundTypeWallpaper(BackgroundType):
     """
     The background is a wallpaper in the `JPEG` format.
 
     .. versionadded:: NEXT.VERSION
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`document` and :attr:`dark_theme_dimming` are equal.
 
     Args:
         document (:obj:`telegram.Document`): Document with the wallpaper
@@ -370,6 +394,8 @@ class BackgroundTypeWallpaper(BackgroundType):
             self.is_blurred: Optional[bool] = is_blurred
             self.is_moving: Optional[bool] = is_moving
 
+            self._id_attrs = (self.document, self.dark_theme_dimming)
+
 
 class BackgroundTypePattern(BackgroundType):
     """
@@ -378,6 +404,9 @@ class BackgroundTypePattern(BackgroundType):
     chosen by the user.
 
     .. versionadded:: NEXT.VERSION
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`document` and :attr:`fill` and :attr:`intensity` are equal.
 
     Args:
         document (:obj:`telegram.Document`): Document with the pattern.
@@ -439,12 +468,17 @@ class BackgroundTypePattern(BackgroundType):
             self.is_inverted: Optional[bool] = is_inverted
             self.is_moving: Optional[bool] = is_moving
 
+            self._id_attrs = (self.document, self.fill, self.intensity)
+
 
 class BackgroundTypeChatTheme(BackgroundType):
     """
     The background is taken directly from a built-in chat theme.
 
     .. versionadded:: NEXT.VERSION
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`theme_name` is equal.
 
     Args:
         theme_name (:obj:`str`): Name of the chat theme, which is usually an emoji.
@@ -467,6 +501,8 @@ class BackgroundTypeChatTheme(BackgroundType):
 
         with self._unfrozen():
             self.theme_name: str = theme_name
+
+            self._id_attrs = (self.theme_name,)
 
 
 class ChatBackground(TelegramObject):
