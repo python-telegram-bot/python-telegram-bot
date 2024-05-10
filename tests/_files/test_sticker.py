@@ -39,7 +39,6 @@ from telegram import (
 from telegram.constants import ParseMode, StickerFormat, StickerType
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -714,7 +713,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             assert data["name"] == "name"
             assert data["title"] == "title"
             assert data["stickers"] == ["wow.png", "wow.tgs", "wow.webp"]
-            assert data["sticker_format"] == "static"
             assert data["needs_repainting"] is True
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -723,7 +721,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
             "name",
             "title",
             stickers=["wow.png", "wow.tgs", "wow.webp"],
-            sticker_format=StickerFormat.STATIC,
             needs_repainting=True,
         )
 
@@ -783,27 +780,6 @@ class TestStickerSetWithoutRequest(TestStickerSetBase):
 
         monkeypatch.setattr(sticker.get_bot(), "get_file", make_assertion)
         assert await sticker.get_file()
-
-    async def test_create_new_sticker_set_format_arg_depr(
-        self, bot, chat_id, sticker_file, monkeypatch
-    ):
-        async def make_assertion(*_, **kwargs):
-            pass
-
-        monkeypatch.setattr(bot, "_post", make_assertion)
-        with pytest.warns(PTBDeprecationWarning, match="`sticker_format` is deprecated"):
-            await bot.create_new_sticker_set(
-                chat_id,
-                "name",
-                "title",
-                stickers=sticker_file,
-                sticker_format="static",
-            )
-
-    async def test_deprecation_creation_args(self, recwarn):
-        with pytest.warns(PTBDeprecationWarning, match="The parameters `is_animated` and ") as w:
-            StickerSet("name", "title", [], "static", is_animated=True)
-            assert w[0].filename == __file__, "wrong stacklevel!"
 
 
 @pytest.mark.xdist_group("stickerset")
