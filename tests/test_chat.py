@@ -263,6 +263,15 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_bot_raw.emoji_status_expiration_date.tzinfo == UTC
         assert emoji_expire_offset_tz == emoji_expire_offset
 
+    def test_always_tuples_attributes(self):
+        chat = Chat(
+            id=123,
+            title="title",
+            type=Chat.PRIVATE,
+        )
+        assert isinstance(chat.active_usernames, tuple)
+        assert chat.active_usernames == ()
+
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
 
