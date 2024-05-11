@@ -120,6 +120,8 @@ PTB_EXTRA_PARAMS = {
     "ChatBoostSource": {"source"},  # attributes common to all subclasses
     "MessageOrigin": {"type", "date"},  # attributes common to all subclasses
     "ReactionType": {"type"},  # attributes common to all subclasses
+    "BackgroundType": {"type"},  # attributes common to all subclasses
+    "BackgroundFill": {"type"},  # attributes common to all subclasses
     "InputTextMessageContent": {"disable_web_page_preview"},  # convenience arg, here for bw compat
 }
 
