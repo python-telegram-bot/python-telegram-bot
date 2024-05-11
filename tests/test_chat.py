@@ -326,16 +326,20 @@ class TestChatWithoutRequest(TestChatBase):
 
     def test_deprecated_attributes(self, chat):
         for depr_attr in _deprecated_attrs:
-            with pytest.warns(PTBDeprecationWarning, match="is deprecated and will only be"):
+            with pytest.warns(PTBDeprecationWarning, match="deprecated and will only be accessib"):
                 getattr(chat, depr_attr)
         with warnings.catch_warnings():  # No warning should be raised
             warnings.simplefilter("error")
             chat.id
             chat.first_name
 
-    def test_required_accent_color_id(self):
-        with pytest.warns(PTBDeprecationWarning, match="requires the `accent_color_id` field"):
-            Chat(1, "type")
+    def test_deprecated_arguments(self):
+        for depr_attr in _deprecated_attrs:
+            with pytest.warns(PTBDeprecationWarning, match="deprecated and will only be availabl"):
+                Chat(1, "type", **{depr_attr: "1"})
+        with warnings.catch_warnings():  # No warning should be raised
+            warnings.simplefilter("error")
+            Chat(1, "type", first_name="first_name")
 
     def test_enum_init(self):
         chat = Chat(id=1, type="foo")

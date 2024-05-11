@@ -201,3 +201,9 @@ class TestChatWithoutRequest(TestChatInfoBase):
             with warnings.catch_warnings():  # No warning should be raised
                 warnings.simplefilter("error")
                 getattr(cfi, depr_attr)
+
+    def test_cfi_creation_no_warning(self, chat_full_info):
+        cfi = chat_full_info
+        with warnings.catch_warnings():
+            dict = cfi.to_dict()
+            ChatFullInfo(**dict)

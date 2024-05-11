@@ -893,14 +893,6 @@ class Chat(TelegramObject):
         self.available_reactions: Optional[Tuple[ReactionType, ...]] = parse_sequence_arg(
             available_reactions
         )
-        if accent_color_id is None:
-            # API 7.3 requires this field, but we can't enforce it for back-compat
-            warn(
-                "Bot API 7.3 requires the `accent_color_id` field to be present. Future versions "
-                "of PTB will enforce this in the `ChatFullInfo` class.",
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
         self.accent_color_id: Optional[int] = accent_color_id
         self.background_custom_emoji_id: Optional[str] = background_custom_emoji_id
         self.profile_accent_color_id: Optional[int] = profile_accent_color_id
@@ -912,6 +904,16 @@ class Chat(TelegramObject):
         self.business_intro: Optional["BusinessIntro"] = business_intro
         self.business_location: Optional["BusinessLocation"] = business_location
         self.business_opening_hours: Optional["BusinessOpeningHours"] = business_opening_hours
+
+        if self.__class__.__name__ == "Chat":
+            for arg in _deprecated_attrs:
+                if (val := object.__getattribute__(self, arg)) is not None and val != ():
+                    warn(
+                        f"The argument `{arg}` is deprecated and will only be available via "
+                        "`ChatFullInfo` in the future.",
+                        stacklevel=2,
+                        category=PTBDeprecationWarning,
+                    )
 
         self._id_attrs = (self.id,)
 
