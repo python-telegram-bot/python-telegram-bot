@@ -143,6 +143,8 @@ PTB_IGNORED_PARAMS = {
     r"MessageOrigin\w+": {"type"},
     r"ChatBoostSource\w+": {"source"},
     r"ReactionType\w+": {"type"},
+    r"BackgroundType\w+": {"type"},
+    r"BackgroundFill\w+": {"type"},
 }
 
 
