@@ -836,14 +836,6 @@ class BackgroundTypeLimit(IntEnum):
 
     __slots__ = ()
 
-    MIN_DIMMING = 0
-    """:obj:`int`: Minimum value allowed for:
-
-    * :paramref:`~telegram.BackgroundTypeFill.dark_theme_dimming` parameter of
-        :class:`telegram.BackgroundTypeFill`
-    * :paramref:`~telegram.BackgroundTypeWallpaper.dark_theme_dimming` parameter of
-        :class:`telegram.BackgroundTypeWallpaper`
-    """
     MAX_DIMMING = 100
     """:obj:`int`: Maximum value allowed for:
 
@@ -851,10 +843,6 @@ class BackgroundTypeLimit(IntEnum):
         :class:`telegram.BackgroundTypeFill`
     * :paramref:`~telegram.BackgroundTypeWallpaper.dark_theme_dimming` parameter of
         :class:`telegram.BackgroundTypeWallpaper`
-    """
-    MIN_INTENSITY = 0
-    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.BackgroundTypePattern.intensity`
-    parameter of :class:`telegram.BackgroundTypePattern`
     """
     MAX_INTENSITY = 100
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.BackgroundTypePattern.intensity`
@@ -871,11 +859,6 @@ class BackgroundFillLimit(IntEnum):
 
     __slots__ = ()
 
-    MIN_ROTATION_ANGLE = 0
-    """:obj:`int`: Minimum value allowed for
-        :paramref:`~telegram.BackgroundFillGradient.rotation_angle` parameter of
-        :class:`telegram.BackgroundFillGradient`
-    """
     MAX_ROTATION_ANGLE = 359
     """:obj:`int`: Maximum value allowed for:
         :paramref:`~telegram.BackgroundFillGradient.rotation_angle` parameter of

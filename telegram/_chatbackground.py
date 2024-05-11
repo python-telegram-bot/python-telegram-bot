@@ -146,8 +146,7 @@ class BackgroundFillGradient(BackgroundFill):
         bottom_color (:obj:`int`): Bottom color of the gradient in the `RGB24` format.
         rotation_angle (:obj:`int`): Clockwise rotation angle of the background
             fill in degrees;
-            :tg-const:`telegram.constants.BackgroundFillLimit.MIN_ROTATION_ANGLE`-
-            :tg-const:`telegram.constants.BackgroundFillLimit.MAX_ROTATION_ANGLE`.
+            0-:tg-const:`telegram.constants.BackgroundFillLimit.MAX_ROTATION_ANGLE`.
 
 
     Attributes:
@@ -157,8 +156,7 @@ class BackgroundFillGradient(BackgroundFill):
         bottom_color (:obj:`int`): Bottom color of the gradient in the `RGB24` format.
         rotation_angle (:obj:`int`): Clockwise rotation angle of the background
             fill in degrees;
-            :tg-const:`telegram.constants.BackgroundFillLimit.MIN_ROTATION_ANGLE`-
-            :tg-const:`telegram.constants.BackgroundFillLimit.MAX_ROTATION_ANGLE`.
+            0-:tg-const:`telegram.constants.BackgroundFillLimit.MAX_ROTATION_ANGLE`.
     """
 
     __slots__ = ("bottom_color", "rotation_angle", "top_color")
@@ -308,8 +306,7 @@ class BackgroundTypeFill(BackgroundType):
         fill (:obj:`telegram.BackgroundFill`): The background fill.
         dark_theme_dimming (:obj:`int`): Dimming of the background in dark themes, as a
             percentage;
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MIN_DIMMING`-
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
+            0-:tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
 
     Attributes:
         type (:obj:`str`): Type of the background. Always
@@ -317,8 +314,7 @@ class BackgroundTypeFill(BackgroundType):
         fill (:obj:`telegram.BackgroundFill`): The background fill.
         dark_theme_dimming (:obj:`int`): Dimming of the background in dark themes, as a
             percentage;
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MIN_DIMMING`-
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
+            0-:tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
     """
 
     __slots__ = ("dark_theme_dimming", "fill")
@@ -352,8 +348,7 @@ class BackgroundTypeWallpaper(BackgroundType):
         document (:obj:`telegram.Document`): Document with the wallpaper
         dark_theme_dimming (:obj:`int`): Dimming of the background in dark themes, as a
             percentage;
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MIN_DIMMING`-
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
+            0-:tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
         is_blurred (:obj:`bool`, optional): :obj:`True`, if the wallpaper is downscaled to fit
             in a 450x450 square and then box-blurred with radius 12
         is_moving (:obj:`bool`, optional): :obj:`True`, if the background moves slightly
@@ -365,8 +360,7 @@ class BackgroundTypeWallpaper(BackgroundType):
         document (:obj:`telegram.Document`): Document with the wallpaper
         dark_theme_dimming (:obj:`int`): Dimming of the background in dark themes, as a
             percentage;
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MIN_DIMMING`-
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
+            0-:tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
         is_blurred (:obj:`bool`): Optional. :obj:`True`, if the wallpaper is downscaled to fit
             in a 450x450 square and then box-blurred with radius 12
         is_moving (:obj:`bool`): Optional. :obj:`True`, if the background moves slightly
@@ -414,8 +408,7 @@ class BackgroundTypePattern(BackgroundType):
             the pattern.
         intensity (:obj:`int`): Intensity of the pattern when it is shown above the filled
             background;
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MIN_INTENSITY`-
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MAX_INTENSITY`.
+            0-:tg-const:`telegram.constants.BackgroundTypeLimit.MAX_INTENSITY`.
         is_inverted (:obj:`int`, optional): :obj:`True`, if the background fill must be applied
             only to the pattern itself. All other pixels are black in this case. For dark
             themes only.
@@ -430,8 +423,7 @@ class BackgroundTypePattern(BackgroundType):
             the pattern.
         intensity (:obj:`int`): Intensity of the pattern when it is shown above the filled
             background;
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MIN_INTENSITY`-
-            :tg-const:`telegram.constants.BackgroundTypeLimit.MAX_INTENSITY`.
+            0-:tg-const:`telegram.constants.BackgroundTypeLimit.MAX_INTENSITY`.
         is_inverted (:obj:`int`): Optional. :obj:`True`, if the background fill must be applied
             only to the pattern itself. All other pixels are black in this case. For dark
             themes only.
