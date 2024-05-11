@@ -2611,7 +2611,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             live_period (:obj:`int`, optional): Period in seconds for which the location will be
                 updated, should be between
                 :tg-const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD` and
-                :tg-const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`.
+                :tg-const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`, or
+                :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
+                locations that can be edited indefinitely.
             heading (:obj:`int`, optional): For live locations, a direction in which the user is
                 moving, in degrees. Must be between
                 :tg-const:`telegram.constants.LocationLimit.MIN_HEADING` and
@@ -2764,8 +2766,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 can be updated, starting from the message send date. If
                 :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` is specified,
                 then the location can be updated forever. Otherwise, the new value must not exceed
-                the current live_period by more than a day, and the live location expiration date
-                must remain within the next 90 days. If not specified, then `live_period`
+                the current ``live_period`` by more than a day, and the live location expiration
+                date must remain within the next 90 days. If not specified, then ``live_period``
                 remains unchanged
 
                 .. versionadded:: NEXT.VERSION.
