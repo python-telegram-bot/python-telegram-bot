@@ -301,8 +301,9 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         async def make_assertion(*_, **kwargs):
             latitude = kwargs.get("latitude") == 1
             longitude = kwargs.get("longitude") == 2
+            live = kwargs.get("live_period") == 900
             ids = self.check_passed_ids(callback_query, kwargs)
-            return ids and latitude and longitude
+            return ids and latitude and longitude and live
 
         assert check_shortcut_signature(
             CallbackQuery.edit_message_live_location,
@@ -322,8 +323,10 @@ class TestCallbackQueryWithoutRequest(TestCallbackQueryBase):
         )
 
         monkeypatch.setattr(callback_query.get_bot(), "edit_message_live_location", make_assertion)
-        assert await callback_query.edit_message_live_location(latitude=1, longitude=2)
-        assert await callback_query.edit_message_live_location(1, 2)
+        assert await callback_query.edit_message_live_location(
+            latitude=1, longitude=2, live_period=900
+        )
+        assert await callback_query.edit_message_live_location(1, 2, live_period=900)
 
     async def test_stop_message_live_location(self, monkeypatch, callback_query):
         if isinstance(callback_query.message, InaccessibleMessage):

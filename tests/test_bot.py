@@ -55,6 +55,7 @@ from telegram import (
     InputMediaDocument,
     InputMediaPhoto,
     InputMessageContent,
+    InputPollOption,
     InputTextMessageContent,
     LabeledPrice,
     LinkPreviewOptions,
@@ -1940,6 +1941,54 @@ class TestBotWithoutRequest:
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
         [
+            ({"parse_mode": ParseMode.HTML}, "NOTHING"),
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_poll_default_text_parse_mode(
+        self, default_bot, raw_bot, chat_id, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            option_1 = request_data.parameters["options"][0]
+            option_2 = request_data.parameters["options"][1]
+            assert option_1.get("text_parse_mode") == (default_bot.defaults.text_parse_mode)
+            assert option_2.get("text_parse_mode") == (
+                default_bot.defaults.text_parse_mode if custom == "NOTHING" else custom
+            )
+            return make_message("dummy reply").to_dict()
+
+        async def make_raw_assertion(url, request_data: RequestData, *args, **kwargs):
+            option_1 = request_data.parameters["options"][0]
+            option_2 = request_data.parameters["options"][1]
+            assert option_1.get("text_parse_mode") is None
+            assert option_2.get("text_parse_mode") == (None if custom == "NOTHING" else custom)
+            return make_message("dummy reply").to_dict()
+
+        if custom == "NOTHING":
+            option_2 = InputPollOption("option2")
+        else:
+            option_2 = InputPollOption("option2", text_parse_mode=custom)
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_poll(
+            chat_id,
+            question="question",
+            options=["option1", option_2],
+        )
+
+        monkeypatch.setattr(raw_bot.request, "post", make_raw_assertion)
+        await raw_bot.send_poll(
+            chat_id,
+            question="question",
+            options=["option1", option_2],
+        )
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
             ({"parse_mode": ParseMode.HTML}, None),
             ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
             ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
@@ -2326,7 +2375,7 @@ class TestBotWithRequest:
     )
     async def test_send_and_stop_poll(self, bot, super_group_id, reply_markup):
         question = "Is this a test?"
-        answers = ["Yes", "No", "Maybe"]
+        answers = ["Yes", InputPollOption("No"), "Maybe"]
         explanation = "[Here is a link](https://google.com)"
         explanation_entities = [
             MessageEntity(MessageEntity.TEXT_LINK, 0, 14, url="https://google.com")
@@ -2360,7 +2409,7 @@ class TestBotWithRequest:
         assert message.poll
         assert message.poll.question == question
         assert message.poll.options[0].text == answers[0]
-        assert message.poll.options[1].text == answers[1]
+        assert message.poll.options[1].text == answers[1].text
         assert message.poll.options[2].text == answers[2]
         assert not message.poll.is_anonymous
         assert message.poll.allows_multiple_answers
@@ -2380,7 +2429,7 @@ class TestBotWithRequest:
         assert poll.is_closed
         assert poll.options[0].text == answers[0]
         assert poll.options[0].voter_count == 0
-        assert poll.options[1].text == answers[1]
+        assert poll.options[1].text == answers[1].text
         assert poll.options[1].voter_count == 0
         assert poll.options[2].text == answers[2]
         assert poll.options[2].voter_count == 0
