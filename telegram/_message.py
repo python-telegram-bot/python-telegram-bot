@@ -25,6 +25,7 @@ from html import escape
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 from telegram._chat import Chat
+from telegram._chatbackground import ChatBackground
 from telegram._chatboost import ChatBoostAdded
 from telegram._dice import Dice
 from telegram._files.animation import Animation
@@ -554,6 +555,11 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.1
 
+        chat_background_set  (:obj:`telegram.ChatBackground`, optional): Service message: chat
+            background set.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
         from_user (:class:`telegram.User`): Optional. Sender of the message; empty for messages
@@ -854,6 +860,11 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.1
 
+        chat_background_set (:obj:`telegram.ChatBackground`): Optional. Service message: chat
+            background set
+
+            .. versionadded:: Next.Version
+
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
        :exc:`ValueError` when encountering a custom emoji.
@@ -877,6 +888,7 @@ class Message(MaybeInaccessibleMessage):
         "caption",
         "caption_entities",
         "channel_chat_created",
+        "chat_background_set",
         "chat_shared",
         "connected_website",
         "contact",
@@ -1030,6 +1042,7 @@ class Message(MaybeInaccessibleMessage):
         business_connection_id: Optional[str] = None,
         sender_business_bot: Optional[User] = None,
         is_from_offline: Optional[bool] = None,
+        chat_background_set: Optional[ChatBackground] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1128,6 +1141,7 @@ class Message(MaybeInaccessibleMessage):
             self.business_connection_id: Optional[str] = business_connection_id
             self.sender_business_bot: Optional[User] = sender_business_bot
             self.is_from_offline: Optional[bool] = is_from_offline
+            self.chat_background_set: Optional[ChatBackground] = chat_background_set
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1242,6 +1256,7 @@ class Message(MaybeInaccessibleMessage):
         )
         data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
+        data["chat_background_set"] = ChatBackground.de_json(data.get("chat_background_set"), bot)
 
         # Unfortunately, this needs to be here due to cyclic imports
         from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
@@ -3654,6 +3669,7 @@ class Message(MaybeInaccessibleMessage):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
+        live_period: Optional[int] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3695,6 +3711,7 @@ class Message(MaybeInaccessibleMessage):
             horizontal_accuracy=horizontal_accuracy,
             heading=heading,
             proximity_alert_radius=proximity_alert_radius,
+            live_period=live_period,
             inline_message_id=None,
         )
 

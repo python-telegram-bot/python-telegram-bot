@@ -27,7 +27,10 @@ exclude_dirs = {
     / "_passport",
 }
 
-exclude_patterns = {re.compile(re.escape("self.type: ReactionType = type"))}
+exclude_patterns = {
+    re.compile(re.escape("self.type: ReactionType = type")),
+    re.compile(re.escape("self.type: BackgroundType = type")),
+}
 
 
 def test_types_are_converted_to_enum():

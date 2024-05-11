@@ -2720,6 +2720,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
+        live_period: Optional[int] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2758,6 +2759,15 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 if specified.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard.
+            live_period (:obj:`int`, optional): New period in seconds during which the location
+                can be updated, starting from the message send date. If
+                :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` is specified,
+                then the location can be updated forever. Otherwise, the new value must not exceed
+                the current live_period by more than a day, and the live location expiration date
+                must remain within the next 90 days. If not specified, then `live_period`
+                remains unchanged
+
+                .. versionadded:: NEXT.VERSION.
 
         Keyword Args:
             location (:class:`telegram.Location`, optional): The location to send.
@@ -2790,6 +2800,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "horizontal_accuracy": horizontal_accuracy,
             "heading": heading,
             "proximity_alert_radius": proximity_alert_radius,
+            "live_period": live_period,
         }
 
         return await self._send_message(
