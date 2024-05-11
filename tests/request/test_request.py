@@ -47,6 +47,7 @@ from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
 from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.slots import mro_slots
 
 # We only need mixed_rqs fixture, but it uses the others, so pytest needs us to import them as well
@@ -72,7 +73,7 @@ def mocker_factory(
 
 @pytest.fixture()
 async def httpx_request():
-    async with HTTPXRequest() as rq:
+    async with NonchalantHttpxRequest() as rq:
         yield rq
 
 
@@ -130,14 +131,12 @@ class TestRequestWithoutRequest:
             assert getattr(inst, at, "err") != "err", f"got extra slot '{at}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    async def test_context_manager(self, monkeypatch):
+    async def test_context_manager(self, monkeypatch, httpx_request):
         async def initialize():
             self.test_flag = ["initialize"]
 
         async def shutdown():
             self.test_flag.append("stop")
-
-        httpx_request = HTTPXRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx_request, "shutdown", shutdown)
@@ -147,14 +146,12 @@ class TestRequestWithoutRequest:
 
         assert self.test_flag == ["initialize", "stop"]
 
-    async def test_context_manager_exception_on_init(self, monkeypatch):
+    async def test_context_manager_exception_on_init(self, monkeypatch, httpx_request):
         async def initialize():
             raise RuntimeError("initialize")
 
         async def shutdown():
             self.test_flag = "stop"
-
-        httpx_request = HTTPXRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx_request, "shutdown", shutdown)
@@ -538,14 +535,12 @@ class TestHTTPXRequestWithoutRequest:
         with pytest.raises(RuntimeError, match="not initialized"):
             await httpx_request.do_request(url="url", method="GET")
 
-    async def test_context_manager(self, monkeypatch):
+    async def test_context_manager(self, monkeypatch, httpx_request):
         async def initialize():
             self.test_flag = ["initialize"]
 
         async def aclose(*args):
             self.test_flag.append("stop")
-
-        httpx_request = HTTPXRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx.AsyncClient, "aclose", aclose)
@@ -555,14 +550,12 @@ class TestHTTPXRequestWithoutRequest:
 
         assert self.test_flag == ["initialize", "stop"]
 
-    async def test_context_manager_exception_on_init(self, monkeypatch):
+    async def test_context_manager_exception_on_init(self, monkeypatch, httpx_request):
         async def initialize():
             raise RuntimeError("initialize")
 
         async def aclose(*args):
             self.test_flag = "stop"
-
-        httpx_request = HTTPXRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx.AsyncClient, "aclose", aclose)

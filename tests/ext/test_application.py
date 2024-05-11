@@ -60,7 +60,7 @@ from tests.auxil.asyncio_helpers import call_after
 from tests.auxil.build_messages import make_message_update
 from tests.auxil.files import PROJECT_ROOT_PATH
 from tests.auxil.networking import send_webhook_message
-from tests.auxil.pytest_classes import make_bot
+from tests.auxil.pytest_classes import PytestApplication, PytestUpdater, make_bot
 from tests.auxil.slots import mro_slots
 
 
@@ -1580,7 +1580,13 @@ class TestApplication:
         async def post_init(app: Application) -> None:
             events.append("post_init")
 
-        app = Application.builder().bot(one_time_bot).post_init(post_init).build()
+        app = (
+            Application.builder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_init(post_init)
+            .build()
+        )
         app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         monkeypatch.setattr(
@@ -1623,7 +1629,13 @@ class TestApplication:
         async def post_shutdown(app: Application) -> None:
             events.append("post_shutdown")
 
-        app = Application.builder().bot(one_time_bot).post_shutdown(post_shutdown).build()
+        app = (
+            Application.builder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_shutdown(post_shutdown)
+            .build()
+        )
         app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         monkeypatch.setattr(
@@ -1649,7 +1661,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_polling_post_stop(self, bot, monkeypatch):
+    def test_run_polling_post_stop(self, one_time_bot, monkeypatch):
         events = []
 
         async def get_updates(*args, **kwargs):
@@ -1670,7 +1682,13 @@ class TestApplication:
         async def post_stop(app: Application) -> None:
             events.append("post_stop")
 
-        app = Application.builder().token(bot.token).post_stop(post_stop).build()
+        app = (
+            Application.builder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_stop(post_stop)
+            .build()
+        )
         app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         monkeypatch.setattr(app, "stop", call_after(app.stop, lambda _: events.append("stop")))
@@ -1862,7 +1880,13 @@ class TestApplication:
         async def post_init(app: Application) -> None:
             events.append("post_init")
 
-        app = Application.builder().bot(one_time_bot).post_init(post_init).build()
+        app = (
+            Application.builder()
+            .post_init(post_init)
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .build()
+        )
         app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
@@ -1922,7 +1946,13 @@ class TestApplication:
         async def post_shutdown(app: Application) -> None:
             events.append("post_shutdown")
 
-        app = Application.builder().bot(one_time_bot).post_shutdown(post_shutdown).build()
+        app = (
+            Application.builder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_shutdown(post_shutdown)
+            .build()
+        )
         app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
@@ -1959,7 +1989,7 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
-    def test_run_webhook_post_stop(self, bot, monkeypatch):
+    def test_run_webhook_post_stop(self, one_time_bot, monkeypatch):
         events = []
 
         async def delete_webhook(*args, **kwargs):
@@ -1986,7 +2016,13 @@ class TestApplication:
         async def post_stop(app: Application) -> None:
             events.append("post_stop")
 
-        app = Application.builder().token(bot.token).post_stop(post_stop).build()
+        app = (
+            Application.builder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_stop(post_stop)
+            .build()
+        )
         app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
@@ -2343,7 +2379,13 @@ class TestApplication:
 
             app.create_task(task(app))
 
-        app = ApplicationBuilder().bot(one_time_bot).post_init(post_init).build()
+        app = (
+            ApplicationBuilder()
+            .application_class(PytestApplication)
+            .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
+            .post_init(post_init)
+            .build()
+        )
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
