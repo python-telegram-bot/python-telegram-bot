@@ -21,7 +21,6 @@ from datetime import date
 from typing import Optional
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.datetime import DTM_UTC
 from telegram._utils.types import JSONDict
 
 
