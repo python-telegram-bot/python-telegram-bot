@@ -6312,7 +6312,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         name: str,
         title: str,
         stickers: Sequence["InputSticker"],
-        sticker_format: Optional[str] = None,
         sticker_type: Optional[str] = None,
         needs_repainting: Optional[bool] = None,
         *,
@@ -6339,6 +6338,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             Removed the deprecated parameters mentioned above and adjusted the order of the
             parameters.
 
+        .. versionremoved:: NEXT.VERSION
+           Removed the deprecated parameter ``sticker_format``.
+
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
             name (:obj:`str`): Short name of sticker set, to be used in t.me/addstickers/ URLs
@@ -6357,16 +6359,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 stickers to be added to the sticker set.
 
                 .. versionadded:: 20.2
-
-            sticker_format (:obj:`str`): Format of stickers in the set, must be one of
-                :attr:`~telegram.constants.StickerFormat.STATIC`,
-                :attr:`~telegram.constants.StickerFormat.ANIMATED` or
-                :attr:`~telegram.constants.StickerFormat.VIDEO`.
-
-                .. versionadded:: 20.2
-
-                .. deprecated:: 21.1
-                    Use :paramref:`telegram.InputSticker.format` instead.
 
             sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
                 :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`, or
@@ -6387,20 +6379,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        if sticker_format is not None:
-            warn(
-                "The parameter `sticker_format` is deprecated. Use the parameter"
-                " `InputSticker.format` in the parameter `stickers` instead.",
-                stacklevel=2,
-                category=PTBDeprecationWarning,
-            )
-
         data: JSONDict = {
             "user_id": user_id,
             "name": name,
             "title": title,
             "stickers": stickers,
-            "sticker_format": sticker_format,
             "sticker_type": sticker_type,
             "needs_repainting": needs_repainting,
         }

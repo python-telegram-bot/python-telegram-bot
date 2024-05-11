@@ -364,7 +364,7 @@ class TestDocumentWithRequest(TestDocumentBase):
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="Message to reply not found"):
+            with pytest.raises(BadRequest, match="Message to be replied not found"):
                 await default_bot.send_document(
                     chat_id, document, reply_to_message_id=reply_to_message.message_id
                 )
