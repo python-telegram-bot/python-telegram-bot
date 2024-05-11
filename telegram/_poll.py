@@ -28,10 +28,77 @@ from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
-from telegram._utils.types import JSONDict
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot
+
+
+class InputPollOption(TelegramObject):
+    """
+    This object contains information about one answer option in a poll to send.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`text` is equal.
+
+    .. versionadded:: NEXT.VERSION
+
+    Args:
+        text (:obj:`str`): Option text,
+            :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
+            characters.
+        text_parse_mode (:obj:`str`, optional): |parse_mode|
+            Currently, only custom emoji entities are allowed.
+        text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities
+            that appear in the option :paramref:`text`. It can be specified instead of
+            :paramref:`text_parse_mode`.
+            Currently, only custom emoji entities are allowed.
+            This list is empty if the text does not contain entities.
+
+    Attributes:
+        text (:obj:`str`): Option text,
+            :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
+            characters.
+        text_parse_mode (:obj:`str`): Optional. |parse_mode|
+            Currently, only custom emoji entities are allowed.
+        text_entities (Sequence[:class:`telegram.MessageEntity`]): Special entities
+            that appear in the option :paramref:`text`. It can be specified instead of
+            :paramref:`text_parse_mode`.
+            Currently, only custom emoji entities are allowed.
+            This list is empty if the text does not contain entities.
+    """
+
+    __slots__ = ("text", "text_entities", "text_parse_mode")
+
+    def __init__(
+        self,
+        text: str,
+        text_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        text_entities: Optional[Sequence[MessageEntity]] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.text: str = text
+        self.text_parse_mode: ODVInput[str] = text_parse_mode
+        self.text_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
+
+        self._id_attrs = (self.text,)
+
+        self._freeze()
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InputPollOption"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["text_entities"] = MessageEntity.de_list(data.get("text_entities"), bot)
+
+        return super().de_json(data=data, bot=bot)
 
 
 class PollOption(TelegramObject):

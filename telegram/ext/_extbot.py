@@ -64,6 +64,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
     InputMedia,
+    InputPollOption,
     LinkPreviewOptions,
     Location,
     MaskPosition,
@@ -436,6 +437,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         # 3) set the correct parse_mode for all InputMedia objects
         # 4) handle the LinkPreviewOptions case (see below)
         # 5) handle the ReplyParameters case (see below)
+        # 6) handle text_parse_mode in InputPollOption
         for key, val in data.items():
             # 1)
             if isinstance(val, DefaultValue):
@@ -486,6 +488,20 @@ class ExtBot(Bot, Generic[RLARGS]):
                     )
 
                 data[key] = new_value
+
+            elif isinstance(val, Sequence) and all(
+                isinstance(obj, InputPollOption) for obj in val
+            ):
+                new_val = []
+                for option in val:
+                    if not isinstance(option.text_parse_mode, DefaultValue):
+                        new_val.append(option)
+                    else:
+                        new_option = copy(option)
+                        with new_option._unfrozen():
+                            new_option.text_parse_mode = self.defaults.text_parse_mode
+                        new_val.append(new_option)
+                data[key] = new_val
 
     def _replace_keyboard(self, reply_markup: Optional[KT]) -> Optional[KT]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
@@ -2919,7 +2935,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         question: str,
-        options: Sequence[str],
+        options: Sequence[Union[str, "InputPollOption"]],
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,

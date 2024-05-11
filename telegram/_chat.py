@@ -57,6 +57,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPollOption,
         LabeledPrice,
         LinkPreviewOptions,
         Location,
@@ -2545,7 +2546,7 @@ class Chat(TelegramObject):
     async def send_poll(
         self,
         question: str,
-        options: Sequence[str],
+        options: Sequence[Union[str, "InputPollOption"]],
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,
         allows_multiple_answers: Optional[bool] = None,

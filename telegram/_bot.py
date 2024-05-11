@@ -84,7 +84,7 @@ from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
-from telegram._poll import Poll
+from telegram._poll import InputPollOption, Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
 from telegram._sentwebappmessage import SentWebAppMessage
@@ -6826,7 +6826,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[int, str],
         question: str,
-        options: Sequence[str],
+        options: Sequence[Union[str, "InputPollOption"]],
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
@@ -6859,14 +6859,20 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
                 :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
-            options (Sequence[:obj:`str`]): Sequence of answer options,
+            options (Sequence[:obj:`str` | :class:`telegram.InputPollOption`]): Sequence of
                 :tg-const:`telegram.Poll.MIN_OPTION_NUMBER`-
-                :tg-const:`telegram.Poll.MAX_OPTION_NUMBER` strings
+                :tg-const:`telegram.Poll.MAX_OPTION_NUMBER` answer options. Each option may either
+                be a string with
                 :tg-const:`telegram.Poll.MIN_OPTION_LENGTH`-
-                :tg-const:`telegram.Poll.MAX_OPTION_LENGTH` characters each.
+                :tg-const:`telegram.Poll.MAX_OPTION_LENGTH` characters or an
+                :class:`~telegram.InputPollOption` object. Strings are converted to
+                :class:`~telegram.InputPollOption` objects automatically.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
+
+                .. versionchanged:: NEXT.VERSION
+                   Bot API 7.3 adds support for :class:`~telegram.InputPollOption` objects.
             is_anonymous (:obj:`bool`, optional): :obj:`True`, if the poll needs to be anonymous,
                 defaults to :obj:`True`.
             type (:obj:`str`, optional): Poll type, :tg-const:`telegram.Poll.QUIZ` or
@@ -6952,7 +6958,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         data: JSONDict = {
             "chat_id": chat_id,
             "question": question,
-            "options": options,
+            "options": [
+                InputPollOption(option) if isinstance(option, str) else option
+                for option in options
+            ],
             "explanation_parse_mode": explanation_parse_mode,
             "is_anonymous": is_anonymous,
             "type": type,

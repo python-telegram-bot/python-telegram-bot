@@ -141,6 +141,7 @@ __all__ = (
     "InputMediaPhoto",
     "InputMediaVideo",
     "InputMessageContent",
+    "InputPollOption",
     "InputSticker",
     "InputTextMessageContent",
     "InputVenueMessageContent",
@@ -425,7 +426,7 @@ from ._payment.shippingaddress import ShippingAddress
 from ._payment.shippingoption import ShippingOption
 from ._payment.shippingquery import ShippingQuery
 from ._payment.successfulpayment import SuccessfulPayment
-from ._poll import Poll, PollAnswer, PollOption
+from ._poll import InputPollOption, Poll, PollAnswer, PollOption
 from ._proximityalerttriggered import ProximityAlertTriggered
 from ._reaction import ReactionCount, ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from ._reply import ExternalReplyInfo, ReplyParameters, TextQuote
