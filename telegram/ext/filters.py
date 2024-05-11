@@ -529,7 +529,7 @@ class _XORFilter(UpdateFilter):
 class _All(MessageFilter):
     __slots__ = ()
 
-    def filter(self, _: Message) -> bool:
+    def filter(self, message: Message) -> bool:  # noqa: ARG002
         return True
 
 
