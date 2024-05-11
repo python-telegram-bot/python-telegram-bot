@@ -210,7 +210,7 @@ class BackgroundFillFreeformGradient(BackgroundFill):
         super().__init__(type=self.FREEFORM_GRADIENT, api_kwargs=api_kwargs)
 
         with self._unfrozen():
-            self.colors: Tuple[int] = parse_sequence_arg(colors)
+            self.colors: Tuple[int, ...] = parse_sequence_arg(colors)
 
             self._id_attrs = (self.colors,)
 
