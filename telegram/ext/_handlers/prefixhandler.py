@@ -171,8 +171,8 @@ class PrefixHandler(BaseHandler[Update, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,
-        application: "Application[Any, CCT, Any, Any, Any, Any]",
+        update: Update,  # noqa: ARG002
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single

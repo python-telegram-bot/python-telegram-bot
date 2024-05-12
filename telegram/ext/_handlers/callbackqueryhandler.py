@@ -159,8 +159,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,
-        application: "Application[Any, CCT, Any, Any, Any, Any]",
+        update: Update,  # noqa: ARG002
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
         check_result: Union[bool, Match[str]],
     ) -> None:
         """Add the result of ``re.match(pattern, update.callback_query.data)`` to

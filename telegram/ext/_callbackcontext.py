@@ -165,7 +165,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self.application.bot_data
 
     @bot_data.setter
-    def bot_data(self, value: object) -> NoReturn:
+    def bot_data(self, _: object) -> NoReturn:
         raise AttributeError(
             f"You can not assign a new value to bot_data, see {_STORING_DATA_WIKI}"
         )
@@ -192,7 +192,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return None
 
     @chat_data.setter
-    def chat_data(self, value: object) -> NoReturn:
+    def chat_data(self, _: object) -> NoReturn:
         raise AttributeError(
             f"You can not assign a new value to chat_data, see {_STORING_DATA_WIKI}"
         )
@@ -214,7 +214,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return None
 
     @user_data.setter
-    def user_data(self, value: object) -> NoReturn:
+    def user_data(self, _: object) -> NoReturn:
         raise AttributeError(
             f"You can not assign a new value to user_data, see {_STORING_DATA_WIKI}"
         )
