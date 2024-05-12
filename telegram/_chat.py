@@ -905,7 +905,7 @@ class Chat(TelegramObject):
         self.business_location: Optional["BusinessLocation"] = business_location
         self.business_opening_hours: Optional["BusinessOpeningHours"] = business_opening_hours
 
-        if self.__class__.__name__ == "Chat":
+        if self.__class__ is Chat:
             for arg in _deprecated_attrs:
                 if (val := object.__getattribute__(self, arg)) is not None and val != ():
                     warn(
@@ -920,7 +920,7 @@ class Chat(TelegramObject):
         self._freeze()
 
     def __getattribute__(self, name: str) -> Any:
-        if name in _deprecated_attrs and self.__class__.__name__ == "Chat":
+        if name in _deprecated_attrs and self.__class__ is Chat:
             warn(
                 f"The attribute `{name}` is deprecated and will only be accessible via "
                 "`ChatFullInfo` in the future.",
