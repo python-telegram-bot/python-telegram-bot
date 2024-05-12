@@ -16,7 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 import datetime
+import warnings
 
 import pytest
 
@@ -35,9 +37,11 @@ from telegram import (
     ReactionTypeEmoji,
     User,
 )
+from telegram._chat import _deprecated_attrs
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ChatAction, ChatType, ReactionEmoji
 from telegram.helpers import escape_markdown
+from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -84,6 +88,8 @@ def chat(bot):
         business_opening_hours=TestChatBase.business_opening_hours,
         birthdate=Birthdate(1, 1),
         personal_chat=TestChatBase.personal_chat,
+        first_name=TestChatBase.first_name,
+        last_name=TestChatBase.last_name,
     )
     chat.set_bot(bot)
     chat._unfreeze()
@@ -137,6 +143,8 @@ class TestChatBase:
     custom_emoji_sticker_set_name = "custom_emoji_sticker_set_name"
     birthdate = Birthdate(1, 1)
     personal_chat = Chat(3, "private", "private")
+    first_name = "first"
+    last_name = "last"
 
 
 class TestChatWithoutRequest(TestChatBase):
@@ -185,6 +193,8 @@ class TestChatWithoutRequest(TestChatBase):
             "custom_emoji_sticker_set_name": self.custom_emoji_sticker_set_name,
             "birthdate": self.birthdate.to_dict(),
             "personal_chat": self.personal_chat.to_dict(),
+            "first_name": self.first_name,
+            "last_name": self.last_name,
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -230,6 +240,8 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.custom_emoji_sticker_set_name == self.custom_emoji_sticker_set_name
         assert chat.birthdate == self.birthdate
         assert chat.personal_chat == self.personal_chat
+        assert chat.first_name == self.first_name
+        assert chat.last_name == self.last_name
 
     def test_de_json_localization(self, bot, raw_bot, tz_bot):
         json_dict = {
@@ -250,6 +262,15 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_bot.emoji_status_expiration_date.tzinfo == UTC
         assert chat_bot_raw.emoji_status_expiration_date.tzinfo == UTC
         assert emoji_expire_offset_tz == emoji_expire_offset
+
+    def test_always_tuples_attributes(self):
+        chat = Chat(
+            id=123,
+            title="title",
+            type=Chat.PRIVATE,
+        )
+        assert isinstance(chat.active_usernames, tuple)
+        assert chat.active_usernames == ()
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -300,15 +321,25 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_dict["unrestrict_boost_count"] == chat.unrestrict_boost_count
         assert chat_dict["birthdate"] == chat.birthdate.to_dict()
         assert chat_dict["personal_chat"] == chat.personal_chat.to_dict()
+        assert chat_dict["first_name"] == chat.first_name
+        assert chat_dict["last_name"] == chat.last_name
 
-    def test_always_tuples_attributes(self):
-        chat = Chat(
-            id=123,
-            title="title",
-            type=Chat.PRIVATE,
-        )
-        assert isinstance(chat.active_usernames, tuple)
-        assert chat.active_usernames == ()
+    def test_deprecated_attributes(self, chat):
+        for depr_attr in _deprecated_attrs:
+            with pytest.warns(PTBDeprecationWarning, match="deprecated and will only be accessib"):
+                getattr(chat, depr_attr)
+        with warnings.catch_warnings():  # No warning should be raised
+            warnings.simplefilter("error")
+            chat.id
+            chat.first_name
+
+    def test_deprecated_arguments(self):
+        for depr_attr in _deprecated_attrs:
+            with pytest.warns(PTBDeprecationWarning, match="deprecated and will only be availabl"):
+                Chat(1, "type", **{depr_attr: "1"})
+        with warnings.catch_warnings():  # No warning should be raised
+            warnings.simplefilter("error")
+            Chat(1, "type", first_name="first_name")
 
     def test_enum_init(self):
         chat = Chat(id=1, type="foo")
@@ -348,10 +379,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.full_name == "first\u2022name last\u2022name"
         chat = Chat(id=1, type=Chat.PRIVATE, first_name="first\u2022name")
         assert chat.full_name == "first\u2022name"
-        chat = Chat(
-            id=1,
-            type=Chat.PRIVATE,
-        )
+        chat = Chat(id=1, type=Chat.PRIVATE)
         assert chat.full_name is None
 
     def test_effective_name(self):
@@ -588,7 +616,7 @@ class TestChatWithoutRequest(TestChatBase):
     async def test_set_permissions(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs["chat_id"] == chat.id
-            permissions = kwargs["permissions"] == self.permissions
+            permissions = kwargs["permissions"] == ChatPermissions.all_permissions()
             return chat_id and permissions
 
         assert check_shortcut_signature(
@@ -600,7 +628,7 @@ class TestChatWithoutRequest(TestChatBase):
         assert await check_defaults_handling(chat.set_permissions, chat.get_bot())
 
         monkeypatch.setattr(chat.get_bot(), "set_chat_permissions", make_assertion)
-        assert await chat.set_permissions(permissions=self.permissions)
+        assert await chat.set_permissions(permissions=ChatPermissions.all_permissions())
 
     async def test_set_administrator_custom_title(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):

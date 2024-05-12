@@ -46,6 +46,7 @@ Available Types
     telegram.chatboostsourcegiveaway
     telegram.chatboostsourcepremium
     telegram.chatboostupdated
+    telegram.chatfullinfo
     telegram.chatinvitelink
     telegram.chatjoinrequest
     telegram.chatlocation

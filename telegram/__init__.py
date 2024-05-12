@@ -64,6 +64,7 @@ __all__ = (
     "ChatBoostSourceGiveaway",
     "ChatBoostSourcePremium",
     "ChatBoostUpdated",
+    "ChatFullInfo",
     "ChatInviteLink",
     "ChatJoinRequest",
     "ChatLocation",
@@ -292,6 +293,7 @@ from ._chatboost import (
     ChatBoostUpdated,
     UserChatBoosts,
 )
+from ._chatfullinfo import ChatFullInfo
 from ._chatinvitelink import ChatInviteLink
 from ._chatjoinrequest import ChatJoinRequest
 from ._chatlocation import ChatLocation

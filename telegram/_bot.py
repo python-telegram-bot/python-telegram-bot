@@ -58,9 +58,9 @@ from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
 from telegram._botname import BotName
 from telegram._business import BusinessConnection
-from telegram._chat import Chat
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._chatboost import UserChatBoosts
+from telegram._chatfullinfo import ChatFullInfo
 from telegram._chatinvitelink import ChatInviteLink
 from telegram._chatmember import ChatMember
 from telegram._chatpermissions import ChatPermissions
@@ -4445,16 +4445,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Chat:
+    ) -> ChatFullInfo:
         """
         Use this method to get up to date information about the chat (current name of the user for
         one-on-one conversations, current username of a user, group or channel, etc.).
+
+        .. versionchanged:: NEXT.VERSION
+            In accordance to Bot API 7.3, this method now returns a :class:`telegram.ChatFullInfo`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
 
         Returns:
-            :class:`telegram.Chat`
+            :class:`telegram.ChatFullInfo`
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -4472,7 +4475,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-        return Chat.de_json(result, self)  # type: ignore[return-value]
+        return ChatFullInfo.de_json(result, self)  # type: ignore[return-value]
 
     async def get_chat_administrators(
         self,
