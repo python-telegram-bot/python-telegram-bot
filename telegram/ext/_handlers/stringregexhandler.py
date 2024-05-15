@@ -52,7 +52,7 @@ class StringRegexHandler(BaseHandler[str, CCT]):
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::
 
-                async def callback(update: Update, context: CallbackContext)
+                async def callback(update: str, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
