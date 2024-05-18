@@ -524,7 +524,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
     @classmethod
     def _warn(
-        cls, message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0
+        cls,
+        message: Union[str, PTBUserWarning],
+        category: Type[Warning] = PTBUserWarning,
+        stacklevel: int = 0,
     ) -> None:
         """Convenience method to issue a warning. This method is here mostly to make it easier
         for ExtBot to add 1 level to all warning calls.
@@ -837,7 +840,6 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     f"Please use 'Bot.{endpoint}' instead of "
                     f"'Bot.do_api_request(\"{endpoint}\", ...)'"
                 ),
-                PTBDeprecationWarning,
                 stacklevel=2,
             )
 
@@ -4209,10 +4211,12 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             except NotImplementedError:
                 arg_read_timeout = 2
                 self._warn(
-                    f"The class {self._request[0].__class__.__name__} does not override "
-                    "the property `read_timeout`. Overriding this property will be mandatory in "
-                    "future versions. Using 2 seconds as fallback.",
-                    PTBDeprecationWarning,
+                    PTBDeprecationWarning(
+                        "20.7",
+                        f"The class {self._request[0].__class__.__name__} does not override "
+                        "the property `read_timeout`. Overriding this property will be mandatory "
+                        "in future versions. Using 2 seconds as fallback.",
+                    ),
                     stacklevel=2,
                 )
 

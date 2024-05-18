@@ -2076,6 +2076,7 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.do_api_request("camel_case")
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     async def test_do_api_request_media_write_timeout(self, bot, chat_id, monkeypatch):
         test_flag = None
 
@@ -2114,6 +2115,7 @@ class TestBotWithoutRequest:
             DEFAULT_NONE,
         )
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     async def test_do_api_request_default_timezone(self, tz_bot, monkeypatch):
         until = dtm.datetime(2020, 1, 11, 16, 13)
         until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
@@ -4061,7 +4063,7 @@ class TestBotWithRequest:
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     async def test_do_api_request_warning_known_method(self, bot, bot_class):
-        with pytest.warns(PTBDeprecationWarning, match="Please use 'Bot.get_me'") as record:
+        with pytest.warns(PTBUserWarning, match="Please use 'Bot.get_me'") as record:
             await bot_class(bot.token).do_api_request("get_me")
 
         assert record[0].filename == __file__, "Wrong stack level!"
@@ -4070,6 +4072,7 @@ class TestBotWithRequest:
         with pytest.raises(EndPointNotFound, match="'unknownEndpoint' not found"):
             await bot.do_api_request("unknown_endpoint")
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     async def test_do_api_request_invalid_token(self, bot):
         # we do not initialize the bot here on purpose b/c that's the case were we actually
         # do not know for sure if the token is invalid or the method was not found
@@ -4084,6 +4087,7 @@ class TestBotWithRequest:
         ):
             await Bot(bot.token).do_api_request("unknown_endpoint")
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     @pytest.mark.parametrize("return_type", [Message, None])
     async def test_do_api_request_basic_and_files(self, bot, chat_id, return_type):
         result = await bot.do_api_request(
@@ -4108,6 +4112,7 @@ class TestBotWithRequest:
         assert out.read() == data_file("telegram.png").open("rb").read()
         assert result.document.file_name == "telegram.png"
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     @pytest.mark.parametrize("return_type", [Message, None])
     async def test_do_api_request_list_return_type(self, bot, chat_id, return_type):
         result = await bot.do_api_request(
@@ -4146,6 +4151,7 @@ class TestBotWithRequest:
             assert out.read() == data_file(file_name).open("rb").read()
             assert message.document.file_name == file_name
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     @pytest.mark.parametrize("return_type", [Message, None])
     async def test_do_api_request_bool_return_type(self, bot, chat_id, return_type):
         assert await bot.do_api_request("delete_my_commands", return_type=return_type) is True

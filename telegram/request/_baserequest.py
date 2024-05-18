@@ -318,10 +318,12 @@ class BaseRequest(
             and isinstance(write_timeout, DefaultValue)
         ):
             warn(
-                f"The `write_timeout` parameter passed to {self.__class__.__name__}.do_request "
-                "will default to `BaseRequest.DEFAULT_NONE` instead of 20 in future versions "
-                "for *all* methods of the `Bot` class, including methods sending media.",
-                PTBDeprecationWarning,
+                PTBDeprecationWarning(
+                    "20.7",
+                    f"The `write_timeout` parameter passed to {self.__class__.__name__}.do_request"
+                    " will default to `BaseRequest.DEFAULT_NONE` instead of 20 in future versions "
+                    "for *all* methods of the `Bot` class, including methods sending media.",
+                ),
                 stacklevel=3,
             )
             write_timeout = 20

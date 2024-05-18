@@ -56,4 +56,11 @@ class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
        Renamed TelegramDeprecationWarning to PTBDeprecationWarning.
     """
 
-    __slots__ = ()
+    __slots__ = ("message", "version")
+
+    def __init__(self, version: str, message: str) -> None:
+        self.version = version
+        self.message = message
+
+    def __str__(self) -> str:
+        return f"Deprecated since version {self.version}: {self.message}"

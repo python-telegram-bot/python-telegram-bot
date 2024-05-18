@@ -528,9 +528,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
         warn(
-            "`ApplicationBuilder.proxy_url` is deprecated since version "
-            "20.7. Use `ApplicationBuilder.proxy` instead.",
-            PTBDeprecationWarning,
+            PTBDeprecationWarning(
+                "20.7",
+                "`ApplicationBuilder.proxy_url` is deprecated. Use `ApplicationBuilder.proxy` "
+                "instead.",
+            ),
             stacklevel=2,
         )
         return self.proxy(proxy_url)
@@ -760,9 +762,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
         warn(
-            "`ApplicationBuilder.get_updates_proxy_url` is deprecated since version "
-            "20.7. Use `ApplicationBuilder.get_updates_proxy` instead.",
-            PTBDeprecationWarning,
+            PTBDeprecationWarning(
+                "20.7",
+                "`ApplicationBuilder.get_updates_proxy_url` is deprecated. Use "
+                "`ApplicationBuilder.get_updates_proxy` instead.",
+            ),
             stacklevel=2,
         )
         return self.get_updates_proxy(get_updates_proxy_url)
