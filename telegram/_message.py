@@ -65,6 +65,7 @@ from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
+from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import (
     CorrectOptionID,
     FileInput,
@@ -4202,9 +4203,7 @@ class Message(MaybeInaccessibleMessage):
         if not self.text:
             raise RuntimeError("This Message has no 'text'.")
 
-        entity_text = self.text.encode("utf-16-le")
-        entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
-        return entity_text.decode("utf-16-le")
+        return parse_message_entity(self.text, entity)
 
     def parse_caption_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
@@ -4228,9 +4227,7 @@ class Message(MaybeInaccessibleMessage):
         if not self.caption:
             raise RuntimeError("This Message has no 'caption'.")
 
-        entity_text = self.caption.encode("utf-16-le")
-        entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
-        return entity_text.decode("utf-16-le")
+        return parse_message_entity(self.caption, entity)
 
     def parse_entities(self, types: Optional[List[str]] = None) -> Dict[MessageEntity, str]:
         """
@@ -4255,12 +4252,7 @@ class Message(MaybeInaccessibleMessage):
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         """
-        if types is None:
-            types = MessageEntity.ALL_TYPES
-
-        return {
-            entity: self.parse_entity(entity) for entity in self.entities if entity.type in types
-        }
+        return parse_message_entities(self.text, self.entities, types=types)
 
     def parse_caption_entities(
         self, types: Optional[List[str]] = None
@@ -4287,14 +4279,7 @@ class Message(MaybeInaccessibleMessage):
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         """
-        if types is None:
-            types = MessageEntity.ALL_TYPES
-
-        return {
-            entity: self.parse_caption_entity(entity)
-            for entity in self.caption_entities
-            if entity.type in types
-        }
+        return parse_message_entities(self.caption, self.caption_entities, types=types)
 
     @classmethod
     def _parse_html(

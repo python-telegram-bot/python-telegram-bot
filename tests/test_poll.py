@@ -237,6 +237,7 @@ def poll():
         explanation_entities=TestPollBase.explanation_entities,
         open_period=TestPollBase.open_period,
         close_date=TestPollBase.close_date,
+        question_entities=TestPollBase.question_entities,
     )
     poll._unfreeze()
     return poll
@@ -244,7 +245,7 @@ def poll():
 
 class TestPollBase:
     id_ = "id"
-    question = "Test?"
+    question = "Test Question?"
     options = [PollOption("test", 10), PollOption("test2", 11)]
     total_voter_count = 0
     is_closed = True
@@ -258,6 +259,10 @@ class TestPollBase:
     explanation_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     open_period = 42
     close_date = datetime.now(timezone.utc)
+    question_entities = [
+        MessageEntity(MessageEntity.BOLD, 0, 4),
+        MessageEntity(MessageEntity.ITALIC, 5, 8),
+    ]
 
 
 class TestPollWithoutRequest(TestPollBase):
@@ -275,6 +280,7 @@ class TestPollWithoutRequest(TestPollBase):
             "explanation_entities": [self.explanation_entities[0].to_dict()],
             "open_period": self.open_period,
             "close_date": to_timestamp(self.close_date),
+            "question_entities": [e.to_dict() for e in self.question_entities],
         }
         poll = Poll.de_json(json_dict, bot)
         assert poll.api_kwargs == {}
@@ -296,6 +302,7 @@ class TestPollWithoutRequest(TestPollBase):
         assert poll.open_period == self.open_period
         assert abs(poll.close_date - self.close_date) < timedelta(seconds=1)
         assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)
+        assert poll.question_entities == tuple(self.question_entities)
 
     def test_de_json_localization(self, tz_bot, bot, raw_bot):
         json_dict = {
@@ -311,6 +318,7 @@ class TestPollWithoutRequest(TestPollBase):
             "explanation_entities": [self.explanation_entities[0].to_dict()],
             "open_period": self.open_period,
             "close_date": to_timestamp(self.close_date),
+            "question_entities": [e.to_dict() for e in self.question_entities],
         }
 
         poll_raw = Poll.de_json(json_dict, raw_bot)
@@ -343,6 +351,7 @@ class TestPollWithoutRequest(TestPollBase):
         assert poll_dict["explanation_entities"] == [poll.explanation_entities[0].to_dict()]
         assert poll_dict["open_period"] == poll.open_period
         assert poll_dict["close_date"] == to_timestamp(poll.close_date)
+        assert poll_dict["question_entities"] == [e.to_dict() for e in poll.question_entities]
 
     def test_equality(self):
         a = Poll(123, "question", ["O1", "O2"], 1, False, True, Poll.REGULAR, True)
@@ -383,7 +392,7 @@ class TestPollWithoutRequest(TestPollBase):
         )
         assert poll.type is PollType.QUIZ
 
-    def test_parse_entity(self, poll):
+    def test_parse_explanation_entity(self, poll):
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         poll.explanation_entities = [entity]
 
@@ -401,10 +410,24 @@ class TestPollWithoutRequest(TestPollBase):
                 allows_multiple_answers=False,
             ).parse_explanation_entity(entity)
 
-    def test_parse_entities(self, poll):
+    def test_parse_explanation_entities(self, poll):
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
         poll.explanation_entities = [entity_2, entity]
 
         assert poll.parse_explanation_entities(MessageEntity.URL) == {entity: "http://google.com"}
         assert poll.parse_explanation_entities() == {entity: "http://google.com", entity_2: "h"}
+
+    def test_parse_question_entity(self, poll):
+        entity = MessageEntity(MessageEntity.ITALIC, 5, 8)
+        poll.question_entities = [entity]
+
+        assert poll.parse_question_entity(entity) == "Question"
+
+    def test_parse_question_entities(self, poll):
+        entity = MessageEntity(MessageEntity.ITALIC, 5, 8)
+        entity_2 = MessageEntity(MessageEntity.BOLD, 0, 4)
+        poll.question_entities = [entity_2, entity]
+
+        assert poll.parse_question_entities(MessageEntity.ITALIC) == {entity: "Question"}
+        assert poll.parse_question_entities() == {entity: "Question", entity_2: "Test"}
