@@ -401,7 +401,7 @@ class _InvertedFilter(UpdateFilter):
         return f"<inverted {self.inv_filter}>"
 
     @name.setter
-    def name(self, name: str) -> NoReturn:
+    def name(self, _: str) -> NoReturn:
         raise RuntimeError("Cannot set name for combined filters.")
 
 
@@ -492,7 +492,7 @@ class _MergedFilter(UpdateFilter):
         )
 
     @name.setter
-    def name(self, name: str) -> NoReturn:
+    def name(self, _: str) -> NoReturn:
         raise RuntimeError("Cannot set name for combined filters.")
 
 
@@ -522,14 +522,14 @@ class _XORFilter(UpdateFilter):
         return f"<{self.base_filter} xor {self.xor_filter}>"
 
     @name.setter
-    def name(self, name: str) -> NoReturn:
+    def name(self, _: str) -> NoReturn:
         raise RuntimeError("Cannot set name for combined filters.")
 
 
 class _All(MessageFilter):
     __slots__ = ()
 
-    def filter(self, message: Message) -> bool:
+    def filter(self, message: Message) -> bool:  # noqa: ARG002
         return True
 
 
@@ -809,7 +809,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         )
 
     @name.setter
-    def name(self, name: str) -> NoReturn:
+    def name(self, _: str) -> NoReturn:
         raise RuntimeError(f"Cannot set name for filters.{self.__class__.__name__}")
 
 
