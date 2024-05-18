@@ -439,6 +439,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         # 5) handle the ReplyParameters case (see below)
         # 6) handle text_parse_mode in InputPollOption
         for key, val in data.items():
+            if key == "question_parse_mode":
+                print(isinstance(val, DefaultValue), self.defaults.api_defaults.get(key, val.value))
             # 1)
             if isinstance(val, DefaultValue):
                 data[key] = self.defaults.api_defaults.get(key, val.value)
@@ -2950,6 +2952,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        question_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        question_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
