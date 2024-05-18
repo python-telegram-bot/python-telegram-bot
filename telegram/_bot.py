@@ -2287,9 +2287,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         Use this method to send audio files, if you want Telegram clients to display the file
         as a playable voice message. For this to work, your audio must be in an ``.ogg`` file
-        encoded with OPUS (other formats may be sent as Audio or Document). Bots can currently
-        send voice messages of up to :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD`
-        in size, this limit may be changed in the future.
+        encoded with OPUS , or in .MP3 format, or in .M4A format (other formats may be sent as
+        :class:`~telegram.Audio` or :class:`~telegram.Document`). Bots can currently send voice
+        messages of up to :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD` in size,
+        this limit may be changed in the future.
 
         Note:
             To use this method, the file must have the type :mimetype:`audio/ogg` and be no more
@@ -2610,7 +2611,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             live_period (:obj:`int`, optional): Period in seconds for which the location will be
                 updated, should be between
                 :tg-const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD` and
-                :tg-const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`.
+                :tg-const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`, or
+                :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
+                locations that can be edited indefinitely.
             heading (:obj:`int`, optional): For live locations, a direction in which the user is
                 moving, in degrees. Must be between
                 :tg-const:`telegram.constants.LocationLimit.MIN_HEADING` and
@@ -2763,8 +2766,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 can be updated, starting from the message send date. If
                 :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` is specified,
                 then the location can be updated forever. Otherwise, the new value must not exceed
-                the current live_period by more than a day, and the live location expiration date
-                must remain within the next 90 days. If not specified, then `live_period`
+                the current ``live_period`` by more than a day, and the live location expiration
+                date must remain within the next 90 days. If not specified, then ``live_period``
                 remains unchanged
 
                 .. versionadded:: NEXT.VERSION.
@@ -5325,7 +5328,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.6
             can_edit_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                edit stories posted by other users.
+                edit stories posted by other users, post stories to the chat page, pin chat
+                stories, and access the chat's story archive
 
                 .. versionadded:: 20.6
             can_delete_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can

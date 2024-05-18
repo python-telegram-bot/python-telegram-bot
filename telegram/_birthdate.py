@@ -26,7 +26,7 @@ from telegram._utils.types import JSONDict
 
 class Birthdate(TelegramObject):
     """
-    This object represents a user's birthday.
+    This object describes the birthdate of a user.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`day`, and :attr:`month` are equal.

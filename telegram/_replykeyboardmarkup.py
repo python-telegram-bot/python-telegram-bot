@@ -28,7 +28,8 @@ from telegram._utils.types import JSONDict
 
 
 class ReplyKeyboardMarkup(TelegramObject):
-    """This object represents a custom keyboard with reply options.
+    """This object represents a custom keyboard with reply options. Not supported in channels and
+    for messages sent on behalf of a Telegram Business account.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their size of :attr:`keyboard` and all the buttons are equal.
