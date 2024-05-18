@@ -105,7 +105,11 @@ class TestInputPollOptionWithoutRequest(TestInputPollOptionBase):
 
 @pytest.fixture(scope="module")
 def poll_option():
-    out = PollOption(text=TestPollOptionBase.text, voter_count=TestPollOptionBase.voter_count)
+    out = PollOption(
+        text=TestPollOptionBase.text,
+        voter_count=TestPollOptionBase.voter_count,
+        text_entities=TestPollOptionBase.text_entities,
+    )
     out._unfreeze()
     return out
 
@@ -113,6 +117,10 @@ def poll_option():
 class TestPollOptionBase:
     text = "test option"
     voter_count = 3
+    text_entities = [
+        MessageEntity(MessageEntity.BOLD, 0, 4),
+        MessageEntity(MessageEntity.ITALIC, 5, 6),
+    ]
 
 
 class TestPollOptionWithoutRequest(TestPollOptionBase):
@@ -129,12 +137,42 @@ class TestPollOptionWithoutRequest(TestPollOptionBase):
         assert poll_option.text == self.text
         assert poll_option.voter_count == self.voter_count
 
+    def test_de_json_all(self):
+        json_dict = {
+            "text": self.text,
+            "voter_count": self.voter_count,
+            "text_entities": [e.to_dict() for e in self.text_entities],
+        }
+        poll_option = PollOption.de_json(json_dict, None)
+        assert poll_option.api_kwargs == {}
+
+        assert poll_option.text == self.text
+        assert poll_option.voter_count == self.voter_count
+        assert poll_option.text_entities == tuple(self.text_entities)
+
     def test_to_dict(self, poll_option):
         poll_option_dict = poll_option.to_dict()
 
         assert isinstance(poll_option_dict, dict)
         assert poll_option_dict["text"] == poll_option.text
         assert poll_option_dict["voter_count"] == poll_option.voter_count
+        assert poll_option_dict["text_entities"] == [
+            e.to_dict() for e in poll_option.text_entities
+        ]
+
+    def test_parse_entity(self, poll_option):
+        entity = MessageEntity(MessageEntity.BOLD, 0, 4)
+        poll_option.text_entities = [entity]
+
+        assert poll_option.parse_entity(entity) == "test"
+
+    def test_parse_entities(self, poll_option):
+        entity = MessageEntity(MessageEntity.BOLD, 0, 4)
+        entity_2 = MessageEntity(MessageEntity.ITALIC, 5, 6)
+        poll_option.text_entities = [entity, entity_2]
+
+        assert poll_option.parse_entities(MessageEntity.BOLD) == {entity: "test"}
+        assert poll_option.parse_entities() == {entity: "test", entity_2: "option"}
 
     def test_equality(self):
         a = PollOption("text", 1)

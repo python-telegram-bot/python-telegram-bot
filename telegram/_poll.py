@@ -114,25 +114,100 @@ class PollOption(TelegramObject):
             :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
             characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
+        text_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities
+            that appear in the option text. Currently, only custom emoji entities are allowed in
+            poll option texts.
+
+            .. versionchanged:: NEXT.VERSION
 
     Attributes:
         text (:obj:`str`): Option text,
             :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
             characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
+        text_entities (Tuple[:class:`telegram.MessageEntity`]): Special entities
+            that appear in the option text. Currently, only custom emoji entities are allowed in
+            poll option texts.
+            This list is empty if the question does not contain entities.
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
-    __slots__ = ("text", "voter_count")
+    __slots__ = ("text", "text_entities", "voter_count")
 
-    def __init__(self, text: str, voter_count: int, *, api_kwargs: Optional[JSONDict] = None):
+    def __init__(
+        self,
+        text: str,
+        voter_count: int,
+        text_entities: Optional[Sequence[MessageEntity]] = None,
+        *,
+        api_kwargs: Optional[JSONDict] = None,
+    ):
         super().__init__(api_kwargs=api_kwargs)
         self.text: str = text
         self.voter_count: int = voter_count
+        self.text_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
 
         self._id_attrs = (self.text, self.voter_count)
 
         self._freeze()
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["PollOption"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["text_entities"] = MessageEntity.de_list(data.get("text_entities"), bot)
+
+        return super().de_json(data=data, bot=bot)
+
+    def parse_entity(self, entity: MessageEntity) -> str:
+        """Returns the text in :attr:`text`
+        from a given :class:`telegram.MessageEntity` of :attr:`text_entities`.
+
+        Note:
+            This method is present because Telegram calculates the offset and length in
+            UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
+            (That is, you can't just slice ``Message.text`` with the offset and length.)
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
+                be an entity that belongs to :attr:`text_entities`.
+
+        Returns:
+            :obj:`str`: The text of the given entity.
+        """
+        return parse_message_entity(self.text, entity)
+
+    def parse_entities(self, types: Optional[List[str]] = None) -> Dict[MessageEntity, str]:
+        """
+        Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
+        It contains entities from this polls question filtered by their ``type`` attribute as
+        the key, and the text that each entity belongs to as the value of the :obj:`dict`.
+
+        Note:
+            This method should always be used instead of the :attr:`text_entities`
+            attribute, since it calculates the correct substring from the message text based on
+            UTF-16 codepoints. See :attr:`parse_entity` for more info.
+
+        .. versionadded:: NEXT.VERSION
+
+        Args:
+            types (List[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
+                    ``type`` attribute of an entity is contained in this list, it will be returned.
+                    Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
+
+        Returns:
+            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            the text that belongs to them, calculated based on UTF-16 codepoints.
+        """
+        return parse_message_entities(self.text, self.text_entities, types)
 
     MIN_LENGTH: Final[int] = constants.PollLimit.MIN_OPTION_LENGTH
     """:const:`telegram.constants.PollLimit.MIN_OPTION_LENGTH`
