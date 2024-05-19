@@ -59,8 +59,8 @@ class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
     __slots__ = ("message", "version")
 
     def __init__(self, version: str, message: str) -> None:
-        self.version = version
-        self.message = message
+        self.version: str = version
+        self.message: str = message
 
     def __str__(self) -> str:
         return f"Deprecated since version {self.version}: {self.message}"

@@ -161,6 +161,6 @@ class ChatFullInfo(Chat):
 
         # Required and unique to this class-
         with self._unfrozen():
-            self.max_reaction_count = max_reaction_count
+            self.max_reaction_count: int = max_reaction_count
 
         self._freeze()
