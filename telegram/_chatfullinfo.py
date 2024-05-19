@@ -40,8 +40,6 @@ class ChatFullInfo(Chat):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.Chat.id` is equal.
 
-    .. versionadded:: NEXT.VERSION
-
     Caution:
         This class is a subclass of :class:`telegram.Chat` and inherits all attributes and methods
         for backwards compatibility. In the future, this class will *NOT* inherit from
@@ -49,6 +47,8 @@ class ChatFullInfo(Chat):
 
     .. seealso::
         All arguments and attributes can be found in :class:`telegram.Chat`.
+
+    .. versionadded:: NEXT.VERSION
 
     Args:
         max_reaction_count (:obj:`int`): The maximum number of reactions that can be set on a
