@@ -144,6 +144,7 @@ class TestPollOptionWithoutRequest(TestPollOptionBase):
             "text_entities": [e.to_dict() for e in self.text_entities],
         }
         poll_option = PollOption.de_json(json_dict, None)
+        assert PollOption.de_json(None, None) is None
         assert poll_option.api_kwargs == {}
 
         assert poll_option.text == self.text
@@ -455,6 +456,18 @@ class TestPollWithoutRequest(TestPollBase):
 
         assert poll.parse_explanation_entities(MessageEntity.URL) == {entity: "http://google.com"}
         assert poll.parse_explanation_entities() == {entity: "http://google.com", entity_2: "h"}
+
+        with pytest.raises(RuntimeError, match="Poll has no"):
+            Poll(
+                "id",
+                "question",
+                [PollOption("text", voter_count=0)],
+                total_voter_count=0,
+                is_closed=False,
+                is_anonymous=False,
+                type=Poll.QUIZ,
+                allows_multiple_answers=False,
+            ).parse_explanation_entities()
 
     def test_parse_question_entity(self, poll):
         entity = MessageEntity(MessageEntity.ITALIC, 5, 8)
