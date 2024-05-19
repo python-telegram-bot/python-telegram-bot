@@ -118,7 +118,7 @@ class PollOption(TelegramObject):
             that appear in the option text. Currently, only custom emoji entities are allowed in
             poll option texts.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         text (:obj:`str`): Option text,
@@ -544,6 +544,8 @@ class Poll(TelegramObject):
         """Returns the text in :attr:`question` from a given :class:`telegram.MessageEntity` of
         :attr:`question_entities`.
 
+        .. versionadded:: NEXT.VERSION
+
         Note:
             This method is present because Telegram calculates the offset and length in
             UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
@@ -565,6 +567,8 @@ class Poll(TelegramObject):
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this polls question filtered by their ``type`` attribute as
         the key, and the text that each entity belongs to as the value of the :obj:`dict`.
+
+        .. versionadded:: NEXT.VERSION
 
         Note:
             This method should always be used instead of the :attr:`question_entities`

@@ -6925,8 +6925,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionadded:: NEXT.VERSION
             question_entities (Sequence[:class:`telegram.Message`], optional): Special entities
-                that appear in the poll :paramref:`question`. Can be specified instead of
+                that appear in the poll :paramref:`question`. It can be specified instead of
                 :paramref:`question_parse_mode`.
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -6955,7 +6957,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        print("send_poll got called", repr(question_parse_mode))
         data: JSONDict = {
             "chat_id": chat_id,
             "question": question,

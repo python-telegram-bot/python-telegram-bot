@@ -1952,9 +1952,6 @@ class TestBotWithoutRequest:
     async def test_send_poll_default_text_question_parse_mode(
         self, default_bot, raw_bot, chat_id, custom, monkeypatch
     ):
-        print()
-        print("custom", custom)
-        print("default", default_bot.defaults.question_parse_mode)
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             expected = default_bot.defaults.text_parse_mode if custom == "NOTHING" else custom
 
@@ -1962,11 +1959,6 @@ class TestBotWithoutRequest:
             option_2 = request_data.parameters["options"][1]
             assert option_1.get("text_parse_mode") == (default_bot.defaults.text_parse_mode)
             assert option_2.get("text_parse_mode") == expected
-
-            print("make_assertion")
-            print(expected)
-            print(request_data.parameters)
-
             assert request_data.parameters.get("question_parse_mode") == expected
 
             return make_message("dummy reply").to_dict()
@@ -1995,18 +1987,12 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         await default_bot.send_poll(
-            chat_id,
-            question="question",
-            options=["option1", option_2],
-            **kwargs
+            chat_id, question="question", options=["option1", option_2], **kwargs
         )
 
         monkeypatch.setattr(raw_bot.request, "post", make_raw_assertion)
         await raw_bot.send_poll(
-            chat_id,
-            question="question",
-            options=["option1", option_2],
-            **kwargs
+            chat_id, question="question", options=["option1", option_2], **kwargs
         )
 
     @pytest.mark.parametrize(

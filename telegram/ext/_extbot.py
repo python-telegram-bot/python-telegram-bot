@@ -439,8 +439,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         # 5) handle the ReplyParameters case (see below)
         # 6) handle text_parse_mode in InputPollOption
         for key, val in data.items():
-            if key == "question_parse_mode":
-                print(isinstance(val, DefaultValue), self.defaults.api_defaults.get(key, val.value))
             # 1)
             if isinstance(val, DefaultValue):
                 data[key] = self.defaults.api_defaults.get(key, val.value)
@@ -491,6 +489,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
                 data[key] = new_value
 
+            # 6)
             elif isinstance(val, Sequence) and all(
                 isinstance(obj, InputPollOption) for obj in val
             ):
@@ -2991,6 +2990,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            question_parse_mode=question_parse_mode,
+            question_entities=question_entities,
         )
 
     async def send_sticker(
