@@ -910,10 +910,12 @@ class Chat(TelegramObject):
             for arg in _deprecated_attrs:
                 if (val := object.__getattribute__(self, arg)) is not None and val != ():
                     warn(
-                        f"The argument `{arg}` is deprecated and will only be available via "
-                        "`ChatFullInfo` in the future.",
+                        PTBDeprecationWarning(
+                            "NEXT.VERSION",
+                            f"The argument `{arg}` is deprecated and will only be available via "
+                            "`ChatFullInfo` in the future.",
+                        ),
                         stacklevel=2,
-                        category=PTBDeprecationWarning,
                     )
 
         self._id_attrs = (self.id,)
@@ -923,10 +925,12 @@ class Chat(TelegramObject):
     def __getattribute__(self, name: str) -> Any:
         if name in _deprecated_attrs and self.__class__ is Chat:
             warn(
-                f"The attribute `{name}` is deprecated and will only be accessible via "
-                "`ChatFullInfo` in the future.",
+                PTBDeprecationWarning(
+                    "NEXT.VERSION",
+                    f"The attribute `{name}` is deprecated and will only be accessible via "
+                    "`ChatFullInfo` in the future.",
+                ),
                 stacklevel=2,
-                category=PTBDeprecationWarning,
             )
         return super().__getattribute__(name)
 

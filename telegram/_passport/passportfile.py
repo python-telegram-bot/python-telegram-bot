@@ -107,9 +107,11 @@ class PassportFile(TelegramObject):
             This attribute will return a datetime instead of a integer in future major versions.
         """
         warn(
-            "The attribute `file_date` will return a datetime instead of an integer in future"
-            " major versions.",
-            PTBDeprecationWarning,
+            PTBDeprecationWarning(
+                "20.6",
+                "The attribute `file_date` will return a datetime instead of an integer in future"
+                " major versions.",
+            ),
             stacklevel=2,
         )
         return self._file_date

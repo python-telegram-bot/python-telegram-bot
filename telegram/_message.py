@@ -1579,9 +1579,11 @@ class Message(MaybeInaccessibleMessage):
 
         if quote is not None:
             warn(
-                "The `quote` parameter is deprecated in favor of the `do_quote` parameter. Please "
-                "update your code to use `do_quote` instead.",
-                PTBDeprecationWarning,
+                PTBDeprecationWarning(
+                    "20.8",
+                    "The `quote` parameter is deprecated in favor of the `do_quote` parameter. "
+                    "Please update your code to use `do_quote` instead.",
+                ),
                 stacklevel=2,
             )
 

@@ -857,9 +857,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         if (read_timeout, write_timeout, connect_timeout, pool_timeout) != ((DEFAULT_NONE,) * 4):
             warn(
-                "Setting timeouts via `Application.run_polling` is deprecated. "
-                "Please use `ApplicationBuilder.get_updates_*_timeout` instead.",
-                PTBDeprecationWarning,
+                PTBDeprecationWarning(
+                    "20.6",
+                    "Setting timeouts via `Application.run_polling` is deprecated. "
+                    "Please use `ApplicationBuilder.get_updates_*_timeout` instead.",
+                ),
                 stacklevel=2,
             )
 
@@ -1183,9 +1185,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             # Generator-based coroutines are not supported in Python 3.12+
             if sys.version_info < (3, 12) and isinstance(coroutine, Generator):
                 warn(
-                    "Generator-based coroutines are deprecated in create_task and will not work"
-                    " in Python 3.12+",
-                    category=PTBDeprecationWarning,
+                    PTBDeprecationWarning(
+                        "20.4",
+                        "Generator-based coroutines are deprecated in create_task and will not"
+                        " work in Python 3.12+",
+                    ),
                 )
                 return await asyncio.create_task(coroutine)
             # If user uses generator in python 3.12+, Exception will happen and we cannot do

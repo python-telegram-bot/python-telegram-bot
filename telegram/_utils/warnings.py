@@ -26,19 +26,28 @@ Warning:
     the changelog.
 """
 import warnings
-from typing import Type
+from typing import Type, Union
 
 from telegram.warnings import PTBUserWarning
 
 
-def warn(message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int = 0) -> None:
+def warn(
+    message: Union[str, PTBUserWarning],
+    category: Type[Warning] = PTBUserWarning,
+    stacklevel: int = 0,
+) -> None:
     """
     Helper function used as a shortcut for warning with default values.
 
     .. versionadded:: 20.0
 
     Args:
-        message (:obj:`str`): Specify the warnings message to pass to ``warnings.warn()``.
+        message (:obj:`str` | :obj:`PTBUserWarning`): Specify the warnings message to pass to
+            ``warnings.warn()``.
+
+            .. versionchanged:: NEXT.VERSION
+                Now also accepts a :obj:`PTBUserWarning` instance.
+
         category (:obj:`Type[Warning]`, optional): Specify the Warning class to pass to
             ``warnings.warn()``. Defaults to :class:`telegram.warnings.PTBUserWarning`.
         stacklevel (:obj:`int`, optional): Specify the stacklevel to pass to ``warnings.warn()``.

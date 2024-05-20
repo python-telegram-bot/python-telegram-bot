@@ -156,9 +156,11 @@ class Defaults:
             raise ValueError("`quote` and `do_quote` are mutually exclusive")
         if disable_web_page_preview is not None:
             warn(
-                "`Defaults.disable_web_page_preview` is deprecated. Use "
-                "`Defaults.link_preview_options` instead.",
-                category=PTBDeprecationWarning,
+                PTBDeprecationWarning(
+                    "20.8",
+                    "`Defaults.disable_web_page_preview` is deprecated. Use "
+                    "`Defaults.link_preview_options` instead.",
+                ),
                 stacklevel=2,
             )
             self._link_preview_options: Optional[LinkPreviewOptions] = LinkPreviewOptions(
@@ -169,8 +171,9 @@ class Defaults:
 
         if quote is not None:
             warn(
-                "`Defaults.quote` is deprecated. Use `Defaults.do_quote` instead.",
-                category=PTBDeprecationWarning,
+                PTBDeprecationWarning(
+                    "20.8", "`Defaults.quote` is deprecated. Use `Defaults.do_quote` instead."
+                ),
                 stacklevel=2,
             )
             self._do_quote: Optional[bool] = quote

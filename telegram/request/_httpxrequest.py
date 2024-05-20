@@ -146,9 +146,9 @@ class HTTPXRequest(BaseRequest):
         if proxy_url is not None:
             proxy = proxy_url
             warn(
-                "The parameter `proxy_url` is deprecated since version 20.7. Use `proxy` "
-                "instead.",
-                PTBDeprecationWarning,
+                PTBDeprecationWarning(
+                    "20.7", "The parameter `proxy_url` is deprecated. Use `proxy` instead."
+                ),
                 stacklevel=2,
             )
 
