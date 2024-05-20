@@ -19,6 +19,7 @@
 """The integration of persistence into the application is tested in test_basepersistence.
 """
 import asyncio
+import functools
 import inspect
 import logging
 import os
@@ -2083,75 +2084,175 @@ class TestApplication:
         assert set(self.received.keys()) == set(expected.keys())
         assert self.received == expected
 
-    @pytest.mark.skipif(
-        platform.system() == "Windows",
-        reason="Can't send signals without stopping whole process on windows",
-    )
-    async def test_cancellation_error_does_not_stop_polling(
-        self, one_time_bot, monkeypatch, caplog
+    @pytest.mark.parametrize("exception", [SystemExit, KeyboardInterrupt])
+    def test_raise_system_exit_keyboard_interrupt_post_init(
+        self, one_time_bot, monkeypatch, exception
     ):
-        """
-        Ensures that hitting CTRL+C while polling *without* run_polling doesn't kill
-        the update_fetcher loop such that a shutdown is still possible.
-        This test is far from perfect, but it's the closest we can come with sane effort.
-        """
+        async def post_init(application):
+            raise exception
+
+        called_callbacks = set()
+
+        async def callback(*args, **kwargs):
+            called_callbacks.add(kwargs["name"])
+
+        for cls, method, entry in [
+            (Application, "initialize", "app_initialize"),
+            (Application, "start", "app_start"),
+            (Application, "stop", "app_stop"),
+            (Application, "shutdown", "app_shutdown"),
+            (Updater, "initialize", "updater_initialize"),
+            (Updater, "shutdown", "updater_shutdown"),
+            (Updater, "stop", "updater_stop"),
+            (Updater, "start_polling", "updater_start_polling"),
+        ]:
+
+            def after(_, name):
+                called_callbacks.add(name)
+
+            monkeypatch.setattr(
+                cls,
+                method,
+                call_after(getattr(cls, method), functools.partial(after, name=entry)),
+            )
+
+        app = (
+            ApplicationBuilder()
+            .bot(one_time_bot)
+            .post_init(post_init)
+            .post_stop(functools.partial(callback, name="post_stop"))
+            .post_shutdown(functools.partial(callback, name="post_shutdown"))
+            .build()
+        )
+
+        app.run_polling(close_loop=False)
+
+        # This checks two things:
+        # 1. start/stop are *not* called!
+        # 2. we do have a graceful shutdown
+        assert called_callbacks == {
+            "app_initialize",
+            "updater_initialize",
+            "app_shutdown",
+            "post_stop",
+            "post_shutdown",
+            "updater_shutdown",
+        }
+
+    @pytest.mark.parametrize("exception", [SystemExit("PTBTest"), KeyboardInterrupt("PTBTest")])
+    @pytest.mark.parametrize("kind", ["handler", "error_handler", "job"])
+    # @pytest.mark.parametrize("block", [True, False])
+    # Testing with block=False would be nice but that doesn't work well with pytest for some reason
+    # in any case, block=False is the simpler behavior since it is roughly similar to what happens
+    # when you hit CTRL+C in the commandline.
+    def test_raise_system_exit_keyboard_jobs_handlers(
+        self, one_time_bot, monkeypatch, exception, kind, caplog
+    ):
+        async def queue_and_raise(application):
+            await application.update_queue.put("will_not_be_processed")
+            raise exception
+
+        async def handler_callback(update, context):
+            if kind == "handler":
+                await queue_and_raise(context.application)
+            elif kind == "error_handler":
+                raise TelegramError("Triggering error callback")
+
+        async def error_callback(update, context):
+            await queue_and_raise(context.application)
+
+        async def job_callback(context):
+            await queue_and_raise(context.application)
+
+        async def enqueue_update():
+            await asyncio.sleep(0.5)
+            await app.update_queue.put(1)
+
+        async def post_init(application):
+            if kind == "job":
+                application.job_queue.run_once(when=0.5, callback=job_callback)
+            else:
+                app.create_task(enqueue_update())
+
+        async def update_logger_callback(update, context):
+            context.bot_data.setdefault("processed_updates", set()).add(update)
+
+        called_callbacks = set()
+
+        async def callback(*args, **kwargs):
+            called_callbacks.add(kwargs["name"])
 
         async def get_updates(*args, **kwargs):
             await asyncio.sleep(0)
-            return [None]
+            return []
 
-        monkeypatch.setattr(one_time_bot, "get_updates", get_updates)
-        app = ApplicationBuilder().bot(one_time_bot).build()
+        for cls, method, entry in [
+            (Application, "initialize", "app_initialize"),
+            (Application, "start", "app_start"),
+            (Application, "stop", "app_stop"),
+            (Application, "shutdown", "app_shutdown"),
+            (Updater, "initialize", "updater_initialize"),
+            (Updater, "shutdown", "updater_shutdown"),
+            (Updater, "stop", "updater_stop"),
+            (Updater, "start_polling", "updater_start_polling"),
+        ]:
 
-        original_get = app.update_queue.get
-        raise_cancelled_error = threading.Event()
+            def after(_, name):
+                called_callbacks.add(name)
 
-        async def get(*arg, **kwargs):
-            await asyncio.sleep(0.05)
-            if raise_cancelled_error.is_set():
-                raise_cancelled_error.clear()
-                raise asyncio.CancelledError("Mocked CancelledError")
-            return await original_get(*arg, **kwargs)
+            monkeypatch.setattr(
+                cls,
+                method,
+                call_after(getattr(cls, method), functools.partial(after, name=entry)),
+            )
 
-        monkeypatch.setattr(app.update_queue, "get", get)
-
-        def thread_target():
-            waited = 0
-            while not app.running:
-                time.sleep(0.05)
-                waited += 0.05
-                if waited > 5:
-                    pytest.fail("App apparently won't start")
-
-            time.sleep(0.1)
-            raise_cancelled_error.set()
-
-        async with app:
-            with caplog.at_level(logging.WARNING):
-                thread = Thread(target=thread_target)
-                await app.start()
-                thread.start()
-                assert thread.is_alive()
-                raise_cancelled_error.wait()
-
-                # The exit should have been caught and the app should still be running
-                assert not thread.is_alive()
-                assert app.running
-
-                # Explicit shutdown is required
-                await app.stop()
-                thread.join()
-
-        assert not thread.is_alive()
-        assert not app.running
-
-        # Make sure that we were warned about the necessity of a manual shutdown
-        assert len(caplog.records) == 1
-        record = caplog.records[0]
-        assert record.name == "telegram.ext.Application"
-        assert record.getMessage().startswith(
-            "Fetching updates got a asyncio.CancelledError. Ignoring"
+        app = (
+            ApplicationBuilder()
+            .bot(one_time_bot)
+            .post_init(post_init)
+            .post_stop(functools.partial(callback, name="post_stop"))
+            .post_shutdown(functools.partial(callback, name="post_shutdown"))
+            .build()
         )
+        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+
+        app.add_handler(TypeHandler(object, update_logger_callback), group=-10)
+        app.add_handler(TypeHandler(object, handler_callback))
+        app.add_error_handler(error_callback)
+        with caplog.at_level(logging.DEBUG):
+            app.run_polling(close_loop=False)
+
+        # This checks that we have a clean shutdown even when the user raises SystemExit
+        # or KeyboardInterrupt in a handler/error handler/job callback
+        assert called_callbacks == {
+            "app_initialize",
+            "app_shutdown",
+            "app_start",
+            "app_stop",
+            "post_shutdown",
+            "post_stop",
+            "updater_initialize",
+            "updater_shutdown",
+            "updater_start_polling",
+            "updater_stop",
+        }
+
+        # These next checks make sure that the update queue is properly cleaned even if there are
+        # still pending updates in the queue
+        # Unfortunately this is apparently extremely hard to get right with jobs, so we're
+        # skipping that case for the sake of simplicity
+        if kind == "job":
+            return
+
+        found = False
+        for record in caplog.records:
+            if record.getMessage() != "Dropping pending update: will_not_be_processed":
+                continue
+            assert record.name == "telegram.ext.Application"
+            assert record.levelno == logging.DEBUG
+            found = True
+        assert found, "`Dropping pending updates` message not found in logs!"
+        assert "will_not_be_processed" not in app.bot_data.get("processed_updates", set())
 
     def test_run_without_updater(self, one_time_bot):
         app = ApplicationBuilder().bot(one_time_bot).updater(None).build()
@@ -2311,7 +2412,43 @@ class TestApplication:
 
         assert len(caplog.records) == 1
         assert caplog.records[-1].name == "telegram.ext.Application"
-        assert caplog.records[-1].getMessage().endswith("stop_running() does nothing.")
+        assert caplog.records[-1].getMessage().endswith("`stop_running()` likely has no effect.")
+
+    def test_stop_running_post_init(self, app, monkeypatch, caplog, one_time_bot):
+        async def post_init(app):
+            app.stop_running()
+
+        called_callbacks = []
+
+        async def callback(*args, **kwargs):
+            called_callbacks.append(kwargs["name"])
+
+        monkeypatch.setattr(Application, "start", functools.partial(callback, name="start"))
+        monkeypatch.setattr(
+            Updater, "start_polling", functools.partial(callback, name="start_polling")
+        )
+
+        app = (
+            ApplicationBuilder()
+            .bot(one_time_bot)
+            .post_init(post_init)
+            .post_stop(functools.partial(callback, name="post_stop"))
+            .post_shutdown(functools.partial(callback, name="post_shutdown"))
+            .build()
+        )
+
+        with caplog.at_level(logging.INFO):
+            app.run_polling(close_loop=False)
+
+        # The important part here is that start(_polling) are *not* called!
+        assert called_callbacks == ["post_stop", "post_shutdown"]
+
+        assert len(caplog.records) == 1
+        assert caplog.records[-1].name == "telegram.ext.Application"
+        assert (
+            "Application received stop signal via `stop_running`"
+            in caplog.records[-1].getMessage()
+        )
 
     @pytest.mark.parametrize("method", ["polling", "webhook"])
     def test_stop_running(self, one_time_bot, monkeypatch, method):
