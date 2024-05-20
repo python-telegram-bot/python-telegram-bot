@@ -273,7 +273,7 @@ class Defaults:
         """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
         the corresponding parameter of :class:`telegram.InputPollOption`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.2
         """
         return self._parse_mode
 
@@ -288,7 +288,7 @@ class Defaults:
         """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
         the corresponding parameter of :meth:`telegram.Bot.send_poll`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.2
         """
         return self._parse_mode
 

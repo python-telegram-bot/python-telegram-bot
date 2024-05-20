@@ -45,7 +45,7 @@ def warn(
         message (:obj:`str` | :obj:`PTBUserWarning`): Specify the warnings message to pass to
             ``warnings.warn()``.
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.2
                 Now also accepts a :obj:`PTBUserWarning` instance.
 
         category (:obj:`Type[Warning]`, optional): Specify the Warning class to pass to

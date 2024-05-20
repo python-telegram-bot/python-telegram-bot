@@ -559,7 +559,7 @@ class Message(MaybeInaccessibleMessage):
         chat_background_set  (:obj:`telegram.ChatBackground`, optional): Service message: chat
             background set.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -864,7 +864,7 @@ class Message(MaybeInaccessibleMessage):
         chat_background_set (:obj:`telegram.ChatBackground`): Optional. Service message: chat
             background set
 
-            .. versionadded:: Next.Version
+            .. versionadded:: 21.2
 
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a

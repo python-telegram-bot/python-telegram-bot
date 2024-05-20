@@ -1,7 +1,7 @@
 BackgroundTypePattern
 =====================
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 21.2
 
 .. autoclass:: telegram.BackgroundTypePattern
     :members:

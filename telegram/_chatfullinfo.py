@@ -48,19 +48,19 @@ class ChatFullInfo(Chat):
     .. seealso::
         All arguments and attributes can be found in :class:`telegram.Chat`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         max_reaction_count (:obj:`int`): The maximum number of reactions that can be set on a
             message in the chat.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
 
     Attributes:
         max_reaction_count (:obj:`int`): The maximum number of reactions that can be set on a
             message in the chat.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
     """
 
     __slots__ = ("max_reaction_count",)

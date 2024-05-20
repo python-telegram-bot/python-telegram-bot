@@ -67,7 +67,7 @@ class ChatMemberUpdated(TelegramObject):
             sending a direct join request without using an invite link and being approved by
             an administrator
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
 
     Attributes:
         chat (:class:`telegram.Chat`): Chat the user belongs to.
@@ -89,7 +89,7 @@ class ChatMemberUpdated(TelegramObject):
             sending a direct join request without using an invite link and being approved
             by an administrator
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
 
     """
 

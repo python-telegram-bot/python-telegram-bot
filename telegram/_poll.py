@@ -43,7 +43,7 @@ class InputPollOption(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         text (:obj:`str`): Option text,
@@ -118,7 +118,7 @@ class PollOption(TelegramObject):
             that appear in the option text. Currently, only custom emoji entities are allowed in
             poll option texts.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
 
     Attributes:
         text (:obj:`str`): Option text,
@@ -130,7 +130,7 @@ class PollOption(TelegramObject):
             poll option texts.
             This list is empty if the question does not contain entities.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
 
     """
 
@@ -174,7 +174,7 @@ class PollOption(TelegramObject):
             UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
             (That is, you can't just slice ``Message.text`` with the offset and length.)
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.2
 
         Args:
             entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
@@ -196,7 +196,7 @@ class PollOption(TelegramObject):
             attribute, since it calculates the correct substring from the message text based on
             UTF-16 codepoints. See :attr:`parse_entity` for more info.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.2
 
         Args:
             types (List[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
@@ -362,7 +362,7 @@ class Poll(TelegramObject):
             that appear in the :attr:`question`. Currently, only custom emoji entities are allowed
             in poll questions.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
 
     Attributes:
         id (:obj:`str`): Unique poll identifier.
@@ -404,7 +404,7 @@ class Poll(TelegramObject):
             in poll questions.
             This list is empty if the question does not contain entities.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
 
     """
 
@@ -544,7 +544,7 @@ class Poll(TelegramObject):
         """Returns the text in :attr:`question` from a given :class:`telegram.MessageEntity` of
         :attr:`question_entities`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.2
 
         Note:
             This method is present because Telegram calculates the offset and length in
@@ -568,7 +568,7 @@ class Poll(TelegramObject):
         It contains entities from this polls question filtered by their ``type`` attribute as
         the key, and the text that each entity belongs to as the value of the :obj:`dict`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.2
 
         Note:
             This method should always be used instead of the :attr:`question_entities`

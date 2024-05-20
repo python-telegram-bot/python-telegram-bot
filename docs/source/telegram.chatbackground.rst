@@ -1,7 +1,7 @@
 ChatBackground
 ==============
 
-.. versionadded:: NEXT.VERSION
+.. versionadded:: 21.2
 
 .. autoclass:: telegram.ChatBackground
     :members:

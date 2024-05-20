@@ -831,7 +831,7 @@ class BackgroundTypeLimit(IntEnum):
     :class:`telegram.BackgroundTypeWallpaper` and :class:`telegram.BackgroundTypePattern`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
     """
 
     __slots__ = ()
@@ -854,7 +854,7 @@ class BackgroundFillLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.BackgroundFillGradient`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
     """
 
     __slots__ = ()
@@ -1483,7 +1483,7 @@ class LocationLimit(IntEnum):
     * :paramref:`~telegram.Bot.send_location.live_period` parameter of
       :meth:`telegram.Bot.send_location`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
     """
 
     MIN_PROXIMITY_ALERT_RADIUS = 1
@@ -1788,7 +1788,7 @@ class MessageType(StringEnum):
     CHAT_BACKGROUND_SET = "chat_background_set"
     """:obj:`str`: Messages with :attr:`telegram.Message.chat_background_set`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
     """
     CONNECTED_WEBSITE = "connected_website"
     """:obj:`str`: Messages with :attr:`telegram.Message.connected_website`."""
@@ -2948,7 +2948,7 @@ class BackgroundTypeType(StringEnum):
     """This enum contains the available types of :class:`telegram.BackgroundType`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
     """
 
     __slots__ = ()
@@ -2967,7 +2967,7 @@ class BackgroundFillType(StringEnum):
     """This enum contains the available types of :class:`telegram.BackgroundFill`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
     """
 
     __slots__ = ()

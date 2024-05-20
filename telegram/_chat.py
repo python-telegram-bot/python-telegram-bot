@@ -150,13 +150,13 @@ class Chat(TelegramObject):
         photo (:class:`telegram.ChatPhoto`, optional): Chat photo.
             Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         bio (:obj:`str`, optional): Bio of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_private_forwards (:obj:`bool`, optional): :obj:`True`, if privacy settings of the other
@@ -165,38 +165,38 @@ class Chat(TelegramObject):
 
             .. versionadded:: 13.9
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
             Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         invite_link (:obj:`str`, optional): Primary invite link, for groups, supergroups and
             channel. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         pinned_message (:class:`telegram.Message`, optional): The most recent pinned message
             (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
             consecutive messages sent by each unprivileged user.
             Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         message_auto_delete_time (:obj:`int`, optional): The time after which all messages sent to
@@ -205,7 +205,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 13.4
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_protected_content (:obj:`bool`, optional): :obj:`True`, if messages from the chat can't
@@ -213,7 +213,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 13.9
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_visible_history (:obj:`bool`, optional): :obj:`True`, if new chat members will have
@@ -222,32 +222,32 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the
             sticker set. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         linked_chat_id (:obj:`int`, optional): Unique identifier for the linked chat, i.e. the
             discussion group identifier for a channel and vice versa; for supergroups and channel
             chats. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         location (:class:`telegram.ChatLocation`, optional): For supergroups, the location to which
             the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         join_to_send_messages (:obj:`bool`, optional): :obj:`True`, if users need to join the
@@ -256,7 +256,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         join_by_request (:obj:`bool`, optional): :obj:`True`, if all users directly joining the
@@ -265,7 +265,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_restricted_voice_and_video_messages (:obj:`bool`, optional): :obj:`True`, if the
@@ -274,7 +274,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         is_forum (:obj:`bool`, optional): :obj:`True`, if the supergroup chat is a forum
@@ -288,7 +288,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         business_intro (:class:`telegram.BusinessIntro`, optional): For private chats with
@@ -297,7 +297,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         business_location (:class:`telegram.BusinessLocation`, optional): For private chats with
@@ -306,7 +306,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         business_opening_hours (:class:`telegram.BusinessOpeningHours`, optional): For private
@@ -315,7 +315,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         available_reactions (Sequence[:class:`telegram.ReactionType`], optional): List of available
@@ -325,7 +325,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         accent_color_id (:obj:`int`, optional): Identifier of the
@@ -336,7 +336,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         background_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of emoji chosen
@@ -345,7 +345,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         profile_accent_color_id (:obj:`int`, optional): Identifier of the
@@ -355,7 +355,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         profile_background_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of
@@ -364,7 +364,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         emoji_status_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of emoji
@@ -373,7 +373,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         emoji_status_expiration_date (:class:`datetime.datetime`, optional): Expiration date of
@@ -383,7 +383,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.5
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_aggressive_anti_spam_enabled (:obj:`bool`, optional): :obj:`True`, if aggressive
@@ -392,7 +392,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_hidden_members (:obj:`bool`, optional): :obj:`True`, if non-administrators can only
@@ -401,7 +401,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         unrestrict_boost_count (:obj:`int`, optional): For supergroups, the minimum number of
@@ -410,7 +410,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         custom_emoji_sticker_set_name (:obj:`str`, optional): For supergroups, the name of the
@@ -419,7 +419,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         birthdate (:obj:`telegram.Birthdate`, optional): For private chats,
@@ -427,7 +427,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         personal_chat (:obj:`telegram.Chat`, optional): For private chats, the personal channel of
@@ -435,7 +435,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
 
@@ -454,13 +454,13 @@ class Chat(TelegramObject):
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
             Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_private_forwards (:obj:`bool`): Optional. :obj:`True`, if privacy settings of the other
@@ -469,38 +469,38 @@ class Chat(TelegramObject):
 
             .. versionadded:: 13.9
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
             Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         invite_link (:obj:`str`): Optional. Primary invite link, for groups, supergroups and
             channel. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         pinned_message (:class:`telegram.Message`): Optional. The most recent pinned message
             (by sending date). Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         permissions (:class:`telegram.ChatPermissions`): Optional. Default chat member permissions,
             for groups and supergroups. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
             consecutive messages sent by each unprivileged user. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         message_auto_delete_time (:obj:`int`): Optional. The time after which all messages sent to
@@ -509,7 +509,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 13.4
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_protected_content (:obj:`bool`): Optional. :obj:`True`, if messages from the chat can't
@@ -517,7 +517,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 13.9
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_visible_history (:obj:`bool`): Optional. :obj:`True`, if new chat members will have
@@ -526,32 +526,32 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
             sticker set. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         linked_chat_id (:obj:`int`): Optional. Unique identifier for the linked chat, i.e. the
             discussion group identifier for a channel and vice versa; for supergroups and channel
             chats. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         location (:class:`telegram.ChatLocation`): Optional. For supergroups, the location to which
             the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         join_to_send_messages (:obj:`bool`): Optional. :obj:`True`, if users need to join
@@ -560,7 +560,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         join_by_request (:obj:`bool`): Optional. :obj:`True`, if all users directly joining the
@@ -569,7 +569,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_restricted_voice_and_video_messages (:obj:`bool`): Optional. :obj:`True`, if the
@@ -578,7 +578,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         is_forum (:obj:`bool`): Optional. :obj:`True`, if the supergroup chat is a forum
@@ -594,7 +594,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         business_intro (:class:`telegram.BusinessIntro`): Optional. For private chats with
@@ -603,7 +603,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         business_location (:class:`telegram.BusinessLocation`): Optional. For private chats with
@@ -612,7 +612,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         business_opening_hours (:class:`telegram.BusinessOpeningHours`): Optional. For private
@@ -621,7 +621,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         available_reactions (Tuple[:class:`telegram.ReactionType`]): Optional. List of available
@@ -631,7 +631,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         accent_color_id (:obj:`int`): Optional. Identifier of the
@@ -642,7 +642,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         background_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji chosen
@@ -651,7 +651,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         profile_accent_color_id (:obj:`int`): Optional. Identifier of the
@@ -661,7 +661,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         profile_background_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of
@@ -670,7 +670,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.8
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         emoji_status_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji
@@ -679,7 +679,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         emoji_status_expiration_date (:class:`datetime.datetime`): Optional. Expiration date of
@@ -689,7 +689,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.5
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_aggressive_anti_spam_enabled (:obj:`bool`): Optional. :obj:`True`, if aggressive
@@ -698,7 +698,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         has_hidden_members (:obj:`bool`): Optional. :obj:`True`, if non-administrators can only
@@ -707,7 +707,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         unrestrict_boost_count (:obj:`int`): Optional. For supergroups, the minimum number of
@@ -716,7 +716,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         custom_emoji_sticker_set_name (:obj:`str`): Optional. For supergroups, the name of the
@@ -725,7 +725,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.0
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         birthdate (:obj:`telegram.Birthdate`): Optional. For private chats,
@@ -733,7 +733,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         personal_chat (:obj:`telegram.Chat`): Optional. For private chats, the personal channel of
@@ -741,7 +741,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.2
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
 
@@ -911,7 +911,7 @@ class Chat(TelegramObject):
                 if (val := object.__getattribute__(self, arg)) is not None and val != ():
                     warn(
                         PTBDeprecationWarning(
-                            "NEXT.VERSION",
+                            "21.2",
                             f"The argument `{arg}` is deprecated and will only be available via "
                             "`ChatFullInfo` in the future.",
                         ),
@@ -926,7 +926,7 @@ class Chat(TelegramObject):
         if name in _deprecated_attrs and self.__class__ is Chat:
             warn(
                 PTBDeprecationWarning(
-                    "NEXT.VERSION",
+                    "21.2",
                     f"The attribute `{name}` is deprecated and will only be accessible via "
                     "`ChatFullInfo` in the future.",
                 ),

@@ -733,7 +733,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
 
         .. versionadded:: 20.5
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.2
             Added support for calling within :meth:`post_init`.
         """
         if self.running:

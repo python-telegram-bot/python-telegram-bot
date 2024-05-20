@@ -2772,7 +2772,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 date must remain within the next 90 days. If not specified, then ``live_period``
                 remains unchanged
 
-                .. versionadded:: NEXT.VERSION.
+                .. versionadded:: 21.2.
 
         Keyword Args:
             location (:class:`telegram.Location`, optional): The location to send.
@@ -4457,7 +4457,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Use this method to get up to date information about the chat (current name of the user for
         one-on-one conversations, current username of a user, group or channel, etc.).
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.2
             In accordance to Bot API 7.3, this method now returns a :class:`telegram.ChatFullInfo`.
 
         Args:
@@ -6360,7 +6360,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             Removed the deprecated parameters mentioned above and adjusted the order of the
             parameters.
 
-        .. versionremoved:: NEXT.VERSION
+        .. versionremoved:: 21.2
            Removed the deprecated parameter ``sticker_format``.
 
         Args:
@@ -6867,7 +6867,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 20.0
                     |sequenceargs|
 
-                .. versionchanged:: NEXT.VERSION
+                .. versionchanged:: 21.2
                    Bot API 7.3 adds support for :class:`~telegram.InputPollOption` objects.
             is_anonymous (:obj:`bool`, optional): :obj:`True`, if the poll needs to be anonymous,
                 defaults to :obj:`True`.
@@ -6927,12 +6927,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 See the constants in :class:`telegram.constants.ParseMode` for the available modes.
                 Currently, only custom emoji entities are allowed.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.2
             question_entities (Sequence[:class:`telegram.Message`], optional): Special entities
                 that appear in the poll :paramref:`question`. It can be specified instead of
                 :paramref:`question_parse_mode`.
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.2
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|

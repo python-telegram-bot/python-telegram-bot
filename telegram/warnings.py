@@ -58,18 +58,18 @@ class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
     Args:
         version (:obj:`str`): The version in which the feature was deprecated.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
         message (:obj:`str`): The message to display.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
 
     Attributes:
         version (:obj:`str`): The version in which the feature was deprecated.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
         message (:obj:`str`): The message to display.
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.2
     """
 
     __slots__ = ("message", "version")
@@ -82,6 +82,6 @@ class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
         """Returns a string representation of the warning, using :attr:`message` and
         :attr:`version`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.2
         """
         return f"Deprecated since version {self.version}: {self.message}"

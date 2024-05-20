@@ -40,7 +40,7 @@ class BackgroundFill(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         type (:obj:`str`): Type of the background fill. Can be one of:
@@ -104,7 +104,7 @@ class BackgroundFillSolid(BackgroundFill):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`color` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         color (:obj:`int`): The color of the background fill in the `RGB24` format.
@@ -139,7 +139,7 @@ class BackgroundFillGradient(BackgroundFill):
     considered equal, if their :attr:`top_color`, :attr:`bottom_color`
     and :attr:`rotation_angle` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         top_color (:obj:`int`): Top color of the gradient in the `RGB24` format.
@@ -186,7 +186,7 @@ class BackgroundFillFreeformGradient(BackgroundFill):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`colors` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         colors (Sequence[:obj:`int`]): A list of the 3 or 4 base colors that are used to
@@ -226,7 +226,7 @@ class BackgroundType(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         type (:obj:`str`): Type of the background. Can be one of:
@@ -300,7 +300,7 @@ class BackgroundTypeFill(BackgroundType):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`fill` and :attr:`dark_theme_dimming` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         fill (:obj:`telegram.BackgroundFill`): The background fill.
@@ -342,7 +342,7 @@ class BackgroundTypeWallpaper(BackgroundType):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`document` and :attr:`dark_theme_dimming` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         document (:obj:`telegram.Document`): Document with the wallpaper
@@ -400,7 +400,7 @@ class BackgroundTypePattern(BackgroundType):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`document` and :attr:`fill` and :attr:`intensity` are equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         document (:obj:`telegram.Document`): Document with the pattern.
@@ -470,7 +470,7 @@ class BackgroundTypeChatTheme(BackgroundType):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`theme_name` is equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         theme_name (:obj:`str`): Name of the chat theme, which is usually an emoji.
@@ -504,7 +504,7 @@ class ChatBackground(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type` is  equal.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.2
 
     Args:
         type (:obj:`telegram.BackgroundType`): Type of the background.
