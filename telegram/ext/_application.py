@@ -766,7 +766,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling` and
         a graceful shutdown of the app on exit.
 
-        |app_run_shutdown|  :paramref:`stop_signals`.
+        |app_run_shutdown| :paramref:`stop_signals`.
 
         The order of execution by :meth:`run_polling` is roughly as follows:
 
