@@ -6837,6 +6837,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        question_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        question_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -6921,6 +6923,16 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            question_parse_mode (:obj:`str`, optional): Mode for parsing entities in the question.
+                See the constants in :class:`telegram.constants.ParseMode` for the available modes.
+                Currently, only custom emoji entities are allowed.
+
+                .. versionadded:: NEXT.VERSION
+            question_entities (Sequence[:class:`telegram.Message`], optional): Special entities
+                that appear in the poll :paramref:`question`. It can be specified instead of
+                :paramref:`question_parse_mode`.
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -6966,6 +6978,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "explanation_entities": explanation_entities,
             "open_period": open_period,
             "close_date": close_date,
+            "question_parse_mode": question_parse_mode,
+            "question_entities": question_entities,
         }
 
         return await self._send_message(

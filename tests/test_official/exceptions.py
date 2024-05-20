@@ -20,6 +20,7 @@
 
 
 from telegram import Animation, Audio, Document, PhotoSize, Sticker, Video, VideoNote, Voice
+from telegram._chat import _deprecated_attrs
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -47,15 +48,17 @@ class ParamTypeCheckingExceptions:
         "sticker": Sticker,
     }
 
+    # TODO: Look into merging this with COMPLEX_TYPES
     # Exceptions to the "Array of" types, where we accept more types than the official API
-    # key: parameter name, value: type which must be present in the annotation
+    # key: (parameter name, is_class), value: type which must be present in the annotation
     ARRAY_OF_EXCEPTIONS = {
-        "results": "InlineQueryResult",  # + Callable
-        "commands": "BotCommand",  # + tuple[str, str]
-        "keyboard": "KeyboardButton",  # + sequence[sequence[str]]
-        "reaction": "ReactionType",  # + str
+        ("results", False): "InlineQueryResult",  # + Callable
+        ("commands", False): "BotCommand",  # + tuple[str, str]
+        ("keyboard", True): "KeyboardButton",  # + sequence[sequence[str]]
+        ("reaction", False): "ReactionType",  # + str
+        ("options", False): "InputPollOption",  # + str
         # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
-        "file_hashes": "List[str]",
+        ("file_hashes", True): "List[str]",
     }
 
     # Special cases for other parameters that accept more types than the official API, and are
@@ -171,43 +174,7 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 # Arguments that are optional arguments for now for backwards compatibility
 BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
-    "Chat": {
-        "background_custom_emoji_id",
-        "has_private_forwards",
-        "invite_link",
-        "has_hidden_members",
-        "permissions",
-        "custom_emoji_sticker_set_name",
-        "pinned_message",
-        "birthdate",
-        "emoji_status_custom_emoji_id",
-        "join_by_request",
-        "business_intro",
-        "business_opening_hours",
-        "description",
-        "has_protected_content",
-        "available_reactions",
-        "has_aggressive_anti_spam_enabled",
-        "slow_mode_delay",
-        "profile_background_custom_emoji_id",
-        "linked_chat_id",
-        "bio",
-        "accent_color_id",
-        "unrestrict_boost_count",
-        "can_set_sticker_set",
-        "has_restricted_voice_and_video_messages",
-        "emoji_status_expiration_date",
-        "photo",
-        "join_to_send_messages",
-        "message_auto_delete_time",
-        "location",
-        "active_usernames",
-        "profile_accent_color_id",
-        "sticker_set_name",
-        "has_visible_history",
-        "business_location",
-        "personal_chat",
-    },  # removed by bot api 7.3
+    "Chat": set(_deprecated_attrs),  # removed by bot api 7.3
 }
 
 

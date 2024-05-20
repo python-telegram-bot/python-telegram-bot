@@ -31,6 +31,7 @@ try:
 except ImportError:
     APS_AVAILABLE = False
 
+from telegram._utils.logging import get_logger
 from telegram._utils.repr import build_repr_with_selected_attrs
 from telegram._utils.types import JSONDict
 from telegram.ext._extbot import ExtBot
@@ -44,6 +45,7 @@ if TYPE_CHECKING:
 
 
 _ALL_DAYS = tuple(range(7))
+_LOGGER = get_logger(__name__, class_name="JobQueue")
 
 
 class JobQueue(Generic[CCT]):
@@ -953,7 +955,16 @@ class Job(Generic[CCT]):
         self, application: "Application[Any, CCT, Any, Any, Any, JobQueue[CCT]]"
     ) -> None:
         try:
-            context = application.context_types.context.from_job(self, application)
+            try:
+                context = application.context_types.context.from_job(self, application)
+            except Exception as exc:
+                _LOGGER.critical(
+                    "Error while building CallbackContext for job %s. Job will not be run.",
+                    self._job,
+                    exc_info=exc,
+                )
+                return
+
             await context.refresh_data()
             await self.callback(context)
         except Exception as exc:

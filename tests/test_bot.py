@@ -1949,42 +1949,47 @@ class TestBotWithoutRequest:
         ],
         indirect=["default_bot"],
     )
-    async def test_send_poll_default_text_parse_mode(
+    async def test_send_poll_default_text_question_parse_mode(
         self, default_bot, raw_bot, chat_id, custom, monkeypatch
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            expected = default_bot.defaults.text_parse_mode if custom == "NOTHING" else custom
+
             option_1 = request_data.parameters["options"][0]
             option_2 = request_data.parameters["options"][1]
             assert option_1.get("text_parse_mode") == (default_bot.defaults.text_parse_mode)
-            assert option_2.get("text_parse_mode") == (
-                default_bot.defaults.text_parse_mode if custom == "NOTHING" else custom
-            )
+            assert option_2.get("text_parse_mode") == expected
+            assert request_data.parameters.get("question_parse_mode") == expected
+
             return make_message("dummy reply").to_dict()
 
         async def make_raw_assertion(url, request_data: RequestData, *args, **kwargs):
+            expected = None if custom == "NOTHING" else custom
+
             option_1 = request_data.parameters["options"][0]
             option_2 = request_data.parameters["options"][1]
             assert option_1.get("text_parse_mode") is None
-            assert option_2.get("text_parse_mode") == (None if custom == "NOTHING" else custom)
+            assert option_2.get("text_parse_mode") == expected
+
+            assert request_data.parameters.get("question_parse_mode") == expected
+
             return make_message("dummy reply").to_dict()
 
         if custom == "NOTHING":
             option_2 = InputPollOption("option2")
+            kwargs = {}
         else:
             option_2 = InputPollOption("option2", text_parse_mode=custom)
+            kwargs = {"question_parse_mode": custom}
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         await default_bot.send_poll(
-            chat_id,
-            question="question",
-            options=["option1", option_2],
+            chat_id, question="question", options=["option1", option_2], **kwargs
         )
 
         monkeypatch.setattr(raw_bot.request, "post", make_raw_assertion)
         await raw_bot.send_poll(
-            chat_id,
-            question="question",
-            options=["option1", option_2],
+            chat_id, question="question", options=["option1", option_2], **kwargs
         )
 
     @pytest.mark.parametrize(
@@ -2015,6 +2020,30 @@ class TestBotWithoutRequest:
             question="question",
             options=["option1", "option2"],
             reply_parameters=ReplyParameters(**kwargs),
+        )
+
+    async def test_send_poll_question_parse_mode_entities(self, bot, monkeypatch):
+        # Currently only custom emoji are supported as entities which we can't test
+        # We just test that the correct data is passed for now
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["question_entities"] == [
+                {"type": "custom_emoji", "offset": 0, "length": 1},
+                {"type": "custom_emoji", "offset": 2, "length": 1},
+            ]
+            assert request_data.parameters["question_parse_mode"] == ParseMode.MARKDOWN_V2
+            return make_message("dummy reply").to_dict()
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        await bot.send_poll(
+            1,
+            question="😀😃",
+            options=["option1", "option2"],
+            question_entities=[
+                MessageEntity(MessageEntity.CUSTOM_EMOJI, 0, 1),
+                MessageEntity(MessageEntity.CUSTOM_EMOJI, 2, 1),
+            ],
+            question_parse_mode=ParseMode.MARKDOWN_V2,
         )
 
     @pytest.mark.parametrize(
