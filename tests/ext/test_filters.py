@@ -1090,6 +1090,11 @@ class TestFilters:
         assert filters.StatusUpdate.GIVEAWAY_COMPLETED.check_update(update)
         update.message.giveaway_completed = None
 
+        update.message.chat_background_set = "test_background"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.CHAT_BACKGROUND_SET.check_update(update)
+        update.message.chat_background_set = None
+
     def test_filters_forwarded(self, update, message_origin_user):
         assert filters.FORWARDED.check_update(update)
         update.message.forward_origin = MessageOriginHiddenUser(datetime.datetime.utcnow(), 1)

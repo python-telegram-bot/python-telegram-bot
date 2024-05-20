@@ -314,6 +314,8 @@ def build_kwargs(
             elif name == "ok":
                 kws["ok"] = False
                 kws["error_message"] = "error"
+            elif name == "options":
+                kws[name] = ["option1", "option2"]
             else:
                 kws[name] = True
 

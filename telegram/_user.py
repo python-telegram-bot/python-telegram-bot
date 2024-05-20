@@ -40,6 +40,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPollOption,
         LabeledPrice,
         LinkPreviewOptions,
         Location,
@@ -1482,7 +1483,7 @@ class User(TelegramObject):
     async def send_poll(
         self,
         question: str,
-        options: Sequence[str],
+        options: Sequence[Union[str, "InputPollOption"]],
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,
         allows_multiple_answers: Optional[bool] = None,
@@ -1499,6 +1500,8 @@ class User(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        question_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        question_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1548,6 +1551,8 @@ class User(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
+            question_parse_mode=question_parse_mode,
+            question_entities=question_entities,
         )
 
     async def send_copy(

@@ -148,8 +148,11 @@ def check_param_type(
     # Now let's do the checking, starting with "Array of ..." types.
     if "Array of " in tg_param_type:
         # For exceptions just check if they contain the annotation
-        if ptb_param.name in PTCE.ARRAY_OF_EXCEPTIONS:
-            return PTCE.ARRAY_OF_EXCEPTIONS[ptb_param.name] in str(ptb_annotation), Sequence
+        if any(ptb_param.name in key for key in PTCE.ARRAY_OF_EXCEPTIONS):
+            for (p_name, is_expected_class), exception_type in PTCE.ARRAY_OF_EXCEPTIONS.items():
+                if ptb_param.name == p_name and is_class is is_expected_class:
+                    log("Checking that `%s` is an exception!\n", ptb_param.name)
+                    return exception_type in str(ptb_annotation), Sequence
 
         obj_match: re.Match | None = re.search(ARRAY_OF_PATTERN, tg_param_type)
         if obj_match is None:

@@ -30,7 +30,8 @@ class ForceReply(TelegramObject):
     Upon receiving a message with this object, Telegram clients will display a reply interface to
     the user (act as if the user has selected the bot's message and tapped 'Reply'). This can be
     extremely useful if you want to create user-friendly step-by-step interfaces without having
-    to sacrifice privacy mode.
+    to sacrifice `privacy mode <https://core.telegram.org/bots/features#privacy-mode>`_. Not
+    supported in channels and for messages sent on behalf of a Telegram Business account.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`selective` is equal.

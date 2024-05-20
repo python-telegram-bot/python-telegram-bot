@@ -50,8 +50,8 @@ from telegram import (
     BotShortDescription,
     BusinessConnection,
     CallbackQuery,
-    Chat,
     ChatAdministratorRights,
+    ChatFullInfo,
     ChatInviteLink,
     ChatMember,
     ChatPermissions,
@@ -64,6 +64,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultsButton,
     InputMedia,
+    InputPollOption,
     LinkPreviewOptions,
     Location,
     MaskPosition,
@@ -113,7 +114,7 @@ if TYPE_CHECKING:
     )
     from telegram.ext import BaseRateLimiter, Defaults
 
-HandledTypes = TypeVar("HandledTypes", bound=Union[Message, CallbackQuery, Chat])
+HandledTypes = TypeVar("HandledTypes", bound=Union[Message, CallbackQuery, ChatFullInfo])
 KT = TypeVar("KT", bound=ReplyMarkup)
 
 
@@ -436,6 +437,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         # 3) set the correct parse_mode for all InputMedia objects
         # 4) handle the LinkPreviewOptions case (see below)
         # 5) handle the ReplyParameters case (see below)
+        # 6) handle text_parse_mode in InputPollOption
         for key, val in data.items():
             # 1)
             if isinstance(val, DefaultValue):
@@ -486,6 +488,21 @@ class ExtBot(Bot, Generic[RLARGS]):
                     )
 
                 data[key] = new_value
+
+            # 6)
+            elif isinstance(val, Sequence) and all(
+                isinstance(obj, InputPollOption) for obj in val
+            ):
+                new_val = []
+                for option in val:
+                    if not isinstance(option.text_parse_mode, DefaultValue):
+                        new_val.append(option)
+                    else:
+                        new_option = copy(option)
+                        with new_option._unfrozen():
+                            new_option.text_parse_mode = self.defaults.text_parse_mode
+                        new_val.append(new_option)
+                data[key] = new_val
 
     def _replace_keyboard(self, reply_markup: Optional[KT]) -> Optional[KT]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
@@ -554,7 +571,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             self.callback_data_cache.process_message(message=obj)
             return obj  # type: ignore[return-value]
 
-        if isinstance(obj, Chat) and obj.pinned_message:
+        if isinstance(obj, ChatFullInfo) and obj.pinned_message:
             self.callback_data_cache.process_message(obj.pinned_message)
 
         return obj
@@ -853,7 +870,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
         rate_limit_args: Optional[RLARGS] = None,
-    ) -> Chat:
+    ) -> ChatFullInfo:
         # We override this method to call self._insert_callback_data
         result = await super().get_chat(
             chat_id=chat_id,
@@ -1520,6 +1537,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
+        live_period: Optional[int] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1539,6 +1557,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             horizontal_accuracy=horizontal_accuracy,
             heading=heading,
             proximity_alert_radius=proximity_alert_radius,
+            live_period=live_period,
             location=location,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2915,7 +2934,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         chat_id: Union[int, str],
         question: str,
-        options: Sequence[str],
+        options: Sequence[Union[str, "InputPollOption"]],
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
@@ -2932,6 +2951,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        question_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        question_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2969,6 +2990,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            question_parse_mode=question_parse_mode,
+            question_entities=question_entities,
         )
 
     async def send_sticker(
