@@ -1075,16 +1075,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             loop.run_forever()
         except (KeyboardInterrupt, SystemExit):
             _LOGGER.debug("Application received stop signal. Shutting down.")
-        except Exception as exc:
-            # In case the coroutine wasn't awaited, we don't need to bother the user with a warning
-            updater_coroutine.close()
-            raise exc
         finally:
             # We arrive here either by catching the exceptions above or if the loop gets stopped
+            # In case the coroutine wasn't awaited, we don't need to bother the user with a warning
+            updater_coroutine.close()
+
             try:
-                # In we never got to await the coroutine, it's cleaner to close it here
-                # This can be the case e.g. if post_init raises SystemExit
-                updater_coroutine.close()
                 # Mypy doesn't know that we already check if updater is None
                 if self.updater.running:  # type: ignore[union-attr]
                     loop.run_until_complete(self.updater.stop())  # type: ignore[union-attr]
