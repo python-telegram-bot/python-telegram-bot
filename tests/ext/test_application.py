@@ -2134,7 +2134,6 @@ class TestApplication:
             "app_initialize",
             "updater_initialize",
             "app_shutdown",
-            "post_stop",
             "post_shutdown",
             "updater_shutdown",
         }
@@ -2441,7 +2440,8 @@ class TestApplication:
             app.run_polling(close_loop=False)
 
         # The important part here is that start(_polling) are *not* called!
-        assert called_callbacks == ["post_stop", "post_shutdown"]
+        # post_stop must not be called either, since we never called stop()
+        assert called_callbacks == ["post_shutdown"]
 
         assert len(caplog.records) == 1
         assert caplog.records[-1].name == "telegram.ext.Application"

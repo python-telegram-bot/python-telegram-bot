@@ -1086,8 +1086,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     loop.run_until_complete(self.updater.stop())  # type: ignore[union-attr]
                 if self.running:
                     loop.run_until_complete(self.stop())
-                if self.post_stop:
-                    loop.run_until_complete(self.post_stop(self))
+                    # post_stop should be called only if stop was called!
+                    if self.post_stop:
+                        loop.run_until_complete(self.post_stop(self))
                 loop.run_until_complete(self.shutdown())
                 if self.post_shutdown:
                     loop.run_until_complete(self.post_shutdown(self))
