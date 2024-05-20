@@ -2421,3 +2421,83 @@ class TestApplication:
         assert len(assertions) == 5
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
+
+    async def test_process_update_exception_in_building_context(self, monkeypatch, caplog, app):
+        # Makes sure that exceptions in building the context don't stop the application
+        exception = ValueError("TestException")
+        original_from_update = CallbackContext.from_update
+
+        def raise_exception(update, application):
+            if update == 1:
+                raise exception
+            return original_from_update(update, application)
+
+        monkeypatch.setattr(CallbackContext, "from_update", raise_exception)
+
+        received_updates = set()
+
+        async def callback(update, context):
+            received_updates.add(update)
+
+        app.add_handler(TypeHandler(int, callback))
+
+        async with app:
+            with caplog.at_level(logging.CRITICAL):
+                await app.process_update(1)
+
+            assert received_updates == set()
+            assert len(caplog.records) == 1
+            record = caplog.records[0]
+            assert record.name == "telegram.ext.Application"
+            assert record.getMessage().startswith(
+                "Error while building CallbackContext for update 1"
+            )
+            assert record.levelno == logging.CRITICAL
+
+            # Let's also check that no critical log is produced when the exception is not raised
+            caplog.clear()
+            with caplog.at_level(logging.CRITICAL):
+                await app.process_update(2)
+
+            assert received_updates == {2}
+            assert len(caplog.records) == 0
+
+    async def test_process_error_exception_in_building_context(self, monkeypatch, caplog, app):
+        # Makes sure that exceptions in building the context don't stop the application
+        exception = ValueError("TestException")
+        original_from_error = CallbackContext.from_error
+
+        def raise_exception(update, error, application, *args, **kwargs):
+            if error == 1:
+                raise exception
+            return original_from_error(update, error, application, *args, **kwargs)
+
+        monkeypatch.setattr(CallbackContext, "from_error", raise_exception)
+
+        received_errors = set()
+
+        async def callback(update, context):
+            received_errors.add(context.error)
+
+        app.add_error_handler(callback)
+
+        async with app:
+            with caplog.at_level(logging.CRITICAL):
+                await app.process_error(update=None, error=1)
+
+            assert received_errors == set()
+            assert len(caplog.records) == 1
+            record = caplog.records[0]
+            assert record.name == "telegram.ext.Application"
+            assert record.getMessage().startswith(
+                "Error while building CallbackContext for exception 1"
+            )
+            assert record.levelno == logging.CRITICAL
+
+            # Let's also check that no critical log is produced when the exception is not raised
+            caplog.clear()
+            with caplog.at_level(logging.CRITICAL):
+                await app.process_error(update=None, error=2)
+
+            assert received_errors == {2}
+            assert len(caplog.records) == 0

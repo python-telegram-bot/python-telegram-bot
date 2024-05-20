@@ -646,3 +646,44 @@ class TestJobQueue:
         tg_job = Job.from_aps_job(aps_job)
         assert tg_job is job
         assert tg_job.job is aps_job
+
+    async def test_run_job_exception_in_building_context(
+        self, monkeypatch, job_queue, caplog, app
+    ):
+        # Makes sure that exceptions in building the context don't stop the application
+        exception = ValueError("TestException")
+        original_from_job = CallbackContext.from_job
+
+        def raise_exception(job, application):
+            if job.data == 1:
+                raise exception
+            return original_from_job(job, application)
+
+        monkeypatch.setattr(CallbackContext, "from_job", raise_exception)
+
+        received_jobs = set()
+
+        async def job_callback(context):
+            received_jobs.add(context.job.data)
+
+        with caplog.at_level(logging.CRITICAL):
+            job_queue.run_once(job_callback, 0.1, data=1)
+            await asyncio.sleep(0.2)
+
+        assert received_jobs == set()
+        assert len(caplog.records) == 1
+        record = caplog.records[0]
+        assert record.name == "telegram.ext.JobQueue"
+        assert record.getMessage().startswith(
+            "Error while building CallbackContext for job job_callback"
+        )
+        assert record.levelno == logging.CRITICAL
+
+        # Let's also check that no critical log is produced when the exception is not raised
+        caplog.clear()
+        with caplog.at_level(logging.CRITICAL):
+            job_queue.run_once(job_callback, 0.1, data=2)
+            await asyncio.sleep(0.2)
+
+        assert received_jobs == {2}
+        assert len(caplog.records) == 0
