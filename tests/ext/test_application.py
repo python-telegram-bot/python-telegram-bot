@@ -2440,7 +2440,7 @@ class TestApplication:
             app.run_polling(close_loop=False)
 
         # The important part here is that start(_polling) are *not* called!
-        # post_stop must not be called either, since we never called start()
+        # post_stop must not be called either, since we never called stop()
         assert called_callbacks == ["post_shutdown"]
 
         assert len(caplog.records) == 1
