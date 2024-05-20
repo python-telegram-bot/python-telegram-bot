@@ -260,8 +260,8 @@ class Chat(TelegramObject):
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
         join_by_request (:obj:`bool`, optional): :obj:`True`, if all users directly joining the
-            supergroup need to be approved by supergroup administrators. Returned only in
-            :meth:`telegram.Bot.get_chat`.
+            supergroup without using an invite link need to be approved by supergroup
+            administrators. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
 
@@ -563,9 +563,9 @@ class Chat(TelegramObject):
             .. deprecated:: NEXT.VERSION
                 In accordance to Bot API 7.3, this attribute will be moved to
                 :class:`telegram.ChatFullInfo`.
-        join_by_request (:obj:`bool`): Optional. :obj:`True`, if all users directly
-            joining the supergroup need to be approved by supergroup administrators. Returned only
-            in :meth:`telegram.Bot.get_chat`.
+        join_by_request (:obj:`bool`): Optional. :obj:`True`, if all users directly joining the
+            supergroup without using an invite link need to be approved by supergroup
+            administrators. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
 
