@@ -335,7 +335,7 @@ class TestVoiceWithRequest(TestVoiceBase):
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match="Message to reply not found"):
+            with pytest.raises(BadRequest, match="Message to be replied not found"):
                 await default_bot.send_voice(
                     chat_id, voice, reply_to_message_id=reply_to_message.message_id
                 )

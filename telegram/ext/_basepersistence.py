@@ -163,7 +163,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         return self._update_interval
 
     @update_interval.setter
-    def update_interval(self, value: object) -> NoReturn:
+    def update_interval(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to update_interval after initialization."
         )

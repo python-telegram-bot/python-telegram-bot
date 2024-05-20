@@ -23,12 +23,6 @@ from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
-from telegram._utils.warnings_transition import (
-    build_deprecation_warning_message,
-    warn_about_deprecated_attr_in_property,
-)
-from telegram.warnings import PTBDeprecationWarning
 
 if TYPE_CHECKING:
     from telegram._bot import Bot
@@ -44,11 +38,14 @@ class UsersShared(TelegramObject):
 
     .. versionadded:: 20.8
        Bot API 7.0 replaces ``UserShared`` with this class. The only difference is that now
-       the :attr:`user_ids` is a sequence instead of a single integer.
+       the ``user_ids`` is a sequence instead of a single integer.
 
     .. versionchanged:: 21.1
        The argument :attr:`users` is now considered for the equality comparison instead of
-       :attr:`user_ids`.
+       ``user_ids``.
+
+    .. versionremoved:: NEXT.VERSION
+       Removed the deprecated argument and attribute ``user_ids``.
 
     Args:
         request_id (:obj:`int`): Identifier of the request.
@@ -57,18 +54,8 @@ class UsersShared(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. deprecated:: 21.1
-                In future versions, this argument will become keyword only.
-        user_ids (Sequence[:obj:`int`], optional): Identifiers of the shared users. These numbers
-            may have more than 32 significant bits and some programming languages may have
-            difficulty/silent defects in interpreting them. But they have at most 52 significant
-            bits, so 64-bit integers or double-precision float types are safe for storing these
-            identifiers. The bot may not have access to the users and could be unable to use
-            these identifiers, unless the users are already known to the bot by some other means.
-
-            .. deprecated:: 21.1
-               Bot API 7.2 introduced by :paramref:`users`, replacing this argument. Hence, this
-               argument is now optional and will be removed in future versions.
+            .. versionchanged:: NEXT.VERSION
+               This argument is now required.
 
     Attributes:
         request_id (:obj:`int`): Identifier of the request.
@@ -83,30 +70,13 @@ class UsersShared(TelegramObject):
     def __init__(
         self,
         request_id: int,
-        user_ids: Optional[Sequence[int]] = None,
-        users: Optional[Sequence["SharedUser"]] = None,
+        users: Sequence["SharedUser"],
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.request_id: int = request_id
-
-        if users is None:
-            raise TypeError("`users` is a required argument since Bot API 7.2")
-
         self.users: Tuple[SharedUser, ...] = parse_sequence_arg(users)
-
-        if user_ids is not None:
-            warn(
-                build_deprecation_warning_message(
-                    deprecated_name="user_ids",
-                    new_name="users",
-                    object_type="parameter",
-                    bot_api_version="7.2",
-                ),
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
 
         self._id_attrs = (self.request_id, self.users)
 
@@ -129,28 +99,6 @@ class UsersShared(TelegramObject):
             api_kwargs = {"user_ids": user_ids}
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
-
-    @property
-    def user_ids(self) -> Tuple[int, ...]:
-        """
-        Tuple[:obj:`int`]: Identifiers of the shared users. These numbers may have
-        more than 32 significant bits and some programming languages may have difficulty/silent
-        defects in interpreting them. But they have at most 52 significant bits, so 64-bit
-        integers or double-precision float types are safe for storing these identifiers. The
-        bot may not have access to the users and could be unable to use these identifiers,
-        unless the users are already known to the bot by some other means.
-
-        .. deprecated:: 21.1
-            As Bot API 7.2 replaces this attribute with :attr:`users`, this attribute will be
-            removed in future versions.
-        """
-        warn_about_deprecated_attr_in_property(
-            deprecated_attr_name="user_ids",
-            new_attr_name="users",
-            bot_api_version="7.2",
-            stacklevel=2,
-        )
-        return tuple(user.user_id for user in self.users)
 
 
 class ChatShared(TelegramObject):
