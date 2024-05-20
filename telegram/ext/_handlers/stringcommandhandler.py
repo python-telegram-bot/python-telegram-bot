@@ -98,8 +98,8 @@ class StringCommandHandler(BaseHandler[str, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: str,
-        application: "Application[Any, CCT, Any, Any, Any, Any]",
+        update: str,  # noqa: ARG002
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
         check_result: Optional[List[str]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single
