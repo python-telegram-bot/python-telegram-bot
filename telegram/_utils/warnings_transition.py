@@ -86,8 +86,7 @@ def warn_about_deprecated_arg_return_new_arg(
                 f"Bot API {bot_api_version} renamed the argument '{deprecated_arg_name}' to "
                 f"'{new_arg_name}'.",
             ),
-            PTBDeprecationWarning,
-            stacklevel + 1,
+            stacklevel=stacklevel + 1,  # type: ignore[call-arg]
         )
         return deprecated_arg
 

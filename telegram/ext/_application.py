@@ -831,7 +831,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
                     "Setting timeouts via `Application.run_polling` is deprecated. "
                     "Please use `ApplicationBuilder.get_updates_*_timeout` instead.",
                 ),
-                PTBDeprecationWarning,
                 stacklevel=2,
             )
 
