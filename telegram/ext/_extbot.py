@@ -489,6 +489,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
                 data[key] = new_value
 
+            # 6)
             elif isinstance(val, Sequence) and all(
                 isinstance(obj, InputPollOption) for obj in val
             ):
@@ -2950,6 +2951,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        question_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        question_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2987,6 +2990,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            question_parse_mode=question_parse_mode,
+            question_entities=question_entities,
         )
 
     async def send_sticker(
