@@ -2454,6 +2454,7 @@ class TestApplication:
             )
             assert record.levelno == logging.CRITICAL
 
+            # Let's also check that no critical log is produced when the exception is not raised
             caplog.clear()
             with caplog.at_level(logging.CRITICAL):
                 await app.process_update(2)
@@ -2493,6 +2494,7 @@ class TestApplication:
             )
             assert record.levelno == logging.CRITICAL
 
+            # Let's also check that no critical log is produced when the exception is not raised
             caplog.clear()
             with caplog.at_level(logging.CRITICAL):
                 await app.process_error(update=None, error=2)

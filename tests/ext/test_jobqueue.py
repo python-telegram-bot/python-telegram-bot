@@ -655,7 +655,6 @@ class TestJobQueue:
         original_from_job = CallbackContext.from_job
 
         def raise_exception(job, application):
-            print(job, job.data, application)
             if job.data == 1:
                 raise exception
             return original_from_job(job, application)
@@ -680,6 +679,7 @@ class TestJobQueue:
         )
         assert record.levelno == logging.CRITICAL
 
+        # Let's also check that no critical log is produced when the exception is not raised
         caplog.clear()
         with caplog.at_level(logging.CRITICAL):
             job_queue.run_once(job_callback, 0.1, data=2)
