@@ -63,6 +63,11 @@ class ChatMemberUpdated(TelegramObject):
             chat via a chat folder invite link
 
             .. versionadded:: 20.3
+        via_join_request (:obj:`bool`, optional): :obj:`True`, if the user joined the chat after
+            sending a direct join request without using an invite link and being approved by
+            an administrator
+
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         chat (:class:`telegram.Chat`): Chat the user belongs to.
@@ -80,6 +85,11 @@ class ChatMemberUpdated(TelegramObject):
             chat via a chat folder invite link
 
             .. versionadded:: 20.3
+        via_join_request (:obj:`bool`): Optional. :obj:`True`, if the user joined the chat after
+            sending a direct join request without using an invite link and being approved
+            by an administrator
+
+            .. versionadded:: NEXT.VERSION
 
     """
 
@@ -91,6 +101,7 @@ class ChatMemberUpdated(TelegramObject):
         "new_chat_member",
         "old_chat_member",
         "via_chat_folder_invite_link",
+        "via_join_request",
     )
 
     def __init__(
@@ -102,6 +113,7 @@ class ChatMemberUpdated(TelegramObject):
         new_chat_member: ChatMember,
         invite_link: Optional[ChatInviteLink] = None,
         via_chat_folder_invite_link: Optional[bool] = None,
+        via_join_request: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -116,6 +128,7 @@ class ChatMemberUpdated(TelegramObject):
 
         # Optionals
         self.invite_link: Optional[ChatInviteLink] = invite_link
+        self.via_join_request: Optional[bool] = via_join_request
 
         self._id_attrs = (
             self.chat,

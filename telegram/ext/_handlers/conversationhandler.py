@@ -473,7 +473,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._entry_points
 
     @entry_points.setter
-    def entry_points(self, value: object) -> NoReturn:
+    def entry_points(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to entry_points after initialization."
         )
@@ -487,7 +487,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._states
 
     @states.setter
-    def states(self, value: object) -> NoReturn:
+    def states(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to states after initialization.")
 
     @property
@@ -499,7 +499,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._fallbacks
 
     @fallbacks.setter
-    def fallbacks(self, value: object) -> NoReturn:
+    def fallbacks(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to fallbacks after initialization.")
 
     @property
@@ -508,7 +508,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._allow_reentry
 
     @allow_reentry.setter
-    def allow_reentry(self, value: object) -> NoReturn:
+    def allow_reentry(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to allow_reentry after initialization."
         )
@@ -519,7 +519,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._per_user
 
     @per_user.setter
-    def per_user(self, value: object) -> NoReturn:
+    def per_user(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to per_user after initialization.")
 
     @property
@@ -528,7 +528,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._per_chat
 
     @per_chat.setter
-    def per_chat(self, value: object) -> NoReturn:
+    def per_chat(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to per_chat after initialization.")
 
     @property
@@ -537,7 +537,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._per_message
 
     @per_message.setter
-    def per_message(self, value: object) -> NoReturn:
+    def per_message(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to per_message after initialization.")
 
     @property
@@ -551,7 +551,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._conversation_timeout
 
     @conversation_timeout.setter
-    def conversation_timeout(self, value: object) -> NoReturn:
+    def conversation_timeout(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to conversation_timeout after initialization."
         )
@@ -562,7 +562,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._name
 
     @name.setter
-    def name(self, value: object) -> NoReturn:
+    def name(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to name after initialization.")
 
     @property
@@ -574,7 +574,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._persistent
 
     @persistent.setter
-    def persistent(self, value: object) -> NoReturn:
+    def persistent(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to persistent after initialization.")
 
     @property
@@ -586,7 +586,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         return self._map_to_parent
 
     @map_to_parent.setter
-    def map_to_parent(self, value: object) -> NoReturn:
+    def map_to_parent(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to map_to_parent after initialization."
         )

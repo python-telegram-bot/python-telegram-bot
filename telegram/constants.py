@@ -37,6 +37,10 @@ __all__ = [
     "SUPPORTED_WEBHOOK_PORTS",
     "ZERO_DATE",
     "AccentColor",
+    "BackgroundFillLimit",
+    "BackgroundFillType",
+    "BackgroundTypeLimit",
+    "BackgroundTypeType",
     "BotCommandLimit",
     "BotCommandScopeType",
     "BotDescriptionLimit",
@@ -142,7 +146,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=2)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=3)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -822,6 +826,46 @@ class ChatLimit(IntEnum):
     """
 
 
+class BackgroundTypeLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.BackgroundTypeFill`,
+    :class:`telegram.BackgroundTypeWallpaper` and :class:`telegram.BackgroundTypePattern`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_DIMMING = 100
+    """:obj:`int`: Maximum value allowed for:
+
+    * :paramref:`~telegram.BackgroundTypeFill.dark_theme_dimming` parameter of
+        :class:`telegram.BackgroundTypeFill`
+    * :paramref:`~telegram.BackgroundTypeWallpaper.dark_theme_dimming` parameter of
+        :class:`telegram.BackgroundTypeWallpaper`
+    """
+    MAX_INTENSITY = 100
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.BackgroundTypePattern.intensity`
+    parameter of :class:`telegram.BackgroundTypePattern`
+    """
+
+
+class BackgroundFillLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.BackgroundFillGradient`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    MAX_ROTATION_ANGLE = 359
+    """:obj:`int`: Maximum value allowed for:
+        :paramref:`~telegram.BackgroundFillGradient.rotation_angle` parameter of
+        :class:`telegram.BackgroundFillGradient`
+    """
+
+
 class ChatMemberStatus(StringEnum):
     """This enum contains the available states for :class:`telegram.ChatMember`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -1427,6 +1471,21 @@ class LocationLimit(IntEnum):
       :meth:`telegram.Bot.send_location`
     """
 
+    LIVE_PERIOD_FOREVER = int(hex(0x7FFFFFFF), 16)
+    """:obj:`int`: Value for live locations that can be edited indefinitely. Passed in:
+
+    * :paramref:`~telegram.InlineQueryResultLocation.live_period` parameter of
+      :class:`telegram.InlineQueryResultLocation`
+    * :paramref:`~telegram.InputLocationMessageContent.live_period` parameter of
+      :class:`telegram.InputLocationMessageContent`
+    * :paramref:`~telegram.Bot.edit_message_live_location.live_period` parameter of
+      :meth:`telegram.Bot.edit_message_live_location`
+    * :paramref:`~telegram.Bot.send_location.live_period` parameter of
+      :meth:`telegram.Bot.send_location`
+
+    .. versionadded:: NEXT.VERSION
+    """
+
     MIN_PROXIMITY_ALERT_RADIUS = 1
     """:obj:`int`: Minimum value allowed for:
 
@@ -1725,6 +1784,11 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.chat_shared`.
 
     .. versionadded:: 20.8
+    """
+    CHAT_BACKGROUND_SET = "chat_background_set"
+    """:obj:`str`: Messages with :attr:`telegram.Message.chat_background_set`.
+
+    .. versionadded:: NEXT.VERSION
     """
     CONNECTED_WEBSITE = "connected_website"
     """:obj:`str`: Messages with :attr:`telegram.Message.connected_website`."""
@@ -2878,3 +2942,39 @@ class ReactionEmoji(StringEnum):
     """:obj:`str`: Woman Shrugging"""
     POUTING_FACE = "😡"
     """:obj:`str`: Pouting face"""
+
+
+class BackgroundTypeType(StringEnum):
+    """This enum contains the available types of :class:`telegram.BackgroundType`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    FILL = "fill"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with fill background."""
+    WALLPAPER = "wallpaper"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with wallpaper background."""
+    PATTERN = "pattern"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with pattern background."""
+    CHAT_THEME = "chat_theme"
+    """:obj:`str`: A :class:`telegram.BackgroundType` with chat_theme background."""
+
+
+class BackgroundFillType(StringEnum):
+    """This enum contains the available types of :class:`telegram.BackgroundFill`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    SOLID = "solid"
+    """:obj:`str`: A :class:`telegram.BackgroundFill` with solid fill."""
+    GRADIENT = "gradient"
+    """:obj:`str`: A :class:`telegram.BackgroundFill` with gradient fill."""
+    FREEFORM_GRADIENT = "freeform_gradient"
+    """:obj:`str`: A :class:`telegram.BackgroundFill` with freeform_gradient fill."""

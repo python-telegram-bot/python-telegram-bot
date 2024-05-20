@@ -179,13 +179,14 @@ class Defaults:
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
         for kwarg in (
-            "parse_mode",
-            "explanation_parse_mode",
-            "disable_notification",
             "allow_sending_without_reply",
-            "protect_content",
-            "link_preview_options",
+            "disable_notification",
             "do_quote",
+            "explanation_parse_mode",
+            "link_preview_options",
+            "parse_mode",
+            "protect_content",
+            "question_parse_mode",
         ):
             value = getattr(self, kwarg)
             if value is not None:
@@ -235,7 +236,7 @@ class Defaults:
         return self._parse_mode
 
     @parse_mode.setter
-    def parse_mode(self, value: object) -> NoReturn:
+    def parse_mode(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to parse_mode after initialization.")
 
     @property
@@ -246,7 +247,7 @@ class Defaults:
         return self._parse_mode
 
     @explanation_parse_mode.setter
-    def explanation_parse_mode(self, value: object) -> NoReturn:
+    def explanation_parse_mode(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to explanation_parse_mode after initialization."
         )
@@ -259,9 +260,39 @@ class Defaults:
         return self._parse_mode
 
     @quote_parse_mode.setter
-    def quote_parse_mode(self, value: object) -> NoReturn:
+    def quote_parse_mode(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to quote_parse_mode after initialization."
+        )
+
+    @property
+    def text_parse_mode(self) -> Optional[str]:
+        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
+        the corresponding parameter of :class:`telegram.InputPollOption`.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self._parse_mode
+
+    @text_parse_mode.setter
+    def text_parse_mode(self, _: object) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to text_parse_mode after initialization."
+        )
+
+    @property
+    def question_parse_mode(self) -> Optional[str]:
+        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
+        the corresponding parameter of :meth:`telegram.Bot.send_poll`.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self._parse_mode
+
+    @question_parse_mode.setter
+    def question_parse_mode(self, _: object) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to question_parse_mode after initialization."
         )
 
     @property
@@ -272,7 +303,7 @@ class Defaults:
         return self._disable_notification
 
     @disable_notification.setter
-    def disable_notification(self, value: object) -> NoReturn:
+    def disable_notification(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to disable_notification after initialization."
         )
@@ -289,7 +320,7 @@ class Defaults:
         return self._link_preview_options.is_disabled if self._link_preview_options else None
 
     @disable_web_page_preview.setter
-    def disable_web_page_preview(self, value: object) -> NoReturn:
+    def disable_web_page_preview(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to disable_web_page_preview after initialization."
         )
@@ -302,7 +333,7 @@ class Defaults:
         return self._allow_sending_without_reply
 
     @allow_sending_without_reply.setter
-    def allow_sending_without_reply(self, value: object) -> NoReturn:
+    def allow_sending_without_reply(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to allow_sending_without_reply after initialization."
         )
@@ -318,7 +349,7 @@ class Defaults:
         return self._do_quote if self._do_quote is not None else None
 
     @quote.setter
-    def quote(self, value: object) -> NoReturn:
+    def quote(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to quote after initialization.")
 
     @property
@@ -329,7 +360,7 @@ class Defaults:
         return self._tzinfo
 
     @tzinfo.setter
-    def tzinfo(self, value: object) -> NoReturn:
+    def tzinfo(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to tzinfo after initialization.")
 
     @property
@@ -341,7 +372,7 @@ class Defaults:
         return self._block
 
     @block.setter
-    def block(self, value: object) -> NoReturn:
+    def block(self, _: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to block after initialization.")
 
     @property
@@ -354,7 +385,7 @@ class Defaults:
         return self._protect_content
 
     @protect_content.setter
-    def protect_content(self, value: object) -> NoReturn:
+    def protect_content(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can't assign a new value to protect_content after initialization."
         )
