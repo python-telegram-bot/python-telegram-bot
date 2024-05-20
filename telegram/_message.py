@@ -25,6 +25,7 @@ from html import escape
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 from telegram._chat import Chat
+from telegram._chatbackground import ChatBackground
 from telegram._chatboost import ChatBoostAdded
 from telegram._dice import Dice
 from telegram._files.animation import Animation
@@ -64,6 +65,7 @@ from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
+from telegram._utils.entities import parse_message_entities, parse_message_entity
 from telegram._utils.types import (
     CorrectOptionID,
     FileInput,
@@ -99,6 +101,7 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
+        InputPollOption,
         LabeledPrice,
         MessageId,
         MessageOrigin,
@@ -553,6 +556,11 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.1
 
+        chat_background_set  (:obj:`telegram.ChatBackground`, optional): Service message: chat
+            background set.
+
+            .. versionadded:: NEXT.VERSION
+
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
         from_user (:class:`telegram.User`): Optional. Sender of the message; empty for messages
@@ -853,6 +861,11 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 21.1
 
+        chat_background_set (:obj:`telegram.ChatBackground`): Optional. Service message: chat
+            background set
+
+            .. versionadded:: Next.Version
+
     .. |custom_emoji_no_md1_support| replace:: Since custom emoji entities are not supported by
        :attr:`~telegram.constants.ParseMode.MARKDOWN`, this method now raises a
        :exc:`ValueError` when encountering a custom emoji.
@@ -876,6 +889,7 @@ class Message(MaybeInaccessibleMessage):
         "caption",
         "caption_entities",
         "channel_chat_created",
+        "chat_background_set",
         "chat_shared",
         "connected_website",
         "contact",
@@ -1029,6 +1043,7 @@ class Message(MaybeInaccessibleMessage):
         business_connection_id: Optional[str] = None,
         sender_business_bot: Optional[User] = None,
         is_from_offline: Optional[bool] = None,
+        chat_background_set: Optional[ChatBackground] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1127,6 +1142,7 @@ class Message(MaybeInaccessibleMessage):
             self.business_connection_id: Optional[str] = business_connection_id
             self.sender_business_bot: Optional[User] = sender_business_bot
             self.is_from_offline: Optional[bool] = is_from_offline
+            self.chat_background_set: Optional[ChatBackground] = chat_background_set
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1241,6 +1257,7 @@ class Message(MaybeInaccessibleMessage):
         )
         data["users_shared"] = UsersShared.de_json(data.get("users_shared"), bot)
         data["chat_shared"] = ChatShared.de_json(data.get("chat_shared"), bot)
+        data["chat_background_set"] = ChatBackground.de_json(data.get("chat_background_set"), bot)
 
         # Unfortunately, this needs to be here due to cyclic imports
         from telegram._giveaway import (  # pylint: disable=import-outside-toplevel
@@ -2890,7 +2907,7 @@ class Message(MaybeInaccessibleMessage):
     async def reply_poll(
         self,
         question: str,
-        options: Sequence[str],
+        options: Sequence[Union[str, "InputPollOption"]],
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
@@ -2906,6 +2923,8 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        question_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        question_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2976,6 +2995,8 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
+            question_parse_mode=question_parse_mode,
+            question_entities=question_entities,
         )
 
     async def reply_dice(
@@ -3653,6 +3674,7 @@ class Message(MaybeInaccessibleMessage):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
+        live_period: Optional[int] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3694,6 +3716,7 @@ class Message(MaybeInaccessibleMessage):
             horizontal_accuracy=horizontal_accuracy,
             heading=heading,
             proximity_alert_radius=proximity_alert_radius,
+            live_period=live_period,
             inline_message_id=None,
         )
 
@@ -4184,9 +4207,7 @@ class Message(MaybeInaccessibleMessage):
         if not self.text:
             raise RuntimeError("This Message has no 'text'.")
 
-        entity_text = self.text.encode("utf-16-le")
-        entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
-        return entity_text.decode("utf-16-le")
+        return parse_message_entity(self.text, entity)
 
     def parse_caption_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
@@ -4210,9 +4231,7 @@ class Message(MaybeInaccessibleMessage):
         if not self.caption:
             raise RuntimeError("This Message has no 'caption'.")
 
-        entity_text = self.caption.encode("utf-16-le")
-        entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
-        return entity_text.decode("utf-16-le")
+        return parse_message_entity(self.caption, entity)
 
     def parse_entities(self, types: Optional[List[str]] = None) -> Dict[MessageEntity, str]:
         """
@@ -4237,12 +4256,7 @@ class Message(MaybeInaccessibleMessage):
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         """
-        if types is None:
-            types = MessageEntity.ALL_TYPES
-
-        return {
-            entity: self.parse_entity(entity) for entity in self.entities if entity.type in types
-        }
+        return parse_message_entities(self.text, self.entities, types=types)
 
     def parse_caption_entities(
         self, types: Optional[List[str]] = None
@@ -4269,14 +4283,7 @@ class Message(MaybeInaccessibleMessage):
             the text that belongs to them, calculated based on UTF-16 codepoints.
 
         """
-        if types is None:
-            types = MessageEntity.ALL_TYPES
-
-        return {
-            entity: self.parse_caption_entity(entity)
-            for entity in self.caption_entities
-            if entity.type in types
-        }
+        return parse_message_entities(self.caption, self.caption_entities, types=types)
 
     @classmethod
     def _parse_html(

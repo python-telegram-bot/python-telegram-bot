@@ -179,13 +179,14 @@ class Defaults:
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
         for kwarg in (
-            "parse_mode",
-            "explanation_parse_mode",
-            "disable_notification",
             "allow_sending_without_reply",
-            "protect_content",
-            "link_preview_options",
+            "disable_notification",
             "do_quote",
+            "explanation_parse_mode",
+            "link_preview_options",
+            "parse_mode",
+            "protect_content",
+            "question_parse_mode",
         ):
             value = getattr(self, kwarg)
             if value is not None:
@@ -262,6 +263,36 @@ class Defaults:
     def quote_parse_mode(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to quote_parse_mode after initialization."
+        )
+
+    @property
+    def text_parse_mode(self) -> Optional[str]:
+        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
+        the corresponding parameter of :class:`telegram.InputPollOption`.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self._parse_mode
+
+    @text_parse_mode.setter
+    def text_parse_mode(self, _: object) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to text_parse_mode after initialization."
+        )
+
+    @property
+    def question_parse_mode(self) -> Optional[str]:
+        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
+        the corresponding parameter of :meth:`telegram.Bot.send_poll`.
+
+        .. versionadded:: NEXT.VERSION
+        """
+        return self._parse_mode
+
+    @question_parse_mode.setter
+    def question_parse_mode(self, _: object) -> NoReturn:
+        raise AttributeError(
+            "You can not assign a new value to question_parse_mode after initialization."
         )
 
     @property

@@ -58,9 +58,9 @@ from telegram._botcommandscope import BotCommandScope
 from telegram._botdescription import BotDescription, BotShortDescription
 from telegram._botname import BotName
 from telegram._business import BusinessConnection
-from telegram._chat import Chat
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._chatboost import UserChatBoosts
+from telegram._chatfullinfo import ChatFullInfo
 from telegram._chatinvitelink import ChatInviteLink
 from telegram._chatmember import ChatMember
 from telegram._chatpermissions import ChatPermissions
@@ -84,7 +84,7 @@ from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._menubutton import MenuButton
 from telegram._message import Message
 from telegram._messageid import MessageId
-from telegram._poll import Poll
+from telegram._poll import InputPollOption, Poll
 from telegram._reaction import ReactionType, ReactionTypeCustomEmoji, ReactionTypeEmoji
 from telegram._reply import ReplyParameters
 from telegram._sentwebappmessage import SentWebAppMessage
@@ -2287,9 +2287,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         """
         Use this method to send audio files, if you want Telegram clients to display the file
         as a playable voice message. For this to work, your audio must be in an ``.ogg`` file
-        encoded with OPUS (other formats may be sent as Audio or Document). Bots can currently
-        send voice messages of up to :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD`
-        in size, this limit may be changed in the future.
+        encoded with OPUS , or in .MP3 format, or in .M4A format (other formats may be sent as
+        :class:`~telegram.Audio` or :class:`~telegram.Document`). Bots can currently send voice
+        messages of up to :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD` in size,
+        this limit may be changed in the future.
 
         Note:
             To use this method, the file must have the type :mimetype:`audio/ogg` and be no more
@@ -2610,7 +2611,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             live_period (:obj:`int`, optional): Period in seconds for which the location will be
                 updated, should be between
                 :tg-const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD` and
-                :tg-const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`.
+                :tg-const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`, or
+                :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
+                locations that can be edited indefinitely.
             heading (:obj:`int`, optional): For live locations, a direction in which the user is
                 moving, in degrees. Must be between
                 :tg-const:`telegram.constants.LocationLimit.MIN_HEADING` and
@@ -2720,6 +2723,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
+        live_period: Optional[int] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2758,6 +2762,15 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 if specified.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard.
+            live_period (:obj:`int`, optional): New period in seconds during which the location
+                can be updated, starting from the message send date. If
+                :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` is specified,
+                then the location can be updated forever. Otherwise, the new value must not exceed
+                the current ``live_period`` by more than a day, and the live location expiration
+                date must remain within the next 90 days. If not specified, then ``live_period``
+                remains unchanged
+
+                .. versionadded:: NEXT.VERSION.
 
         Keyword Args:
             location (:class:`telegram.Location`, optional): The location to send.
@@ -2790,6 +2803,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "horizontal_accuracy": horizontal_accuracy,
             "heading": heading,
             "proximity_alert_radius": proximity_alert_radius,
+            "live_period": live_period,
         }
 
         return await self._send_message(
@@ -4434,16 +4448,19 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
-    ) -> Chat:
+    ) -> ChatFullInfo:
         """
         Use this method to get up to date information about the chat (current name of the user for
         one-on-one conversations, current username of a user, group or channel, etc.).
+
+        .. versionchanged:: NEXT.VERSION
+            In accordance to Bot API 7.3, this method now returns a :class:`telegram.ChatFullInfo`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
 
         Returns:
-            :class:`telegram.Chat`
+            :class:`telegram.ChatFullInfo`
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -4461,7 +4478,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
 
-        return Chat.de_json(result, self)  # type: ignore[return-value]
+        return ChatFullInfo.de_json(result, self)  # type: ignore[return-value]
 
     async def get_chat_administrators(
         self,
@@ -5311,7 +5328,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
                 .. versionadded:: 20.6
             can_edit_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
-                edit stories posted by other users.
+                edit stories posted by other users, post stories to the chat page, pin chat
+                stories, and access the chat's story archive
 
                 .. versionadded:: 20.6
             can_delete_stories (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
@@ -6798,7 +6816,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[int, str],
         question: str,
-        options: Sequence[str],
+        options: Sequence[Union[str, "InputPollOption"]],
         is_anonymous: Optional[bool] = None,
         type: Optional[str] = None,  # pylint: disable=redefined-builtin
         allows_multiple_answers: Optional[bool] = None,
@@ -6815,6 +6833,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        question_parse_mode: ODVInput[str] = DEFAULT_NONE,
+        question_entities: Optional[Sequence["MessageEntity"]] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -6831,14 +6851,20 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
                 :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
-            options (Sequence[:obj:`str`]): Sequence of answer options,
+            options (Sequence[:obj:`str` | :class:`telegram.InputPollOption`]): Sequence of
                 :tg-const:`telegram.Poll.MIN_OPTION_NUMBER`-
-                :tg-const:`telegram.Poll.MAX_OPTION_NUMBER` strings
+                :tg-const:`telegram.Poll.MAX_OPTION_NUMBER` answer options. Each option may either
+                be a string with
                 :tg-const:`telegram.Poll.MIN_OPTION_LENGTH`-
-                :tg-const:`telegram.Poll.MAX_OPTION_LENGTH` characters each.
+                :tg-const:`telegram.Poll.MAX_OPTION_LENGTH` characters or an
+                :class:`~telegram.InputPollOption` object. Strings are converted to
+                :class:`~telegram.InputPollOption` objects automatically.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
+
+                .. versionchanged:: NEXT.VERSION
+                   Bot API 7.3 adds support for :class:`~telegram.InputPollOption` objects.
             is_anonymous (:obj:`bool`, optional): :obj:`True`, if the poll needs to be anonymous,
                 defaults to :obj:`True`.
             type (:obj:`str`, optional): Poll type, :tg-const:`telegram.Poll.QUIZ` or
@@ -6893,6 +6919,16 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            question_parse_mode (:obj:`str`, optional): Mode for parsing entities in the question.
+                See the constants in :class:`telegram.constants.ParseMode` for the available modes.
+                Currently, only custom emoji entities are allowed.
+
+                .. versionadded:: NEXT.VERSION
+            question_entities (Sequence[:class:`telegram.Message`], optional): Special entities
+                that appear in the poll :paramref:`question`. It can be specified instead of
+                :paramref:`question_parse_mode`.
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -6924,7 +6960,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         data: JSONDict = {
             "chat_id": chat_id,
             "question": question,
-            "options": options,
+            "options": [
+                InputPollOption(option) if isinstance(option, str) else option
+                for option in options
+            ],
             "explanation_parse_mode": explanation_parse_mode,
             "is_anonymous": is_anonymous,
             "type": type,
@@ -6935,6 +6974,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "explanation_entities": explanation_entities,
             "open_period": open_period,
             "close_date": close_date,
+            "question_parse_mode": question_parse_mode,
+            "question_entities": question_entities,
         }
 
         return await self._send_message(

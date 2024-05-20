@@ -461,6 +461,7 @@ class CallbackQuery(TelegramObject):
         horizontal_accuracy: Optional[float] = None,
         heading: Optional[int] = None,
         proximity_alert_radius: Optional[int] = None,
+        live_period: Optional[int] = None,
         *,
         location: Optional[Location] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -509,6 +510,7 @@ class CallbackQuery(TelegramObject):
                 horizontal_accuracy=horizontal_accuracy,
                 heading=heading,
                 proximity_alert_radius=proximity_alert_radius,
+                live_period=live_period,
                 chat_id=None,
                 message_id=None,
             )
@@ -525,6 +527,7 @@ class CallbackQuery(TelegramObject):
             horizontal_accuracy=horizontal_accuracy,
             heading=heading,
             proximity_alert_radius=proximity_alert_radius,
+            live_period=live_period,
         )
 
     async def stop_message_live_location(

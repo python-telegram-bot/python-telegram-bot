@@ -1909,7 +1909,8 @@ class StatusUpdate:
         def filter(self, update: Update) -> bool:
             return bool(
                 # keep this alphabetically sorted for easier maintenance
-                StatusUpdate.CHAT_CREATED.check_update(update)
+                StatusUpdate.CHAT_BACKGROUND_SET.check_update(update)
+                or StatusUpdate.CHAT_CREATED.check_update(update)
                 or StatusUpdate.CHAT_SHARED.check_update(update)
                 or StatusUpdate.CONNECTED_WEBSITE.check_update(update)
                 or StatusUpdate.DELETE_CHAT_PHOTO.check_update(update)
@@ -1941,6 +1942,15 @@ class StatusUpdate:
 
     ALL = _All(name="filters.StatusUpdate.ALL")
     """Messages that contain any of the below."""
+
+    class _ChatBackgroundSet(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.chat_background_set)
+
+    CHAT_BACKGROUND_SET = _ChatBackgroundSet(name="filters.StatusUpdate.CHAT_BACKGROUND_SET")
+    """Messages that contain :attr:`telegram.Message.chat_background_set`."""
 
     class _ChatCreated(MessageFilter):
         __slots__ = ()
