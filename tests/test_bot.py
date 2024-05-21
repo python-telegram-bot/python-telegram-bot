@@ -103,11 +103,10 @@ from tests.auxil.networking import OfflineRequest, expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
 
-from ._files.test_photo import photo_file
 from .auxil.build_messages import make_message
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 async def message(bot, chat_id):  # mostly used in tests for edit_message
     out = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
@@ -1128,7 +1127,7 @@ class TestBotWithoutRequest:
             )
 
         # Test with send media group
-        media = InputMediaPhoto(photo_file)
+        media = InputMediaPhoto("")
         with pytest.raises(ValueError, match="`reply_to_message_id` and"):
             await offline_bot.send_media_group(
                 chat_id, media, reply_to_message_id=1, reply_parameters=True
