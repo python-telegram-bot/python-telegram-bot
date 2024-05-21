@@ -66,7 +66,7 @@ markers = [
     "no_req",
     "req",
 ]
-asyncio_mode = "auto"
+# asyncio_mode = "auto"
 log_format = "%(funcName)s - Line %(lineno)d - %(message)s"
 # log_level = "DEBUG"  # uncomment to see DEBUG logs
 

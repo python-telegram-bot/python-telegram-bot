@@ -32,18 +32,8 @@ from telegram import (
     Sticker,
 )
 from telegram.error import BadRequest
+from tests.auxil.constants import TEST_MSG_TEXT, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
 from tests.auxil.slots import mro_slots
-
-TEST_MSG_TEXT = "Topics are forever"
-TEST_TOPIC_ICON_COLOR = 0x6FB9F0
-TEST_TOPIC_NAME = "Sad bot true: real stories"
-
-
-@pytest.fixture(scope="module")
-async def emoji_id(bot):
-    emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
-    first_sticker = emoji_sticker_list[0]
-    return first_sticker.custom_emoji_id
 
 
 @pytest.fixture(scope="module")
@@ -54,23 +44,6 @@ async def forum_topic_object(forum_group_id, emoji_id):
         icon_color=TEST_TOPIC_ICON_COLOR,
         icon_custom_emoji_id=emoji_id,
     )
-
-
-@pytest.fixture()
-async def real_topic(bot, emoji_id, forum_group_id):
-    result = await bot.create_forum_topic(
-        chat_id=forum_group_id,
-        name=TEST_TOPIC_NAME,
-        icon_color=TEST_TOPIC_ICON_COLOR,
-        icon_custom_emoji_id=emoji_id,
-    )
-
-    yield result
-
-    result = await bot.delete_forum_topic(
-        chat_id=forum_group_id, message_thread_id=result.message_thread_id
-    )
-    assert result is True, "Topic was not deleted"
 
 
 class TestForumTopicWithoutRequest:

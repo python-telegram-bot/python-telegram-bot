@@ -40,7 +40,7 @@ from telegram.ext import ApplicationBuilder, Defaults, Updater
 from telegram.ext.filters import MessageFilter, UpdateFilter
 from tests.auxil.build_messages import DATE
 from tests.auxil.ci_bots import BOT_INFO_PROVIDER
-from tests.auxil.constants import PRIVATE_KEY
+from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
 from tests.auxil.envvars import RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
 from tests.auxil.networking import NonchalantHttpxRequest
@@ -237,6 +237,30 @@ def thumb_file():
 def class_thumb_file():
     with data_file("thumb.jpg").open("rb") as f:
         yield f
+
+
+@pytest.fixture(scope="session")
+async def emoji_id(bot):
+    emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
+    first_sticker = emoji_sticker_list[0]
+    return first_sticker.custom_emoji_id
+
+
+@pytest.fixture()
+async def real_topic(bot, emoji_id, forum_group_id):
+    result = await bot.create_forum_topic(
+        chat_id=forum_group_id,
+        name=TEST_TOPIC_NAME,
+        icon_color=TEST_TOPIC_ICON_COLOR,
+        icon_custom_emoji_id=emoji_id,
+    )
+
+    yield result
+
+    result = await bot.delete_forum_topic(
+        chat_id=forum_group_id, message_thread_id=result.message_thread_id
+    )
+    assert result is True, "Topic was not deleted"
 
 
 @pytest.fixture(

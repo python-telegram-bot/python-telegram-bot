@@ -37,20 +37,6 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
-def animation_file():
-    with data_file("game.gif").open("rb") as f:
-        yield f
-
-
-@pytest.fixture(scope="module")
-async def animation(bot, chat_id):
-    with data_file("game.gif").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
-        return (
-            await bot.send_animation(chat_id, animation=f, read_timeout=50, thumbnail=thumb)
-        ).animation
-
-
 class TestAnimationBase:
     animation_file_id = "CgADAQADngIAAuyVeEez0xRovKi9VAI"
     animation_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
