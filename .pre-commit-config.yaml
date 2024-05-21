@@ -2,7 +2,8 @@
 
 ci:
     autofix_prs: false
-    autoupdate_schedule: monthly
+    autoupdate_schedule: quarterly
+    autoupdate_commit_msg: 'Bump `pre-commit` Hooks to Latest Versions'
 
 repos:
 -   repo: https://github.com/astral-sh/ruff-pre-commit
