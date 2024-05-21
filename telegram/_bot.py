@@ -1152,7 +1152,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         Note:
             Since the release of Bot API 5.5 it can be impossible to forward messages from
             some chats. Use the attributes :attr:`telegram.Message.has_protected_content` and
-            :attr:`telegram.Chat.has_protected_content` to check this.
+            :attr:`telegram.ChatFullInfo.has_protected_content` to check this.
 
             As a workaround, it is still possible to use :meth:`copy_message`. However, this
             behaviour is undocumented and might be changed by Telegram.
@@ -4610,8 +4610,8 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     ) -> bool:
         """Use this method to set a new group sticker set for a supergroup.
         The bot must be an administrator in the chat for this to work and must have the appropriate
-        admin rights. Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned
-        in :meth:`get_chat` requests to check if the bot can use this method.
+        admin rights. Use the field :attr:`telegram.ChatFullInfo.can_set_sticker_set` optionally
+        returned in :meth:`get_chat` requests to check if the bot can use this method.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
@@ -4644,7 +4644,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
     ) -> bool:
         """Use this method to delete a group sticker set from a supergroup. The bot must be an
         administrator in the chat for this to work and must have the appropriate admin rights.
-        Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned in
+        Use the field :attr:`telegram.ChatFullInfo.can_set_sticker_set` optionally returned in
         :meth:`get_chat` requests to check if the bot can use this method.
 
         Args:

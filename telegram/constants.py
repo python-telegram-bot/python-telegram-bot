@@ -168,7 +168,8 @@ ZERO_DATE: Final[datetime.datetime] = datetime.datetime(1970, 1, 1, tzinfo=UTC)
 
 
 class AccentColor(Enum):
-    """This enum contains the available accent colors for :class:`telegram.Chat.accent_color_id`.
+    """This enum contains the available accent colors for
+    :class:`telegram.ChatFullInfo.accent_color_id`.
     The members of this enum are named tuples with the following attributes:
 
     - ``identifier`` (:obj:`int`): The identifier of the accent color.
@@ -1959,7 +1960,7 @@ class PollingLimit(IntEnum):
 
 class ProfileAccentColor(Enum):
     """This enum contains the available accent colors for
-    :class:`telegram.Chat.profile_accent_color_id`.
+    :class:`telegram.ChatFullInfo.profile_accent_color_id`.
     The members of this enum are named tuples with the following attributes:
 
     - ``identifier`` (:obj:`int`): The identifier of the accent color.

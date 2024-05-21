@@ -20,7 +20,6 @@
 
 
 from telegram import Animation, Audio, Document, PhotoSize, Sticker, Video, VideoNote, Voice
-from telegram._chat import _deprecated_attrs
 from tests.test_official.helpers import _get_params_base
 
 IGNORED_OBJECTS = ("ResponseParameters",)
@@ -173,9 +172,7 @@ def ignored_param_requirements(object_name: str) -> set[str]:
 
 
 # Arguments that are optional arguments for now for backwards compatibility
-BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {
-    "Chat": set(_deprecated_attrs),  # removed by bot api 7.3
-}
+BACKWARDS_COMPAT_KWARGS: dict[str, set[str]] = {}
 
 
 def backwards_compat_kwargs(object_name: str) -> set[str]:
