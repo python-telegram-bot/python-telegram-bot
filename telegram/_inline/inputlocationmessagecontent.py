@@ -42,7 +42,9 @@ class InputLocationMessageContent(InputMessageContent):
         live_period (:obj:`int`, optional): Period in seconds for which the location will be
             updated, should be between
             :tg-const:`telegram.InputLocationMessageContent.MIN_LIVE_PERIOD` and
-            :tg-const:`telegram.InputLocationMessageContent.MAX_LIVE_PERIOD`.
+            :tg-const:`telegram.InputLocationMessageContent.MAX_LIVE_PERIOD` or
+            :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
+            locations that can be edited indefinitely.
         heading (:obj:`int`, optional): For live locations, a direction in which the user is
             moving, in degrees. Must be between
             :tg-const:`telegram.InputLocationMessageContent.MIN_HEADING` and

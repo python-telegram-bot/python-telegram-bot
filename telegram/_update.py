@@ -141,8 +141,8 @@ class Update(TelegramObject):
 
             .. versionadded:: 21.1
 
-        business_message (:class:`telegram.Message`, optional): New non-service message
-            from a connected business account.
+        business_message (:class:`telegram.Message`, optional): New message from a connected
+            business account.
 
             .. versionadded:: 21.1
 
@@ -249,8 +249,8 @@ class Update(TelegramObject):
 
             .. versionadded:: 21.1
 
-        business_message (:class:`telegram.Message`): Optional. New non-service message
-            from a connected business account.
+        business_message (:class:`telegram.Message`): Optional. New message from a connected
+            business account.
 
             .. versionadded:: 21.1
 

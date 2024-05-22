@@ -355,6 +355,7 @@ class ReplyParameters(TelegramObject):
             chat, or in the chat :paramref:`chat_id` if it is specified.
         chat_id (:obj:`int` | :obj:`str`, optional): If the message to be replied to is from a
             different chat, |chat_id_channel|
+            Not supported for messages sent on behalf of a business account.
         allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply| Can be
             used only for replies in the same chat and forum topic.
         quote (:obj:`str`, optional): Quoted part of the message to be replied to; 0-1024
@@ -376,6 +377,7 @@ class ReplyParameters(TelegramObject):
             chat, or in the chat :paramref:`chat_id` if it is specified.
         chat_id (:obj:`int` | :obj:`str`): Optional. If the message to be replied to is from a
             different chat, |chat_id_channel|
+            Not supported for messages sent on behalf of a business account.
         allow_sending_without_reply (:obj:`bool`): Optional. |allow_sending_without_reply| Can be
             used only for replies in the same chat and forum topic.
         quote (:obj:`str`): Optional. Quoted part of the message to be replied to; 0-1024

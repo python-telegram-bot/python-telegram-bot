@@ -44,7 +44,7 @@ class UsersShared(TelegramObject):
        The argument :attr:`users` is now considered for the equality comparison instead of
        ``user_ids``.
 
-    .. versionremoved:: NEXT.VERSION
+    .. versionremoved:: 21.2
        Removed the deprecated argument and attribute ``user_ids``.
 
     Args:
@@ -54,7 +54,7 @@ class UsersShared(TelegramObject):
 
             .. versionadded:: 21.1
 
-            .. versionchanged:: NEXT.VERSION
+            .. versionchanged:: 21.2
                This argument is now required.
 
     Attributes:

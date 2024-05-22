@@ -26,7 +26,7 @@ from telegram._utils.types import JSONDict
 
 class Birthdate(TelegramObject):
     """
-    This object represents a user's birthday.
+    This object describes the birthdate of a user.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`day`, and :attr:`month` are equal.
@@ -71,9 +71,9 @@ class Birthdate(TelegramObject):
         self._freeze()
 
     def to_date(self, year: Optional[int] = None) -> date:
-        """Return the birthdate as a datetime object.
+        """Return the birthdate as a date object.
 
-        .. versionchanged:: NEXT.VERSION
+        .. versionchanged:: 21.2
            Now returns a :obj:`datetime.date` object instead of a :obj:`datetime.datetime` object,
            as was originally intended.
 

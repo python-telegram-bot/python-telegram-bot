@@ -33,7 +33,7 @@ class TestWarnings:
         [
             (PTBUserWarning("test message")),
             (PTBRuntimeWarning("test message")),
-            (PTBDeprecationWarning()),
+            (PTBDeprecationWarning("20.6", "test message")),
         ],
     )
     def test_slots_behavior(self, inst):
@@ -80,9 +80,8 @@ class TestWarnings:
         assert str(recwarn[1].message) == "test message 2"
         assert Path(recwarn[1].filename) == expected_file, "incorrect stacklevel!"
 
-        warn("test message 3", stacklevel=1, category=PTBDeprecationWarning)
-        expected_file = Path(__file__)
+        warn(PTBDeprecationWarning("20.6", "test message 3"), stacklevel=1)
         assert len(recwarn) == 3
         assert recwarn[2].category is PTBDeprecationWarning
-        assert str(recwarn[2].message) == "test message 3"
-        assert Path(recwarn[2].filename) == expected_file, "incorrect stacklevel!"
+        assert str(recwarn[2].message) == "Deprecated since version 20.6: test message 3"
+        assert Path(recwarn[2].filename) == Path(__file__), "incorrect stacklevel!"

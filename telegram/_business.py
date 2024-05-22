@@ -189,7 +189,7 @@ class BusinessMessagesDeleted(TelegramObject):
 
 class BusinessIntro(TelegramObject):
     """
-    This object represents the intro of a business account.
+    This object contains information about the start page settings of a Telegram Business account.
 
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if their
@@ -246,7 +246,7 @@ class BusinessIntro(TelegramObject):
 
 class BusinessLocation(TelegramObject):
     """
-    This object represents the location of a business account.
+    This object contains information about the location of a Telegram Business account.
 
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if their
@@ -298,7 +298,7 @@ class BusinessLocation(TelegramObject):
 
 class BusinessOpeningHoursInterval(TelegramObject):
     """
-    This object represents the time intervals describing business opening hours.
+    This object describes an interval of time during which a business is open.
 
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if their
@@ -390,7 +390,7 @@ class BusinessOpeningHoursInterval(TelegramObject):
 
 class BusinessOpeningHours(TelegramObject):
     """
-    This object represents the opening hours of a business account.
+    This object describes the opening hours of a business.
 
     Objects of this class are comparable in terms of equality.
     Two objects of this class are considered equal, if their

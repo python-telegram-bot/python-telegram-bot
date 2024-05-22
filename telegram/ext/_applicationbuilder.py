@@ -528,9 +528,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
         warn(
-            "`ApplicationBuilder.proxy_url` is deprecated since version "
-            "20.7. Use `ApplicationBuilder.proxy` instead.",
-            PTBDeprecationWarning,
+            PTBDeprecationWarning(
+                "20.7",
+                "`ApplicationBuilder.proxy_url` is deprecated. Use `ApplicationBuilder.proxy` "
+                "instead.",
+            ),
             stacklevel=2,
         )
         return self.proxy(proxy_url)
@@ -760,9 +762,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
         warn(
-            "`ApplicationBuilder.get_updates_proxy_url` is deprecated since version "
-            "20.7. Use `ApplicationBuilder.get_updates_proxy` instead.",
-            PTBDeprecationWarning,
+            PTBDeprecationWarning(
+                "20.7",
+                "`ApplicationBuilder.get_updates_proxy_url` is deprecated. Use "
+                "`ApplicationBuilder.get_updates_proxy` instead.",
+            ),
             stacklevel=2,
         )
         return self.get_updates_proxy(get_updates_proxy_url)
@@ -1334,7 +1338,13 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Tip:
             This can be used for custom stop logic that requires to await coroutines, e.g.
-            sending message to a chat before shutting down the bot
+            sending message to a chat before shutting down the bot.
+
+        Hint:
+            The callback will be called only, if :meth:`Application.stop` was indeed called
+            successfully. For example, if the application is stopped early by calling
+            :meth:`Application.stop_running` within :meth:`post_init`, then the set callback will
+            *not* be called.
 
         Example:
             .. code::

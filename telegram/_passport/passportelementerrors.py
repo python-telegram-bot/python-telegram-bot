@@ -210,9 +210,11 @@ class PassportElementErrorFiles(PassportElementError):
             This attribute will return a tuple instead of a list in future major versions.
         """
         warn(
-            "The attribute `file_hashes` will return a tuple instead of a list in future major"
-            " versions.",
-            PTBDeprecationWarning,
+            PTBDeprecationWarning(
+                "20.6",
+                "The attribute `file_hashes` will return a tuple instead of a list in future major"
+                " versions.",
+            ),
             stacklevel=2,
         )
         return self._file_hashes
@@ -427,10 +429,12 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             This attribute will return a tuple instead of a list in future major versions.
         """
         warn(
-            "The attribute `file_hashes` will return a tuple instead of a list in future major"
-            " versions. See the stability policy:"
-            " https://docs.python-telegram-bot.org/en/stable/stability_policy.html",
-            PTBDeprecationWarning,
+            PTBDeprecationWarning(
+                "20.6",
+                "The attribute `file_hashes` will return a tuple instead of a list in future major"
+                " versions. See the stability policy:"
+                " https://docs.python-telegram-bot.org/en/stable/stability_policy.html",
+            ),
             stacklevel=2,
         )
         return self._file_hashes

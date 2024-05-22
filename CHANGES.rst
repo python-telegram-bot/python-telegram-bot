@@ -4,6 +4,58 @@
 Changelog
 =========
 
+Version 21.2
+============
+
+*Released 2024-05-20*
+
+This is the technical changelog for version 21.2. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support for Bot API 7.3 (:pr:`4246`, :pr:`4260`, :pr:`4243`, :pr:`4248`, :pr:`4242` closes :issue:`4236`, :pr:`4247` by `aelkheir <https://github.com/aelkheir>`_)
+- Remove Functionality Deprecated by Bot API 7.2 (:pr:`4245`)
+
+New Features
+------------
+
+- Add Version to ``PTBDeprecationWarning`` (:pr:`4262` closes :issue:`4261`)
+- Handle Exceptions in building ``CallbackContext`` (:pr:`4222`)
+
+Bug Fixes
+---------
+
+- Call ``Application.post_stop`` Only if ``Application.stop`` was called (:pr:`4211` closes :issue:`4210`)
+- Handle ``SystemExit`` raised in Handlers (:pr:`4157` closes :issue:`4155` and :issue:`4156`)
+- Make ``Birthdate.to_date`` Return a ``datetime.date`` Object (:pr:`4251`)
+
+Documentation Improvements
+--------------------------
+
+- Documentation Improvements (:pr:`4217`)
+
+Internal Changes
+----------------
+
+- Add New Rules to ``ruff`` Config (:pr:`4250`)
+- Adapt Test Suite to Changes in Error Messages (:pr:`4238`)
+
+Dependency Updates
+------------------
+
+- Bump ``furo`` from 2024.4.27 to 2024.5.6 (:pr:`4252`)
+- ``pre-commit`` autoupdate (:pr:`4239`)
+- Bump ``pytest`` from 8.1.1 to 8.2.0 (:pr:`4231`)
+- Bump ``dependabot/fetch-metadata`` from 2.0.0 to 2.1.0 (:pr:`4228`)
+- Bump ``pytest-asyncio`` from 0.21.1 to 0.21.2 (:pr:`4232`)
+- Bump ``pytest-xdist`` from 3.6.0 to 3.6.1 (:pr:`4233`)
+- Bump ``furo`` from 2024.1.29 to 2024.4.27 (:pr:`4230`)
+- Bump ``srvaroa/labeler`` from 1.10.0 to 1.10.1 (:pr:`4227`)
+- Bump ``pytest`` from 7.4.4 to 8.1.1 (:pr:`4218`)
+- Bump ``sphinx`` from 7.2.6 to 7.3.7 (:pr:`4215`)
+- Bump ``pytest-xdist`` from 3.5.0 to 3.6.0 (:pr:`4215`)
+
 Version 21.1.1
 ==============
 

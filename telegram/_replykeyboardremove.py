@@ -29,6 +29,7 @@ class ReplyKeyboardRemove(TelegramObject):
     keyboard and display the default letter-keyboard. By default, custom keyboards are displayed
     until a new keyboard is sent by a bot. An exception is made for one-time keyboards that are
     hidden immediately after the user presses a button (see :class:`telegram.ReplyKeyboardMarkup`).
+    Not supported in channels and for messages sent on behalf of a Telegram Business account.
 
     Note:
         User will not be able to summon this keyboard; if you want to hide the keyboard from

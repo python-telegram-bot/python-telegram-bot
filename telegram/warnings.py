@@ -54,6 +54,34 @@ class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
 
     .. versionchanged:: 20.0
        Renamed TelegramDeprecationWarning to PTBDeprecationWarning.
+
+    Args:
+        version (:obj:`str`): The version in which the feature was deprecated.
+
+            .. versionadded:: 21.2
+        message (:obj:`str`): The message to display.
+
+            .. versionadded:: 21.2
+
+    Attributes:
+        version (:obj:`str`): The version in which the feature was deprecated.
+
+            .. versionadded:: 21.2
+        message (:obj:`str`): The message to display.
+
+            .. versionadded:: 21.2
     """
 
-    __slots__ = ()
+    __slots__ = ("message", "version")
+
+    def __init__(self, version: str, message: str) -> None:
+        self.version: str = version
+        self.message: str = message
+
+    def __str__(self) -> str:
+        """Returns a string representation of the warning, using :attr:`message` and
+        :attr:`version`.
+
+        .. versionadded:: 21.2
+        """
+        return f"Deprecated since version {self.version}: {self.message}"

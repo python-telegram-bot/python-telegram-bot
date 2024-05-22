@@ -23,10 +23,10 @@ inside warnings.py.
 
 .. versionadded:: 20.2
 """
-from typing import Any, Callable, Type
+from typing import Any, Callable, Type, Union
 
 from telegram._utils.warnings import warn
-from telegram.warnings import PTBDeprecationWarning
+from telegram.warnings import PTBDeprecationWarning, PTBUserWarning
 
 
 def build_deprecation_warning_message(
@@ -54,8 +54,9 @@ def warn_about_deprecated_arg_return_new_arg(
     deprecated_arg_name: str,
     new_arg_name: str,
     bot_api_version: str,
+    ptb_version: str,
     stacklevel: int = 2,
-    warn_callback: Callable[[str, Type[Warning], int], None] = warn,
+    warn_callback: Callable[[Union[str, PTBUserWarning], Type[Warning], int], None] = warn,
 ) -> Any:
     """A helper function for the transition in API when argument is renamed.
 
@@ -80,10 +81,12 @@ def warn_about_deprecated_arg_return_new_arg(
 
     if deprecated_arg:
         warn_callback(
-            f"Bot API {bot_api_version} renamed the argument '{deprecated_arg_name}' to "
-            f"'{new_arg_name}'.",
-            PTBDeprecationWarning,
-            stacklevel + 1,
+            PTBDeprecationWarning(
+                ptb_version,
+                f"Bot API {bot_api_version} renamed the argument '{deprecated_arg_name}' to "
+                f"'{new_arg_name}'.",
+            ),
+            stacklevel=stacklevel + 1,  # type: ignore[call-arg]
         )
         return deprecated_arg
 
@@ -94,6 +97,7 @@ def warn_about_deprecated_attr_in_property(
     deprecated_attr_name: str,
     new_attr_name: str,
     bot_api_version: str,
+    ptb_version: str,
     stacklevel: int = 2,
 ) -> None:
     """A helper function for the transition in API when attribute is renamed. Call from properties.
@@ -101,8 +105,10 @@ def warn_about_deprecated_attr_in_property(
     The properties replace deprecated attributes in classes and issue these deprecation warnings.
     """
     warn(
-        f"Bot API {bot_api_version} renamed the attribute '{deprecated_attr_name}' to "
-        f"'{new_attr_name}'.",
-        PTBDeprecationWarning,
+        PTBDeprecationWarning(
+            ptb_version,
+            f"Bot API {bot_api_version} renamed the attribute '{deprecated_attr_name}' to "
+            f"'{new_attr_name}'.",
+        ),
         stacklevel=stacklevel + 1,
     )

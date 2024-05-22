@@ -89,7 +89,9 @@ class InlineQueryResultLocation(InlineQueryResult):
         live_period (:obj:`int`): Optional. Period in seconds for which the location will be
             updated, should be between
             :tg-const:`telegram.InlineQueryResultLocation.MIN_LIVE_PERIOD` and
-            :tg-const:`telegram.InlineQueryResultLocation.MAX_LIVE_PERIOD`.
+            :tg-const:`telegram.InlineQueryResultLocation.MAX_LIVE_PERIOD` or
+            :tg-const:`telegram.constants.LocationLimit.LIVE_PERIOD_FOREVER` for live
+            locations that can be edited indefinitely.
         heading (:obj:`int`): Optional. For live locations, a direction in which the user is
             moving, in degrees. Must be between
             :tg-const:`telegram.InlineQueryResultLocation.MIN_HEADING` and

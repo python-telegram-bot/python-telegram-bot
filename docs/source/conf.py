@@ -20,9 +20,9 @@ author = "Leandro Toledo"
 # built documents.
 #
 # The short X.Y version.
-version = "21.1.1"  # telegram.__version__[:3]
+version = "21.2"  # telegram.__version__[:3]
 # The full version, including alpha/beta/rc tags.
-release = "21.1.1"  # telegram.__version__
+release = "21.2"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "6.1.3"
@@ -67,7 +67,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # Global substitutions
-rst_prolog = (Path.cwd() / "../substitutions/global.rst").read_text(encoding="utf-8")
+rst_prolog = ""
+for file in Path.cwd().glob("../substitutions/*.rst"):
+    rst_prolog += "\n" + file.read_text(encoding="utf-8")
 
 # -- Extension settings ------------------------------------------------
 napoleon_use_admonition_for_examples = True
