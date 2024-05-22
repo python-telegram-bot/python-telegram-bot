@@ -385,7 +385,7 @@ from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonReq
 from ._linkpreviewoptions import LinkPreviewOptions
 from ._loginurl import LoginUrl
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
-from ._MESSAGE import InaccessibleMessage, MaybeInaccessibleMessage, Message
+from ._message import InaccessibleMessage, MaybeInaccessibleMessage, Message
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from ._messageentity import MessageEntity
 from ._messageid import MessageId
