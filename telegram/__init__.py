@@ -242,6 +242,7 @@ __all__ = (
     "warnings",
 )
 
+from pathlib import Path
 
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
@@ -384,7 +385,7 @@ from ._keyboardbuttonrequest import KeyboardButtonRequestChat, KeyboardButtonReq
 from ._linkpreviewoptions import LinkPreviewOptions
 from ._loginurl import LoginUrl
 from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
-from ._message import InaccessibleMessage, MaybeInaccessibleMessage, Message
+from ._MESSAGE import InaccessibleMessage, MaybeInaccessibleMessage, Message
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from ._messageentity import MessageEntity
 from ._messageid import MessageId
@@ -442,6 +443,7 @@ from ._telegramobject import TelegramObject
 from ._update import Update
 from ._user import User
 from ._userprofilephotos import UserProfilePhotos
+from ._utils.warnings import warn
 from ._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -475,3 +477,28 @@ __bot_api_version__: str = _version.__bot_api_version__
 #:
 #: .. versionadded:: 20.0
 __bot_api_version_info__: constants._BotAPIVersion = _version.__bot_api_version_info__
+
+
+if not (Path(__file__).resolve().absolute() / "ext").exists():
+    _MESSAGE = (
+        "Hey. You seem to be using the `python-telegram-bot-raw` library. "
+        "Please note that this libray has been deprecated and will no longer be updated. "
+        "Please instead use the `python-telegram-bot` library. The change requires no "
+        "changes in your code and requires no additional dependencies. For additional "
+        "information, please see the channel post at "
+        "https://t.me/pythontelegrambotchannel/1."
+    )
+
+    # DeprecationWarning is ignored by default in Python 3.7 and later by default outside
+    # __main__ modules. We use both warning categories to increase the chance of the user
+    # seeing the warning.
+
+    warn(
+        warnings.PTBDeprecationWarning(version="NEXT.VERSION", message=_MESSAGE),
+        stacklevel=2,
+    )
+    warn(
+        message=_MESSAGE,
+        category=warnings.PTBUserWarning,
+        stacklevel=2,
+    )
