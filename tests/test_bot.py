@@ -102,7 +102,7 @@ from tests.auxil.slots import mro_slots
 from .auxil.build_messages import make_message
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 async def message(bot, chat_id):  # mostly used in tests for edit_message
     out = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
@@ -2427,38 +2427,56 @@ class TestBotWithRequest:
         assert new_message.poll.id == message.poll.id
         assert new_message.poll.is_closed
 
-    async def test_send_close_date_default_tz(self, tz_bot, super_group_id):
+    async def test_send_close_date_default_tz(self, tz_bots, super_group_id):
         question = "Is this a test?"
         answers = ["Yes", "No", "Maybe"]
         reply_markup = InlineKeyboardMarkup.from_button(
             InlineKeyboardButton(text="text", callback_data="data")
         )
 
-        aware_close_date = dtm.datetime.now(tz=tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=5)
-        close_date = aware_close_date.replace(tzinfo=None)
+        coros = []
+        for tz_bot in tz_bots:
+            aware_close_date = dtm.datetime.now(tz=tz_bot.defaults.tzinfo) + dtm.timedelta(
+                seconds=5
+            )
+            close_date = aware_close_date.replace(tzinfo=None)
 
-        msg = await tz_bot.send_poll(  # The timezone returned from this is always converted to UTC
-            chat_id=super_group_id,
-            question=question,
-            options=answers,
-            close_date=close_date,
-            read_timeout=60,
-        )
-        msg.poll._unfreeze()
-        # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
-        msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
-        assert abs(msg.poll.close_date - aware_close_date) <= dtm.timedelta(seconds=5)
+            coros.append(
+                tz_bot.send_poll(  # The timezone returned from this is always converted
+                    chat_id=super_group_id,  # to UTC
+                    question=question,
+                    options=answers,
+                    close_date=close_date,
+                    read_timeout=60,
+                )
+            )
+
+        messages = await asyncio.gather(*coros)
+
+        for msg in messages:
+            msg.poll._unfreeze()
+            # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
+            msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
+            assert abs(msg.poll.close_date - aware_close_date) <= dtm.timedelta(seconds=5)
 
         await asyncio.sleep(5.1)
 
-        new_message = await tz_bot.edit_message_reply_markup(
-            chat_id=super_group_id,
-            message_id=msg.message_id,
-            reply_markup=reply_markup,
-            read_timeout=60,
-        )
-        assert new_message.poll.id == msg.poll.id
-        assert new_message.poll.is_closed
+        edit_msg_coros = []
+        for tz_bot, msg in zip(tz_bots, messages):
+            edit_msg_coros.append(
+                tz_bot.edit_message_reply_markup(
+                    chat_id=super_group_id,
+                    message_id=msg.message_id,
+                    reply_markup=reply_markup,
+                    read_timeout=60,
+                )
+            )
+
+        poll_ids = [msg.poll.id for msg in messages]
+        for new_message_coro in asyncio.as_completed(edit_msg_coros):
+            new_message = await new_message_coro
+            assert new_message.poll.id in poll_ids
+            assert new_message.poll.is_closed
 
     async def test_send_poll_explanation_entities(self, bot, chat_id):
         test_string = "Italic Bold Code"
@@ -2644,8 +2662,8 @@ class TestBotWithRequest:
         assert user_profile_photos.total_count == 1
         assert user_profile_photos.photos[0][0].file_size == 5403
 
-    async def test_edit_message_text(self, bot, message):
-        message = await bot.edit_message_text(
+    async def test_edit_message_text_parse_mode_and_entities(self, bot, message):
+        msg_1 = bot.edit_message_text(
             text="new_text",
             chat_id=message.chat_id,
             message_id=message.message_id,
@@ -2653,64 +2671,57 @@ class TestBotWithRequest:
             disable_web_page_preview=True,
         )
 
-        assert message.text == "new_text"
-
-    async def test_edit_message_text_entities(self, bot, message):
         test_string = "Italic Bold Code"
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.ITALIC, 7, 4),
             MessageEntity(MessageEntity.ITALIC, 12, 4),
         ]
-        message = await bot.edit_message_text(
+        msg_2 = bot.edit_message_text(
             text=test_string,
             chat_id=message.chat_id,
             message_id=message.message_id,
             entities=entities,
         )
-
-        assert message.text == test_string
-        assert message.entities == tuple(entities)
+        msg_1, msg_2 = await asyncio.gather(msg_1, msg_2)
+        assert msg_1.text_html == "new_text"
+        assert msg_2.text == test_string
+        assert msg_2.entities == tuple(entities)
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_edit_message_text_default_parse_mode(self, default_bot, message):
         test_string = "Italic Bold Code"
         test_markdown_string = "_Italic_ *Bold* `Code`"
+        test_markdown_string_2 = "_Italic_ *Bold* `Code` 2"
 
-        message = await default_bot.edit_message_text(
+        msg = await default_bot.edit_message_text(
             text=test_markdown_string,
             chat_id=message.chat_id,
             message_id=message.message_id,
             disable_web_page_preview=True,
         )
-        assert message.text_markdown == test_markdown_string
-        assert message.text == test_string
+        assert msg.text_markdown == test_markdown_string
+        assert msg.text == test_string
 
-        message = await default_bot.edit_message_text(
+        msg = await default_bot.edit_message_text(
             text=test_markdown_string,
             chat_id=message.chat_id,
             message_id=message.message_id,
             parse_mode=None,
             disable_web_page_preview=True,
         )
-        assert message.text == test_markdown_string
-        assert message.text_markdown == escape_markdown(test_markdown_string)
+        assert msg.text == test_markdown_string
+        assert msg.text_markdown == escape_markdown(test_markdown_string)
 
-        message = await default_bot.edit_message_text(
-            text=test_markdown_string,
-            chat_id=message.chat_id,
-            message_id=message.message_id,
-            disable_web_page_preview=True,
-        )
-        message = await default_bot.edit_message_text(
-            text=test_markdown_string,
+        msg = await default_bot.edit_message_text(
+            text=test_markdown_string_2,
             chat_id=message.chat_id,
             message_id=message.message_id,
             parse_mode="HTML",
             disable_web_page_preview=True,
         )
-        assert message.text == test_markdown_string
-        assert message.text_markdown == escape_markdown(test_markdown_string)
+        assert msg.text == test_markdown_string_2
+        assert msg.text_markdown == escape_markdown(test_markdown_string_2)
 
     @pytest.mark.skip(reason="need reference to an inline message")
     async def test_edit_message_text_inline(self):
@@ -2748,37 +2759,33 @@ class TestBotWithRequest:
     async def test_edit_message_caption_default_parse_mode(self, default_bot, media_message):
         test_string = "Italic Bold Code"
         test_markdown_string = "_Italic_ *Bold* `Code`"
+        test_markdown_string_2 = "_Italic_ *Bold* `Code` 2"
 
-        message = await default_bot.edit_message_caption(
+        msg = await default_bot.edit_message_caption(
             caption=test_markdown_string,
             chat_id=media_message.chat_id,
             message_id=media_message.message_id,
         )
-        assert message.caption_markdown == test_markdown_string
-        assert message.caption == test_string
+        assert msg.caption_markdown == test_markdown_string
+        assert msg.caption == test_string
 
-        message = await default_bot.edit_message_caption(
+        msg = await default_bot.edit_message_caption(
             caption=test_markdown_string,
             chat_id=media_message.chat_id,
             message_id=media_message.message_id,
             parse_mode=None,
         )
-        assert message.caption == test_markdown_string
-        assert message.caption_markdown == escape_markdown(test_markdown_string)
+        assert msg.caption == test_markdown_string
+        assert msg.caption_markdown == escape_markdown(test_markdown_string)
 
-        message = await default_bot.edit_message_caption(
-            caption=test_markdown_string,
-            chat_id=media_message.chat_id,
-            message_id=media_message.message_id,
-        )
-        message = await default_bot.edit_message_caption(
-            caption=test_markdown_string,
+        msg = await default_bot.edit_message_caption(
+            caption=test_markdown_string_2,
             chat_id=media_message.chat_id,
             message_id=media_message.message_id,
             parse_mode="HTML",
         )
-        assert message.caption == test_markdown_string
-        assert message.caption_markdown == escape_markdown(test_markdown_string)
+        assert msg.caption == test_markdown_string_2
+        assert msg.caption_markdown == escape_markdown(test_markdown_string_2)
 
     async def test_edit_message_caption_with_parse_mode(self, bot, media_message):
         message = await bot.edit_message_caption(
@@ -3253,53 +3260,85 @@ class TestBotWithRequest:
         assert revoked_invite_link.invite_link == invite_link.invite_link
         assert revoked_invite_link.is_revoked
 
-    async def test_advanced_chat_invite_links_default_tzinfo(self, tz_bot, channel_id):
+    async def test_advanced_chat_invite_links_default_tzinfo(self, tz_bots, channel_id):
         # we are testing this all in one function in order to save api calls
         add_seconds = dtm.timedelta(0, 70)
-        aware_expire_date = dtm.datetime.now(tz=tz_bot.defaults.tzinfo) + add_seconds
-        time_in_future = aware_expire_date.replace(tzinfo=None)
 
-        invite_link = await tz_bot.create_chat_invite_link(
-            channel_id, expire_date=time_in_future, member_limit=10
-        )
-        assert invite_link.invite_link
-        assert not invite_link.invite_link.endswith("...")
-        assert abs(invite_link.expire_date - aware_expire_date) < dtm.timedelta(seconds=1)
-        assert invite_link.member_limit == 10
+        new_inv_link_coros = []
+        aware_expire_dates = []
+        invite_links = []
+        for tz_bot in tz_bots:
+            aware_expire_date = dtm.datetime.now(tz=tz_bot.defaults.tzinfo) + add_seconds
+            aware_expire_dates.append(aware_expire_date)
+            time_in_future = aware_expire_date.replace(tzinfo=None)
+
+            new_inv_link_coros.append(
+                tz_bot.create_chat_invite_link(
+                    channel_id, expire_date=time_in_future, member_limit=10
+                )
+            )
+        for inv_link_coro in asyncio.as_completed(new_inv_link_coros):
+            invite_link = await inv_link_coro
+            assert invite_link.invite_link
+            assert not invite_link.invite_link.endswith("...")
+            assert abs(invite_link.expire_date - aware_expire_date) < dtm.timedelta(seconds=1)
+            assert invite_link.member_limit == 10
+            invite_links.append(invite_link)
+
+        assert all(invite_links)
 
         add_seconds = dtm.timedelta(0, 80)
-        aware_expire_date += add_seconds
-        time_in_future = aware_expire_date.replace(tzinfo=None)
+        aware_expire_dates = [aed + add_seconds for aed in aware_expire_dates]
+        edit_inv_link_coros = []
 
-        edited_invite_link = await tz_bot.edit_chat_invite_link(
-            channel_id,
-            invite_link.invite_link,
-            expire_date=time_in_future,
-            member_limit=20,
-            name="NewName",
-        )
-        assert edited_invite_link.invite_link == invite_link.invite_link
-        assert abs(edited_invite_link.expire_date - aware_expire_date) < dtm.timedelta(seconds=1)
-        assert edited_invite_link.name == "NewName"
-        assert edited_invite_link.member_limit == 20
+        for tz_bot, aed, inv_link in zip(tz_bots, aware_expire_dates, invite_links):
+            time_in_future = aed.replace(tzinfo=None)
+            edit_inv_link_coros.append(
+                tz_bot.edit_chat_invite_link(
+                    channel_id,
+                    inv_link.invite_link,
+                    expire_date=time_in_future,
+                    member_limit=20,
+                    name="NewName",
+                )
+            )
 
-        edited_invite_link = await tz_bot.edit_chat_invite_link(
-            channel_id,
-            invite_link.invite_link,
-            name="EvenNewerName",
-            creates_join_request=True,
-        )
-        assert edited_invite_link.invite_link == invite_link.invite_link
-        assert not edited_invite_link.expire_date
-        assert edited_invite_link.name == "EvenNewerName"
-        assert edited_invite_link.creates_join_request
-        assert edited_invite_link.member_limit is None
+        for edit_inv_link_coro in asyncio.as_completed(edit_inv_link_coros):
+            edited_invite_link = await edit_inv_link_coro
+            # We can use any of the aware dates since they were generated at the same time
+            aed = aware_expire_dates[0]
+            assert edited_invite_link.invite_link in [il.invite_link for il in invite_links]
+            assert abs(edited_invite_link.expire_date - aed) < dtm.timedelta(seconds=1)
+            assert edited_invite_link.name == "NewName"
+            assert edited_invite_link.member_limit == 20
 
-        revoked_invite_link = await tz_bot.revoke_chat_invite_link(
-            channel_id, invite_link.invite_link
-        )
-        assert revoked_invite_link.invite_link == invite_link.invite_link
-        assert revoked_invite_link.is_revoked
+        edit_inv_link_coros = []
+        for tz_bot, inv_link in zip(tz_bots, invite_links):
+            edit_inv_link_coros.append(
+                tz_bot.edit_chat_invite_link(
+                    channel_id,
+                    inv_link.invite_link,
+                    name="EvenNewerName",
+                    creates_join_request=True,
+                )
+            )
+
+        for edit_inv_link_coro in asyncio.as_completed(edit_inv_link_coros):
+            edited_invite_link = await edit_inv_link_coro
+            assert edited_invite_link.invite_link in [il.invite_link for il in invite_links]
+            assert not edited_invite_link.expire_date
+            assert edited_invite_link.name == "EvenNewerName"
+            assert edited_invite_link.creates_join_request
+            assert edited_invite_link.member_limit is None
+
+        revoke_coros = []
+        for tz_bot, inv_link in zip(tz_bots, invite_links):
+            revoke_coros.append(tz_bot.revoke_chat_invite_link(channel_id, inv_link.invite_link))
+
+        for revoke_coro in asyncio.as_completed(revoke_coros):
+            revoked_invite_link = await revoke_coro
+            assert revoked_invite_link.invite_link in [il.invite_link for il in invite_links]
+            assert revoked_invite_link.is_revoked
 
     async def test_approve_chat_join_request(self, bot, chat_id, channel_id):
         # TODO: Need incoming join request to properly test

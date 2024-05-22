@@ -181,6 +181,23 @@ async def tz_bot(timezone, bot_info):
 
 
 @pytest.fixture(scope="session")
+async def tz_bots(tzinfos, bot_info):
+    bots = []
+    if len(bots) == 3:
+        return bots
+    for tzinfo in tzinfos:
+        defaults = Defaults(tzinfo=tzinfo)
+        try:
+            bots.append(_default_bots[defaults])
+        except KeyError:
+            default_bot = make_bot(bot_info, defaults=defaults)
+            await default_bot.initialize()
+            _default_bots[defaults] = default_bot
+            bots.append(default_bot)
+    return bots
+
+
+@pytest.fixture(scope="session")
 def chat_id(bot_info):
     return bot_info["chat_id"]
 
@@ -307,6 +324,18 @@ def tzinfo(request):
         return pytz.timezone(request.param)
     hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
     return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
+
+
+@pytest.fixture(scope="session")
+def tzinfos():
+    """Returns a list of timezone objects for testing."""
+    if TEST_WITH_OPT_DEPS:
+        return [pytz.timezone("Europe/Berlin"), pytz.timezone("Asia/Singapore"), pytz.utc]
+    return [
+        BasicTimezone(offset=datetime.timedelta(hours=2), name="Europe/Berlin"),
+        BasicTimezone(offset=datetime.timedelta(hours=8), name="Asia/Singapore"),
+        BasicTimezone(offset=datetime.timedelta(hours=0), name="UTC"),
+    ]
 
 
 @pytest.fixture(scope="session")
