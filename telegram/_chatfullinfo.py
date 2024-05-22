@@ -44,6 +44,9 @@ class ChatFullInfo(_ChatBase):
 
     .. versionadded:: 21.2
 
+    .. versionchanged:: NEXT.VERSION
+        You can now also use the shortcut methods of :class:`telegram.Chat` on this object.
+
     Args:
         id (:obj:`int`): Unique identifier for this chat.
         type (:obj:`str`): Type of chat, can be either :attr:`PRIVATE`, :attr:`GROUP`,
@@ -526,10 +529,4 @@ class ChatFullInfo(_ChatBase):
             data.get("business_opening_hours"), bot
         )
 
-        api_kwargs = {}
-        # This is a deprecated field that TG still returns for backwards compatibility
-        # Let's filter it out to speed up the de-json process
-        if (amaa := "all_members_are_administrators") in data:
-            api_kwargs[amaa] = data.pop(amaa)
-
-        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
+        return super().de_json(data=data, bot=bot)

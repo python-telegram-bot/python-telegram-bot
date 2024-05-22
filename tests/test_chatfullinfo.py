@@ -86,13 +86,13 @@ def chat_full_info(bot):
     return chat
 
 
+# Shortcut methods are tested in test_chat.py.
 class TestChatFullInfoBase:
     id_ = -28767330
     max_reaction_count = 2
     title = "ToledosPalaceBot - Group"
     type_ = "group"
     username = "username"
-    all_members_are_administrators = False
     sticker_set_name = "stickers"
     can_set_sticker_set = False
     permissions = ChatPermissions(
@@ -154,7 +154,6 @@ class TestChatFullInfoWithoutRequest(TestChatFullInfoBase):
             "accent_color_id": self.accent_color_id,
             "max_reaction_count": self.max_reaction_count,
             "username": self.username,
-            "all_members_are_administrators": self.all_members_are_administrators,
             "sticker_set_name": self.sticker_set_name,
             "can_set_sticker_set": self.can_set_sticker_set,
             "permissions": self.permissions.to_dict(),
@@ -215,9 +214,6 @@ class TestChatFullInfoWithoutRequest(TestChatFullInfoBase):
             cfi.has_restricted_voice_and_video_messages
             == self.has_restricted_voice_and_video_messages
         )
-        assert cfi.api_kwargs == {
-            "all_members_are_administrators": self.all_members_are_administrators
-        }
         assert cfi.is_forum == self.is_forum
         assert cfi.active_usernames == tuple(self.active_usernames)
         assert cfi.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
