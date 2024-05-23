@@ -67,7 +67,7 @@ Please instead use the ``python-telegram-bot`` `library <https://pypi.org/python
 The change requires no changes in your code and requires no additional dependencies.
 For additional information, please see this `channel post <https://t.me/pythontelegrambotchannel/1>`_.
 
----
+----
 
 We have made you a wrapper you can't refuse
 
