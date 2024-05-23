@@ -479,7 +479,7 @@ __bot_api_version__: str = _version.__bot_api_version__
 __bot_api_version_info__: constants._BotAPIVersion = _version.__bot_api_version_info__
 
 
-if not (Path(__file__).resolve().absolute() / "ext").exists():
+if not (Path(__file__).parent.resolve().absolute() / "ext").exists():
     _MESSAGE = (
         "Hey. You seem to be using the `python-telegram-bot-raw` library. "
         "Please note that this libray has been deprecated and will no longer be updated. "
