@@ -342,6 +342,9 @@ class Message(MaybeInaccessibleMessage):
             .. versionchanged:: 20.0
                 |sequenceclassargs|
 
+        show_caption_above_media (:obj:`bool`, optional): |show_cap_above_med|
+
+            .. versionadded:: NEXT.VERSION
         audio (:class:`telegram.Audio`, optional): Message is an audio file, information
             about the file.
         document (:class:`telegram.Document`, optional): Message is a general file, information
@@ -636,6 +639,9 @@ class Message(MaybeInaccessibleMessage):
             .. versionchanged:: 20.0
                 |tupleclassattrs|
 
+        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
+
+            .. versionadded:: NEXT.VERSION
         audio (:class:`telegram.Audio`): Optional. Message is an audio file, information
             about the file.
 
@@ -953,6 +959,7 @@ class Message(MaybeInaccessibleMessage):
         "sender_boost_count",
         "sender_business_bot",
         "sender_chat",
+        "show_caption_above_media",
         "sticker",
         "story",
         "successful_payment",
@@ -1056,6 +1063,7 @@ class Message(MaybeInaccessibleMessage):
         is_from_offline: Optional[bool] = None,
         chat_background_set: Optional[ChatBackground] = None,
         effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1156,6 +1164,7 @@ class Message(MaybeInaccessibleMessage):
             self.is_from_offline: Optional[bool] = is_from_offline
             self.chat_background_set: Optional[ChatBackground] = chat_background_set
             self.effect_id: Optional[str] = effect_id
+            self.show_caption_above_media: Optional[bool] = show_caption_above_media
 
             self._effective_attachment = DEFAULT_NONE
 

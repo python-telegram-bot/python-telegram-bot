@@ -46,6 +46,7 @@ def inline_query_result_video():
         description=TestInlineQueryResultVideoBase.description,
         input_message_content=TestInlineQueryResultVideoBase.input_message_content,
         reply_markup=TestInlineQueryResultVideoBase.reply_markup,
+        show_caption_above_media=TestInlineQueryResultVideoBase.show_caption_above_media,
     )
 
 
@@ -65,6 +66,7 @@ class TestInlineQueryResultVideoBase:
     description = "description"
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    show_caption_above_media = True
 
 
 class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
@@ -93,6 +95,7 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_video.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_video.show_caption_above_media == self.show_caption_above_media
 
     def test_caption_entities_always_tuple(self):
         video = InlineQueryResultVideo(
@@ -139,6 +142,10 @@ class TestInlineQueryResultVideoWithoutRequest(TestInlineQueryResultVideoBase):
         assert (
             inline_query_result_video_dict["reply_markup"]
             == inline_query_result_video.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_video_dict["show_caption_above_media"]
+            == inline_query_result_video.show_caption_above_media
         )
 
     def test_equality(self):

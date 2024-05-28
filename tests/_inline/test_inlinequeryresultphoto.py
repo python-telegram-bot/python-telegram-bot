@@ -44,6 +44,7 @@ def inline_query_result_photo():
         caption_entities=TestInlineQueryResultPhotoBase.caption_entities,
         input_message_content=TestInlineQueryResultPhotoBase.input_message_content,
         reply_markup=TestInlineQueryResultPhotoBase.reply_markup,
+        show_caption_above_media=TestInlineQueryResultPhotoBase.show_caption_above_media,
     )
 
 
@@ -62,6 +63,7 @@ class TestInlineQueryResultPhotoBase:
 
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    show_caption_above_media = True
 
 
 class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
@@ -88,6 +90,7 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_photo.show_caption_above_media == self.show_caption_above_media
 
     def test_caption_entities_always_tuple(self):
         result = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumbnail_url)
@@ -127,6 +130,10 @@ class TestInlineQueryResultPhotoWithoutRequest(TestInlineQueryResultPhotoBase):
         assert (
             inline_query_result_photo_dict["reply_markup"]
             == inline_query_result_photo.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_photo_dict["show_caption_above_media"]
+            == inline_query_result_photo.show_caption_above_media
         )
 
     def test_equality(self):
