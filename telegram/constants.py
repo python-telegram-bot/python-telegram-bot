@@ -1801,6 +1801,10 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
     DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
+    EFFECT_ID = "effect_id"
+    """:obj:`str`: Messages with :attr:`telegram.Message.effect_id`.
+
+    .. versionadded:: NEXT.VERSION"""
     FORUM_TOPIC_CREATED = "forum_topic_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_created`.
 
