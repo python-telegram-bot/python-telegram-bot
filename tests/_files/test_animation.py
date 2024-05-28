@@ -233,6 +233,7 @@ class TestAnimationWithRequest(TestAnimationBase):
             protect_content=True,
             thumbnail=thumb_file,
             has_spoiler=True,
+            show_caption_above_media=True,
         )
 
         assert isinstance(message.animation, Animation)
@@ -246,6 +247,7 @@ class TestAnimationWithRequest(TestAnimationBase):
         assert message.animation.thumbnail.width == self.width
         assert message.animation.thumbnail.height == self.height
         assert message.has_protected_content
+        assert message.show_caption_above_media
         try:
             assert message.has_media_spoiler
         except AssertionError:

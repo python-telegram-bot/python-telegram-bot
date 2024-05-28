@@ -1284,6 +1284,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1350,6 +1351,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: NEXT.VERSION
+            show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1387,6 +1391,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "chat_id": chat_id,
             "photo": self._parse_file_input(photo, PhotoSize, filename=filename),
             "has_spoiler": has_spoiler,
+            "show_caption_above_media": show_caption_above_media,
         }
 
         return await self._send_message(
@@ -1856,6 +1861,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1939,6 +1945,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: NEXT.VERSION
+            show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1981,6 +1990,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "supports_streaming": supports_streaming,
             "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
             "has_spoiler": has_spoiler,
+            "show_caption_above_media": show_caption_above_media,
         }
 
         return await self._send_message(
@@ -2166,6 +2176,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2243,6 +2254,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
                 .. versionadded:: NEXT.VERSION
+            show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2284,6 +2298,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "height": height,
             "thumbnail": self._parse_file_input(thumbnail, attach=True) if thumbnail else None,
             "has_spoiler": has_spoiler,
+            "show_caption_above_media": show_caption_above_media,
         }
 
         return await self._send_message(
@@ -4030,6 +4045,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4061,6 +4077,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                     |sequenceargs|
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
+            show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+                .. versionadded:: NEXT.VERSION
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -4074,6 +4093,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "chat_id": chat_id,
             "message_id": message_id,
             "inline_message_id": inline_message_id,
+            "show_caption_above_media": show_caption_above_media,
         }
 
         return await self._send_message(
@@ -7567,6 +7587,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -7610,6 +7631,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
                 .. versionadded:: 20.8
+            show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7666,6 +7690,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "reply_markup": reply_markup,
             "message_thread_id": message_thread_id,
             "reply_parameters": reply_parameters,
+            "show_caption_above_media": show_caption_above_media,
         }
 
         result = await self._post(

@@ -2060,6 +2060,7 @@ class Message(MaybeInaccessibleMessage):
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2126,6 +2127,7 @@ class Message(MaybeInaccessibleMessage):
             has_spoiler=has_spoiler,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def reply_audio(
@@ -2315,6 +2317,7 @@ class Message(MaybeInaccessibleMessage):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2385,6 +2388,7 @@ class Message(MaybeInaccessibleMessage):
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def reply_sticker(
@@ -2478,6 +2482,7 @@ class Message(MaybeInaccessibleMessage):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2549,6 +2554,7 @@ class Message(MaybeInaccessibleMessage):
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
             message_effect_id=message_effect_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def reply_video_note(
@@ -3427,6 +3433,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3471,6 +3478,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def reply_copy(
@@ -3485,6 +3493,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3548,6 +3557,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def edit_text(
@@ -3606,6 +3616,7 @@ class Message(MaybeInaccessibleMessage):
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3645,6 +3656,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             caption_entities=caption_entities,
             inline_message_id=None,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def edit_media(
