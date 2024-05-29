@@ -2180,6 +2180,16 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_message(2, "text", business_connection_id=42)
 
+    async def test_message_effect_id_argument(self, bot, monkeypatch):
+        """We can't test every single method easily, so we just test one. Our linting will catch
+        any unused args with the others."""
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters.get("message_effect_id") == 42
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_message(2, "text", message_effect_id=42)
+
     async def test_get_business_connection(self, bot, monkeypatch):
         bci = "42"
         user = User(1, "first", False)

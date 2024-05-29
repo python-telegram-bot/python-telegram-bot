@@ -273,6 +273,7 @@ def message(bot):
         {"sender_business_bot": User(1, "BusinessBot", True)},
         {"business_connection_id": "123456789"},
         {"chat_background_set": ChatBackground(type=BackgroundTypeChatTheme("ice"))},
+        {"effect_id": "123456789"},
     ],
     ids=[
         "reply",
@@ -342,6 +343,7 @@ def message(bot):
         "business_connection_id",
         "is_from_offline",
         "chat_background_set",
+        "effect_id",
     ],
 )
 def message_params(bot, request):

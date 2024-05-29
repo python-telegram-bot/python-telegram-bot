@@ -672,6 +672,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         link_preview_options: ODVInput["LinkPreviewOptions"] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -711,7 +712,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         data["disable_notification"] = disable_notification
         data["protect_content"] = protect_content
         data["parse_mode"] = parse_mode
-        data["reply_parameters"] = reply_parameters
+
+        if reply_parameters is not None:
+            data["reply_parameters"] = reply_parameters
 
         if link_preview_options is not None:
             data["link_preview_options"] = link_preview_options
@@ -730,6 +733,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
         if business_connection_id is not None:
             data["business_connection_id"] = business_connection_id
+
+        if message_effect_id is not None:
+            data["message_effect_id"] = message_effect_id
 
         result = await self._post(
             endpoint,
@@ -919,6 +925,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -967,6 +974,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1024,6 +1034,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             parse_mode=parse_mode,
             link_preview_options=link_preview_options,
             reply_parameters=reply_parameters,
+            message_effect_id=message_effect_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1272,6 +1283,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1335,6 +1347,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1393,6 +1408,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_audio(
@@ -1412,6 +1428,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1484,6 +1501,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1545,6 +1565,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_document(
@@ -1562,6 +1583,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1633,6 +1655,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1690,6 +1715,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_sticker(
@@ -1703,6 +1729,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         emoji: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1754,6 +1781,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1803,6 +1833,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_video(
@@ -1824,6 +1855,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -1904,6 +1936,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1967,6 +2002,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_video_note(
@@ -1982,6 +2018,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2047,6 +2084,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2104,6 +2144,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_animation(
@@ -2124,6 +2165,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2198,6 +2240,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2260,6 +2305,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_voice(
@@ -2276,6 +2322,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2344,6 +2391,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2402,6 +2452,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_media_group(
@@ -2415,6 +2466,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2465,6 +2517,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2558,6 +2613,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             "message_thread_id": message_thread_id,
             "reply_parameters": reply_parameters,
             "business_connection_id": business_connection_id,
+            "message_effect_id": message_effect_id,
         }
 
         result = await self._post(
@@ -2587,6 +2643,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2643,6 +2700,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2712,6 +2772,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def edit_message_live_location(
@@ -2883,6 +2944,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -2935,6 +2997,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3015,6 +3080,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_contact(
@@ -3030,6 +3096,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -3072,6 +3139,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3143,6 +3213,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_game(
@@ -3155,6 +3226,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -3187,6 +3259,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3233,6 +3308,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_chat_action(
@@ -4845,6 +4921,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -4950,6 +5027,9 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             reply_parameters (:class:`telegram.ReplyParameters`, optional): |reply_parameters|
 
                 .. versionadded:: 20.8
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -5018,6 +5098,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
+            message_effect_id=message_effect_id,
         )
 
     async def answer_shipping_query(
@@ -6839,6 +6920,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         business_connection_id: Optional[str] = None,
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Optional[Sequence["MessageEntity"]] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -6933,6 +7015,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :paramref:`question_parse_mode`.
 
                 .. versionadded:: 21.2
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -6998,6 +7083,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def stop_poll(
@@ -7055,6 +7141,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -7101,6 +7188,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             business_connection_id (:obj:`str`, optional): |business_id_str|
 
                 .. versionadded:: 21.1
+            message_effect_id (:obj:`str`, optional): |message_effect_id|
+
+                .. versionadded:: NEXT.VERSION
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7148,6 +7238,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def get_my_default_administrator_rights(

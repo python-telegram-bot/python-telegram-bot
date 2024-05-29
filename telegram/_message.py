@@ -328,6 +328,11 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 20.8
 
+        effect_id (:obj:`str`, optional): Unique identifier of the message effect added to the
+            message.
+
+            ..versionadded:: NEXT.VERSION
+
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
             caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
@@ -617,6 +622,11 @@ class Message(MaybeInaccessibleMessage):
 
             .. versionadded:: 20.8
 
+        effect_id (:obj:`str`): Optional. Unique identifier of the message effect added to the
+            message.
+
+            ..versionadded:: NEXT.VERSION
+
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
             caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
@@ -897,6 +907,7 @@ class Message(MaybeInaccessibleMessage):
         "dice",
         "document",
         "edit_date",
+        "effect_id",
         "entities",
         "external_reply",
         "forum_topic_closed",
@@ -1044,6 +1055,7 @@ class Message(MaybeInaccessibleMessage):
         sender_business_bot: Optional[User] = None,
         is_from_offline: Optional[bool] = None,
         chat_background_set: Optional[ChatBackground] = None,
+        effect_id: Optional[str] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -1143,6 +1155,7 @@ class Message(MaybeInaccessibleMessage):
             self.sender_business_bot: Optional[User] = sender_business_bot
             self.is_from_offline: Optional[bool] = is_from_offline
             self.chat_background_set: Optional[ChatBackground] = chat_background_set
+            self.effect_id: Optional[str] = effect_id
 
             self._effective_attachment = DEFAULT_NONE
 
@@ -1634,6 +1647,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1698,6 +1712,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_markdown(
@@ -1710,6 +1725,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1780,6 +1796,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_markdown_v2(
@@ -1792,6 +1809,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1858,6 +1876,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_html(
@@ -1870,6 +1889,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1936,6 +1956,7 @@ class Message(MaybeInaccessibleMessage):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_media_group(
@@ -1947,6 +1968,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2013,6 +2035,7 @@ class Message(MaybeInaccessibleMessage):
             parse_mode=parse_mode,
             caption_entities=caption_entities,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_photo(
@@ -2027,6 +2050,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2092,6 +2116,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             has_spoiler=has_spoiler,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_audio(
@@ -2109,6 +2134,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2177,6 +2203,7 @@ class Message(MaybeInaccessibleMessage):
             api_kwargs=api_kwargs,
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_document(
@@ -2192,6 +2219,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2258,6 +2286,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_animation(
@@ -2276,6 +2305,7 @@ class Message(MaybeInaccessibleMessage):
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2345,6 +2375,7 @@ class Message(MaybeInaccessibleMessage):
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_sticker(
@@ -2356,6 +2387,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         emoji: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2416,6 +2448,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             emoji=emoji,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_video(
@@ -2435,6 +2468,7 @@ class Message(MaybeInaccessibleMessage):
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2505,6 +2539,7 @@ class Message(MaybeInaccessibleMessage):
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_video_note(
@@ -2518,6 +2553,7 @@ class Message(MaybeInaccessibleMessage):
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2582,6 +2618,7 @@ class Message(MaybeInaccessibleMessage):
             message_thread_id=message_thread_id,
             thumbnail=thumbnail,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_voice(
@@ -2596,6 +2633,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2661,6 +2699,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_location(
@@ -2676,6 +2715,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2742,6 +2782,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_venue(
@@ -2759,6 +2800,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2827,6 +2869,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_contact(
@@ -2840,6 +2883,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2904,6 +2948,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_poll(
@@ -2927,6 +2972,7 @@ class Message(MaybeInaccessibleMessage):
         reply_parameters: Optional["ReplyParameters"] = None,
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Optional[Sequence["MessageEntity"]] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2999,6 +3045,7 @@ class Message(MaybeInaccessibleMessage):
             business_connection_id=self.business_connection_id,
             question_parse_mode=question_parse_mode,
             question_entities=question_entities,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_dice(
@@ -3009,6 +3056,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3068,6 +3116,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_chat_action(
@@ -3122,6 +3171,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3183,6 +3233,7 @@ class Message(MaybeInaccessibleMessage):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=self.business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def reply_invoice(
@@ -3213,6 +3264,7 @@ class Message(MaybeInaccessibleMessage):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: ODVInput[int] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3302,6 +3354,7 @@ class Message(MaybeInaccessibleMessage):
             suggested_tip_amounts=suggested_tip_amounts,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            message_effect_id=message_effect_id,
         )
 
     async def forward(
