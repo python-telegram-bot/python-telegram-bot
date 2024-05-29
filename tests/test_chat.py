@@ -17,31 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-import datetime
-import warnings
 
 import pytest
 
-from telegram import (
-    Birthdate,
-    Bot,
-    BusinessIntro,
-    BusinessLocation,
-    BusinessOpeningHours,
-    BusinessOpeningHoursInterval,
-    Chat,
-    ChatLocation,
-    ChatPermissions,
-    Location,
-    ReactionTypeCustomEmoji,
-    ReactionTypeEmoji,
-    User,
-)
-from telegram._chat import _deprecated_attrs
-from telegram._utils.datetime import UTC, to_timestamp
+from telegram import Bot, Chat, ChatPermissions, ReactionTypeEmoji, User
 from telegram.constants import ChatAction, ChatType, ReactionEmoji
 from telegram.helpers import escape_markdown
-from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.bot_method_checks import (
     check_defaults_handling,
     check_shortcut_call,
@@ -57,37 +38,7 @@ def chat(bot):
         title=TestChatBase.title,
         type=TestChatBase.type_,
         username=TestChatBase.username,
-        sticker_set_name=TestChatBase.sticker_set_name,
-        can_set_sticker_set=TestChatBase.can_set_sticker_set,
-        permissions=TestChatBase.permissions,
-        slow_mode_delay=TestChatBase.slow_mode_delay,
-        bio=TestChatBase.bio,
-        linked_chat_id=TestChatBase.linked_chat_id,
-        location=TestChatBase.location,
-        has_private_forwards=True,
-        has_protected_content=True,
-        has_visible_history=True,
-        join_to_send_messages=True,
-        join_by_request=True,
-        has_restricted_voice_and_video_messages=True,
         is_forum=True,
-        active_usernames=TestChatBase.active_usernames,
-        emoji_status_custom_emoji_id=TestChatBase.emoji_status_custom_emoji_id,
-        emoji_status_expiration_date=TestChatBase.emoji_status_expiration_date,
-        has_aggressive_anti_spam_enabled=TestChatBase.has_aggressive_anti_spam_enabled,
-        has_hidden_members=TestChatBase.has_hidden_members,
-        available_reactions=TestChatBase.available_reactions,
-        accent_color_id=TestChatBase.accent_color_id,
-        background_custom_emoji_id=TestChatBase.background_custom_emoji_id,
-        profile_accent_color_id=TestChatBase.profile_accent_color_id,
-        profile_background_custom_emoji_id=TestChatBase.profile_background_custom_emoji_id,
-        unrestrict_boost_count=TestChatBase.unrestrict_boost_count,
-        custom_emoji_sticker_set_name=TestChatBase.custom_emoji_sticker_set_name,
-        business_intro=TestChatBase.business_intro,
-        business_location=TestChatBase.business_location,
-        business_opening_hours=TestChatBase.business_opening_hours,
-        birthdate=Birthdate(1, 1),
-        personal_chat=TestChatBase.personal_chat,
         first_name=TestChatBase.first_name,
         last_name=TestChatBase.last_name,
     )
@@ -101,48 +52,7 @@ class TestChatBase:
     title = "ToledosPalaceBot - Group"
     type_ = "group"
     username = "username"
-    all_members_are_administrators = False
-    sticker_set_name = "stickers"
-    can_set_sticker_set = False
-    permissions = ChatPermissions(
-        can_send_messages=True,
-        can_change_info=False,
-        can_invite_users=True,
-    )
-    slow_mode_delay = 30
-    bio = "I'm a Barbie Girl in a Barbie World"
-    linked_chat_id = 11880
-    location = ChatLocation(Location(123, 456), "Barbie World")
-    has_protected_content = True
-    has_visible_history = True
-    has_private_forwards = True
-    join_to_send_messages = True
-    join_by_request = True
-    has_restricted_voice_and_video_messages = True
     is_forum = True
-    active_usernames = ["These", "Are", "Usernames!"]
-    emoji_status_custom_emoji_id = "VeryUniqueCustomEmojiID"
-    emoji_status_expiration_date = datetime.datetime.now(tz=UTC).replace(microsecond=0)
-    has_aggressive_anti_spam_enabled = True
-    has_hidden_members = True
-    available_reactions = [
-        ReactionTypeEmoji(ReactionEmoji.THUMBS_DOWN),
-        ReactionTypeCustomEmoji("custom_emoji_id"),
-    ]
-    business_intro = BusinessIntro("Title", "Description", None)
-    business_location = BusinessLocation("Address", Location(123, 456))
-    business_opening_hours = BusinessOpeningHours(
-        "Country/City",
-        [BusinessOpeningHoursInterval(opening, opening + 60) for opening in (0, 24 * 60)],
-    )
-    accent_color_id = 1
-    background_custom_emoji_id = "background_custom_emoji_id"
-    profile_accent_color_id = 2
-    profile_background_custom_emoji_id = "profile_background_custom_emoji_id"
-    unrestrict_boost_count = 100
-    custom_emoji_sticker_set_name = "custom_emoji_sticker_set_name"
-    birthdate = Birthdate(1, 1)
-    personal_chat = Chat(3, "private", "private")
     first_name = "first"
     last_name = "last"
 
@@ -159,40 +69,7 @@ class TestChatWithoutRequest(TestChatBase):
             "title": self.title,
             "type": self.type_,
             "username": self.username,
-            "all_members_are_administrators": self.all_members_are_administrators,
-            "sticker_set_name": self.sticker_set_name,
-            "can_set_sticker_set": self.can_set_sticker_set,
-            "permissions": self.permissions.to_dict(),
-            "slow_mode_delay": self.slow_mode_delay,
-            "bio": self.bio,
-            "business_intro": self.business_intro.to_dict(),
-            "business_location": self.business_location.to_dict(),
-            "business_opening_hours": self.business_opening_hours.to_dict(),
-            "has_protected_content": self.has_protected_content,
-            "has_visible_history": self.has_visible_history,
-            "has_private_forwards": self.has_private_forwards,
-            "linked_chat_id": self.linked_chat_id,
-            "location": self.location.to_dict(),
-            "join_to_send_messages": self.join_to_send_messages,
-            "join_by_request": self.join_by_request,
-            "has_restricted_voice_and_video_messages": (
-                self.has_restricted_voice_and_video_messages
-            ),
             "is_forum": self.is_forum,
-            "active_usernames": self.active_usernames,
-            "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id,
-            "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
-            "has_aggressive_anti_spam_enabled": self.has_aggressive_anti_spam_enabled,
-            "has_hidden_members": self.has_hidden_members,
-            "available_reactions": [reaction.to_dict() for reaction in self.available_reactions],
-            "accent_color_id": self.accent_color_id,
-            "background_custom_emoji_id": self.background_custom_emoji_id,
-            "profile_accent_color_id": self.profile_accent_color_id,
-            "profile_background_custom_emoji_id": self.profile_background_custom_emoji_id,
-            "unrestrict_boost_count": self.unrestrict_boost_count,
-            "custom_emoji_sticker_set_name": self.custom_emoji_sticker_set_name,
-            "birthdate": self.birthdate.to_dict(),
-            "personal_chat": self.personal_chat.to_dict(),
             "first_name": self.first_name,
             "last_name": self.last_name,
         }
@@ -202,75 +79,9 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat.title == self.title
         assert chat.type == self.type_
         assert chat.username == self.username
-        assert chat.sticker_set_name == self.sticker_set_name
-        assert chat.can_set_sticker_set == self.can_set_sticker_set
-        assert chat.permissions == self.permissions
-        assert chat.slow_mode_delay == self.slow_mode_delay
-        assert chat.bio == self.bio
-        assert chat.business_intro == self.business_intro
-        assert chat.business_location == self.business_location
-        assert chat.business_opening_hours == self.business_opening_hours
-        assert chat.has_protected_content == self.has_protected_content
-        assert chat.has_visible_history == self.has_visible_history
-        assert chat.has_private_forwards == self.has_private_forwards
-        assert chat.linked_chat_id == self.linked_chat_id
-        assert chat.location.location == self.location.location
-        assert chat.location.address == self.location.address
-        assert chat.join_to_send_messages == self.join_to_send_messages
-        assert chat.join_by_request == self.join_by_request
-        assert (
-            chat.has_restricted_voice_and_video_messages
-            == self.has_restricted_voice_and_video_messages
-        )
-        assert chat.api_kwargs == {
-            "all_members_are_administrators": self.all_members_are_administrators
-        }
         assert chat.is_forum == self.is_forum
-        assert chat.active_usernames == tuple(self.active_usernames)
-        assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
-        assert chat.emoji_status_expiration_date == (self.emoji_status_expiration_date)
-        assert chat.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
-        assert chat.has_hidden_members == self.has_hidden_members
-        assert chat.available_reactions == tuple(self.available_reactions)
-        assert chat.accent_color_id == self.accent_color_id
-        assert chat.background_custom_emoji_id == self.background_custom_emoji_id
-        assert chat.profile_accent_color_id == self.profile_accent_color_id
-        assert chat.profile_background_custom_emoji_id == self.profile_background_custom_emoji_id
-        assert chat.unrestrict_boost_count == self.unrestrict_boost_count
-        assert chat.custom_emoji_sticker_set_name == self.custom_emoji_sticker_set_name
-        assert chat.birthdate == self.birthdate
-        assert chat.personal_chat == self.personal_chat
         assert chat.first_name == self.first_name
         assert chat.last_name == self.last_name
-
-    def test_de_json_localization(self, bot, raw_bot, tz_bot):
-        json_dict = {
-            "id": self.id_,
-            "type": self.type_,
-            "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
-        }
-        chat_bot = Chat.de_json(json_dict, bot)
-        chat_bot_raw = Chat.de_json(json_dict, raw_bot)
-        chat_bot_tz = Chat.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing tzinfo objects is not reliable
-        emoji_expire_offset = chat_bot_tz.emoji_status_expiration_date.utcoffset()
-        emoji_expire_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
-            chat_bot_tz.emoji_status_expiration_date.replace(tzinfo=None)
-        )
-
-        assert chat_bot.emoji_status_expiration_date.tzinfo == UTC
-        assert chat_bot_raw.emoji_status_expiration_date.tzinfo == UTC
-        assert emoji_expire_offset_tz == emoji_expire_offset
-
-    def test_always_tuples_attributes(self):
-        chat = Chat(
-            id=123,
-            title="title",
-            type=Chat.PRIVATE,
-        )
-        assert isinstance(chat.active_usernames, tuple)
-        assert chat.active_usernames == ()
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -280,66 +91,9 @@ class TestChatWithoutRequest(TestChatBase):
         assert chat_dict["title"] == chat.title
         assert chat_dict["type"] == chat.type
         assert chat_dict["username"] == chat.username
-        assert chat_dict["permissions"] == chat.permissions.to_dict()
-        assert chat_dict["slow_mode_delay"] == chat.slow_mode_delay
-        assert chat_dict["bio"] == chat.bio
-        assert chat_dict["business_intro"] == chat.business_intro.to_dict()
-        assert chat_dict["business_location"] == chat.business_location.to_dict()
-        assert chat_dict["business_opening_hours"] == chat.business_opening_hours.to_dict()
-        assert chat_dict["has_private_forwards"] == chat.has_private_forwards
-        assert chat_dict["has_protected_content"] == chat.has_protected_content
-        assert chat_dict["has_visible_history"] == chat.has_visible_history
-        assert chat_dict["linked_chat_id"] == chat.linked_chat_id
-        assert chat_dict["location"] == chat.location.to_dict()
-        assert chat_dict["join_to_send_messages"] == chat.join_to_send_messages
-        assert chat_dict["join_by_request"] == chat.join_by_request
-        assert (
-            chat_dict["has_restricted_voice_and_video_messages"]
-            == chat.has_restricted_voice_and_video_messages
-        )
         assert chat_dict["is_forum"] == chat.is_forum
-        assert chat_dict["active_usernames"] == list(chat.active_usernames)
-        assert chat_dict["emoji_status_custom_emoji_id"] == chat.emoji_status_custom_emoji_id
-        assert chat_dict["emoji_status_expiration_date"] == to_timestamp(
-            chat.emoji_status_expiration_date
-        )
-        assert (
-            chat_dict["has_aggressive_anti_spam_enabled"] == chat.has_aggressive_anti_spam_enabled
-        )
-        assert chat_dict["has_hidden_members"] == chat.has_hidden_members
-        assert chat_dict["available_reactions"] == [
-            reaction.to_dict() for reaction in chat.available_reactions
-        ]
-        assert chat_dict["accent_color_id"] == chat.accent_color_id
-        assert chat_dict["background_custom_emoji_id"] == chat.background_custom_emoji_id
-        assert chat_dict["profile_accent_color_id"] == chat.profile_accent_color_id
-        assert (
-            chat_dict["profile_background_custom_emoji_id"]
-            == chat.profile_background_custom_emoji_id
-        )
-        assert chat_dict["custom_emoji_sticker_set_name"] == chat.custom_emoji_sticker_set_name
-        assert chat_dict["unrestrict_boost_count"] == chat.unrestrict_boost_count
-        assert chat_dict["birthdate"] == chat.birthdate.to_dict()
-        assert chat_dict["personal_chat"] == chat.personal_chat.to_dict()
         assert chat_dict["first_name"] == chat.first_name
         assert chat_dict["last_name"] == chat.last_name
-
-    def test_deprecated_attributes(self, chat):
-        for depr_attr in _deprecated_attrs:
-            with pytest.warns(PTBDeprecationWarning, match="deprecated and will only be accessib"):
-                getattr(chat, depr_attr)
-        with warnings.catch_warnings():  # No warning should be raised
-            warnings.simplefilter("error")
-            chat.id
-            chat.first_name
-
-    def test_deprecated_arguments(self):
-        for depr_attr in _deprecated_attrs:
-            with pytest.warns(PTBDeprecationWarning, match="deprecated and will only be availabl"):
-                Chat(1, "type", **{depr_attr: "1"})
-        with warnings.catch_warnings():  # No warning should be raised
-            warnings.simplefilter("error")
-            Chat(1, "type", first_name="first_name")
 
     def test_enum_init(self):
         chat = Chat(id=1, type="foo")

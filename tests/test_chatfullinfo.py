@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
-import warnings
 
 import pytest
 
@@ -35,7 +34,6 @@ from telegram import (
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
 )
-from telegram._chat import _deprecated_attrs
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ReactionEmoji
 from tests.auxil.slots import mro_slots
@@ -44,19 +42,19 @@ from tests.auxil.slots import mro_slots
 @pytest.fixture(scope="module")
 def chat_full_info(bot):
     chat = ChatFullInfo(
-        TestChatInfoBase.id_,
-        type=TestChatInfoBase.type_,
-        accent_color_id=TestChatInfoBase.accent_color_id,
-        max_reaction_count=TestChatInfoBase.max_reaction_count,
-        title=TestChatInfoBase.title,
-        username=TestChatInfoBase.username,
-        sticker_set_name=TestChatInfoBase.sticker_set_name,
-        can_set_sticker_set=TestChatInfoBase.can_set_sticker_set,
-        permissions=TestChatInfoBase.permissions,
-        slow_mode_delay=TestChatInfoBase.slow_mode_delay,
-        bio=TestChatInfoBase.bio,
-        linked_chat_id=TestChatInfoBase.linked_chat_id,
-        location=TestChatInfoBase.location,
+        TestChatFullInfoBase.id_,
+        type=TestChatFullInfoBase.type_,
+        accent_color_id=TestChatFullInfoBase.accent_color_id,
+        max_reaction_count=TestChatFullInfoBase.max_reaction_count,
+        title=TestChatFullInfoBase.title,
+        username=TestChatFullInfoBase.username,
+        sticker_set_name=TestChatFullInfoBase.sticker_set_name,
+        can_set_sticker_set=TestChatFullInfoBase.can_set_sticker_set,
+        permissions=TestChatFullInfoBase.permissions,
+        slow_mode_delay=TestChatFullInfoBase.slow_mode_delay,
+        bio=TestChatFullInfoBase.bio,
+        linked_chat_id=TestChatFullInfoBase.linked_chat_id,
+        location=TestChatFullInfoBase.location,
         has_private_forwards=True,
         has_protected_content=True,
         has_visible_history=True,
@@ -64,35 +62,37 @@ def chat_full_info(bot):
         join_by_request=True,
         has_restricted_voice_and_video_messages=True,
         is_forum=True,
-        active_usernames=TestChatInfoBase.active_usernames,
-        emoji_status_custom_emoji_id=TestChatInfoBase.emoji_status_custom_emoji_id,
-        emoji_status_expiration_date=TestChatInfoBase.emoji_status_expiration_date,
-        has_aggressive_anti_spam_enabled=TestChatInfoBase.has_aggressive_anti_spam_enabled,
-        has_hidden_members=TestChatInfoBase.has_hidden_members,
-        available_reactions=TestChatInfoBase.available_reactions,
-        background_custom_emoji_id=TestChatInfoBase.background_custom_emoji_id,
-        profile_accent_color_id=TestChatInfoBase.profile_accent_color_id,
-        profile_background_custom_emoji_id=TestChatInfoBase.profile_background_custom_emoji_id,
-        unrestrict_boost_count=TestChatInfoBase.unrestrict_boost_count,
-        custom_emoji_sticker_set_name=TestChatInfoBase.custom_emoji_sticker_set_name,
-        business_intro=TestChatInfoBase.business_intro,
-        business_location=TestChatInfoBase.business_location,
-        business_opening_hours=TestChatInfoBase.business_opening_hours,
+        active_usernames=TestChatFullInfoBase.active_usernames,
+        emoji_status_custom_emoji_id=TestChatFullInfoBase.emoji_status_custom_emoji_id,
+        emoji_status_expiration_date=TestChatFullInfoBase.emoji_status_expiration_date,
+        has_aggressive_anti_spam_enabled=TestChatFullInfoBase.has_aggressive_anti_spam_enabled,
+        has_hidden_members=TestChatFullInfoBase.has_hidden_members,
+        available_reactions=TestChatFullInfoBase.available_reactions,
+        background_custom_emoji_id=TestChatFullInfoBase.background_custom_emoji_id,
+        profile_accent_color_id=TestChatFullInfoBase.profile_accent_color_id,
+        profile_background_custom_emoji_id=TestChatFullInfoBase.profile_background_custom_emoji_id,
+        unrestrict_boost_count=TestChatFullInfoBase.unrestrict_boost_count,
+        custom_emoji_sticker_set_name=TestChatFullInfoBase.custom_emoji_sticker_set_name,
+        business_intro=TestChatFullInfoBase.business_intro,
+        business_location=TestChatFullInfoBase.business_location,
+        business_opening_hours=TestChatFullInfoBase.business_opening_hours,
         birthdate=Birthdate(1, 1),
-        personal_chat=TestChatInfoBase.personal_chat,
+        personal_chat=TestChatFullInfoBase.personal_chat,
+        first_name="first_name",
+        last_name="last_name",
     )
     chat.set_bot(bot)
     chat._unfreeze()
     return chat
 
 
-class TestChatInfoBase:
+# Shortcut methods are tested in test_chat.py.
+class TestChatFullInfoBase:
     id_ = -28767330
     max_reaction_count = 2
     title = "ToledosPalaceBot - Group"
     type_ = "group"
     username = "username"
-    all_members_are_administrators = False
     sticker_set_name = "stickers"
     can_set_sticker_set = False
     permissions = ChatPermissions(
@@ -134,13 +134,16 @@ class TestChatInfoBase:
     custom_emoji_sticker_set_name = "custom_emoji_sticker_set_name"
     birthdate = Birthdate(1, 1)
     personal_chat = Chat(3, "private", "private")
+    first_name = "first_name"
+    last_name = "last_name"
 
 
-class TestChatWithoutRequest(TestChatInfoBase):
+class TestChatFullInfoWithoutRequest(TestChatFullInfoBase):
     def test_slot_behaviour(self, chat_full_info):
         cfi = chat_full_info
         for attr in cfi.__slots__:
             assert getattr(cfi, attr, "err") != "err", f"got extra slot '{attr}'"
+
         assert len(mro_slots(cfi)) == len(set(mro_slots(cfi))), "duplicate slot"
 
     def test_de_json(self, bot):
@@ -151,7 +154,6 @@ class TestChatWithoutRequest(TestChatInfoBase):
             "accent_color_id": self.accent_color_id,
             "max_reaction_count": self.max_reaction_count,
             "username": self.username,
-            "all_members_are_administrators": self.all_members_are_administrators,
             "sticker_set_name": self.sticker_set_name,
             "can_set_sticker_set": self.can_set_sticker_set,
             "permissions": self.permissions.to_dict(),
@@ -184,26 +186,134 @@ class TestChatWithoutRequest(TestChatInfoBase):
             "custom_emoji_sticker_set_name": self.custom_emoji_sticker_set_name,
             "birthdate": self.birthdate.to_dict(),
             "personal_chat": self.personal_chat.to_dict(),
+            "first_name": self.first_name,
+            "last_name": self.last_name,
         }
         cfi = ChatFullInfo.de_json(json_dict, bot)
+        assert cfi.id == self.id_
+        assert cfi.title == self.title
+        assert cfi.type == self.type_
+        assert cfi.username == self.username
+        assert cfi.sticker_set_name == self.sticker_set_name
+        assert cfi.can_set_sticker_set == self.can_set_sticker_set
+        assert cfi.permissions == self.permissions
+        assert cfi.slow_mode_delay == self.slow_mode_delay
+        assert cfi.bio == self.bio
+        assert cfi.business_intro == self.business_intro
+        assert cfi.business_location == self.business_location
+        assert cfi.business_opening_hours == self.business_opening_hours
+        assert cfi.has_protected_content == self.has_protected_content
+        assert cfi.has_visible_history == self.has_visible_history
+        assert cfi.has_private_forwards == self.has_private_forwards
+        assert cfi.linked_chat_id == self.linked_chat_id
+        assert cfi.location.location == self.location.location
+        assert cfi.location.address == self.location.address
+        assert cfi.join_to_send_messages == self.join_to_send_messages
+        assert cfi.join_by_request == self.join_by_request
+        assert (
+            cfi.has_restricted_voice_and_video_messages
+            == self.has_restricted_voice_and_video_messages
+        )
+        assert cfi.is_forum == self.is_forum
+        assert cfi.active_usernames == tuple(self.active_usernames)
+        assert cfi.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
+        assert cfi.emoji_status_expiration_date == (self.emoji_status_expiration_date)
+        assert cfi.has_aggressive_anti_spam_enabled == self.has_aggressive_anti_spam_enabled
+        assert cfi.has_hidden_members == self.has_hidden_members
+        assert cfi.available_reactions == tuple(self.available_reactions)
+        assert cfi.accent_color_id == self.accent_color_id
+        assert cfi.background_custom_emoji_id == self.background_custom_emoji_id
+        assert cfi.profile_accent_color_id == self.profile_accent_color_id
+        assert cfi.profile_background_custom_emoji_id == self.profile_background_custom_emoji_id
+        assert cfi.unrestrict_boost_count == self.unrestrict_boost_count
+        assert cfi.custom_emoji_sticker_set_name == self.custom_emoji_sticker_set_name
+        assert cfi.birthdate == self.birthdate
+        assert cfi.personal_chat == self.personal_chat
+        assert cfi.first_name == self.first_name
+        assert cfi.last_name == self.last_name
         assert cfi.max_reaction_count == self.max_reaction_count
+
+    def test_de_json_localization(self, bot, raw_bot, tz_bot):
+        json_dict = {
+            "id": self.id_,
+            "type": self.type_,
+            "accent_color_id": self.accent_color_id,
+            "max_reaction_count": self.max_reaction_count,
+            "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
+        }
+        cfi_bot = ChatFullInfo.de_json(json_dict, bot)
+        cfi_bot_raw = ChatFullInfo.de_json(json_dict, raw_bot)
+        cfi_bot_tz = ChatFullInfo.de_json(json_dict, tz_bot)
+
+        # comparing utcoffsets because comparing tzinfo objects is not reliable
+        emoji_expire_offset = cfi_bot_tz.emoji_status_expiration_date.utcoffset()
+        emoji_expire_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
+            cfi_bot_tz.emoji_status_expiration_date.replace(tzinfo=None)
+        )
+
+        assert cfi_bot.emoji_status_expiration_date.tzinfo == UTC
+        assert cfi_bot_raw.emoji_status_expiration_date.tzinfo == UTC
+        assert emoji_expire_offset_tz == emoji_expire_offset
 
     def test_to_dict(self, chat_full_info):
         cfi = chat_full_info
         cfi_dict = cfi.to_dict()
 
         assert isinstance(cfi_dict, dict)
+        assert cfi_dict["id"] == cfi.id
+        assert cfi_dict["title"] == cfi.title
+        assert cfi_dict["type"] == cfi.type
+        assert cfi_dict["username"] == cfi.username
+        assert cfi_dict["permissions"] == cfi.permissions.to_dict()
+        assert cfi_dict["slow_mode_delay"] == cfi.slow_mode_delay
+        assert cfi_dict["bio"] == cfi.bio
+        assert cfi_dict["business_intro"] == cfi.business_intro.to_dict()
+        assert cfi_dict["business_location"] == cfi.business_location.to_dict()
+        assert cfi_dict["business_opening_hours"] == cfi.business_opening_hours.to_dict()
+        assert cfi_dict["has_private_forwards"] == cfi.has_private_forwards
+        assert cfi_dict["has_protected_content"] == cfi.has_protected_content
+        assert cfi_dict["has_visible_history"] == cfi.has_visible_history
+        assert cfi_dict["linked_chat_id"] == cfi.linked_chat_id
+        assert cfi_dict["location"] == cfi.location.to_dict()
+        assert cfi_dict["join_to_send_messages"] == cfi.join_to_send_messages
+        assert cfi_dict["join_by_request"] == cfi.join_by_request
+        assert (
+            cfi_dict["has_restricted_voice_and_video_messages"]
+            == cfi.has_restricted_voice_and_video_messages
+        )
+        assert cfi_dict["is_forum"] == cfi.is_forum
+        assert cfi_dict["active_usernames"] == list(cfi.active_usernames)
+        assert cfi_dict["emoji_status_custom_emoji_id"] == cfi.emoji_status_custom_emoji_id
+        assert cfi_dict["emoji_status_expiration_date"] == to_timestamp(
+            cfi.emoji_status_expiration_date
+        )
+        assert cfi_dict["has_aggressive_anti_spam_enabled"] == cfi.has_aggressive_anti_spam_enabled
+        assert cfi_dict["has_hidden_members"] == cfi.has_hidden_members
+        assert cfi_dict["available_reactions"] == [
+            reaction.to_dict() for reaction in cfi.available_reactions
+        ]
+        assert cfi_dict["accent_color_id"] == cfi.accent_color_id
+        assert cfi_dict["background_custom_emoji_id"] == cfi.background_custom_emoji_id
+        assert cfi_dict["profile_accent_color_id"] == cfi.profile_accent_color_id
+        assert (
+            cfi_dict["profile_background_custom_emoji_id"]
+            == cfi.profile_background_custom_emoji_id
+        )
+        assert cfi_dict["custom_emoji_sticker_set_name"] == cfi.custom_emoji_sticker_set_name
+        assert cfi_dict["unrestrict_boost_count"] == cfi.unrestrict_boost_count
+        assert cfi_dict["birthdate"] == cfi.birthdate.to_dict()
+        assert cfi_dict["personal_chat"] == cfi.personal_chat.to_dict()
+        assert cfi_dict["first_name"] == cfi.first_name
+        assert cfi_dict["last_name"] == cfi.last_name
+
         assert cfi_dict["max_reaction_count"] == cfi.max_reaction_count
 
-    def test_attr_access_no_warning(self, chat_full_info):
-        cfi = chat_full_info
-        for depr_attr in _deprecated_attrs:
-            with warnings.catch_warnings():  # No warning should be raised
-                warnings.simplefilter("error")
-                getattr(cfi, depr_attr)
-
-    def test_cfi_creation_no_warning(self, chat_full_info):
-        cfi = chat_full_info
-        with warnings.catch_warnings():
-            dict = cfi.to_dict()
-            ChatFullInfo(**dict)
+    def test_always_tuples_attributes(self):
+        cfi = ChatFullInfo(
+            id=123,
+            type=Chat.PRIVATE,
+            accent_color_id=1,
+            max_reaction_count=2,
+        )
+        assert isinstance(cfi.active_usernames, tuple)
+        assert cfi.active_usernames == ()
