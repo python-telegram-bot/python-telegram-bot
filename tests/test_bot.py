@@ -2814,9 +2814,11 @@ class TestBotWithRequest:
             caption="new_caption",
             chat_id=media_message.chat_id,
             message_id=media_message.message_id,
+            show_caption_above_media=False,
         )
 
         assert message.caption == "new_caption"
+        assert not message.show_caption_above_media
 
     async def test_edit_message_caption_entities(self, bot, media_message):
         test_string = "Italic Bold Code"
@@ -3799,6 +3801,7 @@ class TestBotWithRequest:
             parse_mode=ParseMode.HTML,
             reply_to_message_id=media_message.message_id,
             reply_markup=keyboard,
+            show_caption_above_media=False,
         )
         # we send a temp message which replies to the returned message id in order to get a
         # message object

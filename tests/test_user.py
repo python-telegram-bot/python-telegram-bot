@@ -439,8 +439,8 @@ class TestUserWithoutRequest(TestUserBase):
             return from_chat_id and message_id and user_id
 
         assert check_shortcut_signature(User.send_copy, Bot.copy_message, ["chat_id"], [])
-        assert await check_shortcut_call(user.copy_message, user.get_bot(), "copy_message")
-        assert await check_defaults_handling(user.copy_message, user.get_bot())
+        assert await check_shortcut_call(user.send_copy, user.get_bot(), "copy_message")
+        assert await check_defaults_handling(user.send_copy, user.get_bot())
 
         monkeypatch.setattr(user.get_bot(), "copy_message", make_assertion)
         assert await user.send_copy(from_chat_id="from_chat_id", message_id="message_id")

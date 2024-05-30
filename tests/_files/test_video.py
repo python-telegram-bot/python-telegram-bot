@@ -244,6 +244,7 @@ class TestVideoWithRequest(TestVideoBase):
             parse_mode="Markdown",
             thumbnail=thumb_file,
             has_spoiler=True,
+            show_caption_above_media=True,
         )
 
         assert isinstance(message.video, Video)
@@ -265,6 +266,7 @@ class TestVideoWithRequest(TestVideoBase):
         assert message.video.file_name == self.file_name
         assert message.has_protected_content
         assert message.has_media_spoiler
+        assert message.show_caption_above_media
 
     async def test_get_and_download(self, bot, video, chat_id, tmp_file):
         new_file = await bot.get_file(video.file_id)

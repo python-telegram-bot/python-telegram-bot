@@ -173,10 +173,9 @@ class TestConstantsWithoutRequest:
             "is_accessible",
             "quote",
             "external_reply",
-            # attribute is deprecated, no need to add it to MessageType
-            "user_shared",
             "via_bot",
             "is_from_offline",
+            "show_caption_above_media",
         }
 
     @pytest.mark.parametrize(

@@ -281,6 +281,7 @@ class CallbackQuery(TelegramObject):
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -326,6 +327,7 @@ class CallbackQuery(TelegramObject):
                 caption_entities=caption_entities,
                 chat_id=None,
                 message_id=None,
+                show_caption_above_media=show_caption_above_media,
             )
         return await self._get_message().edit_caption(
             caption=caption,
@@ -337,6 +339,7 @@ class CallbackQuery(TelegramObject):
             parse_mode=parse_mode,
             api_kwargs=api_kwargs,
             caption_entities=caption_entities,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def edit_message_reply_markup(
@@ -815,6 +818,7 @@ class CallbackQuery(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: Optional[int] = None,
@@ -861,6 +865,7 @@ class CallbackQuery(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             reply_parameters=reply_parameters,
+            show_caption_above_media=show_caption_above_media,
         )
 
     MAX_ANSWER_TEXT_LENGTH: Final[int] = (

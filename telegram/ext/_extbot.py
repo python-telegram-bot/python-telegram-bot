@@ -800,6 +800,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -830,6 +831,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def copy_messages(
@@ -1508,6 +1510,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence["MessageEntity"]] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1529,6 +1532,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def edit_message_live_location(
@@ -2382,6 +2386,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2419,6 +2424,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def send_audio(
@@ -2922,6 +2928,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2955,6 +2962,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def send_poll(
@@ -3141,6 +3149,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
         message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -3179,6 +3188,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             message_effect_id=message_effect_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def send_video_note(
