@@ -3256,7 +3256,7 @@ class Message(MaybeInaccessibleMessage):
         title: str,
         description: str,
         payload: str,
-        provider_token: str,
+        provider_token: Optional[str],
         currency: str,
         prices: Sequence["LabeledPrice"],
         start_parameter: Optional[str] = None,
