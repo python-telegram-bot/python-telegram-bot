@@ -51,6 +51,10 @@ class InputInvoiceMessageContent(InputMessageContent):
         provider_token (:obj:`str`): Payment provider token, obtained via
             `@Botfather <https://t.me/Botfather>`_. Pass an empty string for payments in `Telegram
             Stars <https://t.me/BotNews/90>`_.
+
+            .. deprecated:: NEXT.VERSION
+                As of Bot API 7.4, this parameter is now optional and future versions of the
+                library will make it optional as well.
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
             `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_.
             Pass ``XTR`` for payments in `Telegram Stars <https://t.me/BotNews/90>`_.
