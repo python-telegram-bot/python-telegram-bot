@@ -4407,6 +4407,8 @@ class Message(MaybeInaccessibleMessage):
                 insert = f'<a href="{escaped_text}">{escaped_text}</a>'
             elif entity.type == MessageEntity.BLOCKQUOTE:
                 insert = f"<blockquote>{escaped_text}</blockquote>"
+            elif entity.type == MessageEntity.EXPANDABLE_BLOCKQUOTE:
+                insert = f"<blockquote expandable>{escaped_text}</blockquote>"
             elif entity.type == MessageEntity.BOLD:
                 insert = f"<b>{escaped_text}</b>"
             elif entity.type == MessageEntity.ITALIC:
@@ -4557,11 +4559,12 @@ class Message(MaybeInaccessibleMessage):
     ) -> Optional[str]:
         if version == 1:
             for entity_type in (
-                MessageEntity.UNDERLINE,
-                MessageEntity.STRIKETHROUGH,
-                MessageEntity.SPOILER,
+                MessageEntity.EXPANDABLE_BLOCKQUOTE,
                 MessageEntity.BLOCKQUOTE,
                 MessageEntity.CUSTOM_EMOJI,
+                MessageEntity.SPOILER,
+                MessageEntity.STRIKETHROUGH,
+                MessageEntity.UNDERLINE,
             ):
                 if any(entity.type == entity_type for entity in entities):
                     name = entity_type.name.title().replace("_", " ")  # type:ignore[attr-defined]
@@ -4641,8 +4644,10 @@ class Message(MaybeInaccessibleMessage):
                 insert = f"~{escaped_text}~"
             elif entity.type == MessageEntity.SPOILER:
                 insert = f"||{escaped_text}||"
-            elif entity.type == MessageEntity.BLOCKQUOTE:
+            elif entity.type in (MessageEntity.BLOCKQUOTE, MessageEntity.EXPANDABLE_BLOCKQUOTE):
                 insert = ">" + "\n>".join(escaped_text.splitlines())
+                if entity.type == MessageEntity.EXPANDABLE_BLOCKQUOTE:
+                    insert = f"{insert}||"
             elif entity.type == MessageEntity.CUSTOM_EMOJI:
                 # This should never be needed because ids are numeric but the documentation
                 # specifically mentions it so here we are
