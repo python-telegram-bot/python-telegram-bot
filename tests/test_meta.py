@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+import sys
 
 import pytest
 
@@ -26,6 +27,11 @@ skip_disabled = pytest.mark.skipif(
     not env_var_2_bool(os.getenv("TEST_BUILD", "")), reason="TEST_BUILD not enabled"
 )
 
+# disable for python 3.13 and above
+skip_disabled_py_3_13 = pytest.mark.skipif(
+    sys.version_info >= (3, 13), reason="Py 3.13 and above changes locals() which affects setup.py"
+)
+
 
 # To make the tests agnostic of the cwd
 @pytest.fixture(autouse=True)
@@ -33,11 +39,13 @@ def _change_test_dir(request, monkeypatch):
     monkeypatch.chdir(request.config.rootdir)
 
 
+@skip_disabled_py_3_13
 @skip_disabled
 def test_build():
     assert os.system("python setup.py bdist_dumb") == 0  # pragma: no cover
 
 
+@skip_disabled_py_3_13
 @skip_disabled
 def test_build_raw():
     assert os.system("python setup_raw.py bdist_dumb") == 0  # pragma: no cover
