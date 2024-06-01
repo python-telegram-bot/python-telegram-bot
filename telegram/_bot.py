@@ -4974,7 +4974,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
-                `Telegram Stars <https://t.me/BotNews/90>`_.
+                |tg_stars|.
 
                 .. deprecated:: NEXT.VERSION
                     As of Bot API 7.4, this parameter is now optional and future versions of the
@@ -4982,11 +4982,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
 
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_. Pass ``XTR`` for
-                payment in `Telegram Stars <https://t.me/BotNews/90>`_.
+                payment in |tg_stars|.
             prices (Sequence[:class:`telegram.LabeledPrice`]): Price breakdown, a sequence
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
-                bonus, etc.). Must contain exactly one item for payment in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                bonus, etc.). Must contain exactly one item for payment in |tg_stars|.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
@@ -4995,8 +4994,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 a maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
                 `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
                 shows the number of digits past the decimal point for each currency (2 for the
-                majority of currencies). Defaults to ``0``. Not supported for payment in `Telegram
-                Stars <https://t.me/BotNews/90>`_.
+                majority of currencies). Defaults to ``0``. Not supported for payment in |tg_stars|
 
                 .. versionadded:: 13.5
             suggested_tip_amounts (Sequence[:obj:`int`], optional): An array of
@@ -5029,26 +5027,20 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
             photo_width (:obj:`int`, optional): Photo width.
             photo_height (:obj:`int`, optional): Photo height.
             need_name (:obj:`bool`, optional): Pass :obj:`True`, if you require the user's full
-                name to complete the order. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                name to complete the order. Ignored for payments in |tg_stars|.
             need_phone_number (:obj:`bool`, optional): Pass :obj:`True`, if you require the user's
-                phone number to complete the order. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                phone number to complete the order. Ignored for payments in |tg_stars|.
             need_email (:obj:`bool`, optional): Pass :obj:`True`, if you require the user's email
-                to complete the order. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                to complete the order. Ignored for payments in |tg_stars|.
             need_shipping_address (:obj:`bool`, optional): Pass :obj:`True`, if you require the
-                user's shipping address to complete the order. Ignored for payments in `Telegram
-                Stars <https://t.me/BotNews/90>`_.
+                user's shipping address to complete the order. Ignored for payments in
+                |tg_stars|.
             send_phone_number_to_provider (:obj:`bool`, optional): Pass :obj:`True`, if user's
-                phone number should be sent to provider. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                phone number should be sent to provider. Ignored for payments in |tg_stars|.
             send_email_to_provider (:obj:`bool`, optional): Pass :obj:`True`, if user's email
-                address should be sent to provider. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                address should be sent to provider. Ignored for payments in |tg_stars|.
             is_flexible (:obj:`bool`, optional): Pass :obj:`True`, if the final price depends on
-                the shipping method. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                the shipping method. Ignored for payments in |tg_stars|.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -7915,7 +7907,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
-                `Telegram Stars <https://t.me/BotNews/90>`_.
+                |tg_stars|.
 
                 .. deprecated:: NEXT.VERSION
                     As of Bot API 7.4, this parameter is now optional and future versions of the
@@ -7923,11 +7915,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
                 <https://core.telegram.org/bots/payments#supported-currencies>`_. Pass ``XTR`` for
-                payments in `Telegram Stars <https://t.me/BotNews/90>`_.
+                payments in |tg_stars|.
             prices (Sequence[:class:`telegram.LabeledPrice`)]: Price breakdown, a sequence
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
-                bonus, etc.). Must contain exactly one item for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                bonus, etc.). Must contain exactly one item for payments in |tg_stars|.
 
                 .. versionchanged:: 20.0
                     |sequenceargs|
@@ -7936,8 +7927,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 a maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
                 `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
                 shows the number of digits past the decimal point for each currency (2 for the
-                majority of currencies). Defaults to ``0``. Not supported for payments in `Telegram
-                Stars <https://t.me/BotNews/90>`_.
+                majority of currencies). Defaults to ``0``. Not supported for payments in
+                |tg_stars|.
             suggested_tip_amounts (Sequence[:obj:`int`], optional): An array of
                 suggested amounts of tips in the *smallest* units of the currency (integer, **not**
                 float/double). At most :tg-const:`telegram.Invoice.MAX_TIP_AMOUNTS` suggested tip
@@ -7956,26 +7947,20 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             photo_width (:obj:`int`, optional): Photo width.
             photo_height (:obj:`int`, optional): Photo height.
             need_name (:obj:`bool`, optional): Pass :obj:`True`, if you require the user's full
-                name to complete the order. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                name to complete the order. Ignored for payments in |tg_stars|.
             need_phone_number (:obj:`bool`, optional): Pass :obj:`True`, if you require the user's
-                phone number to complete the order. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                phone number to complete the order. Ignored for payments in |tg_stars|.
             need_email (:obj:`bool`, optional): Pass :obj:`True`, if you require the user's email
-                address to complete the order. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                address to complete the order. Ignored for payments in |tg_stars|.
             need_shipping_address (:obj:`bool`, optional): Pass :obj:`True`, if you require the
-                user's shipping address to complete the order. Ignored for payments in `Telegram
-                Stars <https://t.me/BotNews/90>`_.
+                user's shipping address to complete the order. Ignored for payments in
+                |tg_stars|.
             send_phone_number_to_provider (:obj:`bool`, optional): Pass :obj:`True`, if user's
-                phone number should be sent to provider. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                phone number should be sent to provider. Ignored for payments in |tg_stars|.
             send_email_to_provider (:obj:`bool`, optional): Pass :obj:`True`, if user's email
-                address should be sent to provider. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                address should be sent to provider. Ignored for payments in |tg_stars|.
             is_flexible (:obj:`bool`, optional): Pass :obj:`True`, if the final price depends on
-                the shipping method. Ignored for payments in `Telegram Stars
-                <https://t.me/BotNews/90>`_.
+                the shipping method. Ignored for payments in |tg_stars|.
 
         Returns:
             :class:`str`: On success, the created invoice link is returned.
@@ -9054,7 +9039,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: Optional[JSONDict] = None,
     ) -> bool:
-        """Refunds a successful payment in `Telegram Stars <https://t.me/BotNews/90>`.
+        """Refunds a successful payment in |tg_stars|.
 
         .. versionadded:: NEXT.VERSION
 
