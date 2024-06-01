@@ -26,7 +26,7 @@ Setting things up
 
    .. code-block:: bash
 
-      $ pip install -r requirements-all.txt
+      $ pip install .[dev-all]
 
 
 5. Install pre-commit hooks:
@@ -214,7 +214,7 @@ We use `sphinx`_ to generate static HTML docs. To build them, first make sure yo
 
 .. code-block:: bash
 
-   $ pip install -r docs/requirements-docs.txt
+   $ pip install .[docs]
 
 then run the following from the PTB root directory:
 

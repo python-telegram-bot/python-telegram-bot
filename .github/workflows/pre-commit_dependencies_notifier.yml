@@ -2,8 +2,7 @@ name: Warning maintainers
 on:
   pull_request_target:
     paths:
-      - requirements.txt
-      - requirements-opts.txt
+      - pyproject.toml
       - .pre-commit-config.yaml
 permissions:
  pull-requests: write

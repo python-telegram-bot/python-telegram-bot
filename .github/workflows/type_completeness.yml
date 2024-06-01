@@ -3,8 +3,7 @@ on:
   pull_request:
     paths:
       - telegram/**
-      - requirements.txt
-      - requirements-opts.txt
+      - pyproject.toml
   push:
     branches:
       - master
