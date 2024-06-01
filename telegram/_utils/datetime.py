@@ -194,7 +194,7 @@ def extract_tzinfo_from_defaults(bot: "Bot") -> Union[dtm.tzinfo, None]:
     If the bot has no default values, :obj:`None` is returned.
     """
     # We don't use `ininstance(bot, ExtBot)` here so that this works
-    # in `python-telegram-bot-raw` as well
+    # without the job-queue extra dependencies as well
     if hasattr(bot, "defaults") and bot.defaults:
         return bot.defaults.tzinfo
     return None

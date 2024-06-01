@@ -1,6 +1,3 @@
-..
-    Make sure to apply any changes to this file to README_RAW.rst as well!
-
 .. image:: https://raw.githubusercontent.com/python-telegram-bot/logos/master/logo-text/png/ptb-logo-text_768.png
    :align: center
    :target: https://python-telegram-bot.org
@@ -78,13 +75,6 @@ It's compatible with Python versions **3.8+**.
 In addition to the pure API implementation, this library features a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
 ``telegram.ext`` submodule.
-
-A pure API implementation *without* ``telegram.ext`` is available as the standalone package ``python-telegram-bot-raw``.  `See here for details. <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/README_RAW.rst>`_
-
-Note
-----
-
-Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conjunction will result in undesired side-effects, so only install *one* of both.
 
 Telegram API support
 ====================

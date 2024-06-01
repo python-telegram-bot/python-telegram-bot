@@ -1,6 +1,3 @@
-..
-    Make sure to apply any changes to this file to README.rst as well!
-
 .. image:: https://github.com/python-telegram-bot/logos/blob/master/logo-text/png/ptb-raw-logo-text_768.png?raw=true
    :align: center
    :target: https://python-telegram-bot.org
@@ -61,6 +58,16 @@
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram
    :target: https://telegram.me/pythontelegrambotgroup
    :alt: Telegram Group
+
+⚠️ Deprecation Notice
+=====================
+
+The ``python-telegram-bot-raw`` library will no longer be updated after NEXT.VERSION.
+Please instead use the ``python-telegram-bot`` `library <https://pypi.org/python-telegram-bot>`_.
+The change requires no changes in your code and requires no additional dependencies.
+For additional information, please see this `channel post <https://t.me/pythontelegrambotchannel/145>`_.
+
+----
 
 We have made you a wrapper you can't refuse
 
