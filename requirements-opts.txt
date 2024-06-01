@@ -14,7 +14,7 @@ httpx[socks] # socks
 httpx[http2] # http2
 cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=39.0.1 # passport
 # temporary! Remove after cffi releases 1.17.0
-cffi >= 1.17.0rc1 # passport
+cffi >= 1.17.0rc1;python_version>"3.12" # passport
 aiolimiter~=1.1.0 # rate-limiter!ext
 
 # tornado is rather stable, but let's not allow the next mayor release without prior testing
