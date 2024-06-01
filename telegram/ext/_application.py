@@ -257,6 +257,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             "__update_persistence_event",
             "__update_persistence_lock",
             "__update_persistence_task",
+            "__stop_running_marker",
             "_chat_data",
             "_chat_ids_to_be_deleted_in_persistence",
             "_chat_ids_to_be_updated_in_persistence",

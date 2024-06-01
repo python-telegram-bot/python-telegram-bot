@@ -446,7 +446,7 @@ class Update(TelegramObject):
         )
 
         self._effective_user: Optional[User] = None
-        self._effective_sender: Optional[Union["User", "Chat"]] = None
+        self._effective_sender: Optional[Union[User, Chat]] = None
         self._effective_chat: Optional[Chat] = None
         self._effective_message: Optional[Message] = None
 
@@ -568,7 +568,7 @@ class Update(TelegramObject):
         if self._effective_sender:
             return self._effective_sender
 
-        sender: Optional[Union["User", "Chat"]] = None
+        sender: Optional[Union[User, Chat]] = None
 
         if message := (
             self.message

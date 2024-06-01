@@ -313,7 +313,7 @@ class GiveawayCompleted(TelegramObject):
 
         self.winner_count: int = winner_count
         self.unclaimed_prize_count: Optional[int] = unclaimed_prize_count
-        self.giveaway_message: Optional["Message"] = giveaway_message
+        self.giveaway_message: Optional[Message] = giveaway_message
 
         self._id_attrs = (
             self.winner_count,
