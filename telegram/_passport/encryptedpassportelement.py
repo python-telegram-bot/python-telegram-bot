@@ -157,7 +157,10 @@ class EncryptedPassportElement(TelegramObject):
         reverse_side: Optional[PassportFile] = None,
         selfie: Optional[PassportFile] = None,
         translation: Optional[Sequence[PassportFile]] = None,
-        credentials: Optional["Credentials"] = None,  # pylint: disable=unused-argument
+        # TODO: Remove the credentials argument in 22.0 or later
+        credentials: Optional[  # pylint: disable=unused-argument  # noqa: ARG002
+            "Credentials"
+        ] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):

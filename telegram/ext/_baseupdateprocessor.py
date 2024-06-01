@@ -165,7 +165,7 @@ class SimpleUpdateProcessor(BaseUpdateProcessor):
 
     async def do_process_update(
         self,
-        update: object,
+        update: object,  # noqa: ARG002
         coroutine: "Awaitable[Any]",
     ) -> None:
         """Immediately awaits the coroutine, i.e. does not apply any additional processing.

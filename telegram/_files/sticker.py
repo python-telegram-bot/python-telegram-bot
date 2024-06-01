@@ -235,7 +235,7 @@ class StickerSet(TelegramObject):
     .. versionchanged:: 20.5
        |removed_thumb_note|
 
-    .. versionremoved:: NEXT.VERSION
+    .. versionremoved:: 21.2
        Removed the deprecated arguments and attributes ``is_animated`` and ``is_video``.
 
     Args:

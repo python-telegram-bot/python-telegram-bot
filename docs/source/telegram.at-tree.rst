@@ -28,6 +28,16 @@ Available Types
     telegram.callbackquery
     telegram.chat
     telegram.chatadministratorrights
+    telegram.chatbackground
+    telegram.backgroundtype
+    telegram.backgroundtypefill
+    telegram.backgroundtypewallpaper
+    telegram.backgroundtypepattern
+    telegram.backgroundtypechattheme
+    telegram.backgroundfill
+    telegram.backgroundfillsolid
+    telegram.backgroundfillgradient
+    telegram.backgroundfillfreeformgradient
     telegram.chatboost
     telegram.chatboostadded
     telegram.chatboostremoved
@@ -36,6 +46,7 @@ Available Types
     telegram.chatboostsourcegiveaway
     telegram.chatboostsourcepremium
     telegram.chatboostupdated
+    telegram.chatfullinfo
     telegram.chatinvitelink
     telegram.chatjoinrequest
     telegram.chatlocation
@@ -77,6 +88,7 @@ Available Types
     telegram.inputmediadocument
     telegram.inputmediaphoto
     telegram.inputmediavideo
+    telegram.inputpolloption
     telegram.inputsticker
     telegram.keyboardbutton
     telegram.keyboardbuttonpolltype

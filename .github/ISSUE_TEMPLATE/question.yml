@@ -12,6 +12,8 @@ body:
         To make it easier for us to help you, please read this [article](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Ask-Right).
 
         Please mind that there is also a users' [Telegram group](https://t.me/pythontelegrambotgroup) for questions about the library. Questions asked there might be answered quicker than here. Moreover, [GitHub Discussions](https://github.com/python-telegram-bot/python-telegram-bot/discussions) offer a slightly better format to discuss usage questions.
+        
+        If you have asked the same question elsewhere (e.g. the [Telegram group](https://t.me/pythontelegrambotgroup) or [StackOverflow](https://stackoverflow.com/questions/tagged/python-telegram-bot)), provide a link to that thread.
 
   - type: textarea
     id: issue-faced

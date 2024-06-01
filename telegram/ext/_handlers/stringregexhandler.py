@@ -52,7 +52,7 @@ class StringRegexHandler(BaseHandler[str, CCT]):
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::
 
-                async def callback(update: Update, context: CallbackContext)
+                async def callback(update: str, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -103,8 +103,8 @@ class StringRegexHandler(BaseHandler[str, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: str,
-        application: "Application[Any, CCT, Any, Any, Any, Any]",
+        update: str,  # noqa: ARG002
+        application: "Application[Any, CCT, Any, Any, Any, Any]",  # noqa: ARG002
         check_result: Optional[Match[str]],
     ) -> None:
         """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as

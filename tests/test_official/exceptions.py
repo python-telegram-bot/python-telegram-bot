@@ -47,15 +47,17 @@ class ParamTypeCheckingExceptions:
         "sticker": Sticker,
     }
 
+    # TODO: Look into merging this with COMPLEX_TYPES
     # Exceptions to the "Array of" types, where we accept more types than the official API
-    # key: parameter name, value: type which must be present in the annotation
+    # key: (parameter name, is_class), value: type which must be present in the annotation
     ARRAY_OF_EXCEPTIONS = {
-        "results": "InlineQueryResult",  # + Callable
-        "commands": "BotCommand",  # + tuple[str, str]
-        "keyboard": "KeyboardButton",  # + sequence[sequence[str]]
-        "reaction": "ReactionType",  # + str
+        ("results", False): "InlineQueryResult",  # + Callable
+        ("commands", False): "BotCommand",  # + tuple[str, str]
+        ("keyboard", True): "KeyboardButton",  # + sequence[sequence[str]]
+        ("reaction", False): "ReactionType",  # + str
+        ("options", False): "InputPollOption",  # + str
         # TODO: Deprecated and will be corrected (and removed) in next major PTB version:
-        "file_hashes": "List[str]",
+        ("file_hashes", True): "List[str]",
     }
 
     # Special cases for other parameters that accept more types than the official API, and are
@@ -120,6 +122,8 @@ PTB_EXTRA_PARAMS = {
     "ChatBoostSource": {"source"},  # attributes common to all subclasses
     "MessageOrigin": {"type", "date"},  # attributes common to all subclasses
     "ReactionType": {"type"},  # attributes common to all subclasses
+    "BackgroundType": {"type"},  # attributes common to all subclasses
+    "BackgroundFill": {"type"},  # attributes common to all subclasses
     "InputTextMessageContent": {"disable_web_page_preview"},  # convenience arg, here for bw compat
 }
 
@@ -143,6 +147,8 @@ PTB_IGNORED_PARAMS = {
     r"MessageOrigin\w+": {"type"},
     r"ChatBoostSource\w+": {"source"},
     r"ReactionType\w+": {"type"},
+    r"BackgroundType\w+": {"type"},
+    r"BackgroundFill\w+": {"type"},
 }
 
 

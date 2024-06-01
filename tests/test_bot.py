@@ -43,6 +43,7 @@ from telegram import (
     CallbackQuery,
     Chat,
     ChatAdministratorRights,
+    ChatFullInfo,
     ChatPermissions,
     Dice,
     InlineKeyboardButton,
@@ -55,6 +56,7 @@ from telegram import (
     InputMediaDocument,
     InputMediaPhoto,
     InputMessageContent,
+    InputPollOption,
     InputTextMessageContent,
     LabeledPrice,
     LinkPreviewOptions,
@@ -1940,6 +1942,59 @@ class TestBotWithoutRequest:
     @pytest.mark.parametrize(
         ("default_bot", "custom"),
         [
+            ({"parse_mode": ParseMode.HTML}, "NOTHING"),
+            ({"parse_mode": ParseMode.HTML}, None),
+            ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
+            ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
+        ],
+        indirect=["default_bot"],
+    )
+    async def test_send_poll_default_text_question_parse_mode(
+        self, default_bot, raw_bot, chat_id, custom, monkeypatch
+    ):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            expected = default_bot.defaults.text_parse_mode if custom == "NOTHING" else custom
+
+            option_1 = request_data.parameters["options"][0]
+            option_2 = request_data.parameters["options"][1]
+            assert option_1.get("text_parse_mode") == (default_bot.defaults.text_parse_mode)
+            assert option_2.get("text_parse_mode") == expected
+            assert request_data.parameters.get("question_parse_mode") == expected
+
+            return make_message("dummy reply").to_dict()
+
+        async def make_raw_assertion(url, request_data: RequestData, *args, **kwargs):
+            expected = None if custom == "NOTHING" else custom
+
+            option_1 = request_data.parameters["options"][0]
+            option_2 = request_data.parameters["options"][1]
+            assert option_1.get("text_parse_mode") is None
+            assert option_2.get("text_parse_mode") == expected
+
+            assert request_data.parameters.get("question_parse_mode") == expected
+
+            return make_message("dummy reply").to_dict()
+
+        if custom == "NOTHING":
+            option_2 = InputPollOption("option2")
+            kwargs = {}
+        else:
+            option_2 = InputPollOption("option2", text_parse_mode=custom)
+            kwargs = {"question_parse_mode": custom}
+
+        monkeypatch.setattr(default_bot.request, "post", make_assertion)
+        await default_bot.send_poll(
+            chat_id, question="question", options=["option1", option_2], **kwargs
+        )
+
+        monkeypatch.setattr(raw_bot.request, "post", make_raw_assertion)
+        await raw_bot.send_poll(
+            chat_id, question="question", options=["option1", option_2], **kwargs
+        )
+
+    @pytest.mark.parametrize(
+        ("default_bot", "custom"),
+        [
             ({"parse_mode": ParseMode.HTML}, None),
             ({"parse_mode": ParseMode.HTML}, ParseMode.MARKDOWN_V2),
             ({"parse_mode": None}, ParseMode.MARKDOWN_V2),
@@ -1965,6 +2020,30 @@ class TestBotWithoutRequest:
             question="question",
             options=["option1", "option2"],
             reply_parameters=ReplyParameters(**kwargs),
+        )
+
+    async def test_send_poll_question_parse_mode_entities(self, bot, monkeypatch):
+        # Currently only custom emoji are supported as entities which we can't test
+        # We just test that the correct data is passed for now
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            assert request_data.parameters["question_entities"] == [
+                {"type": "custom_emoji", "offset": 0, "length": 1},
+                {"type": "custom_emoji", "offset": 2, "length": 1},
+            ]
+            assert request_data.parameters["question_parse_mode"] == ParseMode.MARKDOWN_V2
+            return make_message("dummy reply").to_dict()
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        await bot.send_poll(
+            1,
+            question="😀😃",
+            options=["option1", "option2"],
+            question_entities=[
+                MessageEntity(MessageEntity.CUSTOM_EMOJI, 0, 1),
+                MessageEntity(MessageEntity.CUSTOM_EMOJI, 2, 1),
+            ],
+            question_parse_mode=ParseMode.MARKDOWN_V2,
         )
 
     @pytest.mark.parametrize(
@@ -2026,6 +2105,7 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.do_api_request("camel_case")
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     async def test_do_api_request_media_write_timeout(self, bot, chat_id, monkeypatch):
         test_flag = None
 
@@ -2064,6 +2144,7 @@ class TestBotWithoutRequest:
             DEFAULT_NONE,
         )
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     async def test_do_api_request_default_timezone(self, tz_bot, monkeypatch):
         until = dtm.datetime(2020, 1, 11, 16, 13)
         until_timestamp = to_timestamp(until, tzinfo=tz_bot.defaults.tzinfo)
@@ -2326,7 +2407,7 @@ class TestBotWithRequest:
     )
     async def test_send_and_stop_poll(self, bot, super_group_id, reply_markup):
         question = "Is this a test?"
-        answers = ["Yes", "No", "Maybe"]
+        answers = ["Yes", InputPollOption("No"), "Maybe"]
         explanation = "[Here is a link](https://google.com)"
         explanation_entities = [
             MessageEntity(MessageEntity.TEXT_LINK, 0, 14, url="https://google.com")
@@ -2360,7 +2441,7 @@ class TestBotWithRequest:
         assert message.poll
         assert message.poll.question == question
         assert message.poll.options[0].text == answers[0]
-        assert message.poll.options[1].text == answers[1]
+        assert message.poll.options[1].text == answers[1].text
         assert message.poll.options[2].text == answers[2]
         assert not message.poll.is_anonymous
         assert message.poll.allows_multiple_answers
@@ -2380,7 +2461,7 @@ class TestBotWithRequest:
         assert poll.is_closed
         assert poll.options[0].text == answers[0]
         assert poll.options[0].voter_count == 0
-        assert poll.options[1].text == answers[1]
+        assert poll.options[1].text == answers[1].text
         assert poll.options[1].voter_count == 0
         assert poll.options[2].text == answers[2]
         assert poll.options[2].voter_count == 0
@@ -2921,10 +3002,10 @@ class TestBotWithRequest:
             await bot.leave_chat(-123456)
 
     async def test_get_chat(self, bot, super_group_id):
-        chat = await bot.get_chat(super_group_id)
-        assert chat.type == "supergroup"
-        assert chat.title == f">>> telegram.Bot(test) @{bot.username}"
-        assert chat.id == int(super_group_id)
+        cfi = await bot.get_chat(super_group_id)
+        assert cfi.type == "supergroup"
+        assert cfi.title == f">>> telegram.Bot(test) @{bot.username}"
+        assert cfi.id == int(super_group_id)
 
     async def test_get_chat_administrators(self, bot, channel_id):
         admins = await bot.get_chat_administrators(channel_id)
@@ -3900,9 +3981,9 @@ class TestBotWithRequest:
             )
             assert data == "callback_data"
 
-            chat = await bot.get_chat(channel_id)
-            assert chat.pinned_message == message
-            assert chat.pinned_message.reply_markup == reply_markup
+            cfi = await bot.get_chat(channel_id)
+            assert cfi.pinned_message == message
+            assert cfi.pinned_message.reply_markup == reply_markup
             assert await message.unpin()  # (not placed in finally block since msg can be unbound)
         finally:
             bot.callback_data_cache.clear_callback_data()
@@ -3915,11 +3996,11 @@ class TestBotWithRequest:
         await bot.unpin_all_chat_messages(super_group_id)
 
         try:
-            chat = await bot.get_chat(super_group_id)
+            cfi = await bot.get_chat(super_group_id)
 
-            assert isinstance(chat, Chat)
-            assert int(chat.id) == int(super_group_id)
-            assert chat.pinned_message is None
+            assert isinstance(cfi, ChatFullInfo)
+            assert int(cfi.id) == int(super_group_id)
+            assert cfi.pinned_message is None
         finally:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
@@ -4011,7 +4092,7 @@ class TestBotWithRequest:
 
     @pytest.mark.parametrize("bot_class", [Bot, ExtBot])
     async def test_do_api_request_warning_known_method(self, bot, bot_class):
-        with pytest.warns(PTBDeprecationWarning, match="Please use 'Bot.get_me'") as record:
+        with pytest.warns(PTBUserWarning, match="Please use 'Bot.get_me'") as record:
             await bot_class(bot.token).do_api_request("get_me")
 
         assert record[0].filename == __file__, "Wrong stack level!"
@@ -4020,6 +4101,7 @@ class TestBotWithRequest:
         with pytest.raises(EndPointNotFound, match="'unknownEndpoint' not found"):
             await bot.do_api_request("unknown_endpoint")
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     async def test_do_api_request_invalid_token(self, bot):
         # we do not initialize the bot here on purpose b/c that's the case were we actually
         # do not know for sure if the token is invalid or the method was not found
@@ -4034,6 +4116,7 @@ class TestBotWithRequest:
         ):
             await Bot(bot.token).do_api_request("unknown_endpoint")
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     @pytest.mark.parametrize("return_type", [Message, None])
     async def test_do_api_request_basic_and_files(self, bot, chat_id, return_type):
         result = await bot.do_api_request(
@@ -4058,6 +4141,7 @@ class TestBotWithRequest:
         assert out.read() == data_file("telegram.png").open("rb").read()
         assert result.document.file_name == "telegram.png"
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     @pytest.mark.parametrize("return_type", [Message, None])
     async def test_do_api_request_list_return_type(self, bot, chat_id, return_type):
         result = await bot.do_api_request(
@@ -4096,6 +4180,7 @@ class TestBotWithRequest:
             assert out.read() == data_file(file_name).open("rb").read()
             assert message.document.file_name == file_name
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     @pytest.mark.parametrize("return_type", [Message, None])
     async def test_do_api_request_bool_return_type(self, bot, chat_id, return_type):
         assert await bot.do_api_request("delete_my_commands", return_type=return_type) is True
