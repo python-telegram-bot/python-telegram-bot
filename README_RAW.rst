@@ -65,7 +65,7 @@
 The ``python-telegram-bot-raw`` library will no longer be updated after NEXT.VERSION.
 Please instead use the ``python-telegram-bot`` `library <https://pypi.org/python-telegram-bot>`_.
 The change requires no changes in your code and requires no additional dependencies.
-For additional information, please see this `channel post <https://t.me/pythontelegrambotchannel/1>`_.
+For additional information, please see this `channel post <https://t.me/pythontelegrambotchannel/145>`_.
 
 ----
 

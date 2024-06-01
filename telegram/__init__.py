@@ -486,7 +486,7 @@ if not (Path(__file__).parent.resolve().absolute() / "ext").exists():
         "Please instead use the `python-telegram-bot` library. The change requires no "
         "changes in your code and requires no additional dependencies. For additional "
         "information, please see the channel post at "
-        "https://t.me/pythontelegrambotchannel/1."
+        "https://t.me/pythontelegrambotchannel/145."
     )
 
     # DeprecationWarning is ignored by default in Python 3.7 and later by default outside
