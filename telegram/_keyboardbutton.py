@@ -32,7 +32,8 @@ if TYPE_CHECKING:
 
 class KeyboardButton(TelegramObject):
     """
-    This object represents one button of the reply keyboard. For simple text buttons, :obj:`str`
+    This object represents one button of the reply keyboard. At most one of the optional fields
+    must be used to specify type of the button. For simple text buttons, :obj:`str`
     can be used instead of this object to specify text of the button.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
