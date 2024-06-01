@@ -85,3 +85,5 @@
 .. |message_effect_id| replace:: Unique identifier of the message effect to be added to the message; for private chats only.
 
 .. |show_cap_above_med| replace:: :obj:`True`, if the caption must be shown above the message media.
+
+.. |tg_stars| replace:: `Telegram Stars <https://t.me/BotNews/90>`__
