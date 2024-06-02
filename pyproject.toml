@@ -89,7 +89,7 @@ socks = [
 ]
 webhooks = [
     # tornado is rather stable, but let's not allow the next mayor release without prior testing
-    "webhooks",
+    "tornado~=6.4",
 ]
 
 # Development only

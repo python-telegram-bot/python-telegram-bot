@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install .[docs]
+          python -W ignore -m pip install .[dev-all]
       - name: Test autogeneration of admonitions
         run: pytest -v --tb=short tests/docs/admonition_inserter.py
       - name: Build docs
