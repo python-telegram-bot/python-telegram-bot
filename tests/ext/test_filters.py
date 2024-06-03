@@ -1107,6 +1107,11 @@ class TestFilters:
         update.message.game = "test"
         assert filters.GAME.check_update(update)
 
+    def test_filters_effect_id(self, update):
+        assert not filters.EFFECT_ID.check_update(update)
+        update.message.effect_id = "test"
+        assert filters.EFFECT_ID.check_update(update)
+
     def test_entities_filter(self, update, message_entity):
         update.message.entities = [message_entity]
         assert filters.Entity(message_entity.type).check_update(update)

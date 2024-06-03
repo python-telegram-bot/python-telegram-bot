@@ -146,7 +146,7 @@ class _AccentColor(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=3)
+BOT_API_VERSION_INFO: Final[_BotAPIVersion] = _BotAPIVersion(major=7, minor=4)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -1630,48 +1630,53 @@ class MessageEntityType(StringEnum):
 
     __slots__ = ()
 
-    MENTION = "mention"
-    """:obj:`str`: Message entities representing a mention."""
-    HASHTAG = "hashtag"
-    """:obj:`str`: Message entities representing a hashtag."""
-    CASHTAG = "cashtag"
-    """:obj:`str`: Message entities representing a cashtag."""
-    PHONE_NUMBER = "phone_number"
-    """:obj:`str`: Message entities representing a phone number."""
-    BOT_COMMAND = "bot_command"
-    """:obj:`str`: Message entities representing a bot command."""
-    URL = "url"
-    """:obj:`str`: Message entities representing a url."""
-    EMAIL = "email"
-    """:obj:`str`: Message entities representing a email."""
+    BLOCKQUOTE = "blockquote"
+    """:obj:`str`: Message entities representing a block quotation.
+
+    .. versionadded:: 20.8
+    """
     BOLD = "bold"
     """:obj:`str`: Message entities representing bold text."""
-    ITALIC = "italic"
-    """:obj:`str`: Message entities representing italic text."""
+    BOT_COMMAND = "bot_command"
+    """:obj:`str`: Message entities representing a bot command."""
+    CASHTAG = "cashtag"
+    """:obj:`str`: Message entities representing a cashtag."""
     CODE = "code"
     """:obj:`str`: Message entities representing monowidth string."""
+    CUSTOM_EMOJI = "custom_emoji"
+    """:obj:`str`: Message entities representing inline custom emoji stickers.
+
+    .. versionadded:: 20.0
+    """
+    EMAIL = "email"
+    """:obj:`str`: Message entities representing a email."""
+    EXPANDABLE_BLOCKQUOTE = "expandable_blockquote"
+    """:obj:`str`: Message entities representing collapsed-by-default block quotation.
+
+    .. versionadded:: NEXT.VERSION
+    """
+    HASHTAG = "hashtag"
+    """:obj:`str`: Message entities representing a hashtag."""
+    ITALIC = "italic"
+    """:obj:`str`: Message entities representing italic text."""
+    MENTION = "mention"
+    """:obj:`str`: Message entities representing a mention."""
+    PHONE_NUMBER = "phone_number"
+    """:obj:`str`: Message entities representing a phone number."""
     PRE = "pre"
     """:obj:`str`: Message entities representing monowidth block."""
+    SPOILER = "spoiler"
+    """:obj:`str`: Message entities representing spoiler text."""
+    STRIKETHROUGH = "strikethrough"
+    """:obj:`str`: Message entities representing strikethrough text."""
     TEXT_LINK = "text_link"
     """:obj:`str`: Message entities representing clickable text URLs."""
     TEXT_MENTION = "text_mention"
     """:obj:`str`: Message entities representing text mention for users without usernames."""
     UNDERLINE = "underline"
     """:obj:`str`: Message entities representing underline text."""
-    STRIKETHROUGH = "strikethrough"
-    """:obj:`str`: Message entities representing strikethrough text."""
-    SPOILER = "spoiler"
-    """:obj:`str`: Message entities representing spoiler text."""
-    CUSTOM_EMOJI = "custom_emoji"
-    """:obj:`str`: Message entities representing inline custom emoji stickers.
-
-    .. versionadded:: 20.0
-    """
-    BLOCKQUOTE = "blockquote"
-    """:obj:`str`: Message entities representing a block quotation.
-
-    .. versionadded:: 20.8
-    """
+    URL = "url"
+    """:obj:`str`: Message entities representing a url."""
 
 
 class MessageLimit(IntEnum):
@@ -1801,6 +1806,10 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
     DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
+    EFFECT_ID = "effect_id"
+    """:obj:`str`: Messages with :attr:`telegram.Message.effect_id`.
+
+    .. versionadded:: NEXT.VERSION"""
     FORUM_TOPIC_CREATED = "forum_topic_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_created`.
 

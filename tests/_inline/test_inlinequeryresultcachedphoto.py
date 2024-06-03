@@ -41,6 +41,7 @@ def inline_query_result_cached_photo():
         caption_entities=TestInlineQueryResultCachedPhotoBase.caption_entities,
         input_message_content=TestInlineQueryResultCachedPhotoBase.input_message_content,
         reply_markup=TestInlineQueryResultCachedPhotoBase.reply_markup,
+        show_caption_above_media=TestInlineQueryResultCachedPhotoBase.show_caption_above_media,
     )
 
 
@@ -55,6 +56,7 @@ class TestInlineQueryResultCachedPhotoBase:
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    show_caption_above_media = True
 
 
 class TestInlineQueryResultCachedPhotoWithoutRequest(TestInlineQueryResultCachedPhotoBase):
@@ -79,6 +81,10 @@ class TestInlineQueryResultCachedPhotoWithoutRequest(TestInlineQueryResultCached
         )
         assert (
             inline_query_result_cached_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_cached_photo.show_caption_above_media
+            == self.show_caption_above_media
         )
 
     def test_caption_entities_always_tuple(self):
@@ -123,6 +129,10 @@ class TestInlineQueryResultCachedPhotoWithoutRequest(TestInlineQueryResultCached
         assert (
             inline_query_result_cached_photo_dict["reply_markup"]
             == inline_query_result_cached_photo.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_cached_photo_dict["show_caption_above_media"]
+            == inline_query_result_cached_photo.show_caption_above_media
         )
 
     def test_equality(self):
