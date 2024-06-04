@@ -247,6 +247,7 @@ class TestPhotoWithRequest(TestPhotoBase):
             protect_content=True,
             parse_mode="Markdown",
             has_spoiler=True,
+            show_caption_above_media=True,
         )
 
         assert isinstance(message.photo[-2], PhotoSize)
@@ -264,6 +265,7 @@ class TestPhotoWithRequest(TestPhotoBase):
         assert message.caption == self.caption.replace("*", "")
         assert message.has_protected_content
         assert message.has_media_spoiler
+        assert message.show_caption_above_media
 
     async def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file):
         message = await bot.send_photo(

@@ -292,13 +292,14 @@ class TestInvoiceWithRequest(TestInvoiceBase):
                 self.title,
                 self.description,
                 self.payload,
-                provider_token,
-                self.currency,
-                self.prices,
+                "",  # using tg stars
+                "XTR",
+                [self.prices[0]],
                 allow_sending_without_reply=custom,
                 reply_to_message_id=reply_to_message.message_id,
             )
             assert message.reply_to_message is None
+            assert message.invoice.currency == "XTR"
         elif default_bot.defaults.allow_sending_without_reply:
             message = await default_bot.send_invoice(
                 chat_id,
