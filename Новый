@@ -1,0 +1,35 @@
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+# Функция для обработки команды /start
+def start(update, context):
+    update.message.reply_text('Привет! Я ваш бот.')
+
+# Функция для обработки обычных текстовых сообщений
+def echo(update, context):
+    update.message.reply_text(update.message.text)
+
+# Функция для обработки ошибок
+def error(update, context):
+    print(f'Update {update} caused error {context.error}')
+
+# Основная функция, где происходит настройка бота
+def main():
+    # Создаем Updater и передаем ему токен вашего бота.
+    updater = Updater("Chigrish", use_context=True)
+
+    # Получаем диспетчера для регистрации обработчиков
+    dp = updater.dispatcher
+
+    # Регистрируем обработчики
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(MessageHandler(Filters.text, echo))
+
+    # Регистрация обработчика ошибок
+    dp.add_error_handler(error)
+
+    # Запускаем бота
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
