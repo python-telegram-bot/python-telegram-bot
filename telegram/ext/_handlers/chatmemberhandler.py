@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatMemberHandler class."""
-
 from typing import Final, Optional, TypeVar
 
 from telegram import Update
@@ -51,21 +50,18 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-
         chat_member_types (:obj:`int`, optional): Pass one of :attr:`MY_CHAT_MEMBER`,
             :attr:`CHAT_MEMBER` or :attr:`ANY_CHAT_MEMBER` to specify if this handler should handle
             only updates with :attr:`telegram.Update.my_chat_member`,
             :attr:`telegram.Update.chat_member` or both. Defaults to :attr:`MY_CHAT_MEMBER`.
-
-            .. versionadded:: NEXT.VERSION
-        chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters chat member updates from
-        specified chat ID(s) only.
-
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
+        chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters chat member updates from
+            specified chat ID(s) only.
+            .. versionadded:: NEXT.VERSION
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
@@ -82,7 +78,6 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         "_chat_ids",
         "chat_member_types",
     )
-
     MY_CHAT_MEMBER: Final[int] = -1
     """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.my_chat_member`."""
     CHAT_MEMBER: Final[int] = 0
@@ -95,8 +90,8 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         self,
         callback: HandlerCallback[Update, CCT, RT],
         chat_member_types: int = MY_CHAT_MEMBER,
-        chat_id: Optional[SCT[int]] = None,
         block: DVType[bool] = DEFAULT_TRUE,
+        chat_id: Optional[SCT[int]] = None,
     ):
         super().__init__(callback, block=block)
 
@@ -115,29 +110,16 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         """
         if not isinstance(update, Update):
             return False
-
         if not (update.my_chat_member or update.chat_member):
             return False
-
-        if self.__is_chat_restricted(update):
+        if (
+            self._chat_ids
+            and update.effective_chat
+            and update.effective_chat.id not in self._chat_ids
+        ):
             return False
-
         if self.chat_member_types == self.ANY_CHAT_MEMBER:
             return True
-
         if self.chat_member_types == self.CHAT_MEMBER:
             return bool(update.chat_member)
-
         return bool(update.my_chat_member)
-
-    def __is_chat_restricted(self, update: Update) -> bool:
-        """Checks if the handler is chat ID restricted and doesn't match with update's chat ID."""
-        if not self._chat_ids:
-            return False
-        chat_id = None
-        if update.chat_member:
-            chat_id = update.chat_member.chat.id
-        elif update.my_chat_member:
-            chat_id = update.my_chat_member.chat.id
-
-        return chat_id is not None and chat_id not in self._chat_ids
