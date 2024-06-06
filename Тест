@@ -1,0 +1,27 @@
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
+
+# Вставьте сюда ваш токен
+TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('Привет!')
+
+def main() -> None:
+    # Создаем апдейтер и передаем ему наш токен
+    updater = Updater(TOKEN)
+
+    # Получаем диспетчер для регистрации обработчиков
+    dispatcher = updater.dispatcher
+
+    # Регистрируем обработчик команды /start
+    dispatcher.add_handler(CommandHandler("start", start))
+
+    # Запускаем бота
+    updater.start_polling()
+
+    # Останавливаем бота при завершении работы
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
