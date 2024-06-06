@@ -1005,6 +1005,7 @@ class _ChatBase(TelegramObject):
         link_preview_options: ODVInput["LinkPreviewOptions"] = DEFAULT_NONE,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1045,6 +1046,7 @@ class _ChatBase(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def delete_message(
@@ -1121,6 +1123,7 @@ class _ChatBase(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1162,6 +1165,7 @@ class _ChatBase(TelegramObject):
             caption_entities=caption_entities,
             reply_parameters=reply_parameters,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_chat_action(
@@ -1214,6 +1218,8 @@ class _ChatBase(TelegramObject):
         has_spoiler: Optional[bool] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1255,6 +1261,8 @@ class _ChatBase(TelegramObject):
             api_kwargs=api_kwargs,
             has_spoiler=has_spoiler,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def send_contact(
@@ -1269,6 +1277,7 @@ class _ChatBase(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1309,6 +1318,7 @@ class _ChatBase(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_audio(
@@ -1327,6 +1337,7 @@ class _ChatBase(TelegramObject):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1371,6 +1382,7 @@ class _ChatBase(TelegramObject):
             api_kwargs=api_kwargs,
             thumbnail=thumbnail,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_document(
@@ -1387,6 +1399,7 @@ class _ChatBase(TelegramObject):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1429,6 +1442,7 @@ class _ChatBase(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_dice(
@@ -1440,6 +1454,7 @@ class _ChatBase(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1475,6 +1490,7 @@ class _ChatBase(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_game(
@@ -1486,6 +1502,7 @@ class _ChatBase(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1521,6 +1538,7 @@ class _ChatBase(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_invoice(
@@ -1528,7 +1546,7 @@ class _ChatBase(TelegramObject):
         title: str,
         description: str,
         payload: str,
-        provider_token: str,
+        provider_token: Optional[str],
         currency: str,
         prices: Sequence["LabeledPrice"],
         start_parameter: Optional[str] = None,
@@ -1551,6 +1569,7 @@ class _ChatBase(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1615,6 +1634,7 @@ class _ChatBase(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             reply_parameters=reply_parameters,
+            message_effect_id=message_effect_id,
         )
 
     async def send_location(
@@ -1631,6 +1651,7 @@ class _ChatBase(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1673,6 +1694,7 @@ class _ChatBase(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_animation(
@@ -1692,6 +1714,8 @@ class _ChatBase(TelegramObject):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1737,6 +1761,8 @@ class _ChatBase(TelegramObject):
             has_spoiler=has_spoiler,
             thumbnail=thumbnail,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def send_sticker(
@@ -1749,6 +1775,7 @@ class _ChatBase(TelegramObject):
         emoji: Optional[str] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1785,6 +1812,7 @@ class _ChatBase(TelegramObject):
             message_thread_id=message_thread_id,
             emoji=emoji,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_venue(
@@ -1803,6 +1831,7 @@ class _ChatBase(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1847,6 +1876,7 @@ class _ChatBase(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_video(
@@ -1867,6 +1897,8 @@ class _ChatBase(TelegramObject):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1913,6 +1945,8 @@ class _ChatBase(TelegramObject):
             message_thread_id=message_thread_id,
             has_spoiler=has_spoiler,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def send_video_note(
@@ -1927,6 +1961,7 @@ class _ChatBase(TelegramObject):
         thumbnail: Optional[FileInput] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1967,6 +2002,7 @@ class _ChatBase(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_voice(
@@ -1982,6 +2018,7 @@ class _ChatBase(TelegramObject):
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
         business_connection_id: Optional[str] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2023,6 +2060,7 @@ class _ChatBase(TelegramObject):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             business_connection_id=business_connection_id,
+            message_effect_id=message_effect_id,
         )
 
     async def send_poll(
@@ -2047,6 +2085,7 @@ class _ChatBase(TelegramObject):
         business_connection_id: Optional[str] = None,
         question_parse_mode: ODVInput[str] = DEFAULT_NONE,
         question_entities: Optional[Sequence["MessageEntity"]] = None,
+        message_effect_id: Optional[str] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2083,6 +2122,7 @@ class _ChatBase(TelegramObject):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            message_effect_id=message_effect_id,
             explanation=explanation,
             explanation_parse_mode=explanation_parse_mode,
             open_period=open_period,
@@ -2109,6 +2149,7 @@ class _ChatBase(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2149,6 +2190,7 @@ class _ChatBase(TelegramObject):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def copy_message(
@@ -2163,6 +2205,7 @@ class _ChatBase(TelegramObject):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: Optional[int] = None,
         reply_parameters: Optional["ReplyParameters"] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         reply_to_message_id: Optional[int] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -2203,6 +2246,7 @@ class _ChatBase(TelegramObject):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            show_caption_above_media=show_caption_above_media,
         )
 
     async def send_copies(

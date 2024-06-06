@@ -76,6 +76,7 @@ def input_media_video(class_thumb_file):
         thumbnail=class_thumb_file,
         supports_streaming=TestInputMediaVideoBase.supports_streaming,
         has_spoiler=TestInputMediaVideoBase.has_spoiler,
+        show_caption_above_media=TestInputMediaVideoBase.show_caption_above_media,
     )
 
 
@@ -87,6 +88,7 @@ def input_media_photo():
         parse_mode=TestInputMediaPhotoBase.parse_mode,
         caption_entities=TestInputMediaPhotoBase.caption_entities,
         has_spoiler=TestInputMediaPhotoBase.has_spoiler,
+        show_caption_above_media=TestInputMediaPhotoBase.show_caption_above_media,
     )
 
 
@@ -102,6 +104,7 @@ def input_media_animation(class_thumb_file):
         thumbnail=class_thumb_file,
         duration=TestInputMediaAnimationBase.duration,
         has_spoiler=TestInputMediaAnimationBase.has_spoiler,
+        show_caption_above_media=TestInputMediaAnimationBase.show_caption_above_media,
     )
 
 
@@ -142,6 +145,7 @@ class TestInputMediaVideoBase:
     supports_streaming = True
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     has_spoiler = True
+    show_caption_above_media = True
 
 
 class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
@@ -163,6 +167,7 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
         assert input_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_media_video.thumbnail, InputFile)
         assert input_media_video.has_spoiler == self.has_spoiler
+        assert input_media_video.show_caption_above_media == self.show_caption_above_media
 
     def test_caption_entities_always_tuple(self):
         input_media_video = InputMediaVideo(self.media)
@@ -182,6 +187,10 @@ class TestInputMediaVideoWithoutRequest(TestInputMediaVideoBase):
         ]
         assert input_media_video_dict["supports_streaming"] == input_media_video.supports_streaming
         assert input_media_video_dict["has_spoiler"] == input_media_video.has_spoiler
+        assert (
+            input_media_video_dict["show_caption_above_media"]
+            == input_media_video.show_caption_above_media
+        )
 
     def test_with_video(self, video):  # noqa: F811
         # fixture found in test_video
@@ -235,6 +244,7 @@ class TestInputMediaPhotoBase:
     parse_mode = "Markdown"
     caption_entities = [MessageEntity(MessageEntity.BOLD, 0, 2)]
     has_spoiler = True
+    show_caption_above_media = True
 
 
 class TestInputMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
@@ -251,6 +261,7 @@ class TestInputMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
         assert input_media_photo.parse_mode == self.parse_mode
         assert input_media_photo.caption_entities == tuple(self.caption_entities)
         assert input_media_photo.has_spoiler == self.has_spoiler
+        assert input_media_photo.show_caption_above_media == self.show_caption_above_media
 
     def test_caption_entities_always_tuple(self):
         input_media_photo = InputMediaPhoto(self.media)
@@ -266,6 +277,10 @@ class TestInputMediaPhotoWithoutRequest(TestInputMediaPhotoBase):
             ce.to_dict() for ce in input_media_photo.caption_entities
         ]
         assert input_media_photo_dict["has_spoiler"] == input_media_photo.has_spoiler
+        assert (
+            input_media_photo_dict["show_caption_above_media"]
+            == input_media_photo.show_caption_above_media
+        )
 
     def test_with_photo(self, photo):  # noqa: F811
         # fixture found in test_photo
@@ -296,6 +311,7 @@ class TestInputMediaAnimationBase:
     height = 30
     duration = 1
     has_spoiler = True
+    show_caption_above_media = True
 
 
 class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
@@ -313,6 +329,7 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
         assert input_media_animation.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_animation.thumbnail, InputFile)
         assert input_media_animation.has_spoiler == self.has_spoiler
+        assert input_media_animation.show_caption_above_media == self.show_caption_above_media
 
     def test_caption_entities_always_tuple(self):
         input_media_animation = InputMediaAnimation(self.media)
@@ -331,6 +348,10 @@ class TestInputMediaAnimationWithoutRequest(TestInputMediaAnimationBase):
         assert input_media_animation_dict["height"] == input_media_animation.height
         assert input_media_animation_dict["duration"] == input_media_animation.duration
         assert input_media_animation_dict["has_spoiler"] == input_media_animation.has_spoiler
+        assert (
+            input_media_animation_dict["show_caption_above_media"]
+            == input_media_animation.show_caption_above_media
+        )
 
     def test_with_animation(self, animation):  # noqa: F811
         # fixture found in test_animation

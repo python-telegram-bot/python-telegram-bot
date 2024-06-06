@@ -273,6 +273,8 @@ def message(bot):
         {"sender_business_bot": User(1, "BusinessBot", True)},
         {"business_connection_id": "123456789"},
         {"chat_background_set": ChatBackground(type=BackgroundTypeChatTheme("ice"))},
+        {"effect_id": "123456789"},
+        {"show_caption_above_media": True},
     ],
     ids=[
         "reply",
@@ -342,6 +344,8 @@ def message(bot):
         "business_connection_id",
         "is_from_offline",
         "chat_background_set",
+        "effect_id",
+        "show_caption_above_media",
     ],
 )
 def message_params(bot, request):
@@ -399,11 +403,12 @@ class TestMessageBase:
         {"length": 2, "offset": 150, "type": "custom_emoji", "custom_emoji_id": "1"},
         {"length": 34, "offset": 154, "type": "blockquote"},
         {"length": 6, "offset": 181, "type": "bold"},
+        {"length": 33, "offset": 190, "type": "expandable_blockquote"},
     ]
     test_text_v2 = (
         r"Test for <bold, ita_lic, \`code, links, text-mention and `\pre. "
         "http://google.com and bold nested in strk>trgh nested in italic. Python pre. Spoiled. "
-        "👍.\nMultiline\nblock quote\nwith nested."
+        "👍.\nMultiline\nblock quote\nwith nested.\n\nMultiline\nexpandable\nblock quote."
     )
     test_message = Message(
         message_id=1,
@@ -728,7 +733,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>. '
             '<tg-emoji emoji-id="1">👍</tg-emoji>.\n'
-            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>"
+            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>\n\n"
+            "<blockquote expandable>Multiline\nexpandable\nblock quote.</blockquote>"
         )
         text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
@@ -749,7 +755,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>. '
             '<tg-emoji emoji-id="1">👍</tg-emoji>.\n'
-            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>"
+            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>\n\n"
+            "<blockquote expandable>Multiline\nexpandable\nblock quote.</blockquote>"
         )
         text_html = self.test_message_v2.text_html_urled
         assert text_html == test_html_string
@@ -774,6 +781,9 @@ class TestMessageWithoutRequest(TestMessageBase):
             ">Multiline\n"
             ">block quote\n"
             r">with *nested*\."
+            "\n\n>Multiline\n"
+            ">expandable\n"
+            r">block quote\.||"
         )
         text_markdown = self.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
@@ -830,6 +840,9 @@ class TestMessageWithoutRequest(TestMessageBase):
             ">Multiline\n"
             ">block quote\n"
             r">with *nested*\."
+            "\n\n>Multiline\n"
+            ">expandable\n"
+            r">block quote\.||"
         )
         text_markdown = self.test_message_v2.text_markdown_v2_urled
         assert text_markdown == test_md_string
@@ -946,7 +959,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>. '
             '<tg-emoji emoji-id="1">👍</tg-emoji>.\n'
-            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>"
+            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>\n\n"
+            "<blockquote expandable>Multiline\nexpandable\nblock quote.</blockquote>"
         )
         caption_html = self.test_message_v2.caption_html
         assert caption_html == test_html_string
@@ -967,7 +981,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>. '
             '<tg-emoji emoji-id="1">👍</tg-emoji>.\n'
-            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>"
+            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>\n\n"
+            "<blockquote expandable>Multiline\nexpandable\nblock quote.</blockquote>"
         )
         caption_html = self.test_message_v2.caption_html_urled
         assert caption_html == test_html_string
@@ -992,6 +1007,9 @@ class TestMessageWithoutRequest(TestMessageBase):
             ">Multiline\n"
             ">block quote\n"
             r">with *nested*\."
+            "\n\n>Multiline\n"
+            ">expandable\n"
+            r">block quote\.||"
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2
         assert caption_markdown == test_md_string
@@ -1023,6 +1041,9 @@ class TestMessageWithoutRequest(TestMessageBase):
             ">Multiline\n"
             ">block quote\n"
             r">with *nested*\."
+            "\n\n>Multiline\n"
+            ">expandable\n"
+            r">block quote\.||"
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2_urled
         assert caption_markdown == test_md_string
@@ -1484,6 +1505,9 @@ class TestMessageWithoutRequest(TestMessageBase):
             ">Multiline\n"
             ">block quote\n"
             r">with *nested*\."
+            "\n\n>Multiline\n"
+            ">expandable\n"
+            r">block quote\.||"
         )
 
         async def make_assertion(*_, **kwargs):
@@ -1534,7 +1558,8 @@ class TestMessageWithoutRequest(TestMessageBase):
             '<pre><code class="python">Python pre</code></pre>. '
             '<span class="tg-spoiler">Spoiled</span>. '
             '<tg-emoji emoji-id="1">👍</tg-emoji>.\n'
-            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>"
+            "<blockquote>Multiline\nblock quote\nwith <b>nested</b>.</blockquote>\n\n"
+            "<blockquote expandable>Multiline\nexpandable\nblock quote.</blockquote>"
         )
 
         async def make_assertion(*_, **kwargs):

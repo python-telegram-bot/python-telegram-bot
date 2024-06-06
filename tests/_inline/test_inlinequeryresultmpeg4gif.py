@@ -45,6 +45,7 @@ def inline_query_result_mpeg4_gif():
         input_message_content=TestInlineQueryResultMpeg4GifBase.input_message_content,
         reply_markup=TestInlineQueryResultMpeg4GifBase.reply_markup,
         thumbnail_mime_type=TestInlineQueryResultMpeg4GifBase.thumbnail_mime_type,
+        show_caption_above_media=TestInlineQueryResultMpeg4GifBase.show_caption_above_media,
     )
 
 
@@ -63,6 +64,7 @@ class TestInlineQueryResultMpeg4GifBase:
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    show_caption_above_media = True
 
 
 class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifBase):
@@ -90,6 +92,9 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_mpeg4_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert (
+            inline_query_result_mpeg4_gif.show_caption_above_media == self.show_caption_above_media
+        )
 
     def test_caption_entities_always_tuple(self):
         result = InlineQueryResultMpeg4Gif(self.id_, self.mpeg4_url, self.thumbnail_url)
@@ -143,6 +148,10 @@ class TestInlineQueryResultMpeg4GifWithoutRequest(TestInlineQueryResultMpeg4GifB
         assert (
             inline_query_result_mpeg4_gif_dict["reply_markup"]
             == inline_query_result_mpeg4_gif.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_mpeg4_gif_dict["show_caption_above_media"]
+            == inline_query_result_mpeg4_gif.show_caption_above_media
         )
 
     def test_equality(self):
