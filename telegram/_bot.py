@@ -976,7 +976,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1350,10 +1350,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1508,7 +1508,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1662,7 +1662,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1788,7 +1788,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -1944,10 +1944,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2096,7 +2096,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2253,10 +2253,10 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2408,7 +2408,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2534,7 +2534,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -2717,7 +2717,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3014,7 +3014,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3156,7 +3156,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -3276,7 +3276,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -4079,7 +4079,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 inline keyboard.
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -4976,7 +4976,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 21.3
                     As of Bot API 7.4, this parameter is now optional and future versions of the
                     library will make it optional as well.
 
@@ -5057,7 +5057,7 @@ class Bot(TelegramObject, AsyncContextManager["Bot"]):
                 .. versionadded:: 20.8
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7045,7 +7045,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 21.2
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7218,7 +7218,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 21.1
             message_effect_id (:obj:`str`, optional): |message_effect_id|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7641,7 +7641,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 20.8
             show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
-                .. versionadded:: NEXT.VERSION
+                .. versionadded:: 21.3
 
         Keyword Args:
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
@@ -7910,7 +7910,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 `@BotFather <https://t.me/BotFather>`_. Pass an empty string for payments in
                 |tg_stars|.
 
-                .. deprecated:: NEXT.VERSION
+                .. deprecated:: 21.3
                     As of Bot API 7.4, this parameter is now optional and future versions of the
                     library will make it optional as well.
 
@@ -9042,7 +9042,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> bool:
         """Refunds a successful payment in |tg_stars|.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.3
 
         Args:
             user_id (:obj:`int`): User identifier of the user whose payment will be refunded.

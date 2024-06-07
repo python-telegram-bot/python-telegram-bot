@@ -61,7 +61,7 @@ class InlineQueryResultCachedGif(InlineQueryResult):
             message to be sent instead of the gif.
         show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GIF`.
@@ -86,7 +86,7 @@ class InlineQueryResultCachedGif(InlineQueryResult):
             message to be sent instead of the gif.
         show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
 
     """
 

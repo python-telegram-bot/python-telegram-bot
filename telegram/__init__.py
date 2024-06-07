@@ -494,7 +494,7 @@ if not (Path(__file__).parent.resolve().absolute() / "ext").exists():
     # seeing the warning.
 
     warn(
-        warnings.PTBDeprecationWarning(version="NEXT.VERSION", message=_MESSAGE),
+        warnings.PTBDeprecationWarning(version="21.3", message=_MESSAGE),
         stacklevel=2,
     )
     warn(

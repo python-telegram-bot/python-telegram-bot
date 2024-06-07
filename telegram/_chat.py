@@ -69,7 +69,7 @@ if TYPE_CHECKING:
 class _ChatBase(TelegramObject):
     """Base class for :class:`telegram.Chat` and :class:`telegram.ChatFullInfo`.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.3
     """
 
     __slots__ = ("first_name", "id", "is_forum", "last_name", "title", "type", "username")
@@ -3277,7 +3277,7 @@ class Chat(_ChatBase):
         this field for backwards compatibility, it is available through
         :attr:`~telegram.TelegramObject.api_kwargs`.
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.3
         As per Bot API 7.3, most of the arguments and attributes of this class have now moved to
         :class:`telegram.ChatFullInfo`.
 

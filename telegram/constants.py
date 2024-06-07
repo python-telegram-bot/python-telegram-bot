@@ -1653,7 +1653,7 @@ class MessageEntityType(StringEnum):
     EXPANDABLE_BLOCKQUOTE = "expandable_blockquote"
     """:obj:`str`: Message entities representing collapsed-by-default block quotation.
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.3
     """
     HASHTAG = "hashtag"
     """:obj:`str`: Message entities representing a hashtag."""
@@ -1809,7 +1809,7 @@ class MessageType(StringEnum):
     EFFECT_ID = "effect_id"
     """:obj:`str`: Messages with :attr:`telegram.Message.effect_id`.
 
-    .. versionadded:: NEXT.VERSION"""
+    .. versionadded:: 21.3"""
     FORUM_TOPIC_CREATED = "forum_topic_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.forum_topic_created`.
 

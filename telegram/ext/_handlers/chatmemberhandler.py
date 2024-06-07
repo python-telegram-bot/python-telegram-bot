@@ -61,7 +61,7 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
             .. seealso:: :wiki:`Concurrency`
         chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters chat member updates from
             specified chat ID(s) only.
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
