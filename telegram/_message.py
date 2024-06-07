@@ -255,8 +255,8 @@ class Message(MaybeInaccessibleMessage):
 
     .. versionchanged:: 20.8
         * This class is now a subclass of :class:`telegram.MaybeInaccessibleMessage`.
-        * The :paramref:`pinned_message` now can be either class:`telegram.Message` or
-          class:`telegram.InaccessibleMessage`.
+        * The :paramref:`pinned_message` now can be either :class:`telegram.Message` or
+          :class:`telegram.InaccessibleMessage`.
 
     .. versionchanged:: 20.0
 
@@ -419,8 +419,8 @@ class Message(MaybeInaccessibleMessage):
             :attr:`reply_to_message` fields even if it is itself a reply.
 
             .. versionchanged:: 20.8
-                This attribute now is either class:`telegram.Message` or
-                class:`telegram.InaccessibleMessage`.
+                This attribute now is either :class:`telegram.Message` or
+                :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
@@ -731,8 +731,8 @@ class Message(MaybeInaccessibleMessage):
             :attr:`reply_to_message` fields even if it is itself a reply.
 
             .. versionchanged:: 20.8
-                This attribute now is either class:`telegram.Message` or
-                class:`telegram.InaccessibleMessage`.
+                This attribute now is either :class:`telegram.Message` or
+                :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
             information about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service

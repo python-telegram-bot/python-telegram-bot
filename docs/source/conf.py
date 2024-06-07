@@ -20,9 +20,13 @@ author = "Leandro Toledo"
 # built documents.
 #
 # The short X.Y version.
-version = "21.2"  # telegram.__version__[:3]
+
+# Import needs to be below the sys.path.insert above
+import telegram  # noqa: E402
+
+version = telegram.__version__
 # The full version, including alpha/beta/rc tags.
-release = "21.2"  # telegram.__version__
+release = telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "6.1.3"

@@ -7536,7 +7536,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         minutes.
 
         Returns:
-            :obj:`True`: On success
+            :obj:`True`: On success, :obj:`True` is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -7567,7 +7567,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         10 minutes after the bot is launched.
 
         Returns:
-            :obj:`True`: On success
+            :obj:`True`: On success, :obj:`True` is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -7664,7 +7664,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                     |keyword_only_arg|
 
         Returns:
-            :class:`telegram.MessageId`: On success
+            :class:`telegram.MessageId`: On success, the :class:`telegram.MessageId` of the sent
+                message is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`
