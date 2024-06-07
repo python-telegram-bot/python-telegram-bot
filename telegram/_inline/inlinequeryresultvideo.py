@@ -90,7 +90,7 @@ class InlineQueryResultVideo(InlineQueryResult):
             (e.g., a YouTube video).
         show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
 
     Raises:
         :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
@@ -132,7 +132,7 @@ class InlineQueryResultVideo(InlineQueryResult):
             (e.g., a YouTube video).
         show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
 
     """
 

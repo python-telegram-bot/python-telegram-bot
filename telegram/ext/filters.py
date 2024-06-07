@@ -1349,7 +1349,7 @@ class _EffectId(MessageFilter):
 EFFECT_ID = _EffectId(name="filters.EFFECT_ID")
 """Messages that contain :attr:`telegram.Message.effect_id`.
 
-.. versionadded:: NEXT.VERSION"""
+.. versionadded:: 21.3"""
 
 
 class Entity(MessageFilter):

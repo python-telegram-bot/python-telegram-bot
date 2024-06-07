@@ -52,7 +52,7 @@ class InputInvoiceMessageContent(InputMessageContent):
             `@Botfather <https://t.me/Botfather>`_. Pass an empty string for payments in
             |tg_stars|.
 
-            .. deprecated:: NEXT.VERSION
+            .. deprecated:: 21.3
                 As of Bot API 7.4, this parameter is now optional and future versions of the
                 library will make it optional as well.
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on

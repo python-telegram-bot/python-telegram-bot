@@ -165,7 +165,7 @@ class MessageEntity(TelegramObject):
     EXPANDABLE_BLOCKQUOTE: Final[str] = constants.MessageEntityType.EXPANDABLE_BLOCKQUOTE
     """:const:`telegram.constants.MessageEntityType.EXPANDABLE_BLOCKQUOTE`
 
-    .. versionadded:: NEXT.VERSION
+    .. versionadded:: 21.3
     """
     HASHTAG: Final[str] = constants.MessageEntityType.HASHTAG
     """:const:`telegram.constants.MessageEntityType.HASHTAG`"""

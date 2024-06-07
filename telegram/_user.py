@@ -2163,7 +2163,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.refund_star_payment`.
 
-        .. versionadded:: NEXT.VERSION
+        .. versionadded:: 21.3
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

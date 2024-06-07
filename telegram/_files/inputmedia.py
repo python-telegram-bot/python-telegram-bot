@@ -162,7 +162,7 @@ class InputMediaAnimation(InputMedia):
             .. versionadded:: 20.2
         show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATION`.
@@ -189,7 +189,7 @@ class InputMediaAnimation(InputMedia):
             .. versionadded:: 20.2
         show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
     """
 
     __slots__ = (
@@ -277,7 +277,7 @@ class InputMediaPhoto(InputMedia):
             .. versionadded:: 20.0
         show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
@@ -298,7 +298,7 @@ class InputMediaPhoto(InputMedia):
             .. versionadded:: 20.0
         show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
     """
 
     __slots__ = (
@@ -387,7 +387,7 @@ class InputMediaVideo(InputMedia):
             .. versionadded:: 20.2
         show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.VIDEO`.
@@ -416,7 +416,7 @@ class InputMediaVideo(InputMedia):
             .. versionadded:: 20.2
         show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
     """
 
     __slots__ = (

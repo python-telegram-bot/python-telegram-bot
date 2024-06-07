@@ -255,8 +255,8 @@ class Message(MaybeInaccessibleMessage):
 
     .. versionchanged:: 20.8
         * This class is now a subclass of :class:`telegram.MaybeInaccessibleMessage`.
-        * The :paramref:`pinned_message` now can be either class:`telegram.Message` or
-          class:`telegram.InaccessibleMessage`.
+        * The :paramref:`pinned_message` now can be either :class:`telegram.Message` or
+          :class:`telegram.InaccessibleMessage`.
 
     .. versionchanged:: 20.0
 
@@ -331,7 +331,7 @@ class Message(MaybeInaccessibleMessage):
         effect_id (:obj:`str`, optional): Unique identifier of the message effect added to the
             message.
 
-            ..versionadded:: NEXT.VERSION
+            ..versionadded:: 21.3
 
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -344,7 +344,7 @@ class Message(MaybeInaccessibleMessage):
 
         show_caption_above_media (:obj:`bool`, optional): |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
         audio (:class:`telegram.Audio`, optional): Message is an audio file, information
             about the file.
         document (:class:`telegram.Document`, optional): Message is a general file, information
@@ -419,8 +419,8 @@ class Message(MaybeInaccessibleMessage):
             :attr:`reply_to_message` fields even if it is itself a reply.
 
             .. versionchanged:: 20.8
-                This attribute now is either class:`telegram.Message` or
-                class:`telegram.InaccessibleMessage`.
+                This attribute now is either :class:`telegram.Message` or
+                :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
@@ -628,7 +628,7 @@ class Message(MaybeInaccessibleMessage):
         effect_id (:obj:`str`): Optional. Unique identifier of the message effect added to the
             message.
 
-            ..versionadded:: NEXT.VERSION
+            ..versionadded:: 21.3
 
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -641,7 +641,7 @@ class Message(MaybeInaccessibleMessage):
 
         show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
 
-            .. versionadded:: NEXT.VERSION
+            .. versionadded:: 21.3
         audio (:class:`telegram.Audio`): Optional. Message is an audio file, information
             about the file.
 
@@ -731,8 +731,8 @@ class Message(MaybeInaccessibleMessage):
             :attr:`reply_to_message` fields even if it is itself a reply.
 
             .. versionchanged:: 20.8
-                This attribute now is either class:`telegram.Message` or
-                class:`telegram.InaccessibleMessage`.
+                This attribute now is either :class:`telegram.Message` or
+                :class:`telegram.InaccessibleMessage`.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
             information about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service

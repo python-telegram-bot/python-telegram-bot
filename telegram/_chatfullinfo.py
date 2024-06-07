@@ -44,7 +44,7 @@ class ChatFullInfo(_ChatBase):
 
     .. versionadded:: 21.2
 
-    .. versionchanged:: NEXT.VERSION
+    .. versionchanged:: 21.3
         Explicit support for all shortcut methods known from :class:`telegram.Chat` on this
         object. Previously those were only available because this class inherited from
         :class:`telegram.Chat`.
