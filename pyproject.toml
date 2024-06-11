@@ -88,7 +88,7 @@ socks = [
     "httpx[socks]",
 ]
 webhooks = [
-    # tornado is rather stable, but let's not allow the next mayor release without prior testing
+    # tornado is rather stable, but let's not allow the next major release without prior testing
     "tornado~=6.4",
 ]
 
