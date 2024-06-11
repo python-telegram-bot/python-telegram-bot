@@ -125,7 +125,7 @@ docs = [
 
 # HATCH
 [tool.hatch.version]
-# dynamically evaluatios the `__version__` variable in that file
+# dynamically evaluates the `__version__` variable in that file
 source = "code"
 path = "telegram/_version.py"
 search-paths = ["telegram"]
