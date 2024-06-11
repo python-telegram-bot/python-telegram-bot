@@ -41,7 +41,7 @@ dependencies = [
 ]
 
 [project.urls]
-"Hompage" = "https://python-telegram-bot.org"
+"Homepage" = "https://python-telegram-bot.org"
 "Documentation" = "https://docs.python-telegram-bot.org"
 "Bug Tracker" = "https://github.com/python-telegram-bot/python-telegram-bot/issues"
 "Source Code" = "https://github.com/python-telegram-bot/python-telegram-bot"
