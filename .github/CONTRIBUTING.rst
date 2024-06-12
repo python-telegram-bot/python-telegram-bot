@@ -26,7 +26,7 @@ Setting things up
 
    .. code-block:: bash
 
-      $ pip install .[dev-all]
+      $ pip install -r requirements-dev-all.txt
 
 
 5. Install pre-commit hooks:

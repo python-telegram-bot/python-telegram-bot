@@ -1,0 +1,7 @@
+sphinx==7.3.7
+furo==2024.5.6
+furo-sphinx-search @ git+https://github.com/harshil21/furo-sphinx-search@v0.2.0.1
+sphinx-paramlinks==0.6.0
+sphinxcontrib-mermaid==0.9.2
+sphinx-copybutton==0.5.2
+sphinx-inline-tabs==2023.4.21

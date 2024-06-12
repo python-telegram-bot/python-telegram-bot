@@ -94,36 +94,6 @@ webhooks = [
     "tornado~=6.4",
 ]
 
-# Development only
-dev-all = [
-    "python-telegram-bot[all,dev,docs]",
-]
-dev = [
-    # needed for pre-commit hooks in the git commit command
-    "pre-commit",
-    # required for building the wheels for releases
-    "build",
-    # For the test suite
-    "pytest==8.2.1",
-    # needed because pytest doesn't come with native support for coroutines as tests
-    "pytest-asyncio==0.21.2",
-    # xdist runs tests in parallel
-    "pytest-xdist==3.6.1",
-    # Used for flaky tests (flaky decorator)
-    "flaky",
-    # used in test_official for parsing tg docs
-    "beautifulsoup4",
-]
-docs = [
-    "sphinx==7.3.7",
-    "furo==2024.5.6",
-    "furo-sphinx-search @ git+https://github.com/harshil21/furo-sphinx-search@v0.2.0.1",
-    "sphinx-paramlinks==0.6.0",
-    "sphinxcontrib-mermaid==0.9.2",
-    "sphinx-copybutton==0.5.2",
-    "sphinx-inline-tabs==2023.4.21",
-]
-
 
 # HATCH
 [tool.hatch.version]

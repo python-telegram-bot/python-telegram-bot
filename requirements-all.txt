@@ -1,0 +1,3 @@
+-e .[all]
+-r requirements-dev.txt
+-r docs/requirements-docs.txt
