@@ -9,6 +9,7 @@ name = "python-telegram-bot"
 description = "We have made you a wrapper you can't refuse"
 readme = "README.rst"
 requires-python = ">=3.8"
+license = "LGPL-3.0-only"
 license_files = { paths = ["LICENSE", "LICENSE.dual", "LICENSE.lesser"] }
 authors = [
     { name = "Leandro Toledo", email = "devs@python-telegram-bot.org" }
