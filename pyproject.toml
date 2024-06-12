@@ -9,7 +9,7 @@ name = "python-telegram-bot"
 description = "We have made you a wrapper you can't refuse"
 readme = "README.rst"
 requires-python = ">=3.8"
-license = "GPL-3.0-only"
+license_files = { paths = ["LICENSE", "LICENSE.dual", "LICENSE.lesser"] }
 authors = [
     { name = "Leandro Toledo", email = "devs@python-telegram-bot.org" }
 ]
@@ -47,6 +47,7 @@ dependencies = [
 "Source Code" = "https://github.com/python-telegram-bot/python-telegram-bot"
 "News" = "https://t.me/pythontelegrambotchannel"
 "Changelog" = "https://docs.python-telegram-bot.org/en/stable/changelog.html"
+"Support" = "https://t.me/pythontelegrambotgroup"
 
 [project.optional-dependencies]
 # Make sure to install those as additional_dependencies in the
