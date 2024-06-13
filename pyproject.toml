@@ -105,10 +105,6 @@ search-paths = ["telegram"]
 [tool.hatch.build]
 packages = ["telegram"]
 
-[tool.hatch.metadata]
-# For the furo-sphinx-search dependency
-allow-direct-references = true
-
 # BLACK:
 [tool.black]
 line-length = 99
