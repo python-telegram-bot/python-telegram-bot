@@ -108,7 +108,6 @@ packages = ["telegram"]
 # BLACK:
 [tool.black]
 line-length = 99
-target-version = ['py38', 'py39', 'py310', 'py311']
 
 # ISORT:
 [tool.isort]  # black config
