@@ -1,4 +1,4 @@
-# Make sure that the additional_dependencies here match requirements(-opts).txt
+# Make sure that the additional_dependencies here match pyproject.toml
 
 ci:
     autofix_prs: false
