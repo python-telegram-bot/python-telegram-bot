@@ -1,0 +1,19 @@
+-e .
+
+# required for building the wheels for releases
+build
+
+# For the test suite
+pytest==8.2.1
+
+# needed because pytest doesn't come with native support for coroutines as tests
+pytest-asyncio==0.21.2
+
+# xdist runs tests in parallel
+pytest-xdist==3.6.1
+
+# Used for flaky tests (flaky decorator)
+flaky
+
+# used in test_official for parsing tg docs
+beautifulsoup4

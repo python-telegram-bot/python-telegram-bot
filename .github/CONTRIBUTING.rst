@@ -26,7 +26,7 @@ Setting things up
 
    .. code-block:: bash
 
-      $ pip install -r requirements-all.txt
+      $ pip install -r requirements-dev-all.txt
 
 
 5. Install pre-commit hooks:
@@ -210,13 +210,8 @@ doc strings don't have a separate documentation site they generate, instead, the
 
 User facing documentation
 -------------------------
-We use `sphinx`_ to generate static HTML docs. To build them, first make sure you're running Python 3.9 or above and have the required dependencies:
-
-.. code-block:: bash
-
-   $ pip install -r docs/requirements-docs.txt
-
-then run the following from the PTB root directory:
+We use `sphinx`_ to generate static HTML docs. To build them, first make sure you're running Python 3.9 or above and have the required dependencies installed as explained above.
+Then, run the following from the PTB root directory:
 
 .. code-block:: bash
 

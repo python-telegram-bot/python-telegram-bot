@@ -98,7 +98,8 @@ You can also install ``python-telegram-bot`` from source, though this is usually
 
     $ git clone https://github.com/python-telegram-bot/python-telegram-bot
     $ cd python-telegram-bot
-    $ python setup.py install
+    $ pip install build
+    $ python -m build
 
 Verifying Releases
 ------------------

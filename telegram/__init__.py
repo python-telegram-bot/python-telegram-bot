@@ -242,8 +242,6 @@ __all__ = (
     "warnings",
 )
 
-from pathlib import Path
-
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
 from ._bot import Bot
@@ -443,7 +441,6 @@ from ._telegramobject import TelegramObject
 from ._update import Update
 from ._user import User
 from ._userprofilephotos import UserProfilePhotos
-from ._utils.warnings import warn
 from ._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
@@ -472,33 +469,8 @@ __version_info__: _version.Version = _version.__version_info__
 #:
 #: .. versionchanged:: 20.0
 #:    This constant was previously named ``bot_api_version``.
-__bot_api_version__: str = _version.__bot_api_version__
+__bot_api_version__: str = constants.BOT_API_VERSION
 #: :class:`typing.NamedTuple`: Shortcut for :const:`telegram.constants.BOT_API_VERSION_INFO`.
 #:
 #: .. versionadded:: 20.0
-__bot_api_version_info__: constants._BotAPIVersion = _version.__bot_api_version_info__
-
-
-if not (Path(__file__).parent.resolve().absolute() / "ext").exists():
-    _MESSAGE = (
-        "Hey. You seem to be using the `python-telegram-bot-raw` library. "
-        "Please note that this libray has been deprecated and will no longer be updated. "
-        "Please instead use the `python-telegram-bot` library. The change requires no "
-        "changes in your code and requires no additional dependencies. For additional "
-        "information, please see the channel post at "
-        "https://t.me/pythontelegrambotchannel/145."
-    )
-
-    # DeprecationWarning is ignored by default in Python 3.7 and later by default outside
-    # __main__ modules. We use both warning categories to increase the chance of the user
-    # seeing the warning.
-
-    warn(
-        warnings.PTBDeprecationWarning(version="21.3", message=_MESSAGE),
-        stacklevel=2,
-    )
-    warn(
-        message=_MESSAGE,
-        category=warnings.PTBUserWarning,
-        stacklevel=2,
-    )
+__bot_api_version_info__: constants._BotAPIVersion = constants.BOT_API_VERSION_INFO
