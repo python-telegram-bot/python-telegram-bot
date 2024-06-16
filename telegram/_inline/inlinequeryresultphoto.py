@@ -74,6 +74,9 @@ class InlineQueryResultPhoto(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the photo.
+        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+            .. versionadded:: 21.3
 
     Raises:
         :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
@@ -105,6 +108,9 @@ class InlineQueryResultPhoto(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the photo.
+        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
+
+            .. versionadded:: 21.3
 
     """
 
@@ -118,6 +124,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         "photo_url",
         "photo_width",
         "reply_markup",
+        "show_caption_above_media",
         "thumbnail_url",
         "title",
     )
@@ -136,6 +143,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         input_message_content: Optional["InputMessageContent"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence[MessageEntity]] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -155,3 +163,4 @@ class InlineQueryResultPhoto(InlineQueryResult):
             self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
+            self.show_caption_above_media: Optional[bool] = show_caption_above_media

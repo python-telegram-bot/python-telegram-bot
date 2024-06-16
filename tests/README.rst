@@ -4,7 +4,7 @@ Testing in PTB
 
 PTB uses `pytest`_ for testing. To run the tests, you need to
 have pytest installed along with a few other dependencies. You can find the list of dependencies
-in the ``requirements-dev.txt`` file in the root of the repository.
+in the ``pyproject.toml`` file in the root of the repository.
 
 Running tests
 =============

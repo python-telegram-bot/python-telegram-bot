@@ -21,8 +21,9 @@ from typing import Final, Optional, TypeVar
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import DVType
+from telegram._utils.types import SCT, DVType
 from telegram.ext._handlers.basehandler import BaseHandler
+from telegram.ext._utils._update_parsing import parse_chat_id
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar("RT")
@@ -58,6 +59,9 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
             .. seealso:: :wiki:`Concurrency`
+        chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters chat member updates from
+            specified chat ID(s) only.
+            .. versionadded:: 21.3
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
@@ -70,7 +74,10 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
 
     """
 
-    __slots__ = ("chat_member_types",)
+    __slots__ = (
+        "_chat_ids",
+        "chat_member_types",
+    )
     MY_CHAT_MEMBER: Final[int] = -1
     """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.my_chat_member`."""
     CHAT_MEMBER: Final[int] = 0
@@ -84,10 +91,12 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         callback: HandlerCallback[Update, CCT, RT],
         chat_member_types: int = MY_CHAT_MEMBER,
         block: DVType[bool] = DEFAULT_TRUE,
+        chat_id: Optional[SCT[int]] = None,
     ):
         super().__init__(callback, block=block)
 
         self.chat_member_types: Optional[int] = chat_member_types
+        self._chat_ids = parse_chat_id(chat_id)
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -99,12 +108,18 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
-        if isinstance(update, Update):
-            if not (update.my_chat_member or update.chat_member):
-                return False
-            if self.chat_member_types == self.ANY_CHAT_MEMBER:
-                return True
-            if self.chat_member_types == self.CHAT_MEMBER:
-                return bool(update.chat_member)
-            return bool(update.my_chat_member)
-        return False
+        if not isinstance(update, Update):
+            return False
+        if not (update.my_chat_member or update.chat_member):
+            return False
+        if (
+            self._chat_ids
+            and update.effective_chat
+            and update.effective_chat.id not in self._chat_ids
+        ):
+            return False
+        if self.chat_member_types == self.ANY_CHAT_MEMBER:
+            return True
+        if self.chat_member_types == self.CHAT_MEMBER:
+            return bool(update.chat_member)
+        return bool(update.my_chat_member)

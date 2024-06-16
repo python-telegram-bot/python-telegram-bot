@@ -80,7 +80,9 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the video animation.
+        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
 
+            .. versionadded:: 21.3
     Raises:
         :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
             supplied or if both are supplied and are not equal.
@@ -118,7 +120,9 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the video animation.
+        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
 
+            .. versionadded:: 21.3
     """
 
     __slots__ = (
@@ -131,6 +135,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         "mpeg4_width",
         "parse_mode",
         "reply_markup",
+        "show_caption_above_media",
         "thumbnail_mime_type",
         "thumbnail_url",
         "title",
@@ -151,6 +156,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence[MessageEntity]] = None,
         thumbnail_mime_type: Optional[str] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -171,3 +177,4 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
             self.thumbnail_mime_type: Optional[str] = thumbnail_mime_type
+            self.show_caption_above_media: Optional[bool] = show_caption_above_media

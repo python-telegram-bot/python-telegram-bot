@@ -29,9 +29,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install -r requirements.txt
-          python -W ignore -m pip install -r requirements-opts.txt
-          python -W ignore -m pip install -r requirements-dev.txt
+          python -W ignore -m pip install .[all]
+          python -W ignore -m pip install -r requirements-unit-tests.txt
       - name: Compare to official api
         run: |
           pytest -v tests/test_official/test_official.py --junit-xml=.test_report_official.xml

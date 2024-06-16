@@ -88,6 +88,9 @@ class InlineQueryResultVideo(InlineQueryResult):
             message to be sent instead of the video. This field is required if
             ``InlineQueryResultVideo`` is used to send an HTML-page as a result
             (e.g., a YouTube video).
+        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+            .. versionadded:: 21.3
 
     Raises:
         :class:`ValueError`: If neither :paramref:`thumbnail_url` nor :paramref:`thumb_url` is
@@ -127,6 +130,9 @@ class InlineQueryResultVideo(InlineQueryResult):
             message to be sent instead of the video. This field is required if
             ``InlineQueryResultVideo`` is used to send an HTML-page as a result
             (e.g., a YouTube video).
+        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
+
+            .. versionadded:: 21.3
 
     """
 
@@ -138,6 +144,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         "mime_type",
         "parse_mode",
         "reply_markup",
+        "show_caption_above_media",
         "thumbnail_url",
         "title",
         "video_duration",
@@ -162,6 +169,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         input_message_content: Optional["InputMessageContent"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence[MessageEntity]] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -183,3 +191,4 @@ class InlineQueryResultVideo(InlineQueryResult):
             self.description: Optional[str] = description
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
+            self.show_caption_above_media: Optional[bool] = show_caption_above_media

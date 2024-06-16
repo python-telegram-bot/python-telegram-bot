@@ -59,6 +59,9 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the MPEG-4 file.
+        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+            .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.MPEG4GIF`.
@@ -81,6 +84,9 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the MPEG-4 file.
+        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
+
+            .. versionadded:: 21.3
 
     """
 
@@ -91,6 +97,7 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
         "mpeg4_file_id",
         "parse_mode",
         "reply_markup",
+        "show_caption_above_media",
         "title",
     )
 
@@ -104,6 +111,7 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
         input_message_content: Optional["InputMessageContent"] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Optional[Sequence[MessageEntity]] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -119,3 +127,4 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
             self.caption_entities: Tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
             self.reply_markup: Optional[InlineKeyboardMarkup] = reply_markup
             self.input_message_content: Optional[InputMessageContent] = input_message_content
+            self.show_caption_above_media: Optional[bool] = show_caption_above_media

@@ -4,9 +4,8 @@ on:
     paths:
       - telegram/**
       - tests/**
-      - requirements.txt
-      - requirements-opts.txt
-      - requirements-dev.txt
+      - pyproject.toml
+      - requirements-unit-tests.txt
   push:
     branches:
       - master
@@ -35,8 +34,8 @@ jobs:
         run: |
           python -W ignore -m pip install --upgrade pip
           python -W ignore -m pip install -U pytest-cov
-          python -W ignore -m pip install -r requirements.txt
-          python -W ignore -m pip install -r requirements-dev.txt
+          python -W ignore -m pip install .
+          python -W ignore -m pip install -r requirements-unit-tests.txt
           python -W ignore -m pip install pytest-xdist[psutil]
 
       - name: Test with pytest
@@ -65,7 +64,7 @@ jobs:
 
           # Test the rest
           export TEST_WITH_OPT_DEPS='true'
-          pip install -r requirements-opts.txt
+          pip install .[all]
           # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU
           # worker. Increasing number of workers has little effect on test duration, but it seems
           # to increase flakyness, specially on python 3.7 with --dist=loadgroup.
