@@ -283,13 +283,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
             "updater",
             "user_data",
         )
+        # Allowing '__weakref__' creation here since we need it for the JobQueue
+        # Currently the __weakref__ slot is already created
+        # in the AsyncContextManager base class for pythons < 3.13
         + ("__weakref__",)
         if sys.version_info >= (3, 13)
         else ()
     )
-    # Allowing '__weakref__' creation here since we need it for the JobQueue
-    # Currently the __weakref__ slot is already created
-    # in the AsyncContextManager base class for pythons < 3.13
 
     def __init__(
         self: "Application[BT, CCT, UD, CD, BD, JQ]",

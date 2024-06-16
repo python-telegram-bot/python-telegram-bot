@@ -131,12 +131,14 @@ class TestRequestWithoutRequest:
             assert getattr(inst, at, "err") != "err", f"got extra slot '{at}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    async def test_context_manager(self, monkeypatch, httpx_request):
+    async def test_context_manager(self, monkeypatch):
         async def initialize():
             self.test_flag = ["initialize"]
 
         async def shutdown():
             self.test_flag.append("stop")
+
+        httpx_request = NonchalantHttpxRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx_request, "shutdown", shutdown)
@@ -146,12 +148,14 @@ class TestRequestWithoutRequest:
 
         assert self.test_flag == ["initialize", "stop"]
 
-    async def test_context_manager_exception_on_init(self, monkeypatch, httpx_request):
+    async def test_context_manager_exception_on_init(self, monkeypatch):
         async def initialize():
             raise RuntimeError("initialize")
 
         async def shutdown():
             self.test_flag = "stop"
+
+        httpx_request = NonchalantHttpxRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx_request, "shutdown", shutdown)
@@ -535,12 +539,14 @@ class TestHTTPXRequestWithoutRequest:
         with pytest.raises(RuntimeError, match="not initialized"):
             await httpx_request.do_request(url="url", method="GET")
 
-    async def test_context_manager(self, monkeypatch, httpx_request):
+    async def test_context_manager(self, monkeypatch):
         async def initialize():
             self.test_flag = ["initialize"]
 
         async def aclose(*args):
             self.test_flag.append("stop")
+
+        httpx_request = NonchalantHttpxRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx.AsyncClient, "aclose", aclose)
@@ -550,12 +556,14 @@ class TestHTTPXRequestWithoutRequest:
 
         assert self.test_flag == ["initialize", "stop"]
 
-    async def test_context_manager_exception_on_init(self, monkeypatch, httpx_request):
+    async def test_context_manager_exception_on_init(self, monkeypatch):
         async def initialize():
             raise RuntimeError("initialize")
 
         async def aclose(*args):
             self.test_flag = "stop"
+
+        httpx_request = NonchalantHttpxRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx.AsyncClient, "aclose", aclose)
