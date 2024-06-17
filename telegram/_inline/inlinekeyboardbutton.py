@@ -120,9 +120,12 @@ class InlineKeyboardButton(TelegramObject):
                 This is similar to the new parameter :paramref:`switch_inline_query_chosen_chat`,
                 but gives no control over which chats can be selected.
         switch_inline_query_current_chat (:obj:`str`, optional): If set, pressing the button will
-            prompt the user to select one of their chats of the specified type, open that chat and
-            insert the bot's username and the specified inline query in the input field. Not
-            supported for messages sent on behalf of a Telegram Business account.
+            insert the bot's username and the specified inline query in the current chat's input
+            field. May be empty, in which case only the bot's username will be inserted.
+
+            This offers a quick way for the user to open your bot in inline mode in the same chat
+            - good for selecting something from multiple options. Not supported in channels and for
+            messages sent on behalf of a Telegram Business account.
         callback_game (:class:`telegram.CallbackGame`, optional): Description of the game that will
             be launched when the user presses the button
 
@@ -189,9 +192,12 @@ class InlineKeyboardButton(TelegramObject):
                 This is similar to the new parameter :paramref:`switch_inline_query_chosen_chat`,
                 but gives no control over which chats can be selected.
         switch_inline_query_current_chat (:obj:`str`): Optional. If set, pressing the button will
-            prompt the user to select one of their chats of the specified type, open that chat and
-            insert the bot's username and the specified inline query in the input field. Not
-            supported for messages sent on behalf of a Telegram Business account.
+            insert the bot's username and the specified inline query in the current chat's input
+            field. May be empty, in which case only the bot's username will be inserted.
+
+            This offers a quick way for the user to open your bot in inline mode in the same chat
+            - good for selecting something from multiple options. Not supported in channels and for
+            messages sent on behalf of a Telegram Business account.
         callback_game (:class:`telegram.CallbackGame`): Optional. Description of the game that will
             be launched when the user presses the button.
 
