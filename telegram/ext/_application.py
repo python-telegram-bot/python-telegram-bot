@@ -251,39 +251,44 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AsyncContextManager["Applica
     """
 
     __slots__ = (
-        "__create_task_tasks",
-        "__update_fetcher_task",
-        "__update_persistence_event",
-        "__update_persistence_lock",
-        "__update_persistence_task",
+        (  # noqa: RUF005
+            "__create_task_tasks",
+            "__update_fetcher_task",
+            "__update_persistence_event",
+            "__update_persistence_lock",
+            "__update_persistence_task",
+            "__stop_running_marker",
+            "_chat_data",
+            "_chat_ids_to_be_deleted_in_persistence",
+            "_chat_ids_to_be_updated_in_persistence",
+            "_conversation_handler_conversations",
+            "_initialized",
+            "_job_queue",
+            "_running",
+            "_update_processor",
+            "_user_data",
+            "_user_ids_to_be_deleted_in_persistence",
+            "_user_ids_to_be_updated_in_persistence",
+            "bot",
+            "bot_data",
+            "chat_data",
+            "context_types",
+            "error_handlers",
+            "handlers",
+            "persistence",
+            "post_init",
+            "post_shutdown",
+            "post_stop",
+            "update_queue",
+            "updater",
+            "user_data",
+        )
         # Allowing '__weakref__' creation here since we need it for the JobQueue
-        # Uncomment if necessary - currently the __weakref__ slot is already created
-        # in the AsyncContextManager base class
-        # "__weakref__",
-        "_chat_data",
-        "_chat_ids_to_be_deleted_in_persistence",
-        "_chat_ids_to_be_updated_in_persistence",
-        "_conversation_handler_conversations",
-        "_initialized",
-        "_job_queue",
-        "_running",
-        "_update_processor",
-        "_user_data",
-        "_user_ids_to_be_deleted_in_persistence",
-        "_user_ids_to_be_updated_in_persistence",
-        "bot",
-        "bot_data",
-        "chat_data",
-        "context_types",
-        "error_handlers",
-        "handlers",
-        "persistence",
-        "post_init",
-        "post_shutdown",
-        "post_stop",
-        "update_queue",
-        "updater",
-        "user_data",
+        # Currently the __weakref__ slot is already created
+        # in the AsyncContextManager base class for pythons < 3.13
+        + ("__weakref__",)
+        if sys.version_info >= (3, 13)
+        else ()
     )
 
     def __init__(

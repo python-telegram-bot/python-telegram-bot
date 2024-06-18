@@ -47,6 +47,7 @@ from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
 from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
+from tests.auxil.networking import NonchalantHttpxRequest
 from tests.auxil.slots import mro_slots
 
 # We only need mixed_rqs fixture, but it uses the others, so pytest needs us to import them as well
@@ -72,7 +73,7 @@ def mocker_factory(
 
 @pytest.fixture()
 async def httpx_request():
-    async with HTTPXRequest() as rq:
+    async with NonchalantHttpxRequest() as rq:
         yield rq
 
 
@@ -137,7 +138,7 @@ class TestRequestWithoutRequest:
         async def shutdown():
             self.test_flag.append("stop")
 
-        httpx_request = HTTPXRequest()
+        httpx_request = NonchalantHttpxRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx_request, "shutdown", shutdown)
@@ -154,7 +155,7 @@ class TestRequestWithoutRequest:
         async def shutdown():
             self.test_flag = "stop"
 
-        httpx_request = HTTPXRequest()
+        httpx_request = NonchalantHttpxRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx_request, "shutdown", shutdown)
@@ -545,7 +546,7 @@ class TestHTTPXRequestWithoutRequest:
         async def aclose(*args):
             self.test_flag.append("stop")
 
-        httpx_request = HTTPXRequest()
+        httpx_request = NonchalantHttpxRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx.AsyncClient, "aclose", aclose)
@@ -562,7 +563,7 @@ class TestHTTPXRequestWithoutRequest:
         async def aclose(*args):
             self.test_flag = "stop"
 
-        httpx_request = HTTPXRequest()
+        httpx_request = NonchalantHttpxRequest()
 
         monkeypatch.setattr(httpx_request, "initialize", initialize)
         monkeypatch.setattr(httpx.AsyncClient, "aclose", aclose)

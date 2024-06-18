@@ -490,10 +490,10 @@ class ChatFullInfo(_ChatBase):
             self.unrestrict_boost_count: Optional[int] = unrestrict_boost_count
             self.custom_emoji_sticker_set_name: Optional[str] = custom_emoji_sticker_set_name
             self.birthdate: Optional[Birthdate] = birthdate
-            self.personal_chat: Optional["Chat"] = personal_chat
-            self.business_intro: Optional["BusinessIntro"] = business_intro
-            self.business_location: Optional["BusinessLocation"] = business_location
-            self.business_opening_hours: Optional["BusinessOpeningHours"] = business_opening_hours
+            self.personal_chat: Optional[Chat] = personal_chat
+            self.business_intro: Optional[BusinessIntro] = business_intro
+            self.business_location: Optional[BusinessLocation] = business_location
+            self.business_opening_hours: Optional[BusinessOpeningHours] = business_opening_hours
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatFullInfo"]:

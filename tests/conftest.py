@@ -20,6 +20,7 @@ import asyncio
 import datetime
 import logging
 import sys
+from pathlib import Path
 from typing import Dict, List
 from uuid import uuid4
 
@@ -291,6 +292,5 @@ def timezone(tzinfo):
 
 
 @pytest.fixture()
-def tmp_file(tmp_path):
-    with tmp_path / uuid4().hex as file:
-        yield file
+def tmp_file(tmp_path) -> Path:
+    return tmp_path / uuid4().hex

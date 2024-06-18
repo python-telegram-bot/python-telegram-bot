@@ -2624,7 +2624,9 @@ class TestMessageWithoutRequest(TestMessageBase):
     async def test_default_do_quote(
         self, bot, message, default_quote, chat_type, expected, monkeypatch
     ):
-        message.set_bot(PytestExtBot(token=bot.token, defaults=Defaults(do_quote=default_quote)))
+        original_bot = message.get_bot()
+        temp_bot = PytestExtBot(token=bot.token, defaults=Defaults(do_quote=default_quote))
+        message.set_bot(temp_bot)
 
         async def make_assertion(*_, **kwargs):
             reply_parameters = kwargs.get("reply_parameters") or ReplyParameters(message_id=False)
@@ -2637,7 +2639,7 @@ class TestMessageWithoutRequest(TestMessageBase):
             message.chat.type = chat_type
             assert await message.reply_text("test")
         finally:
-            message.get_bot()._defaults = None
+            message.set_bot(original_bot)
 
     async def test_edit_forum_topic(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):

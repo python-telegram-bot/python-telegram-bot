@@ -97,7 +97,7 @@ from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
-from tests.auxil.networking import expect_bad_request
+from tests.auxil.networking import NonchalantHttpxRequest, expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
 
@@ -253,7 +253,7 @@ class TestBotWithoutRequest:
         async def stop(*args, **kwargs):
             self.test_flag.append("stop")
 
-        temp_bot = PytestBot(token=bot.token)
+        temp_bot = PytestBot(token=bot.token, request=NonchalantHttpxRequest())
         orig_stop = temp_bot.request.shutdown
 
         try:
