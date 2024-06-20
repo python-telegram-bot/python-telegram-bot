@@ -21,6 +21,11 @@ from typing import Final, NamedTuple
 
 __all__ = ("__version__", "__version_info__")
 
+coverage_report = {
+    "101": False,
+    "102": False,
+}
+
 
 class Version(NamedTuple):
     """Copies the behavior of sys.version_info.
@@ -43,10 +48,13 @@ class Version(NamedTuple):
     def __str__(self) -> str:
         version = f"{self.major}.{self.minor}"
         if self.micro != 0:
+            coverage_report["101"] = True
+            # print("Micro condition hit")
             version = f"{version}.{self.micro}"
         if self.releaselevel != "final":
+            coverage_report["102"] = True
+            # print("Releaselevel condition hit")
             version = f"{version}{self._rl_shorthand()}{self.serial}"
-
         return version
 
 
@@ -54,3 +62,28 @@ __version_info__: Final[Version] = Version(
     major=21, minor=3, micro=0, releaselevel="final", serial=0
 )
 __version__: Final[str] = str(__version_info__)
+
+
+
+def print_coverage():
+    for branch, hit in coverage_report.items():
+        print(f"{branch} was {'hit' if hit else 'not hit'}")
+
+# Calling __str__ with different parameters
+
+# shouldnt activate neither (-)
+version1_1 = Version(major=21, minor=3, micro=0, releaselevel="final", serial=0)
+version1_1.__str__()
+print_coverage()
+print("\n")
+
+# should activate micro (101)
+version1_2 = Version(major=21, minor=3, micro=1, releaselevel="final", serial=0)
+version1_2.__str__()
+print_coverage()
+print("\n")
+
+# should activate releaselevel (102)
+version2_2 = Version(major=21, minor=3, micro=0, releaselevel="beta", serial=1)
+version2_2.__str__()
+print_coverage()
