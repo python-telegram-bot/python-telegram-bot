@@ -2303,6 +2303,23 @@ class ReplyLimit(IntEnum):
     """
 
 
+class RevenueWithdrawalStateType(StringEnum):
+    """This enum contains the available types of :class:`telegram.RevenueWithdrawalState`.
+    The enum members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    PENDING = "pending"
+    """:obj:`str`: A withdrawal in progress."""
+    SUCCEEDED = "succeeded"
+    """:obj:`str`: A withdrawal succeeded."""
+    FAILED = "failed"
+    """:obj:`str`: A withdrawal failed and the transaction was refunded."""
+
+
 class StickerFormat(StringEnum):
     """This enum contains the available formats of :class:`telegram.Sticker` in the set. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -2434,6 +2451,23 @@ class StickerType(StringEnum):
     """:obj:`str`: Mask sticker."""
     CUSTOM_EMOJI = "custom_emoji"
     """:obj:`str`: Custom emoji sticker."""
+
+
+class TransactionPartnerType(StringEnum):
+    """This enum contains the available types of :class:`telegram.TransactionPartner`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: NEXT.VERSION
+    """
+
+    __slots__ = ()
+
+    FRAGMENT = "fragment"
+    """:obj:`str`: Withdrawal transaction with Fragment."""
+    USER = "user"
+    """:obj:`str`: Transaction with a user."""
+    OTHER = "other"
+    """:obj:`str`: Transaction with unknown source or recipient."""
 
 
 class ParseMode(StringEnum):

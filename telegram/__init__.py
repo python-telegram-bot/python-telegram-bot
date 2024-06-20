@@ -200,6 +200,10 @@ __all__ = (
     "ReplyKeyboardRemove",
     "ReplyParameters",
     "ResidentialAddress",
+    "RevenueWithdrawalState",
+    "RevenueWithdrawalStateFailed",
+    "RevenueWithdrawalStatePending",
+    "RevenueWithdrawalStateSucceeded",
     "SecureData",
     "SecureValue",
     "SentWebAppMessage",
@@ -207,6 +211,8 @@ __all__ = (
     "ShippingAddress",
     "ShippingOption",
     "ShippingQuery",
+    "StarTransaction",
+    "StarTransactions",
     "Sticker",
     "StickerSet",
     "Story",
@@ -214,6 +220,10 @@ __all__ = (
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
     "TextQuote",
+    "TransactionPartner",
+    "TransactionPartnerFragment",
+    "TransactionPartnerOther",
+    "TransactionPartnerUser",
     "Update",
     "User",
     "UserChatBoosts",
@@ -240,6 +250,19 @@ __all__ = (
     "helpers",
     "request",
     "warnings",
+)
+
+from telegram._stars import (
+    RevenueWithdrawalState,
+    RevenueWithdrawalStateFailed,
+    RevenueWithdrawalStatePending,
+    RevenueWithdrawalStateSucceeded,
+    StarTransaction,
+    StarTransactions,
+    TransactionPartner,
+    TransactionPartnerFragment,
+    TransactionPartnerOther,
+    TransactionPartnerUser,
 )
 
 from . import _version, constants, error, helpers, request, warnings
