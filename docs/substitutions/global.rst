@@ -82,6 +82,8 @@
 
 .. |business_id_str| replace:: Unique identifier of the business connection on behalf of which the message will be sent.
 
+.. |business_id_str_edit| replace:: Unique identifier of the business connection on behalf of which the message to be edited was sent
+
 .. |message_effect_id| replace:: Unique identifier of the message effect to be added to the message; for private chats only.
 
 .. |show_cap_above_med| replace:: :obj:`True`, if the caption must be shown above the message media.
