@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Dict, List
 from uuid import uuid4
 
+import httpx
 import pytest
 
 from telegram import (
@@ -61,6 +62,48 @@ if sys.version_info < (3, 10):
     collect_ignore_glob = ["test_official/*.py"]
 
 
+_unblocked_request = httpx.AsyncClient.request
+
+
+class RequestProtector:
+
+    def __init__(self):
+        self.requests_allowed: bool = True
+
+    def allow_requests(self):
+        self.requests_allowed = True
+
+    def block_requests(self):
+        self.requests_allowed = False
+
+    def build_request_method(self):
+        async def request(*args, **kwargs):
+            if not self.requests_allowed:
+                raise RuntimeError("This function should not be called")
+            return await _unblocked_request(*args, **kwargs)
+
+        return request
+
+
+request_protector = RequestProtector()
+httpx.AsyncClient.request = request_protector.build_request_method()
+
+
+def pytest_runtest_teardown() -> None:
+    request_protector.allow_requests()
+
+
+def pytest_runtest_setup(item) -> None:
+    # If the test has the `disable_httpx` marker, it's explicitly disabled.
+    print(item)
+    print("condition", bool("disable_httpx" in item.fixturenames or item.get_closest_marker("disable_httpx")))
+    print("state", request_protector.requests_allowed)
+    if "disable_httpx" in item.fixturenames or item.get_closest_marker(
+        "disable_httpx"
+    ):
+        request_protector.block_requests()
+
+
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
 def pytest_runtestloop(session: pytest.Session):
     session.add_marker(
@@ -90,8 +133,12 @@ def pytest_collection_modifyitems(items: List[pytest.Item]):
             )  # don't add/override any previously set markers
             and not parent.get_closest_marker(name="req")
         ):  # Add the flaky marker with a rerun filter to the class
-            parent.add_marker(pytest.mark.flaky(3, 1, rerun_filter=no_rerun_after_xfail_or_flood))
+            # parent.add_marker(pytest.mark.flaky(3, 1, rerun_filter=no_rerun_after_xfail_or_flood))
             parent.add_marker(pytest.mark.req)
+        elif parent.name.endswith("WithoutRequest") and not parent.get_closest_marker(
+            name="disable_httpx"
+        ):
+            parent.add_marker(pytest.mark.disable_httpx)
         # Add the no_req marker to all classes that end with 'WithoutRequest' and don't have it
         elif parent.name.endswith("WithoutRequest") and not parent.get_closest_marker(
             name="no_req"

@@ -173,6 +173,7 @@ markers = [
     "dev", # If you want to test a specific test, use this
     "no_req",
     "req",
+    "disable_httpx: Disable httpx requests for a specific test"
 ]
 asyncio_mode = "auto"
 log_format = "%(funcName)s - Line %(lineno)d - %(message)s"
