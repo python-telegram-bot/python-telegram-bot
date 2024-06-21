@@ -208,3 +208,54 @@ License
 
 You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_.
 Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under LGPL-3, but applications that use the library don't have to be.
+pip install python-telegram-bot openai
+import openai
+from telegram import Update, ForceReply
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+
+# إعداد مفتاح API الخاص بـ OpenAI
+openai.api_key = 'YOUR_OPENAI_API_KEY'
+
+# إعداد رمز الوصول الخاص ببوت تليجرام
+TELEGRAM_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+
+# دالة توليد الرد باستخدام نموذج GPT
+def generate_response(prompt):
+    response = openai.Completion.create(
+            engine="text-davinci-004",  # يمكنك استخدام النموذج المناسب مثل davinci أو gpt-4
+                    prompt=prompt,
+                            max_tokens=150
+                                )
+                                    return response.choices[0].text.strip()
+
+                                    # دالة بدء المحادثة
+                                    def start(update: Update, _: CallbackContext) -> None:
+                                        update.message.reply_text('مرحبا! أرسل لي أي شيء وسأجيب عليك باستخدام GPT.')
+
+                                        # دالة معالجة الرسائل الواردة والرد عليها
+                                        def echo(update: Update, _: CallbackContext) -> None:
+                                            user_input = update.message.text
+                                                response = generate_response(user_input)
+                                                    update.message.reply_text(response)
+
+                                                    # الدالة الرئيسية لإعداد البوت
+                                                    def main() -> None:
+                                                        # إعداد محدث تليجرام
+                                                            updater = Updater(TELEGRAM_TOKEN)
+                                                                
+                                                                    # إعداد موزع الرسائل
+                                                                        dispatcher = updater.dispatcher
+
+                                                                            # إعداد المعالجات للأوامر والرسائل
+                                                                                dispatcher.add_handler(CommandHandler("start", start))
+                                                                                    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+
+                                                                                        # بدء تشغيل البوت
+                                                                                            updater.start_polling()
+
+                                                                                                # إبقاء البوت يعمل حتى يتم إيقافه
+                                                                                                    updater.idle()
+
+                                                                                                    if __name__ == '__main__':
+                                                                                                        main()
+                                                                                                        
