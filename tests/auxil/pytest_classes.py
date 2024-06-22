@@ -36,12 +36,8 @@ def _get_bot_user(token: str) -> User:
     # This is important in e.g. bot equality tests. The other parameters like first_name don't
     # matter as much. In the future we may provide a way to get all the correct info from the token
     user_id = int(token.split(":")[0])
-    first_name = bot_info.get(
-        "name",
-    )
-    username = bot_info.get(
-        "username",
-    ).strip("@")
+    first_name = bot_info.get("name")
+    username = bot_info.get("username").strip("@")
     return User(
         user_id,
         first_name,

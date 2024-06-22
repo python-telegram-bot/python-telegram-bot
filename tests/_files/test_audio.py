@@ -37,18 +37,6 @@ from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
-def audio_file():
-    with data_file("telegram.mp3").open("rb") as f:
-        yield f
-
-
-@pytest.fixture(scope="module")
-async def audio(bot, chat_id):
-    with data_file("telegram.mp3").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
-        return (await bot.send_audio(chat_id, audio=f, read_timeout=50, thumbnail=thumb)).audio
-
-
 class TestAudioBase:
     caption = "Test *audio*"
     performer = "Leandro Toledo"
