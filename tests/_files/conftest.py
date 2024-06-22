@@ -21,6 +21,7 @@ import pytest
 
 from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
+from tests.conftest import permissive_bot
 
 
 @pytest.fixture()
@@ -30,10 +31,12 @@ def animation_file():
 
 
 @pytest.fixture(scope="session")
-async def animation(bot, chat_id, aiolib):
+async def animation(permissive_bot, chat_id):
     with data_file("game.gif").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
         return (
-            await bot.send_animation(chat_id, animation=f, read_timeout=50, thumbnail=thumb)
+            await permissive_bot.send_animation(
+                chat_id, animation=f, read_timeout=50, thumbnail=thumb
+            )
         ).animation
 
 
@@ -44,9 +47,11 @@ def audio_file():
 
 
 @pytest.fixture(scope="session")
-async def audio(bot, chat_id, aiolib):
+async def audio(permissive_bot, chat_id):
     with data_file("telegram.mp3").open("rb") as f, data_file("thumb.jpg").open("rb") as thumb:
-        return (await bot.send_audio(chat_id, audio=f, read_timeout=50, thumbnail=thumb)).audio
+        return (
+            await permissive_bot.send_audio(chat_id, audio=f, read_timeout=50, thumbnail=thumb)
+        ).audio
 
 
 @pytest.fixture()
@@ -56,9 +61,9 @@ def document_file():
 
 
 @pytest.fixture(scope="session")
-async def document(bot, chat_id, aiolib):
+async def document(permissive_bot, chat_id):
     with data_file("telegram.png").open("rb") as f:
-        return (await bot.send_document(chat_id, document=f, read_timeout=50)).document
+        return (await permissive_bot.send_document(chat_id, document=f, read_timeout=50)).document
 
 
 @pytest.fixture()
@@ -68,10 +73,10 @@ def photo_file():
 
 
 @pytest.fixture(scope="session")
-async def photolist(bot, chat_id, aiolib):
+async def photolist(permissive_bot, chat_id):
     async def func():
         with data_file("telegram.jpg").open("rb") as f:
-            return (await bot.send_photo(chat_id, photo=f, read_timeout=50)).photo
+            return (await permissive_bot.send_photo(chat_id, photo=f, read_timeout=50)).photo
 
     return await expect_bad_request(
         func, "Type of file mismatch", "Telegram did not accept the file."
@@ -95,9 +100,9 @@ def video_file():
 
 
 @pytest.fixture(scope="session")
-async def video(bot, chat_id, aiolib):
+async def video(permissive_bot, chat_id):
     with data_file("telegram.mp4").open("rb") as f:
-        return (await bot.send_video(chat_id, video=f, read_timeout=50)).video
+        return (await permissive_bot.send_video(chat_id, video=f, read_timeout=50)).video
 
 
 @pytest.fixture()

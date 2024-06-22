@@ -45,7 +45,7 @@ from tests.auxil.ci_bots import BOT_INFO_PROVIDER
 from tests.auxil.constants import PRIVATE_KEY, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
 from tests.auxil.envvars import RUN_TEST_OFFICIAL, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
-from tests.auxil.networking import NonchalantHttpxRequest
+from tests.auxil.networking import NonchalantHttpxRequest, REQUEST_PROTECTOR
 from tests.auxil.pytest_classes import PytestApplication, PytestBot, make_bot
 from tests.auxil.timezones import BasicTimezone
 
@@ -62,46 +62,20 @@ if sys.version_info < (3, 10):
     collect_ignore_glob = ["test_official/*.py"]
 
 
-_unblocked_request = httpx.AsyncClient.request
-
-
-class RequestProtector:
-
-    def __init__(self):
-        self.requests_allowed: bool = True
-
-    def allow_requests(self):
-        self.requests_allowed = True
-
-    def block_requests(self):
-        self.requests_allowed = False
-
-    def build_request_method(self):
-        async def request(*args, **kwargs):
-            if not self.requests_allowed:
-                raise RuntimeError("This function should not be called")
-            return await _unblocked_request(*args, **kwargs)
-
-        return request
-
-
-request_protector = RequestProtector()
-httpx.AsyncClient.request = request_protector.build_request_method()
+# Setup for the fixture pytest.mark.disable_httpx that allows to cut of internet connection
+# for tests to ensure that they don't make any requests. This needs to come rather early
+# to ensure that httpx.AsyncClient.request is patched before any tests import httpx.
+httpx.AsyncClient.request = REQUEST_PROTECTOR.build_request_method()
 
 
 def pytest_runtest_teardown() -> None:
-    request_protector.allow_requests()
+    REQUEST_PROTECTOR.allow_requests()
 
 
 def pytest_runtest_setup(item) -> None:
     # If the test has the `disable_httpx` marker, it's explicitly disabled.
-    print(item)
-    print("condition", bool("disable_httpx" in item.fixturenames or item.get_closest_marker("disable_httpx")))
-    print("state", request_protector.requests_allowed)
-    if "disable_httpx" in item.fixturenames or item.get_closest_marker(
-        "disable_httpx"
-    ):
-        request_protector.block_requests()
+    if "disable_httpx" in item.fixturenames or item.get_closest_marker("disable_httpx"):
+        REQUEST_PROTECTOR.block_requests()
 
 
 # This is here instead of in setup.cfg due to https://github.com/pytest-dev/pytest/issues/8343
@@ -120,30 +94,43 @@ def no_rerun_after_xfail_or_flood(error, name, test: pytest.Function, plugin):
     return not (xfail_present or did_we_flood)
 
 
+_test_root = Path(__file__).parent.resolve().absolute()
+_ext_test_root = _test_root / "ext"
+
+
 def pytest_collection_modifyitems(items: List[pytest.Item]):
     """Here we add a flaky marker to all request making tests and a (no_)req marker to the rest."""
     for item in items:  # items are the test methods
-        parent = item.parent  # Get the parent of the item (class, or module if defined outside)
-        if parent is None:  # should never happen, but just in case
+        # Get the parent of the item (class, or module if defined outside)
+        parent = item.parent
+        if parent is None:
+            # should never happen, but just in case
             return
-        if (  # Check if the class name ends with 'WithRequest' and if it has no flaky marker
+        if (
+            # Check if the class name ends with 'WithRequest' and if it has no flaky marker
             parent.name.endswith("WithRequest")
-            and not parent.get_closest_marker(  # get_closest_marker gets pytest.marks with `name`
-                name="flaky"
-            )  # don't add/override any previously set markers
+            and not (
+                # get_closest_marker gets pytest.marks with `name`
+                parent.get_closest_marker(name="flaky")
+            )
+            # don't add/override any previously set markers
             and not parent.get_closest_marker(name="req")
-        ):  # Add the flaky marker with a rerun filter to the class
-            # parent.add_marker(pytest.mark.flaky(3, 1, rerun_filter=no_rerun_after_xfail_or_flood))
+        ):
+            # Add the flaky marker with a rerun filter to the class
+            parent.add_marker(pytest.mark.flaky(3, 1, rerun_filter=no_rerun_after_xfail_or_flood))
             parent.add_marker(pytest.mark.req)
-        # elif parent.name.endswith("WithoutRequest") and not parent.get_closest_marker(
-        #     name="disable_httpx"
-        # ):
-        #     parent.add_marker(pytest.mark.disable_httpx)
-        # Add the no_req marker to all classes that end with 'WithoutRequest' and don't have it
         elif parent.name.endswith("WithoutRequest") and not parent.get_closest_marker(
             name="no_req"
         ):
+            # Add the no_req marker to all classes that end with 'WithoutRequest' and don't have it
             parent.add_marker(pytest.mark.no_req)
+
+        # We cut of the networking connection for all classes that end with 'WithoutRequest' and
+        # for all tests in /tests/ext to ensure that we find wrongly located test cases.
+        if (
+            parent.name.endswith("WithoutRequest") or (_ext_test_root in item.path.parents)
+        ) and not parent.get_closest_marker(name="disable_httpx"):
+            parent.add_marker(pytest.mark.disable_httpx)
 
 
 # Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be
@@ -169,6 +156,15 @@ async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
     async with make_bot(bot_info) as _bot:
         yield _bot
+
+
+@pytest.fixture(scope="session")
+def permissive_bot(bot):
+    """A bot that is always allowed to make requests. Useful for fixtures that need to make
+    requests but may be used in *WithoutReq test classes.
+    """
+    with REQUEST_PROTECTOR.allowing_requests():
+        yield bot
 
 
 @pytest.fixture()

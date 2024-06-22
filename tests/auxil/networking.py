@@ -16,9 +16,14 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
+import contextlib
+import threading
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
+import httpx
 import pytest
 from httpx import AsyncClient, AsyncHTTPTransport, Response
 
@@ -119,3 +124,46 @@ async def send_webhook_message(
         return await client.request(
             url=url, method=get_method or "POST", data=payload, headers=headers
         )
+
+
+_unblocked_request = httpx.AsyncClient.request
+
+
+class RequestProtector:
+
+    def __init__(self):
+        self._requests_allowed: bool = True
+        self._lock = contextlib.nullcontext()
+
+    @property
+    def requests_allowed(self) -> bool:
+        return self._requests_allowed
+
+    def allow_requests(self):
+        with self._lock:
+            self._requests_allowed = True
+
+    def block_requests(self):
+        with self._lock:
+            self._requests_allowed = False
+
+    @contextlib.contextmanager
+    def allowing_requests(
+        self: "RequestProtector",
+    ) -> contextlib.AbstractAsyncContextManager["RequestProtector"]:
+        with self._lock:
+            orig_status = self._requests_allowed
+            self._requests_allowed = True
+            yield self
+            self._requests_allowed = orig_status
+
+    def build_request_method(self):
+        async def request(*args, **kwargs):
+            if not self._requests_allowed:
+                raise RuntimeError("This function should not be called")
+            return await _unblocked_request(*args, **kwargs)
+
+        return request
+
+
+REQUEST_PROTECTOR = RequestProtector()

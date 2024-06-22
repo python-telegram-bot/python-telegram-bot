@@ -58,6 +58,7 @@ class TestAnimationWithoutRequest(TestAnimationBase):
             assert getattr(animation, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(animation)) == len(set(mro_slots(animation))), "duplicate slot"
 
+    @pytest.mark.disable_httpx
     def test_creation(self, animation):
         assert isinstance(animation, Animation)
         assert isinstance(animation.file_id, str)
