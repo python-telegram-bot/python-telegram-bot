@@ -131,7 +131,7 @@ class PassportFile(TelegramObject):
                 .. versionchanged:: NEXT.VERSION
                    :paramref:`bot` now is optional and defaults to :obj:`None`
 
-                .. versiondeprecated:: NEXT.VERSION
+                .. deprecated:: NEXT.VERSION
                    This argument will be converted to an optional argument in future versions.
             credentials (:class:`telegram.FileCredentials`): The credentials
 
@@ -171,7 +171,7 @@ class PassportFile(TelegramObject):
                 .. versionchanged:: NEXT.VERSION
                    :paramref:`bot` now is optional and defaults to :obj:`None`
 
-                .. versiondeprecated:: NEXT.VERSION
+                .. deprecated:: NEXT.VERSION
                    This argument will be converted to an optional argument in future versions.
             credentials (:class:`telegram.FileCredentials`): The credentials
 
