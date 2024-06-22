@@ -231,7 +231,9 @@ class ExternalReplyInfo(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ExternalReplyInfo"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ExternalReplyInfo"]:
         """See :obj:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -329,7 +331,9 @@ class TextQuote(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["TextQuote"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["TextQuote"]:
         """See :obj:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -434,7 +438,9 @@ class ReplyParameters(TelegramObject):
         self._freeze()
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ReplyParameters"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ReplyParameters"]:
         """See :obj:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

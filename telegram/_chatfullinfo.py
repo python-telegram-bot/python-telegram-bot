@@ -496,7 +496,9 @@ class ChatFullInfo(_ChatBase):
             self.business_opening_hours: Optional[BusinessOpeningHours] = business_opening_hours
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatFullInfo"]:
+    def de_json(
+        cls, data: Optional[JSONDict], bot: Optional["Bot"] = None
+    ) -> Optional["ChatFullInfo"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

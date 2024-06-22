@@ -178,7 +178,10 @@ class MaybeInaccessibleMessage(TelegramObject):
 
     @classmethod
     def _de_json(
-        cls, data: Optional[JSONDict], bot: "Bot", api_kwargs: Optional[JSONDict] = None
+        cls,
+        data: Optional[JSONDict],
+        bot: Optional["Bot"] = None,
+        api_kwargs: Optional[JSONDict] = None,
     ) -> Optional["MaybeInaccessibleMessage"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
@@ -1205,7 +1208,7 @@ class Message(MaybeInaccessibleMessage):
         return None
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Message"]:
+    def de_json(cls, data: Optional[JSONDict], bot: Optional["Bot"] = None) -> Optional["Message"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
