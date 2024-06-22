@@ -2209,6 +2209,19 @@ class TestBotWithoutRequest:
         obj = await bot.get_business_connection(business_connection_id=bci)
         assert isinstance(obj, BusinessConnection)
 
+    async def test_send_chat_action_all_args(self, bot, chat_id, monkeypatch):
+        async def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs["chat_id"] == chat_id
+                and kwargs["action"] == "action"
+                and kwargs["message_thread_id"] == 1
+                and kwargs["business_connection_id"] == 3
+            )
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+        assert await bot.send_chat_action(chat_id, "action", 1, 3)
+
     async def test_refund_star_payment(self, bot, monkeypatch):
         # can't make actual request so we just test that the correct data is passed
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
