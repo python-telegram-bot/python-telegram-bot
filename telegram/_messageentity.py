@@ -140,50 +140,55 @@ class MessageEntity(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    MENTION: Final[str] = constants.MessageEntityType.MENTION
-    """:const:`telegram.constants.MessageEntityType.MENTION`"""
-    HASHTAG: Final[str] = constants.MessageEntityType.HASHTAG
-    """:const:`telegram.constants.MessageEntityType.HASHTAG`"""
-    CASHTAG: Final[str] = constants.MessageEntityType.CASHTAG
-    """:const:`telegram.constants.MessageEntityType.CASHTAG`"""
-    PHONE_NUMBER: Final[str] = constants.MessageEntityType.PHONE_NUMBER
-    """:const:`telegram.constants.MessageEntityType.PHONE_NUMBER`"""
-    BOT_COMMAND: Final[str] = constants.MessageEntityType.BOT_COMMAND
-    """:const:`telegram.constants.MessageEntityType.BOT_COMMAND`"""
-    URL: Final[str] = constants.MessageEntityType.URL
-    """:const:`telegram.constants.MessageEntityType.URL`"""
-    EMAIL: Final[str] = constants.MessageEntityType.EMAIL
-    """:const:`telegram.constants.MessageEntityType.EMAIL`"""
+    ALL_TYPES: Final[List[str]] = list(constants.MessageEntityType)
+    """List[:obj:`str`]: A list of all available message entity types."""
+    BLOCKQUOTE: Final[str] = constants.MessageEntityType.BLOCKQUOTE
+    """:const:`telegram.constants.MessageEntityType.BLOCKQUOTE`
+
+    .. versionadded:: 20.8
+    """
     BOLD: Final[str] = constants.MessageEntityType.BOLD
     """:const:`telegram.constants.MessageEntityType.BOLD`"""
-    ITALIC: Final[str] = constants.MessageEntityType.ITALIC
-    """:const:`telegram.constants.MessageEntityType.ITALIC`"""
+    BOT_COMMAND: Final[str] = constants.MessageEntityType.BOT_COMMAND
+    """:const:`telegram.constants.MessageEntityType.BOT_COMMAND`"""
+    CASHTAG: Final[str] = constants.MessageEntityType.CASHTAG
+    """:const:`telegram.constants.MessageEntityType.CASHTAG`"""
     CODE: Final[str] = constants.MessageEntityType.CODE
     """:const:`telegram.constants.MessageEntityType.CODE`"""
+    CUSTOM_EMOJI: Final[str] = constants.MessageEntityType.CUSTOM_EMOJI
+    """:const:`telegram.constants.MessageEntityType.CUSTOM_EMOJI`
+
+    .. versionadded:: 20.0
+    """
+    EMAIL: Final[str] = constants.MessageEntityType.EMAIL
+    """:const:`telegram.constants.MessageEntityType.EMAIL`"""
+    EXPANDABLE_BLOCKQUOTE: Final[str] = constants.MessageEntityType.EXPANDABLE_BLOCKQUOTE
+    """:const:`telegram.constants.MessageEntityType.EXPANDABLE_BLOCKQUOTE`
+
+    .. versionadded:: 21.3
+    """
+    HASHTAG: Final[str] = constants.MessageEntityType.HASHTAG
+    """:const:`telegram.constants.MessageEntityType.HASHTAG`"""
+    ITALIC: Final[str] = constants.MessageEntityType.ITALIC
+    """:const:`telegram.constants.MessageEntityType.ITALIC`"""
+    MENTION: Final[str] = constants.MessageEntityType.MENTION
+    """:const:`telegram.constants.MessageEntityType.MENTION`"""
+    PHONE_NUMBER: Final[str] = constants.MessageEntityType.PHONE_NUMBER
+    """:const:`telegram.constants.MessageEntityType.PHONE_NUMBER`"""
     PRE: Final[str] = constants.MessageEntityType.PRE
     """:const:`telegram.constants.MessageEntityType.PRE`"""
+    SPOILER: Final[str] = constants.MessageEntityType.SPOILER
+    """:const:`telegram.constants.MessageEntityType.SPOILER`
+
+    .. versionadded:: 13.10
+    """
+    STRIKETHROUGH: Final[str] = constants.MessageEntityType.STRIKETHROUGH
+    """:const:`telegram.constants.MessageEntityType.STRIKETHROUGH`"""
     TEXT_LINK: Final[str] = constants.MessageEntityType.TEXT_LINK
     """:const:`telegram.constants.MessageEntityType.TEXT_LINK`"""
     TEXT_MENTION: Final[str] = constants.MessageEntityType.TEXT_MENTION
     """:const:`telegram.constants.MessageEntityType.TEXT_MENTION`"""
     UNDERLINE: Final[str] = constants.MessageEntityType.UNDERLINE
     """:const:`telegram.constants.MessageEntityType.UNDERLINE`"""
-    STRIKETHROUGH: Final[str] = constants.MessageEntityType.STRIKETHROUGH
-    """:const:`telegram.constants.MessageEntityType.STRIKETHROUGH`"""
-    SPOILER: Final[str] = constants.MessageEntityType.SPOILER
-    """:const:`telegram.constants.MessageEntityType.SPOILER`
-
-    .. versionadded:: 13.10
-    """
-    CUSTOM_EMOJI: Final[str] = constants.MessageEntityType.CUSTOM_EMOJI
-    """:const:`telegram.constants.MessageEntityType.CUSTOM_EMOJI`
-
-    .. versionadded:: 20.0
-    """
-    BLOCKQUOTE: Final[str] = constants.MessageEntityType.BLOCKQUOTE
-    """:const:`telegram.constants.MessageEntityType.BLOCKQUOTE`
-
-    .. versionadded:: 20.8
-    """
-    ALL_TYPES: Final[List[str]] = list(constants.MessageEntityType)
-    """List[:obj:`str`]: A list of all available message entity types."""
+    URL: Final[str] = constants.MessageEntityType.URL
+    """:const:`telegram.constants.MessageEntityType.URL`"""

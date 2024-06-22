@@ -342,10 +342,14 @@ class TestTelegramObject:
         chat = (await pp.get_chat_data())[1]
         assert chat.id == 1
         assert chat.type == Chat.PRIVATE
-        assert chat.api_kwargs == {
+        api_kwargs_expected = {
             "all_members_are_administrators": True,
             "something": "Manually inserted",
         }
+        # There are older attrs in Chat's api_kwargs which are present but we don't care about them
+        for k, v in api_kwargs_expected.items():
+            assert chat.api_kwargs[k] == v
+
         with pytest.raises(AttributeError):
             # removed attribute should not be available as attribute, only though api_kwargs
             chat.all_members_are_administrators

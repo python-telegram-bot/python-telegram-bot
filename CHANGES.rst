@@ -4,6 +4,40 @@
 Changelog
 =========
 
+Version 21.3
+============
+*Released 2024-06-07*
+
+This is the technical changelog for version 21.3. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support for Bot API 7.4 (:pr:`4286`, :pr:`4276` closes :issue:`4275`, :pr:`4285`, :pr:`4283`, :pr:`4280`, :pr:`4278`, :pr:`4279`)
+- Deprecate ``python-telegram-bot-raw`` (:pr:`4270`)
+- Remove Functionality Deprecated in Bot API 7.3 (:pr:`4266` closes :issue:`4244`)
+
+New Features
+------------
+
+- Add Parameter ``chat_id`` to ``ChatMemberHandler`` (:pr:`4290` by `uniquetrij <https://github.com/uniquetrij>`_ closes :issue:`4287`)
+
+Documentation Improvements
+--------------------------
+
+- Documentation Improvements (:pr:`4264` closes :issue:`4240`)
+
+Internal Changes
+----------------
+
+- Add ``setuptools`` to ``requirements-dev.txt`` (:pr:`4282`)
+- Update Settings for pre-commit.ci (:pr:`4265`)
+
+Dependency Updates
+------------------
+
+- Bump ``pytest`` from 8.2.0 to 8.2.1 (:pr:`4272`)
+
 Version 21.2
 ============
 

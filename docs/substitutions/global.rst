@@ -81,3 +81,9 @@
 .. |non_optional_story_argument| replace:: As of this version, this argument is now required. In accordance with our `stability policy <https://docs.python-telegram-bot.org/en/stable/stability_policy.html>`__, the signature will be kept as optional for now, though they are mandatory and an error will be raised if you don't pass it.
 
 .. |business_id_str| replace:: Unique identifier of the business connection on behalf of which the message will be sent.
+
+.. |message_effect_id| replace:: Unique identifier of the message effect to be added to the message; for private chats only.
+
+.. |show_cap_above_med| replace:: :obj:`True`, if the caption must be shown above the message media.
+
+.. |tg_stars| replace:: `Telegram Stars <https://t.me/BotNews/90>`__

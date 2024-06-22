@@ -242,7 +242,6 @@ __all__ = (
     "warnings",
 )
 
-
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
 from ._bot import Bot
@@ -470,8 +469,8 @@ __version_info__: _version.Version = _version.__version_info__
 #:
 #: .. versionchanged:: 20.0
 #:    This constant was previously named ``bot_api_version``.
-__bot_api_version__: str = _version.__bot_api_version__
+__bot_api_version__: str = constants.BOT_API_VERSION
 #: :class:`typing.NamedTuple`: Shortcut for :const:`telegram.constants.BOT_API_VERSION_INFO`.
 #:
 #: .. versionadded:: 20.0
-__bot_api_version_info__: constants._BotAPIVersion = _version.__bot_api_version_info__
+__bot_api_version_info__: constants._BotAPIVersion = constants.BOT_API_VERSION_INFO

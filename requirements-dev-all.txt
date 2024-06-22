@@ -1,0 +1,5 @@
+-e .[all]
+# needed for pre-commit hooks in the git commit command
+pre-commit
+-r requirements-unit-tests.txt
+-r docs/requirements-docs.txt

@@ -97,7 +97,7 @@ from tests.auxil.bot_method_checks import check_defaults_handling
 from tests.auxil.ci_bots import FALLBACKS
 from tests.auxil.envvars import GITHUB_ACTION, TEST_WITH_OPT_DEPS
 from tests.auxil.files import data_file
-from tests.auxil.networking import expect_bad_request
+from tests.auxil.networking import NonchalantHttpxRequest, expect_bad_request
 from tests.auxil.pytest_classes import PytestBot, PytestExtBot, make_bot
 from tests.auxil.slots import mro_slots
 
@@ -252,7 +252,7 @@ class TestBotWithoutRequest:
         async def stop(*args, **kwargs):
             self.test_flag.append("stop")
 
-        temp_bot = PytestBot(token=bot.token)
+        temp_bot = PytestBot(token=bot.token, request=NonchalantHttpxRequest())
         orig_stop = temp_bot.request.shutdown
 
         try:
@@ -2179,6 +2179,16 @@ class TestBotWithoutRequest:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_message(2, "text", business_connection_id=42)
 
+    async def test_message_effect_id_argument(self, bot, monkeypatch):
+        """We can't test every single method easily, so we just test one. Our linting will catch
+        any unused args with the others."""
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters.get("message_effect_id") == 42
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.send_message(2, "text", message_effect_id=42)
+
     async def test_get_business_connection(self, bot, monkeypatch):
         bci = "42"
         user = User(1, "first", False)
@@ -2211,6 +2221,17 @@ class TestBotWithoutRequest:
 
         monkeypatch.setattr(bot, "_post", make_assertion)
         assert await bot.send_chat_action(chat_id, "action", 1, 3)
+
+    async def test_refund_star_payment(self, bot, monkeypatch):
+        # can't make actual request so we just test that the correct data is passed
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return (
+                request_data.parameters.get("user_id") == 42
+                and request_data.parameters.get("telegram_payment_charge_id") == "37"
+            )
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+        assert await bot.refund_star_payment(42, "37")
 
 
 class TestBotWithRequest:
@@ -2813,9 +2834,11 @@ class TestBotWithRequest:
             caption="new_caption",
             chat_id=media_message.chat_id,
             message_id=media_message.message_id,
+            show_caption_above_media=False,
         )
 
         assert message.caption == "new_caption"
+        assert not message.show_caption_above_media
 
     async def test_edit_message_caption_entities(self, bot, media_message):
         test_string = "Italic Bold Code"
@@ -3804,6 +3827,7 @@ class TestBotWithRequest:
             parse_mode=ParseMode.HTML,
             reply_to_message_id=media_message.message_id,
             reply_markup=keyboard,
+            show_caption_above_media=False,
         )
         # we send a temp message which replies to the returned message id in order to get a
         # message object

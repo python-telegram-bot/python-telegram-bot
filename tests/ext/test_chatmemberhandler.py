@@ -144,6 +144,66 @@ class TestChatMemberHandler:
             await app.process_update(chat_member)
             assert self.test_flag == result_2
 
+    @pytest.mark.parametrize(
+        argnames=["allowed_types", "chat_id", "expected"],
+        argvalues=[
+            (ChatMemberHandler.MY_CHAT_MEMBER, None, (True, False)),
+            (ChatMemberHandler.CHAT_MEMBER, None, (False, True)),
+            (ChatMemberHandler.ANY_CHAT_MEMBER, None, (True, True)),
+            (ChatMemberHandler.MY_CHAT_MEMBER, 1, (True, False)),
+            (ChatMemberHandler.CHAT_MEMBER, 1, (False, True)),
+            (ChatMemberHandler.ANY_CHAT_MEMBER, 1, (True, True)),
+            (ChatMemberHandler.MY_CHAT_MEMBER, [1], (True, False)),
+            (ChatMemberHandler.CHAT_MEMBER, [1], (False, True)),
+            (ChatMemberHandler.ANY_CHAT_MEMBER, [1], (True, True)),
+            (ChatMemberHandler.MY_CHAT_MEMBER, 2, (False, False)),
+            (ChatMemberHandler.CHAT_MEMBER, 2, (False, False)),
+            (ChatMemberHandler.ANY_CHAT_MEMBER, 2, (False, False)),
+            (ChatMemberHandler.MY_CHAT_MEMBER, [2], (False, False)),
+            (ChatMemberHandler.CHAT_MEMBER, [2], (False, False)),
+            (ChatMemberHandler.ANY_CHAT_MEMBER, [2], (False, False)),
+        ],
+        ids=[
+            "MY_CHAT_MEMBER",
+            "CHAT_MEMBER",
+            "ANY_CHAT_MEMBER",
+            "MY_CHAT_MEMBER, CHAT=1 ",
+            "CHAT_MEMBER, CHAT=1",
+            "ANY_CHAT_MEMBER, CHAT=1",
+            "MY_CHAT_MEMBER, CHAT=[1] ",
+            "CHAT_MEMBER, CHAT=[1]",
+            "ANY_CHAT_MEMBER, CHAT=[1]",
+            "MY_CHAT_MEMBER, CHAT=2 ",
+            "CHAT_MEMBER, CHAT=2",
+            "ANY_CHAT_MEMBER, CHAT=2",
+            "MY_CHAT_MEMBER, CHAT=[2] ",
+            "CHAT_MEMBER, CHAT=[2]",
+            "ANY_CHAT_MEMBER, CHAT=[2]",
+        ],
+    )
+    async def test_chat_member_types_with_chat_id(
+        self, app, chat_member_updated, chat_member, expected, allowed_types, chat_id
+    ):
+        result_1, result_2 = expected
+
+        handler = ChatMemberHandler(
+            self.callback, chat_member_types=allowed_types, chat_id=chat_id
+        )
+        app.add_handler(handler)
+
+        async with app:
+            assert handler.check_update(chat_member) == result_1
+            await app.process_update(chat_member)
+            assert self.test_flag == result_1
+
+            self.test_flag = False
+            chat_member.my_chat_member = None
+            chat_member.chat_member = chat_member_updated
+
+            assert handler.check_update(chat_member) == result_2
+            await app.process_update(chat_member)
+            assert self.test_flag == result_2
+
     def test_other_update_types(self, false_update):
         handler = ChatMemberHandler(self.callback)
         assert not handler.check_update(false_update)

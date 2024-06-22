@@ -46,6 +46,7 @@ __all__ = (
     "CHAT",
     "COMMAND",
     "CONTACT",
+    "EFFECT_ID",
     "FORWARDED",
     "GAME",
     "GIVEAWAY",
@@ -1336,6 +1337,19 @@ class Document:
     """Use as ``filters.Document.XML``."""
     ZIP = MimeType(mimetypes.types_map[".zip"])
     """Use as ``filters.Document.ZIP``."""
+
+
+class _EffectId(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.effect_id)
+
+
+EFFECT_ID = _EffectId(name="filters.EFFECT_ID")
+"""Messages that contain :attr:`telegram.Message.effect_id`.
+
+.. versionadded:: 21.3"""
 
 
 class Entity(MessageFilter):

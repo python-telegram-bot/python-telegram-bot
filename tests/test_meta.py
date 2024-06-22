@@ -35,9 +35,4 @@ def _change_test_dir(request, monkeypatch):
 
 @skip_disabled
 def test_build():
-    assert os.system("python setup.py bdist_dumb") == 0  # pragma: no cover
-
-
-@skip_disabled
-def test_build_raw():
-    assert os.system("python setup_raw.py bdist_dumb") == 0  # pragma: no cover
+    assert os.system("python -m build") == 0  # pragma: no cover

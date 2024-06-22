@@ -45,6 +45,7 @@ def inline_query_result_gif():
         input_message_content=TestInlineQueryResultGifBase.input_message_content,
         reply_markup=TestInlineQueryResultGifBase.reply_markup,
         thumbnail_mime_type=TestInlineQueryResultGifBase.thumbnail_mime_type,
+        show_caption_above_media=TestInlineQueryResultGifBase.show_caption_above_media,
     )
 
 
@@ -63,6 +64,7 @@ class TestInlineQueryResultGifBase:
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     input_message_content = InputTextMessageContent("input_message_content")
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    show_caption_above_media = True
 
 
 class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
@@ -94,6 +96,7 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
             == self.input_message_content.to_dict()
         )
         assert inline_query_result_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_gif.show_caption_above_media == self.show_caption_above_media
 
     def test_to_dict(self, inline_query_result_gif):
         inline_query_result_gif_dict = inline_query_result_gif.to_dict()
@@ -125,6 +128,10 @@ class TestInlineQueryResultGifWithoutRequest(TestInlineQueryResultGifBase):
         assert (
             inline_query_result_gif_dict["reply_markup"]
             == inline_query_result_gif.reply_markup.to_dict()
+        )
+        assert (
+            inline_query_result_gif_dict["show_caption_above_media"]
+            == inline_query_result_gif.show_caption_above_media
         )
 
     def test_equality(self):

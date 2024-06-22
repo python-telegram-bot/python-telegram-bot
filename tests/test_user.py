@@ -439,8 +439,8 @@ class TestUserWithoutRequest(TestUserBase):
             return from_chat_id and message_id and user_id
 
         assert check_shortcut_signature(User.send_copy, Bot.copy_message, ["chat_id"], [])
-        assert await check_shortcut_call(user.copy_message, user.get_bot(), "copy_message")
-        assert await check_defaults_handling(user.copy_message, user.get_bot())
+        assert await check_shortcut_call(user.send_copy, user.get_bot(), "copy_message")
+        assert await check_defaults_handling(user.send_copy, user.get_bot())
 
         monkeypatch.setattr(user.get_bot(), "copy_message", make_assertion)
         assert await user.send_copy(from_chat_id="from_chat_id", message_id="message_id")
@@ -700,3 +700,18 @@ class TestUserWithoutRequest(TestUserBase):
 
         monkeypatch.setattr(user.get_bot(), "forward_messages", make_assertion)
         assert await user.forward_messages_to(chat_id="test_forwards", message_ids=(42, 43))
+
+    async def test_instance_method_refund_star_payment(self, monkeypatch, user):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["user_id"] == user.id and kwargs["telegram_payment_charge_id"] == 42
+
+        assert check_shortcut_signature(
+            user.refund_star_payment, Bot.refund_star_payment, ["user_id"], []
+        )
+        assert await check_shortcut_call(
+            user.refund_star_payment, user.get_bot(), "refund_star_payment"
+        )
+        assert await check_defaults_handling(user.refund_star_payment, user.get_bot())
+
+        monkeypatch.setattr(user.get_bot(), "refund_star_payment", make_assertion)
+        assert await user.refund_star_payment(telegram_payment_charge_id=42)

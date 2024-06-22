@@ -160,6 +160,9 @@ class InputMediaAnimation(InputMedia):
                 optional): |thumbdocstringnopath|
 
             .. versionadded:: 20.2
+        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+            .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATION`.
@@ -184,9 +187,19 @@ class InputMediaAnimation(InputMedia):
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. versionadded:: 20.2
+        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
+
+            .. versionadded:: 21.3
     """
 
-    __slots__ = ("duration", "has_spoiler", "height", "thumbnail", "width")
+    __slots__ = (
+        "duration",
+        "has_spoiler",
+        "height",
+        "show_caption_above_media",
+        "thumbnail",
+        "width",
+    )
 
     def __init__(
         self,
@@ -200,6 +213,7 @@ class InputMediaAnimation(InputMedia):
         filename: Optional[str] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -229,6 +243,7 @@ class InputMediaAnimation(InputMedia):
             self.height: Optional[int] = height
             self.duration: Optional[int] = duration
             self.has_spoiler: Optional[bool] = has_spoiler
+            self.show_caption_above_media: Optional[bool] = show_caption_above_media
 
 
 class InputMediaPhoto(InputMedia):
@@ -260,6 +275,9 @@ class InputMediaPhoto(InputMedia):
             with a spoiler animation.
 
             .. versionadded:: 20.0
+        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+            .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
@@ -278,9 +296,15 @@ class InputMediaPhoto(InputMedia):
             spoiler animation.
 
             .. versionadded:: 20.0
+        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
+
+            .. versionadded:: 21.3
     """
 
-    __slots__ = ("has_spoiler",)
+    __slots__ = (
+        "has_spoiler",
+        "show_caption_above_media",
+    )
 
     def __init__(
         self,
@@ -290,6 +314,7 @@ class InputMediaPhoto(InputMedia):
         caption_entities: Optional[Sequence[MessageEntity]] = None,
         filename: Optional[str] = None,
         has_spoiler: Optional[bool] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -307,6 +332,7 @@ class InputMediaPhoto(InputMedia):
 
         with self._unfrozen():
             self.has_spoiler: Optional[bool] = has_spoiler
+            self.show_caption_above_media: Optional[bool] = show_caption_above_media
 
 
 class InputMediaVideo(InputMedia):
@@ -359,6 +385,9 @@ class InputMediaVideo(InputMedia):
                 optional): |thumbdocstringnopath|
 
             .. versionadded:: 20.2
+        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+
+            .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.VIDEO`.
@@ -385,12 +414,16 @@ class InputMediaVideo(InputMedia):
         thumbnail (:class:`telegram.InputFile`): Optional. |thumbdocstringbase|
 
             .. versionadded:: 20.2
+        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
+
+            .. versionadded:: 21.3
     """
 
     __slots__ = (
         "duration",
         "has_spoiler",
         "height",
+        "show_caption_above_media",
         "supports_streaming",
         "thumbnail",
         "width",
@@ -409,6 +442,7 @@ class InputMediaVideo(InputMedia):
         filename: Optional[str] = None,
         has_spoiler: Optional[bool] = None,
         thumbnail: Optional[FileInput] = None,
+        show_caption_above_media: Optional[bool] = None,
         *,
         api_kwargs: Optional[JSONDict] = None,
     ):
@@ -439,6 +473,7 @@ class InputMediaVideo(InputMedia):
             )
             self.supports_streaming: Optional[bool] = supports_streaming
             self.has_spoiler: Optional[bool] = has_spoiler
+            self.show_caption_above_media: Optional[bool] = show_caption_above_media
 
 
 class InputMediaAudio(InputMedia):
