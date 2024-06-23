@@ -64,6 +64,9 @@ from tests.auxil.files import PROJECT_ROOT_PATH
 from tests.auxil.pytest_classes import PytestBot, make_bot
 from tests.auxil.slots import mro_slots
 
+from telegram.ext import ConversationHandler
+from telegram.ext._handlers.conversationhandler import PendingState, CoverageTest
+
 
 @pytest.fixture(scope="class")
 def user1():
@@ -84,6 +87,13 @@ def raise_ahs(func):
         return result
 
     return decorator
+
+class TestPendingState:
+    def test_pending_state_not_done(self):
+        task = CoverageTest(done=False)
+        pending_state = PendingState(task, old_state=object())
+        with pytest.raises(RuntimeError):
+            pending_state.resolve()
 
 
 class TestConversationHandler:

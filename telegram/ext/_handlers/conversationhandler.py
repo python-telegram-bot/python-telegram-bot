@@ -73,6 +73,13 @@ class _ConversationTimeoutContext(Generic[CCT]):
     application: "Application[Any, CCT, Any, Any, Any, JobQueue]"
     callback_context: CCT
 
+branch_coverage = {
+    "101": False,  
+    "102": False,   
+    "103": False, 
+    "104": False
+}
+
 
 @dataclass
 class PendingState:
@@ -99,10 +106,12 @@ class PendingState:
             :exc:`RuntimeError`: If the current task has not yet finished.
         """
         if not self.task.done():
+            branch_coverage["101"] = True
             raise RuntimeError("New state is not yet available")
 
         exc = self.task.exception()
         if exc:
+            branch_coverage["102"] = True
             _LOGGER.exception(
                 "Task function raised exception. Falling back to old state %s",
                 self.old_state,
@@ -111,12 +120,76 @@ class PendingState:
 
         res = self.task.result()
         if res is None and self.old_state is None:
+            branch_coverage["103"] = True
             res = ConversationHandler.END
         elif res is None:
+            branch_coverage["104"] = True
             # returning None from a callback means that we want to stay in the old state
             return self.old_state
 
         return res
+    
+    def print_coverage():
+        for branch, hit in branch_coverage.items():
+            print(f"{branch} was {'hit' if hit else 'not hit'}")
+
+
+
+
+
+class ConversationHandler:
+    END = "end"
+
+class CoverageTest:
+    def __init__(self, done=False, exception=None, result=None):
+        self._done = done
+        self._exception = exception
+        self._result = result
+
+    def done(self):
+        return self._done
+
+    def exception(self):
+        return self._exception
+
+    def result(self):
+        return self._result
+
+"""
+
+# case 1: self.task.done is false [101]
+task = CoverageTest(done=False)
+pending_state = PendingState(task, old_state=object())
+try:
+    pending_state.resolve()
+except RuntimeError:
+    pass
+
+
+# case 2: exc is true [102]
+task = CoverageTest(done=True, exception=True)
+pending_state = PendingState(task, old_state=object())
+pending_state.resolve()
+
+
+# case 3: res and self.old_state are None [103]
+task = CoverageTest(done=True, result=None)
+pending_state = PendingState(task, old_state=None)
+pending_state.resolve()
+
+
+# case 4: just res is None [104]
+task = CoverageTest(done=True, result=None)
+pending_state = PendingState(task, old_state=object())
+pending_state.resolve()
+
+print("Branch coverage:")
+PendingState.print_coverage() """
+
+
+
+
+
 
 
 class ConversationHandler(BaseHandler[Update, CCT]):
