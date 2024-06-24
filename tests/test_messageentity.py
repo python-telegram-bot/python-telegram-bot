@@ -96,3 +96,17 @@ class TestMessageEntityWithoutRequest(TestMessageEntityBase):
 
         assert a != d
         assert hash(a) != hash(d)
+
+    def test_fix_utf16(self):
+        text = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
+        unicode_entities = [
+            MessageEntity(offset=2, length=4, type=MessageEntity.BOLD),
+            MessageEntity(offset=9, length=6, type=MessageEntity.ITALIC),
+            MessageEntity(offset=28, length=3, type=MessageEntity.UNDERLINE),
+        ]
+        utf_16_entities = MessageEntity.adjust_message_entities_for_utf_16(text, unicode_entities)
+        offsets_lengths = [(3, 4), (11, 6), (30, 6)]
+        for entity, offset_length in zip(utf_16_entities, offsets_lengths):
+            offset, length = offset_length
+            assert entity.offset == offset
+            assert entity.length == length
