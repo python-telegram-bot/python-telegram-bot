@@ -104,7 +104,7 @@ class TestMessageEntityWithoutRequest(TestMessageEntityBase):
             MessageEntity(offset=9, length=6, type=MessageEntity.ITALIC),
             MessageEntity(offset=28, length=3, type=MessageEntity.UNDERLINE),
         ]
-        utf_16_entities = MessageEntity.adjust_message_entities_for_utf_16(text, unicode_entities)
+        utf_16_entities = MessageEntity.adjust_message_entities_to_utf_16(text, unicode_entities)
         offsets_lengths = [(3, 4), (11, 6), (30, 6)]
         for entity, offset_length in zip(utf_16_entities, offsets_lengths):
             offset, length = offset_length

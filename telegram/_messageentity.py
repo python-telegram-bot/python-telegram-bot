@@ -156,33 +156,35 @@ class MessageEntity(TelegramObject):
         Below is a snippet of code that demonstrates how to use this function to convert
         entities from Unicode to UTF-16 space. The `unicode_entities` are calculated in
         Unicode and the `utf_16_entities` are calculated in UTF-16.
-            ```python
-            text = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
-            #         ^^^^   ^^^^^^             ^^^
-            unicode_entities = [
-                MessageEntity(offset=2, length=4, type=MessageEntity.BOLD),
-                MessageEntity(offset=9, length=6, type=MessageEntity.ITALIC),
-                MessageEntity(offset=28, length=3, type=MessageEntity.UNDERLINE),
-            ]
-            utf_16_entities = MessageEntity.adjust_message_entities_for_utf_16(
-                text, unicode_entities
-            )
-            await bot.send_message(
-                chat_id=123,
-                text=text,
-                entities=utf_16_entities,
-            )
-            # utf_16_entities[0]: offset=3, length=4
-            # utf_16_entities[1]: offset=11, length=6
-            # utf_16_entities[2]: offset=30, length=6
-            ```
+
+        ```python
+        text = "𠌕 bold 𝄢 italic underlined: 𝛙𝌢𑁍"
+        #         ^^^^   ^^^^^^             ^^^
+        unicode_entities = [
+            MessageEntity(offset=2, length=4, type=MessageEntity.BOLD),
+            MessageEntity(offset=9, length=6, type=MessageEntity.ITALIC),
+            MessageEntity(offset=28, length=3, type=MessageEntity.UNDERLINE),
+        ]
+        utf_16_entities = MessageEntity.adjust_message_entities_to_utf_16(
+            text, unicode_entities
+        )
+        await bot.send_message(
+            chat_id=123,
+            text=text,
+            entities=utf_16_entities,
+        )
+        # utf_16_entities[0]: offset=3, length=4
+        # utf_16_entities[1]: offset=11, length=6
+        # utf_16_entities[2]: offset=30, length=6
+        ```
 
         Args:
-            text: The text that the entities belong to
-            entities: Sequence of entities with offset and length calculated in Unicode
+            text (:obj:`str`): The text that the entities belong to
+            entities (List[:class:`telegram.MessageEntity`]): Sequence of entities
+                with offset and length calculated in Unicode
 
         Returns:
-            Sequence[MessageEntity]: Sequence of entities with offset and length
+            List[:class:`telegram.MessageEntity`]: Sequence of entities with offset and length
                 calculated in UTF-16 encoding
         """
         offsets_set = set()
