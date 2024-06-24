@@ -129,9 +129,9 @@ class PendingState:
 
         return res
     
-    def print_coverage():
+    """ def print_coverage():
         for branch, hit in branch_coverage.items():
-            print(f"{branch} was {'hit' if hit else 'not hit'}")
+            print(f"{branch} was {'hit' if hit else 'not hit'}") """
 
 
 
@@ -153,10 +153,9 @@ class CoverageTest:
         return self._exception
 
     def result(self):
-        return self._result
-
+        return self._result  
+    
 """
-
 # case 1: self.task.done is false [101]
 task = CoverageTest(done=False)
 pending_state = PendingState(task, old_state=object())

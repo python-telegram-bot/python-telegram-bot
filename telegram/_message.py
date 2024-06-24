@@ -110,6 +110,17 @@ if TYPE_CHECKING:
     )
 
 
+
+branch_coverage = {
+    "201": False,
+    "202": False,
+    "202.1": False,
+    "203": False,
+    "203.1": False,
+    "203.2": False,
+}
+
+
 class _ReplyKwargs(TypedDict):
     __slots__ = ("chat_id", "reply_parameters")  # type: ignore[misc]
 
@@ -1401,23 +1412,56 @@ class Message(MaybeInaccessibleMessage):
     ) -> Optional[ReplyParameters]:
         """Modify kwargs for replying with or without quoting."""
         if reply_to_message_id is not None:
+            branch_coverage["201"] = True
             return ReplyParameters(reply_to_message_id)
 
         if quote is not None:
+            branch_coverage["202"] = True
             if quote:
+                branch_coverage["202.1"] = True
                 return ReplyParameters(self.message_id)
 
         else:
+            branch_coverage["203"] = True
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
             # logic into ExtBot
             if hasattr(self.get_bot(), "defaults") and self.get_bot().defaults:  # type: ignore
                 default_quote = self.get_bot().defaults.quote  # type: ignore[attr-defined]
             else:
+                branch_coverage["203.1"] = True
                 default_quote = None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
+                branch_coverage["203.2"] = True
                 return ReplyParameters(self.message_id)
 
         return None
+
+# shift tab before running
+
+    """ # Case 1: reply_to_message_id is not none [201]
+    message = {"message_id": 123, "chat_type": Chat.PRIVATE}
+    result = Message._quote(message, quote=None, reply_to_message_id=456)
+
+    # Case 2: quote is not none and false [202]
+    message = {"message_id": 123, "chat_type": Chat.PRIVATE}
+    result = Message._quote(message, quote=False, reply_to_message_id=None)
+
+    # Case 3: quote is not none and true [202.1]
+    message = Message(message_id=123, date=datetime.datetime(2024, 6, 22), chat=Chat.PRIVATE)
+    result = message._quote(quote=True, reply_to_message_id=None) """
+
+    """ # Case 5: quote and reply_to_message_id is none [203] [203.1]
+    bot_instance = Bot("1234")
+    message_instance = Message(message_id=123, date=datetime.datetime(2024, 6, 22), chat= Chat.PRIVATE)
+    message_instance.set_bot(bot_instance)
+
+    # Case 6: chat.type = group [203.2]
+    message_instance.chat.type = Chat.GROUP
+    result = message_instance._quote(quote=None, reply_to_message_id=None)
+
+    print("Branch coverage:")
+    for branch, hit in branch_coverage.items():
+    print(f"{branch} was {'hit' if hit else 'not hit'}") """
 
     def compute_quote_position_and_entities(
         self, quote: str, index: Optional[int] = None
