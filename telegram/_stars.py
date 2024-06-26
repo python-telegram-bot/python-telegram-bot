@@ -20,11 +20,13 @@
 """This module contains the classes for Telegram Stars transactions."""
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Type
+from typing import TYPE_CHECKING, Dict, Final, Optional, Sequence, Tuple, Type
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils import enum
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -63,7 +65,7 @@ class RevenueWithdrawalState(TelegramObject):
 
     def __init__(self, type: str, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.type: str = type
+        self.type: str = enum.get_member(constants.RevenueWithdrawalStateType, type, type)
 
         self._id_attrs = (self.type,)
         self._freeze()
@@ -101,10 +103,14 @@ class RevenueWithdrawalStatePending(RevenueWithdrawalState):
 
     def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(type=RevenueWithdrawalState.PENDING, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
     """The withdrawal succeeded.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`date` are equal.
 
     .. versionadded:: NEXT.VERSION
 
@@ -133,6 +139,10 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
         with self._unfrozen():
             self.date: datetime = date
             self.url: str = url
+            self._id_attrs = (
+                self.type,
+                self.date,
+            )
 
     @classmethod
     def de_json(
@@ -143,10 +153,9 @@ class RevenueWithdrawalStateSucceeded(RevenueWithdrawalState):
         if not data:
             return None
 
-        if "date" in data:
-            # Get the local timezone from the bot if it has defaults
-            loc_tzinfo = extract_tzinfo_from_defaults(bot)
-            data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+        data["date"] = from_timestamp(data.get("date", None), tzinfo=loc_tzinfo)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
@@ -165,6 +174,7 @@ class RevenueWithdrawalStateFailed(RevenueWithdrawalState):
 
     def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(type=RevenueWithdrawalState.FAILED, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class TransactionPartner(TelegramObject):
@@ -198,17 +208,27 @@ class TransactionPartner(TelegramObject):
 
     def __init__(self, type: str, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.type: str = type
+        self.type: str = enum.get_member(constants.TransactionPartnerType, type, type)
 
         self._id_attrs = (self.type,)
         self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["TransactionPartner"]:
-        print(data)
+        """Converts JSON data to the appropriate :class:`TransactionPartner` object, i.e. takes
+        care of selecting the correct subclass.
+
+        Args:
+            data (Dict[:obj:`str`, ...]): The JSON data.
+            bot (:class:`telegram.Bot`): The bot associated with this object.
+
+        Returns:
+            The Telegram object.
+
+        """
         data = cls._parse_data(data)
 
-        if not data:
+        if not data and cls is TransactionPartner:
             return None
 
         _class_mapping: Dict[str, Type[TransactionPartner]] = {
@@ -218,7 +238,7 @@ class TransactionPartner(TelegramObject):
         }
 
         if cls is TransactionPartner and data.get("type") in _class_mapping:
-            return _class_mapping[data.get("type")].de_json(data=data, bot=bot)
+            return _class_mapping[data.pop("type")].de_json(data=data, bot=bot)
 
         return super().de_json(data=data, bot=bot)
 
@@ -271,6 +291,9 @@ class TransactionPartnerFragment(TransactionPartner):
 class TransactionPartnerUser(TransactionPartner):
     """Describes a transaction with a user.
 
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`user` are equal.
+
     .. versionadded:: NEXT.VERSION
 
     Args:
@@ -289,6 +312,10 @@ class TransactionPartnerUser(TransactionPartner):
 
         with self._unfrozen():
             self.user: User = user
+            self._id_attrs = (
+                self.type,
+                self.user,
+            )
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["TransactionPartnerUser"]:
@@ -316,13 +343,14 @@ class TransactionPartnerOther(TransactionPartner):
 
     def __init__(self, *, api_kwargs: Optional[JSONDict] = None) -> None:
         super().__init__(type=TransactionPartner.OTHER, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class StarTransaction(TelegramObject):
     """Describes a Telegram Star transaction.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`id`, :attr:`amount`, and :attr:`date` are equal.
+    considered equal, if their :attr:`id`, :attr:`source`, and :attr:`receiver` are equal.
 
     .. versionadded:: NEXT.VERSION
 
@@ -376,9 +404,10 @@ class StarTransaction(TelegramObject):
 
         self._id_attrs = (
             self.id,
-            self.amount,
-            self.date,
+            self.source,
+            self.receiver,
         )
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StarTransaction"]:
@@ -387,12 +416,12 @@ class StarTransaction(TelegramObject):
         if not data:
             return None
 
-        if "date" in data:
-            # Get the local timezone from the bot if it has defaults
-            loc_tzinfo = extract_tzinfo_from_defaults(bot)
-            data["date"] = from_timestamp(data["date"], tzinfo=loc_tzinfo)
+        # Get the local timezone from the bot if it has defaults
+        loc_tzinfo = extract_tzinfo_from_defaults(bot)
+        data["date"] = from_timestamp(data.get("date", None), tzinfo=loc_tzinfo)
 
         data["source"] = TransactionPartner.de_json(data.get("source"), bot)
+        print(data.get("receiver"))
         data["receiver"] = TransactionPartner.de_json(data.get("receiver"), bot)
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
@@ -403,7 +432,7 @@ class StarTransactions(TelegramObject):
     Contains a list of Telegram Star transactions.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`transactions` is equal.
+    considered equal, if their :attr:`transactions` are equal.
 
     .. versionadded:: NEXT.VERSION
 
@@ -411,7 +440,7 @@ class StarTransactions(TelegramObject):
         transactions (Sequence[:class:`telegram.StarTransaction`]): The list of transactions.
 
     Attributes:
-        transactions (Sequence[:class:`telegram.StarTransaction`]): The list of transactions.
+        transactions (Tuple[:class:`telegram.StarTransaction`]): The list of transactions.
     """
 
     __slots__ = ("transactions",)
@@ -420,7 +449,17 @@ class StarTransactions(TelegramObject):
         self, transactions: Sequence[StarTransaction], *, api_kwargs: Optional[JSONDict] = None
     ):
         super().__init__(api_kwargs=api_kwargs)
-        self.transactions: Sequence[StarTransaction] = transactions
+        self.transactions: Tuple[StarTransaction, ...] = parse_sequence_arg(transactions)
 
         self._id_attrs = (self.transactions,)
         self._freeze()
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StarTransactions"]:
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data["transactions"] = StarTransaction.de_list(data.get("transactions"), bot)
+        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]

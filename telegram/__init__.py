@@ -252,19 +252,6 @@ __all__ = (
     "warnings",
 )
 
-from telegram._stars import (
-    RevenueWithdrawalState,
-    RevenueWithdrawalStateFailed,
-    RevenueWithdrawalStatePending,
-    RevenueWithdrawalStateSucceeded,
-    StarTransaction,
-    StarTransactions,
-    TransactionPartner,
-    TransactionPartnerFragment,
-    TransactionPartnerOther,
-    TransactionPartnerUser,
-)
-
 from . import _version, constants, error, helpers, request, warnings
 from ._birthdate import Birthdate
 from ._bot import Bot
@@ -458,6 +445,18 @@ from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._sentwebappmessage import SentWebAppMessage
 from ._shared import ChatShared, SharedUser, UsersShared
+from ._stars import (
+    RevenueWithdrawalState,
+    RevenueWithdrawalStateFailed,
+    RevenueWithdrawalStatePending,
+    RevenueWithdrawalStateSucceeded,
+    StarTransaction,
+    StarTransactions,
+    TransactionPartner,
+    TransactionPartnerFragment,
+    TransactionPartnerOther,
+    TransactionPartnerUser,
+)
 from ._story import Story
 from ._switchinlinequerychosenchat import SwitchInlineQueryChosenChat
 from ._telegramobject import TelegramObject

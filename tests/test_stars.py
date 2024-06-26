@@ -18,27 +18,31 @@
 # along with this program. If not, see [http://www.gnu.org/licenses/].
 
 import datetime
+from copy import deepcopy
 
 import pytest
 
 from telegram import (
+    Dice,
     RevenueWithdrawalStateFailed,
     RevenueWithdrawalStatePending,
     RevenueWithdrawalStateSucceeded,
     StarTransaction,
+    StarTransactions,
+    TransactionPartner,
     TransactionPartnerFragment,
     TransactionPartnerOther,
     TransactionPartnerUser,
     User,
 )
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
+from telegram.constants import TransactionPartnerType
 from tests.auxil.slots import mro_slots
 
 
-@pytest.fixture()
 def withdrawal_state_succeeded():
     return RevenueWithdrawalStateSucceeded(
-        date=to_timestamp(datetime.datetime.utcnow()),
+        date=datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC),
         url="url",
     )
 
@@ -53,7 +57,6 @@ def withdrawal_state_pending():
     return RevenueWithdrawalStatePending()
 
 
-@pytest.fixture()
 def transaction_partner_user():
     return TransactionPartnerUser(
         user=User(id=1, is_bot=False, first_name="first_name", username="username"),
@@ -65,28 +68,95 @@ def transaction_partner_other():
     return TransactionPartnerOther()
 
 
-@pytest.fixture()
-def transaction_partner_fragment(withdrawal_state_succeeded):
+def transaction_partner_fragment():
     return TransactionPartnerFragment(
-        withdrawal_state=withdrawal_state_succeeded,
+        withdrawal_state=withdrawal_state_succeeded(),
+    )
+
+
+def star_transaction():
+    return StarTransaction(
+        id="1",
+        amount=1,
+        date=to_timestamp(datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)),
+        source=transaction_partner_user(),
+        receiver=transaction_partner_fragment(),
     )
 
 
 @pytest.fixture()
-def star_transaction(transaction_partner_user, transaction_partner_fragment):
-    return StarTransaction(
-        id="1",
-        amount=1,
-        date=to_timestamp(datetime.datetime.utcnow()),
-        source=transaction_partner_user,
-        receiver=transaction_partner_fragment,
+def star_transactions():
+    return StarTransactions(
+        transactions=[
+            star_transaction(),
+            star_transaction(),
+        ]
+    )
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        TransactionPartner.FRAGMENT,
+        TransactionPartner.OTHER,
+        TransactionPartner.USER,
+    ],
+)
+def tp_scope_type(request):
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        TransactionPartnerFragment,
+        TransactionPartnerOther,
+        TransactionPartnerUser,
+    ],
+    ids=[
+        TransactionPartner.FRAGMENT,
+        TransactionPartner.OTHER,
+        TransactionPartner.USER,
+    ],
+)
+def tp_scope_class(request):
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        (TransactionPartnerFragment, TransactionPartner.FRAGMENT),
+        (TransactionPartnerOther, TransactionPartner.OTHER),
+        (TransactionPartnerUser, TransactionPartner.USER),
+    ],
+    ids=[
+        TransactionPartner.FRAGMENT,
+        TransactionPartner.OTHER,
+        TransactionPartner.USER,
+    ],
+)
+def tp_scope_class_and_type(request):
+    return request.param
+
+
+@pytest.fixture(scope="module")
+def transaction_partner(tp_scope_class_and_type):
+    # We use de_json here so that we don't have to worry about which class gets which arguments
+    return tp_scope_class_and_type[0].de_json(
+        {
+            "type": tp_scope_class_and_type[1],
+            "withdrawal_state": TestTransactionPartnerBase.withdrawal_state.to_dict(),
+            "user": TestTransactionPartnerBase.user.to_dict(),
+        },
+        bot=None,
     )
 
 
 class TestStarTransactionBase:
     id = "2"
     amount = 2
-    date = to_timestamp(datetime.datetime.utcnow())
+    date = to_timestamp(datetime.datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC))
     source = TransactionPartnerUser(
         user=User(
             id=2,
@@ -98,8 +168,8 @@ class TestStarTransactionBase:
 
 
 class TestStarTransactionWithoutRequest(TestStarTransactionBase):
-    def test_slot_behaviour(self, star_transaction):
-        inst = star_transaction
+    def test_slot_behaviour(self):
+        inst = star_transaction()
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -119,8 +189,8 @@ class TestStarTransactionWithoutRequest(TestStarTransactionBase):
         assert st.source == self.source
         assert st.receiver == self.receiver
 
-    def test_de_json_star_transaction_localization(self, star_transaction, tz_bot, bot, raw_bot):
-        json_dict = star_transaction.to_dict()
+    def test_de_json_star_transaction_localization(self, tz_bot, bot, raw_bot):
+        json_dict = star_transaction().to_dict()
         st_raw = StarTransaction.de_json(json_dict, raw_bot)
         st_bot = StarTransaction.de_json(json_dict, bot)
         st_tz = StarTransaction.de_json(json_dict, tz_bot)
@@ -133,15 +203,16 @@ class TestStarTransactionWithoutRequest(TestStarTransactionBase):
         assert st_bot.date.tzinfo == UTC
         assert st_offset == tz_bot_offset
 
-    def test_to_dict(self, star_transaction):
+    def test_to_dict(self):
+        st = star_transaction()
         expected_dict = {
             "id": "1",
             "amount": 1,
-            "date": star_transaction.date,
-            "source": star_transaction.source.to_dict(),
-            "receiver": star_transaction.receiver.to_dict(),
+            "date": st.date,
+            "source": st.source.to_dict(),
+            "receiver": st.receiver.to_dict(),
         }
-        assert star_transaction.to_dict() == expected_dict
+        assert st.to_dict() == expected_dict
 
     def test_equality(self):
         a = StarTransaction(
@@ -154,7 +225,7 @@ class TestStarTransactionWithoutRequest(TestStarTransactionBase):
         b = StarTransaction(
             id=self.id,
             amount=self.amount,
-            date=self.date,
+            date=None,
             source=self.source,
             receiver=self.receiver,
         )
@@ -177,3 +248,161 @@ class TestStarTransactionWithoutRequest(TestStarTransactionBase):
 
         assert a != c
         assert hash(a) != hash(c)
+
+
+class TestStarTransactionsBase:
+    transactions = [star_transaction(), star_transaction()]
+
+
+class TestStarTransactionsWithoutRequest(TestStarTransactionsBase):
+    def test_slot_behaviour(self, star_transactions):
+        inst = star_transactions
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, bot):
+        json_dict = {
+            "transactions": [t.to_dict() for t in self.transactions],
+        }
+        st = StarTransactions.de_json(json_dict, bot)
+        assert st.transactions == tuple(self.transactions)
+
+    def test_to_dict(self, star_transactions):
+        expected_dict = {
+            "transactions": [t.to_dict() for t in self.transactions],
+        }
+        assert star_transactions.to_dict() == expected_dict
+
+    def test_equality(self):
+        a = StarTransactions(
+            transactions=self.transactions,
+        )
+        b = StarTransactions(
+            transactions=self.transactions,
+        )
+        c = StarTransactions(
+            transactions=[star_transaction()],
+        )
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+
+class TestTransactionPartnerBase:
+    withdrawal_state = withdrawal_state_succeeded()
+    user = transaction_partner_user().user
+
+
+class TestTransactionPartner(TestTransactionPartnerBase):
+    def test_slot_behaviour(self, transaction_partner):
+        inst = transaction_partner
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, bot, tp_scope_class_and_type):
+        cls = tp_scope_class_and_type[0]
+        type_ = tp_scope_class_and_type[1]
+
+        json_dict = {
+            "type": type_,
+            "withdrawal_state": self.withdrawal_state.to_dict(),
+            "user": self.user.to_dict(),
+        }
+        tp = TransactionPartner.de_json(json_dict, bot)
+        assert set(tp.api_kwargs.keys()) == {"user", "withdrawal_state"} - set(cls.__slots__)
+
+        assert isinstance(tp, TransactionPartner)
+        assert type(tp) is cls
+        assert tp.type == type_
+        if "withdrawal_state" in cls.__slots__:
+            assert tp.withdrawal_state == self.withdrawal_state
+        if "user" in cls.__slots__:
+            assert tp.user == self.user
+
+        assert cls.de_json(None, bot) is None
+        assert TransactionPartner.de_json({}, bot) is None
+
+    def test_de_json_invalid_type(self, bot):
+        json_dict = {
+            "type": "invalid",
+            "withdrawal_state": self.withdrawal_state.to_dict(),
+            "user": self.user.to_dict(),
+        }
+        tp = TransactionPartner.de_json(json_dict, bot)
+        assert tp.api_kwargs == {
+            "withdrawal_state": self.withdrawal_state.to_dict(),
+            "user": self.user.to_dict(),
+        }
+
+        assert type(tp) is TransactionPartner
+        assert tp.type == "invalid"
+
+    def test_de_json_subclass(self, tp_scope_class, bot):
+        """This makes sure that e.g. TransactionPartnerUser(data) never returns a
+        TransactionPartnerFragment instance."""
+        json_dict = {
+            "type": "invalid",
+            "withdrawal_state": self.withdrawal_state.to_dict(),
+            "user": self.user.to_dict(),
+        }
+        assert type(tp_scope_class.de_json(json_dict, bot)) is tp_scope_class
+
+    def test_to_dict(self, transaction_partner):
+        tp_dict = transaction_partner.to_dict()
+
+        assert isinstance(tp_dict, dict)
+        assert tp_dict["type"] == transaction_partner.type
+        if hasattr(transaction_partner, "web_app"):
+            assert tp_dict["user"] == transaction_partner.user.to_dict()
+        if hasattr(transaction_partner, "withdrawal_state"):
+            assert tp_dict["withdrawal_state"] == transaction_partner.withdrawal_state.to_dict()
+
+    def test_type_enum_conversion(self):
+        assert type(TransactionPartner("other").type) is TransactionPartnerType
+        assert TransactionPartner("unknown").type == "unknown"
+
+    def test_equality(self, transaction_partner, bot):
+        a = TransactionPartner("base_type")
+        b = TransactionPartner("base_type")
+        c = transaction_partner
+        d = deepcopy(transaction_partner)
+        e = Dice(4, "emoji")
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+        assert c == d
+        assert hash(c) == hash(d)
+
+        assert c != e
+        assert hash(c) != hash(e)
+
+        if hasattr(c, "user"):
+            json_dict = c.to_dict()
+            json_dict["user"] = User(1, "something", True).to_dict()
+            f = c.__class__.de_json(json_dict, bot)
+
+            assert c != f
+            assert hash(c) != hash(f)
+
+        if hasattr(c, "withdrawal_state"):
+            json_dict = c.to_dict()
+            json_dict["withdrawal_state"] = withdrawal_state_succeeded().to_dict()
+            g = c.__class__.de_json(json_dict, bot)
+
+            assert c != g
+            assert hash(c) != hash(g)
